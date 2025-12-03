@@ -1,8 +1,10 @@
 import { CombinedGraphQLErrors, gql } from "@apollo/client";
 import { useApolloClient, useMutation } from "@apollo/client/react";
-import { Box, Stack, Text } from "@chakra-ui/react";
+import { Box, HStack, Stack, Text } from "@chakra-ui/react";
 import { AlertCircleIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
 import { Link } from "@parallel/components/common/Link";
+import { OverflownText } from "@parallel/components/common/OverflownText";
+import { PetitionFieldReference } from "@parallel/components/common/PetitionFieldReference";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { SupportButton } from "@parallel/components/common/SupportButton";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
@@ -19,6 +21,7 @@ import {
   withPetitionLayoutContext,
 } from "@parallel/components/layout/PetitionLayout";
 import { AddPetitionAccessDialog } from "@parallel/components/petition-activity/dialogs/AddPetitionAccessDialog";
+import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import { PetitionComposeAlertsContainer } from "@parallel/components/petition-common/alerts/PetitionComposeAlertsContainer";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
 import { AddNewFieldPlaceholderProvider } from "@parallel/components/petition-compose/AddNewFieldPlaceholderProvider";
@@ -89,7 +92,6 @@ import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
 import { useAsyncEffect } from "@parallel/utils/useAsyncEffect";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
-
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
@@ -503,6 +505,51 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             id="page.petition-compose.field-referenced-in-petition-attachments-visibility"
             defaultMessage="This field is referenced in the visibility conditions of a document attachment. To continue, first remove the referencing conditions."
           />
+        ),
+      });
+    } else if (isApolloError(error, "FIELD_IS_REFERENCED_IN_UPDATE_PROFILE_ON_CLOSE_CONFIG")) {
+      const { allFieldsWithIndices } = fieldsRef.current;
+
+      const fieldGroups = allFieldsWithIndices.filter(([f]) =>
+        (
+          (error as CombinedGraphQLErrors).errors[0].extensions?.fieldGroupsIds as string[]
+        )?.includes(f.id),
+      );
+
+      await showErrorDialog.ignoringDialogErrors({
+        message: (
+          <Stack>
+            <Text>
+              <FormattedMessage
+                id="page.petition-compose.field-referenced-in-update-profile-on-close-message"
+                defaultMessage="This field updates a profile on close and cannot be removed."
+              />
+            </Text>
+            <Text>
+              <FormattedMessage
+                id="page.petition-compose.variable-referenced-in-update-profile-on-close-message"
+                defaultMessage="Update the configuration of the following { fieldsCount, plural, =1 {field} other {fields}} and try again."
+                values={{
+                  fieldsCount: fieldGroups.length,
+                }}
+              />
+            </Text>
+            <Stack spacing={1} paddingTop={2} paddingX={1}>
+              {fieldGroups.map(([f, fieldIndex]) => (
+                <HStack key={f.id} alignItems="flex-start">
+                  <PetitionFieldTypeIndicator
+                    as="span"
+                    type={f.type}
+                    fieldIndex={fieldIndex}
+                    marginTop={1}
+                  />
+                  <OverflownText flex="1">
+                    <PetitionFieldReference field={f} fontWeight="normal" />
+                  </OverflownText>
+                </HStack>
+              ))}
+            </Stack>
+          </Stack>
         ),
       });
     }
@@ -1512,7 +1559,9 @@ const _fragments = {
             id
           }
         }
+        ...PetitionFieldReference_PetitionField
       }
+      ${PetitionFieldReference.fragments.PetitionField}
       ${PetitionComposeFieldList.fragments.PetitionField}
       ${PetitionComposeFieldSettings.fragments.PetitionField}
       ${validatePetitionFields.fragments.PetitionField}

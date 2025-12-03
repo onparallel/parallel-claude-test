@@ -571,7 +571,7 @@ export class ProfileRepository extends BaseRepository {
           pff.profile_type_field_id = dptf.id
           and pff.deleted_at is null
       ),
-      updated_petition_fields as (
+      unlinked_petition_fields as (
         update petition_field pf set
           profile_type_field_id = null,
           updated_at = NOW(),
@@ -581,6 +581,32 @@ export class ProfileRepository extends BaseRepository {
           pf.profile_type_field_id is not null
           and pf.profile_type_field_id = dptf.id
           and pf.deleted_at is null
+      ),
+      updated_petition_field_options as (
+        update petition_field pf set
+          options = jsonb_set(
+            options,
+            '{updateProfileOnClose}',
+            coalesce(
+              (
+                select jsonb_agg(element)
+                from jsonb_array_elements(options->'updateProfileOnClose') as element
+                where (element->>'profileTypeFieldId')::int not in (select id from deleted_profile_type_fields)
+              ),
+              'null'::jsonb
+            )
+          ),
+          updated_at = NOW(),
+          updated_by = :deletedBy
+        where 
+          pf.profile_type_id = :profileTypeId
+          and pf.deleted_at is null
+          and pf.options->>'updateProfileOnClose' is not null
+          and exists (
+            select 1
+            from jsonb_array_elements(pf.options->'updateProfileOnClose') as element
+            where (element->>'profileTypeFieldId')::int in (select id from deleted_profile_type_fields)
+          )
       ),
       deleted_profile_subscriptions as (
         update event_subscription es set

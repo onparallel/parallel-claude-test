@@ -402,7 +402,7 @@ const ProfileFieldBackgroundCheckValue = chakraForwardRef<"div", ProfileProperty
                 {content.entity.name}
               </OverflownText>
               {topics.length > 3 ? (
-                <HStack spacing={1}>
+                <HStack spacing={1} marginStart={1}>
                   <EnumerateList
                     values={topics as string[]}
                     maxItems={1}

@@ -22,6 +22,7 @@ export function ProfileFormFieldNumber({
   showSuggestionsButton,
   areSuggestionsVisible,
   onToggleSuggestions,
+  showBaseStyles,
 }: ProfileFormFieldNumberProps) {
   const { control } = useFormContext<ProfileFormData>();
   return (
@@ -40,7 +41,7 @@ export function ProfileFormFieldNumber({
           return (
             <NumeralInput
               name={name}
-              borderColor="transparent"
+              borderColor={showBaseStyles ? undefined : "transparent"}
               value={value}
               onChange={(value) => onChange(value ?? null)}
               onBlur={() => {

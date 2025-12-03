@@ -8147,6 +8147,133 @@ describe("GraphQL/Profiles", () => {
         .select("*");
       expect(dbEventSubscriptions).toHaveLength(0);
     });
+
+    it("removes updateProfileOnClose array item when deleting a referenced profile type field", async () => {
+      const [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "FIELD_GROUP",
+        profile_type_id: profileTypes[3].id,
+        options: JSON.stringify({
+          updateProfileOnClose: [
+            { profileTypeFieldId: profileType3Fields[3].id, source: { type: "ASK_USER" } },
+            { profileTypeFieldId: profileType3Fields[4].id, source: { type: "ASK_USER" } },
+          ],
+        }),
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $profileTypeFieldIds: [GID!]!) {
+            deleteProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldIds: $profileTypeFieldIds
+            ) {
+              id
+              fields {
+                id
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[3].id),
+          profileTypeFieldIds: [toGlobalId("ProfileTypeField", profileType3Fields[3].id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.deleteProfileTypeField).toEqual({
+        id: toGlobalId("ProfileType", profileTypes[3].id),
+        fields: [
+          {
+            id: toGlobalId("ProfileTypeField", profileType3Fields[0].id),
+          },
+          {
+            id: toGlobalId("ProfileTypeField", profileType3Fields[1].id),
+          },
+          {
+            id: toGlobalId("ProfileTypeField", profileType3Fields[2].id),
+          },
+          {
+            id: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
+          },
+        ],
+      });
+
+      const dbFieldGroup = await mocks.knex
+        .from("petition_field")
+        .where("id", fieldGroup.id)
+        .select("*");
+      expect(dbFieldGroup).toHaveLength(1);
+      expect(dbFieldGroup[0]).toMatchObject({
+        options: {
+          updateProfileOnClose: [
+            { profileTypeFieldId: profileType3Fields[4].id, source: { type: "ASK_USER" } },
+          ],
+        },
+      });
+    });
+
+    it("nulls config if removing all updateProfileOnClose array items when deleting a referenced profile type field", async () => {
+      const [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "FIELD_GROUP",
+        profile_type_id: profileTypes[3].id,
+        options: JSON.stringify({
+          updateProfileOnClose: [
+            { profileTypeFieldId: profileType3Fields[3].id, source: { type: "ASK_USER" } },
+          ],
+        }),
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $profileTypeFieldIds: [GID!]!) {
+            deleteProfileTypeField(
+              profileTypeId: $profileTypeId
+              profileTypeFieldIds: $profileTypeFieldIds
+            ) {
+              id
+              fields {
+                id
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[3].id),
+          profileTypeFieldIds: [toGlobalId("ProfileTypeField", profileType3Fields[3].id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.deleteProfileTypeField).toEqual({
+        id: toGlobalId("ProfileType", profileTypes[3].id),
+        fields: [
+          {
+            id: toGlobalId("ProfileTypeField", profileType3Fields[0].id),
+          },
+          {
+            id: toGlobalId("ProfileTypeField", profileType3Fields[1].id),
+          },
+          {
+            id: toGlobalId("ProfileTypeField", profileType3Fields[2].id),
+          },
+          {
+            id: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
+          },
+        ],
+      });
+
+      const dbFieldGroup = await mocks.knex
+        .from("petition_field")
+        .where("id", fieldGroup.id)
+        .select("*");
+      expect(dbFieldGroup).toHaveLength(1);
+      expect(dbFieldGroup[0]).toMatchObject({
+        options: {
+          updateProfileOnClose: null,
+        },
+      });
+    });
   });
 
   describe("updateProfileFieldValue", () => {

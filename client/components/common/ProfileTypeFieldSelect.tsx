@@ -4,7 +4,15 @@ import { HighlightText } from "@parallel/components/common/HighlightText";
 import { ProfileTypeFieldSelect_ProfileTypeFieldFragment } from "@parallel/graphql/__types";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomSelectProps } from "@parallel/utils/react-select/types";
-import { memo, useCallback, useMemo } from "react";
+import {
+  ForwardedRef,
+  ReactElement,
+  RefAttributes,
+  forwardRef,
+  memo,
+  useCallback,
+  useMemo,
+} from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, {
   ActionMeta,
@@ -13,6 +21,7 @@ import Select, {
   OnChangeValue,
   OptionProps,
   SingleValue as SV,
+  SelectInstance,
   SingleValueProps,
   components,
 } from "react-select";
@@ -21,7 +30,22 @@ import { isNonNullish } from "remeda";
 import { ProfileTypeFieldTypeIndicator } from "../organization/profiles/ProfileTypeFieldTypeIndicator";
 import { localizableUserTextRender } from "./LocalizableUserTextRender";
 
+const fragments = {
+  ProfileTypeField: gql`
+    fragment ProfileTypeFieldSelect_ProfileTypeField on ProfileTypeField {
+      id
+      name
+      type
+    }
+  `,
+};
+
 type ProfileTypeFieldSelection = ProfileTypeFieldSelect_ProfileTypeFieldFragment;
+
+export type ProfileTypeFieldSelectInstance<
+  IsMulti extends boolean,
+  OptionType extends ProfileTypeFieldSelection = ProfileTypeFieldSelection,
+> = SelectInstance<OptionType, IsMulti, never>;
 
 export interface ProfileTypeFieldSelectProps<
   OptionType extends ProfileTypeFieldSelection,
@@ -32,172 +56,180 @@ export interface ProfileTypeFieldSelectProps<
   onCreateProperty?: (name: string, isSuggested: boolean) => Promise<void>;
   suggestedPropertyName?: string;
   fontSize?: string;
+  isTooltipDisabled?: boolean;
 }
 
-export function ProfileTypeFieldSelect<
-  OptionType extends ProfileTypeFieldSelection,
-  IsMulti extends boolean = false,
->({
-  value,
-  onChange,
-  fields,
-  isMulti,
-  filterFields,
-  onCreateProperty,
-  suggestedPropertyName,
-  ...props
-}: ProfileTypeFieldSelectProps<OptionType, IsMulti>) {
-  const intl = useIntl();
-  const rsProps = useReactSelectProps<ProfileTypeFieldSelectOption<OptionType>, IsMulti, never>({
-    ...(props as any),
-    components: {
-      SingleValue,
-      MultiValueLabel,
-      Option,
-    },
-    styles: {
-      option: (styles: CSSObjectWithLabel) => ({
-        ...styles,
-        display: "flex",
-        padding: "6px 8px",
-      }),
-    },
-  });
-
-  const { options, _value } = useMemo(() => {
-    let options = fields.map((field, index) => {
-      const label = localizableUserTextRender({
-        value: field.name,
-        intl,
-        default: intl.formatMessage({
-          id: "generic.unnamed-profile-type-field",
-          defaultMessage: "Unnamed property",
+export const ProfileTypeFieldSelect = Object.assign(
+  forwardRef(function ProfileTypeFieldSelect<
+    OptionType extends ProfileTypeFieldSelection,
+    IsMulti extends boolean = false,
+  >(
+    {
+      value,
+      onChange,
+      fields,
+      isMulti,
+      filterFields,
+      onCreateProperty,
+      suggestedPropertyName,
+      ...props
+    }: ProfileTypeFieldSelectProps<OptionType, IsMulti>,
+    ref: ForwardedRef<ProfileTypeFieldSelectInstance<IsMulti, OptionType>>,
+  ) {
+    const intl = useIntl();
+    const rsProps = useReactSelectProps<ProfileTypeFieldSelectOption<OptionType>, IsMulti, never>({
+      ...(props as any),
+      components: {
+        SingleValue,
+        MultiValueLabel,
+        Option,
+      },
+      styles: {
+        option: (styles: CSSObjectWithLabel) => ({
+          ...styles,
+          display: "flex",
+          padding: "6px 8px",
         }),
-      });
-      return {
-        type: "FIELD",
-        field,
-        fieldIndex: index + 1,
-        label,
-      };
+      },
     });
-    if (isNonNullish(filterFields)) {
-      options = options.filter(({ field }) => filterFields(field));
-    }
-    if (isNonNullish(suggestedPropertyName)) {
-      options.push({
-        type: "SUGGESTION",
-        field: {} as any,
-        fieldIndex: 0,
-        label: suggestedPropertyName,
+
+    const { options, _value } = useMemo(() => {
+      let options = fields.map((field, index) => {
+        const label = localizableUserTextRender({
+          value: field.name,
+          intl,
+          default: intl.formatMessage({
+            id: "generic.unnamed-profile-type-field",
+            defaultMessage: "Unnamed property",
+          }),
+        });
+        return {
+          type: "FIELD",
+          field,
+          fieldIndex: index + 1,
+          label,
+        };
       });
-    }
-
-    const _value = isMulti
-      ? (value as OptionType[]).map((v) => mapValue(v, options)!)
-      : mapValue(value as OptionType | null, options);
-    return { options, _value };
-  }, [fields, value, intl.locale]);
-
-  const handleChange = useCallback(
-    (
-      value: OnChangeValue<ProfileTypeFieldSelectOption<OptionType>, IsMulti>,
-      actionMeta: ActionMeta<ProfileTypeFieldSelectOption<OptionType>>,
-    ) => {
-      if (isMulti) {
-        onChange(
-          (value as ProfileTypeFieldSelectOption<OptionType>[]).map(
-            (value) => value?.field ?? null,
-          ) as any,
-          actionMeta as any,
-        );
-      } else {
-        onChange(
-          ((value as SV<ProfileTypeFieldSelectOption<OptionType>>)?.field ?? null) as any,
-          actionMeta as any,
-        );
+      if (isNonNullish(filterFields)) {
+        options = options.filter(({ field }) => filterFields(field));
       }
-    },
-    [onChange, isMulti],
-  );
+      if (isNonNullish(suggestedPropertyName)) {
+        options.push({
+          type: "SUGGESTION",
+          field: {} as any,
+          fieldIndex: 0,
+          label: suggestedPropertyName,
+        });
+      }
 
-  async function handleCreate(name: string) {
-    await onCreateProperty?.(name, name === suggestedPropertyName);
-  }
+      const _value = isMulti
+        ? (value as OptionType[]).map((v) => mapValue(v, options)!)
+        : mapValue(value as OptionType | null, options);
+      return { options, _value };
+    }, [fields, value, intl.locale]);
 
-  const formatCreateLabel = (label: string) => {
-    return (
-      <Text as="span">
-        <FormattedMessage
-          id="component.profile-type-field-select.create-property"
-          defaultMessage="Create property: <b>{label}</b>"
-          values={{ label }}
-        />
-      </Text>
-    );
-  };
-
-  return isNonNullish(onCreateProperty) ? (
-    <CreatableSelect
-      options={options}
-      isMulti={isMulti}
-      isSearchable={true}
-      value={_value as any}
-      onChange={(value, meta) => {
-        if (!isMulti && (value as any).type === "SUGGESTION") {
-          handleCreate((value as any).label);
+    const handleChange = useCallback(
+      (
+        value: OnChangeValue<ProfileTypeFieldSelectOption<OptionType>, IsMulti>,
+        actionMeta: ActionMeta<ProfileTypeFieldSelectOption<OptionType>>,
+      ) => {
+        if (isMulti) {
+          onChange(
+            (value as ProfileTypeFieldSelectOption<OptionType>[]).map(
+              (value) => value?.field ?? null,
+            ) as any,
+            actionMeta as any,
+          );
         } else {
-          handleChange(value as any, meta as ActionMeta<ProfileTypeFieldSelectOption<OptionType>>);
+          onChange(
+            ((value as SV<ProfileTypeFieldSelectOption<OptionType>>)?.field ?? null) as any,
+            actionMeta as any,
+          );
         }
-      }}
-      getOptionValue={getOptionValue}
-      getOptionLabel={getOptionLabel}
-      onCreateOption={handleCreate}
-      formatCreateLabel={formatCreateLabel}
-      suggestedPropertyName={suggestedPropertyName}
-      placeholder={
-        props.placeholder ??
-        intl.formatMessage({
-          id: "component.profile-type-field-select.placeholder",
-          defaultMessage: "Select a property",
-        })
-      }
-      {...(props as any)}
-      {...rsProps}
-    />
-  ) : (
-    <Select<OptionType, IsMulti, never>
-      options={options}
-      isMulti={isMulti}
-      isSearchable={true}
-      value={_value as any}
-      onChange={(value, meta) => {
-        handleChange(value as any, meta as ActionMeta<ProfileTypeFieldSelectOption<OptionType>>);
-      }}
-      getOptionValue={getOptionValue}
-      getOptionLabel={getOptionLabel}
-      placeholder={
-        props.placeholder ??
-        intl.formatMessage({
-          id: "component.profile-type-field-select.placeholder",
-          defaultMessage: "Select a property",
-        })
-      }
-      {...(props as any)}
-      {...rsProps}
-    />
-  );
-}
+      },
+      [onChange, isMulti],
+    );
 
-ProfileTypeFieldSelect.fragments = {
-  ProfileTypeField: gql`
-    fragment ProfileTypeFieldSelect_ProfileTypeField on ProfileTypeField {
-      id
-      name
-      type
+    async function handleCreate(name: string) {
+      await onCreateProperty?.(name, name === suggestedPropertyName);
     }
-  `,
-};
+
+    const formatCreateLabel = (label: string) => {
+      return (
+        <Text as="span">
+          <FormattedMessage
+            id="component.profile-type-field-select.create-property"
+            defaultMessage="Create property: <b>{label}</b>"
+            values={{ label }}
+          />
+        </Text>
+      );
+    };
+
+    return isNonNullish(onCreateProperty) ? (
+      <CreatableSelect
+        ref={ref as any}
+        options={options}
+        isMulti={isMulti}
+        isSearchable={true}
+        value={_value as any}
+        onChange={(value, meta) => {
+          if (!isMulti && (value as any).type === "SUGGESTION") {
+            handleCreate((value as any).label);
+          } else {
+            handleChange(
+              value as any,
+              meta as ActionMeta<ProfileTypeFieldSelectOption<OptionType>>,
+            );
+          }
+        }}
+        getOptionValue={getOptionValue}
+        getOptionLabel={getOptionLabel}
+        onCreateOption={handleCreate}
+        formatCreateLabel={formatCreateLabel}
+        suggestedPropertyName={suggestedPropertyName}
+        placeholder={
+          props.placeholder ??
+          intl.formatMessage({
+            id: "component.profile-type-field-select.placeholder",
+            defaultMessage: "Select a property",
+          })
+        }
+        {...(props as any)}
+        {...rsProps}
+      />
+    ) : (
+      <Select<OptionType, IsMulti, never>
+        ref={ref as any}
+        options={options}
+        isMulti={isMulti}
+        isSearchable={true}
+        value={_value as any}
+        onChange={(value, meta) => {
+          handleChange(value as any, meta as ActionMeta<ProfileTypeFieldSelectOption<OptionType>>);
+        }}
+        getOptionValue={getOptionValue}
+        getOptionLabel={getOptionLabel}
+        placeholder={
+          props.placeholder ??
+          intl.formatMessage({
+            id: "component.profile-type-field-select.placeholder",
+            defaultMessage: "Select a property",
+          })
+        }
+        {...(props as any)}
+        {...rsProps}
+      />
+    );
+  }) as <
+    IsMulti extends boolean = false,
+    OptionType extends ProfileTypeFieldSelection = ProfileTypeFieldSelection,
+  >(
+    props: ProfileTypeFieldSelectProps<OptionType, IsMulti> &
+      RefAttributes<ProfileTypeFieldSelectInstance<IsMulti, OptionType>>,
+  ) => ReactElement,
+  { fragments },
+);
 
 interface ProfileTypeFieldSelectOption<T extends ProfileTypeFieldSelection> {
   field: T;
@@ -211,15 +243,21 @@ const ProfileTypeFieldSelectItem = memo(function ProfileTypeFieldSelectItem<
   option,
   highlight,
   fontSize = "md",
+  isTooltipDisabled,
 }: {
   option: ProfileTypeFieldSelectOption<T>;
   highlight?: string;
   fontSize?: string;
+  isTooltipDisabled?: boolean;
 }) {
   const { field, fieldIndex, label } = option;
   return (
     <>
-      <ProfileTypeFieldTypeIndicator type={field.type} fieldIndex={fieldIndex} />
+      <ProfileTypeFieldTypeIndicator
+        type={field.type}
+        fieldIndex={fieldIndex}
+        isTooltipDisabled={isTooltipDisabled}
+      />
       <Box
         fontSize={fontSize}
         marginStart={2}
@@ -252,6 +290,7 @@ function mapValue<T extends { field: { id: string } }>(value: { id: string } | n
 
 interface ReactSelectExtraProps {
   fontSize?: string;
+  isTooltipDisabled?: boolean;
 }
 
 function SingleValue(
@@ -266,6 +305,7 @@ function SingleValue(
           option={props.data}
           highlight={props.selectProps.inputValue ?? ""}
           fontSize={props.selectProps.fontSize}
+          isTooltipDisabled={props.selectProps.isTooltipDisabled}
         />
       </Flex>
     </components.SingleValue>
@@ -285,13 +325,18 @@ function MultiValueLabel({
           option={props.data}
           highlight={props.selectProps.inputValue ?? ""}
           fontSize={props.selectProps.fontSize}
+          isTooltipDisabled={props.selectProps.isTooltipDisabled}
         />
       </Flex>
     </components.MultiValueLabel>
   );
 }
 
-function Option(props: OptionProps<ProfileTypeFieldSelectOption<ProfileTypeFieldSelection>>) {
+function Option(
+  props: OptionProps<ProfileTypeFieldSelectOption<ProfileTypeFieldSelection>> & {
+    selectProps: ReactSelectExtraProps;
+  },
+) {
   if ((props.data as any).__isNew__) {
     return (
       <components.Option
@@ -330,6 +375,7 @@ function Option(props: OptionProps<ProfileTypeFieldSelectOption<ProfileTypeField
       <ProfileTypeFieldSelectItem
         option={props.data}
         highlight={props.selectProps.inputValue ?? ""}
+        isTooltipDisabled={props.selectProps.isTooltipDisabled}
       />
     </components.Option>
   );

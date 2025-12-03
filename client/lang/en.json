@@ -1315,11 +1315,6 @@
     "context": "Background check profile"
   },
   {
-    "term": "component.configure-adverse-media-automate-search-dialog.remove-setting",
-    "definition": "Remove setting",
-    "context": "Remove setting"
-  },
-  {
     "term": "component.configure-approval-steps-dialog.add-approval-button",
     "definition": "Add approval",
     "context": "Add approval"
@@ -1418,11 +1413,6 @@
     "term": "component.configure-automate-search-dialog.nationality-label",
     "definition": "Nationality",
     "context": "Nationality"
-  },
-  {
-    "term": "component.configure-automate-search-dialog.remove-setting",
-    "definition": "Remove setting",
-    "context": "Remove setting"
   },
   {
     "term": "component.configure-automate-search-dialog.type-of-search-label",
@@ -1573,6 +1563,76 @@
     "term": "component.configure-reminder-settings-dialog.opted-out-warning",
     "definition": "The following contacts opted out from receiving reminders and any changes will not apply to them:",
     "context": "The following contacts opted out from receiving reminders and any changes will not apply to them:"
+  },
+  {
+    "term": "component.configure-update-profile-on-close-dialog.add-property-button",
+    "definition": "Add property",
+    "context": "Add property"
+  },
+  {
+    "term": "component.configure-update-profile-on-close-dialog.body",
+    "definition": "Select the properties of the profile to update when the parallel is closed.",
+    "context": "Select the properties of the profile to update when the parallel is closed."
+  },
+  {
+    "term": "component.configure-update-profile-on-close-dialog.complete-label",
+    "definition": "Complete",
+    "context": "Complete"
+  },
+  {
+    "term": "component.configure-update-profile-on-close-dialog.field-already-in-use",
+    "definition": "This field is already in use",
+    "context": "This field is already in use"
+  },
+  {
+    "term": "component.configure-update-profile-on-close-dialog.header",
+    "definition": "Properties of the profile to update",
+    "context": "Properties of the profile to update"
+  },
+  {
+    "term": "component.configure-update-profile-on-close-dialog.remove-property-button",
+    "definition": "Remove property",
+    "context": "Remove property"
+  },
+  {
+    "term": "component.configure-update-profile-on-close-dialog.select-mapping-delete-current-option-label",
+    "definition": "Delete current value",
+    "context": "Delete current value"
+  },
+  {
+    "term": "component.configure-update-profile-on-close-dialog.select-mapping-field-options-label",
+    "definition": "Field options",
+    "context": "Field options"
+  },
+  {
+    "term": "component.configure-update-profile-on-close-dialog.select-mapping-keep-current-option-label",
+    "definition": "Keep current value",
+    "context": "Keep current value"
+  },
+  {
+    "term": "component.configure-update-profile-on-close-dialog.select-mapping-other-option-label",
+    "definition": "Others",
+    "context": "Others"
+  },
+  {
+    "term": "component.configure-update-profile-on-close-dialog.select-mapping-property-options-label",
+    "definition": "Property options",
+    "context": "Property options"
+  },
+  {
+    "term": "component.configure-update-profile-on-close-dialog.select-mapping-variable-options-label",
+    "definition": "Variable options",
+    "context": "Variable options"
+  },
+  {
+    "term": "component.configure-update-profile-on-close-dialog.select-source-placeholder",
+    "definition": "Select a source",
+    "context": "Select a source"
+  },
+  {
+    "term": "component.configure-update-profile-on-close-dialog.with-label",
+    "definition": "with",
+    "context": "with"
   },
   {
     "term": "component.confirm-activate-user-dialog.activate-users",
@@ -6850,6 +6910,16 @@
     "context": "Set up relationships"
   },
   {
+    "term": "component.petition-compose-field-group-settings.update-profile-on-close",
+    "definition": "Update profile on close",
+    "context": "Update profile on close"
+  },
+  {
+    "term": "component.petition-compose-field-group-settings.update-profile-on-close-description-1",
+    "definition": "Automate the update of the profile data associated with the parallel and avoid having to complete them manually.",
+    "context": "Automate the update of the profile data associated with the parallel and avoid having to complete them manually."
+  },
+  {
     "term": "component.petition-compose-field-list.add-field",
     "definition": "Add field",
     "context": "Add field"
@@ -7385,9 +7455,49 @@
     "context": "Show calculation steps"
   },
   {
+    "term": "component.petition-compose-variables.variable-referenced-in-update-profile-on-close-message-2",
+    "definition": "Update the configuration of the following { fieldsCount, plural, =1 {field} other {fields}} and try again.",
+    "context": "Update the configuration of the following { fieldsCount, plural, =1 {field} other {fields}} and try again."
+  },
+  {
+    "term": "component.petition-compose-variables.variable-updates-profile-on-close-message",
+    "definition": "This variable updates a profile on close and cannot be removed.",
+    "context": "This variable updates a profile on close and cannot be removed."
+  },
+  {
     "term": "component.petition-contents.hidden-fields-divider",
     "definition": "{count, plural, =1 {1 field is} other {# fields are}} not applicable",
     "context": "{count, plural, =1 {1 field is} other {# fields are}} not applicable"
+  },
+  {
+    "term": "component.petition-field-and-variables-select.ask-on-close",
+    "definition": "Ask on close",
+    "context": "Ask on close"
+  },
+  {
+    "term": "component.petition-field-and-variables-select.group-fields",
+    "definition": "Fields",
+    "context": "Fields"
+  },
+  {
+    "term": "component.petition-field-and-variables-select.group-metadata",
+    "definition": "Parallel metadata",
+    "context": "Parallel metadata"
+  },
+  {
+    "term": "component.petition-field-and-variables-select.group-others",
+    "definition": "Others",
+    "context": "Others"
+  },
+  {
+    "term": "component.petition-field-and-variables-select.group-variables",
+    "definition": "Variables",
+    "context": "Variables"
+  },
+  {
+    "term": "component.petition-field-and-variables-select.metadata-closed-at",
+    "definition": "Parallel close date",
+    "context": "Parallel close date"
   },
   {
     "term": "component.petition-field-checkbox-settings.exact-number",
@@ -12365,11 +12475,6 @@
     "context": "References must begin with a letter"
   },
   {
-    "term": "component.settings-row-button.remove-setting",
-    "definition": "Remove setting",
-    "context": "Remove setting"
-  },
-  {
     "term": "component.settings-row-placeholder.placeholder-description",
     "definition": "The placeholder is the subtle descriptive text that shows when the input field is empty.",
     "context": "The placeholder is the subtle descriptive text that shows when the input field is empty."
@@ -13916,8 +14021,8 @@
   },
   {
     "term": "component.use-profile-properties-columns.new-value",
-    "definition": "Value in parallel",
-    "context": "Value in parallel"
+    "definition": "New value",
+    "context": "New value"
   },
   {
     "term": "component.use-profile-properties-columns.property-name",
@@ -14805,9 +14910,9 @@
     "context": "Edit name"
   },
   {
-    "term": "generic.edit-settings",
-    "definition": "Edit settings",
-    "context": "Edit settings"
+    "term": "generic.edit-setting",
+    "definition": "Edit setting",
+    "context": "Edit setting"
   },
   {
     "term": "generic.edited-indicator",
@@ -15953,6 +16058,11 @@
     "term": "generic.remove-condition",
     "definition": "Remove condition",
     "context": "Remove condition"
+  },
+  {
+    "term": "generic.remove-setting",
+    "definition": "Remove setting",
+    "context": "Remove setting"
   },
   {
     "term": "generic.rename",
@@ -18155,6 +18265,11 @@
     "context": "This field is referenced in the visibility conditions of a document attachment. To continue, first remove the referencing conditions."
   },
   {
+    "term": "page.petition-compose.field-referenced-in-update-profile-on-close-message",
+    "definition": "This field updates a profile on close and cannot be removed.",
+    "context": "This field updates a profile on close and cannot be removed."
+  },
+  {
     "term": "page.petition-compose.first-child-is-internal-error",
     "definition": "The first field of a group cannot be internal if the group is not.",
     "context": "The first field of a group cannot be internal if the group is not."
@@ -18178,6 +18293,11 @@
     "term": "page.petition-compose.variable-referenced-in-petition-attachments-visibility",
     "definition": "This variable is referenced in the visibility conditions of a document attachment. To continue, first remove the referencing conditions.",
     "context": "This variable is referenced in the visibility conditions of a document attachment. To continue, first remove the referencing conditions."
+  },
+  {
+    "term": "page.petition-compose.variable-referenced-in-update-profile-on-close-message",
+    "definition": "Update the configuration of the following { fieldsCount, plural, =1 {field} other {fields}} and try again.",
+    "context": "Update the configuration of the following { fieldsCount, plural, =1 {field} other {fields}} and try again."
   },
   {
     "term": "page.petition-replies.export-pdf",

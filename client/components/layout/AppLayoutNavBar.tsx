@@ -88,7 +88,7 @@ import { Wrap } from "../common/Wrap";
 import { useAlertsContactUsDialog } from "../common/dialogs/AlertsContactUsDialog";
 import { useProfilesContactUsDialog } from "../common/dialogs/ProfilesContactUsDialog";
 import { NotificationsButton } from "../notifications/NotificationsButton";
-import { getProfileTypeFieldIcon } from "../organization/profiles/getProfileTypeFieldIcon";
+import { getProfileTypeIcon } from "../organization/profiles/getProfileTypeIcon";
 import { useCreateProfileDialog } from "../profiles/dialogs/CreateProfileDialog";
 import { NavBarButton } from "./NavBarButton";
 import { UserMenu } from "./UserMenu";
@@ -741,7 +741,7 @@ function SectionsAndProfilesList({
             <List spacing={2}>
               {me.pinnedProfileTypes.length ? (
                 me.pinnedProfileTypes.map((profileType) => {
-                  const icon = getProfileTypeFieldIcon(profileType.icon);
+                  const icon = getProfileTypeIcon(profileType.icon);
                   return (
                     <ListItem key={profileType.id}>
                       <NakedLink href={`/app/profiles?type=${profileType.id}`}>
@@ -815,7 +815,7 @@ const ProfileTypeButton = forwardRef<HTMLAnchorElement, ProfileTypeButtonProps>(
     const intl = useIntl();
 
     const menuItemProps = useMenuItem(rest, ref);
-    const icon = getProfileTypeFieldIcon(profileType.icon);
+    const icon = getProfileTypeIcon(profileType.icon);
     return (
       <LinkBox
         key={profileType.id}
@@ -1012,7 +1012,7 @@ function CreateMenuButtonSection({
               </MenuItem>
             </NakedLink>
             {pinnedProfileTypes.map((profileType) => {
-              const icon = getProfileTypeFieldIcon(profileType.icon);
+              const icon = getProfileTypeIcon(profileType.icon);
               return (
                 <MenuItem
                   key={profileType.id}

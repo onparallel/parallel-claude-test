@@ -10,6 +10,7 @@ import {
   PetitionFieldType,
 } from "@parallel/graphql/__types";
 import { FORMATS, prettifyTimezone } from "@parallel/utils/dates";
+import { EnumerateList } from "@parallel/utils/EnumerateList";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { formatNumberWithPrefix } from "@parallel/utils/formatNumberWithPrefix";
 import { getEntityTypeLabel } from "@parallel/utils/getEntityTypeLabel";
@@ -21,11 +22,13 @@ import { useDownloadReplyFile } from "@parallel/utils/useDownloadReplyFile";
 import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFiles";
 import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
 import { FormattedDate, FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, pick } from "remeda";
+import { isNonNullish, isNullish, pick } from "remeda";
 import { BackgroundCheckRiskLabel } from "../petition-common/BackgroundCheckRiskLabel";
 import { Divider } from "./Divider";
+import { Link } from "./Link";
 import { OverflownText } from "./OverflownText";
 import { SimpleFileButton } from "./SimpleFileButton";
+import { SmallPopover } from "./SmallPopover";
 import { UserReference } from "./UserReference";
 
 export interface PetitionFieldRepliesContentProps {
@@ -318,9 +321,43 @@ function PetitionFieldBackgroundCheck({
             <BusinessIcon boxSize={4} />
           )}
           <OverflownText minWidth="40px">{content.entity.name}</OverflownText>
-          {(content.entity?.properties?.topics as string[] | undefined)?.map((topic, i) => (
-            <BackgroundCheckRiskLabel key={i} risk={topic} />
-          ))}
+
+          {isNullish(content.entity?.properties?.topics) ? null : (
+            <>
+              {content.entity.properties.topics.length > 3 ? (
+                <HStack spacing={1} marginStart={1}>
+                  <EnumerateList
+                    values={(content.entity?.properties?.topics as string[] | undefined) ?? []}
+                    maxItems={1}
+                    renderItem={({ value }, index) => (
+                      <BackgroundCheckRiskLabel key={index} risk={value} />
+                    )}
+                    renderOther={({ children, remaining }) => (
+                      <SmallPopover
+                        content={
+                          <List display="flex" flexWrap="wrap" gap={1.5}>
+                            {remaining.map((value, i) => (
+                              <ListItem key={i} minWidth={0} display="flex">
+                                <BackgroundCheckRiskLabel risk={value} />
+                              </ListItem>
+                            ))}
+                          </List>
+                        }
+                      >
+                        <Link href="#">{children}</Link>
+                      </SmallPopover>
+                    )}
+                  />
+                </HStack>
+              ) : (
+                <HStack marginStart={1}>
+                  {(content.entity?.properties?.topics as string[] | undefined)?.map((topic, i) => (
+                    <BackgroundCheckRiskLabel key={i} risk={topic} />
+                  ))}
+                </HStack>
+              )}
+            </>
+          )}
         </HStack>
       ) : (
         <HStack display="inline-flex" minWidth={0}>

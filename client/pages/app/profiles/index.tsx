@@ -49,7 +49,7 @@ import {
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { withPermission } from "@parallel/components/common/withPermission";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { getProfileTypeFieldIcon } from "@parallel/components/organization/profiles/getProfileTypeFieldIcon";
+import { getProfileTypeIcon } from "@parallel/components/organization/profiles/getProfileTypeIcon";
 import { useConfirmChangeViewAllDialog } from "@parallel/components/petition-compose/dialogs/ConfirmChangeViewAllDialog";
 import { useAskNameDialog } from "@parallel/components/petition-list/AskNameDialog";
 import { useCreateProfileDialog } from "@parallel/components/profiles/dialogs/CreateProfileDialog";
@@ -428,7 +428,7 @@ function Profiles() {
     selectedCount: selectedIds.length,
   });
 
-  const icon = getProfileTypeFieldIcon(profileType?.icon);
+  const icon = getProfileTypeIcon(profileType?.icon);
 
   const sortedAndFilteredColumns = useMemo(() => {
     return ["name", ...(columns ?? [])]

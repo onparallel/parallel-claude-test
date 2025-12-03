@@ -23,6 +23,7 @@ export function ProfileFormFieldPhone({
   showSuggestionsButton,
   areSuggestionsVisible,
   onToggleSuggestions,
+  showBaseStyles,
 }: ProfileFormFieldPhoneProps) {
   const { control, clearErrors, setError } = useFormContext<ProfileFormData>();
 
@@ -40,7 +41,7 @@ export function ProfileFormFieldPhone({
         control={control}
         render={({ field: { ref, onChange, value, ...rest }, fieldState }) => (
           <PhoneInputLazy
-            borderColor="transparent"
+            borderColor={showBaseStyles ? undefined : "transparent"}
             value={value ?? ""}
             onChange={(value: string, { isValid }) => {
               onChange(value ?? "");

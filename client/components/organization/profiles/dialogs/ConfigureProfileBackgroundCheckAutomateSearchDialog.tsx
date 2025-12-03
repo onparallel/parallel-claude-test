@@ -430,10 +430,7 @@ export function ConfigureProfileBackgroundCheckAutomateSearchDialog({
             variant="outline"
             onClick={() => props.onReject("DELETE_AUTO_SEARCH_CONFIG")}
           >
-            <FormattedMessage
-              id="component.configure-automate-search-dialog.remove-setting"
-              defaultMessage="Remove setting"
-            />
+            <FormattedMessage id="generic.remove-setting" defaultMessage="Remove setting" />
           </Button>
         ) : null
       }

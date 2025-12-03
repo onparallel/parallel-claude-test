@@ -408,8 +408,8 @@ function ProfileTypeProccess({ process, onDragEnd, onEdit, onRemove }: ProfileTy
             size="sm"
             icon={<SettingsIcon boxSize={4} />}
             label={intl.formatMessage({
-              id: "generic.edit-settings",
-              defaultMessage: "Edit settings",
+              id: "generic.edit-setting",
+              defaultMessage: "Edit setting",
             })}
             onClick={onEdit}
           />

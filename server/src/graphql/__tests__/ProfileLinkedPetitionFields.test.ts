@@ -3022,7 +3022,19 @@ describe("ProfileLinkedPetitionFields", () => {
       expect(errors).toContainGraphQLError("CONFLICT_RESOLUTION_REQUIRED_ERROR", {
         conflictResolutions: [],
         expirations: [
-          toGlobalId("ProfileTypeField", contractProfileTypeFields["p_expiration_date"].id),
+          {
+            profileTypeFieldId: toGlobalId(
+              "ProfileTypeField",
+              contractProfileTypeFields["p_expiration_date"].id,
+            ),
+            source: {
+              type: "FIELD",
+              fieldId: toGlobalId(
+                "PetitionField",
+                contractChildFields.find((c) => c.alias === "c_p_expiration_date")!.id,
+              ),
+            },
+          },
         ],
       });
       expect(data).toBeNull();
@@ -3109,8 +3121,32 @@ describe("ProfileLinkedPetitionFields", () => {
 
       expect(errors).toContainGraphQLError("CONFLICT_RESOLUTION_REQUIRED_ERROR", {
         conflictResolutions: [
-          toGlobalId("ProfileTypeField", contractProfileTypeFields["p_counterparty"].id),
-          toGlobalId("ProfileTypeField", contractProfileTypeFields["p_contract_type"].id),
+          {
+            profileTypeFieldId: toGlobalId(
+              "ProfileTypeField",
+              contractProfileTypeFields["p_counterparty"].id,
+            ),
+            source: {
+              type: "FIELD",
+              fieldId: toGlobalId(
+                "PetitionField",
+                contractChildFields.find((c) => c.alias === "c_p_counterparty")!.id,
+              ),
+            },
+          },
+          {
+            profileTypeFieldId: toGlobalId(
+              "ProfileTypeField",
+              contractProfileTypeFields["p_contract_type"].id,
+            ),
+            source: {
+              type: "FIELD",
+              fieldId: toGlobalId(
+                "PetitionField",
+                contractChildFields.find((c) => c.alias === "c_p_contract_type")!.id,
+              ),
+            },
+          },
         ],
         expirations: [],
       });
@@ -7866,7 +7902,13 @@ describe("ProfileLinkedPetitionFields", () => {
       );
       expect(errors).toContainGraphQLError("CONFLICT_RESOLUTION_REQUIRED_ERROR", {
         conflictResolutions: [
-          toGlobalId("ProfileTypeField", profileTypeFields.find((f) => f.type === "CHECKBOX")!.id),
+          {
+            profileTypeFieldId: toGlobalId(
+              "ProfileTypeField",
+              profileTypeFields.find((f) => f.type === "CHECKBOX")!.id,
+            ),
+            source: { type: "FIELD", fieldId: toGlobalId("PetitionField", checkboxChild.id) },
+          },
         ],
         expirations: [],
       });
@@ -9172,7 +9214,15 @@ describe("ProfileLinkedPetitionFields", () => {
       );
 
       expect(errors).toContainGraphQLError("CONFLICT_RESOLUTION_REQUIRED_ERROR", {
-        conflictResolutions: [toGlobalId("ProfileTypeField", profileTypeFields[7].id)],
+        conflictResolutions: [
+          {
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[7].id),
+            source: {
+              type: "FIELD",
+              fieldId: toGlobalId("PetitionField", backgroundCheckChild.id),
+            },
+          },
+        ],
         expirations: [],
       });
       expect(data).toBeNull();
@@ -9293,7 +9343,15 @@ describe("ProfileLinkedPetitionFields", () => {
       );
 
       expect(errors).toContainGraphQLError("CONFLICT_RESOLUTION_REQUIRED_ERROR", {
-        conflictResolutions: [toGlobalId("ProfileTypeField", profileTypeFields[7].id)],
+        conflictResolutions: [
+          {
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[7].id),
+            source: {
+              type: "FIELD",
+              fieldId: toGlobalId("PetitionField", backgroundCheckChild.id),
+            },
+          },
+        ],
         expirations: [],
       });
       expect(data).toBeNull();
@@ -9413,7 +9471,15 @@ describe("ProfileLinkedPetitionFields", () => {
       );
 
       expect(errors).toContainGraphQLError("CONFLICT_RESOLUTION_REQUIRED_ERROR", {
-        conflictResolutions: [toGlobalId("ProfileTypeField", profileTypeFields[7].id)],
+        conflictResolutions: [
+          {
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[7].id),
+            source: {
+              type: "FIELD",
+              fieldId: toGlobalId("PetitionField", backgroundCheckChild.id),
+            },
+          },
+        ],
         expirations: [],
       });
       expect(data).toBeNull();
@@ -9900,6 +9966,1348 @@ describe("ProfileLinkedPetitionFields", () => {
                   },
                 },
               ],
+            },
+          ],
+        },
+      });
+    });
+  });
+
+  describe("archiveFieldGroupReplyIntoProfile / updateProfileOnClose", () => {
+    let contract: ProfileType;
+    let contractFields: Record<string, ProfileTypeField>;
+
+    let petition: Petition;
+
+    let isConfidentialField: PetitionField;
+    let notesField: PetitionField;
+    let countryField: PetitionField;
+    let fieldGroup: PetitionField;
+
+    let paymentTermsChildField: PetitionField;
+
+    beforeAll(async () => {
+      [contract] = await mocks.knex
+        .from("profile_type")
+        .where("standard_type", "CONTRACT")
+        .whereNull("deleted_at")
+        .select("*");
+      const _contractFields = await mocks.knex
+        .from("profile_type_field")
+        .where("profile_type_id", contract.id)
+        .whereNull("deleted_at")
+        .orderBy("position", "asc")
+        .select("*");
+
+      contractFields = indexBy(_contractFields, (f) => f.alias!);
+
+      [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+        variables: [
+          { name: "contract_value", default_value: 0, type: "NUMBER" },
+          {
+            name: "contract_type",
+            default_value: "A01",
+            type: "ENUM",
+            value_labels: [
+              { value: "A01", label: "Service agreement" },
+              { value: "A02", label: "Employment contract" },
+              { value: "A03", label: "Lease agreement" },
+              { value: "A04", label: "Sales contract" },
+              { value: "A05", label: "Non-Disclosure Agreement (NDA)" },
+              { value: "A06", label: "Partnership agreement" },
+              { value: "A07", label: "Supply contract" },
+              { value: "A08", label: "Consulting agreement" },
+              { value: "A09", label: "Software development agreement" },
+              { value: "A10", label: "Purchase order" },
+              { value: "A11", label: "Software as a Service agreement (SaaS)" },
+              { value: "A12", label: "Data protection agreement (DPA)" },
+              { value: "A13", label: "Loan agreement" },
+              { value: "A14", label: "Credit facility" },
+            ],
+          },
+        ],
+        status: "CLOSED",
+        closed_at: new Date("2025-10-14"),
+      }));
+
+      [isConfidentialField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "SELECT",
+        multiple: false,
+        options: JSON.stringify({
+          values: ["YES", "NO", "KEEP", "DELETE"],
+          labels: ["Yes", "No", "Keep", "Delete"],
+        }),
+      }));
+
+      [notesField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "SHORT_TEXT",
+        multiple: false,
+      }));
+
+      [countryField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "SELECT",
+        multiple: false,
+        options: JSON.stringify({
+          values: [],
+          standardList: "COUNTRIES",
+        }),
+      }));
+
+      [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "FIELD_GROUP",
+        profile_type_id: contract.id,
+        options: JSON.stringify({
+          groupName: "Contract",
+          updateProfileOnClose: [
+            {
+              profileTypeFieldId: contractFields["p_counterparty"].id,
+              source: { type: "ASK_USER" },
+            },
+            {
+              profileTypeFieldId: contractFields["p_effective_date"].id,
+              source: { type: "PETITION_METADATA", name: "CLOSED_AT" },
+            },
+            {
+              profileTypeFieldId: contractFields["p_jurisdiction"].id,
+              source: { type: "FIELD", fieldId: countryField.id },
+            },
+            {
+              profileTypeFieldId: contractFields["p_contract_value"].id,
+              source: { type: "VARIABLE", name: "contract_value" },
+            },
+            {
+              profileTypeFieldId: contractFields["p_payment_terms"].id,
+              source: { type: "FIELD", fieldId: notesField.id },
+            },
+            {
+              profileTypeFieldId: contractFields["p_contract_type"].id,
+              source: {
+                type: "VARIABLE",
+                name: "contract_type",
+                map: {
+                  A01: "SERVICE_AGREEMENT",
+                  A02: "EMPLOYMENT_CONTRACT",
+                  A03: "LEASE_AGREEMENT",
+                  A04: "SALES_CONTRACT",
+                  A05: "-KEEP",
+                  A06: "-DELETE",
+                  A07: "SUPPLY_CONTRACT",
+                  A08: "CONSULTING_AGREEMENT",
+                  A09: "SOFTWARE_DEVELOPMENT_AGREEMENT",
+                  A10: "PURCHASE_ORDER",
+                  A11: "SAAS",
+                  A12: "DPA",
+                  A13: "LOAN",
+                  A14: "CREDIT",
+                },
+              },
+            },
+            {
+              profileTypeFieldId: contractFields["p_confidentiality_agreement"].id,
+              source: {
+                type: "FIELD",
+                fieldId: isConfidentialField.id,
+                map: {
+                  YES: "Y",
+                  NO: "N",
+                  KEEP: "-KEEP",
+                  DELETE: "-DELETE",
+                },
+              },
+            },
+          ],
+        }),
+        math: JSON.stringify([
+          {
+            operator: "AND",
+            conditions: [
+              {
+                fieldId: countryField.id,
+                modifier: "ANY",
+                operator: "EQUAL",
+                value: "AR",
+              },
+            ],
+            operations: [
+              {
+                operator: "ASSIGNATION",
+                operand: { type: "NUMBER", value: 100 },
+                variable: "contract_value",
+              },
+            ],
+          },
+        ]),
+      }));
+
+      [paymentTermsChildField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        parent_petition_field_id: fieldGroup.id,
+        profile_type_field_id: contractFields["p_payment_terms"].id,
+        type: "SHORT_TEXT",
+      }));
+    });
+
+    afterEach(async () => {
+      await mocks.knex.from("petition_field_reply").update({ deleted_at: new Date() });
+    });
+
+    it("completes profile based on updateProfileOnClose config", async () => {
+      const [profile] = await mocks.createRandomProfiles(organization.id, contract.id, 1);
+      const [parentReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+
+      await mocks.createRandomTextReply(isConfidentialField.id, undefined, 1, () => ({
+        user_id: user.id,
+        type: "SELECT",
+        content: { value: "YES" },
+      }));
+
+      await mocks.createRandomTextReply(countryField.id, undefined, 1, () => ({
+        user_id: user.id,
+        type: "SELECT",
+        content: { value: "AR" },
+      }));
+
+      await mocks.createRandomTextReply(notesField.id, undefined, 1, () => ({
+        user_id: user.id,
+        type: "SHORT_TEXT",
+        content: { value: "Payment terms" },
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+          ) {
+            archiveFieldGroupReplyIntoProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              conflictResolutions: []
+              expirations: []
+            ) {
+              id
+              associatedProfile {
+                properties {
+                  field {
+                    alias
+                  }
+                  value {
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", parentReply.id),
+          profileId: toGlobalId("Profile", profile.id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.archiveFieldGroupReplyIntoProfile).toEqual({
+        id: toGlobalId("PetitionFieldReply", parentReply.id),
+        associatedProfile: {
+          properties: [
+            {
+              field: {
+                alias: "p_counterparty",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_contract_type",
+              },
+              value: {
+                content: { value: "SERVICE_AGREEMENT" },
+              },
+            },
+            {
+              field: {
+                alias: "p_effective_date",
+              },
+              value: {
+                content: { value: "2025-10-14" },
+              },
+            },
+            {
+              field: {
+                alias: "p_expiration_date",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_jurisdiction",
+              },
+              value: {
+                content: { value: "AR" },
+              },
+            },
+            {
+              field: {
+                alias: "p_contract_value",
+              },
+              value: {
+                content: { value: 100 },
+              },
+            },
+            {
+              field: {
+                alias: "p_contract_currency",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_payment_terms",
+              },
+              value: {
+                content: { value: "Payment terms" },
+              },
+            },
+            {
+              field: {
+                alias: "p_renewal_terms",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_original_document",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_amendments",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_termination_clauses",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_confidentiality_agreement",
+              },
+              value: { content: { value: "Y" } },
+            },
+            {
+              field: {
+                alias: "p_performance_metrics",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_dispute_resolution_mechanism",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_compliance_obligations",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_security_provisions",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_notes",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_billing_contact_full_name",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_billing_contact_email",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_legal_contact_full_name",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_legal_contact_email",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_signature_date",
+              },
+              value: null,
+            },
+          ],
+        },
+      });
+    });
+
+    it("prioritizes updateProfileOnClose config over replies on linked fields", async () => {
+      const [profile] = await mocks.createRandomProfiles(organization.id, contract.id, 1);
+      const [parentReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+
+      await mocks.createRandomTextReply(paymentTermsChildField.id, undefined, 1, () => ({
+        user_id: user.id,
+        type: "SHORT_TEXT",
+        parent_petition_field_reply_id: parentReply.id,
+        content: { value: "Payment terms ON CHILD FIELD" },
+      }));
+
+      await mocks.createRandomTextReply(notesField.id, undefined, 1, () => ({
+        user_id: user.id,
+        type: "SHORT_TEXT",
+        content: { value: "Payment terms ON NOTES FIELD" },
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+          ) {
+            archiveFieldGroupReplyIntoProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              conflictResolutions: []
+              expirations: []
+            ) {
+              id
+              associatedProfile {
+                properties(filter: [{ alias: "p_payment_terms" }]) {
+                  field {
+                    alias
+                  }
+                  value {
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", parentReply.id),
+          profileId: toGlobalId("Profile", profile.id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.archiveFieldGroupReplyIntoProfile).toEqual({
+        id: toGlobalId("PetitionFieldReply", parentReply.id),
+        associatedProfile: {
+          properties: [
+            {
+              field: {
+                alias: "p_payment_terms",
+              },
+              value: {
+                content: { value: "Payment terms ON NOTES FIELD" },
+              },
+            },
+          ],
+        },
+      });
+    });
+
+    it("sends conflict if properties on config are already replied on profile", async () => {
+      const { errors: profileErrors, data: profileData } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
+            createProfile(profileTypeId: $profileTypeId, fields: $fields) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", contract.id),
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId(
+                "ProfileTypeField",
+                contractFields["p_effective_date"].id,
+              ),
+              content: { value: "2020-10-14" },
+            },
+            {
+              profileTypeFieldId: toGlobalId(
+                "ProfileTypeField",
+                contractFields["p_contract_value"].id,
+              ),
+              content: { value: 500 },
+            },
+            {
+              profileTypeFieldId: toGlobalId(
+                "ProfileTypeField",
+                contractFields["p_jurisdiction"].id,
+              ),
+              content: { value: "ES" },
+            },
+          ],
+        },
+      );
+
+      expect(profileErrors).toBeUndefined();
+      expect(profileData?.createProfile).toEqual({
+        id: expect.any(String),
+      });
+
+      const profileId = fromGlobalId(profileData!.createProfile.id).id;
+
+      const [parentReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+          ) {
+            archiveFieldGroupReplyIntoProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              conflictResolutions: []
+              expirations: []
+            ) {
+              id
+              associatedProfile {
+                properties {
+                  field {
+                    alias
+                  }
+                  value {
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", parentReply.id),
+          profileId: toGlobalId("Profile", profileId),
+        },
+      );
+
+      expect(errors).toContainGraphQLError("CONFLICT_RESOLUTION_REQUIRED_ERROR", {
+        conflictResolutions: [
+          {
+            profileTypeFieldId: toGlobalId(
+              "ProfileTypeField",
+              contractFields["p_effective_date"].id,
+            ),
+            source: { type: "PETITION_METADATA", name: "CLOSED_AT" },
+          },
+          {
+            profileTypeFieldId: toGlobalId(
+              "ProfileTypeField",
+              contractFields["p_contract_value"].id,
+            ),
+            source: { type: "VARIABLE", name: "contract_value" },
+          },
+          {
+            profileTypeFieldId: toGlobalId("ProfileTypeField", contractFields["p_jurisdiction"].id),
+            source: { type: "FIELD", fieldId: toGlobalId("PetitionField", countryField.id) },
+          },
+        ],
+        expirations: [],
+      });
+      expect(data).toBeNull();
+    });
+
+    it("resolves conflicts if properties on config are already replied on profile", async () => {
+      await mocks.createRandomTextReply(countryField.id, undefined, 1, () => ({
+        user_id: user.id,
+        type: "SELECT",
+        content: { value: "AR" },
+      }));
+
+      const { errors: profileErrors, data: profileData } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
+            createProfile(profileTypeId: $profileTypeId, fields: $fields) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", contract.id),
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId(
+                "ProfileTypeField",
+                contractFields["p_effective_date"].id,
+              ),
+              content: { value: "2020-10-14" },
+            },
+            {
+              profileTypeFieldId: toGlobalId(
+                "ProfileTypeField",
+                contractFields["p_contract_value"].id,
+              ),
+              content: { value: 500 },
+            },
+            {
+              profileTypeFieldId: toGlobalId(
+                "ProfileTypeField",
+                contractFields["p_jurisdiction"].id,
+              ),
+              content: { value: "ES" },
+            },
+          ],
+        },
+      );
+
+      expect(profileErrors).toBeUndefined();
+      expect(profileData?.createProfile).toEqual({
+        id: expect.any(String),
+      });
+
+      const profileId = fromGlobalId(profileData!.createProfile.id).id;
+
+      const [parentReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+          ) {
+            archiveFieldGroupReplyIntoProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              conflictResolutions: []
+              expirations: []
+            ) {
+              id
+              associatedProfile {
+                properties {
+                  field {
+                    alias
+                  }
+                  value {
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", parentReply.id),
+          profileId: toGlobalId("Profile", profileId),
+        },
+      );
+
+      expect(errors).toContainGraphQLError("CONFLICT_RESOLUTION_REQUIRED_ERROR", {
+        conflictResolutions: [
+          {
+            profileTypeFieldId: toGlobalId(
+              "ProfileTypeField",
+              contractFields["p_effective_date"].id,
+            ),
+            source: { type: "PETITION_METADATA", name: "CLOSED_AT" },
+          },
+          {
+            profileTypeFieldId: toGlobalId(
+              "ProfileTypeField",
+              contractFields["p_contract_value"].id,
+            ),
+            source: { type: "VARIABLE", name: "contract_value" },
+          },
+          {
+            profileTypeFieldId: toGlobalId("ProfileTypeField", contractFields["p_jurisdiction"].id),
+            source: { type: "FIELD", fieldId: toGlobalId("PetitionField", countryField.id) },
+          },
+        ],
+        expirations: [],
+      });
+      expect(data).toBeNull();
+
+      const { errors: resolveErrors, data: resolveData } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+            $conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
+          ) {
+            archiveFieldGroupReplyIntoProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              conflictResolutions: $conflictResolutions
+              expirations: []
+            ) {
+              id
+              associatedProfile {
+                properties {
+                  field {
+                    alias
+                  }
+                  value {
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", parentReply.id),
+          profileId: toGlobalId("Profile", profileId),
+          conflictResolutions: [
+            {
+              profileTypeFieldId: toGlobalId(
+                "ProfileTypeField",
+                contractFields["p_effective_date"].id,
+              ),
+              action: "OVERWRITE",
+            },
+            {
+              profileTypeFieldId: toGlobalId(
+                "ProfileTypeField",
+                contractFields["p_contract_value"].id,
+              ),
+              action: "IGNORE",
+            },
+            {
+              profileTypeFieldId: toGlobalId(
+                "ProfileTypeField",
+                contractFields["p_jurisdiction"].id,
+              ),
+              action: "OVERWRITE",
+            },
+          ],
+        },
+      );
+
+      expect(resolveErrors).toBeUndefined();
+      expect(resolveData?.archiveFieldGroupReplyIntoProfile).toEqual({
+        id: toGlobalId("PetitionFieldReply", parentReply.id),
+        associatedProfile: {
+          properties: [
+            {
+              field: {
+                alias: "p_counterparty",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_contract_type",
+              },
+              value: {
+                content: { value: "SERVICE_AGREEMENT" },
+              },
+            },
+            {
+              field: {
+                alias: "p_effective_date",
+              },
+              value: {
+                content: { value: "2025-10-14" },
+              },
+            },
+            {
+              field: {
+                alias: "p_expiration_date",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_jurisdiction",
+              },
+              value: {
+                content: { value: "AR" },
+              },
+            },
+            {
+              field: {
+                alias: "p_contract_value",
+              },
+              value: {
+                content: { value: 500 },
+              },
+            },
+            {
+              field: {
+                alias: "p_contract_currency",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_payment_terms",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_renewal_terms",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_original_document",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_amendments",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_termination_clauses",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_confidentiality_agreement",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_performance_metrics",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_dispute_resolution_mechanism",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_compliance_obligations",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_security_provisions",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_notes",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_billing_contact_full_name",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_billing_contact_email",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_legal_contact_full_name",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_legal_contact_email",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_signature_date",
+              },
+              value: null,
+            },
+          ],
+        },
+      });
+    });
+
+    it("keeps the value of the contract type when the map value is -KEEP on VARIABLE source", async () => {
+      await mocks.knex.from("petition").update({
+        variables: JSON.stringify([
+          { name: "contract_value", default_value: 0, type: "NUMBER" },
+          {
+            name: "contract_type",
+            default_value: "A05",
+            type: "ENUM",
+            value_labels: [
+              { value: "A01", label: "Service agreement" },
+              { value: "A02", label: "Employment contract" },
+              { value: "A03", label: "Lease agreement" },
+              { value: "A04", label: "Sales contract" },
+              { value: "A05", label: "Non-Disclosure Agreement (NDA)" },
+              { value: "A06", label: "Partnership agreement" },
+              { value: "A07", label: "Supply contract" },
+              { value: "A08", label: "Consulting agreement" },
+              { value: "A09", label: "Software development agreement" },
+              { value: "A10", label: "Purchase order" },
+              { value: "A11", label: "Software as a Service agreement (SaaS)" },
+              { value: "A12", label: "Data protection agreement (DPA)" },
+              { value: "A13", label: "Loan agreement" },
+              { value: "A14", label: "Credit facility" },
+            ],
+          },
+        ]),
+      });
+
+      const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+
+      const { errors: profileErrors, data: profileData } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
+            createProfile(profileTypeId: $profileTypeId, fields: $fields) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", contract.id),
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId(
+                "ProfileTypeField",
+                contractFields["p_contract_type"].id,
+              ),
+              content: { value: "SAAS" },
+            },
+          ],
+        },
+      );
+
+      expect(profileErrors).toBeUndefined();
+      expect(profileData?.createProfile).toEqual({
+        id: expect.any(String),
+      });
+
+      const profileId = fromGlobalId(profileData?.createProfile.id).id;
+
+      const { errors: archiveErrors, data: archiveData } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+          ) {
+            archiveFieldGroupReplyIntoProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              conflictResolutions: []
+              expirations: []
+            ) {
+              id
+              associatedProfile {
+                properties(filter: [{ alias: "p_contract_type" }]) {
+                  field {
+                    alias
+                  }
+                  value {
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
+          profileId: toGlobalId("Profile", profileId),
+        },
+      );
+
+      expect(archiveErrors).toBeUndefined();
+      expect(archiveData?.archiveFieldGroupReplyIntoProfile).toEqual({
+        id: toGlobalId("PetitionFieldReply", groupReply.id),
+        associatedProfile: {
+          properties: [
+            {
+              field: {
+                alias: "p_contract_type",
+              },
+              value: {
+                content: { value: "SAAS" },
+              },
+            },
+          ],
+        },
+      });
+    });
+
+    it("removes the value of the contract type when the map value is -DELETE on VARIABLE source", async () => {
+      await mocks.knex.from("petition").update({
+        variables: JSON.stringify([
+          { name: "contract_value", default_value: 0, type: "NUMBER" },
+          {
+            name: "contract_type",
+            default_value: "A06",
+            type: "ENUM",
+            value_labels: [
+              { value: "A01", label: "Service agreement" },
+              { value: "A02", label: "Employment contract" },
+              { value: "A03", label: "Lease agreement" },
+              { value: "A04", label: "Sales contract" },
+              { value: "A05", label: "Non-Disclosure Agreement (NDA)" },
+              { value: "A06", label: "Partnership agreement" },
+              { value: "A07", label: "Supply contract" },
+              { value: "A08", label: "Consulting agreement" },
+              { value: "A09", label: "Software development agreement" },
+              { value: "A10", label: "Purchase order" },
+              { value: "A11", label: "Software as a Service agreement (SaaS)" },
+              { value: "A12", label: "Data protection agreement (DPA)" },
+              { value: "A13", label: "Loan agreement" },
+              { value: "A14", label: "Credit facility" },
+            ],
+          },
+        ]),
+      });
+
+      const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+
+      const { errors: profileErrors, data: profileData } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
+            createProfile(profileTypeId: $profileTypeId, fields: $fields) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", contract.id),
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId(
+                "ProfileTypeField",
+                contractFields["p_contract_type"].id,
+              ),
+              content: { value: "SAAS" },
+            },
+          ],
+        },
+      );
+
+      expect(profileErrors).toBeUndefined();
+      expect(profileData?.createProfile).toEqual({
+        id: expect.any(String),
+      });
+
+      const profileId = fromGlobalId(profileData?.createProfile.id).id;
+
+      const { errors: archiveErrors, data: archiveData } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+          ) {
+            archiveFieldGroupReplyIntoProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              conflictResolutions: []
+              expirations: []
+            ) {
+              id
+              associatedProfile {
+                properties(filter: [{ alias: "p_contract_type" }]) {
+                  field {
+                    alias
+                  }
+                  value {
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
+          profileId: toGlobalId("Profile", profileId),
+        },
+      );
+
+      expect(archiveErrors).toBeUndefined();
+      expect(archiveData?.archiveFieldGroupReplyIntoProfile).toEqual({
+        id: toGlobalId("PetitionFieldReply", groupReply.id),
+        associatedProfile: {
+          properties: [
+            {
+              field: {
+                alias: "p_contract_type",
+              },
+              value: null,
+            },
+          ],
+        },
+      });
+    });
+
+    it("keeps the value of the confidentiality agreement when the map value is -KEEP on FIELD source", async () => {
+      await mocks.createRandomTextReply(isConfidentialField.id, undefined, 1, () => ({
+        user_id: user.id,
+        type: "SELECT",
+        content: { value: "KEEP" },
+      }));
+
+      const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+
+      const { errors: profileErrors, data: profileData } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
+            createProfile(profileTypeId: $profileTypeId, fields: $fields) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", contract.id),
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId(
+                "ProfileTypeField",
+                contractFields["p_confidentiality_agreement"].id,
+              ),
+              content: { value: "N" },
+            },
+          ],
+        },
+      );
+
+      expect(profileErrors).toBeUndefined();
+      expect(profileData?.createProfile).toEqual({
+        id: expect.any(String),
+      });
+
+      const profileId = fromGlobalId(profileData?.createProfile.id).id;
+
+      const { errors: archiveErrors, data: archiveData } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+          ) {
+            archiveFieldGroupReplyIntoProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              conflictResolutions: []
+              expirations: []
+            ) {
+              id
+              associatedProfile {
+                properties(filter: [{ alias: "p_confidentiality_agreement" }]) {
+                  field {
+                    alias
+                  }
+                  value {
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
+          profileId: toGlobalId("Profile", profileId),
+        },
+      );
+
+      expect(archiveErrors).toBeUndefined();
+      expect(archiveData?.archiveFieldGroupReplyIntoProfile).toEqual({
+        id: toGlobalId("PetitionFieldReply", groupReply.id),
+        associatedProfile: {
+          properties: [
+            {
+              field: {
+                alias: "p_confidentiality_agreement",
+              },
+              value: {
+                content: { value: "N" },
+              },
+            },
+          ],
+        },
+      });
+    });
+
+    it("removes the value of the confidentiality agreement when the map value is -DELETE on FIELD source", async () => {
+      await mocks.createRandomTextReply(isConfidentialField.id, undefined, 1, () => ({
+        user_id: user.id,
+        type: "SELECT",
+        content: { value: "DELETE" },
+      }));
+
+      const [groupReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+
+      const { errors: profileErrors, data: profileData } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!, $fields: [CreateProfileFieldValueInput!]!) {
+            createProfile(profileTypeId: $profileTypeId, fields: $fields) {
+              id
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", contract.id),
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId(
+                "ProfileTypeField",
+                contractFields["p_confidentiality_agreement"].id,
+              ),
+              content: { value: "Y" },
+            },
+          ],
+        },
+      );
+
+      expect(profileErrors).toBeUndefined();
+      expect(profileData?.createProfile).toEqual({
+        id: expect.any(String),
+      });
+
+      const profileId = fromGlobalId(profileData?.createProfile.id).id;
+
+      const { errors: archiveErrors, data: archiveData } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+          ) {
+            archiveFieldGroupReplyIntoProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              conflictResolutions: []
+              expirations: []
+            ) {
+              id
+              associatedProfile {
+                properties(filter: [{ alias: "p_confidentiality_agreement" }]) {
+                  field {
+                    alias
+                  }
+                  value {
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", groupReply.id),
+          profileId: toGlobalId("Profile", profileId),
+        },
+      );
+
+      expect(archiveErrors).toBeUndefined();
+      expect(archiveData?.archiveFieldGroupReplyIntoProfile).toEqual({
+        id: toGlobalId("PetitionFieldReply", groupReply.id),
+        associatedProfile: {
+          properties: [
+            {
+              field: {
+                alias: "p_confidentiality_agreement",
+              },
+              value: null,
             },
           ],
         },

@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import {
   Alert,
   AlertDescription,
@@ -9,40 +10,48 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  Spinner,
   Stack,
   Text,
 } from "@chakra-ui/react";
 import { FieldDateIcon } from "@parallel/chakra/icons";
 import { DateInput } from "@parallel/components/common/DateInput";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
+import { ProfileReference } from "@parallel/components/common/ProfileReference";
 import { SimpleFileButton } from "@parallel/components/common/SimpleFileButton";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
-import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import {
+  useWizardDialog,
+  WizardStepDialogProps,
+} from "@parallel/components/common/dialogs/WizardDialog";
 import {
   ArchiveFieldGroupReplyIntoProfileExpirationInput,
-  useConfigureExpirationsDateDialog_PetitionFieldFragment,
-  useConfigureExpirationsDateDialog_PetitionFieldReplyFragment,
+  useConfigureExpirationsDateDialog_profileDocument,
+  useConfigureExpirationsDateDialog_ProfileFieldPropertyFragment,
+  useConfigureExpirationsDateDialog_ProfileFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { isFileTypeField } from "@parallel/utils/isFileTypeField";
+import { UpdateProfileOnClose } from "@parallel/utils/fieldOptions";
 import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
-import { useDownloadReplyFile } from "@parallel/utils/useDownloadReplyFile";
+import { useDownloadProfileFieldFile } from "@parallel/utils/useDownloadProfileFieldFile";
 import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFiles";
 import { isPast, sub } from "date-fns";
 import { useEffect, useState } from "react";
 
 import { FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 
-interface ConfigureExpirationsDateDialogProps {
-  petitionId: string;
-  profileName: React.ReactNode;
-  profileTypeFieldsWithReplies: [
-    useConfigureExpirationsDateDialog_PetitionFieldFragment,
-    useConfigureExpirationsDateDialog_PetitionFieldReplyFragment[],
-  ][];
-}
+type ConfigureExpirationsDateDialogSteps = {
+  LOADING: {
+    profileId: string;
+    pendingExpirations: UpdateProfileOnClose[];
+  };
+  RESOLVE_EXPIRATIONS: {
+    profile: useConfigureExpirationsDateDialog_ProfileFragment;
+    pendingExpirations: UpdateProfileOnClose[];
+  };
+};
 
 interface ConfigureExpirationsDateDialogData {
   expirations: {
@@ -51,20 +60,77 @@ interface ConfigureExpirationsDateDialogData {
   }[];
 }
 
-function ConfigureExpirationsDateDialog({
-  petitionId,
-  profileName,
-  profileTypeFieldsWithReplies,
+function ConfigureExpirationsDateLoadingDialog({
+  profileId,
+  pendingExpirations,
+  onStep,
   ...props
-}: DialogProps<
-  ConfigureExpirationsDateDialogProps,
+}: WizardStepDialogProps<ConfigureExpirationsDateDialogSteps, "LOADING", void>) {
+  const { data, loading } = useQuery(useConfigureExpirationsDateDialog_profileDocument, {
+    variables: { profileId },
+  });
+
+  useEffect(() => {
+    if (
+      !loading &&
+      isNonNullish(data) &&
+      isNonNullish(data.profile) &&
+      data.profile.__typename === "Profile"
+    ) {
+      onStep("RESOLVE_EXPIRATIONS", {
+        profile: data.profile,
+        pendingExpirations,
+      });
+    }
+  }, [loading, data, onStep, pendingExpirations]);
+  return (
+    <ConfirmDialog
+      size="lg"
+      closeOnEsc={true}
+      closeOnOverlayClick={false}
+      hasCloseButton={true}
+      header={
+        <FormattedMessage
+          id="component.configure-expirations-date-dialog.header"
+          defaultMessage="Configure expirations date"
+        />
+      }
+      body={
+        <Center padding={8} minHeight="200px">
+          <Spinner
+            thickness="4px"
+            speed="0.65s"
+            emptyColor="gray.200"
+            color="primary.500"
+            size="xl"
+          />
+        </Center>
+      }
+      confirm={<></>}
+      cancel={
+        <Button disabled>
+          <FormattedMessage id="generic.close" defaultMessage="Close" />
+        </Button>
+      }
+      {...props}
+    />
+  );
+}
+
+function ConfigureExpirationsDateDialog({
+  profile,
+  pendingExpirations,
+  ...props
+}: WizardStepDialogProps<
+  ConfigureExpirationsDateDialogSteps,
+  "RESOLVE_EXPIRATIONS",
   ArchiveFieldGroupReplyIntoProfileExpirationInput[]
 >) {
   const form = useForm<ConfigureExpirationsDateDialogData>({
     mode: "onChange",
     defaultValues: {
-      expirations: profileTypeFieldsWithReplies.map(([field]) => ({
-        profileTypeFieldId: field.profileTypeField!.id,
+      expirations: pendingExpirations.map(({ profileTypeFieldId }) => ({
+        profileTypeFieldId,
         expiryDate: null,
       })),
     },
@@ -109,23 +175,25 @@ function ConfigureExpirationsDateDialog({
               id="component.configure-expirations-date-dialog.body"
               defaultMessage="Adds the expiration date of the following <b>{profileName}</b> properties:"
               values={{
-                profileName,
+                profileName: <ProfileReference profile={profile} />,
               }}
             />
           </Text>
           <Stack spacing={4}>
             <FormProvider {...form}>
               {fields.map((field, index) => {
-                const [currentField, replies] = profileTypeFieldsWithReplies.find(
-                  ([f]) => f.profileTypeField!.id === field.profileTypeFieldId,
-                )!;
+                const property = profile.properties.find(
+                  (property) => property.field.id === field.profileTypeFieldId,
+                );
+                if (isNullish(property)) {
+                  return null;
+                }
                 return (
                   <ExpirationDateRow
                     key={field.id}
                     index={index}
-                    petitionId={petitionId}
-                    field={currentField}
-                    replies={replies}
+                    profileId={profile.id}
+                    property={property}
                   />
                 );
               })}
@@ -149,14 +217,12 @@ function ConfigureExpirationsDateDialog({
 
 function ExpirationDateRow({
   index,
-  petitionId,
-  field,
-  replies,
+  profileId,
+  property,
 }: {
   index: number;
-  petitionId: string;
-  field: useConfigureExpirationsDateDialog_PetitionFieldFragment;
-  replies: useConfigureExpirationsDateDialog_PetitionFieldReplyFragment[];
+  profileId: string;
+  property: useConfigureExpirationsDateDialog_ProfileFieldPropertyFragment;
 }) {
   const intl = useIntl();
 
@@ -167,9 +233,10 @@ function ExpirationDateRow({
   } = useFormContext<ConfigureExpirationsDateDialogData>();
 
   const { browserName } = useBrowserMetadata();
-  const downloadReplyFile = useDownloadReplyFile();
+  const downloadProfileFieldFile = useDownloadProfileFieldFile();
   const userHasRemovePreviewFiles = useHasRemovePreviewFiles();
-  const { name, expiryAlertAheadTime } = field.profileTypeField!;
+  const field = property.field;
+  const { name, expiryAlertAheadTime } = field;
 
   const expiryDate = watch(`expirations.${index}.expiryDate` as const);
 
@@ -179,6 +246,7 @@ function ExpirationDateRow({
   const checkIfIsPast = (value: string | null) => isNonNullish(value) && isPast(new Date(value));
   const [isPastDate, setIsPastDate] = useState(checkIfIsPast(expiryDate));
   const handleOnBlur = () => setIsPastDate(checkIfIsPast(expiryDate));
+
   return (
     <FormControl key={field.id} as={Stack} isInvalid={!!errors.expirations?.[index]?.expiryDate}>
       <FormLabel fontWeight={400}>
@@ -211,23 +279,30 @@ function ExpirationDateRow({
         ) : null}
       </Flex>
 
-      {isFileTypeField(field.type) ? (
+      {(field.type === "FILE" ||
+        field.type === "ADVERSE_MEDIA_SEARCH" ||
+        field.type === "BACKGROUND_CHECK") &&
+      isNonNullish(property.files) &&
+      property.files.length > 0 ? (
         <Flex gap={2} flexWrap="wrap">
-          {replies.map((reply) => {
-            const file = reply.content;
+          {property.files.map((file) => {
+            if (isNullish(file?.file)) {
+              return null;
+            }
             return (
-              <Box key={reply.id}>
+              <Box key={file.id}>
                 <SimpleFileButton
-                  isDisabled={!file.uploadComplete}
+                  isDisabled={!file.file.isComplete}
                   onClick={async () => {
-                    await downloadReplyFile(
-                      petitionId,
-                      reply,
+                    await downloadProfileFieldFile(
+                      profileId,
+                      property.field.id,
+                      file.id,
                       userHasRemovePreviewFiles ? false : true,
                     );
                   }}
-                  filename={file.filename}
-                  contentType={file.contentType}
+                  filename={file.file.filename}
+                  contentType={file.file.contentType}
                 />
               </Box>
             );
@@ -285,25 +360,60 @@ function ExpirationDateRow({
 }
 
 export function useConfigureExpirationsDateDialog() {
-  return useDialog(ConfigureExpirationsDateDialog);
+  return useWizardDialog(
+    {
+      LOADING: ConfigureExpirationsDateLoadingDialog,
+      RESOLVE_EXPIRATIONS: ConfigureExpirationsDateDialog,
+    },
+    "LOADING",
+  );
 }
 
 useConfigureExpirationsDateDialog.fragments = {
-  PetitionField: gql`
-    fragment useConfigureExpirationsDateDialog_PetitionField on PetitionField {
-      id
-      type
-      profileTypeField {
+  get ProfileFieldProperty() {
+    return gql`
+      fragment useConfigureExpirationsDateDialog_ProfileFieldProperty on ProfileFieldProperty {
+        field {
+          id
+          type
+          name
+          expiryAlertAheadTime
+        }
+        files {
+          id
+          expiryDate
+          file {
+            contentType
+            filename
+            isComplete
+          }
+        }
+      }
+    `;
+  },
+  get Profile() {
+    return gql`
+      fragment useConfigureExpirationsDateDialog_Profile on Profile {
         id
-        name
-        expiryAlertAheadTime
+        properties {
+          ...useConfigureExpirationsDateDialog_ProfileFieldProperty
+        }
+        ...ProfileReference_Profile
+      }
+      ${ProfileReference.fragments.Profile}
+      ${this.ProfileFieldProperty}
+    `;
+  },
+};
+
+const _queries = [
+  gql`
+    query useConfigureExpirationsDateDialog_profile($profileId: GID!) {
+      profile(profileId: $profileId) {
+        id
+        ...useConfigureExpirationsDateDialog_Profile
       }
     }
+    ${useConfigureExpirationsDateDialog.fragments.Profile}
   `,
-  PetitionFieldReply: gql`
-    fragment useConfigureExpirationsDateDialog_PetitionFieldReply on PetitionFieldReply {
-      id
-      content
-    }
-  `,
-};
+];

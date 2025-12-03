@@ -13,12 +13,15 @@ import {
   PetitionFieldReply,
   PetitionFieldType,
   PetitionFieldTypeValues,
+  ProfileType,
+  ProfileTypeField,
   User,
   UserGroup,
 } from "../../db/__types";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { PETITION_FIELD_SERVICE, PetitionFieldService } from "../../services/PetitionFieldService";
+import { IProfilesSetupService, PROFILES_SETUP_SERVICE } from "../../services/ProfilesSetupService";
 import { toGlobalId } from "../../util/globalId";
 import { TestClient, initServer } from "./server";
 
@@ -5191,6 +5194,472 @@ describe("GraphQL/Petition Fields", () => {
         expect(data).toBeNull();
       },
     );
+
+    describe("updateProfileOnClose", () => {
+      let individual: ProfileType;
+      let profileTypeFields: ProfileTypeField[];
+
+      let petition: Petition;
+      let fieldGroup: PetitionField;
+
+      beforeAll(async () => {
+        await testClient.container
+          .get<IProfilesSetupService>(PROFILES_SETUP_SERVICE)
+          .createDefaultProfileTypes(organization.id, `User:${user.id}`);
+
+        [individual] = await mocks.knex
+          .from("profile_type")
+          .where({
+            standard_type: "INDIVIDUAL",
+            org_id: organization.id,
+            deleted_at: null,
+          })
+          .select("*");
+
+        profileTypeFields = await mocks.knex
+          .from("profile_type_field")
+          .where({
+            profile_type_id: individual.id,
+            deleted_at: null,
+          })
+          .select("*");
+      });
+
+      beforeEach(async () => {
+        [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+          variables: [{ name: "score", default_value: 0, type: "NUMBER" }],
+        }));
+        [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+          type: "FIELD_GROUP",
+          profile_type_id: individual.id,
+          options: JSON.stringify({
+            groupName: "Clients",
+          }),
+        }));
+      });
+
+      it("sends error if trying to set updateProfileOnClose on a field that is not linked to a profile type", async () => {
+        await mocks.knex.from("petition_field").where("id", fieldGroup.id).update({
+          profile_type_id: null,
+        });
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+              updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+                id
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", petition.id),
+            fieldId: toGlobalId("PetitionField", fieldGroup.id),
+            data: {
+              options: {
+                updateProfileOnClose: [
+                  {
+                    profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[0].id),
+                    source: {
+                      type: "ASK_USER",
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        );
+
+        expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+          message: "Error: field must be linked to a profile type",
+        });
+        expect(data).toBeNull();
+      });
+
+      it("sends error if providing no items or more than 20 items", async () => {
+        const { errors: errors1, data: data1 } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+              updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+                id
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", petition.id),
+            fieldId: toGlobalId("PetitionField", fieldGroup.id),
+            data: {
+              options: {
+                updateProfileOnClose: [],
+              },
+            },
+          },
+        );
+
+        expect(errors1).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+          message: "Error: data/updateProfileOnClose must NOT have fewer than 1 items",
+        });
+        expect(data1).toBeNull();
+
+        const { errors: errors2, data: data2 } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+              updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+                id
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", petition.id),
+            fieldId: toGlobalId("PetitionField", fieldGroup.id),
+            data: {
+              options: {
+                updateProfileOnClose: profileTypeFields.slice(0, 21).map((f) => ({
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", f.id),
+                  source: {
+                    type: "ASK_USER",
+                  },
+                })),
+              },
+            },
+          },
+        );
+
+        expect(errors2).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+          message: "Error: data/updateProfileOnClose must NOT have more than 20 items",
+        });
+        expect(data2).toBeNull();
+      });
+
+      it("sends error if repeating profileTypeFields", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+              updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+                id
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", petition.id),
+            fieldId: toGlobalId("PetitionField", fieldGroup.id),
+            data: {
+              options: {
+                updateProfileOnClose: [
+                  {
+                    profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[0].id),
+                    source: {
+                      type: "ASK_USER",
+                    },
+                  },
+                  {
+                    profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[0].id),
+                    source: {
+                      type: "ASK_USER",
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        );
+        expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+          message: "Error: each item in updateProfileOnClose must have a unique profileTypeFieldId",
+        });
+        expect(data).toBeNull();
+      });
+
+      it("sets ASK_USER source", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+              updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+                id
+                options
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", petition.id),
+            fieldId: toGlobalId("PetitionField", fieldGroup.id),
+            data: {
+              options: {
+                updateProfileOnClose: [
+                  {
+                    profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[0].id),
+                    source: {
+                      type: "ASK_USER",
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        );
+        expect(errors).toBeUndefined();
+        expect(data!.updatePetitionField.options).toEqual({
+          groupName: "Clients",
+          updateProfileOnClose: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[0].id),
+              source: { type: "ASK_USER" },
+            },
+          ],
+        });
+      });
+
+      it("sets NUMBER property with variable type NUMBER source", async () => {
+        const [numberProperty] = await mocks.knex
+          .from("profile_type_field")
+          .insert({
+            type: "NUMBER",
+            profile_type_id: individual.id,
+            position: profileTypeFields.length,
+          })
+          .returning("*");
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+              updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+                id
+                options
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", petition.id),
+            fieldId: toGlobalId("PetitionField", fieldGroup.id),
+            data: {
+              options: {
+                updateProfileOnClose: [
+                  {
+                    profileTypeFieldId: toGlobalId("ProfileTypeField", numberProperty.id),
+                    source: {
+                      type: "VARIABLE",
+                      name: "score",
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        );
+        expect(errors).toBeUndefined();
+        expect(data!.updatePetitionField.options).toEqual({
+          groupName: "Clients",
+          updateProfileOnClose: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", numberProperty.id),
+              source: { type: "VARIABLE", name: "score" },
+            },
+          ],
+        });
+      });
+
+      it("sends error if FIELD source is not a single-reply", async () => {
+        const [textField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+          type: "SHORT_TEXT",
+          multiple: true,
+        }));
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+              updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+                id
+                options
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", petition.id),
+            fieldId: toGlobalId("PetitionField", fieldGroup.id),
+            data: {
+              options: {
+                updateProfileOnClose: [
+                  {
+                    profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[0].id),
+                    source: {
+                      type: "FIELD",
+                      fieldId: toGlobalId("PetitionField", textField.id),
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        );
+        expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+          message: "Error: Field must be single reply",
+        });
+        expect(data).toBeNull();
+      });
+
+      it.todo("sets SELECT property with variable type ENUM source");
+
+      it("sets SELECT standardList property with field type SELECT standardList source", async () => {
+        const selectStandardProperty = profileTypeFields.find(
+          (f) => f.type === "SELECT" && f.options.standardList === "COUNTRIES",
+        )!;
+
+        const [selectField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+          type: "SELECT",
+          multiple: false,
+          options: {
+            standardList: "COUNTRIES",
+          },
+        }));
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+              updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+                id
+                options
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", petition.id),
+            fieldId: toGlobalId("PetitionField", fieldGroup.id),
+            data: {
+              options: {
+                updateProfileOnClose: [
+                  {
+                    profileTypeFieldId: toGlobalId("ProfileTypeField", selectStandardProperty.id),
+                    source: {
+                      type: "FIELD",
+                      fieldId: toGlobalId("PetitionField", selectField.id),
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        );
+        expect(errors).toBeUndefined();
+        expect(data!.updatePetitionField.options).toEqual({
+          groupName: "Clients",
+          updateProfileOnClose: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", selectStandardProperty.id),
+              source: { type: "FIELD", fieldId: toGlobalId("PetitionField", selectField.id) },
+            },
+          ],
+        });
+      });
+
+      it("sets SELECT property with field type SELECT source", async () => {
+        const selectProperty = profileTypeFields.find((f) => f.alias === "p_gender")!;
+
+        const [selectField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+          type: "SELECT",
+          multiple: false,
+          options: {
+            values: ["IS_MALE", "IS_FEMALE"],
+            labels: ["Male", "Female"],
+          },
+        }));
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+              updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+                id
+                options
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", petition.id),
+            fieldId: toGlobalId("PetitionField", fieldGroup.id),
+            data: {
+              options: {
+                updateProfileOnClose: [
+                  {
+                    profileTypeFieldId: toGlobalId("ProfileTypeField", selectProperty.id),
+                    source: {
+                      type: "FIELD",
+                      fieldId: toGlobalId("PetitionField", selectField.id),
+                      map: {
+                        IS_MALE: "M",
+                        IS_FEMALE: "F",
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        );
+        expect(errors).toBeUndefined();
+        expect(data!.updatePetitionField.options).toEqual({
+          groupName: "Clients",
+          updateProfileOnClose: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", selectProperty.id),
+              source: {
+                type: "FIELD",
+                fieldId: toGlobalId("PetitionField", selectField.id),
+                map: {
+                  IS_MALE: "M",
+                  IS_FEMALE: "F",
+                },
+              },
+            },
+          ],
+        });
+      });
+
+      it("sends error if values in map are not valid for the SELECT profile type field", async () => {
+        const selectProperty = profileTypeFields.find((f) => f.alias === "p_gender")!;
+
+        const [selectField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+          type: "SELECT",
+          multiple: false,
+          options: {
+            values: ["IS_MALE", "IS_FEMALE"],
+            labels: ["Male", "Female"],
+          },
+        }));
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+              updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+                id
+                options
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", petition.id),
+            fieldId: toGlobalId("PetitionField", fieldGroup.id),
+            data: {
+              options: {
+                updateProfileOnClose: [
+                  {
+                    profileTypeFieldId: toGlobalId("ProfileTypeField", selectProperty.id),
+                    source: {
+                      type: "FIELD",
+                      fieldId: toGlobalId("PetitionField", selectField.id),
+                      map: {
+                        IS_MALE: "UNKNOWN",
+                        IS_FEMALE: "F",
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        );
+
+        expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
+          message: "Error: All map values must be valid values of the profile type field",
+        });
+        expect(data).toBeNull();
+      });
+    });
   });
 
   describe("changePetitionFieldType", () => {

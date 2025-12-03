@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import { useToast } from "@chakra-ui/react";
 import { isDialogError } from "@parallel/components/common/dialogs/DialogProvider";
-import { useArchiveFieldGroupReplyIntoProfileDialog } from "@parallel/components/petition-replies/dialogs/ArchiveFieldGroupReplyIntoProfileDialog";
+import { useArchiveRepliesIntoProfileDialog } from "@parallel/components/petition-replies/dialogs/ArchiveRepliesIntoProfileDialog";
 import { useClosePetitionDialog } from "@parallel/components/petition-replies/dialogs/ClosePetitionDialog";
 import { useConfirmCancelOngoingApprovalsDialog } from "@parallel/components/petition-replies/dialogs/ConfirmCancelOngoingApprovalsDialog";
 import { useConfirmCancelOngoingSignatureDialog } from "@parallel/components/petition-replies/dialogs/ConfirmCancelOngoingSignatureDialog";
@@ -50,7 +50,7 @@ export function useClosePetition({ onRefetch }: useClosePetitionProps) {
   const showSolveUnreviewedRepliesDialog = useSolveUnreviewedRepliesDialog();
   const showConfirmCancelOngoingSignature = useConfirmCancelOngoingSignatureDialog();
   const showConfirmCancelOngoingApprovals = useConfirmCancelOngoingApprovalsDialog();
-  const showArchiveFieldGroupReplyIntoProfileDialog = useArchiveFieldGroupReplyIntoProfileDialog();
+  const showArchiveRepliesIntoProfileDialog = useArchiveRepliesIntoProfileDialog();
 
   const handleFinishPetition = useCallback(
     async ({
@@ -221,7 +221,7 @@ export function useClosePetition({ onRefetch }: useClosePetitionProps) {
 
         // Handle associated profiles if needed
         if (hasLinkedToProfileTypeFields) {
-          await showArchiveFieldGroupReplyIntoProfileDialog({
+          await showArchiveRepliesIntoProfileDialog({
             petitionId: petition.id,
             onRefetch: () => onRefetch?.(),
           });
@@ -244,7 +244,7 @@ export function useClosePetition({ onRefetch }: useClosePetitionProps) {
       showConfirmCancelOngoingApprovals,
       showConfirmCancelOngoingSignature,
       showSolveUnreviewedRepliesDialog,
-      showArchiveFieldGroupReplyIntoProfileDialog,
+      showArchiveRepliesIntoProfileDialog,
       onRefetch,
     ],
   );

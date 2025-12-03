@@ -1,14 +1,18 @@
 import { gql } from "@apollo/client";
 import { Alert, AlertDescription, Button, HStack, Input, Text } from "@chakra-ui/react";
 import { ProfilesIcon } from "@parallel/chakra/icons";
+import { isDialogError } from "@parallel/components/common/dialogs/DialogProvider";
 import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isNonNullish } from "remeda";
+import { useConfigureUpdateProfileOnCloseDialog } from "../../dialogs/ConfigureUpdateProfileOnCloseDialog";
 import { useCreateOrUpdateFieldGroupRelationshipsDialog } from "../../dialogs/CreateOrUpdateFieldGroupRelationshipsDialog";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { SettingsRow } from "../rows/SettingsRow";
+import { SettingsRowButton } from "../rows/SettingsRowButton";
 
 export function PetitionComposeFieldGroupSettings({
   petition,
@@ -56,6 +60,51 @@ export function PetitionComposeFieldGroupSettings({
     } catch {}
   };
 
+  const showConfigureUpdateProfileOnCloseDialog = useConfigureUpdateProfileOnCloseDialog();
+
+  const handleUpdateProfileOnClose = async (enable: boolean) => {
+    if (enable) {
+      try {
+        const { updates } = await showConfigureUpdateProfileOnCloseDialog({
+          petitionId: petition.id,
+          profileTypeId: field.profileType!.id,
+          options: field.options as FieldOptions["FIELD_GROUP"],
+        });
+
+        await onFieldEdit(field.id, {
+          options: {
+            ...field.options,
+            updateProfileOnClose: updates.length > 0 ? updates : null,
+          },
+        });
+      } catch (e) {
+        if (isDialogError(e) && e.reason === "REMOVE_SETTING") {
+          await onFieldEdit(field.id, {
+            options: {
+              ...field.options,
+              updateProfileOnClose: null,
+            },
+          });
+        } else if (!isDialogError(e)) {
+          throw e;
+        }
+      }
+    } else {
+      try {
+        await onFieldEdit(field.id, {
+          options: {
+            ...field.options,
+            updateProfileOnClose: null,
+          },
+        });
+      } catch (e) {
+        if (!isDialogError(e)) {
+          throw e;
+        }
+      }
+    }
+  };
+
   return (
     <>
       {field.isLinkedToProfileType ? (
@@ -83,6 +132,29 @@ export function PetitionComposeFieldGroupSettings({
           </Alert>
         </>
       ) : null}
+      <SettingsRowButton
+        data-section="update-profile-on-close"
+        isDisabled={!field.isLinkedToProfileType}
+        label={
+          <FormattedMessage
+            id="component.petition-compose-field-group-settings.update-profile-on-close"
+            defaultMessage="Update profile on close"
+          />
+        }
+        description={
+          <Text fontSize="sm">
+            <FormattedMessage
+              id="component.petition-compose-field-group-settings.update-profile-on-close-description-1"
+              defaultMessage="Automate the update of the profile data associated with the parallel and avoid having to complete them manually."
+            />
+          </Text>
+        }
+        controlId="update-profile-on-close"
+        isActive={isNonNullish(field.options?.updateProfileOnClose)}
+        onAdd={() => handleUpdateProfileOnClose(true)}
+        onRemove={() => handleUpdateProfileOnClose(false)}
+        onConfig={() => handleUpdateProfileOnClose(true)}
+      />
       <SettingsRow
         isDisabled={isReadOnly}
         label={

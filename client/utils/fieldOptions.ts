@@ -5,6 +5,28 @@ export type FileUploadAccepts = "PDF" | "IMAGE";
 
 export type DynamicSelectOption = [string, string[] | DynamicSelectOption[]];
 
+export interface UpdateProfileOnClose {
+  profileTypeFieldId: string;
+  source:
+    | {
+        type: "VARIABLE";
+        name: string;
+        /** required when variable is type ENUM, maps the enum values to valid options of the profile type field */
+        map?: Record<string, string | null>;
+      }
+    | {
+        type: "FIELD";
+        fieldId: string;
+        /** required when field is type SELECT or CHECKBOX, maps the field values to valid options of the profile type field */
+        map?: Record<string, string | null>;
+      }
+    | {
+        type: "PETITION_METADATA";
+        name: "CLOSED_AT";
+      }
+    | { type: "ASK_USER" };
+}
+
 export interface FieldOptions {
   HEADING: {
     hasPageBreak: boolean;
@@ -93,6 +115,7 @@ export interface FieldOptions {
   };
   FIELD_GROUP: {
     groupName?: Maybe<string>;
+    updateProfileOnClose?: Maybe<UpdateProfileOnClose[]>;
   };
   ES_TAX_DOCUMENTS: {
     attachToPdf: boolean;

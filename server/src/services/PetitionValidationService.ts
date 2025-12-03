@@ -2,8 +2,15 @@ import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import { inject, injectable } from "inversify";
 import { isPossiblePhoneNumber } from "libphonenumber-js";
-import { difference, isNonNullish, isNullish, omit } from "remeda";
-import { PetitionField, PetitionFieldType } from "../db/__types";
+import { difference, isNonNullish, isNullish, omit, unique } from "remeda";
+import { assert } from "ts-essentials";
+import {
+  PetitionField,
+  PetitionFieldType,
+  ProfileTypeField,
+  ProfileTypeFieldType,
+} from "../db/__types";
+import { PetitionVariable } from "../db/repositories/PetitionRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
 import { DynamicSelectOption } from "../graphql/helpers/parseDynamicSelectValues";
 import { isValidEmail } from "../graphql/helpers/validators/validEmail";
@@ -452,12 +459,79 @@ export class PetitionValidationService {
     }
   }
 
-  async validatePetitionFieldOptions(
+  validatePetitionFieldOptionsGlobalIds(options: any) {
+    // BACKGROUND_CHECK / ADVERSE_MEDIA_SEARCH
+    if (isNonNullish(options.autoSearchConfig)) {
+      for (const name of options.autoSearchConfig.name ?? []) {
+        const index = options.autoSearchConfig.name.indexOf(name);
+        assert(
+          typeof name === "string" && isGlobalId(name, "PetitionField"),
+          `autoSearchConfig.name[${index}] must be a valid global id`,
+        );
+      }
+
+      for (const key of ["date", "country", "birthCountry", "backgroundCheck"] as const) {
+        if (isNonNullish(options.autoSearchConfig[key])) {
+          assert(
+            typeof options.autoSearchConfig[key] === "string" &&
+              isGlobalId(options.autoSearchConfig[key], "PetitionField"),
+            `autoSearchConfig.${key} must be a valid global id`,
+          );
+        }
+      }
+    }
+    // PROFILE_SEARCH
+    else if (isNonNullish(options.searchIn)) {
+      for (const searchIn of options.searchIn) {
+        assert(
+          typeof searchIn.profileTypeId === "string" &&
+            isGlobalId(searchIn.profileTypeId, "ProfileType"),
+          `searchIn.profileTypeId must be a valid global id`,
+        );
+        for (const profileTypeFieldId of searchIn.profileTypeFieldIds) {
+          const index = searchIn.profileTypeFieldIds.indexOf(profileTypeFieldId);
+          assert(
+            typeof profileTypeFieldId === "string" &&
+              isGlobalId(profileTypeFieldId, "ProfileTypeField"),
+            `searchIn.profileTypeFieldIds[${index}] must be a valid global id`,
+          );
+        }
+      }
+      // USER_ASSIGNMENT
+    } else if (isNonNullish(options.allowedUserGroupId)) {
+      assert(
+        typeof options.allowedUserGroupId === "string" &&
+          isGlobalId(options.allowedUserGroupId, "UserGroup"),
+        "allowedUserGroupId must be a valid global id",
+      );
+    }
+    // FIELD_GROUP
+    else if (isNonNullish(options.updateProfileOnClose)) {
+      for (const s of options.updateProfileOnClose) {
+        const index = options.updateProfileOnClose.indexOf(s);
+        assert(
+          typeof s.profileTypeFieldId === "string" &&
+            isGlobalId(s.profileTypeFieldId, "ProfileTypeField"),
+          `updateProfileOnClose[${index}].profileTypeFieldId must be a valid global id`,
+        );
+        if (s.source.type === "FIELD") {
+          assert(
+            typeof s.source.fieldId === "string" && isGlobalId(s.source.fieldId, "PetitionField"),
+            `updateProfileOnClose[${index}].source.fieldId must be a valid global id`,
+          );
+        }
+      }
+    }
+  }
+
+  validatePetitionFieldOptions(
     fieldId: number,
     data: { options: Record<string, any> },
-    loadFields: (id: number[]) => Promise<(PetitionField | null)[]>,
+    petitionFieldsById: Record<number, PetitionField>,
+    profileTypeFieldsById: Record<number, ProfileTypeField> = {},
+    variablesByName: Record<string, PetitionVariable> = {},
   ) {
-    const [field] = await loadFields([fieldId]);
+    const field = petitionFieldsById[fieldId];
     if (!field) {
       throw new Error("Petition field not found");
     }
@@ -478,27 +552,21 @@ export class PetitionValidationService {
     this.validateFieldOptionsSchema(field.type, options);
 
     if (isNonNullish(data.options.autoSearchConfig)) {
-      await this.validateAutoSearchConfig(field, data.options.autoSearchConfig, loadFields);
+      this.validateAutoSearchConfig(field, data.options.autoSearchConfig, petitionFieldsById);
+    }
+
+    if (isNonNullish(data.options.updateProfileOnClose)) {
+      this.validateUpdateProfileOnClose(
+        field,
+        data.options.updateProfileOnClose,
+        petitionFieldsById,
+        profileTypeFieldsById,
+        variablesByName,
+      );
     }
 
     if (["SELECT", "CHECKBOX"].includes(field.type)) {
-      const { values, labels } = options as {
-        labels?: string[] | null;
-        values?: string[] | null;
-      };
-      if (isNullish(values) && isNonNullish(labels)) {
-        throw new Error("Values are required when labels are defined");
-      }
-      // make sure every or none of the values have a label
-      if (isNonNullish(values) && isNonNullish(labels) && values.length !== labels.length) {
-        throw new Error("The number of values and labels should match");
-      }
-      if (isNonNullish(labels) && labels.some((l) => l.trim() === "")) {
-        throw new Error("Labels cannot be empty");
-      }
-      if (isNonNullish(options.values) && isNullish(options.labels)) {
-        options.labels = null;
-      }
+      this.validateSelectOptions(options);
     }
 
     return { ...field, options };
@@ -521,10 +589,10 @@ export class PetitionValidationService {
     }
   }
 
-  private async validateAutoSearchConfig(
+  private validateAutoSearchConfig(
     field: Pick<PetitionField, "petition_id" | "type" | "parent_petition_field_id">,
     autoSearchConfig: any,
-    loadFields: (id: number[]) => Promise<(PetitionField | null)[]>,
+    petitionFieldsById: Record<number, PetitionField>,
   ) {
     function isValidField(
       field:
@@ -563,7 +631,7 @@ export class PetitionValidationService {
       if (allUsedFieldsIds.length === 0) {
         throw new Error("Invalid autoSearchConfig");
       }
-      const fields = await loadFields(allUsedFieldsIds);
+      const fields = allUsedFieldsIds.map((id) => petitionFieldsById[id]);
 
       const isValidNameField = config.name.every((id) => {
         const nameField = fields.find((f) => f?.id === id);
@@ -607,7 +675,7 @@ export class PetitionValidationService {
       if (fieldIds.length === 0) {
         throw new Error("Invalid autoSearchConfig");
       }
-      const fields = await loadFields(fieldIds);
+      const fields = fieldIds.map((id) => petitionFieldsById[id]);
       const isValidNameField = (config.name ?? []).every((id) => {
         const nameField = fields.find((f) => f?.id === id);
         return isValidField(nameField, "SHORT_TEXT", field);
@@ -623,6 +691,194 @@ export class PetitionValidationService {
       }
     } else {
       never(`${field.type} cannot have autoSearchConfig`);
+    }
+  }
+
+  private validateUpdateProfileOnClose(
+    field: Pick<PetitionField, "type" | "profile_type_id">,
+    options: NonNullable<PetitionFieldOptions["FIELD_GROUP"]["updateProfileOnClose"]>,
+    petitionFieldsById: Record<number, PetitionField>,
+    profileTypeFieldsById: Record<number, ProfileTypeField>,
+    variablesByName: Record<string, PetitionVariable>,
+  ) {
+    const COMPATIBLE_SOURCES: Record<
+      ProfileTypeFieldType,
+      (
+        | { source: "FIELD"; type: PetitionFieldType }
+        | { source: "VARIABLE"; type: "NUMBER" | "ENUM" }
+        | { source: "PETITION_METADATA"; name: "CLOSED_AT"; type: "DATE" }
+      )[]
+    > = {
+      TEXT: [
+        { source: "FIELD", type: "TEXT" },
+        { source: "FIELD", type: "SHORT_TEXT" },
+        { source: "FIELD", type: "SELECT" },
+        { source: "FIELD", type: "CHECKBOX" },
+        { source: "VARIABLE", type: "ENUM" },
+      ],
+      SHORT_TEXT: [
+        { source: "FIELD", type: "SHORT_TEXT" },
+        { source: "FIELD", type: "SELECT" },
+        { source: "FIELD", type: "CHECKBOX" },
+        { source: "VARIABLE", type: "ENUM" },
+      ],
+      NUMBER: [
+        { source: "FIELD", type: "NUMBER" },
+        { source: "VARIABLE", type: "NUMBER" },
+      ],
+      DATE: [
+        { source: "FIELD", type: "DATE" },
+        { source: "PETITION_METADATA", name: "CLOSED_AT", type: "DATE" },
+      ],
+      FILE: [
+        { source: "FIELD", type: "FILE_UPLOAD" },
+        { source: "FIELD", type: "ID_VERIFICATION" },
+        { source: "FIELD", type: "ES_TAX_DOCUMENTS" },
+        { source: "FIELD", type: "DOW_JONES_KYC" },
+      ],
+      SELECT: [
+        { source: "FIELD", type: "SELECT" },
+        { source: "VARIABLE", type: "ENUM" },
+      ],
+      PHONE: [{ source: "FIELD", type: "PHONE" }],
+      CHECKBOX: [{ source: "FIELD", type: "CHECKBOX" }],
+      BACKGROUND_CHECK: [{ source: "FIELD", type: "BACKGROUND_CHECK" }],
+      ADVERSE_MEDIA_SEARCH: [{ source: "FIELD", type: "ADVERSE_MEDIA_SEARCH" }],
+      USER_ASSIGNMENT: [{ source: "FIELD", type: "USER_ASSIGNMENT" }],
+    };
+
+    try {
+      assert(field.type === "FIELD_GROUP", "field must be a FIELD_GROUP");
+      assert(isNonNullish(field.profile_type_id), "field must be linked to a profile type");
+
+      const profileTypeFieldsIds = options.map((o) => o.profileTypeFieldId);
+      assert(
+        unique(profileTypeFieldsIds).length === profileTypeFieldsIds.length,
+        "each item in updateProfileOnClose must have a unique profileTypeFieldId",
+      );
+
+      for (const option of options) {
+        const index = options.indexOf(option);
+        const profileTypeField = profileTypeFieldsById[option.profileTypeFieldId];
+        assert(
+          isNonNullish(profileTypeField) &&
+            profileTypeField.profile_type_id === field.profile_type_id,
+          `updateProfileOnClose[${index}].profileTypeFieldId must be a valid global id`,
+        );
+
+        const compatibleSources = [
+          ...COMPATIBLE_SOURCES[profileTypeField.type],
+          { source: "ASK_USER" as const },
+        ];
+        assert(
+          compatibleSources.some((s) => s.source === option.source.type),
+          `updateProfileOnClose[${index}].source must be one of the compatible sources for the profile type field type ${profileTypeField.type}`,
+        );
+        if (option.source.type === "FIELD") {
+          const petitionField = petitionFieldsById[option.source.fieldId];
+          assert(
+            isNonNullish(petitionField),
+            `updateProfileOnClose[${index}].source.fieldId must be a valid global id`,
+          );
+          assert(
+            petitionField.multiple === false || petitionField.type === "FILE_UPLOAD",
+            "Field must be single reply",
+          );
+          assert(
+            compatibleSources.some((s) => s.source === "FIELD" && s.type === petitionField.type),
+            `updateProfileOnClose[${index}].source.fieldId must be a valid petition field for the profile type field type ${profileTypeField.type}`,
+          );
+        } else if (option.source.type === "VARIABLE") {
+          const variable = variablesByName[option.source.name];
+          assert(
+            isNonNullish(variable),
+            `updateProfileOnClose[${index}].source.name must be a valid variable name`,
+          );
+          assert(
+            compatibleSources.some((s) => s.source === "VARIABLE" && s.type === variable.type),
+            `updateProfileOnClose[${index}].source.name must be a valid variable for the profile type field type ${profileTypeField.type}`,
+          );
+        } else if (option.source.type === "PETITION_METADATA") {
+          assert(
+            compatibleSources.some(
+              (s) => s.source === "PETITION_METADATA" && s.type === profileTypeField.type,
+            ),
+            `updateProfileOnClose[${index}].source.name must be a valid petition metadata for the profile type field type ${profileTypeField.type}`,
+          );
+        } else if (option.source.type === "ASK_USER") {
+          // ASK_USER is a special source that is not validated here
+          continue;
+        }
+
+        // if profile type field is a SELECT we need to validate the map:
+        // - if SELECT is standard, source must be a standard SELECT FIELD
+        // - map keys must be valid values of the source
+        // - map values must be valid values of the profile type field
+        if (profileTypeField.type === "SELECT") {
+          if (isNonNullish(profileTypeField.options.standardList)) {
+            assert(
+              option.source.type === "FIELD" &&
+                petitionFieldsById[option.source.fieldId].type === "SELECT" &&
+                petitionFieldsById[option.source.fieldId].options.standardList ===
+                  profileTypeField.options.standardList,
+              "The petition field and profile type field must have the same standard list",
+            );
+            assert(
+              isNullish(option.source.map),
+              "Map should not be defined for a standard SELECT profile type field",
+            );
+          } else {
+            assert(
+              (option.source.type === "FIELD" || option.source.type === "VARIABLE") &&
+                isNonNullish(option.source.map),
+              "Map is required for a non-standard SELECT profile type field",
+            );
+
+            const validKeys =
+              option.source.type === "FIELD"
+                ? petitionFieldsById[option.source.fieldId].options.values
+                : (variablesByName[option.source.name]?.value_labels?.map((v) =>
+                    v.value.toString(),
+                  ) ?? []);
+            assert(
+              Object.keys(option.source.map).every((key) => validKeys.includes(key)),
+              "All map keys must be valid values of the source",
+            );
+
+            const validValues = [
+              ...profileTypeField.options.values.map((v: any) => v.value),
+              "-KEEP", // special value to keep the current profile value
+              "-DELETE", // special value to delete the current profile value
+            ];
+            assert(
+              Object.values(option.source.map).every((value) => validValues.includes(value)),
+              "All map values must be valid values of the profile type field",
+            );
+          }
+        }
+      }
+    } catch (error) {
+      if (error instanceof Error && error.message.startsWith("Assertion Error:")) {
+        throw new Error(error.message.slice("Assertion Error: ".length));
+      }
+      throw error;
+    }
+  }
+
+  private validateSelectOptions(options: PetitionFieldOptions["SELECT" | "CHECKBOX"]) {
+    const { values, labels } = options;
+    if (isNullish(values) && isNonNullish(labels)) {
+      throw new Error("Values are required when labels are defined");
+    }
+    // make sure every or none of the values have a label
+    if (isNonNullish(values) && isNonNullish(labels) && values.length !== labels.length) {
+      throw new Error("The number of values and labels should match");
+    }
+    if (isNonNullish(labels) && labels.some((l) => l.trim() === "")) {
+      throw new Error("Labels cannot be empty");
+    }
+    if (isNonNullish(options.values) && isNullish(options.labels)) {
+      options.labels = null;
     }
   }
 }

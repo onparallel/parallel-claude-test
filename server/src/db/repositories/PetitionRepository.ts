@@ -2961,6 +2961,7 @@ export class PetitionRepository extends BaseRepository {
         "automatic_numbering_config",
         "metadata",
         "approval_flow_config",
+        "closed_at",
       ]);
 
     const propertiesByPetitionId = indexBy(properties, (p) => p.id);
@@ -3005,6 +3006,7 @@ export class PetitionRepository extends BaseRepository {
         })),
         metadata: petitionProperties?.metadata ?? {},
         approvalFlowConfig: petitionProperties?.approval_flow_config ?? null,
+        closedAt: petitionProperties?.closed_at ?? null,
       };
     });
   }
@@ -3060,6 +3062,7 @@ export class PetitionRepository extends BaseRepository {
             "standardListDefinitions",
             "metadata",
             "approvalFlowConfig",
+            "closedAt",
           ]),
           fields: sortBy(fields, [(f) => f.position, "asc"]).map((field) => {
             const fieldChildren =
@@ -3506,9 +3509,9 @@ export class PetitionRepository extends BaseRepository {
           // update field visibility and math on cloned fields
           isNonNullish(f.visibility) ||
           isNonNullish(f.math) ||
-          // update field references in autoSearchConfig to point to cloned fields
-          (f.type === "BACKGROUND_CHECK" && isNonNullish(f.options.autoSearchConfig)) ||
-          (f.type === "ADVERSE_MEDIA_SEARCH" && isNonNullish(f.options.autoSearchConfig)),
+          // update field references in autoSearchConfig and updateProfileOnClose to point to cloned fields
+          isNonNullish(f.options.autoSearchConfig) ||
+          isNonNullish(f.options.updateProfileOnClose),
       );
 
       const profileTypesUpdates =

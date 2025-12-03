@@ -21,6 +21,7 @@ export function ProfileFormFieldText({
   showSuggestionsButton,
   areSuggestionsVisible,
   onToggleSuggestions,
+  showBaseStyles,
 }: ProfileFormFieldTextProps) {
   const { register } = useFormContext<ProfileFormData>();
   return (
@@ -33,7 +34,7 @@ export function ProfileFormFieldText({
       onToggleSuggestions={onToggleSuggestions}
     >
       <GrowingTextarea
-        borderColor="transparent"
+        borderColor={showBaseStyles ? undefined : "transparent"}
         maxLength={10_000}
         {...register(`fields.${field.id}.content.value`)}
         onBlur={(e) => {

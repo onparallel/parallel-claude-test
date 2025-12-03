@@ -27,6 +27,7 @@ export function ProfileFormFieldDate({
   showSuggestionsButton,
   areSuggestionsVisible,
   onToggleSuggestions,
+  showBaseStyles,
 }: ProfileFormFieldDateProps) {
   const { browserName } = useBrowserMetadata();
   const { control } = useFormContext<ProfileFormData>();
@@ -54,7 +55,7 @@ export function ProfileFormFieldDate({
             return (
               <DateInput
                 {...field}
-                borderColor="transparent"
+                borderColor={showBaseStyles ? undefined : "transparent"}
                 color={!!useReplyAsExpiryDate && alertIsActive ? "red.500" : undefined}
                 onBlur={(e) => {
                   if (e.target.value) {

@@ -36,7 +36,7 @@ import { PetitionRepliesRightPaneTabs } from "@parallel/components/petition-repl
 import { PetitionSignaturesCard } from "@parallel/components/petition-replies/PetitionSignaturesCard";
 import { PetitionVariablesCard } from "@parallel/components/petition-replies/PetitionVariablesCard";
 import { ProfileDrawer } from "@parallel/components/petition-replies/ProfileDrawer";
-import { useArchiveFieldGroupReplyIntoProfileDialog } from "@parallel/components/petition-replies/dialogs/ArchiveFieldGroupReplyIntoProfileDialog";
+import { useArchiveRepliesIntoProfileDialog } from "@parallel/components/petition-replies/dialogs/ArchiveRepliesIntoProfileDialog";
 import { useExportRepliesDialog } from "@parallel/components/petition-replies/dialogs/ExportRepliesDialog";
 import { useExportRepliesProgressDialog } from "@parallel/components/petition-replies/dialogs/ExportRepliesProgressDialog";
 import {
@@ -448,10 +448,10 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const fieldGroupsWithProfileTypesTotal = countTotalRows(groupedFields);
   const fieldGroupsWithProfileTypesLinked = countLinkedRows(groupedFields);
 
-  const showArchiveFieldGroupReplyIntoProfileDialog = useArchiveFieldGroupReplyIntoProfileDialog();
+  const showArchiveRepliesIntoProfileDialog = useArchiveRepliesIntoProfileDialog();
   const handleAssociateAndFillProfile = async () => {
     try {
-      await showArchiveFieldGroupReplyIntoProfileDialog({
+      await showArchiveRepliesIntoProfileDialog({
         petitionId: petition.id,
         onRefetch: () => refetch(),
       });

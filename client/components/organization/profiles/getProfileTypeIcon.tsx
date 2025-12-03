@@ -19,7 +19,7 @@ import {
 } from "@parallel/chakra/icons";
 import { ProfileTypeIcon } from "@parallel/graphql/__types";
 
-export function getProfileTypeFieldIcon(icon?: ProfileTypeIcon | null) {
+export function getProfileTypeIcon(icon?: ProfileTypeIcon | null) {
   const ICONS = {
     DATABASE: ProfilesIcon,
     PERSON: UserIcon,

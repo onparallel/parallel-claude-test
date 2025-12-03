@@ -17,6 +17,7 @@ import {
 } from "../validations";
 import {
   petitionVariableCanBeCreated,
+  variableIsNotReferencedInFieldOptions,
   variableIsNotReferencedInLogicConditions,
 } from "./authorizers";
 
@@ -131,6 +132,7 @@ export const deletePetitionVariable = mutationField("deletePetitionVariable", {
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     variableIsNotReferencedInLogicConditions("petitionId", "name"),
+    variableIsNotReferencedInFieldOptions("petitionId", "name"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),

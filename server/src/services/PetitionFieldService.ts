@@ -57,6 +57,60 @@ const AUTO_SEARCH_CONFIG_SCHEMA = {
   },
 } as const;
 
+const UPDATE_PROFILE_ON_CLOSE_SCHEMA = {
+  type: "object",
+  required: ["profileTypeFieldId", "source"],
+  additionalProperties: false,
+  properties: {
+    profileTypeFieldId: { type: "number" },
+    source: {
+      oneOf: [
+        {
+          title: "VariableSource",
+          type: "object",
+          required: ["type", "name"],
+          additionalProperties: false,
+          properties: {
+            type: { const: "VARIABLE" },
+            name: { type: "string" },
+            map: { type: ["object", "null"] },
+          },
+        },
+        {
+          title: "FieldSource",
+          type: "object",
+          required: ["type", "fieldId"],
+          additionalProperties: false,
+          properties: {
+            type: { const: "FIELD" },
+            fieldId: { type: "number" },
+            map: { type: ["object", "null"] },
+          },
+        },
+        {
+          title: "PetitionMetadataSource",
+          type: "object",
+          required: ["type", "name"],
+          additionalProperties: false,
+          properties: {
+            type: { const: "PETITION_METADATA" },
+            name: { enum: ["CLOSED_AT"] },
+          },
+        },
+        {
+          title: "AskUserSource",
+          type: "object",
+          required: ["type"],
+          additionalProperties: false,
+          properties: {
+            type: { const: "ASK_USER" },
+          },
+        },
+      ],
+    },
+  },
+} as const;
+
 export const SCHEMAS = {
   NUMBER: {
     type: "object",
@@ -352,6 +406,12 @@ export const SCHEMAS = {
       groupName: {
         type: ["string", "null"],
       },
+      updateProfileOnClose: {
+        type: ["array", "null"],
+        minItems: 1,
+        maxItems: 20,
+        items: UPDATE_PROFILE_ON_CLOSE_SCHEMA,
+      },
     },
   },
   ID_VERIFICATION: {
@@ -576,6 +636,7 @@ export class PetitionFieldService {
         case "FIELD_GROUP": {
           return {
             groupName: field?.options.groupName ?? null,
+            updateProfileOnClose: field?.options.updateProfileOnClose ?? null,
           };
         }
         case "ID_VERIFICATION": {
@@ -640,6 +701,21 @@ export class PetitionFieldService {
     };
   }
 
+  mapUpdateProfileOnClose(
+    config: FromSchema<typeof UPDATE_PROFILE_ON_CLOSE_SCHEMA>[] | null,
+    idMapFn: (type: string, id: number) => string | number,
+  ) {
+    return (
+      config?.map((s) => ({
+        profileTypeFieldId: idMapFn("ProfileTypeField", s.profileTypeFieldId),
+        source:
+          s.source.type === "FIELD"
+            ? { ...s.source, fieldId: idMapFn("PetitionField", s.source.fieldId) }
+            : s.source,
+      })) ?? null
+    );
+  }
+
   /**
    * Maps a field's options to a complete options object based on its type.
    * This method handles both complete and incomplete options values, ensuring
@@ -696,9 +772,8 @@ export class PetitionFieldService {
           replyOnlyFromProfile: field.options.replyOnlyFromProfile ?? false,
         };
       case "SELECT":
-        const options = field.options as PetitionFieldOptions["SELECT"];
         return {
-          ...(await this.loadSelectOptionsValuesAndLabels(options, locale)),
+          ...(await this.loadSelectOptionsValuesAndLabels(field.options, locale)),
           placeholder: field.options.placeholder ?? null,
           standardList: field.options.standardList ?? null,
           replyOnlyFromProfile: field.options.replyOnlyFromProfile ?? false,
@@ -729,6 +804,10 @@ export class PetitionFieldService {
       case "FIELD_GROUP":
         return {
           groupName: field.options.groupName ?? null,
+          updateProfileOnClose: this.mapUpdateProfileOnClose(
+            field.options.updateProfileOnClose ?? null,
+            idMapFn,
+          ),
         };
       case "DOW_JONES_KYC":
         return {};

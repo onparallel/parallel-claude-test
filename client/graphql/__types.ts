@@ -15516,8 +15516,8 @@ export type ProfileLayout_ProfileFragment = {
       hasStoredValue: boolean;
     } | null;
   }>;
-  petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
   relationships: Array<{ __typename?: "ProfileRelationship"; id: string }>;
+  petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
 };
 
 export type ProfileLayout_subscribeToProfileMutationVariables = Exact<{
@@ -15589,8 +15589,8 @@ export type ProfileLayout_subscribeToProfileMutation = {
         hasStoredValue: boolean;
       } | null;
     }>;
-    petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
     relationships: Array<{ __typename?: "ProfileRelationship"; id: string }>;
+    petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
   }>;
 };
 
@@ -15663,8 +15663,8 @@ export type ProfileLayout_unsubscribeFromProfileMutation = {
         hasStoredValue: boolean;
       } | null;
     }>;
-    petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
     relationships: Array<{ __typename?: "ProfileRelationship"; id: string }>;
+    petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
   }>;
 };
 
@@ -27284,6 +27284,79 @@ export type PetitionSettings_enableAutomaticNumberingOnPetitionFieldsMutation = 
       };
 };
 
+export type PetitionUpdateProfileOnCloseSourceSelect_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+    options: { [key: string]: any };
+    multiple: boolean;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      title?: string | null;
+      options: { [key: string]: any };
+      multiple: boolean;
+      parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+    }> | null;
+    parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+  }>;
+  variables: Array<
+    | { __typename?: "PetitionVariableEnum"; name: string; type: PetitionVariableType }
+    | { __typename?: "PetitionVariableNumber"; name: string; type: PetitionVariableType }
+  >;
+};
+
+export type PetitionUpdateProfileOnCloseSourceSelect_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+    options: { [key: string]: any };
+    multiple: boolean;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      title?: string | null;
+      options: { [key: string]: any };
+      multiple: boolean;
+      parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+    }> | null;
+    parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+  }>;
+  variables: Array<
+    | { __typename?: "PetitionVariableEnum"; name: string; type: PetitionVariableType }
+    | { __typename?: "PetitionVariableNumber"; name: string; type: PetitionVariableType }
+  >;
+};
+
+export type PetitionUpdateProfileOnCloseSourceSelect_PetitionBaseFragment =
+  | PetitionUpdateProfileOnCloseSourceSelect_PetitionBase_Petition_Fragment
+  | PetitionUpdateProfileOnCloseSourceSelect_PetitionBase_PetitionTemplate_Fragment;
+
+export type PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldInnerFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  type: PetitionFieldType;
+  title?: string | null;
+  options: { [key: string]: any };
+  multiple: boolean;
+  parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+};
+
+export type PetitionUpdateProfileOnCloseSourceSelect_ProfileTypeFieldFragment = {
+  __typename?: "ProfileTypeField";
+  id: string;
+  type: ProfileTypeFieldType;
+  options: { [key: string]: any };
+};
+
 export type CompliancePeriodDialog_PetitionBase_Petition_Fragment = {
   __typename: "Petition";
   closedAt?: string | null;
@@ -27812,6 +27885,268 @@ export type ConfigureBackgroundCheckAutomateSearchDialog_petitionQuery = {
         }>;
       }
     | null;
+};
+
+export type useConfigureUpdateProfileOnCloseDialog_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  type: PetitionFieldType;
+  options: { [key: string]: any };
+  multiple: boolean;
+  parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+  profileTypeField?: {
+    __typename?: "ProfileTypeField";
+    id: string;
+    type: ProfileTypeFieldType;
+  } | null;
+};
+
+export type useConfigureUpdateProfileOnCloseDialog_PetitionVariable_PetitionVariableEnum_Fragment =
+  {
+    __typename?: "PetitionVariableEnum";
+    name: string;
+    type: PetitionVariableType;
+    valueLabels: Array<{ __typename?: "PetitionVariableEnumLabel"; value: string; label: string }>;
+  };
+
+export type useConfigureUpdateProfileOnCloseDialog_PetitionVariable_PetitionVariableNumber_Fragment =
+  { __typename?: "PetitionVariableNumber"; name: string; type: PetitionVariableType };
+
+export type useConfigureUpdateProfileOnCloseDialog_PetitionVariableFragment =
+  | useConfigureUpdateProfileOnCloseDialog_PetitionVariable_PetitionVariableEnum_Fragment
+  | useConfigureUpdateProfileOnCloseDialog_PetitionVariable_PetitionVariableNumber_Fragment;
+
+export type useConfigureUpdateProfileOnCloseDialog_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+  id: string;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    options: { [key: string]: any };
+    multiple: boolean;
+    title?: string | null;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      options: { [key: string]: any };
+      multiple: boolean;
+      title?: string | null;
+      parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+      profileTypeField?: {
+        __typename?: "ProfileTypeField";
+        id: string;
+        type: ProfileTypeFieldType;
+      } | null;
+    }> | null;
+    parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+    profileTypeField?: {
+      __typename?: "ProfileTypeField";
+      id: string;
+      type: ProfileTypeFieldType;
+    } | null;
+  }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        valueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | { __typename?: "PetitionVariableNumber"; name: string; type: PetitionVariableType }
+  >;
+};
+
+export type useConfigureUpdateProfileOnCloseDialog_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    options: { [key: string]: any };
+    multiple: boolean;
+    title?: string | null;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      options: { [key: string]: any };
+      multiple: boolean;
+      title?: string | null;
+      parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+      profileTypeField?: {
+        __typename?: "ProfileTypeField";
+        id: string;
+        type: ProfileTypeFieldType;
+      } | null;
+    }> | null;
+    parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+    profileTypeField?: {
+      __typename?: "ProfileTypeField";
+      id: string;
+      type: ProfileTypeFieldType;
+    } | null;
+  }>;
+  variables: Array<
+    | {
+        __typename?: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        valueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | { __typename?: "PetitionVariableNumber"; name: string; type: PetitionVariableType }
+  >;
+};
+
+export type useConfigureUpdateProfileOnCloseDialog_PetitionBaseFragment =
+  | useConfigureUpdateProfileOnCloseDialog_PetitionBase_Petition_Fragment
+  | useConfigureUpdateProfileOnCloseDialog_PetitionBase_PetitionTemplate_Fragment;
+
+export type useConfigureUpdateProfileOnCloseDialog_ProfileTypeFieldFragment = {
+  __typename?: "ProfileTypeField";
+  id: string;
+  options: { [key: string]: any };
+  name: { [locale in UserLocale]?: string };
+  type: ProfileTypeFieldType;
+};
+
+export type useConfigureUpdateProfileOnCloseDialog_ProfileTypeFragment = {
+  __typename?: "ProfileType";
+  id: string;
+  fields: Array<{
+    __typename?: "ProfileTypeField";
+    id: string;
+    options: { [key: string]: any };
+    name: { [locale in UserLocale]?: string };
+    type: ProfileTypeFieldType;
+  }>;
+};
+
+export type ConfigureUpdateProfileOnCloseDialog_petitionQueryVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+}>;
+
+export type ConfigureUpdateProfileOnCloseDialog_petitionQuery = {
+  petition?:
+    | {
+        __typename?: "Petition";
+        id: string;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          multiple: boolean;
+          title?: string | null;
+          children?: Array<{
+            __typename?: "PetitionField";
+            id: string;
+            type: PetitionFieldType;
+            options: { [key: string]: any };
+            multiple: boolean;
+            title?: string | null;
+            parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+            profileTypeField?: {
+              __typename?: "ProfileTypeField";
+              id: string;
+              type: ProfileTypeFieldType;
+            } | null;
+          }> | null;
+          parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+          profileTypeField?: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            type: ProfileTypeFieldType;
+          } | null;
+        }>;
+        variables: Array<
+          | {
+              __typename?: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              valueLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | { __typename?: "PetitionVariableNumber"; name: string; type: PetitionVariableType }
+        >;
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          multiple: boolean;
+          title?: string | null;
+          children?: Array<{
+            __typename?: "PetitionField";
+            id: string;
+            type: PetitionFieldType;
+            options: { [key: string]: any };
+            multiple: boolean;
+            title?: string | null;
+            parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+            profileTypeField?: {
+              __typename?: "ProfileTypeField";
+              id: string;
+              type: ProfileTypeFieldType;
+            } | null;
+          }> | null;
+          parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+          profileTypeField?: {
+            __typename?: "ProfileTypeField";
+            id: string;
+            type: ProfileTypeFieldType;
+          } | null;
+        }>;
+        variables: Array<
+          | {
+              __typename?: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              valueLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | { __typename?: "PetitionVariableNumber"; name: string; type: PetitionVariableType }
+        >;
+      }
+    | null;
+};
+
+export type ConfigureUpdateProfileOnCloseDialog_profileTypeQueryVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+}>;
+
+export type ConfigureUpdateProfileOnCloseDialog_profileTypeQuery = {
+  profileType: {
+    __typename?: "ProfileType";
+    id: string;
+    fields: Array<{
+      __typename?: "ProfileTypeField";
+      id: string;
+      options: { [key: string]: any };
+      name: { [locale in UserLocale]?: string };
+      type: ProfileTypeFieldType;
+    }>;
+  };
 };
 
 export type useConfirmDiscardDraftDialog_PetitionBase_Petition_Fragment = {
@@ -39959,6 +40294,7 @@ export type ProfileDrawer_ProfileFragment = {
 
 export type ProfileDrawer_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
+  id: string;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -39991,6 +40327,7 @@ export type ProfileDrawer_PetitionBase_Petition_Fragment = {
 
 export type ProfileDrawer_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
+  id: string;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -40034,8 +40371,8 @@ export type ProfileDrawer_profileQuery = {
     __typename?: "Profile";
     id: string;
     status: ProfileStatus;
-    permanentDeletionAt?: string | null;
     localizableName: { [locale in UserLocale]?: string };
+    permanentDeletionAt?: string | null;
     profileType: {
       __typename?: "ProfileType";
       id: string;
@@ -40080,12 +40417,24 @@ export type ProfileDrawer_profileQuery = {
         hasStoredValue: boolean;
       } | null;
     }>;
-    petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
     relationships: Array<{ __typename?: "ProfileRelationship"; id: string }>;
+    petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
   };
 };
 
-export type useArchiveFieldGroupReplyIntoProfileDialog_ProfileFragment = {
+export type useArchiveRepliesIntoProfileDialog_ProfileFieldPropertyFragment = {
+  __typename?: "ProfileFieldProperty";
+  field: {
+    __typename?: "ProfileTypeField";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    type: ProfileTypeFieldType;
+    myPermission: ProfileTypeFieldPermissionType;
+    isUsedInProfileName: boolean;
+  };
+};
+
+export type useArchiveRepliesIntoProfileDialog_ProfileFragment = {
   __typename?: "Profile";
   id: string;
   localizableName: { [locale in UserLocale]?: string };
@@ -40095,21 +40444,18 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_ProfileFragment = {
     field: {
       __typename?: "ProfileTypeField";
       id: string;
+      name: { [locale in UserLocale]?: string };
       type: ProfileTypeFieldType;
       myPermission: ProfileTypeFieldPermissionType;
+      isUsedInProfileName: boolean;
     };
-    value?: {
-      __typename?: "ProfileFieldValue";
-      id: string;
-      content?: { [key: string]: any } | null;
-    } | null;
+    value?: { __typename?: "ProfileFieldValue"; content?: { [key: string]: any } | null } | null;
     files?: Array<{
       __typename?: "ProfileFieldFile";
-      id: string;
       file?: {
         __typename?: "FileUpload";
-        size: number;
         filename: string;
+        size: number;
         contentType: string;
       } | null;
     }> | null;
@@ -40119,530 +40465,218 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_ProfileFragment = {
     id: string;
     name: { [locale in UserLocale]?: string };
     canCreate: boolean;
+    fields: Array<{ __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType }>;
   };
 };
 
-export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldInnerFragment = {
-  __typename?: "PetitionField";
+export type useArchiveRepliesIntoProfileDialog_PetitionFieldReplyInnerFragment = {
+  __typename?: "PetitionFieldReply";
   id: string;
-  type: PetitionFieldType;
-  options: { [key: string]: any };
-  multiple: boolean;
-  isLinkedToProfileType: boolean;
-  isLinkedToProfileTypeField: boolean;
-  profileType?: { __typename?: "ProfileType"; id: string; profileNamePattern: string } | null;
-  profileTypeField?: {
-    __typename?: "ProfileTypeField";
-    id: string;
-    isUsedInProfileName: boolean;
-  } | null;
-  replies: Array<{
-    __typename?: "PetitionFieldReply";
-    id: string;
-    content: { [key: string]: any };
-    children?: Array<{
-      __typename?: "PetitionFieldGroupChildReply";
-      field: {
-        __typename?: "PetitionField";
-        id: string;
-        type: PetitionFieldType;
-        options: { [key: string]: any };
-        profileTypeField?: {
-          __typename?: "ProfileTypeField";
-          id: string;
-          name: { [locale in UserLocale]?: string };
-          isExpirable: boolean;
-          expiryAlertAheadTime?: Duration | null;
-          options: { [key: string]: any };
-          myPermission: ProfileTypeFieldPermissionType;
-        } | null;
-        profileType?: { __typename?: "ProfileType"; id: string; profileNamePattern: string } | null;
-      };
-      replies: Array<{
-        __typename?: "PetitionFieldReply";
-        id: string;
-        content: { [key: string]: any };
-        associatedProfile?: {
-          __typename?: "Profile";
-          id: string;
-          localizableName: { [locale in UserLocale]?: string };
-          status: ProfileStatus;
-          properties: Array<{
-            __typename?: "ProfileFieldProperty";
-            field: {
-              __typename?: "ProfileTypeField";
-              id: string;
-              type: ProfileTypeFieldType;
-              myPermission: ProfileTypeFieldPermissionType;
-            };
-            value?: {
-              __typename?: "ProfileFieldValue";
-              id: string;
-              content?: { [key: string]: any } | null;
-            } | null;
-            files?: Array<{
-              __typename?: "ProfileFieldFile";
-              id: string;
-              file?: {
-                __typename?: "FileUpload";
-                size: number;
-                filename: string;
-                contentType: string;
-              } | null;
-            }> | null;
-          }>;
-          profileType: {
-            __typename?: "ProfileType";
-            id: string;
-            name: { [locale in UserLocale]?: string };
-            canCreate: boolean;
-          };
-        } | null;
-        parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-      }>;
-    }> | null;
-    associatedProfile?: {
-      __typename?: "Profile";
-      id: string;
-      localizableName: { [locale in UserLocale]?: string };
-      status: ProfileStatus;
-      properties: Array<{
-        __typename?: "ProfileFieldProperty";
-        field: {
-          __typename?: "ProfileTypeField";
-          id: string;
-          type: ProfileTypeFieldType;
-          myPermission: ProfileTypeFieldPermissionType;
-        };
-        value?: {
-          __typename?: "ProfileFieldValue";
-          id: string;
-          content?: { [key: string]: any } | null;
-        } | null;
-        files?: Array<{
-          __typename?: "ProfileFieldFile";
-          id: string;
-          file?: {
-            __typename?: "FileUpload";
-            size: number;
-            filename: string;
-            contentType: string;
-          } | null;
-        }> | null;
-      }>;
-      profileType: {
-        __typename?: "ProfileType";
-        id: string;
-        name: { [locale in UserLocale]?: string };
-        canCreate: boolean;
-      };
-    } | null;
-    parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-  }>;
-};
-
-export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  id: string;
-  type: PetitionFieldType;
-  options: { [key: string]: any };
-  multiple: boolean;
-  isLinkedToProfileType: boolean;
-  isLinkedToProfileTypeField: boolean;
+  content: { [key: string]: any };
+  associatedProfile?: { __typename?: "Profile"; id: string } | null;
+  parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
   children?: Array<{
-    __typename?: "PetitionField";
-    id: string;
-    type: PetitionFieldType;
-    options: { [key: string]: any };
-    multiple: boolean;
-    isLinkedToProfileType: boolean;
-    isLinkedToProfileTypeField: boolean;
-    profileType?: { __typename?: "ProfileType"; id: string; profileNamePattern: string } | null;
-    profileTypeField?: {
-      __typename?: "ProfileTypeField";
-      id: string;
-      isUsedInProfileName: boolean;
-      name: { [locale in UserLocale]?: string };
-      expiryAlertAheadTime?: Duration | null;
-    } | null;
+    __typename?: "PetitionFieldGroupChildReply";
+    field: { __typename?: "PetitionField"; id: string };
     replies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
       content: { [key: string]: any };
-      children?: Array<{
-        __typename?: "PetitionFieldGroupChildReply";
-        field: {
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
-          profileTypeField?: {
-            __typename?: "ProfileTypeField";
-            id: string;
-            name: { [locale in UserLocale]?: string };
-            isExpirable: boolean;
-            expiryAlertAheadTime?: Duration | null;
-            options: { [key: string]: any };
-            myPermission: ProfileTypeFieldPermissionType;
-          } | null;
-          profileType?: {
-            __typename?: "ProfileType";
-            id: string;
-            profileNamePattern: string;
-          } | null;
-        };
-        replies: Array<{
-          __typename?: "PetitionFieldReply";
-          id: string;
-          content: { [key: string]: any };
-          associatedProfile?: {
-            __typename?: "Profile";
-            id: string;
-            localizableName: { [locale in UserLocale]?: string };
-            status: ProfileStatus;
-            properties: Array<{
-              __typename?: "ProfileFieldProperty";
-              field: {
-                __typename?: "ProfileTypeField";
-                id: string;
-                type: ProfileTypeFieldType;
-                myPermission: ProfileTypeFieldPermissionType;
-              };
-              value?: {
-                __typename?: "ProfileFieldValue";
-                id: string;
-                content?: { [key: string]: any } | null;
-              } | null;
-              files?: Array<{
-                __typename?: "ProfileFieldFile";
-                id: string;
-                file?: {
-                  __typename?: "FileUpload";
-                  size: number;
-                  filename: string;
-                  contentType: string;
-                } | null;
-              }> | null;
-            }>;
-            profileType: {
-              __typename?: "ProfileType";
-              id: string;
-              name: { [locale in UserLocale]?: string };
-              canCreate: boolean;
-            };
-          } | null;
-          parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-        }>;
-      }> | null;
-      associatedProfile?: {
-        __typename?: "Profile";
-        id: string;
-        localizableName: { [locale in UserLocale]?: string };
-        status: ProfileStatus;
-        properties: Array<{
-          __typename?: "ProfileFieldProperty";
-          field: {
-            __typename?: "ProfileTypeField";
-            id: string;
-            type: ProfileTypeFieldType;
-            myPermission: ProfileTypeFieldPermissionType;
-          };
-          value?: {
-            __typename?: "ProfileFieldValue";
-            id: string;
-            content?: { [key: string]: any } | null;
-          } | null;
-          files?: Array<{
-            __typename?: "ProfileFieldFile";
-            id: string;
-            file?: {
-              __typename?: "FileUpload";
-              size: number;
-              filename: string;
-              contentType: string;
-            } | null;
-          }> | null;
-        }>;
-        profileType: {
-          __typename?: "ProfileType";
-          id: string;
-          name: { [locale in UserLocale]?: string };
-          canCreate: boolean;
-        };
-      } | null;
       parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
     }>;
   }> | null;
-  profileType?: { __typename?: "ProfileType"; id: string; profileNamePattern: string } | null;
-  replies: Array<{
-    __typename?: "PetitionFieldReply";
-    id: string;
-    content: { [key: string]: any };
-    children?: Array<{
-      __typename?: "PetitionFieldGroupChildReply";
-      field: {
-        __typename?: "PetitionField";
-        id: string;
-        type: PetitionFieldType;
-        options: { [key: string]: any };
-        profileTypeField?: {
-          __typename?: "ProfileTypeField";
-          id: string;
-          name: { [locale in UserLocale]?: string };
-          isExpirable: boolean;
-          expiryAlertAheadTime?: Duration | null;
-          options: { [key: string]: any };
-          myPermission: ProfileTypeFieldPermissionType;
-        } | null;
-        profileType?: { __typename?: "ProfileType"; id: string; profileNamePattern: string } | null;
-      };
-      replies: Array<{
-        __typename?: "PetitionFieldReply";
-        id: string;
-        content: { [key: string]: any };
-        associatedProfile?: {
-          __typename?: "Profile";
-          id: string;
-          localizableName: { [locale in UserLocale]?: string };
-          status: ProfileStatus;
-          properties: Array<{
-            __typename?: "ProfileFieldProperty";
-            field: {
-              __typename?: "ProfileTypeField";
-              id: string;
-              type: ProfileTypeFieldType;
-              myPermission: ProfileTypeFieldPermissionType;
-            };
-            value?: {
-              __typename?: "ProfileFieldValue";
-              id: string;
-              content?: { [key: string]: any } | null;
-            } | null;
-            files?: Array<{
-              __typename?: "ProfileFieldFile";
-              id: string;
-              file?: {
-                __typename?: "FileUpload";
-                size: number;
-                filename: string;
-                contentType: string;
-              } | null;
-            }> | null;
-          }>;
-          profileType: {
-            __typename?: "ProfileType";
-            id: string;
-            name: { [locale in UserLocale]?: string };
-            canCreate: boolean;
-          };
-        } | null;
-        parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-      }>;
-    }> | null;
-    associatedProfile?: {
-      __typename?: "Profile";
-      id: string;
-      localizableName: { [locale in UserLocale]?: string };
-      status: ProfileStatus;
-      properties: Array<{
-        __typename?: "ProfileFieldProperty";
-        field: {
-          __typename?: "ProfileTypeField";
-          id: string;
-          type: ProfileTypeFieldType;
-          myPermission: ProfileTypeFieldPermissionType;
-        };
-        value?: {
-          __typename?: "ProfileFieldValue";
-          id: string;
-          content?: { [key: string]: any } | null;
-        } | null;
-        files?: Array<{
-          __typename?: "ProfileFieldFile";
-          id: string;
-          file?: {
-            __typename?: "FileUpload";
-            size: number;
-            filename: string;
-            contentType: string;
-          } | null;
-        }> | null;
-      }>;
-      profileType: {
-        __typename?: "ProfileType";
-        id: string;
-        name: { [locale in UserLocale]?: string };
-        canCreate: boolean;
-      };
-    } | null;
-    parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-  }>;
-  profileTypeField?: {
-    __typename?: "ProfileTypeField";
-    id: string;
-    isUsedInProfileName: boolean;
-    name: { [locale in UserLocale]?: string };
-    expiryAlertAheadTime?: Duration | null;
-  } | null;
 };
 
-export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyInnerFragment = {
-  __typename?: "PetitionFieldReply";
-  id: string;
-  content: { [key: string]: any };
-  associatedProfile?: {
-    __typename?: "Profile";
-    id: string;
-    localizableName: { [locale in UserLocale]?: string };
-    status: ProfileStatus;
-    properties: Array<{
-      __typename?: "ProfileFieldProperty";
-      field: {
-        __typename?: "ProfileTypeField";
-        id: string;
-        type: ProfileTypeFieldType;
-        myPermission: ProfileTypeFieldPermissionType;
-      };
-      value?: {
-        __typename?: "ProfileFieldValue";
-        id: string;
-        content?: { [key: string]: any } | null;
-      } | null;
-      files?: Array<{
-        __typename?: "ProfileFieldFile";
-        id: string;
-        file?: {
-          __typename?: "FileUpload";
-          size: number;
-          filename: string;
-          contentType: string;
-        } | null;
-      }> | null;
-    }>;
-    profileType: {
-      __typename?: "ProfileType";
-      id: string;
-      name: { [locale in UserLocale]?: string };
-      canCreate: boolean;
-    };
-  } | null;
-};
-
-export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyFragment = {
+export type useArchiveRepliesIntoProfileDialog_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
   id: string;
   content: { [key: string]: any };
   children?: Array<{
     __typename?: "PetitionFieldGroupChildReply";
-    field: {
-      __typename?: "PetitionField";
-      id: string;
-      type: PetitionFieldType;
-      options: { [key: string]: any };
-      profileTypeField?: {
-        __typename?: "ProfileTypeField";
-        id: string;
-        name: { [locale in UserLocale]?: string };
-        isExpirable: boolean;
-        expiryAlertAheadTime?: Duration | null;
-        options: { [key: string]: any };
-        myPermission: ProfileTypeFieldPermissionType;
-      } | null;
-      profileType?: { __typename?: "ProfileType"; id: string; profileNamePattern: string } | null;
-    };
+    field: { __typename?: "PetitionField"; id: string };
     replies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
       content: { [key: string]: any };
-      associatedProfile?: {
-        __typename?: "Profile";
-        id: string;
-        localizableName: { [locale in UserLocale]?: string };
-        status: ProfileStatus;
-        properties: Array<{
-          __typename?: "ProfileFieldProperty";
-          field: {
-            __typename?: "ProfileTypeField";
-            id: string;
-            type: ProfileTypeFieldType;
-            myPermission: ProfileTypeFieldPermissionType;
-          };
-          value?: {
-            __typename?: "ProfileFieldValue";
-            id: string;
-            content?: { [key: string]: any } | null;
-          } | null;
-          files?: Array<{
-            __typename?: "ProfileFieldFile";
-            id: string;
-            file?: {
-              __typename?: "FileUpload";
-              size: number;
-              filename: string;
-              contentType: string;
-            } | null;
-          }> | null;
-        }>;
-        profileType: {
-          __typename?: "ProfileType";
-          id: string;
-          name: { [locale in UserLocale]?: string };
-          canCreate: boolean;
-        };
-      } | null;
       parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-    }>;
-  }> | null;
-  associatedProfile?: {
-    __typename?: "Profile";
-    id: string;
-    localizableName: { [locale in UserLocale]?: string };
-    status: ProfileStatus;
-    properties: Array<{
-      __typename?: "ProfileFieldProperty";
-      field: {
-        __typename?: "ProfileTypeField";
-        id: string;
-        type: ProfileTypeFieldType;
-        myPermission: ProfileTypeFieldPermissionType;
-      };
-      value?: {
-        __typename?: "ProfileFieldValue";
-        id: string;
-        content?: { [key: string]: any } | null;
-      } | null;
-      files?: Array<{
-        __typename?: "ProfileFieldFile";
-        id: string;
-        file?: {
-          __typename?: "FileUpload";
-          size: number;
-          filename: string;
-          contentType: string;
-        } | null;
+      associatedProfile?: { __typename?: "Profile"; id: string } | null;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: { __typename?: "PetitionField"; id: string };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+        }>;
       }> | null;
     }>;
-    profileType: {
-      __typename?: "ProfileType";
-      id: string;
-      name: { [locale in UserLocale]?: string };
-      canCreate: boolean;
-    };
-  } | null;
+  }> | null;
+  associatedProfile?: { __typename?: "Profile"; id: string } | null;
   parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
 };
 
-export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
+export type useArchiveRepliesIntoProfileDialog_ProfileTypeFragment = {
+  __typename?: "ProfileType";
+  id: string;
+  profileNamePattern: string;
+  fields: Array<{
+    __typename?: "ProfileTypeField";
+    id: string;
+    isUsedInProfileName: boolean;
+    type: ProfileTypeFieldType;
+    options: { [key: string]: any };
+  }>;
+};
+
+export type useArchiveRepliesIntoProfileDialog_PetitionFieldInnerFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  title?: string | null;
+  type: PetitionFieldType;
+  options: { [key: string]: any };
+  isLinkedToProfileType: boolean;
+  profileType?: { __typename?: "ProfileType"; id: string } | null;
+  profileTypeField?: {
+    __typename?: "ProfileTypeField";
+    id: string;
+    myPermission: ProfileTypeFieldPermissionType;
+    isUsedInProfileName: boolean;
+  } | null;
+  replies: Array<{
+    __typename?: "PetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+    associatedProfile?: { __typename?: "Profile"; id: string } | null;
+    children?: Array<{
+      __typename?: "PetitionFieldGroupChildReply";
+      field: { __typename?: "PetitionField"; id: string };
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+        parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+        associatedProfile?: { __typename?: "Profile"; id: string } | null;
+        children?: Array<{
+          __typename?: "PetitionFieldGroupChildReply";
+          field: { __typename?: "PetitionField"; id: string };
+          replies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+            parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+          }>;
+        }> | null;
+      }>;
+    }> | null;
+    parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+  }>;
+};
+
+export type useArchiveRepliesIntoProfileDialog_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  type: PetitionFieldType;
+  options: { [key: string]: any };
+  multiple: boolean;
+  title?: string | null;
+  isLinkedToProfileType: boolean;
+  children?: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    title?: string | null;
+    type: PetitionFieldType;
+    options: { [key: string]: any };
+    isLinkedToProfileType: boolean;
+    profileType?: { __typename?: "ProfileType"; id: string } | null;
+    profileTypeField?: {
+      __typename?: "ProfileTypeField";
+      id: string;
+      myPermission: ProfileTypeFieldPermissionType;
+      isUsedInProfileName: boolean;
+    } | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      associatedProfile?: { __typename?: "Profile"; id: string } | null;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: { __typename?: "PetitionField"; id: string };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+          associatedProfile?: { __typename?: "Profile"; id: string } | null;
+          children?: Array<{
+            __typename?: "PetitionFieldGroupChildReply";
+            field: { __typename?: "PetitionField"; id: string };
+            replies: Array<{
+              __typename?: "PetitionFieldReply";
+              id: string;
+              content: { [key: string]: any };
+              parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+            }>;
+          }> | null;
+        }>;
+      }> | null;
+      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+    }>;
+  }> | null;
+  profileType?: { __typename?: "ProfileType"; id: string } | null;
+  replies: Array<{
+    __typename?: "PetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+    associatedProfile?: { __typename?: "Profile"; id: string } | null;
+    children?: Array<{
+      __typename?: "PetitionFieldGroupChildReply";
+      field: {
+        __typename?: "PetitionField";
+        id: string;
+        profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+      };
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+        parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+        associatedProfile?: { __typename?: "Profile"; id: string } | null;
+        children?: Array<{
+          __typename?: "PetitionFieldGroupChildReply";
+          field: { __typename?: "PetitionField"; id: string };
+          replies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+            parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+          }>;
+        }> | null;
+      }>;
+    }> | null;
+    parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+  }>;
+  profileTypeField?: {
+    __typename?: "ProfileTypeField";
+    id: string;
+    myPermission: ProfileTypeFieldPermissionType;
+    isUsedInProfileName: boolean;
+  } | null;
+};
+
+export type useArchiveRepliesIntoProfileDialog_PetitionFragment = {
   __typename?: "Petition";
   id: string;
+  closedAt?: string | null;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
     type: PetitionFieldType;
     options: { [key: string]: any };
     multiple: boolean;
+    title?: string | null;
     isLinkedToProfileType: boolean;
-    isLinkedToProfileTypeField: boolean;
     visibility?: { [key: string]: any } | null;
     math?: Array<{ [key: string]: any }> | null;
     children?: Array<{
@@ -40650,9 +40684,8 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
       id: string;
       type: PetitionFieldType;
       options: { [key: string]: any };
-      multiple: boolean;
+      title?: string | null;
       isLinkedToProfileType: boolean;
-      isLinkedToProfileTypeField: boolean;
       visibility?: { [key: string]: any } | null;
       math?: Array<{ [key: string]: any }> | null;
       parent?: { __typename?: "PetitionField"; id: string } | null;
@@ -40661,107 +40694,28 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
         id: string;
         content: { [key: string]: any };
         isAnonymized: boolean;
+        associatedProfile?: { __typename?: "Profile"; id: string } | null;
         children?: Array<{
           __typename?: "PetitionFieldGroupChildReply";
-          field: {
-            __typename?: "PetitionField";
-            id: string;
-            type: PetitionFieldType;
-            options: { [key: string]: any };
-            profileTypeField?: {
-              __typename?: "ProfileTypeField";
-              id: string;
-              name: { [locale in UserLocale]?: string };
-              isExpirable: boolean;
-              expiryAlertAheadTime?: Duration | null;
-              options: { [key: string]: any };
-              myPermission: ProfileTypeFieldPermissionType;
-            } | null;
-            profileType?: {
-              __typename?: "ProfileType";
-              id: string;
-              profileNamePattern: string;
-            } | null;
-          };
+          field: { __typename?: "PetitionField"; id: string };
           replies: Array<{
             __typename?: "PetitionFieldReply";
             id: string;
             content: { [key: string]: any };
-            associatedProfile?: {
-              __typename?: "Profile";
-              id: string;
-              localizableName: { [locale in UserLocale]?: string };
-              status: ProfileStatus;
-              properties: Array<{
-                __typename?: "ProfileFieldProperty";
-                field: {
-                  __typename?: "ProfileTypeField";
-                  id: string;
-                  type: ProfileTypeFieldType;
-                  myPermission: ProfileTypeFieldPermissionType;
-                };
-                value?: {
-                  __typename?: "ProfileFieldValue";
-                  id: string;
-                  content?: { [key: string]: any } | null;
-                } | null;
-                files?: Array<{
-                  __typename?: "ProfileFieldFile";
-                  id: string;
-                  file?: {
-                    __typename?: "FileUpload";
-                    size: number;
-                    filename: string;
-                    contentType: string;
-                  } | null;
-                }> | null;
-              }>;
-              profileType: {
-                __typename?: "ProfileType";
-                id: string;
-                name: { [locale in UserLocale]?: string };
-                canCreate: boolean;
-              };
-            } | null;
             parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-          }>;
-        }> | null;
-        associatedProfile?: {
-          __typename?: "Profile";
-          id: string;
-          localizableName: { [locale in UserLocale]?: string };
-          status: ProfileStatus;
-          properties: Array<{
-            __typename?: "ProfileFieldProperty";
-            field: {
-              __typename?: "ProfileTypeField";
-              id: string;
-              type: ProfileTypeFieldType;
-              myPermission: ProfileTypeFieldPermissionType;
-            };
-            value?: {
-              __typename?: "ProfileFieldValue";
-              id: string;
-              content?: { [key: string]: any } | null;
-            } | null;
-            files?: Array<{
-              __typename?: "ProfileFieldFile";
-              id: string;
-              file?: {
-                __typename?: "FileUpload";
-                size: number;
-                filename: string;
-                contentType: string;
-              } | null;
+            associatedProfile?: { __typename?: "Profile"; id: string } | null;
+            children?: Array<{
+              __typename?: "PetitionFieldGroupChildReply";
+              field: { __typename?: "PetitionField"; id: string };
+              replies: Array<{
+                __typename?: "PetitionFieldReply";
+                id: string;
+                content: { [key: string]: any };
+                parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+              }>;
             }> | null;
           }>;
-          profileType: {
-            __typename?: "ProfileType";
-            id: string;
-            name: { [locale in UserLocale]?: string };
-            canCreate: boolean;
-          };
-        } | null;
+        }> | null;
         parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
       }>;
       previewReplies: Array<{
@@ -40770,14 +40724,13 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
         content: { [key: string]: any };
         isAnonymized: boolean;
       }>;
-      profileType?: { __typename?: "ProfileType"; id: string; profileNamePattern: string } | null;
       profileTypeField?: {
         __typename?: "ProfileTypeField";
         id: string;
+        myPermission: ProfileTypeFieldPermissionType;
         isUsedInProfileName: boolean;
-        name: { [locale in UserLocale]?: string };
-        expiryAlertAheadTime?: Duration | null;
       } | null;
+      profileType?: { __typename?: "ProfileType"; id: string } | null;
     }> | null;
     replies: Array<{
       __typename?: "PetitionFieldReply";
@@ -40789,103 +40742,28 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
         field: {
           __typename?: "PetitionField";
           id: string;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
-          profileTypeField?: {
-            __typename?: "ProfileTypeField";
-            id: string;
-            name: { [locale in UserLocale]?: string };
-            isExpirable: boolean;
-            expiryAlertAheadTime?: Duration | null;
-            options: { [key: string]: any };
-            myPermission: ProfileTypeFieldPermissionType;
-          } | null;
-          profileType?: {
-            __typename?: "ProfileType";
-            id: string;
-            profileNamePattern: string;
-          } | null;
+          profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
         };
         replies: Array<{
           __typename?: "PetitionFieldReply";
           id: string;
           content: { [key: string]: any };
           isAnonymized: boolean;
-          associatedProfile?: {
-            __typename?: "Profile";
-            id: string;
-            localizableName: { [locale in UserLocale]?: string };
-            status: ProfileStatus;
-            properties: Array<{
-              __typename?: "ProfileFieldProperty";
-              field: {
-                __typename?: "ProfileTypeField";
-                id: string;
-                type: ProfileTypeFieldType;
-                myPermission: ProfileTypeFieldPermissionType;
-              };
-              value?: {
-                __typename?: "ProfileFieldValue";
-                id: string;
-                content?: { [key: string]: any } | null;
-              } | null;
-              files?: Array<{
-                __typename?: "ProfileFieldFile";
-                id: string;
-                file?: {
-                  __typename?: "FileUpload";
-                  size: number;
-                  filename: string;
-                  contentType: string;
-                } | null;
-              }> | null;
-            }>;
-            profileType: {
-              __typename?: "ProfileType";
-              id: string;
-              name: { [locale in UserLocale]?: string };
-              canCreate: boolean;
-            };
-          } | null;
           parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-        }>;
-      }> | null;
-      associatedProfile?: {
-        __typename?: "Profile";
-        id: string;
-        localizableName: { [locale in UserLocale]?: string };
-        status: ProfileStatus;
-        properties: Array<{
-          __typename?: "ProfileFieldProperty";
-          field: {
-            __typename?: "ProfileTypeField";
-            id: string;
-            type: ProfileTypeFieldType;
-            myPermission: ProfileTypeFieldPermissionType;
-          };
-          value?: {
-            __typename?: "ProfileFieldValue";
-            id: string;
-            content?: { [key: string]: any } | null;
-          } | null;
-          files?: Array<{
-            __typename?: "ProfileFieldFile";
-            id: string;
-            file?: {
-              __typename?: "FileUpload";
-              size: number;
-              filename: string;
-              contentType: string;
-            } | null;
+          associatedProfile?: { __typename?: "Profile"; id: string } | null;
+          children?: Array<{
+            __typename?: "PetitionFieldGroupChildReply";
+            field: { __typename?: "PetitionField"; id: string };
+            replies: Array<{
+              __typename?: "PetitionFieldReply";
+              id: string;
+              content: { [key: string]: any };
+              parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+            }>;
           }> | null;
         }>;
-        profileType: {
-          __typename?: "ProfileType";
-          id: string;
-          name: { [locale in UserLocale]?: string };
-          canCreate: boolean;
-        };
-      } | null;
+      }> | null;
+      associatedProfile?: { __typename?: "Profile"; id: string } | null;
       parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
     }>;
     previewReplies: Array<{
@@ -40908,14 +40786,14 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
         }>;
       }> | null;
     }>;
-    profileType?: { __typename?: "ProfileType"; id: string; profileNamePattern: string } | null;
+    parent?: { __typename?: "PetitionField"; id: string } | null;
     profileTypeField?: {
       __typename?: "ProfileTypeField";
       id: string;
+      myPermission: ProfileTypeFieldPermissionType;
       isUsedInProfileName: boolean;
-      name: { [locale in UserLocale]?: string };
-      expiryAlertAheadTime?: Duration | null;
     } | null;
+    profileType?: { __typename?: "ProfileType"; id: string } | null;
   }>;
   automaticNumberingConfig?: {
     __typename?: "AutomaticNumberingConfig";
@@ -40949,23 +40827,24 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment = {
   }>;
 };
 
-export type useArchiveFieldGroupReplyIntoProfileDialog_petitionQueryVariables = Exact<{
-  id: Scalars["GID"]["input"];
+export type useArchiveRepliesIntoProfileDialog_petitionQueryVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
 }>;
 
-export type useArchiveFieldGroupReplyIntoProfileDialog_petitionQuery = {
+export type useArchiveRepliesIntoProfileDialog_petitionQuery = {
   petition?:
     | {
         __typename?: "Petition";
         id: string;
+        closedAt?: string | null;
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
           multiple: boolean;
+          title?: string | null;
           isLinkedToProfileType: boolean;
-          isLinkedToProfileTypeField: boolean;
           visibility?: { [key: string]: any } | null;
           math?: Array<{ [key: string]: any }> | null;
           children?: Array<{
@@ -40973,9 +40852,8 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_petitionQuery = {
             id: string;
             type: PetitionFieldType;
             options: { [key: string]: any };
-            multiple: boolean;
+            title?: string | null;
             isLinkedToProfileType: boolean;
-            isLinkedToProfileTypeField: boolean;
             visibility?: { [key: string]: any } | null;
             math?: Array<{ [key: string]: any }> | null;
             parent?: { __typename?: "PetitionField"; id: string } | null;
@@ -40984,107 +40862,28 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_petitionQuery = {
               id: string;
               content: { [key: string]: any };
               isAnonymized: boolean;
+              associatedProfile?: { __typename?: "Profile"; id: string } | null;
               children?: Array<{
                 __typename?: "PetitionFieldGroupChildReply";
-                field: {
-                  __typename?: "PetitionField";
-                  id: string;
-                  type: PetitionFieldType;
-                  options: { [key: string]: any };
-                  profileTypeField?: {
-                    __typename?: "ProfileTypeField";
-                    id: string;
-                    name: { [locale in UserLocale]?: string };
-                    isExpirable: boolean;
-                    expiryAlertAheadTime?: Duration | null;
-                    options: { [key: string]: any };
-                    myPermission: ProfileTypeFieldPermissionType;
-                  } | null;
-                  profileType?: {
-                    __typename?: "ProfileType";
-                    id: string;
-                    profileNamePattern: string;
-                  } | null;
-                };
+                field: { __typename?: "PetitionField"; id: string };
                 replies: Array<{
                   __typename?: "PetitionFieldReply";
                   id: string;
                   content: { [key: string]: any };
-                  associatedProfile?: {
-                    __typename?: "Profile";
-                    id: string;
-                    localizableName: { [locale in UserLocale]?: string };
-                    status: ProfileStatus;
-                    properties: Array<{
-                      __typename?: "ProfileFieldProperty";
-                      field: {
-                        __typename?: "ProfileTypeField";
-                        id: string;
-                        type: ProfileTypeFieldType;
-                        myPermission: ProfileTypeFieldPermissionType;
-                      };
-                      value?: {
-                        __typename?: "ProfileFieldValue";
-                        id: string;
-                        content?: { [key: string]: any } | null;
-                      } | null;
-                      files?: Array<{
-                        __typename?: "ProfileFieldFile";
-                        id: string;
-                        file?: {
-                          __typename?: "FileUpload";
-                          size: number;
-                          filename: string;
-                          contentType: string;
-                        } | null;
-                      }> | null;
-                    }>;
-                    profileType: {
-                      __typename?: "ProfileType";
-                      id: string;
-                      name: { [locale in UserLocale]?: string };
-                      canCreate: boolean;
-                    };
-                  } | null;
                   parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-                }>;
-              }> | null;
-              associatedProfile?: {
-                __typename?: "Profile";
-                id: string;
-                localizableName: { [locale in UserLocale]?: string };
-                status: ProfileStatus;
-                properties: Array<{
-                  __typename?: "ProfileFieldProperty";
-                  field: {
-                    __typename?: "ProfileTypeField";
-                    id: string;
-                    type: ProfileTypeFieldType;
-                    myPermission: ProfileTypeFieldPermissionType;
-                  };
-                  value?: {
-                    __typename?: "ProfileFieldValue";
-                    id: string;
-                    content?: { [key: string]: any } | null;
-                  } | null;
-                  files?: Array<{
-                    __typename?: "ProfileFieldFile";
-                    id: string;
-                    file?: {
-                      __typename?: "FileUpload";
-                      size: number;
-                      filename: string;
-                      contentType: string;
-                    } | null;
+                  associatedProfile?: { __typename?: "Profile"; id: string } | null;
+                  children?: Array<{
+                    __typename?: "PetitionFieldGroupChildReply";
+                    field: { __typename?: "PetitionField"; id: string };
+                    replies: Array<{
+                      __typename?: "PetitionFieldReply";
+                      id: string;
+                      content: { [key: string]: any };
+                      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+                    }>;
                   }> | null;
                 }>;
-                profileType: {
-                  __typename?: "ProfileType";
-                  id: string;
-                  name: { [locale in UserLocale]?: string };
-                  canCreate: boolean;
-                };
-              } | null;
+              }> | null;
               parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
             }>;
             previewReplies: Array<{
@@ -41093,18 +40892,13 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_petitionQuery = {
               content: { [key: string]: any };
               isAnonymized: boolean;
             }>;
-            profileType?: {
-              __typename?: "ProfileType";
-              id: string;
-              profileNamePattern: string;
-            } | null;
             profileTypeField?: {
               __typename?: "ProfileTypeField";
               id: string;
+              myPermission: ProfileTypeFieldPermissionType;
               isUsedInProfileName: boolean;
-              name: { [locale in UserLocale]?: string };
-              expiryAlertAheadTime?: Duration | null;
             } | null;
+            profileType?: { __typename?: "ProfileType"; id: string } | null;
           }> | null;
           replies: Array<{
             __typename?: "PetitionFieldReply";
@@ -41116,103 +40910,28 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_petitionQuery = {
               field: {
                 __typename?: "PetitionField";
                 id: string;
-                type: PetitionFieldType;
-                options: { [key: string]: any };
-                profileTypeField?: {
-                  __typename?: "ProfileTypeField";
-                  id: string;
-                  name: { [locale in UserLocale]?: string };
-                  isExpirable: boolean;
-                  expiryAlertAheadTime?: Duration | null;
-                  options: { [key: string]: any };
-                  myPermission: ProfileTypeFieldPermissionType;
-                } | null;
-                profileType?: {
-                  __typename?: "ProfileType";
-                  id: string;
-                  profileNamePattern: string;
-                } | null;
+                profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
               };
               replies: Array<{
                 __typename?: "PetitionFieldReply";
                 id: string;
                 content: { [key: string]: any };
                 isAnonymized: boolean;
-                associatedProfile?: {
-                  __typename?: "Profile";
-                  id: string;
-                  localizableName: { [locale in UserLocale]?: string };
-                  status: ProfileStatus;
-                  properties: Array<{
-                    __typename?: "ProfileFieldProperty";
-                    field: {
-                      __typename?: "ProfileTypeField";
-                      id: string;
-                      type: ProfileTypeFieldType;
-                      myPermission: ProfileTypeFieldPermissionType;
-                    };
-                    value?: {
-                      __typename?: "ProfileFieldValue";
-                      id: string;
-                      content?: { [key: string]: any } | null;
-                    } | null;
-                    files?: Array<{
-                      __typename?: "ProfileFieldFile";
-                      id: string;
-                      file?: {
-                        __typename?: "FileUpload";
-                        size: number;
-                        filename: string;
-                        contentType: string;
-                      } | null;
-                    }> | null;
-                  }>;
-                  profileType: {
-                    __typename?: "ProfileType";
-                    id: string;
-                    name: { [locale in UserLocale]?: string };
-                    canCreate: boolean;
-                  };
-                } | null;
                 parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-              }>;
-            }> | null;
-            associatedProfile?: {
-              __typename?: "Profile";
-              id: string;
-              localizableName: { [locale in UserLocale]?: string };
-              status: ProfileStatus;
-              properties: Array<{
-                __typename?: "ProfileFieldProperty";
-                field: {
-                  __typename?: "ProfileTypeField";
-                  id: string;
-                  type: ProfileTypeFieldType;
-                  myPermission: ProfileTypeFieldPermissionType;
-                };
-                value?: {
-                  __typename?: "ProfileFieldValue";
-                  id: string;
-                  content?: { [key: string]: any } | null;
-                } | null;
-                files?: Array<{
-                  __typename?: "ProfileFieldFile";
-                  id: string;
-                  file?: {
-                    __typename?: "FileUpload";
-                    size: number;
-                    filename: string;
-                    contentType: string;
-                  } | null;
+                associatedProfile?: { __typename?: "Profile"; id: string } | null;
+                children?: Array<{
+                  __typename?: "PetitionFieldGroupChildReply";
+                  field: { __typename?: "PetitionField"; id: string };
+                  replies: Array<{
+                    __typename?: "PetitionFieldReply";
+                    id: string;
+                    content: { [key: string]: any };
+                    parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+                  }>;
                 }> | null;
               }>;
-              profileType: {
-                __typename?: "ProfileType";
-                id: string;
-                name: { [locale in UserLocale]?: string };
-                canCreate: boolean;
-              };
-            } | null;
+            }> | null;
+            associatedProfile?: { __typename?: "Profile"; id: string } | null;
             parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
           }>;
           previewReplies: Array<{
@@ -41235,18 +40954,14 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_petitionQuery = {
               }>;
             }> | null;
           }>;
-          profileType?: {
-            __typename?: "ProfileType";
-            id: string;
-            profileNamePattern: string;
-          } | null;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
           profileTypeField?: {
             __typename?: "ProfileTypeField";
             id: string;
+            myPermission: ProfileTypeFieldPermissionType;
             isUsedInProfileName: boolean;
-            name: { [locale in UserLocale]?: string };
-            expiryAlertAheadTime?: Duration | null;
           } | null;
+          profileType?: { __typename?: "ProfileType"; id: string } | null;
         }>;
         automaticNumberingConfig?: {
           __typename?: "AutomaticNumberingConfig";
@@ -41287,7 +41002,67 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_petitionQuery = {
     | null;
 };
 
-export type useArchiveFieldGroupReplyIntoProfileDialog_archiveFieldGroupReplyIntoProfileMutationVariables =
+export type useArchiveRepliesIntoProfileDialog_profileQueryVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+}>;
+
+export type useArchiveRepliesIntoProfileDialog_profileQuery = {
+  profile: {
+    __typename?: "Profile";
+    id: string;
+    localizableName: { [locale in UserLocale]?: string };
+    status: ProfileStatus;
+    properties: Array<{
+      __typename?: "ProfileFieldProperty";
+      field: {
+        __typename?: "ProfileTypeField";
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        type: ProfileTypeFieldType;
+        myPermission: ProfileTypeFieldPermissionType;
+        isUsedInProfileName: boolean;
+      };
+      value?: { __typename?: "ProfileFieldValue"; content?: { [key: string]: any } | null } | null;
+      files?: Array<{
+        __typename?: "ProfileFieldFile";
+        file?: {
+          __typename?: "FileUpload";
+          filename: string;
+          size: number;
+          contentType: string;
+        } | null;
+      }> | null;
+    }>;
+    profileType: {
+      __typename?: "ProfileType";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      canCreate: boolean;
+      fields: Array<{ __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType }>;
+    };
+  };
+};
+
+export type useArchiveRepliesIntoProfileDialog_profileTypeQueryVariables = Exact<{
+  profileTypeId: Scalars["GID"]["input"];
+}>;
+
+export type useArchiveRepliesIntoProfileDialog_profileTypeQuery = {
+  profileType: {
+    __typename?: "ProfileType";
+    id: string;
+    profileNamePattern: string;
+    fields: Array<{
+      __typename?: "ProfileTypeField";
+      id: string;
+      isUsedInProfileName: boolean;
+      type: ProfileTypeFieldType;
+      options: { [key: string]: any };
+    }>;
+  };
+};
+
+export type useArchiveRepliesIntoProfileDialog_archiveFieldGroupReplyIntoProfileMutationVariables =
   Exact<{
     petitionId: Scalars["GID"]["input"];
     petitionFieldId: Scalars["GID"]["input"];
@@ -41301,11 +41076,10 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_archiveFieldGroupReplyInt
       | ArchiveFieldGroupReplyIntoProfileExpirationInput;
   }>;
 
-export type useArchiveFieldGroupReplyIntoProfileDialog_archiveFieldGroupReplyIntoProfileMutation = {
+export type useArchiveRepliesIntoProfileDialog_archiveFieldGroupReplyIntoProfileMutation = {
   archiveFieldGroupReplyIntoProfile: {
     __typename?: "PetitionFieldReply";
     id: string;
-    content: { [key: string]: any };
     associatedProfile?: {
       __typename?: "Profile";
       id: string;
@@ -41316,21 +41090,21 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_archiveFieldGroupReplyInt
         field: {
           __typename?: "ProfileTypeField";
           id: string;
+          name: { [locale in UserLocale]?: string };
           type: ProfileTypeFieldType;
           myPermission: ProfileTypeFieldPermissionType;
+          isUsedInProfileName: boolean;
         };
         value?: {
           __typename?: "ProfileFieldValue";
-          id: string;
           content?: { [key: string]: any } | null;
         } | null;
         files?: Array<{
           __typename?: "ProfileFieldFile";
-          id: string;
           file?: {
             __typename?: "FileUpload";
-            size: number;
             filename: string;
+            size: number;
             contentType: string;
           } | null;
         }> | null;
@@ -41340,70 +41114,9 @@ export type useArchiveFieldGroupReplyIntoProfileDialog_archiveFieldGroupReplyInt
         id: string;
         name: { [locale in UserLocale]?: string };
         canCreate: boolean;
+        fields: Array<{ __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType }>;
       };
     } | null;
-    children?: Array<{
-      __typename?: "PetitionFieldGroupChildReply";
-      field: {
-        __typename?: "PetitionField";
-        id: string;
-        type: PetitionFieldType;
-        options: { [key: string]: any };
-        profileTypeField?: {
-          __typename?: "ProfileTypeField";
-          id: string;
-          name: { [locale in UserLocale]?: string };
-          isExpirable: boolean;
-          expiryAlertAheadTime?: Duration | null;
-          options: { [key: string]: any };
-          myPermission: ProfileTypeFieldPermissionType;
-        } | null;
-        profileType?: { __typename?: "ProfileType"; id: string; profileNamePattern: string } | null;
-      };
-      replies: Array<{
-        __typename?: "PetitionFieldReply";
-        id: string;
-        content: { [key: string]: any };
-        associatedProfile?: {
-          __typename?: "Profile";
-          id: string;
-          localizableName: { [locale in UserLocale]?: string };
-          status: ProfileStatus;
-          properties: Array<{
-            __typename?: "ProfileFieldProperty";
-            field: {
-              __typename?: "ProfileTypeField";
-              id: string;
-              type: ProfileTypeFieldType;
-              myPermission: ProfileTypeFieldPermissionType;
-            };
-            value?: {
-              __typename?: "ProfileFieldValue";
-              id: string;
-              content?: { [key: string]: any } | null;
-            } | null;
-            files?: Array<{
-              __typename?: "ProfileFieldFile";
-              id: string;
-              file?: {
-                __typename?: "FileUpload";
-                size: number;
-                filename: string;
-                contentType: string;
-              } | null;
-            }> | null;
-          }>;
-          profileType: {
-            __typename?: "ProfileType";
-            id: string;
-            name: { [locale in UserLocale]?: string };
-            canCreate: boolean;
-          };
-        } | null;
-        parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-      }>;
-    }> | null;
-    parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
   };
 };
 
@@ -41440,22 +41153,88 @@ export type useClosePetitionDialog_PetitionFragment = {
   }>;
 };
 
-export type useConfigureExpirationsDateDialog_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  id: string;
-  type: PetitionFieldType;
-  profileTypeField?: {
+export type useConfigureExpirationsDateDialog_ProfileFieldPropertyFragment = {
+  __typename?: "ProfileFieldProperty";
+  field: {
     __typename?: "ProfileTypeField";
     id: string;
+    type: ProfileTypeFieldType;
     name: { [locale in UserLocale]?: string };
     expiryAlertAheadTime?: Duration | null;
-  } | null;
+  };
+  files?: Array<{
+    __typename?: "ProfileFieldFile";
+    id: string;
+    expiryDate?: string | null;
+    file?: {
+      __typename?: "FileUpload";
+      contentType: string;
+      filename: string;
+      isComplete: boolean;
+    } | null;
+  }> | null;
 };
 
-export type useConfigureExpirationsDateDialog_PetitionFieldReplyFragment = {
-  __typename?: "PetitionFieldReply";
+export type useConfigureExpirationsDateDialog_ProfileFragment = {
+  __typename?: "Profile";
   id: string;
-  content: { [key: string]: any };
+  localizableName: { [locale in UserLocale]?: string };
+  status: ProfileStatus;
+  properties: Array<{
+    __typename?: "ProfileFieldProperty";
+    field: {
+      __typename?: "ProfileTypeField";
+      id: string;
+      type: ProfileTypeFieldType;
+      name: { [locale in UserLocale]?: string };
+      expiryAlertAheadTime?: Duration | null;
+    };
+    files?: Array<{
+      __typename?: "ProfileFieldFile";
+      id: string;
+      expiryDate?: string | null;
+      file?: {
+        __typename?: "FileUpload";
+        contentType: string;
+        filename: string;
+        isComplete: boolean;
+      } | null;
+    }> | null;
+  }>;
+};
+
+export type useConfigureExpirationsDateDialog_profileQueryVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+}>;
+
+export type useConfigureExpirationsDateDialog_profileQuery = {
+  profile: {
+    __typename?: "Profile";
+    id: string;
+    localizableName: { [locale in UserLocale]?: string };
+    status: ProfileStatus;
+    properties: Array<{
+      __typename?: "ProfileFieldProperty";
+      field: {
+        __typename?: "ProfileTypeField";
+        id: string;
+        type: ProfileTypeFieldType;
+        name: { [locale in UserLocale]?: string };
+        expiryAlertAheadTime?: Duration | null;
+      };
+      files?: Array<{
+        __typename?: "ProfileFieldFile";
+        id: string;
+        expiryDate?: string | null;
+        file?: {
+          __typename?: "FileUpload";
+          contentType: string;
+          filename: string;
+          isComplete: boolean;
+        } | null;
+      }> | null;
+    }>;
+  };
 };
 
 export type ExportRepliesDialog_UserFragment = {
@@ -41679,6 +41458,8 @@ export type useResolveProfilePropertiesConflictsDialog_ProfileFieldPropertyFragm
 export type useResolveProfilePropertiesConflictsDialog_ProfileFragment = {
   __typename?: "Profile";
   id: string;
+  localizableName: { [locale in UserLocale]?: string };
+  status: ProfileStatus;
   properties: Array<{
     __typename?: "ProfileFieldProperty";
     field: {
@@ -41708,19 +41489,137 @@ export type useResolveProfilePropertiesConflictsDialog_ProfileFragment = {
   }>;
 };
 
-export type useResolveProfilePropertiesConflictsDialog_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  id: string;
-  type: PetitionFieldType;
-  options: { [key: string]: any };
-  profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
-};
-
 export type useResolveProfilePropertiesConflictsDialog_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
   id: string;
   content: { [key: string]: any };
   parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+};
+
+export type useResolveProfilePropertiesConflictsDialog_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  type: PetitionFieldType;
+  options: { [key: string]: any };
+  parent?: { __typename?: "PetitionField"; id: string } | null;
+  profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+  replies: Array<{
+    __typename?: "PetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+    parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+  }>;
+};
+
+export type useResolveProfilePropertiesConflictsDialog_PetitionFragment = {
+  __typename?: "Petition";
+  id: string;
+  closedAt?: string | null;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    options: { [key: string]: any };
+    visibility?: { [key: string]: any } | null;
+    math?: Array<{ [key: string]: any }> | null;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      options: { [key: string]: any };
+      visibility?: { [key: string]: any } | null;
+      math?: Array<{ [key: string]: any }> | null;
+      parent?: { __typename?: "PetitionField"; id: string } | null;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+        isAnonymized: boolean;
+        parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+      }>;
+      previewReplies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+        isAnonymized: boolean;
+      }>;
+      profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+    }> | null;
+    parent?: { __typename?: "PetitionField"; id: string } | null;
+    profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: { __typename?: "PetitionField"; id: string };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+    previewReplies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      isAnonymized: boolean;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+        }>;
+      }> | null;
+    }>;
+  }>;
+  variables: Array<
+    | {
+        __typename: "PetitionVariableEnum";
+        name: string;
+        type: PetitionVariableType;
+        defaultEnum: string;
+        enumValueLabels: Array<{
+          __typename?: "PetitionVariableEnumLabel";
+          value: string;
+          label: string;
+        }>;
+      }
+    | {
+        __typename: "PetitionVariableNumber";
+        defaultValue: number;
+        name: string;
+        type: PetitionVariableType;
+        valueLabels: Array<{
+          __typename?: "PetitionVariableNumberValueLabel";
+          value: number;
+          label: string;
+        }>;
+      }
+  >;
+  automaticNumberingConfig?: {
+    __typename?: "AutomaticNumberingConfig";
+    numberingType: AutomaticNumberingType;
+  } | null;
+  customLists: Array<{ __typename?: "PetitionCustomList"; name: string; values: Array<string> }>;
+  standardListDefinitions: Array<{
+    __typename?: "StandardListDefinition";
+    id: string;
+    listName: string;
+    values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
+  }>;
 };
 
 export type useResolveProfilePropertiesConflictsDialog_profileQueryVariables = Exact<{
@@ -41731,6 +41630,8 @@ export type useResolveProfilePropertiesConflictsDialog_profileQuery = {
   profile: {
     __typename?: "Profile";
     id: string;
+    localizableName: { [locale in UserLocale]?: string };
+    status: ProfileStatus;
     properties: Array<{
       __typename?: "ProfileFieldProperty";
       field: {
@@ -41761,6 +41662,130 @@ export type useResolveProfilePropertiesConflictsDialog_profileQuery = {
   };
 };
 
+export type useResolveProfilePropertiesConflictsDialog_petitionQueryVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+}>;
+
+export type useResolveProfilePropertiesConflictsDialog_petitionQuery = {
+  petition?:
+    | {
+        __typename?: "Petition";
+        id: string;
+        closedAt?: string | null;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          visibility?: { [key: string]: any } | null;
+          math?: Array<{ [key: string]: any }> | null;
+          children?: Array<{
+            __typename?: "PetitionField";
+            id: string;
+            type: PetitionFieldType;
+            options: { [key: string]: any };
+            visibility?: { [key: string]: any } | null;
+            math?: Array<{ [key: string]: any }> | null;
+            parent?: { __typename?: "PetitionField"; id: string } | null;
+            replies: Array<{
+              __typename?: "PetitionFieldReply";
+              id: string;
+              content: { [key: string]: any };
+              isAnonymized: boolean;
+              parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+            }>;
+            previewReplies: Array<{
+              __typename?: "PetitionFieldReply";
+              id: string;
+              content: { [key: string]: any };
+              isAnonymized: boolean;
+            }>;
+            profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+          }> | null;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
+          profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+          replies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+            isAnonymized: boolean;
+            parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+            children?: Array<{
+              __typename?: "PetitionFieldGroupChildReply";
+              field: { __typename?: "PetitionField"; id: string };
+              replies: Array<{
+                __typename?: "PetitionFieldReply";
+                id: string;
+                content: { [key: string]: any };
+                isAnonymized: boolean;
+              }>;
+            }> | null;
+          }>;
+          previewReplies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+            isAnonymized: boolean;
+            children?: Array<{
+              __typename?: "PetitionFieldGroupChildReply";
+              field: {
+                __typename?: "PetitionField";
+                id: string;
+                parent?: { __typename?: "PetitionField"; id: string } | null;
+              };
+              replies: Array<{
+                __typename?: "PetitionFieldReply";
+                id: string;
+                content: { [key: string]: any };
+                isAnonymized: boolean;
+              }>;
+            }> | null;
+          }>;
+        }>;
+        variables: Array<
+          | {
+              __typename: "PetitionVariableEnum";
+              name: string;
+              type: PetitionVariableType;
+              defaultEnum: string;
+              enumValueLabels: Array<{
+                __typename?: "PetitionVariableEnumLabel";
+                value: string;
+                label: string;
+              }>;
+            }
+          | {
+              __typename: "PetitionVariableNumber";
+              defaultValue: number;
+              name: string;
+              type: PetitionVariableType;
+              valueLabels: Array<{
+                __typename?: "PetitionVariableNumberValueLabel";
+                value: number;
+                label: string;
+              }>;
+            }
+        >;
+        automaticNumberingConfig?: {
+          __typename?: "AutomaticNumberingConfig";
+          numberingType: AutomaticNumberingType;
+        } | null;
+        customLists: Array<{
+          __typename?: "PetitionCustomList";
+          name: string;
+          values: Array<string>;
+        }>;
+        standardListDefinitions: Array<{
+          __typename?: "StandardListDefinition";
+          id: string;
+          listName: string;
+          values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
+        }>;
+      }
+    | { __typename?: "PetitionTemplate"; id: string }
+    | null;
+};
+
 export type useStartPetitionApprovalFlowDialog_UserFragment = {
   __typename?: "User";
   id: string;
@@ -41776,6 +41801,272 @@ export type useStartPetitionApprovalFlowDialog_PetitionApprovalRequestStepFragme
     id: string;
     user?: { __typename?: "User"; id: string; fullName?: string | null; email: string } | null;
   }>;
+};
+
+export type UpdateProfileFieldValueOnClosePetitionDialog_ProfileFragment = {
+  __typename?: "Profile";
+  id: string;
+  localizableName: { [locale in UserLocale]?: string };
+  status: ProfileStatus;
+  permanentDeletionAt?: string | null;
+  profileType: {
+    __typename?: "ProfileType";
+    id: string;
+    icon: ProfileTypeIcon;
+    name: { [locale in UserLocale]?: string };
+    standardType?: ProfileTypeStandardType | null;
+  };
+  properties: Array<{
+    __typename?: "ProfileFieldProperty";
+    field: {
+      __typename?: "ProfileTypeField";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      position: number;
+      type: ProfileTypeFieldType;
+      myPermission: ProfileTypeFieldPermissionType;
+      alias?: string | null;
+      isExpirable: boolean;
+      expiryAlertAheadTime?: Duration | null;
+      options: { [key: string]: any };
+    };
+    files?: Array<{
+      __typename?: "ProfileFieldFile";
+      id: string;
+      expiryDate?: string | null;
+      file?: {
+        __typename?: "FileUpload";
+        contentType: string;
+        filename: string;
+        isComplete: boolean;
+        size: number;
+      } | null;
+    }> | null;
+    value?: {
+      __typename?: "ProfileFieldValue";
+      id: string;
+      content?: { [key: string]: any } | null;
+      createdAt: string;
+      expiryDate?: string | null;
+      isDraft: boolean;
+      hasPendingReview: boolean;
+      hasActiveMonitoring: boolean;
+      hasStoredValue: boolean;
+    } | null;
+  }>;
+  relationships: Array<{ __typename?: "ProfileRelationship"; id: string }>;
+  petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
+};
+
+export type UpdateProfileFieldValueOnClosePetitionDialog_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  title?: string | null;
+  options: { [key: string]: any };
+};
+
+export type UpdateProfileFieldValueOnClosePetitionDialog_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+  id: string;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    alias?: string | null;
+    type: PetitionFieldType;
+    options: { [key: string]: any };
+    title?: string | null;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      alias?: string | null;
+      options: { [key: string]: any };
+      title?: string | null;
+      type: PetitionFieldType;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+        isAnonymized: boolean;
+      }>;
+    }> | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      isAnonymized: boolean;
+      content: { [key: string]: any };
+    }>;
+  }>;
+};
+
+export type UpdateProfileFieldValueOnClosePetitionDialog_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    alias?: string | null;
+    type: PetitionFieldType;
+    options: { [key: string]: any };
+    title?: string | null;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      alias?: string | null;
+      options: { [key: string]: any };
+      title?: string | null;
+      type: PetitionFieldType;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+        isAnonymized: boolean;
+      }>;
+    }> | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      isAnonymized: boolean;
+      content: { [key: string]: any };
+    }>;
+  }>;
+};
+
+export type UpdateProfileFieldValueOnClosePetitionDialog_PetitionBaseFragment =
+  | UpdateProfileFieldValueOnClosePetitionDialog_PetitionBase_Petition_Fragment
+  | UpdateProfileFieldValueOnClosePetitionDialog_PetitionBase_PetitionTemplate_Fragment;
+
+export type UpdateProfileFieldValueOnClosePetitionDialog_profileQueryVariables = Exact<{
+  profileId: Scalars["GID"]["input"];
+}>;
+
+export type UpdateProfileFieldValueOnClosePetitionDialog_profileQuery = {
+  profile: {
+    __typename?: "Profile";
+    id: string;
+    localizableName: { [locale in UserLocale]?: string };
+    status: ProfileStatus;
+    permanentDeletionAt?: string | null;
+    profileType: {
+      __typename?: "ProfileType";
+      id: string;
+      icon: ProfileTypeIcon;
+      name: { [locale in UserLocale]?: string };
+      standardType?: ProfileTypeStandardType | null;
+    };
+    properties: Array<{
+      __typename?: "ProfileFieldProperty";
+      field: {
+        __typename?: "ProfileTypeField";
+        id: string;
+        name: { [locale in UserLocale]?: string };
+        position: number;
+        type: ProfileTypeFieldType;
+        myPermission: ProfileTypeFieldPermissionType;
+        alias?: string | null;
+        isExpirable: boolean;
+        expiryAlertAheadTime?: Duration | null;
+        options: { [key: string]: any };
+      };
+      files?: Array<{
+        __typename?: "ProfileFieldFile";
+        id: string;
+        expiryDate?: string | null;
+        file?: {
+          __typename?: "FileUpload";
+          contentType: string;
+          filename: string;
+          isComplete: boolean;
+          size: number;
+        } | null;
+      }> | null;
+      value?: {
+        __typename?: "ProfileFieldValue";
+        id: string;
+        content?: { [key: string]: any } | null;
+        createdAt: string;
+        expiryDate?: string | null;
+        isDraft: boolean;
+        hasPendingReview: boolean;
+        hasActiveMonitoring: boolean;
+        hasStoredValue: boolean;
+      } | null;
+    }>;
+    relationships: Array<{ __typename?: "ProfileRelationship"; id: string }>;
+    petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
+  };
+};
+
+export type UpdateProfileFieldValueOnClosePetitionDialog_petitionQueryVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+}>;
+
+export type UpdateProfileFieldValueOnClosePetitionDialog_petitionQuery = {
+  petition?:
+    | {
+        __typename?: "Petition";
+        id: string;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          alias?: string | null;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          title?: string | null;
+          children?: Array<{
+            __typename?: "PetitionField";
+            id: string;
+            alias?: string | null;
+            options: { [key: string]: any };
+            title?: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              __typename?: "PetitionFieldReply";
+              id: string;
+              content: { [key: string]: any };
+              isAnonymized: boolean;
+            }>;
+          }> | null;
+          replies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            isAnonymized: boolean;
+            content: { [key: string]: any };
+          }>;
+        }>;
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        fields: Array<{
+          __typename?: "PetitionField";
+          id: string;
+          alias?: string | null;
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          title?: string | null;
+          children?: Array<{
+            __typename?: "PetitionField";
+            id: string;
+            alias?: string | null;
+            options: { [key: string]: any };
+            title?: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              __typename?: "PetitionFieldReply";
+              id: string;
+              content: { [key: string]: any };
+              isAnonymized: boolean;
+            }>;
+          }> | null;
+          replies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            isAnonymized: boolean;
+            content: { [key: string]: any };
+          }>;
+        }>;
+      }
+    | null;
 };
 
 export type PetitionRepliesFieldIdVerificationReply_PetitionFieldReplyFragment = {
@@ -41880,8 +42171,8 @@ export type ProfileForm_ProfileFragment = {
   __typename?: "Profile";
   id: string;
   status: ProfileStatus;
-  permanentDeletionAt?: string | null;
   localizableName: { [locale in UserLocale]?: string };
+  permanentDeletionAt?: string | null;
   profileType: {
     __typename?: "ProfileType";
     id: string;
@@ -41926,12 +42217,13 @@ export type ProfileForm_ProfileFragment = {
       hasStoredValue: boolean;
     } | null;
   }>;
-  petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
   relationships: Array<{ __typename?: "ProfileRelationship"; id: string }>;
+  petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
 };
 
 export type ProfileForm_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
+  id: string;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -41964,6 +42256,7 @@ export type ProfileForm_PetitionBase_Petition_Fragment = {
 
 export type ProfileForm_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
+  id: string;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -42031,8 +42324,8 @@ export type ProfileForm_updateProfileFieldValueMutation = {
     __typename?: "Profile";
     id: string;
     status: ProfileStatus;
-    permanentDeletionAt?: string | null;
     localizableName: { [locale in UserLocale]?: string };
+    permanentDeletionAt?: string | null;
     profileType: {
       __typename?: "ProfileType";
       id: string;
@@ -42077,8 +42370,8 @@ export type ProfileForm_updateProfileFieldValueMutation = {
         hasStoredValue: boolean;
       } | null;
     }>;
-    petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
     relationships: Array<{ __typename?: "ProfileRelationship"; id: string }>;
+    petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
   };
 };
 
@@ -42181,6 +42474,204 @@ export type ProfileForm_deleteProfileFieldFileMutationVariables = Exact<{
 }>;
 
 export type ProfileForm_deleteProfileFieldFileMutation = { deleteProfileFieldFile: Result };
+
+export type ProfileFormInner_ProfileTypeFieldFragment = {
+  __typename?: "ProfileTypeField";
+  id: string;
+  name: { [locale in UserLocale]?: string };
+  position: number;
+  type: ProfileTypeFieldType;
+  myPermission: ProfileTypeFieldPermissionType;
+  alias?: string | null;
+  isExpirable: boolean;
+  expiryAlertAheadTime?: Duration | null;
+  options: { [key: string]: any };
+};
+
+export type ProfileFormInner_ProfileFieldFileFragment = {
+  __typename?: "ProfileFieldFile";
+  id: string;
+  expiryDate?: string | null;
+  file?: {
+    __typename?: "FileUpload";
+    contentType: string;
+    filename: string;
+    isComplete: boolean;
+    size: number;
+  } | null;
+};
+
+export type ProfileFormInner_ProfileFieldValueFragment = {
+  __typename?: "ProfileFieldValue";
+  id: string;
+  content?: { [key: string]: any } | null;
+  createdAt: string;
+  expiryDate?: string | null;
+  isDraft: boolean;
+  hasPendingReview: boolean;
+  hasActiveMonitoring: boolean;
+  hasStoredValue: boolean;
+};
+
+export type ProfileFormInner_ProfileFieldPropertyFragment = {
+  __typename?: "ProfileFieldProperty";
+  field: {
+    __typename?: "ProfileTypeField";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    position: number;
+    type: ProfileTypeFieldType;
+    myPermission: ProfileTypeFieldPermissionType;
+    alias?: string | null;
+    isExpirable: boolean;
+    expiryAlertAheadTime?: Duration | null;
+    options: { [key: string]: any };
+  };
+  files?: Array<{
+    __typename?: "ProfileFieldFile";
+    id: string;
+    expiryDate?: string | null;
+    file?: {
+      __typename?: "FileUpload";
+      contentType: string;
+      filename: string;
+      isComplete: boolean;
+      size: number;
+    } | null;
+  }> | null;
+  value?: {
+    __typename?: "ProfileFieldValue";
+    id: string;
+    content?: { [key: string]: any } | null;
+    createdAt: string;
+    expiryDate?: string | null;
+    isDraft: boolean;
+    hasPendingReview: boolean;
+    hasActiveMonitoring: boolean;
+    hasStoredValue: boolean;
+  } | null;
+};
+
+export type ProfileFormInner_ProfileFragment = {
+  __typename?: "Profile";
+  id: string;
+  status: ProfileStatus;
+  permanentDeletionAt?: string | null;
+  profileType: {
+    __typename?: "ProfileType";
+    id: string;
+    name: { [locale in UserLocale]?: string };
+    standardType?: ProfileTypeStandardType | null;
+  };
+  properties: Array<{
+    __typename?: "ProfileFieldProperty";
+    field: {
+      __typename?: "ProfileTypeField";
+      id: string;
+      name: { [locale in UserLocale]?: string };
+      position: number;
+      type: ProfileTypeFieldType;
+      myPermission: ProfileTypeFieldPermissionType;
+      alias?: string | null;
+      isExpirable: boolean;
+      expiryAlertAheadTime?: Duration | null;
+      options: { [key: string]: any };
+    };
+    files?: Array<{
+      __typename?: "ProfileFieldFile";
+      id: string;
+      expiryDate?: string | null;
+      file?: {
+        __typename?: "FileUpload";
+        contentType: string;
+        filename: string;
+        isComplete: boolean;
+        size: number;
+      } | null;
+    }> | null;
+    value?: {
+      __typename?: "ProfileFieldValue";
+      id: string;
+      content?: { [key: string]: any } | null;
+      createdAt: string;
+      expiryDate?: string | null;
+      isDraft: boolean;
+      hasPendingReview: boolean;
+      hasActiveMonitoring: boolean;
+      hasStoredValue: boolean;
+    } | null;
+  }>;
+  relationships: Array<{ __typename?: "ProfileRelationship"; id: string }>;
+  petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
+};
+
+export type ProfileFormInner_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    alias?: string | null;
+    type: PetitionFieldType;
+    options: { [key: string]: any };
+    title?: string | null;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      alias?: string | null;
+      options: { [key: string]: any };
+      title?: string | null;
+      type: PetitionFieldType;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+        isAnonymized: boolean;
+      }>;
+    }> | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      isAnonymized: boolean;
+      content: { [key: string]: any };
+    }>;
+  }>;
+};
+
+export type ProfileFormInner_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    alias?: string | null;
+    type: PetitionFieldType;
+    options: { [key: string]: any };
+    title?: string | null;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      alias?: string | null;
+      options: { [key: string]: any };
+      title?: string | null;
+      type: PetitionFieldType;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+        isAnonymized: boolean;
+      }>;
+    }> | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      isAnonymized: boolean;
+      content: { [key: string]: any };
+    }>;
+  }>;
+};
+
+export type ProfileFormInner_PetitionBaseFragment =
+  | ProfileFormInner_PetitionBase_Petition_Fragment
+  | ProfileFormInner_PetitionBase_PetitionTemplate_Fragment;
 
 export type ProfileKeyProcesses_PetitionBaseMiniFragment = {
   __typename?: "PetitionBaseMini";
@@ -67049,7 +67540,6 @@ export type ProfileDetail_profileQuery = {
         hasStoredValue: boolean;
       } | null;
     }>;
-    petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
     relationships: Array<{
       __typename?: "ProfileRelationship";
       id: string;
@@ -67127,6 +67617,7 @@ export type ProfileDetail_profileQuery = {
         isReciprocal: boolean;
       };
     }>;
+    petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
   };
 };
 
@@ -70978,27 +71469,6 @@ export type getPetitionSignatureStatus_PublicPetitionFragment = {
   } | null;
 };
 
-export type getProfileNamePreview_ProfileTypeFragment = {
-  __typename?: "ProfileType";
-  id: string;
-  profileNamePattern: string;
-};
-
-export type getProfileNamePreview_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  id: string;
-  type: PetitionFieldType;
-  options: { [key: string]: any };
-  profileType?: { __typename?: "ProfileType"; id: string; profileNamePattern: string } | null;
-  profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
-};
-
-export type getProfileNamePreview_PetitionFieldReplyFragment = {
-  __typename?: "PetitionFieldReply";
-  id: string;
-  content: { [key: string]: any };
-};
-
 export type getReplyContents_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
   content: { [key: string]: any };
@@ -73427,6 +73897,161 @@ export type useBrowserMetadata_QueryFragment = {
   };
 };
 
+export type useCheckUpdateProfile_ProfileTypeFragment = {
+  __typename?: "ProfileType";
+  id: string;
+  fields: Array<{ __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType }>;
+};
+
+export type useCheckUpdateProfile_ProfileFieldFileFragment = {
+  __typename?: "ProfileFieldFile";
+  file?: { __typename?: "FileUpload"; filename: string; size: number; contentType: string } | null;
+};
+
+export type useCheckUpdateProfile_ProfileFieldValueFragment = {
+  __typename?: "ProfileFieldValue";
+  content?: { [key: string]: any } | null;
+};
+
+export type useCheckUpdateProfile_ProfileFieldPropertyFragment = {
+  __typename?: "ProfileFieldProperty";
+  field: {
+    __typename?: "ProfileTypeField";
+    id: string;
+    myPermission: ProfileTypeFieldPermissionType;
+    type: ProfileTypeFieldType;
+  };
+  value?: { __typename?: "ProfileFieldValue"; content?: { [key: string]: any } | null } | null;
+  files?: Array<{
+    __typename?: "ProfileFieldFile";
+    file?: {
+      __typename?: "FileUpload";
+      filename: string;
+      size: number;
+      contentType: string;
+    } | null;
+  }> | null;
+};
+
+export type useCheckUpdateProfile_ProfileFragment = {
+  __typename?: "Profile";
+  id: string;
+  properties: Array<{
+    __typename?: "ProfileFieldProperty";
+    field: {
+      __typename?: "ProfileTypeField";
+      id: string;
+      myPermission: ProfileTypeFieldPermissionType;
+      type: ProfileTypeFieldType;
+    };
+    value?: { __typename?: "ProfileFieldValue"; content?: { [key: string]: any } | null } | null;
+    files?: Array<{
+      __typename?: "ProfileFieldFile";
+      file?: {
+        __typename?: "FileUpload";
+        filename: string;
+        size: number;
+        contentType: string;
+      } | null;
+    }> | null;
+  }>;
+  profileType: {
+    __typename?: "ProfileType";
+    id: string;
+    fields: Array<{ __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType }>;
+  };
+};
+
+export type useCheckUpdateProfile_PetitionFieldReplyFragment = {
+  __typename?: "PetitionFieldReply";
+  id: string;
+  content: { [key: string]: any };
+  parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+  children?: Array<{
+    __typename?: "PetitionFieldGroupChildReply";
+    field: { __typename?: "PetitionField"; id: string };
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+    }>;
+  }> | null;
+};
+
+export type useCheckUpdateProfile_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  type: PetitionFieldType;
+  replies: Array<{
+    __typename?: "PetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+    parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+    children?: Array<{
+      __typename?: "PetitionFieldGroupChildReply";
+      field: { __typename?: "PetitionField"; id: string };
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+        parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+      }>;
+    }> | null;
+  }>;
+  profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+};
+
+export type useCheckUpdateProfile_PetitionFragment = {
+  __typename?: "Petition";
+  id: string;
+  closedAt?: string | null;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+        parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+        children?: Array<{
+          __typename?: "PetitionFieldGroupChildReply";
+          field: { __typename?: "PetitionField"; id: string };
+          replies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+            parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+          }>;
+        }> | null;
+      }>;
+      profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+    }> | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: { __typename?: "PetitionField"; id: string };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+        }>;
+      }> | null;
+    }>;
+    profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+  }>;
+};
+
 export type useDownloadProfileFieldFile_profileFieldFileDownloadLinkMutationVariables = Exact<{
   profileId: Scalars["GID"]["input"];
   profileTypeFieldId: Scalars["GID"]["input"];
@@ -74620,6 +75245,107 @@ export type useProfileFieldValueFilterOperators_ProfileTypeFieldFragment = {
   type: ProfileTypeFieldType;
   options: { [key: string]: any };
   isExpirable: boolean;
+};
+
+export type useProfileNamePreview_ProfileTypeFragment = {
+  __typename?: "ProfileType";
+  id: string;
+  profileNamePattern: string;
+  fields: Array<{
+    __typename?: "ProfileTypeField";
+    id: string;
+    isUsedInProfileName: boolean;
+    type: ProfileTypeFieldType;
+    options: { [key: string]: any };
+  }>;
+};
+
+export type useProfileNamePreview_PetitionFieldReplyFragment = {
+  __typename?: "PetitionFieldReply";
+  id: string;
+  content: { [key: string]: any };
+  children?: Array<{
+    __typename?: "PetitionFieldGroupChildReply";
+    field: { __typename?: "PetitionField"; id: string };
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+    }>;
+  }> | null;
+};
+
+export type useProfileNamePreview_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  type: PetitionFieldType;
+  options: { [key: string]: any };
+  parent?: { __typename?: "PetitionField"; id: string } | null;
+  replies: Array<{
+    __typename?: "PetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+    children?: Array<{
+      __typename?: "PetitionFieldGroupChildReply";
+      field: { __typename?: "PetitionField"; id: string };
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+      }>;
+    }> | null;
+  }>;
+  profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+};
+
+export type useProfileNamePreview_PetitionFragment = {
+  __typename?: "Petition";
+  id: string;
+  closedAt?: string | null;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    options: { [key: string]: any };
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      options: { [key: string]: any };
+      parent?: { __typename?: "PetitionField"; id: string } | null;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+        children?: Array<{
+          __typename?: "PetitionFieldGroupChildReply";
+          field: { __typename?: "PetitionField"; id: string };
+          replies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+          }>;
+        }> | null;
+      }>;
+      profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+    }> | null;
+    parent?: { __typename?: "PetitionField"; id: string } | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: { __typename?: "PetitionField"; id: string };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+        }>;
+      }> | null;
+    }>;
+    profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+  }>;
 };
 
 export type ProfileValueFilterLine_ProfileTypeFieldFragment = {
@@ -76167,8 +76893,8 @@ export const ProfileFormField_ProfileTypeFieldFragmentDoc = gql`
   ${ProfileFormFieldInputGroup_ProfileTypeFieldFragmentDoc}
   ${useProfileFieldValueHistoryDialog_ProfileTypeFieldFragmentDoc}
 ` as unknown as DocumentNode<ProfileFormField_ProfileTypeFieldFragment, unknown>;
-export const ProfileForm_ProfileTypeFieldFragmentDoc = gql`
-  fragment ProfileForm_ProfileTypeField on ProfileTypeField {
+export const ProfileFormInner_ProfileTypeFieldFragmentDoc = gql`
+  fragment ProfileFormInner_ProfileTypeField on ProfileTypeField {
     id
     name
     position
@@ -76178,7 +76904,7 @@ export const ProfileForm_ProfileTypeFieldFragmentDoc = gql`
     ...ProfileFormField_ProfileTypeField
   }
   ${ProfileFormField_ProfileTypeFieldFragmentDoc}
-` as unknown as DocumentNode<ProfileForm_ProfileTypeFieldFragment, unknown>;
+` as unknown as DocumentNode<ProfileFormInner_ProfileTypeFieldFragment, unknown>;
 export const ProfileFieldFileUpload_ProfileFieldFileFragmentDoc = gql`
   fragment ProfileFieldFileUpload_ProfileFieldFile on ProfileFieldFile {
     id
@@ -76197,13 +76923,13 @@ export const ProfileFormField_ProfileFieldFileFragmentDoc = gql`
   }
   ${ProfileFieldFileUpload_ProfileFieldFileFragmentDoc}
 ` as unknown as DocumentNode<ProfileFormField_ProfileFieldFileFragment, unknown>;
-export const ProfileForm_ProfileFieldFileFragmentDoc = gql`
-  fragment ProfileForm_ProfileFieldFile on ProfileFieldFile {
+export const ProfileFormInner_ProfileFieldFileFragmentDoc = gql`
+  fragment ProfileFormInner_ProfileFieldFile on ProfileFieldFile {
     id
     ...ProfileFormField_ProfileFieldFile
   }
   ${ProfileFormField_ProfileFieldFileFragmentDoc}
-` as unknown as DocumentNode<ProfileForm_ProfileFieldFileFragment, unknown>;
+` as unknown as DocumentNode<ProfileFormInner_ProfileFieldFileFragment, unknown>;
 export const ProfileFormField_ProfileFieldValueFragmentDoc = gql`
   fragment ProfileFormField_ProfileFieldValue on ProfileFieldValue {
     id
@@ -76214,8 +76940,8 @@ export const ProfileFormField_ProfileFieldValueFragmentDoc = gql`
     hasStoredValue
   }
 ` as unknown as DocumentNode<ProfileFormField_ProfileFieldValueFragment, unknown>;
-export const ProfileForm_ProfileFieldValueFragmentDoc = gql`
-  fragment ProfileForm_ProfileFieldValue on ProfileFieldValue {
+export const ProfileFormInner_ProfileFieldValueFragmentDoc = gql`
+  fragment ProfileFormInner_ProfileFieldValue on ProfileFieldValue {
     id
     content
     createdAt
@@ -76223,7 +76949,7 @@ export const ProfileForm_ProfileFieldValueFragmentDoc = gql`
     ...ProfileFormField_ProfileFieldValue
   }
   ${ProfileFormField_ProfileFieldValueFragmentDoc}
-` as unknown as DocumentNode<ProfileForm_ProfileFieldValueFragment, unknown>;
+` as unknown as DocumentNode<ProfileFormInner_ProfileFieldValueFragment, unknown>;
 export const ProfileFormField_ProfileFieldPropertyFragmentDoc = gql`
   fragment ProfileFormField_ProfileFieldProperty on ProfileFieldProperty {
     field {
@@ -76240,24 +76966,46 @@ export const ProfileFormField_ProfileFieldPropertyFragmentDoc = gql`
   ${ProfileFormField_ProfileFieldFileFragmentDoc}
   ${ProfileFormField_ProfileFieldValueFragmentDoc}
 ` as unknown as DocumentNode<ProfileFormField_ProfileFieldPropertyFragment, unknown>;
-export const ProfileForm_ProfileFieldPropertyFragmentDoc = gql`
-  fragment ProfileForm_ProfileFieldProperty on ProfileFieldProperty {
+export const ProfileFormInner_ProfileFieldPropertyFragmentDoc = gql`
+  fragment ProfileFormInner_ProfileFieldProperty on ProfileFieldProperty {
     field {
-      ...ProfileForm_ProfileTypeField
+      ...ProfileFormInner_ProfileTypeField
     }
     files {
-      ...ProfileForm_ProfileFieldFile
+      ...ProfileFormInner_ProfileFieldFile
     }
     value {
-      ...ProfileForm_ProfileFieldValue
+      ...ProfileFormInner_ProfileFieldValue
     }
     ...ProfileFormField_ProfileFieldProperty
   }
-  ${ProfileForm_ProfileTypeFieldFragmentDoc}
-  ${ProfileForm_ProfileFieldFileFragmentDoc}
-  ${ProfileForm_ProfileFieldValueFragmentDoc}
+  ${ProfileFormInner_ProfileTypeFieldFragmentDoc}
+  ${ProfileFormInner_ProfileFieldFileFragmentDoc}
+  ${ProfileFormInner_ProfileFieldValueFragmentDoc}
   ${ProfileFormField_ProfileFieldPropertyFragmentDoc}
-` as unknown as DocumentNode<ProfileForm_ProfileFieldPropertyFragment, unknown>;
+` as unknown as DocumentNode<ProfileFormInner_ProfileFieldPropertyFragment, unknown>;
+export const ProfileFormInner_ProfileFragmentDoc = gql`
+  fragment ProfileFormInner_Profile on Profile {
+    id
+    status
+    profileType {
+      id
+      name
+      standardType
+    }
+    properties {
+      ...ProfileFormInner_ProfileFieldProperty
+    }
+    relationships {
+      id
+    }
+    petitionsTotalCount: associatedPetitions {
+      totalCount
+    }
+    permanentDeletionAt
+  }
+  ${ProfileFormInner_ProfileFieldPropertyFragmentDoc}
+` as unknown as DocumentNode<ProfileFormInner_ProfileFragment, unknown>;
 export const ProfileForm_ProfileFragmentDoc = gql`
   fragment ProfileForm_Profile on Profile {
     id
@@ -76269,20 +77017,11 @@ export const ProfileForm_ProfileFragmentDoc = gql`
       standardType
       ...useImportFromExternalSourceDialog_ProfileType
     }
-    properties {
-      ...ProfileForm_ProfileFieldProperty
-    }
-    petitionsTotalCount: associatedPetitions {
-      totalCount
-    }
-    relationships {
-      id
-    }
-    permanentDeletionAt
+    ...ProfileFormInner_Profile
   }
   ${ProfileReference_ProfileFragmentDoc}
   ${useImportFromExternalSourceDialog_ProfileTypeFragmentDoc}
-  ${ProfileForm_ProfileFieldPropertyFragmentDoc}
+  ${ProfileFormInner_ProfileFragmentDoc}
 ` as unknown as DocumentNode<ProfileForm_ProfileFragment, unknown>;
 export const useProfileSubscribersDialog_UserFragmentDoc = gql`
   fragment useProfileSubscribersDialog_User on User {
@@ -79120,6 +79859,126 @@ export const ConfigureBackgroundCheckAutomateSearchDialog_PetitionFieldFragmentD
   ConfigureBackgroundCheckAutomateSearchDialog_PetitionFieldFragment,
   unknown
 >;
+export const useConfigureUpdateProfileOnCloseDialog_PetitionFieldFragmentDoc = gql`
+  fragment useConfigureUpdateProfileOnCloseDialog_PetitionField on PetitionField {
+    id
+    type
+    options
+    multiple
+    parent {
+      id
+      multiple
+    }
+    profileTypeField {
+      id
+      type
+    }
+  }
+` as unknown as DocumentNode<useConfigureUpdateProfileOnCloseDialog_PetitionFieldFragment, unknown>;
+export const useConfigureUpdateProfileOnCloseDialog_PetitionVariableFragmentDoc = gql`
+  fragment useConfigureUpdateProfileOnCloseDialog_PetitionVariable on PetitionVariable {
+    name
+    type
+    ... on PetitionVariableEnum {
+      valueLabels {
+        value
+        label
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  useConfigureUpdateProfileOnCloseDialog_PetitionVariableFragment,
+  unknown
+>;
+export const PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldInnerFragmentDoc = gql`
+  fragment PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldInner on PetitionField {
+    id
+    type
+    title
+    options
+    multiple
+    parent {
+      id
+      multiple
+    }
+  }
+` as unknown as DocumentNode<
+  PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldInnerFragment,
+  unknown
+>;
+export const PetitionUpdateProfileOnCloseSourceSelect_PetitionBaseFragmentDoc = gql`
+  fragment PetitionUpdateProfileOnCloseSourceSelect_PetitionBase on PetitionBase {
+    fields {
+      id
+      ...PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldInner
+      children {
+        id
+        ...PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldInner
+      }
+    }
+    variables {
+      name
+      type
+    }
+  }
+  ${PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldInnerFragmentDoc}
+` as unknown as DocumentNode<
+  PetitionUpdateProfileOnCloseSourceSelect_PetitionBaseFragment,
+  unknown
+>;
+export const useConfigureUpdateProfileOnCloseDialog_PetitionBaseFragmentDoc = gql`
+  fragment useConfigureUpdateProfileOnCloseDialog_PetitionBase on PetitionBase {
+    id
+    fields {
+      id
+      ...useConfigureUpdateProfileOnCloseDialog_PetitionField
+      children {
+        id
+        ...useConfigureUpdateProfileOnCloseDialog_PetitionField
+      }
+    }
+    variables {
+      ...useConfigureUpdateProfileOnCloseDialog_PetitionVariable
+    }
+    ...PetitionUpdateProfileOnCloseSourceSelect_PetitionBase
+  }
+  ${useConfigureUpdateProfileOnCloseDialog_PetitionFieldFragmentDoc}
+  ${useConfigureUpdateProfileOnCloseDialog_PetitionVariableFragmentDoc}
+  ${PetitionUpdateProfileOnCloseSourceSelect_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<useConfigureUpdateProfileOnCloseDialog_PetitionBaseFragment, unknown>;
+export const PetitionUpdateProfileOnCloseSourceSelect_ProfileTypeFieldFragmentDoc = gql`
+  fragment PetitionUpdateProfileOnCloseSourceSelect_ProfileTypeField on ProfileTypeField {
+    id
+    type
+    options
+  }
+` as unknown as DocumentNode<
+  PetitionUpdateProfileOnCloseSourceSelect_ProfileTypeFieldFragment,
+  unknown
+>;
+export const useConfigureUpdateProfileOnCloseDialog_ProfileTypeFieldFragmentDoc = gql`
+  fragment useConfigureUpdateProfileOnCloseDialog_ProfileTypeField on ProfileTypeField {
+    id
+    options
+    ...ProfileTypeFieldSelect_ProfileTypeField
+    ...PetitionUpdateProfileOnCloseSourceSelect_ProfileTypeField
+  }
+  ${ProfileTypeFieldSelect_ProfileTypeFieldFragmentDoc}
+  ${PetitionUpdateProfileOnCloseSourceSelect_ProfileTypeFieldFragmentDoc}
+` as unknown as DocumentNode<
+  useConfigureUpdateProfileOnCloseDialog_ProfileTypeFieldFragment,
+  unknown
+>;
+export const useConfigureUpdateProfileOnCloseDialog_ProfileTypeFragmentDoc = gql`
+  fragment useConfigureUpdateProfileOnCloseDialog_ProfileType on ProfileType {
+    id
+    fields {
+      id
+      ...useConfigureUpdateProfileOnCloseDialog_ProfileTypeField
+    }
+  }
+  ${useConfigureUpdateProfileOnCloseDialog_ProfileTypeFieldFragmentDoc}
+` as unknown as DocumentNode<useConfigureUpdateProfileOnCloseDialog_ProfileTypeFragment, unknown>;
 export const useCreateOrUpdateFieldGroupRelationshipsDialog_PetitionFieldFragmentDoc = gql`
   fragment useCreateOrUpdateFieldGroupRelationshipsDialog_PetitionField on PetitionField {
     id
@@ -79296,7 +80155,6 @@ export const useEditPetitionFieldCalculationsDialog_PetitionBaseFragmentDoc = gq
     id
     variables {
       name
-      type
     }
     ...PetitionFieldMathEditor_PetitionBase
   }
@@ -80190,223 +81048,321 @@ export const PetitionRepliesRightPaneTabs_UserFragmentDoc = gql`
   }
   ${PetitionRepliesSummary_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionRepliesRightPaneTabs_UserFragment, unknown>;
-export const getProfileNamePreview_ProfileTypeFragmentDoc = gql`
-  fragment getProfileNamePreview_ProfileType on ProfileType {
-    id
-    profileNamePattern
-  }
-` as unknown as DocumentNode<getProfileNamePreview_ProfileTypeFragment, unknown>;
-export const useArchiveFieldGroupReplyIntoProfileDialog_ProfileFragmentDoc = gql`
-  fragment useArchiveFieldGroupReplyIntoProfileDialog_Profile on Profile {
-    id
-    ...ProfileSelect_Profile
-    properties {
-      field {
-        id
-        type
-        myPermission
-      }
-      value {
-        id
-        content
-      }
-      files {
-        id
-        file {
-          size
-          filename
-          contentType
-        }
-      }
+export const useArchiveRepliesIntoProfileDialog_ProfileFieldPropertyFragmentDoc = gql`
+  fragment useArchiveRepliesIntoProfileDialog_ProfileFieldProperty on ProfileFieldProperty {
+    field {
+      id
+      name
+      type
+      myPermission
+      isUsedInProfileName
     }
   }
-  ${ProfileSelect_ProfileFragmentDoc}
-` as unknown as DocumentNode<useArchiveFieldGroupReplyIntoProfileDialog_ProfileFragment, unknown>;
-export const getProfileNamePreview_PetitionFieldReplyFragmentDoc = gql`
-  fragment getProfileNamePreview_PetitionFieldReply on PetitionFieldReply {
-    id
-    content
-  }
-` as unknown as DocumentNode<getProfileNamePreview_PetitionFieldReplyFragment, unknown>;
-export const useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyInnerFragmentDoc = gql`
-  fragment useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyInner on PetitionFieldReply {
-    id
-    content
-    associatedProfile {
-      ...useArchiveFieldGroupReplyIntoProfileDialog_Profile
-    }
-    ...getProfileNamePreview_PetitionFieldReply
-  }
-  ${useArchiveFieldGroupReplyIntoProfileDialog_ProfileFragmentDoc}
-  ${getProfileNamePreview_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<
-  useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyInnerFragment,
+  useArchiveRepliesIntoProfileDialog_ProfileFieldPropertyFragment,
   unknown
 >;
-export const PetitionFieldRepliesContent_PetitionFieldReplyFragmentDoc = gql`
-  fragment PetitionFieldRepliesContent_PetitionFieldReply on PetitionFieldReply {
+export const useCheckUpdateProfile_ProfileFieldValueFragmentDoc = gql`
+  fragment useCheckUpdateProfile_ProfileFieldValue on ProfileFieldValue {
+    content
+  }
+` as unknown as DocumentNode<useCheckUpdateProfile_ProfileFieldValueFragment, unknown>;
+export const useCheckUpdateProfile_ProfileFieldFileFragmentDoc = gql`
+  fragment useCheckUpdateProfile_ProfileFieldFile on ProfileFieldFile {
+    file {
+      filename
+      size
+      contentType
+    }
+  }
+` as unknown as DocumentNode<useCheckUpdateProfile_ProfileFieldFileFragment, unknown>;
+export const useCheckUpdateProfile_ProfileFieldPropertyFragmentDoc = gql`
+  fragment useCheckUpdateProfile_ProfileFieldProperty on ProfileFieldProperty {
+    field {
+      id
+      myPermission
+      type
+    }
+    value {
+      ...useCheckUpdateProfile_ProfileFieldValue
+    }
+    files {
+      ...useCheckUpdateProfile_ProfileFieldFile
+    }
+  }
+  ${useCheckUpdateProfile_ProfileFieldValueFragmentDoc}
+  ${useCheckUpdateProfile_ProfileFieldFileFragmentDoc}
+` as unknown as DocumentNode<useCheckUpdateProfile_ProfileFieldPropertyFragment, unknown>;
+export const useCheckUpdateProfile_ProfileTypeFragmentDoc = gql`
+  fragment useCheckUpdateProfile_ProfileType on ProfileType {
+    id
+    fields {
+      id
+      type
+    }
+  }
+` as unknown as DocumentNode<useCheckUpdateProfile_ProfileTypeFragment, unknown>;
+export const useCheckUpdateProfile_ProfileFragmentDoc = gql`
+  fragment useCheckUpdateProfile_Profile on Profile {
+    id
+    properties {
+      ...useCheckUpdateProfile_ProfileFieldProperty
+    }
+    profileType {
+      ...useCheckUpdateProfile_ProfileType
+    }
+  }
+  ${useCheckUpdateProfile_ProfileFieldPropertyFragmentDoc}
+  ${useCheckUpdateProfile_ProfileTypeFragmentDoc}
+` as unknown as DocumentNode<useCheckUpdateProfile_ProfileFragment, unknown>;
+export const useArchiveRepliesIntoProfileDialog_ProfileFragmentDoc = gql`
+  fragment useArchiveRepliesIntoProfileDialog_Profile on Profile {
+    id
+    properties {
+      ...useArchiveRepliesIntoProfileDialog_ProfileFieldProperty
+    }
+    ...ProfileSelect_Profile
+    ...ProfileReference_Profile
+    ...useCheckUpdateProfile_Profile
+  }
+  ${useArchiveRepliesIntoProfileDialog_ProfileFieldPropertyFragmentDoc}
+  ${ProfileSelect_ProfileFragmentDoc}
+  ${ProfileReference_ProfileFragmentDoc}
+  ${useCheckUpdateProfile_ProfileFragmentDoc}
+` as unknown as DocumentNode<useArchiveRepliesIntoProfileDialog_ProfileFragment, unknown>;
+export const useProfileNamePreview_ProfileTypeFragmentDoc = gql`
+  fragment useProfileNamePreview_ProfileType on ProfileType {
+    id
+    profileNamePattern
+    fields {
+      id
+      isUsedInProfileName
+      type
+      options
+    }
+  }
+` as unknown as DocumentNode<useProfileNamePreview_ProfileTypeFragment, unknown>;
+export const useArchiveRepliesIntoProfileDialog_ProfileTypeFragmentDoc = gql`
+  fragment useArchiveRepliesIntoProfileDialog_ProfileType on ProfileType {
+    id
+    ...useProfileNamePreview_ProfileType
+  }
+  ${useProfileNamePreview_ProfileTypeFragmentDoc}
+` as unknown as DocumentNode<useArchiveRepliesIntoProfileDialog_ProfileTypeFragment, unknown>;
+export const useCheckUpdateProfile_PetitionFieldReplyFragmentDoc = gql`
+  fragment useCheckUpdateProfile_PetitionFieldReply on PetitionFieldReply {
     id
     content
     parent {
       id
     }
-  }
-` as unknown as DocumentNode<PetitionFieldRepliesContent_PetitionFieldReplyFragment, unknown>;
-export const useResolveProfilePropertiesConflictsDialog_PetitionFieldReplyFragmentDoc = gql`
-  fragment useResolveProfilePropertiesConflictsDialog_PetitionFieldReply on PetitionFieldReply {
-    ...PetitionFieldRepliesContent_PetitionFieldReply
-  }
-  ${PetitionFieldRepliesContent_PetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<
-  useResolveProfilePropertiesConflictsDialog_PetitionFieldReplyFragment,
-  unknown
->;
-export const useConfigureExpirationsDateDialog_PetitionFieldReplyFragmentDoc = gql`
-  fragment useConfigureExpirationsDateDialog_PetitionFieldReply on PetitionFieldReply {
-    id
-    content
-  }
-` as unknown as DocumentNode<useConfigureExpirationsDateDialog_PetitionFieldReplyFragment, unknown>;
-export const getProfileNamePreview_PetitionFieldFragmentDoc = gql`
-  fragment getProfileNamePreview_PetitionField on PetitionField {
-    id
-    type
-    options
-    profileType {
-      ...getProfileNamePreview_ProfileType
-    }
-    profileTypeField {
-      id
-    }
-  }
-  ${getProfileNamePreview_ProfileTypeFragmentDoc}
-` as unknown as DocumentNode<getProfileNamePreview_PetitionFieldFragment, unknown>;
-export const useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyFragmentDoc = gql`
-  fragment useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReply on PetitionFieldReply {
-    ...useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyInner
-    ...useResolveProfilePropertiesConflictsDialog_PetitionFieldReply
-    ...useConfigureExpirationsDateDialog_PetitionFieldReply
     children {
       field {
         id
-        profileTypeField {
-          id
-          name
-          isExpirable
-          expiryAlertAheadTime
-          options
-          myPermission
-        }
-        ...getProfileNamePreview_PetitionField
       }
       replies {
         id
-        ...useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyInner
-        ...useResolveProfilePropertiesConflictsDialog_PetitionFieldReply
-        ...useConfigureExpirationsDateDialog_PetitionFieldReply
+        content
+        parent {
+          id
+        }
       }
     }
   }
-  ${useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyInnerFragmentDoc}
-  ${useResolveProfilePropertiesConflictsDialog_PetitionFieldReplyFragmentDoc}
-  ${useConfigureExpirationsDateDialog_PetitionFieldReplyFragmentDoc}
-  ${getProfileNamePreview_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<useCheckUpdateProfile_PetitionFieldReplyFragment, unknown>;
+export const useArchiveRepliesIntoProfileDialog_PetitionFieldReplyInnerFragmentDoc = gql`
+  fragment useArchiveRepliesIntoProfileDialog_PetitionFieldReplyInner on PetitionFieldReply {
+    id
+    content
+    associatedProfile {
+      id
+    }
+    ...useCheckUpdateProfile_PetitionFieldReply
+  }
+  ${useCheckUpdateProfile_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<
-  useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyFragment,
+  useArchiveRepliesIntoProfileDialog_PetitionFieldReplyInnerFragment,
   unknown
 >;
-export const useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldInnerFragmentDoc = gql`
-  fragment useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldInner on PetitionField {
+export const useArchiveRepliesIntoProfileDialog_PetitionFieldReplyFragmentDoc = gql`
+  fragment useArchiveRepliesIntoProfileDialog_PetitionFieldReply on PetitionFieldReply {
     id
+    children {
+      field {
+        id
+      }
+      replies {
+        id
+        ...useArchiveRepliesIntoProfileDialog_PetitionFieldReplyInner
+      }
+    }
+    ...useArchiveRepliesIntoProfileDialog_PetitionFieldReplyInner
+  }
+  ${useArchiveRepliesIntoProfileDialog_PetitionFieldReplyInnerFragmentDoc}
+` as unknown as DocumentNode<
+  useArchiveRepliesIntoProfileDialog_PetitionFieldReplyFragment,
+  unknown
+>;
+export const useArchiveRepliesIntoProfileDialog_PetitionFieldInnerFragmentDoc = gql`
+  fragment useArchiveRepliesIntoProfileDialog_PetitionFieldInner on PetitionField {
+    id
+    title
     type
     options
-    multiple
     isLinkedToProfileType
-    isLinkedToProfileTypeField
     profileType {
       id
-      ...getProfileNamePreview_ProfileType
     }
     profileTypeField {
       id
+      myPermission
       isUsedInProfileName
     }
     replies {
       id
-      ...useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReply
+      ...useArchiveRepliesIntoProfileDialog_PetitionFieldReply
+      associatedProfile {
+        id
+      }
     }
-    ...getProfileNamePreview_PetitionField
   }
-  ${getProfileNamePreview_ProfileTypeFragmentDoc}
-  ${useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyFragmentDoc}
-  ${getProfileNamePreview_PetitionFieldFragmentDoc}
+  ${useArchiveRepliesIntoProfileDialog_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<
-  useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldInnerFragment,
+  useArchiveRepliesIntoProfileDialog_PetitionFieldInnerFragment,
   unknown
 >;
-export const useConfigureExpirationsDateDialog_PetitionFieldFragmentDoc = gql`
-  fragment useConfigureExpirationsDateDialog_PetitionField on PetitionField {
+export const useArchiveRepliesIntoProfileDialog_PetitionFieldFragmentDoc = gql`
+  fragment useArchiveRepliesIntoProfileDialog_PetitionField on PetitionField {
     id
-    type
-    profileTypeField {
-      id
-      name
-      expiryAlertAheadTime
-    }
-  }
-` as unknown as DocumentNode<useConfigureExpirationsDateDialog_PetitionFieldFragment, unknown>;
-export const PetitionFieldRepliesContent_PetitionFieldFragmentDoc = gql`
-  fragment PetitionFieldRepliesContent_PetitionField on PetitionField {
-    id
-    type
-    options
-  }
-` as unknown as DocumentNode<PetitionFieldRepliesContent_PetitionFieldFragment, unknown>;
-export const useResolveProfilePropertiesConflictsDialog_PetitionFieldFragmentDoc = gql`
-  fragment useResolveProfilePropertiesConflictsDialog_PetitionField on PetitionField {
-    id
-    ...PetitionFieldRepliesContent_PetitionField
-    profileTypeField {
-      id
-    }
-  }
-  ${PetitionFieldRepliesContent_PetitionFieldFragmentDoc}
-` as unknown as DocumentNode<
-  useResolveProfilePropertiesConflictsDialog_PetitionFieldFragment,
-  unknown
->;
-export const useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragmentDoc = gql`
-  fragment useArchiveFieldGroupReplyIntoProfileDialog_PetitionField on PetitionField {
     ...groupFieldsWithProfileTypes_PetitionField
-    ...useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldInner
-    ...useConfigureExpirationsDateDialog_PetitionField
-    ...useResolveProfilePropertiesConflictsDialog_PetitionField
+    ...useArchiveRepliesIntoProfileDialog_PetitionFieldInner
     children {
-      ...useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldInner
-      ...useConfigureExpirationsDateDialog_PetitionField
-      ...useResolveProfilePropertiesConflictsDialog_PetitionField
+      ...useArchiveRepliesIntoProfileDialog_PetitionFieldInner
     }
   }
   ${groupFieldsWithProfileTypes_PetitionFieldFragmentDoc}
-  ${useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldInnerFragmentDoc}
-  ${useConfigureExpirationsDateDialog_PetitionFieldFragmentDoc}
-  ${useResolveProfilePropertiesConflictsDialog_PetitionFieldFragmentDoc}
-` as unknown as DocumentNode<
-  useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragment,
-  unknown
->;
-export const useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragmentDoc = gql`
-  fragment useArchiveFieldGroupReplyIntoProfileDialog_Petition on Petition {
+  ${useArchiveRepliesIntoProfileDialog_PetitionFieldInnerFragmentDoc}
+` as unknown as DocumentNode<useArchiveRepliesIntoProfileDialog_PetitionFieldFragment, unknown>;
+export const useProfileNamePreview_PetitionFieldReplyFragmentDoc = gql`
+  fragment useProfileNamePreview_PetitionFieldReply on PetitionFieldReply {
     id
-    fields {
+    content
+    children {
+      field {
+        id
+      }
+      replies {
+        id
+        content
+      }
+    }
+  }
+` as unknown as DocumentNode<useProfileNamePreview_PetitionFieldReplyFragment, unknown>;
+export const useProfileNamePreview_PetitionFieldFragmentDoc = gql`
+  fragment useProfileNamePreview_PetitionField on PetitionField {
+    id
+    type
+    options
+    parent {
       id
-      ...useArchiveFieldGroupReplyIntoProfileDialog_PetitionField
+    }
+    replies {
+      ...useProfileNamePreview_PetitionFieldReply
+    }
+    profileTypeField {
+      id
+    }
+  }
+  ${useProfileNamePreview_PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<useProfileNamePreview_PetitionFieldFragment, unknown>;
+export const useProfileNamePreview_PetitionFragmentDoc = gql`
+  fragment useProfileNamePreview_Petition on Petition {
+    id
+    closedAt
+    fields {
+      ...useProfileNamePreview_PetitionField
+      children {
+        ...useProfileNamePreview_PetitionField
+      }
+    }
+  }
+  ${useProfileNamePreview_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<useProfileNamePreview_PetitionFragment, unknown>;
+export const useCheckUpdateProfile_PetitionFieldFragmentDoc = gql`
+  fragment useCheckUpdateProfile_PetitionField on PetitionField {
+    id
+    type
+    replies {
+      ...useCheckUpdateProfile_PetitionFieldReply
+    }
+    profileTypeField {
+      id
+    }
+  }
+  ${useCheckUpdateProfile_PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<useCheckUpdateProfile_PetitionFieldFragment, unknown>;
+export const useCheckUpdateProfile_PetitionFragmentDoc = gql`
+  fragment useCheckUpdateProfile_Petition on Petition {
+    id
+    closedAt
+    fields {
+      ...useCheckUpdateProfile_PetitionField
+      children {
+        ...useCheckUpdateProfile_PetitionField
+      }
+    }
+  }
+  ${useCheckUpdateProfile_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<useCheckUpdateProfile_PetitionFragment, unknown>;
+export const useArchiveRepliesIntoProfileDialog_PetitionFragmentDoc = gql`
+  fragment useArchiveRepliesIntoProfileDialog_Petition on Petition {
+    id
+    closedAt
+    fields {
+      ...useArchiveRepliesIntoProfileDialog_PetitionField
     }
     ...useFieldLogic_PetitionBase
+    ...useProfileNamePreview_Petition
+    ...useCheckUpdateProfile_Petition
   }
-  ${useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldFragmentDoc}
+  ${useArchiveRepliesIntoProfileDialog_PetitionFieldFragmentDoc}
   ${useFieldLogic_PetitionBaseFragmentDoc}
-` as unknown as DocumentNode<useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragment, unknown>;
+  ${useProfileNamePreview_PetitionFragmentDoc}
+  ${useCheckUpdateProfile_PetitionFragmentDoc}
+` as unknown as DocumentNode<useArchiveRepliesIntoProfileDialog_PetitionFragment, unknown>;
+export const useConfigureExpirationsDateDialog_ProfileFieldPropertyFragmentDoc = gql`
+  fragment useConfigureExpirationsDateDialog_ProfileFieldProperty on ProfileFieldProperty {
+    field {
+      id
+      type
+      name
+      expiryAlertAheadTime
+    }
+    files {
+      id
+      expiryDate
+      file {
+        contentType
+        filename
+        isComplete
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  useConfigureExpirationsDateDialog_ProfileFieldPropertyFragment,
+  unknown
+>;
+export const useConfigureExpirationsDateDialog_ProfileFragmentDoc = gql`
+  fragment useConfigureExpirationsDateDialog_Profile on Profile {
+    id
+    properties {
+      ...useConfigureExpirationsDateDialog_ProfileFieldProperty
+    }
+    ...ProfileReference_Profile
+  }
+  ${useConfigureExpirationsDateDialog_ProfileFieldPropertyFragmentDoc}
+  ${ProfileReference_ProfileFragmentDoc}
+` as unknown as DocumentNode<useConfigureExpirationsDateDialog_ProfileFragment, unknown>;
 export const ExportRepliesDialog_UserFragmentDoc = gql`
   fragment ExportRepliesDialog_User on User {
     hasExportCuatrecasas: hasFeatureFlag(featureFlag: EXPORT_CUATRECASAS)
@@ -80576,9 +81532,168 @@ export const useResolveProfilePropertiesConflictsDialog_ProfileFragmentDoc = gql
     properties {
       ...useResolveProfilePropertiesConflictsDialog_ProfileFieldProperty
     }
+    ...ProfileReference_Profile
   }
   ${useResolveProfilePropertiesConflictsDialog_ProfileFieldPropertyFragmentDoc}
+  ${ProfileReference_ProfileFragmentDoc}
 ` as unknown as DocumentNode<useResolveProfilePropertiesConflictsDialog_ProfileFragment, unknown>;
+export const PetitionFieldRepliesContent_PetitionFieldFragmentDoc = gql`
+  fragment PetitionFieldRepliesContent_PetitionField on PetitionField {
+    id
+    type
+    options
+  }
+` as unknown as DocumentNode<PetitionFieldRepliesContent_PetitionFieldFragment, unknown>;
+export const PetitionFieldRepliesContent_PetitionFieldReplyFragmentDoc = gql`
+  fragment PetitionFieldRepliesContent_PetitionFieldReply on PetitionFieldReply {
+    id
+    content
+    parent {
+      id
+    }
+  }
+` as unknown as DocumentNode<PetitionFieldRepliesContent_PetitionFieldReplyFragment, unknown>;
+export const useResolveProfilePropertiesConflictsDialog_PetitionFieldReplyFragmentDoc = gql`
+  fragment useResolveProfilePropertiesConflictsDialog_PetitionFieldReply on PetitionFieldReply {
+    id
+    parent {
+      id
+    }
+    ...PetitionFieldRepliesContent_PetitionFieldReply
+  }
+  ${PetitionFieldRepliesContent_PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  useResolveProfilePropertiesConflictsDialog_PetitionFieldReplyFragment,
+  unknown
+>;
+export const useResolveProfilePropertiesConflictsDialog_PetitionFieldFragmentDoc = gql`
+  fragment useResolveProfilePropertiesConflictsDialog_PetitionField on PetitionField {
+    id
+    ...PetitionFieldRepliesContent_PetitionField
+    parent {
+      id
+    }
+    profileTypeField {
+      id
+    }
+    replies {
+      ...useResolveProfilePropertiesConflictsDialog_PetitionFieldReply
+    }
+  }
+  ${PetitionFieldRepliesContent_PetitionFieldFragmentDoc}
+  ${useResolveProfilePropertiesConflictsDialog_PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  useResolveProfilePropertiesConflictsDialog_PetitionFieldFragment,
+  unknown
+>;
+export const useResolveProfilePropertiesConflictsDialog_PetitionFragmentDoc = gql`
+  fragment useResolveProfilePropertiesConflictsDialog_Petition on Petition {
+    id
+    closedAt
+    fields {
+      id
+      ...useResolveProfilePropertiesConflictsDialog_PetitionField
+      children {
+        id
+        ...useResolveProfilePropertiesConflictsDialog_PetitionField
+      }
+    }
+    variables {
+      name
+      __typename
+      ... on PetitionVariableNumber {
+        valueLabels {
+          value
+          label
+        }
+      }
+      ... on PetitionVariableEnum {
+        enumValueLabels: valueLabels {
+          value
+          label
+        }
+      }
+    }
+    ...useFieldLogic_PetitionBase
+  }
+  ${useResolveProfilePropertiesConflictsDialog_PetitionFieldFragmentDoc}
+  ${useFieldLogic_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<useResolveProfilePropertiesConflictsDialog_PetitionFragment, unknown>;
+export const UpdateProfileFieldValueOnClosePetitionDialog_ProfileFragmentDoc = gql`
+  fragment UpdateProfileFieldValueOnClosePetitionDialog_Profile on Profile {
+    id
+    profileType {
+      id
+      icon
+    }
+    ...ProfileReference_Profile
+    ...ProfileFormInner_Profile
+  }
+  ${ProfileReference_ProfileFragmentDoc}
+  ${ProfileFormInner_ProfileFragmentDoc}
+` as unknown as DocumentNode<UpdateProfileFieldValueOnClosePetitionDialog_ProfileFragment, unknown>;
+export const UpdateProfileFieldValueOnClosePetitionDialog_PetitionFieldFragmentDoc = gql`
+  fragment UpdateProfileFieldValueOnClosePetitionDialog_PetitionField on PetitionField {
+    id
+    title
+    options
+  }
+` as unknown as DocumentNode<
+  UpdateProfileFieldValueOnClosePetitionDialog_PetitionFieldFragment,
+  unknown
+>;
+export const ProfileFieldSuggestion_PetitionFieldFragmentDoc = gql`
+  fragment ProfileFieldSuggestion_PetitionField on PetitionField {
+    id
+    title
+    type
+  }
+` as unknown as DocumentNode<ProfileFieldSuggestion_PetitionFieldFragment, unknown>;
+export const ProfileFormField_PetitionFieldFragmentDoc = gql`
+  fragment ProfileFormField_PetitionField on PetitionField {
+    id
+    options
+    replies {
+      id
+      isAnonymized
+      content
+    }
+    ...ProfileFieldSuggestion_PetitionField
+  }
+  ${ProfileFieldSuggestion_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<ProfileFormField_PetitionFieldFragment, unknown>;
+export const ProfileFormInner_PetitionBaseFragmentDoc = gql`
+  fragment ProfileFormInner_PetitionBase on PetitionBase {
+    fields {
+      id
+      alias
+      ...ProfileFormField_PetitionField
+      children {
+        id
+        alias
+        ...ProfileFormField_PetitionField
+      }
+    }
+    ...useAllFieldsWithIndices_PetitionBase
+  }
+  ${ProfileFormField_PetitionFieldFragmentDoc}
+  ${useAllFieldsWithIndices_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<ProfileFormInner_PetitionBaseFragment, unknown>;
+export const UpdateProfileFieldValueOnClosePetitionDialog_PetitionBaseFragmentDoc = gql`
+  fragment UpdateProfileFieldValueOnClosePetitionDialog_PetitionBase on PetitionBase {
+    id
+    fields {
+      id
+      ...UpdateProfileFieldValueOnClosePetitionDialog_PetitionField
+    }
+    ...ProfileFormInner_PetitionBase
+  }
+  ${UpdateProfileFieldValueOnClosePetitionDialog_PetitionFieldFragmentDoc}
+  ${ProfileFormInner_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<
+  UpdateProfileFieldValueOnClosePetitionDialog_PetitionBaseFragment,
+  unknown
+>;
 export const PetitionRepliesFieldIdVerificationReply_PetitionFieldReplyFragmentDoc = gql`
   fragment PetitionRepliesFieldIdVerificationReply_PetitionFieldReply on PetitionFieldReply {
     id
@@ -80599,6 +81714,31 @@ export const PetitionRepliesFieldUserAssignmentReply_PetitionFieldReplyFragmentD
   PetitionRepliesFieldUserAssignmentReply_PetitionFieldReplyFragment,
   unknown
 >;
+export const ProfileForm_ProfileTypeFieldFragmentDoc = gql`
+  fragment ProfileForm_ProfileTypeField on ProfileTypeField {
+    id
+    ...ProfileFormInner_ProfileTypeField
+  }
+  ${ProfileFormInner_ProfileTypeFieldFragmentDoc}
+` as unknown as DocumentNode<ProfileForm_ProfileTypeFieldFragment, unknown>;
+export const ProfileForm_ProfileFieldFileFragmentDoc = gql`
+  fragment ProfileForm_ProfileFieldFile on ProfileFieldFile {
+    ...ProfileFormInner_ProfileFieldFile
+  }
+  ${ProfileFormInner_ProfileFieldFileFragmentDoc}
+` as unknown as DocumentNode<ProfileForm_ProfileFieldFileFragment, unknown>;
+export const ProfileForm_ProfileFieldValueFragmentDoc = gql`
+  fragment ProfileForm_ProfileFieldValue on ProfileFieldValue {
+    ...ProfileFormInner_ProfileFieldValue
+  }
+  ${ProfileFormInner_ProfileFieldValueFragmentDoc}
+` as unknown as DocumentNode<ProfileForm_ProfileFieldValueFragment, unknown>;
+export const ProfileForm_ProfileFieldPropertyFragmentDoc = gql`
+  fragment ProfileForm_ProfileFieldProperty on ProfileFieldProperty {
+    ...ProfileFormInner_ProfileFieldProperty
+  }
+  ${ProfileFormInner_ProfileFieldPropertyFragmentDoc}
+` as unknown as DocumentNode<ProfileForm_ProfileFieldPropertyFragment, unknown>;
 export const ProfileKeyProcesses_PetitionBaseMiniFragmentDoc = gql`
   fragment ProfileKeyProcesses_PetitionBaseMini on PetitionBaseMini {
     id
@@ -83451,6 +84591,7 @@ export const PetitionCompose_PetitionFieldFragmentDoc = gql`
         id
       }
     }
+    ...PetitionFieldReference_PetitionField
   }
   ${PetitionComposeFieldList_PetitionFieldFragmentDoc}
   ${PetitionComposeFieldSettings_PetitionFieldFragmentDoc}
@@ -83458,6 +84599,7 @@ export const PetitionCompose_PetitionFieldFragmentDoc = gql`
   ${FieldErrorDialog_PetitionFieldFragmentDoc}
   ${ReferencedFieldDialog_PetitionFieldFragmentDoc}
   ${PetitionComposeRightPaneTabs_PetitionFieldFragmentDoc}
+  ${PetitionFieldReference_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PetitionCompose_PetitionFieldFragment, unknown>;
 export const PetitionComposeField_PetitionBaseFragmentDoc = gql`
   fragment PetitionComposeField_PetitionBase on PetitionBase {
@@ -85225,42 +86367,12 @@ export const PetitionSignaturesCard_PetitionFragmentDoc = gql`
   ${getPetitionSignatureEnvironment_PetitionFragmentDoc}
   ${useAddNewSignature_PetitionFragmentDoc}
 ` as unknown as DocumentNode<PetitionSignaturesCard_PetitionFragment, unknown>;
-export const ProfileFieldSuggestion_PetitionFieldFragmentDoc = gql`
-  fragment ProfileFieldSuggestion_PetitionField on PetitionField {
-    id
-    title
-    type
-  }
-` as unknown as DocumentNode<ProfileFieldSuggestion_PetitionFieldFragment, unknown>;
-export const ProfileFormField_PetitionFieldFragmentDoc = gql`
-  fragment ProfileFormField_PetitionField on PetitionField {
-    id
-    options
-    replies {
-      id
-      isAnonymized
-      content
-    }
-    ...ProfileFieldSuggestion_PetitionField
-  }
-  ${ProfileFieldSuggestion_PetitionFieldFragmentDoc}
-` as unknown as DocumentNode<ProfileFormField_PetitionFieldFragment, unknown>;
 export const ProfileForm_PetitionBaseFragmentDoc = gql`
   fragment ProfileForm_PetitionBase on PetitionBase {
-    fields {
-      id
-      alias
-      ...ProfileFormField_PetitionField
-      children {
-        id
-        alias
-        ...ProfileFormField_PetitionField
-      }
-    }
-    ...useAllFieldsWithIndices_PetitionBase
+    id
+    ...ProfileFormInner_PetitionBase
   }
-  ${ProfileFormField_PetitionFieldFragmentDoc}
-  ${useAllFieldsWithIndices_PetitionBaseFragmentDoc}
+  ${ProfileFormInner_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<ProfileForm_PetitionBaseFragment, unknown>;
 export const ProfileDrawer_PetitionBaseFragmentDoc = gql`
   fragment ProfileDrawer_PetitionBase on PetitionBase {
@@ -89639,6 +90751,30 @@ export const ConfigureBackgroundCheckAutomateSearchDialog_petitionDocument = gql
   ConfigureBackgroundCheckAutomateSearchDialog_petitionQuery,
   ConfigureBackgroundCheckAutomateSearchDialog_petitionQueryVariables
 >;
+export const ConfigureUpdateProfileOnCloseDialog_petitionDocument = gql`
+  query ConfigureUpdateProfileOnCloseDialog_petition($petitionId: GID!) {
+    petition(id: $petitionId) {
+      id
+      ...useConfigureUpdateProfileOnCloseDialog_PetitionBase
+    }
+  }
+  ${useConfigureUpdateProfileOnCloseDialog_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<
+  ConfigureUpdateProfileOnCloseDialog_petitionQuery,
+  ConfigureUpdateProfileOnCloseDialog_petitionQueryVariables
+>;
+export const ConfigureUpdateProfileOnCloseDialog_profileTypeDocument = gql`
+  query ConfigureUpdateProfileOnCloseDialog_profileType($profileTypeId: GID!) {
+    profileType(profileTypeId: $profileTypeId) {
+      id
+      ...useConfigureUpdateProfileOnCloseDialog_ProfileType
+    }
+  }
+  ${useConfigureUpdateProfileOnCloseDialog_ProfileTypeFragmentDoc}
+` as unknown as DocumentNode<
+  ConfigureUpdateProfileOnCloseDialog_profileTypeQuery,
+  ConfigureUpdateProfileOnCloseDialog_profileTypeQueryVariables
+>;
 export const useCreateOrUpdateFieldGroupRelationshipsDialog_petitionDocument = gql`
   query useCreateOrUpdateFieldGroupRelationshipsDialog_petition($id: GID!) {
     petition(id: $id) {
@@ -90611,48 +91747,79 @@ export const ProfileDrawer_profileDocument = gql`
   }
   ${ProfileForm_ProfileFragmentDoc}
 ` as unknown as DocumentNode<ProfileDrawer_profileQuery, ProfileDrawer_profileQueryVariables>;
-export const useArchiveFieldGroupReplyIntoProfileDialog_petitionDocument = gql`
-  query useArchiveFieldGroupReplyIntoProfileDialog_petition($id: GID!) {
-    petition(id: $id) {
-      ...useArchiveFieldGroupReplyIntoProfileDialog_Petition
+export const useArchiveRepliesIntoProfileDialog_petitionDocument = gql`
+  query useArchiveRepliesIntoProfileDialog_petition($petitionId: GID!) {
+    petition(id: $petitionId) {
+      ...useArchiveRepliesIntoProfileDialog_Petition
     }
   }
-  ${useArchiveFieldGroupReplyIntoProfileDialog_PetitionFragmentDoc}
+  ${useArchiveRepliesIntoProfileDialog_PetitionFragmentDoc}
 ` as unknown as DocumentNode<
-  useArchiveFieldGroupReplyIntoProfileDialog_petitionQuery,
-  useArchiveFieldGroupReplyIntoProfileDialog_petitionQueryVariables
+  useArchiveRepliesIntoProfileDialog_petitionQuery,
+  useArchiveRepliesIntoProfileDialog_petitionQueryVariables
 >;
-export const useArchiveFieldGroupReplyIntoProfileDialog_archiveFieldGroupReplyIntoProfileDocument =
-  gql`
-    mutation useArchiveFieldGroupReplyIntoProfileDialog_archiveFieldGroupReplyIntoProfile(
-      $petitionId: GID!
-      $petitionFieldId: GID!
-      $parentReplyId: GID!
-      $profileId: GID!
-      $conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
-      $expirations: [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+export const useArchiveRepliesIntoProfileDialog_profileDocument = gql`
+  query useArchiveRepliesIntoProfileDialog_profile($profileId: GID!) {
+    profile(profileId: $profileId) {
+      ...useArchiveRepliesIntoProfileDialog_Profile
+    }
+  }
+  ${useArchiveRepliesIntoProfileDialog_ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  useArchiveRepliesIntoProfileDialog_profileQuery,
+  useArchiveRepliesIntoProfileDialog_profileQueryVariables
+>;
+export const useArchiveRepliesIntoProfileDialog_profileTypeDocument = gql`
+  query useArchiveRepliesIntoProfileDialog_profileType($profileTypeId: GID!) {
+    profileType(profileTypeId: $profileTypeId) {
+      ...useArchiveRepliesIntoProfileDialog_ProfileType
+    }
+  }
+  ${useArchiveRepliesIntoProfileDialog_ProfileTypeFragmentDoc}
+` as unknown as DocumentNode<
+  useArchiveRepliesIntoProfileDialog_profileTypeQuery,
+  useArchiveRepliesIntoProfileDialog_profileTypeQueryVariables
+>;
+export const useArchiveRepliesIntoProfileDialog_archiveFieldGroupReplyIntoProfileDocument = gql`
+  mutation useArchiveRepliesIntoProfileDialog_archiveFieldGroupReplyIntoProfile(
+    $petitionId: GID!
+    $petitionFieldId: GID!
+    $parentReplyId: GID!
+    $profileId: GID!
+    $conflictResolutions: [ArchiveFieldGroupReplyIntoProfileConflictResolutionInput!]!
+    $expirations: [ArchiveFieldGroupReplyIntoProfileExpirationInput!]!
+  ) {
+    archiveFieldGroupReplyIntoProfile(
+      petitionId: $petitionId
+      petitionFieldId: $petitionFieldId
+      parentReplyId: $parentReplyId
+      profileId: $profileId
+      conflictResolutions: $conflictResolutions
+      expirations: $expirations
     ) {
-      archiveFieldGroupReplyIntoProfile(
-        petitionId: $petitionId
-        petitionFieldId: $petitionFieldId
-        parentReplyId: $parentReplyId
-        profileId: $profileId
-        conflictResolutions: $conflictResolutions
-        expirations: $expirations
-      ) {
-        ...useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReply
-        associatedProfile {
-          id
-          ...ProfileSelect_Profile
-        }
+      id
+      associatedProfile {
+        ...useArchiveRepliesIntoProfileDialog_Profile
       }
     }
-    ${useArchiveFieldGroupReplyIntoProfileDialog_PetitionFieldReplyFragmentDoc}
-    ${ProfileSelect_ProfileFragmentDoc}
-  ` as unknown as DocumentNode<
-    useArchiveFieldGroupReplyIntoProfileDialog_archiveFieldGroupReplyIntoProfileMutation,
-    useArchiveFieldGroupReplyIntoProfileDialog_archiveFieldGroupReplyIntoProfileMutationVariables
-  >;
+  }
+  ${useArchiveRepliesIntoProfileDialog_ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  useArchiveRepliesIntoProfileDialog_archiveFieldGroupReplyIntoProfileMutation,
+  useArchiveRepliesIntoProfileDialog_archiveFieldGroupReplyIntoProfileMutationVariables
+>;
+export const useConfigureExpirationsDateDialog_profileDocument = gql`
+  query useConfigureExpirationsDateDialog_profile($profileId: GID!) {
+    profile(profileId: $profileId) {
+      id
+      ...useConfigureExpirationsDateDialog_Profile
+    }
+  }
+  ${useConfigureExpirationsDateDialog_ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  useConfigureExpirationsDateDialog_profileQuery,
+  useConfigureExpirationsDateDialog_profileQueryVariables
+>;
 export const ExportRepliesDialog_meDocument = gql`
   query ExportRepliesDialog_me {
     me {
@@ -90696,6 +91863,42 @@ export const useResolveProfilePropertiesConflictsDialog_profileDocument = gql`
 ` as unknown as DocumentNode<
   useResolveProfilePropertiesConflictsDialog_profileQuery,
   useResolveProfilePropertiesConflictsDialog_profileQueryVariables
+>;
+export const useResolveProfilePropertiesConflictsDialog_petitionDocument = gql`
+  query useResolveProfilePropertiesConflictsDialog_petition($petitionId: GID!) {
+    petition(id: $petitionId) {
+      id
+      ...useResolveProfilePropertiesConflictsDialog_Petition
+    }
+  }
+  ${useResolveProfilePropertiesConflictsDialog_PetitionFragmentDoc}
+` as unknown as DocumentNode<
+  useResolveProfilePropertiesConflictsDialog_petitionQuery,
+  useResolveProfilePropertiesConflictsDialog_petitionQueryVariables
+>;
+export const UpdateProfileFieldValueOnClosePetitionDialog_profileDocument = gql`
+  query UpdateProfileFieldValueOnClosePetitionDialog_profile($profileId: GID!) {
+    profile(profileId: $profileId) {
+      id
+      ...UpdateProfileFieldValueOnClosePetitionDialog_Profile
+    }
+  }
+  ${UpdateProfileFieldValueOnClosePetitionDialog_ProfileFragmentDoc}
+` as unknown as DocumentNode<
+  UpdateProfileFieldValueOnClosePetitionDialog_profileQuery,
+  UpdateProfileFieldValueOnClosePetitionDialog_profileQueryVariables
+>;
+export const UpdateProfileFieldValueOnClosePetitionDialog_petitionDocument = gql`
+  query UpdateProfileFieldValueOnClosePetitionDialog_petition($petitionId: GID!) {
+    petition(id: $petitionId) {
+      id
+      ...UpdateProfileFieldValueOnClosePetitionDialog_PetitionBase
+    }
+  }
+  ${UpdateProfileFieldValueOnClosePetitionDialog_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<
+  UpdateProfileFieldValueOnClosePetitionDialog_petitionQuery,
+  UpdateProfileFieldValueOnClosePetitionDialog_petitionQueryVariables
 >;
 export const ProfileForm_copyFileReplyToProfileFieldFileDocument = gql`
   mutation ProfileForm_copyFileReplyToProfileFieldFile(

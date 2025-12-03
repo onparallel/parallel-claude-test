@@ -260,8 +260,11 @@ function mapFieldMathOperation<
   };
 }
 
-export function applyFieldVisibility<T extends FieldLogicPetitionInput>(petition: T): T["fields"] {
-  return zip(petition.fields, evaluateFieldLogic(petition))
+export function applyFieldVisibility<T extends FieldLogicPetitionInput>(
+  petition: T,
+  evaluatedLogic?: FieldLogicResult[],
+): T["fields"] {
+  return zip(petition.fields, evaluatedLogic ?? evaluateFieldLogic(petition))
     .filter(([, { isVisible }]) => isVisible)
     .map(([field, { groupChildrenLogic }]) => ({
       ...field,

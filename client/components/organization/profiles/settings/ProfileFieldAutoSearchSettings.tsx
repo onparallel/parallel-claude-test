@@ -58,8 +58,8 @@ export function ProfileFieldAutoSearchSettings({ profileTypeId }: { profileTypeI
                 <IconButtonWithTooltip
                   icon={<SettingsIcon />}
                   label={intl.formatMessage({
-                    id: "generic.edit-settings",
-                    defaultMessage: "Edit settings",
+                    id: "generic.edit-setting",
+                    defaultMessage: "Edit setting",
                   })}
                   placement="bottom"
                   size="sm"
@@ -68,7 +68,7 @@ export function ProfileFieldAutoSearchSettings({ profileTypeId }: { profileTypeI
                 <IconButtonWithTooltip
                   icon={<DeleteIcon />}
                   label={intl.formatMessage({
-                    id: "component.settings-row-button.remove-setting",
+                    id: "generic.remove-setting",
                     defaultMessage: "Remove setting",
                   })}
                   placement="bottom-start"

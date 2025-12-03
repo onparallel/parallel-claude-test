@@ -14,8 +14,10 @@ import {
   PetitionSignatureStatus,
   PetitionStatus,
 } from "../../db/__types";
+import { PetitionFieldOptions } from "../../services/PetitionFieldService";
 import { PetitionFieldLogicCondition } from "../../util/fieldLogic";
 import { fromGlobalIds, toGlobalId } from "../../util/globalId";
+import { never } from "../../util/never";
 import { collectMentionsFromSlate } from "../../util/slate/mentions";
 import { MaybeArray, unMaybeArray } from "../../util/types";
 import { NexusGenInputs } from "../__types";
@@ -1670,5 +1672,125 @@ export function fieldIsNotReferencedInLogicConditions<
     fieldIsNotReferencedInFieldLogic(petitionIdArg, fieldIdArg),
     fieldIsNotReferencedInApprovalFlowConfig(petitionIdArg, fieldIdArg),
     fieldIsNotReferencedInPetitionAttachmentsVisibility(petitionIdArg, fieldIdArg),
+  );
+}
+
+function fieldIsNotReferencedInAutoSearchConfig<
+  TypeName extends string,
+  FieldName extends string,
+  TArgPetitionId extends Arg<TypeName, FieldName, number>,
+  TArgFieldId extends Arg<TypeName, FieldName, MaybeArray<number>>,
+>(
+  petitionIdArg: TArgPetitionId,
+  fieldIdArg: TArgFieldId,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const petitionId = getArg(args, petitionIdArg);
+    const fieldIds = unMaybeArray(getArg(args, fieldIdArg));
+
+    const petitionFields = await ctx.petitions.loadAllFieldsByPetitionId(petitionId);
+    const fieldsWithAutoSearchConfig = petitionFields.filter(
+      (f) =>
+        isNonNullish(f.options.autoSearchConfig) &&
+        (f.type === "BACKGROUND_CHECK" || f.type === "ADVERSE_MEDIA_SEARCH"),
+    );
+
+    for (const fieldId of fieldIds) {
+      const field = petitionFields.find((f) => f.id === fieldId);
+      if (!field) {
+        continue;
+      }
+
+      // these types can be referenced in autoSearchConfig
+      if (["SHORT_TEXT", "DATE", "SELECT", "BACKGROUND_CHECK"].includes(field.type)) {
+        for (const f of fieldsWithAutoSearchConfig) {
+          if (f.type === "BACKGROUND_CHECK") {
+            const config = f.options.autoSearchConfig as NonNullable<
+              PetitionFieldOptions["BACKGROUND_CHECK"]["autoSearchConfig"]
+            >;
+
+            if (
+              config.name.includes(field.id) ||
+              config.date === field.id ||
+              config.country === field.id ||
+              config.birthCountry === field.id
+            ) {
+              throw new ApolloError(
+                `PetitionField ${toGlobalId("PetitionField", fieldId)} is being referenced on an autoSearchConfig`,
+                "FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG",
+                { fieldId: toGlobalId("PetitionField", fieldId) },
+              );
+            }
+          } else if (f.type === "ADVERSE_MEDIA_SEARCH") {
+            const config = f.options.autoSearchConfig as NonNullable<
+              PetitionFieldOptions["ADVERSE_MEDIA_SEARCH"]["autoSearchConfig"]
+            >;
+
+            if ((config.name ?? []).includes(field.id) || config.backgroundCheck === field.id) {
+              throw new ApolloError(
+                `PetitionField ${toGlobalId("PetitionField", fieldId)} is being referenced on an autoSearchConfig`,
+                "FIELD_IS_REFERENCED_IN_AUTO_SEARCH_CONFIG",
+                { fieldId: toGlobalId("PetitionField", fieldId) },
+              );
+            }
+          } else {
+            never(`${field.type} cannot have autoSearchConfig`);
+          }
+        }
+      }
+    }
+    return true;
+  };
+}
+
+function fieldIsNotReferencedInUpdateProfileOnClose<
+  TypeName extends string,
+  FieldName extends string,
+  TArgPetitionId extends Arg<TypeName, FieldName, number>,
+  TArgFieldId extends Arg<TypeName, FieldName, MaybeArray<number>>,
+>(
+  petitionIdArg: TArgPetitionId,
+  fieldIdArg: TArgFieldId,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const petitionId = getArg(args, petitionIdArg);
+    const fieldIds = unMaybeArray(getArg(args, fieldIdArg));
+
+    const petitionFields = await ctx.petitions.loadAllFieldsByPetitionId(petitionId);
+    const referencingFieldGroups = petitionFields.filter(
+      (f) =>
+        f.type === "FIELD_GROUP" &&
+        isNonNullish(f.options.updateProfileOnClose) &&
+        Array.isArray(f.options.updateProfileOnClose) &&
+        f.options.updateProfileOnClose.length > 0 &&
+        f.options.updateProfileOnClose.some(
+          (o: any) => o.source.type === "FIELD" && fieldIds.includes(o.source.fieldId),
+        ),
+    );
+
+    if (referencingFieldGroups.length > 0) {
+      throw new ApolloError(
+        `Field is being referenced on an updateProfileOnClose`,
+        "FIELD_IS_REFERENCED_IN_UPDATE_PROFILE_ON_CLOSE_CONFIG",
+        {
+          fieldGroupsIds: referencingFieldGroups.map((f) => toGlobalId("PetitionField", f.id)),
+        },
+      );
+    }
+
+    return true;
+  };
+}
+
+export function fieldIsNotReferencedInFieldOptions<
+  TypeName extends string,
+  FieldName extends string,
+>(
+  petitionIdArg: Arg<TypeName, FieldName, number>,
+  fieldIdArg: Arg<TypeName, FieldName, MaybeArray<number>>,
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return and(
+    fieldIsNotReferencedInAutoSearchConfig(petitionIdArg, fieldIdArg),
+    fieldIsNotReferencedInUpdateProfileOnClose(petitionIdArg, fieldIdArg),
   );
 }

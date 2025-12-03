@@ -43,6 +43,7 @@ export function ProfileFormFieldCheckbox({
   showSuggestionsButton,
   areSuggestionsVisible,
   onToggleSuggestions,
+  showBaseStyles,
 }: ProfileFormFieldCheckboxProps) {
   const { control } = useFormContext<ProfileFormData>();
   return (
@@ -70,71 +71,75 @@ export function ProfileFormFieldCheckbox({
                 }
                 onBlur();
               }}
-              styles={{
-                control: (baseStyles) => ({
-                  ...baseStyles,
-                  borderColor: "transparent",
-                  ":hover": {
-                    borderColor: "inherit",
-                  },
-                  ":focus-within": {
-                    borderColor: baseStyles.borderColor,
-                    "[data-rs='multi-value']": { backgroundColor: "#e2e8f0" },
+              styles={
+                showBaseStyles
+                  ? undefined
+                  : {
+                      control: (baseStyles) => ({
+                        ...baseStyles,
+                        borderColor: "transparent",
+                        ":hover": {
+                          borderColor: "inherit",
+                        },
+                        ":focus-within": {
+                          borderColor: baseStyles.borderColor,
+                          "[data-rs='multi-value']": { backgroundColor: "#e2e8f0" },
 
-                    "[data-rs='multi-value-remove']": { display: "flex" },
-                    "[data-rs='value-container'] > :last-child": {
-                      height: "auto",
-                      position: "relative",
-                    },
-                    "[data-rs='value-container'] > :last-child > input": {
-                      height: "auto",
-                    },
-                  },
-                  ":hover, :focus-within": {
-                    "[data-rs='value-container']": { paddingInlineEnd: 0 },
-                    "[data-rs='indicators-container']": { display: "flex" },
-                  },
-                }),
-                valueContainer: (baseStyles) => ({
-                  ...baseStyles,
-                  paddingInlineEnd: "16px",
-                  paddingInlineStart: "10px",
-                  paddingBlock: "2px",
-                  display: "flex",
-                  flexDirection: "column",
-                  flexWrap: "nowrap",
-                  alignItems: "flex-start",
-                }),
-                multiValue: (baseStyles) => ({
-                  ...baseStyles,
-                  backgroundColor: "transparent",
-                }),
-                multiValueRemove: (baseStyles) => ({
-                  ...baseStyles,
-                  display: "none",
-                }),
-                multiValueLabel: (baseStyles) => ({
-                  ...baseStyles,
-                  fontSize: "16px",
-                  whiteSpace: "wrap",
-                }),
-                indicatorsContainer: (baseStyles) => ({
-                  ...baseStyles,
-                  display: "none",
-                }),
-                placeholder: (baseStyles) => ({
-                  ...baseStyles,
-                  display: "none",
-                }),
-                input: (baseStyles) => ({
-                  ...baseStyles,
-                  height: "auto",
-                  position: "absolute",
-                  "> input": {
-                    height: "auto",
-                  },
-                }),
-              }}
+                          "[data-rs='multi-value-remove']": { display: "flex" },
+                          "[data-rs='value-container'] > :last-child": {
+                            height: "auto",
+                            position: "relative",
+                          },
+                          "[data-rs='value-container'] > :last-child > input": {
+                            height: "auto",
+                          },
+                        },
+                        ":hover, :focus-within": {
+                          "[data-rs='value-container']": { paddingInlineEnd: 0 },
+                          "[data-rs='indicators-container']": { display: "flex" },
+                        },
+                      }),
+                      valueContainer: (baseStyles) => ({
+                        ...baseStyles,
+                        paddingInlineEnd: "16px",
+                        paddingInlineStart: "10px",
+                        paddingBlock: "2px",
+                        display: "flex",
+                        flexDirection: "column",
+                        flexWrap: "nowrap",
+                        alignItems: "flex-start",
+                      }),
+                      multiValue: (baseStyles) => ({
+                        ...baseStyles,
+                        backgroundColor: "transparent",
+                      }),
+                      multiValueRemove: (baseStyles) => ({
+                        ...baseStyles,
+                        display: "none",
+                      }),
+                      multiValueLabel: (baseStyles) => ({
+                        ...baseStyles,
+                        fontSize: "16px",
+                        whiteSpace: "wrap",
+                      }),
+                      indicatorsContainer: (baseStyles) => ({
+                        ...baseStyles,
+                        display: "none",
+                      }),
+                      placeholder: (baseStyles) => ({
+                        ...baseStyles,
+                        display: "none",
+                      }),
+                      input: (baseStyles) => ({
+                        ...baseStyles,
+                        height: "auto",
+                        position: "absolute",
+                        "> input": {
+                          height: "auto",
+                        },
+                      }),
+                    }
+              }
             />
           );
         }}

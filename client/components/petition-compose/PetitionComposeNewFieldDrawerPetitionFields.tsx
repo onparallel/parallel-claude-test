@@ -35,7 +35,7 @@ import { PaidBadge } from "../common/PaidBadge";
 import { ProfileTypeReference } from "../common/ProfileTypeReference";
 import { SearchInput } from "../common/SearchInput";
 import { SmallPopover } from "../common/SmallPopover";
-import { getProfileTypeFieldIcon } from "../organization/profiles/getProfileTypeFieldIcon";
+import { getProfileTypeIcon } from "../organization/profiles/getProfileTypeIcon";
 import { PetitionFieldTypeLabel } from "./PetitionFieldTypeLabel";
 
 const FIELD_GROUP_EXCLUDED_FIELD_TYPES = ["FIELD_GROUP", "HEADING"] as PetitionFieldType[];
@@ -447,7 +447,7 @@ function PetitionComposeNewFieldDrawerProfileType({
   const intl = useIntl();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const openingTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
-  const profileTypeIcon = getProfileTypeFieldIcon(profileType.icon);
+  const profileTypeIcon = getProfileTypeIcon(profileType.icon);
   const color = usePetitionFieldTypeColor(type);
   return (
     <SmallPopover

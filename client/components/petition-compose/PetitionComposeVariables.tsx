@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { CombinedGraphQLErrors, gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
   Box,
@@ -43,7 +43,10 @@ import { isNonNullish, uniqueBy } from "remeda";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { HelpCenterLink, NakedHelpCenterLink } from "../common/HelpCenterLink";
 import { IconButtonWithTooltip, IconButtonWithTooltipProps } from "../common/IconButtonWithTooltip";
+import { OverflownText } from "../common/OverflownText";
+import { PetitionFieldReference } from "../common/PetitionFieldReference";
 import { VariableReference } from "../common/VariableReference";
+import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
 import { useConfirmDeleteVariableDialog } from "./dialogs/ConfirmDeleteVariableDialog";
 import {
   useCreatePetitionVariableDialog,
@@ -175,6 +178,49 @@ export function PetitionComposeVariables({
           ),
         });
         return false;
+      } else if (isApolloError(error, "VARIABLE_IS_REFERENCED_IN_UPDATE_PROFILE_ON_CLOSE_CONFIG")) {
+        const fieldGroups = allFieldsWithIndices.filter(([f]) =>
+          (
+            (error as CombinedGraphQLErrors).errors[0].extensions?.fieldGroupsIds as string[]
+          )?.includes(f.id),
+        );
+
+        await showErrorDialog.ignoringDialogErrors({
+          message: (
+            <Stack>
+              <Text>
+                <FormattedMessage
+                  id="component.petition-compose-variables.variable-updates-profile-on-close-message"
+                  defaultMessage="This variable updates a profile on close and cannot be removed."
+                />
+              </Text>
+              <Text>
+                <FormattedMessage
+                  id="component.petition-compose-variables.variable-referenced-in-update-profile-on-close-message-2"
+                  defaultMessage="Update the configuration of the following { fieldsCount, plural, =1 {field} other {fields}} and try again."
+                  values={{
+                    fieldsCount: fieldGroups.length,
+                  }}
+                />
+              </Text>
+              <Stack spacing={1} paddingTop={2} paddingX={1}>
+                {fieldGroups.map(([f, fieldIndex]) => (
+                  <HStack key={f.id} alignItems="flex-start">
+                    <PetitionFieldTypeIndicator
+                      as="span"
+                      type={f.type}
+                      fieldIndex={fieldIndex}
+                      marginTop={1}
+                    />
+                    <OverflownText flex="1">
+                      <PetitionFieldReference field={f} fontWeight="normal" />
+                    </OverflownText>
+                  </HStack>
+                ))}
+              </Stack>
+            </Stack>
+          ),
+        });
       } else if (isApolloError(error, "VARIABLE_IS_REFERENCED_ERROR")) {
         const referencingMath = allFieldsWithIndices.filter(([f]) =>
           (error.errors[0].extensions?.referencingFieldInMathIds as string[])?.includes(f.id),
@@ -420,6 +466,7 @@ PetitionComposeVariables.fragments = {
         ...ReferencedCalculationsDialog_PetitionField
       }
       ${ReferencedCalculationsDialog.fragments.PetitionField}
+      ${PetitionFieldReference.fragments.PetitionField}
     `;
   },
   get PetitionBase() {

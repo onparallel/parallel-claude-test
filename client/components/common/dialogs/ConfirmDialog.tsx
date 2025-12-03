@@ -14,6 +14,7 @@ import { MaybeFunction, unMaybeFunction } from "@parallel/utils/types";
 import { useUpdatingMemoRef } from "@parallel/utils/useUpdatingRef";
 import { ReactNode, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isNonNullish } from "remeda";
 import { ScrollShadows } from "../ScrollShadows";
 import { BaseDialog, BaseDialogProps } from "./DialogProvider";
 
@@ -25,6 +26,7 @@ export interface ConfirmDialogProps<TResult> extends Omit<BaseDialogProps<TResul
   alternative?: ReactNode;
   content?: ModalContentProps;
   hasCloseButton?: boolean;
+  onCloseButtonClick?: () => Promise<void>;
   bodyProps?: MaybeFunction<HTMLChakraProps<"div">>;
 }
 
@@ -38,6 +40,7 @@ export function ConfirmDialog<TResult = void>({
   content,
   initialFocusRef,
   hasCloseButton,
+  onCloseButtonClick,
   ...props
 }: ConfirmDialogProps<TResult>) {
   const intl = useIntl();
@@ -59,6 +62,14 @@ export function ConfirmDialog<TResult = void>({
       <ModalContent {...content}>
         {hasCloseButton ? (
           <ModalCloseButton
+            onClick={async (e) => {
+              e.preventDefault();
+              if (isNonNullish(onCloseButtonClick)) {
+                await onCloseButtonClick();
+              } else {
+                props.onReject();
+              }
+            }}
             aria-label={intl.formatMessage({
               id: "generic.close",
               defaultMessage: "Close",

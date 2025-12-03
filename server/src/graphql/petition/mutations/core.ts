@@ -19,11 +19,13 @@ import {
   filter,
   groupBy,
   indexBy,
+  intersection,
   isNonNullish,
   isNullish,
   map,
   omit,
   partition,
+  pick,
   pipe,
   range,
   sumBy,
@@ -39,20 +41,24 @@ import {
   CreatePublicPetitionLink,
   Petition,
   PetitionFieldType,
+  PetitionFieldTypeValues,
   PetitionPermission,
   ProfileTypeFieldType,
+  ProfileTypeFieldTypeValues,
 } from "../../../db/__types";
 import {
   ProfileFieldExpiryUpdatedEvent,
   ProfileFieldFileAddedEvent,
   ProfileFieldFileRemovedEvent,
 } from "../../../db/events/ProfileEvent";
+import { PetitionFieldOptions } from "../../../services/PetitionFieldService";
 import { chunkWhile } from "../../../util/arrays";
-import { applyFieldVisibility, mapFieldLogic } from "../../../util/fieldLogic";
+import { applyFieldVisibility, evaluateFieldLogic, mapFieldLogic } from "../../../util/fieldLogic";
 import { fromGlobalId, fromGlobalIds, isGlobalId, toGlobalId } from "../../../util/globalId";
 import { importFromExcel } from "../../../util/importFromExcel";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { isValueCompatible } from "../../../util/isValueCompatible";
+import { never } from "../../../util/never";
 import { petitionIsCompleted } from "../../../util/petitionIsCompleted";
 import { isAtLeast } from "../../../util/profileTypeFieldPermission";
 import { pFlatMap } from "../../../util/promises/pFlatMap";
@@ -63,7 +69,7 @@ import {
   renderTextWithPlaceholders,
 } from "../../../util/slate/placeholders";
 import { hash, random } from "../../../util/token";
-import { unMaybeArray } from "../../../util/types";
+import { unMaybeArray, UnwrapArray } from "../../../util/types";
 import { walkObject } from "../../../util/walkObject";
 import { userHasAccessToContactGroups } from "../../contact/authorizers";
 import { RESULT } from "../../helpers/Result";
@@ -144,6 +150,7 @@ import {
   fieldIsLinkedToProfileTypeField,
   fieldIsNotFirstChild,
   fieldIsNotFixed,
+  fieldIsNotReferencedInFieldOptions,
   fieldIsNotReferencedInLogicConditions,
   fieldsBelongsToPetition,
   firstChildHasType,
@@ -179,7 +186,6 @@ import {
 import { validatePublicPetitionLinkSlug } from "../validations";
 import { ApolloError, ArgValidationError, ForbiddenError } from "./../../helpers/errors";
 import {
-  fieldIsNotBeingUsedInAutoSearchConfig,
   publicPetitionLinkIsNotScheduledForDeletion,
   userCanSendAs,
   userHasAccessToPublicPetitionLink,
@@ -1409,7 +1415,7 @@ export const deletePetitionField = mutationField("deletePetitionField", {
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     fieldIsNotReferencedInLogicConditions("petitionId", "fieldId"),
-    fieldIsNotBeingUsedInAutoSearchConfig("petitionId", "fieldId"),
+    fieldIsNotReferencedInFieldOptions("petitionId", "fieldId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1506,7 +1512,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     ifArgEquals(
       (args) => args.data.multiple,
       true,
-      fieldIsNotBeingUsedInAutoSearchConfig("petitionId", "fieldId"),
+      fieldIsNotReferencedInFieldOptions("petitionId", "fieldId"),
     ),
     ifArgDefined(
       (args) => args.data.optional ?? args.data.isInternal,
@@ -1540,21 +1546,11 @@ export const updatePetitionField = mutationField("updatePetitionField", {
       (args) => args.data.options?.replyOnlyFromProfile,
       true,
       and(
-        fieldHasType("fieldId", [
+        fieldHasType(
+          "fieldId",
           // support only field types that can be linked to a profile type field
-          // these fields have an equivalent ProfileTypeFieldType
-          "SHORT_TEXT",
-          "TEXT",
-          "NUMBER",
-          "DATE",
-          "PHONE",
-          "FILE_UPLOAD",
-          "SELECT",
-          "CHECKBOX",
-          "BACKGROUND_CHECK",
-          "ADVERSE_MEDIA_SEARCH",
-          "USER_ASSIGNMENT",
-        ]),
+          intersection.multiset(ProfileTypeFieldTypeValues, PetitionFieldTypeValues),
+        ),
         fieldIsLinkedToProfileTypeField("fieldId"),
         fieldIsNotFirstChild("fieldId"),
       ),
@@ -1682,6 +1678,10 @@ export const updatePetitionField = mutationField("updatePetitionField", {
 
     if (isNonNullish(options)) {
       try {
+        // validate global ids in options before mapping to numeric.
+        // this way we can throw error if user provided a numeric id instead of a global id.
+        ctx.petitionValidation.validatePetitionFieldOptionsGlobalIds(options);
+
         // convert every globalId defined in options to numeric
         const dbOptions = structuredClone(options);
         walkObject(dbOptions, (key, value, node) => {
@@ -1693,12 +1693,22 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           }
         });
 
-        const field = await ctx.petitionValidation.validatePetitionFieldOptions(
+        const allFields = await ctx.petitions.loadAllFieldsByPetitionId(args.petitionId);
+        const { profile_type_id: profileTypeId } = allFields.find((f) => f.id === args.fieldId)!;
+
+        const profileTypeFields = isNonNullish(profileTypeId)
+          ? await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(profileTypeId)
+          : [];
+
+        const petition = await ctx.petitions.loadPetition(args.petitionId);
+        const field = ctx.petitionValidation.validatePetitionFieldOptions(
           args.fieldId,
           {
             options: dbOptions,
           },
-          ctx.petitions.loadField,
+          indexBy(allFields, (f) => f.id),
+          indexBy(profileTypeFields, (f) => f.id),
+          indexBy(petition!.variables ?? [], (v) => v.name),
         );
 
         data.options = field.options;
@@ -1910,10 +1920,12 @@ export const uploadDynamicSelectFile = mutationField("uploadDynamicSelectFieldFi
         updatedAt: fileUpload.updated_at.toISOString(),
       },
     };
-    await ctx.petitionValidation.validatePetitionFieldOptions(
+
+    ctx.petitionValidation.validatePetitionFieldOptions(
       args.fieldId,
       { options },
-      ctx.petitions.loadField,
+      // for validating DYNAMIC_SELECT options, we only need to load the field itself, not all fields
+      { [args.fieldId]: (await ctx.petitions.loadField(args.fieldId))! },
     );
     const [field] = await ctx.petitions.updatePetitionField(
       args.petitionId,
@@ -2605,7 +2617,7 @@ export const changePetitionFieldType = mutationField("changePetitionFieldType", 
     ifArgEquals("type", "FIELD_GROUP", not(fieldHasParent("fieldId"))),
     petitionIsNotAnonymized("petitionId"),
     fieldIsNotReferencedInLogicConditions("petitionId", "fieldId"),
-    fieldIsNotBeingUsedInAutoSearchConfig("petitionId", "fieldId"),
+    fieldIsNotReferencedInFieldOptions("petitionId", "fieldId"),
     not(fieldIsLinkedToProfileTypeField("fieldId")),
   ),
   args: {
@@ -3199,7 +3211,7 @@ export const linkPetitionFieldChildren = mutationField("linkPetitionFieldChildre
         fieldsBelongsToPetition("petitionId", "childrenFieldIds"),
         not(fieldHasType("childrenFieldIds", ["FIELD_GROUP", "HEADING"])),
         not(fieldHasParent("childrenFieldIds")),
-        fieldIsNotBeingUsedInAutoSearchConfig("petitionId", "childrenFieldIds"),
+        fieldIsNotReferencedInFieldOptions("petitionId", "childrenFieldIds"),
       ),
     ),
   ),
@@ -3270,7 +3282,7 @@ export const unlinkPetitionFieldChildren = mutationField("unlinkPetitionFieldChi
         fieldsBelongsToPetition("petitionId", "childrenFieldIds"),
         fieldHasParent("childrenFieldIds", "parentFieldId"),
         fieldIsNotReferencedInLogicConditions("petitionId", "childrenFieldIds"),
-        fieldIsNotBeingUsedInAutoSearchConfig("petitionId", "childrenFieldIds"),
+        fieldIsNotReferencedInFieldOptions("petitionId", "childrenFieldIds"),
         not(fieldIsLinkedToProfileTypeField("childrenFieldIds")),
       ),
     ),
@@ -3511,8 +3523,9 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
         args.petitionId,
       ]);
 
+      const logic = evaluateFieldLogic(composedPetition);
       // only need visible fields of type FIELD_GROUP with a profile_type_id and its visible children
-      const visibleRootFields = applyFieldVisibility(composedPetition);
+      const visibleRootFields = applyFieldVisibility(composedPetition, logic);
       const fieldGroup = visibleRootFields.find((f) => f.id === args.petitionFieldId);
       if (isNullish(fieldGroup)) {
         // trying to archive a FIELD_GROUP reply that is not visible with the current field visibility
@@ -3520,6 +3533,17 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
           "provided field is not visible due to current visibility conditions",
         );
       }
+
+      // load profile and get its values and files
+      const [profile, profileTypeFields, profileFieldValuesAndDrafts, profileFieldFiles] =
+        await Promise.all([
+          ctx.profiles.loadProfile(args.profileId),
+          ctx.profiles.loadProfileTypeFieldsByProfileTypeId(fieldGroup.profile_type_id!),
+          ctx.profiles.loadProfileFieldValuesAndDraftsByProfileId(args.profileId),
+          ctx.profiles.loadProfileFieldFilesByProfileId(args.profileId),
+        ]);
+
+      assert(profile, "Profile not found");
 
       // get not only the field referenced in arguments, but also all the fields with the same groupName and profile_type_id
       const otherRelevantGroups =
@@ -3535,52 +3559,201 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
             )
           : [];
 
-      // get the replies from the children fields that are linked with a property on the profile
-      const groupReplies = [
-        ...(fieldGroup.replies
-          .find((r) => r.id === args.parentReplyId)!
-          .children?.filter((c) => isNonNullish(c.field.profile_type_field_id)) ?? []),
-        ...otherRelevantGroups.flatMap(
-          (g) =>
-            g.replies[0].children?.filter((c) => isNonNullish(c.field.profile_type_field_id)) ?? [],
-        ),
+      const updateOnCloseConfig =
+        (fieldGroup.options
+          .updateProfileOnClose as PetitionFieldOptions["FIELD_GROUP"]["updateProfileOnClose"]) ??
+        [];
+
+      type CollectedReplySource =
+        | {
+            type: "PETITION_METADATA";
+            metadata: {
+              name: string;
+              type: "DATE";
+            };
+          }
+        | {
+            type: "VARIABLE";
+            variable: {
+              name: string;
+              type: "ENUM" | "NUMBER";
+            };
+          }
+        | {
+            type: "FIELD";
+            field: {
+              id: number;
+              type: PetitionFieldType;
+            };
+          };
+
+      let petitionReplies: {
+        profileTypeFieldId: number;
+        source: CollectedReplySource & { replies: { id?: number; content: any }[] };
+      }[] = [
+        // get values from petition metadata
+        ...updateOnCloseConfig
+          .filter((s) => s.source.type === "PETITION_METADATA")
+          .map((s) => {
+            assert(s.source.type === "PETITION_METADATA");
+            return {
+              profileTypeFieldId: s.profileTypeFieldId,
+              source: {
+                type: "PETITION_METADATA" as const,
+                metadata:
+                  s.source.name === "CLOSED_AT"
+                    ? { name: s.source.name, type: "DATE" as const }
+                    : never("Invalid metadata name"),
+                replies: composedPetition.closedAt
+                  ? [{ content: { value: composedPetition.closedAt.toISOString().split("T")[0] } }]
+                  : [],
+              },
+            };
+          }),
+        // get values from variables on the petition
+        ...updateOnCloseConfig
+          .filter((s) => s.source.type === "VARIABLE")
+          .map((s) => {
+            assert(s.source.type === "VARIABLE");
+            const variableName = s.source.name;
+            const variable = composedPetition.variables.find((v) => v.name === variableName);
+            const variableValue = logic[0].finalVariables[variableName];
+            assert(isNonNullish(variable), "Variable not found");
+            const finalValue =
+              variable.type === "NUMBER" ? variableValue : s.source.map?.[variableValue];
+            assert(
+              isNonNullish(finalValue),
+              `Could not determine value for variable ${variableName}`,
+            );
+
+            if (finalValue === "-KEEP" || finalValue === "-DELETE") {
+              // if the value is -KEEP or -DELETE, we need to ignore or overwrite the current value on the profile
+              // this is like providing a conflict resolution for the variable
+              args.conflictResolutions.push({
+                action: finalValue === "-KEEP" ? "IGNORE" : "OVERWRITE",
+                profileTypeFieldId: s.profileTypeFieldId,
+              });
+              return {
+                profileTypeFieldId: s.profileTypeFieldId,
+                source: {
+                  type: "VARIABLE" as const,
+                  variable: {
+                    name: s.source.name,
+                    type: variable.type,
+                  },
+                  replies: [],
+                },
+              };
+            }
+
+            return {
+              profileTypeFieldId: s.profileTypeFieldId,
+              source: {
+                type: "VARIABLE" as const,
+                variable: {
+                  name: s.source.name,
+                  type: variable.type,
+                },
+                replies: [{ content: { value: finalValue } }],
+              },
+            };
+          }),
+        // get values from other fields on the petition
+        ...updateOnCloseConfig
+          .filter((s) => s.source.type === "FIELD")
+          .map((s) => {
+            assert(s.source.type === "FIELD");
+            const fieldId = s.source.fieldId;
+            const field = composedPetition.fields.find((f) => f.id === fieldId);
+            assert(isNonNullish(field), "Field not found");
+            const map = s.source.map;
+            return {
+              profileTypeFieldId: s.profileTypeFieldId,
+              source: {
+                type: "FIELD" as const,
+                field: {
+                  id: field.id,
+                  type: field.type,
+                },
+                replies: field.replies
+                  .map((r) => {
+                    const finalValue =
+                      field.type === "SELECT" && isNullish(field.options.standardList)
+                        ? map?.[r.content.value]
+                        : r.content.value;
+
+                    assert(
+                      isNonNullish(finalValue),
+                      `Could not determine value for field ${fieldId}`,
+                    );
+
+                    if (finalValue === "-KEEP" || finalValue === "-DELETE") {
+                      // if the value is -KEEP or -DELETE, we need to ignore or overwrite the current value on the profile
+                      // this is like providing a conflict resolution for the field
+                      args.conflictResolutions.push({
+                        action: finalValue === "-KEEP" ? "IGNORE" : "OVERWRITE",
+                        profileTypeFieldId: s.profileTypeFieldId,
+                      });
+                      return null;
+                    }
+                    return {
+                      id: r.id,
+                      content: { value: finalValue },
+                    };
+                  })
+                  .filter(isNonNullish),
+              },
+            };
+          }),
+        // get the replies from the children fields that are linked with a property on the profile
+        ...[
+          ...(fieldGroup.replies
+            .find((r) => r.id === args.parentReplyId)!
+            .children?.filter((c) => isNonNullish(c.field.profile_type_field_id)) ?? []),
+          ...otherRelevantGroups.flatMap(
+            (g) =>
+              g.replies[0].children?.filter((c) => isNonNullish(c.field.profile_type_field_id)) ??
+              [],
+          ),
+        ].map(({ field, replies }) => ({
+          profileTypeFieldId: field.profile_type_field_id!,
+          source: {
+            type: "FIELD" as const,
+            field: {
+              id: field.id,
+              type: field.type,
+            },
+            replies: replies.map(pick(["id", "content"])),
+          },
+        })),
       ];
 
-      // load profile and get its values and files
-      const [profile, profileTypeFields, profileFieldValuesAndDrafts, profileFieldFiles] =
-        await Promise.all([
-          ctx.profiles.loadProfile(args.profileId),
-          ctx.profiles.loadProfileTypeFieldsByProfileTypeId(fieldGroup.profile_type_id!),
-          ctx.profiles.loadProfileFieldValuesAndDraftsByProfileId(args.profileId),
-          ctx.profiles.loadProfileFieldFilesByProfileId(args.profileId),
-        ]);
-
-      assert(profile, "Profile not found");
-
       const effectivePermissions = await ctx.profiles.loadProfileTypeFieldUserEffectivePermission(
-        groupReplies.map((r) => ({
-          profileTypeFieldId: r.field.profile_type_field_id!,
+        petitionReplies.map((r) => ({
+          profileTypeFieldId: r.profileTypeFieldId,
           userId: ctx.user!.id,
         })),
       );
 
-      const [fileReplies, simpleReplies] = pipe(
-        zip(groupReplies, effectivePermissions),
+      petitionReplies = pipe(
+        zip(petitionReplies, effectivePermissions),
         filter(([, permission]) => isAtLeast(permission, "WRITE")), // don't write on fields without WRITE permission
-        map(([{ field, replies }]) => ({
-          field: omit(field, ["replies"]), // omit field.replies to avoid confusions (field.replies contain every reply of the field for every group)
-          replies,
+        map(([{ profileTypeFieldId, source }]) => ({
+          profileTypeFieldId,
+          source: source as any,
         })),
-        partition(({ field }) => field.type === "FILE_UPLOAD"),
       );
 
       // extract file_upload_ids from every reply and profile value. This way we can load it all at once for later usage
       const fileUploadIds = unique([
-        ...groupReplies.flatMap((r) =>
-          r.field.type === "FILE_UPLOAD"
-            ? r.replies.map((r) => r.content.file_upload_id as number).filter(isNonNullish)
-            : [],
-        ),
+        ...petitionReplies
+          .filter((r) => r.source.type === "FIELD" && r.source.field.type === "FILE_UPLOAD")
+          .flatMap((r) => {
+            assert(r.source.type === "FIELD");
+            return r.source.replies
+              .map((reply) => reply.content.file_upload_id as number)
+              .filter(isNonNullish);
+          }),
         ...profileFieldFiles.map((pff) => pff.file_upload_id).filter(isNonNullish),
       ]);
 
@@ -3588,8 +3761,12 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
 
       // we need to iterate replies on petition and check if there are conflicts with current values on the profile
       // if any conflict exists, push it to this arrays and throw an ApolloError with the conflicted fields, so the user can select what to do on each case
-      const missingConflictResolutions: number[] = [];
-      const missingExpirations: number[] = [];
+      // conflicts can have distinct sources:
+      // - FIELD: the conflict is related to a field on the petition (child of the main field group)
+      // - VARIABLE: the conflict is related to a variable on the petition
+      // - PETITION_METADATA: the conflict is related to a petition metadata
+      const missingConflictResolutions: typeof petitionReplies = [];
+      const missingExpirations: typeof petitionReplies = [];
 
       // these contain the contents of every profile type field that will be created or updated on the profile.
       // if content is null, it means the value will be removed from the profile
@@ -3603,33 +3780,48 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
         petitionFieldReplyId: number | null;
       }[] = [];
 
+      const [fileReplies, simpleReplies] = partition(
+        petitionReplies,
+        (r) => r.source.type === "FIELD" && r.source.field.type === "FILE_UPLOAD",
+      );
+
       // on simple replies, if there is more than 1 reply on the same profile_type_field_id (2 or more different groups being merged)
       // we just take the first reply and ignore the others, as text values on profile are always single-response
-      for (const { field, replies } of uniqueBy(
+      for (const { profileTypeFieldId, source } of uniqueBy(
         simpleReplies,
-        (r) => r.field.profile_type_field_id,
+        (r) => r.profileTypeFieldId,
       )) {
-        const reply = replies.at(0); // get only 1st reply on non-file fields
-        const profileTypeField = profileTypeFields.find(
-          (f) => f.id === field.profile_type_field_id!,
-        );
+        const reply = source.replies.at(0); // get only 1st reply on non-file fields
+
+        const fieldType =
+          source.type === "FIELD"
+            ? source.field.type
+            : source.type === "PETITION_METADATA"
+              ? source.metadata.type
+              : source.type === "VARIABLE"
+                ? source.variable.type === "NUMBER"
+                  ? "NUMBER"
+                  : "SELECT"
+                : never();
+
+        const profileTypeField = profileTypeFields.find((f) => f.id === profileTypeFieldId);
 
         if (!profileTypeField) {
           continue;
         }
 
         const pfvs = profileFieldValuesAndDrafts.filter(
-          (v) => v.profile_type_field_id === field.profile_type_field_id,
+          (v) => v.profile_type_field_id === profileTypeFieldId,
         );
 
         // always prioritize drafts
         const profileFieldValue = pfvs.find((v) => v.is_draft) || pfvs.find((v) => !v.is_draft);
 
         const resolution = args.conflictResolutions.find(
-          (cr) => cr.profileTypeFieldId === field.profile_type_field_id,
+          (cr) => cr.profileTypeFieldId === profileTypeFieldId,
         );
         const expiration = args.expirations.find(
-          (e) => e.profileTypeFieldId === field.profile_type_field_id,
+          (e) => e.profileTypeFieldId === profileTypeFieldId,
         );
 
         // if already exists a value on the profile, there could be a conflict with reply so we need to check
@@ -3637,13 +3829,16 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
           if (
             isNonNullish(reply) &&
             // if petition reply is a draft, or profile contains a draft, we don't need to check for conflicts
-            (ctx.profilesHelper.isDraftContent(reply.type, reply.content) ||
+            (ctx.profilesHelper.isDraftContent(fieldType, reply.content) ||
               ctx.profilesHelper.isDraftContent(profileFieldValue.type, profileFieldValue.content))
           ) {
             updateProfileFieldValues.push({
               profileId: profile.id,
-              ...ctx.petitionsHelper.mapPetitionFieldReplyToProfileFieldValue(reply),
-              profileTypeFieldId: field.profile_type_field_id!,
+              ...ctx.petitionsHelper.mapPetitionFieldReplyToProfileFieldValue({
+                ...reply,
+                type: fieldType,
+              }),
+              profileTypeFieldId: profileTypeFieldId,
               expiryDate:
                 reply && profileTypeField.options.useReplyAsExpiryDate
                   ? reply.content.value
@@ -3651,7 +3846,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
             });
           } else if (
             isNullish(reply) ||
-            !ctx.petitionsHelper.contentsAreEqual(reply, profileFieldValue)
+            !ctx.petitionsHelper.contentsAreEqual({ ...reply, type: fieldType }, profileFieldValue)
           ) {
             // expiration is required if the field is expirable and the reply is defined (meaning profile value will be modified)
             if (
@@ -3661,11 +3856,11 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
               isNullish(expiration) &&
               (isNullish(resolution) || resolution.action !== "IGNORE") // if resolution is IGNORE, value will not be updated so we don't want to update the expiryDate
             ) {
-              missingExpirations.push(field.profile_type_field_id!);
+              missingExpirations.push({ profileTypeFieldId, source });
             }
             // resolution is required
             if (isNullish(resolution)) {
-              missingConflictResolutions.push(field.profile_type_field_id!);
+              missingConflictResolutions.push({ profileTypeFieldId, source });
             } else if (resolution.action === "OVERWRITE") {
               /**
                * action could be:
@@ -3675,9 +3870,9 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
               updateProfileFieldValues.push({
                 profileId: profile.id,
                 ...ctx.petitionsHelper.mapPetitionFieldReplyToProfileFieldValue(
-                  reply ?? { type: field.type, content: null },
+                  reply ? { ...reply, type: fieldType } : { type: fieldType, content: null },
                 ),
-                profileTypeFieldId: field.profile_type_field_id!,
+                profileTypeFieldId: profileTypeFieldId,
                 expiryDate:
                   reply && profileTypeField.options.useReplyAsExpiryDate
                     ? reply.content.value
@@ -3694,13 +3889,16 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
             isNullish(expiration)
           ) {
             // expiration is required
-            missingExpirations.push(field.profile_type_field_id!);
+            missingExpirations.push({ profileTypeFieldId, source });
           }
 
           updateProfileFieldValues.push({
             profileId: profile.id,
-            ...ctx.petitionsHelper.mapPetitionFieldReplyToProfileFieldValue(reply),
-            profileTypeFieldId: field.profile_type_field_id!,
+            ...ctx.petitionsHelper.mapPetitionFieldReplyToProfileFieldValue({
+              ...reply,
+              type: fieldType,
+            }),
+            profileTypeFieldId: profileTypeFieldId,
             expiryDate:
               reply && profileTypeField.options.useReplyAsExpiryDate
                 ? reply.content.value
@@ -3747,28 +3945,28 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
       }[] = [];
 
       // same process than before, with FILE_UPLOADS
-      for (const { field, replies } of uniqueBy(
+      for (const { profileTypeFieldId, source } of uniqueBy(
         fileReplies,
-        (r) => r.field.profile_type_field_id!,
+        (r) => r.profileTypeFieldId,
       )) {
-        const profileTypeField = profileTypeFields.find(
-          (f) => f.id === field.profile_type_field_id!,
-        );
+        assert(source.type === "FIELD" && source.field.type === "FILE_UPLOAD");
+        const { replies } = source;
+        const profileTypeField = profileTypeFields.find((f) => f.id === profileTypeFieldId);
 
         if (!profileTypeField) {
           continue;
         }
 
         const profileFieldFileValues = profileFieldFiles.filter(
-          (v) => v.profile_type_field_id === field.profile_type_field_id!,
+          (v) => v.profile_type_field_id === profileTypeFieldId,
         );
 
         const resolution = args.conflictResolutions.find(
-          (cr) => cr.profileTypeFieldId === field.profile_type_field_id!,
+          (cr) => cr.profileTypeFieldId === profileTypeFieldId,
         );
 
         const expiration = args.expirations.find(
-          (e) => e.profileTypeFieldId === field.profile_type_field_id!,
+          (e) => e.profileTypeFieldId === profileTypeFieldId,
         );
 
         if (profileFieldFileValues.length > 0) {
@@ -3776,7 +3974,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
             // no replies on field, IGNORE or OVERWRITE?
             if (isNullish(resolution)) {
               // resolution is required
-              missingConflictResolutions.push(field.profile_type_field_id!);
+              missingConflictResolutions.push({ profileTypeFieldId, source });
             }
 
             /**
@@ -3819,7 +4017,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
               isNullish(expiration) &&
               (newFileUploads.length > 0 || currentProfileFieldFileUploads.length > 0) // if there is no difference between reply and profile value, no need to update expiryDate
             ) {
-              missingExpirations.push(field.profile_type_field_id!);
+              missingExpirations.push({ profileTypeFieldId, source });
             }
 
             if (
@@ -3827,13 +4025,13 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
               (newFileUploads.length > 0 || currentProfileFieldFileUploads.length > 0)
             ) {
               // resolution is required only if there is any difference between files on reply and profile
-              missingConflictResolutions.push(field.profile_type_field_id!);
+              missingConflictResolutions.push({ profileTypeFieldId, source });
             } else if (resolution?.action === "APPEND" || resolution?.action === "OVERWRITE") {
               createProfileFieldFiles.push(
                 ...newFileUploads
                   .filter((r) => isNonNullish(r.fileUpload))
                   .map((r) => ({
-                    profileTypeFieldId: field.profile_type_field_id!,
+                    profileTypeFieldId: profileTypeFieldId,
                     fileUploadId: r.fileUpload!.id,
                     expiryDate: expiration?.expiryDate,
                     petitionFieldReplyId: r.replyId,
@@ -3854,14 +4052,14 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
           // if the field is expirable, we require it to be present on expirations array
           if (profileTypeField.is_expirable && isNullish(expiration)) {
             // expiration is required
-            missingExpirations.push(field.profile_type_field_id!);
+            missingExpirations.push({ profileTypeFieldId, source });
           }
 
           createProfileFieldFiles.push(
             ...replies
               .filter((r) => isNullish(r.content.error) && isNonNullish(r.content.file_upload_id))
               .map((r) => ({
-                profileTypeFieldId: field.profile_type_field_id!,
+                profileTypeFieldId: profileTypeFieldId,
                 fileUploadId: r.content.file_upload_id as number,
                 expiryDate: expiration?.expiryDate,
                 petitionFieldReplyId: r.id,
@@ -3871,14 +4069,30 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
       }
 
       if (missingConflictResolutions.length > 0 || missingExpirations.length > 0) {
+        function mapConflict(c: UnwrapArray<typeof petitionReplies>) {
+          return {
+            profileTypeFieldId: toGlobalId("ProfileTypeField", c.profileTypeFieldId),
+            source: {
+              ...(c.source.type === "FIELD"
+                ? {
+                    type: "FIELD" as const,
+                    fieldId: toGlobalId("PetitionField", c.source.field.id),
+                  }
+                : c.source.type === "VARIABLE"
+                  ? { type: "VARIABLE" as const, name: c.source.variable.name }
+                  : c.source.type === "PETITION_METADATA"
+                    ? { type: "PETITION_METADATA" as const, name: c.source.metadata.name }
+                    : never()),
+            },
+          };
+        }
+
         throw new ApolloError(
           "There was a conflict with existing values, please provide conflictResolution and/or expirations data",
           "CONFLICT_RESOLUTION_REQUIRED_ERROR",
           {
-            conflictResolutions: missingConflictResolutions.map((r) =>
-              toGlobalId("ProfileTypeField", r),
-            ),
-            expirations: missingExpirations.map((e) => toGlobalId("ProfileTypeField", e)),
+            conflictResolutions: missingConflictResolutions.map(mapConflict),
+            expirations: missingExpirations.map(mapConflict),
           },
         );
       }

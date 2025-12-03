@@ -82,9 +82,8 @@ export class PetitionFilesService {
       petitionId,
     ]);
 
-    // TODO evaluateFieldLogic se ejecuta 2 veces
     const logic = evaluateFieldLogic(composedPetition);
-    const visibleFields = applyFieldVisibility(composedPetition);
+    const visibleFields = applyFieldVisibility(composedPetition, logic);
 
     const allVisibleReplies = visibleFields
       .flatMap((f) => [
