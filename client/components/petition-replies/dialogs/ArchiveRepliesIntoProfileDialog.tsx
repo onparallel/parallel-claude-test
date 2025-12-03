@@ -164,18 +164,17 @@ function ArchiveRepliesIntoProfileRepliesToProfileDialog({
       if (unsavedSelectedProfiles.current.length > 0) {
         await showConfirmCloseArchiveReplyIntoProfileDialog();
       }
-      props.onReject();
+      return { close: true };
     } catch {}
+    return { close: false };
   };
 
   return (
     <ConfirmDialog
       size="4xl"
-      closeOnEsc={false}
       closeOnOverlayClick={false}
-      hasCloseButton={true}
-      onEsc={handleClose}
-      onCloseButtonClick={handleClose}
+      hasCloseButton
+      onTryClose={handleClose}
       header={
         <FormattedMessage
           id="component.associate-and-fill-profile-to-parallel-dialog.header"
@@ -229,7 +228,14 @@ function ArchiveRepliesIntoProfileRepliesToProfileDialog({
       }
       confirm={<></>}
       cancel={
-        <Button onClick={handleClose}>
+        <Button
+          onClick={async () => {
+            const result = await handleClose();
+            if (result.close) {
+              props.onReject();
+            }
+          }}
+        >
           <FormattedMessage id="generic.close" defaultMessage="Close" />
         </Button>
       }

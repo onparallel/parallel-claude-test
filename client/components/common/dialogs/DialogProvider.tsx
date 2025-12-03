@@ -1,4 +1,5 @@
 import { Modal, ModalOverlay, ModalProps } from "@chakra-ui/react";
+import { withError } from "@parallel/utils/promises/withError";
 import { Prettify } from "@parallel/utils/types";
 import { NextComponentType } from "next";
 import { useRouter } from "next/router";
@@ -164,21 +165,25 @@ export function isDialogError(value: unknown): value is DialogError {
   return value instanceof DialogError;
 }
 
-export type BaseModalProps = Omit<ModalProps, "children" | "isOpen" | "onClose">;
+export interface BaseModalProps extends Omit<ModalProps, "children" | "isOpen" | "onClose"> {
+  onTryClose?: () => Promise<{ close: boolean }>;
+  closeOnNavigation?: boolean;
+}
 
 export interface BaseDialogProps<TResult> extends BaseModalProps, DialogProps<{}, TResult> {
-  closeOnNavigation?: boolean;
   children: ReactNode;
 }
 
 export function BaseDialog<TResult = void>({
   onResolve,
   onReject,
-  closeOnNavigation,
   children,
   ...props
 }: BaseDialogProps<TResult>) {
   const router = useRouter();
+  const contextProps = useContext(BaseDialogPropsContext);
+  const closeOnNavigation = contextProps.closeOnNavigation ?? props.closeOnNavigation;
+  const onTryClose = contextProps.onTryClose ?? props.onTryClose;
   useEffect(() => {
     if (closeOnNavigation) {
       const routeChangeStartHandler = () => onReject("NAVIGATION");
@@ -186,9 +191,22 @@ export function BaseDialog<TResult = void>({
       return () => router.events.off("routeChangeStart", routeChangeStartHandler);
     }
   }, [closeOnNavigation]);
-  const contextProps = useContext(BaseDialogPropsContext);
   return (
-    <Modal isOpen={true} onClose={() => onReject("CLOSE")} {...contextProps} {...props}>
+    <Modal
+      isOpen={true}
+      onClose={async () => {
+        if (isNonNullish(onTryClose)) {
+          const [, result] = await withError(onTryClose());
+          if (result?.close) {
+            onReject("CLOSE");
+          }
+        } else {
+          onReject("CLOSE");
+        }
+      }}
+      {...contextProps}
+      {...props}
+    >
       <ModalOverlay>{children}</ModalOverlay>
     </Modal>
   );
