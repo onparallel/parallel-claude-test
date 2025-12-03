@@ -119,7 +119,7 @@ export const PetitionCommentsAndNotesEditor = chakraForwardRef<
         >
           <FormattedMessage
             id="component.petition-comments-and-notes-editor.notes"
-            defaultMessage="Notes"
+            defaultMessage="Internal notes"
           />
           <HelpPopover>
             <FormattedMessage

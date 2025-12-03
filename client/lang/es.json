@@ -6590,14 +6590,14 @@
     "context": "Ctrl + enter to send"
   },
   {
+    "term": "component.petition-comments-and-notes-editor.notes",
+    "definition": "Notas internas",
+    "context": "Internal notes"
+  },
+  {
     "term": "component.petition-comments-and-notes-editor.note-placeholder",
     "definition": "Escribe @ para mencionar a otros usuarios",
     "context": "Type @ to mention other users"
-  },
-  {
-    "term": "component.petition-comments-and-notes-editor.notes",
-    "definition": "Notas",
-    "context": "Notes"
   },
   {
     "term": "component.petition-comments-and-notes-editor.notes-description",
