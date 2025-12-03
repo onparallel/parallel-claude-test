@@ -1,12 +1,11 @@
 import { SQSClient } from "@aws-sdk/client-sqs";
 import { fork } from "child_process";
-import { ContainerModule, injectable } from "inversify";
+import { Container, ContainerModule, injectable } from "inversify";
 import pMap from "p-map";
 import { Consumer } from "sqs-consumer";
 import yargs from "yargs";
 import { CONFIG, Config } from "../../config";
 import { createContainer } from "../../container";
-import { WorkerContext } from "../../context";
 import { ILogger, LOGGER } from "../../services/Logger";
 import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
 import { awsLogger } from "../../util/awsLogger";
@@ -47,7 +46,7 @@ export interface QueueWorkerOptions<Q extends keyof Config["queueWorkers"]> {
   onForkError?: (
     signal: NodeJS.Signals,
     message: QueueWorkerPayload<Q>,
-    context: WorkerContext,
+    container: Container,
     config: Config["queueWorkers"][Q],
   ) => MaybePromise<void>;
   parser?: (message: string) => QueueWorkerPayload<Q>;
@@ -233,7 +232,7 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
                             await onForkError?.(
                               e as NodeJS.Signals,
                               parser(message.Body!),
-                              container.get<WorkerContext>(WorkerContext),
+                              container,
                               queueConfig,
                             );
                           }

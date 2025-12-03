@@ -1,6 +1,6 @@
 import { Container } from "inversify";
 import { CONFIG, Config, buildConfig } from "./config";
-import { ApiContext, WorkerContext } from "./context";
+import { ApiContext } from "./context";
 import { dbModule } from "./db/module";
 import { integrationsModule } from "./integrations/module";
 import { adverseMediaSearchClientsModule } from "./services/adverse-media-search-clients/module";
@@ -11,7 +11,6 @@ export function createContainer() {
   const container = new Container({ defaultScope: "Request" });
   container.bind<Config>(CONFIG).toDynamicValue(buildConfig).inSingletonScope();
   container.bind<ApiContext>(ApiContext).toSelf();
-  container.bind<WorkerContext>(WorkerContext).toSelf();
   container.load(dbModule);
   container.load(servicesModule);
   container.load(backgroundCheckClientsModule);

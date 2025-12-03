@@ -87,7 +87,7 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
   }
 
   /** starts a signature request on the petition */
-  async startSignatureProcess(payload: { petitionSignatureRequestId: number }) {
+  private async startSignatureProcess(payload: { petitionSignatureRequestId: number }) {
     const enqueued = await this.petitions.loadPetitionSignatureById.raw(
       payload.petitionSignatureRequestId,
     );
@@ -275,7 +275,7 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
   }
 
   /** cancels the signature request for all signers on the petition */
-  async cancelSignatureProcess(payload: { petitionSignatureRequestId: number }) {
+  private async cancelSignatureProcess(payload: { petitionSignatureRequestId: number }) {
     try {
       const signature = await this.fetchPetitionSignature(payload.petitionSignatureRequestId);
       if (!signature.external_id) {
@@ -308,7 +308,10 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
   }
 
   /** sends a reminder email to every pending signer of the signature request */
-  async sendSignatureReminder(payload: { petitionSignatureRequestId: number; userId: number }) {
+  private async sendSignatureReminder(payload: {
+    petitionSignatureRequestId: number;
+    userId: number;
+  }) {
     try {
       const signature = await this.fetchPetitionSignature(payload.petitionSignatureRequestId);
       if (signature.status !== "PROCESSED") {
@@ -332,7 +335,7 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
     }
   }
 
-  async storeSignedDocument(payload: {
+  private async storeSignedDocument(payload: {
     petitionSignatureRequestId: number;
     signedDocumentExternalId: string;
     signer: PetitionSignatureConfigSigner;
@@ -413,7 +416,7 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
     }
   }
 
-  async storeAuditTrail(payload: {
+  private async storeAuditTrail(payload: {
     petitionSignatureRequestId: number;
     signedDocumentExternalId: string;
   }) {
@@ -447,7 +450,10 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
     }
   }
 
-  async updateOrganizationBranding(payload: { orgId: number; integrationId: Maybe<number> }) {
+  private async updateOrganizationBranding(payload: {
+    orgId: number;
+    integrationId: Maybe<number>;
+  }) {
     const signatureIntegrations = await this.integrations.loadIntegrationsByOrgId(
       payload.orgId,
       "SIGNATURE",
@@ -468,7 +474,9 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
     );
   }
 
-  async fetchOrgSignatureIntegration(orgIntegrationId: number): Promise<SignatureOrgIntegration> {
+  private async fetchOrgSignatureIntegration(
+    orgIntegrationId: number,
+  ): Promise<SignatureOrgIntegration> {
     const signatureIntegration = await this.integrations.loadIntegration(orgIntegrationId);
 
     if (!signatureIntegration || signatureIntegration.type !== "SIGNATURE") {
@@ -480,7 +488,7 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
     return signatureIntegration as any;
   }
 
-  async fetchPetition(id: number) {
+  private async fetchPetition(id: number) {
     const petition = await this.petitions.loadPetition(id);
     if (!petition) {
       throw new Error(`Couldn't find petition with id ${id}`);
@@ -488,7 +496,7 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
     return petition;
   }
 
-  async fetchPetitionSignature(petitionSignatureRequestId: number) {
+  private async fetchPetitionSignature(petitionSignatureRequestId: number) {
     const signature = await this.petitions.loadPetitionSignatureById.raw(
       petitionSignatureRequestId,
     );
@@ -530,7 +538,7 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
     }
   }
 
-  async storeDocument(buffer: Buffer, filename: string, integrationId: number) {
+  private async storeDocument(buffer: Buffer, filename: string, integrationId: number) {
     const path = random(16);
     const res = await this.storage.fileUploads.uploadFile(path, "application/pdf", buffer);
 
@@ -547,7 +555,7 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
     return file;
   }
 
-  async storeTemporaryDocument(filePath: string, filename: string) {
+  private async storeTemporaryDocument(filePath: string, filename: string) {
     const path = random(16);
     const buffer = await readFile(filePath);
     const res = await this.storage.temporaryFiles.uploadFile(path, "application/pdf", buffer);
@@ -563,7 +571,7 @@ export class SignatureWorker extends QueueWorker<SignatureWorkerPayload> {
     );
   }
 
-  async getDefaultFileName(petitionId: number, locale: ContactLocale) {
+  private async getDefaultFileName(petitionId: number, locale: ContactLocale) {
     return (
       (await this.petitions.getFirstDefinedTitleFromHeadings(petitionId)) ||
       (await this.i18n.getIntl(locale)).formatMessage({

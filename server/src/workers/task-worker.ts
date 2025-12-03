@@ -1,3 +1,5 @@
+import { CONFIG, Config } from "../config";
+import { TaskRepository } from "../db/repositories/TaskRepository";
 import { createQueueWorker } from "./helpers/createQueueWorker";
 import { TaskWorkerQueue } from "./queues/TaskWorkerQueue";
 import { taskRunnersModule } from "./queues/task-runners/module";
@@ -19,7 +21,10 @@ createQueueWorker("task-worker", TaskWorkerQueue, {
       return 2 * 60_000;
     }
   },
-  async onForkError(signal, { taskId }, ctx) {
-    await ctx.tasks.taskFailed(taskId, { message: signal }, ctx.config.instanceName);
+  async onForkError(signal, { taskId }, container) {
+    const config = container.get<Config>(CONFIG);
+    const taskRepository = container.get<TaskRepository>(TaskRepository);
+
+    await taskRepository.taskFailed(taskId, { message: signal }, config.instanceName);
   },
 });

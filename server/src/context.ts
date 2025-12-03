@@ -2,10 +2,9 @@ import express from "express";
 import { inject, injectable } from "inversify";
 import { CONFIG, Config } from "./config";
 import { Contact, Organization, PetitionAccess, User } from "./db/__types";
-import { ContactRepository, ReadOnlyContactRepository } from "./db/repositories/ContactRepository";
+import { ContactRepository } from "./db/repositories/ContactRepository";
 import { DashboardRepository } from "./db/repositories/DashboardRepository";
 import { EmailLogRepository } from "./db/repositories/EmailLogRepository";
-import { EventRepository } from "./db/repositories/EventRepository";
 import { FeatureFlagRepository } from "./db/repositories/FeatureFlagRepository";
 import { FileRepository } from "./db/repositories/FileRepository";
 import { IntegrationRepository } from "./db/repositories/IntegrationRepository";
@@ -13,30 +12,23 @@ import { LicenseCodeRepository } from "./db/repositories/LicenseCodeRepository";
 import { OrganizationRepository } from "./db/repositories/OrganizationRepository";
 import { PetitionApprovalRequestRepository } from "./db/repositories/PetitionApprovalRequestRepository";
 import { PetitionCommentRepository } from "./db/repositories/PetitionCommentRepository";
-import {
-  PetitionRepository,
-  ReadOnlyPetitionRepository,
-} from "./db/repositories/PetitionRepository";
+import { PetitionRepository } from "./db/repositories/PetitionRepository";
 import { ProfileRepository } from "./db/repositories/ProfileRepository";
 import { SubscriptionRepository } from "./db/repositories/SubscriptionRepository";
 import { SystemRepository } from "./db/repositories/SystemRepository";
-import { ReadOnlyTagRepository, TagRepository } from "./db/repositories/TagRepository";
+import { TagRepository } from "./db/repositories/TagRepository";
 import { TaskRepository } from "./db/repositories/TaskRepository";
 import { UserAuthenticationRepository } from "./db/repositories/UserAuthenticationRepository";
 import { UserGroupRepository } from "./db/repositories/UserGroupRepository";
-import { ReadOnlyUserRepository, UserRepository } from "./db/repositories/UserRepository";
+import { UserRepository } from "./db/repositories/UserRepository";
 import { ViewRepository } from "./db/repositories/ViewRepository";
 import { DOW_JONES_CLIENT, IDowJonesClient } from "./integrations/dow-jones/DowJonesClient";
-import { IFileExportIntegration } from "./integrations/file-export/FileExportIntegration";
-import { IMANAGE_FILE_EXPORT_INTEGRATION } from "./integrations/file-export/imanage/IManageFileExportIntegration";
 import { ACCOUNT_SETUP_SERVICE, IAccountSetupService } from "./services/AccountSetupService";
 import {
   ADVERSE_MEDIA_SEARCH_SERVICE,
   IAdverseMediaSearchService,
 } from "./services/AdverseMediaSearchService";
 import { AI_ASSISTANT_SERVICE, IAiAssistantService } from "./services/AiAssistantService";
-import { AI_COMPLETION_SERVICE, IAiCompletionService } from "./services/AiCompletionService";
-import { ANALYTICS, IAnalyticsService } from "./services/AnalyticsService";
 import { APPROVALS_SERVICE, IApprovalsService } from "./services/ApprovalsService";
 import { AUTH, IAuth } from "./services/AuthService";
 import {
@@ -44,10 +36,6 @@ import {
   IBackgroundCheckService,
 } from "./services/BackgroundCheckService";
 import { BANKFLIP_SERVICE, IBankflipService } from "./services/BankflipService";
-import {
-  DOCUMENT_PROCESSING_SERVICE,
-  IDocumentProcessingService,
-} from "./services/DocumentProcessingService";
 import { EMAILS, IEmailsService } from "./services/EmailsService";
 import { ENCRYPTION_SERVICE, IEncryptionService } from "./services/EncryptionService";
 import {
@@ -69,13 +57,7 @@ import {
   IOrganizationCreditsService,
   ORGANIZATION_CREDITS_SERVICE,
 } from "./services/OrganizationCreditsService";
-import {
-  IOrganizationLayoutService,
-  ORGANIZATION_LAYOUT_SERVICE,
-} from "./services/OrganizationLayoutService";
-import { IPetitionBinder, PETITION_BINDER } from "./services/PetitionBinder";
 import { PETITION_FIELD_SERVICE, PetitionFieldService } from "./services/PetitionFieldService";
-import { PETITION_FILES_SERVICE, PetitionFilesService } from "./services/PetitionFilesService";
 import {
   IPetitionImportExportService,
   PETITION_IMPORT_EXPORT_SERVICE,
@@ -92,10 +74,6 @@ import {
   PETITIONS_HELPER_SERVICE,
   PetitionsHelperService,
 } from "./services/PetitionsHelperService";
-import {
-  PROFILE_EXCEL_EXPORT_SERVICE,
-  ProfileExcelExportService,
-} from "./services/ProfileExcelExportService";
 import {
   PROFILE_EXCEL_IMPORT_SERVICE,
   ProfileExcelImportService,
@@ -114,10 +92,8 @@ import {
 } from "./services/ProfileValidationService";
 import { PROFILES_HELPER_SERVICE, ProfilesHelperService } from "./services/ProfilesHelperService";
 import { IProfilesSetupService, PROFILES_SETUP_SERVICE } from "./services/ProfilesSetupService";
-import { IQueuesService, QUEUES_SERVICE } from "./services/QueuesService";
 import { IRedis, REDIS } from "./services/Redis";
 import { ISignatureService, SIGNATURE } from "./services/SignatureService";
-import { ISmtp, SMTP } from "./services/Smtp";
 import { IStorageService, STORAGE_SERVICE } from "./services/StorageService";
 
 @injectable()
@@ -209,73 +185,5 @@ export class ApiContext {
     public readonly dashboards: DashboardRepository,
     public readonly approvalRequests: PetitionApprovalRequestRepository,
     public readonly petitionComments: PetitionCommentRepository,
-  ) {}
-}
-
-@injectable()
-export class WorkerContext {
-  constructor(
-    @inject(CONFIG) public config: Config,
-    @inject(LOGGER) public logger: ILogger,
-    // Services
-    @inject(SMTP) public readonly smtp: ISmtp,
-    @inject(EMAILS) public readonly emails: IEmailsService,
-    @inject(ANALYTICS) public readonly analytics: IAnalyticsService,
-    @inject(PETITION_BINDER) public readonly petitionBinder: IPetitionBinder,
-    @inject(I18N_SERVICE) public readonly i18n: II18nService,
-    @inject(STORAGE_SERVICE) public readonly storage: IStorageService,
-    @inject(QUEUES_SERVICE) public readonly queues: IQueuesService,
-    @inject(ORG_LIMITS_SERVICE) public readonly orgLimits: IOrgLimitsService,
-    @inject(DOW_JONES_CLIENT) public readonly dowJonesKyc: IDowJonesClient,
-    @inject(ORGANIZATION_LAYOUT_SERVICE)
-    public readonly layouts: IOrganizationLayoutService,
-    @inject(FETCH_SERVICE) public readonly fetch: IFetchService,
-    @inject(PETITION_MESSAGE_CONTEXT_SERVICE)
-    public readonly petitionMessageContext: IPetitionMessageContextService,
-    @inject(BANKFLIP_SERVICE) public readonly bankflip: IBankflipService,
-    @inject(ORGANIZATION_CREDITS_SERVICE) public readonly orgCredits: IOrganizationCreditsService,
-    @inject(AI_COMPLETION_SERVICE) public readonly aiCompletion: IAiCompletionService,
-    @inject(BACKGROUND_CHECK_SERVICE) public readonly backgroundCheck: IBackgroundCheckService,
-    @inject(REDIS) public readonly redis: IRedis,
-    @inject(ID_VERIFICATION_SERVICE) public readonly idVerification: IdVerificationService,
-    @inject(DOCUMENT_PROCESSING_SERVICE)
-    public readonly documentProcessing: IDocumentProcessingService,
-    @inject(PETITION_FILES_SERVICE) public readonly petitionFiles: PetitionFilesService,
-    @inject(PROFILE_EXCEL_IMPORT_SERVICE)
-    public readonly profileExcelImport: ProfileExcelImportService,
-    @inject(PROFILE_EXCEL_EXPORT_SERVICE)
-    public readonly profileExcelExport: ProfileExcelExportService,
-    @inject(IMANAGE_FILE_EXPORT_INTEGRATION) public readonly iManageExport: IFileExportIntegration,
-    @inject(EVENT_SUBSCRIPTION_SERVICE)
-    public readonly eventSubscription: IEventSubscriptionService,
-    @inject(ADVERSE_MEDIA_SEARCH_SERVICE) public readonly adverseMedia: IAdverseMediaSearchService,
-
-    // Helper services
-    @inject(PETITIONS_HELPER_SERVICE) public readonly petitionsHelper: PetitionsHelperService,
-    @inject(PROFILES_HELPER_SERVICE) public readonly profilesHelper: ProfilesHelperService,
-
-    // Repositories
-    public readonly contacts: ContactRepository,
-    public readonly emailLogs: EmailLogRepository,
-    public readonly featureFlags: FeatureFlagRepository,
-    public readonly files: FileRepository,
-    public readonly integrations: IntegrationRepository,
-    public readonly users: UserRepository,
-    public readonly organizations: OrganizationRepository,
-    public readonly petitions: PetitionRepository,
-    public readonly system: SystemRepository,
-    public readonly userGroups: UserGroupRepository,
-    public readonly subscriptions: SubscriptionRepository,
-    public readonly tasks: TaskRepository,
-    public readonly profiles: ProfileRepository,
-    public readonly events: EventRepository,
-    public readonly dashboards: DashboardRepository,
-    public readonly approvalRequests: PetitionApprovalRequestRepository,
-    public readonly petitionComments: PetitionCommentRepository,
-
-    public readonly readonlyContacts: ReadOnlyContactRepository,
-    public readonly readonlyPetitions: ReadOnlyPetitionRepository,
-    public readonly readonlyUsers: ReadOnlyUserRepository,
-    public readonly readonlyTags: ReadOnlyTagRepository,
   ) {}
 }
