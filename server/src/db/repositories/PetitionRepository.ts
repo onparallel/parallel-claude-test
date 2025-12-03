@@ -64,7 +64,7 @@ import {
 import { SlateNode } from "../../util/slate/render";
 import { random } from "../../util/token";
 import { Maybe, MaybeArray, Replace, UnwrapArray, unMaybeArray } from "../../util/types";
-import { TemplateStatsReportInput } from "../../workers/tasks/TemplateStatsReportRunner";
+import { TemplateStatsReportInput } from "../../workers/queues/task-runners/TemplateStatsReportRunner";
 import {
   AiCompletionLog,
   Contact,
