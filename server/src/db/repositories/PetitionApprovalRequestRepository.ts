@@ -14,7 +14,7 @@ import { KNEX } from "../knex";
 export interface ApprovalRequestStepConfig {
   name: string;
   type: PetitionApprovalRequestStepApprovalType;
-  values: { id: number; type: "User" | "UserGroup" }[];
+  values: { id: number; type: "User" | "UserGroup" | "PetitionField" }[];
   visibility?: PetitionFieldVisibility | null;
 }
 

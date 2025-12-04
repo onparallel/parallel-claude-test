@@ -99,6 +99,14 @@ export const startPetitionApprovalRequestStep = mutationField("startPetitionAppr
     );
     assert(approvalRequestStep, "Approval request step not found");
 
+    const approvers = await ctx.approvalRequests.loadPetitionApprovalRequestStepApproversByStepId(
+      args.approvalRequestStepId,
+    );
+
+    if (approvers.length === 0) {
+      return approvalRequestStep;
+    }
+
     let comment: PetitionFieldComment | undefined;
     if (args.message && args.message !== "") {
       comment = await ctx.petitions.createPetitionFieldCommentFromUser(
@@ -143,10 +151,6 @@ export const startPetitionApprovalRequestStep = mutationField("startPetitionAppr
         `User:${ctx.user!.id}`,
       );
     }
-
-    const approvers = await ctx.approvalRequests.loadPetitionApprovalRequestStepApproversByStepId(
-      args.approvalRequestStepId,
-    );
 
     await ctx.approvalRequests.updatePetitionApprovalRequestStepApproverTimestamps(
       approvers.map((a) => a.id),

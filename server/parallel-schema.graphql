@@ -175,7 +175,7 @@ input ApprovalFlowConfigInput {
   type: ApprovalFlowType!
 
   """
-  User or UserGroup GID
+  globalId of the target User, UserGroup or PetitionField
   """
   values: [ID!]!
   visibility: JSONObject

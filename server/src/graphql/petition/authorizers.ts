@@ -1608,10 +1608,11 @@ function fieldIsNotReferencedInApprovalFlowConfig<
     }
 
     const referencedFieldId = fieldIds.find((id) =>
-      petition.approval_flow_config?.some((config) =>
-        config.visibility?.conditions.some(
-          (condition) => "fieldId" in condition && condition.fieldId === id,
-        ),
+      petition.approval_flow_config?.some(
+        (config) =>
+          config.visibility?.conditions.some(
+            (condition) => "fieldId" in condition && condition.fieldId === id,
+          ) || config.values.some((v) => v.type === "PetitionField" && v.id === id),
       ),
     );
 

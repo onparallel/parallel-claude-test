@@ -1355,11 +1355,6 @@
     "context": "More about approvals"
   },
   {
-    "term": "component.configure-approval-steps-dialog.select-approvers",
-    "definition": "Selecciona un responsable",
-    "context": "Select approvers"
-  },
-  {
     "term": "component.configure-automate-search-dialog.birth-country-label",
     "definition": "País de nacimiento",
     "context": "Country of birth"
@@ -12880,6 +12875,11 @@
     "context": "The request for approval with an access to this parallel will be sent to the following users:"
   },
   {
+    "term": "component.start-petition-approval-flow-dialog.body-no-approvers",
+    "definition": "No hay aprobadores asignados para esta solicitud. Aún puedes iniciarla, pero no se enviará a ningún usuario.",
+    "context": "There are no assigned approvers for this request. You can still start it, but it will not be sent to any user."
+  },
+  {
     "term": "component.start-petition-approval-flow-dialog.checkbox-include-information",
     "definition": "Añadir información adicional",
     "context": "Add additional information"
@@ -14160,6 +14160,11 @@
     "context": "Account & Organization settings"
   },
   {
+    "term": "component.user-select.fields-group-label",
+    "definition": "CAMPOS",
+    "context": "Fields"
+  },
+  {
     "term": "component.user-select.placeholder-multi-with-groups",
     "definition": "Selecciona usuarios o equipos de tu organización",
     "context": "Select users or teams from your organization"
@@ -14183,6 +14188,11 @@
     "term": "component.user-select.user-group-icon-alt",
     "definition": "Equipo",
     "context": "Team"
+  },
+  {
+    "term": "component.user-select.users-and-teams-group-label",
+    "definition": "Usuarios y equipos",
+    "context": "Users and teams"
   },
   {
     "term": "component.user-settings-layout.account-section",
@@ -16168,6 +16178,11 @@
     "term": "generic.send",
     "definition": "Enviar",
     "context": "Send"
+  },
+  {
+    "term": "generic.send-anyway",
+    "definition": "Enviar de todas formas",
+    "context": "Send anyway"
   },
   {
     "term": "generic.send-to",

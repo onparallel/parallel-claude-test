@@ -192,7 +192,7 @@ export interface ApprovalFlowConfig {
 export interface ApprovalFlowConfigInput {
   name: Scalars["String"]["input"];
   type: ApprovalFlowType;
-  /** User or UserGroup GID */
+  /** globalId of the target User, UserGroup or PetitionField */
   values: Array<Scalars["ID"]["input"]>;
   visibility?: InputMaybe<Scalars["JSONObject"]["input"]>;
 }
@@ -8162,6 +8162,103 @@ export type AppSumoLicenseAlert_OrgLicenseFragment = {
   __typename?: "OrgLicense";
   name: string;
   externalId: string;
+};
+
+export type ApprovalFlowConfigApproverSelect_UserFragment = {
+  __typename?: "User";
+  id: string;
+  fullName?: string | null;
+  email: string;
+};
+
+export type ApprovalFlowConfigApproverSelect_UserGroupFragment = {
+  __typename?: "UserGroup";
+  id: string;
+  name: string;
+  memberCount: number;
+  localizableName: { [locale in UserLocale]?: string };
+  type: UserGroupType;
+};
+
+export type ApprovalFlowConfigApproverSelect_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+  id: string;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+    options: { [key: string]: any };
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      title?: string | null;
+      options: { [key: string]: any };
+      parent?: { __typename?: "PetitionField"; id: string } | null;
+    }> | null;
+    parent?: { __typename?: "PetitionField"; id: string } | null;
+  }>;
+};
+
+export type ApprovalFlowConfigApproverSelect_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+    options: { [key: string]: any };
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      title?: string | null;
+      options: { [key: string]: any };
+      parent?: { __typename?: "PetitionField"; id: string } | null;
+    }> | null;
+    parent?: { __typename?: "PetitionField"; id: string } | null;
+  }>;
+};
+
+export type ApprovalFlowConfigApproverSelect_PetitionBaseFragment =
+  | ApprovalFlowConfigApproverSelect_PetitionBase_Petition_Fragment
+  | ApprovalFlowConfigApproverSelect_PetitionBase_PetitionTemplate_Fragment;
+
+export type ApprovalFlowConfigApproverSelect_PetitionFieldInnerFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  type: PetitionFieldType;
+  title?: string | null;
+  options: { [key: string]: any };
+  parent?: { __typename?: "PetitionField"; id: string } | null;
+};
+
+export type ApprovalFlowConfigApproverSelect_canCreateUsersQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type ApprovalFlowConfigApproverSelect_canCreateUsersQuery = {
+  me: { __typename?: "User"; id: string; canCreateUsers: boolean };
+};
+
+export type ApprovalFlowConfigApproverSelect_useGetUsersOrGroupsQueryVariables = Exact<{
+  ids: Array<Scalars["ID"]["input"]> | Scalars["ID"]["input"];
+}>;
+
+export type ApprovalFlowConfigApproverSelect_useGetUsersOrGroupsQuery = {
+  getUsersOrGroups: Array<
+    | { __typename?: "User"; id: string; fullName?: string | null; email: string }
+    | {
+        __typename?: "UserGroup";
+        id: string;
+        name: string;
+        memberCount: number;
+        localizableName: { [locale in UserLocale]?: string };
+        type: UserGroupType;
+      }
+  >;
 };
 
 export type ContactListPopover_ContactFragment = {
@@ -36864,359 +36961,6 @@ export type PetitionApprovalsCard_approvePetitionApprovalRequestStepMutationVari
 
 export type PetitionApprovalsCard_approvePetitionApprovalRequestStepMutation = {
   approvePetitionApprovalRequestStep: {
-    __typename?: "PetitionApprovalRequestStep";
-    id: string;
-    status: PetitionApprovalRequestStepStatus;
-    stepName: string;
-    approvalType: PetitionApprovalRequestStepApprovalType;
-    petition: {
-      __typename?: "Petition";
-      id: string;
-      status: PetitionStatus;
-      currentApprovalRequestStatus: PetitionApprovalRequestStatus;
-      generalCommentCount: number;
-      unreadGeneralCommentCount: number;
-      hasStartedProcess: boolean;
-      isInteractionWithRecipientsEnabled: boolean;
-      currentSignatureRequest?: {
-        __typename?: "PetitionSignatureRequest";
-        id: string;
-        status: PetitionSignatureRequestStatus;
-        cancelReason?: string | null;
-        environment: SignatureOrgIntegrationEnvironment;
-        signatureConfig: {
-          __typename?: "SignatureConfig";
-          review: boolean;
-          reviewAfterApproval?: boolean | null;
-        };
-      } | null;
-      signatureConfig?: {
-        __typename?: "SignatureConfig";
-        isEnabled: boolean;
-        review: boolean;
-        reviewAfterApproval?: boolean | null;
-        allowAdditionalSigners: boolean;
-        minSigners: number;
-        signingMode: SignatureConfigSigningMode;
-        instructions?: string | null;
-        title?: string | null;
-        useCustomDocument: boolean;
-        timezone: string;
-        integration?: {
-          __typename?: "SignatureOrgIntegration";
-          id: string;
-          environment: SignatureOrgIntegrationEnvironment;
-          name: string;
-          provider: SignatureOrgIntegrationProvider;
-        } | null;
-        signers: Array<{
-          __typename?: "PetitionSigner";
-          signWithDigitalCertificate?: boolean | null;
-          signWithEmbeddedImageFileUploadId?: string | null;
-          contactId?: string | null;
-          firstName: string;
-          lastName?: string | null;
-          fullName: string;
-          email?: string | null;
-          isPreset: boolean;
-          signWithEmbeddedImageUrl300?: string | null;
-        } | null>;
-      } | null;
-      signatureRequests: Array<{
-        __typename?: "PetitionSignatureRequest";
-        id: string;
-        status: PetitionSignatureRequestStatus;
-        isAnonymized: boolean;
-        metadata: { [key: string]: any };
-        auditTrailFilename?: string | null;
-        errorCode?: string | null;
-        createdAt: string;
-        errorMessage?: string | null;
-        extraErrorData?: any | null;
-        latestSignatureReminderAt?: string | null;
-        cancelReason?: string | null;
-        signerStatus: Array<{
-          __typename?: "PetitionSignatureRequestSignerStatus";
-          status: string;
-          sentAt?: string | null;
-          openedAt?: string | null;
-          signedAt?: string | null;
-          declinedAt?: string | null;
-          bouncedAt?: string | null;
-          signer: {
-            __typename?: "PetitionSigner";
-            signWithEmbeddedImageFileUploadId?: string | null;
-            contactId?: string | null;
-            firstName: string;
-            lastName?: string | null;
-            fullName: string;
-            email?: string | null;
-            isPreset: boolean;
-            signWithDigitalCertificate?: boolean | null;
-          };
-        }>;
-        signatureConfig: {
-          __typename?: "SignatureConfig";
-          signingMode: SignatureConfigSigningMode;
-          integration?: {
-            __typename?: "SignatureOrgIntegration";
-            id: string;
-            provider: SignatureOrgIntegrationProvider;
-          } | null;
-        };
-      }>;
-      currentApprovalRequestSteps?: Array<{
-        __typename?: "PetitionApprovalRequestStep";
-        id: string;
-        status: PetitionApprovalRequestStepStatus;
-        stepName: string;
-        approvalType: PetitionApprovalRequestStepApprovalType;
-        approvers: Array<{
-          __typename?: "PetitionApprovalRequestStepApprover";
-          id: string;
-          approvedAt?: string | null;
-          canceledAt?: string | null;
-          rejectedAt?: string | null;
-          sentAt?: string | null;
-          skippedAt?: string | null;
-          user?: {
-            __typename?: "User";
-            id: string;
-            isMe: boolean;
-            fullName?: string | null;
-            email: string;
-            status: UserStatus;
-          } | null;
-        }>;
-      }> | null;
-      oldApprovalRequestSteps: Array<{
-        __typename?: "PetitionApprovalRequestStep";
-        id: string;
-        status: PetitionApprovalRequestStepStatus;
-        stepName: string;
-        approvalType: PetitionApprovalRequestStepApprovalType;
-        approvers: Array<{
-          __typename?: "PetitionApprovalRequestStepApprover";
-          id: string;
-          approvedAt?: string | null;
-          canceledAt?: string | null;
-          rejectedAt?: string | null;
-          sentAt?: string | null;
-          skippedAt?: string | null;
-          user?: {
-            __typename?: "User";
-            id: string;
-            isMe: boolean;
-            fullName?: string | null;
-            email: string;
-            status: UserStatus;
-          } | null;
-        }>;
-      }>;
-      approvalFlowConfig?: Array<{
-        __typename?: "ApprovalFlowConfig";
-        name: string;
-        type: ApprovalFlowType;
-        values: Array<string>;
-        visibility?: { [key: string]: any } | null;
-        approvers: Array<{
-          __typename?: "User";
-          id: string;
-          isMe: boolean;
-          fullName?: string | null;
-          email: string;
-          status: UserStatus;
-        } | null>;
-      }> | null;
-      fields: Array<{
-        __typename?: "PetitionField";
-        type: PetitionFieldType;
-        options: { [key: string]: any };
-        optional: boolean;
-        isReadOnly: boolean;
-        isInternal: boolean;
-        id: string;
-        visibility?: { [key: string]: any } | null;
-        math?: Array<{ [key: string]: any }> | null;
-        replies: Array<{
-          __typename?: "PetitionFieldReply";
-          id: string;
-          createdAt: string;
-          updatedAt: string;
-          content: { [key: string]: any };
-          isAnonymized: boolean;
-          children?: Array<{
-            __typename?: "PetitionFieldGroupChildReply";
-            field: {
-              __typename?: "PetitionField";
-              optional: boolean;
-              isInternal: boolean;
-              isReadOnly: boolean;
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              id: string;
-              previewReplies: Array<{
-                __typename?: "PetitionFieldReply";
-                id: string;
-                content: { [key: string]: any };
-                isAnonymized: boolean;
-                children?: Array<{
-                  __typename?: "PetitionFieldGroupChildReply";
-                  field: {
-                    __typename?: "PetitionField";
-                    type: PetitionFieldType;
-                    options: { [key: string]: any };
-                    optional: boolean;
-                  };
-                  replies: Array<{
-                    __typename?: "PetitionFieldReply";
-                    id: string;
-                    content: { [key: string]: any };
-                    isAnonymized: boolean;
-                  }>;
-                }> | null;
-              }>;
-              replies: Array<{
-                __typename?: "PetitionFieldReply";
-                id: string;
-                content: { [key: string]: any };
-                isAnonymized: boolean;
-                children?: Array<{
-                  __typename?: "PetitionFieldGroupChildReply";
-                  field: {
-                    __typename?: "PetitionField";
-                    type: PetitionFieldType;
-                    options: { [key: string]: any };
-                    optional: boolean;
-                  };
-                  replies: Array<{
-                    __typename?: "PetitionFieldReply";
-                    id: string;
-                    content: { [key: string]: any };
-                    isAnonymized: boolean;
-                  }>;
-                }> | null;
-              }>;
-            };
-            replies: Array<{
-              __typename?: "PetitionFieldReply";
-              id: string;
-              content: { [key: string]: any };
-              isAnonymized: boolean;
-              createdAt: string;
-              updatedAt: string;
-            }>;
-          }> | null;
-        }>;
-        previewReplies: Array<{
-          __typename?: "PetitionFieldReply";
-          id: string;
-          content: { [key: string]: any };
-          isAnonymized: boolean;
-          children?: Array<{
-            __typename?: "PetitionFieldGroupChildReply";
-            field: {
-              __typename?: "PetitionField";
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              optional: boolean;
-              id: string;
-              parent?: { __typename?: "PetitionField"; id: string } | null;
-            };
-            replies: Array<{
-              __typename?: "PetitionFieldReply";
-              id: string;
-              content: { [key: string]: any };
-              isAnonymized: boolean;
-            }>;
-          }> | null;
-        }>;
-        children?: Array<{
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          options: { [key: string]: any };
-          visibility?: { [key: string]: any } | null;
-          math?: Array<{ [key: string]: any }> | null;
-          parent?: { __typename?: "PetitionField"; id: string } | null;
-          replies: Array<{
-            __typename?: "PetitionFieldReply";
-            id: string;
-            content: { [key: string]: any };
-            isAnonymized: boolean;
-          }>;
-          previewReplies: Array<{
-            __typename?: "PetitionFieldReply";
-            id: string;
-            content: { [key: string]: any };
-            isAnonymized: boolean;
-          }>;
-        }> | null;
-      }>;
-      automaticNumberingConfig?: {
-        __typename?: "AutomaticNumberingConfig";
-        numberingType: AutomaticNumberingType;
-      } | null;
-      variables: Array<
-        | {
-            __typename?: "PetitionVariableEnum";
-            name: string;
-            type: PetitionVariableType;
-            defaultEnum: string;
-            enumValueLabels: Array<{
-              __typename?: "PetitionVariableEnumLabel";
-              value: string;
-              label: string;
-            }>;
-          }
-        | {
-            __typename?: "PetitionVariableNumber";
-            defaultValue: number;
-            name: string;
-            type: PetitionVariableType;
-          }
-      >;
-      customLists: Array<{
-        __typename?: "PetitionCustomList";
-        name: string;
-        values: Array<string>;
-      }>;
-      standardListDefinitions: Array<{
-        __typename?: "StandardListDefinition";
-        id: string;
-        listName: string;
-        values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
-      }>;
-    };
-    approvers: Array<{
-      __typename?: "PetitionApprovalRequestStepApprover";
-      id: string;
-      approvedAt?: string | null;
-      canceledAt?: string | null;
-      rejectedAt?: string | null;
-      sentAt?: string | null;
-      skippedAt?: string | null;
-      user?: {
-        __typename?: "User";
-        id: string;
-        isMe: boolean;
-        fullName?: string | null;
-        email: string;
-        status: UserStatus;
-      } | null;
-    }>;
-  };
-};
-
-export type PetitionApprovalsCard_startPetitionApprovalRequestStepMutationVariables = Exact<{
-  petitionId: Scalars["GID"]["input"];
-  approvalRequestStepId: Scalars["GID"]["input"];
-  message?: InputMaybe<Scalars["String"]["input"]>;
-  attachments?: InputMaybe<Array<Scalars["Upload"]["input"]> | Scalars["Upload"]["input"]>;
-}>;
-
-export type PetitionApprovalsCard_startPetitionApprovalRequestStepMutation = {
-  startPetitionApprovalRequestStep: {
     __typename?: "PetitionApprovalRequestStep";
     id: string;
     status: PetitionApprovalRequestStepStatus;
@@ -76406,6 +76150,49 @@ export const AppSumoLicenseAlert_OrgLicenseFragmentDoc = gql`
     externalId
   }
 ` as unknown as DocumentNode<AppSumoLicenseAlert_OrgLicenseFragment, unknown>;
+export const UserSelectOption_UserFragmentDoc = gql`
+  fragment UserSelectOption_User on User {
+    id
+    fullName
+    email
+  }
+` as unknown as DocumentNode<UserSelectOption_UserFragment, unknown>;
+export const ApprovalFlowConfigApproverSelect_UserFragmentDoc = gql`
+  fragment ApprovalFlowConfigApproverSelect_User on User {
+    id
+    fullName
+    email
+    ...UserSelectOption_User
+  }
+  ${UserSelectOption_UserFragmentDoc}
+` as unknown as DocumentNode<ApprovalFlowConfigApproverSelect_UserFragment, unknown>;
+export const UserGroupReference_UserGroupFragmentDoc = gql`
+  fragment UserGroupReference_UserGroup on UserGroup {
+    name
+    localizableName
+    type
+  }
+` as unknown as DocumentNode<UserGroupReference_UserGroupFragment, unknown>;
+export const UserSelectOption_UserGroupFragmentDoc = gql`
+  fragment UserSelectOption_UserGroup on UserGroup {
+    id
+    name
+    memberCount
+    ...UserGroupReference_UserGroup
+  }
+  ${UserGroupReference_UserGroupFragmentDoc}
+` as unknown as DocumentNode<UserSelectOption_UserGroupFragment, unknown>;
+export const ApprovalFlowConfigApproverSelect_UserGroupFragmentDoc = gql`
+  fragment ApprovalFlowConfigApproverSelect_UserGroup on UserGroup {
+    id
+    name
+    memberCount
+    ...UserSelectOption_UserGroup
+    ...UserGroupReference_UserGroup
+  }
+  ${UserSelectOption_UserGroupFragmentDoc}
+  ${UserGroupReference_UserGroupFragmentDoc}
+` as unknown as DocumentNode<ApprovalFlowConfigApproverSelect_UserGroupFragment, unknown>;
 export const ContactListPopover_ContactFragmentDoc = gql`
   fragment ContactListPopover_Contact on Contact {
     id
@@ -76594,13 +76381,6 @@ export const ProfileTypeSelect_ProfileTypeFragmentDoc = gql`
     canCreate
   }
 ` as unknown as DocumentNode<ProfileTypeSelect_ProfileTypeFragment, unknown>;
-export const UserGroupReference_UserGroupFragmentDoc = gql`
-  fragment UserGroupReference_UserGroup on UserGroup {
-    name
-    localizableName
-    type
-  }
-` as unknown as DocumentNode<UserGroupReference_UserGroupFragment, unknown>;
 export const UserGroupMembersPopover_UserGroupFragmentDoc = gql`
   fragment UserGroupMembersPopover_UserGroup on UserGroup {
     id
@@ -76642,13 +76422,6 @@ export const TaskProgressDialog_TaskFragmentDoc = gql`
     error
   }
 ` as unknown as DocumentNode<TaskProgressDialog_TaskFragment, unknown>;
-export const UserSelectOption_UserFragmentDoc = gql`
-  fragment UserSelectOption_User on User {
-    id
-    fullName
-    email
-  }
-` as unknown as DocumentNode<UserSelectOption_UserFragment, unknown>;
 export const UserSelect_UserFragmentDoc = gql`
   fragment UserSelect_User on User {
     id
@@ -79800,6 +79573,33 @@ export const PetitionVisibilityEditor_PetitionBaseFragmentDoc = gql`
   ${PetitionVisibilityEditor_PetitionFieldFragmentDoc}
   ${PetitionFieldLogicContext_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionVisibilityEditor_PetitionBaseFragment, unknown>;
+export const ApprovalFlowConfigApproverSelect_PetitionFieldInnerFragmentDoc = gql`
+  fragment ApprovalFlowConfigApproverSelect_PetitionFieldInner on PetitionField {
+    id
+    type
+    title
+    options
+    parent {
+      id
+    }
+  }
+` as unknown as DocumentNode<ApprovalFlowConfigApproverSelect_PetitionFieldInnerFragment, unknown>;
+export const ApprovalFlowConfigApproverSelect_PetitionBaseFragmentDoc = gql`
+  fragment ApprovalFlowConfigApproverSelect_PetitionBase on PetitionBase {
+    id
+    fields {
+      id
+      ...ApprovalFlowConfigApproverSelect_PetitionFieldInner
+      children {
+        id
+        ...ApprovalFlowConfigApproverSelect_PetitionFieldInner
+      }
+    }
+    ...useAllFieldsWithIndices_PetitionBase
+  }
+  ${ApprovalFlowConfigApproverSelect_PetitionFieldInnerFragmentDoc}
+  ${useAllFieldsWithIndices_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<ApprovalFlowConfigApproverSelect_PetitionBaseFragment, unknown>;
 export const ConfigureApprovalStepsDialog_PetitionBaseFragmentDoc = gql`
   fragment ConfigureApprovalStepsDialog_PetitionBase on PetitionBase {
     id
@@ -79811,10 +79611,12 @@ export const ConfigureApprovalStepsDialog_PetitionBaseFragmentDoc = gql`
       id
       ...PetitionVisibilityEditor_PetitionField
     }
+    ...ApprovalFlowConfigApproverSelect_PetitionBase
   }
   ${PetitionVisibilityEditor_PetitionBaseFragmentDoc}
   ${Fragments_FullApprovalFlowConfigFragmentDoc}
   ${PetitionVisibilityEditor_PetitionFieldFragmentDoc}
+  ${ApprovalFlowConfigApproverSelect_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<ConfigureApprovalStepsDialog_PetitionBaseFragment, unknown>;
 export const ConfigureBackgroundCheckAutomateSearchDialog_InnerPetitionFieldFragmentDoc = gql`
   fragment ConfigureBackgroundCheckAutomateSearchDialog_InnerPetitionField on PetitionField {
@@ -83392,15 +83194,6 @@ export const useProfileTypeFieldPermissionDialog_UserFragmentDoc = gql`
   }
   ${UserAvatar_UserFragmentDoc}
 ` as unknown as DocumentNode<useProfileTypeFieldPermissionDialog_UserFragment, unknown>;
-export const UserSelectOption_UserGroupFragmentDoc = gql`
-  fragment UserSelectOption_UserGroup on UserGroup {
-    id
-    name
-    memberCount
-    ...UserGroupReference_UserGroup
-  }
-  ${UserGroupReference_UserGroupFragmentDoc}
-` as unknown as DocumentNode<UserSelectOption_UserGroupFragment, unknown>;
 export const UserSelect_UserGroupFragmentDoc = gql`
   fragment UserSelect_UserGroup on UserGroup {
     id
@@ -88600,6 +88393,34 @@ export const AdminOrganizationsLayout_updateOrganizationDocument = gql`
   AdminOrganizationsLayout_updateOrganizationMutation,
   AdminOrganizationsLayout_updateOrganizationMutationVariables
 >;
+export const ApprovalFlowConfigApproverSelect_canCreateUsersDocument = gql`
+  query ApprovalFlowConfigApproverSelect_canCreateUsers {
+    me {
+      id
+      canCreateUsers
+    }
+  }
+` as unknown as DocumentNode<
+  ApprovalFlowConfigApproverSelect_canCreateUsersQuery,
+  ApprovalFlowConfigApproverSelect_canCreateUsersQueryVariables
+>;
+export const ApprovalFlowConfigApproverSelect_useGetUsersOrGroupsDocument = gql`
+  query ApprovalFlowConfigApproverSelect_useGetUsersOrGroups($ids: [ID!]!) {
+    getUsersOrGroups(ids: $ids) {
+      ... on User {
+        ...ApprovalFlowConfigApproverSelect_User
+      }
+      ... on UserGroup {
+        ...ApprovalFlowConfigApproverSelect_UserGroup
+      }
+    }
+  }
+  ${ApprovalFlowConfigApproverSelect_UserFragmentDoc}
+  ${ApprovalFlowConfigApproverSelect_UserGroupFragmentDoc}
+` as unknown as DocumentNode<
+  ApprovalFlowConfigApproverSelect_useGetUsersOrGroupsQuery,
+  ApprovalFlowConfigApproverSelect_useGetUsersOrGroupsQueryVariables
+>;
 export const PetitionSelect_petitionsDocument = gql`
   query PetitionSelect_petitions(
     $offset: Int
@@ -91501,33 +91322,6 @@ export const PetitionApprovalsCard_approvePetitionApprovalRequestStepDocument = 
 ` as unknown as DocumentNode<
   PetitionApprovalsCard_approvePetitionApprovalRequestStepMutation,
   PetitionApprovalsCard_approvePetitionApprovalRequestStepMutationVariables
->;
-export const PetitionApprovalsCard_startPetitionApprovalRequestStepDocument = gql`
-  mutation PetitionApprovalsCard_startPetitionApprovalRequestStep(
-    $petitionId: GID!
-    $approvalRequestStepId: GID!
-    $message: String
-    $attachments: [Upload!]
-  ) {
-    startPetitionApprovalRequestStep(
-      petitionId: $petitionId
-      approvalRequestStepId: $approvalRequestStepId
-      message: $message
-      attachments: $attachments
-    ) {
-      id
-      ...PetitionApprovalsCard_PetitionApprovalRequestStep
-      petition {
-        id
-        ...PetitionApprovalsCard_Petition
-      }
-    }
-  }
-  ${PetitionApprovalsCard_PetitionApprovalRequestStepFragmentDoc}
-  ${PetitionApprovalsCard_PetitionFragmentDoc}
-` as unknown as DocumentNode<
-  PetitionApprovalsCard_startPetitionApprovalRequestStepMutation,
-  PetitionApprovalsCard_startPetitionApprovalRequestStepMutationVariables
 >;
 export const PetitionApprovalsCard_sendPetitionApprovalRequestStepReminderDocument = gql`
   mutation PetitionApprovalsCard_sendPetitionApprovalRequestStepReminder(

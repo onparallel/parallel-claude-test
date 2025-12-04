@@ -177,7 +177,7 @@ export type ApprovalFlowConfig = {
 export type ApprovalFlowConfigInput = {
   name: Scalars["String"]["input"];
   type: ApprovalFlowType;
-  /** User or UserGroup GID */
+  /** globalId of the target User, UserGroup or PetitionField */
   values: Array<Scalars["ID"]["input"]>;
   visibility?: InputMaybe<Scalars["JSONObject"]["input"]>;
 };

@@ -3,12 +3,14 @@ import { useQuery } from "@apollo/client/react";
 import {
   Box,
   Button,
+  Center,
   Editable,
   EditableInput,
   EditablePreview,
   FormControl,
   Grid,
   HStack,
+  Spinner,
   Stack,
   Text,
   useEditableControls,
@@ -20,12 +22,15 @@ import {
   PlusCircleIcon,
   ThumbsUpIcon,
 } from "@parallel/chakra/icons";
+import { ApprovalFlowConfigApproverSelect } from "@parallel/components/common/ApprovalFlowConfigApproverSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
-import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import {
+  useWizardDialog,
+  WizardStepDialogProps,
+} from "@parallel/components/common/dialogs/WizardDialog";
 import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { SimpleSelect, useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
-import { UserSelect } from "@parallel/components/common/UserSelect";
 import {
   ApprovalFlowConfigInput,
   ConfigureApprovalStepsDialog_PetitionBaseFragment,
@@ -33,50 +38,95 @@ import {
 } from "@parallel/graphql/__types";
 import { Fragments } from "@parallel/utils/apollo/fragments";
 import { PetitionFieldLogicCondition } from "@parallel/utils/fieldLogic/types";
-import { useSearchUserGroups } from "@parallel/utils/useSearchUserGroups";
-import { useSearchUsers } from "@parallel/utils/useSearchUsers";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish, omit } from "remeda";
 import { PetitionVisibilityEditor } from "../logic/PetitionVisibilityEditor";
 
-interface ConfigureApprovalStepsDialogProps {
-  petitionId: string;
-}
+type ConfigureApprovalStepsDialogSteps = {
+  LOADING: {
+    petitionId: string;
+  };
+  STEP_1: {
+    petition: ConfigureApprovalStepsDialog_PetitionBaseFragment;
+  };
+};
 
 interface ConfigureApprovalStepsDialogFormData {
   approvals: ApprovalFlowConfigInput[];
 }
 
-function ConfigureApprovalStepsDialog({
+function ConfigureApprovalStepsLoadingDialog({
   petitionId,
+  onStep,
   ...props
-}: DialogProps<ConfigureApprovalStepsDialogProps, ApprovalFlowConfigInput[]>) {
+}: WizardStepDialogProps<ConfigureApprovalStepsDialogSteps, "LOADING", ApprovalFlowConfigInput[]>) {
+  const result = useQuery(ConfigureApprovalStepsDialog_petitionDocument, {
+    variables: { petitionId },
+  });
+
+  useEffect(() => {
+    if (result.dataState === "complete" && isNonNullish(result.data.petition)) {
+      onStep("STEP_1", { petition: result.data.petition });
+    }
+  }, [result, onStep]);
+
+  return (
+    <ConfirmDialog
+      size="3xl"
+      hasCloseButton
+      header={
+        <HStack>
+          <ThumbsUpIcon />
+          <Text>
+            <FormattedMessage
+              id="component.configure-approval-steps-dialog.header"
+              defaultMessage="Approval steps"
+            />
+          </Text>
+        </HStack>
+      }
+      body={
+        <Center padding={8} minHeight="200px">
+          <Spinner
+            thickness="4px"
+            speed="0.65s"
+            emptyColor="gray.200"
+            color="primary.500"
+            size="xl"
+          />
+        </Center>
+      }
+      confirm={
+        <Button colorScheme="primary" isDisabled>
+          <FormattedMessage id="generic.save-changes" defaultMessage="Save changes" />
+        </Button>
+      }
+      {...props}
+    />
+  );
+}
+
+function ConfigureApprovalStepsDialog({
+  petition,
+  onStep,
+  ...props
+}: WizardStepDialogProps<ConfigureApprovalStepsDialogSteps, "STEP_1", ApprovalFlowConfigInput[]>) {
   const intl = useIntl();
   const form = useForm<ConfigureApprovalStepsDialogFormData>({
     mode: "onSubmit",
     defaultValues: {
-      approvals: [],
+      approvals: petition.approvalFlowConfig?.map((v) => omit(v, ["__typename"])) ?? [],
     },
   });
 
   const { handleSubmit, control } = form;
 
-  const { fields, append, remove, replace } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     control,
     name: "approvals",
   });
-
-  const { data } = useQuery(ConfigureApprovalStepsDialog_petitionDocument, {
-    variables: { petitionId },
-  });
-
-  useEffect(() => {
-    if (data?.petition) {
-      replace(data.petition?.approvalFlowConfig?.map((v) => omit(v, ["__typename"])) ?? []);
-    }
-  }, [data]);
 
   return (
     <ConfirmDialog
@@ -129,7 +179,7 @@ function ConfigureApprovalStepsDialog({
                     <ApprovalCard
                       key={id}
                       index={index}
-                      petition={data?.petition as ConfigureApprovalStepsDialog_PetitionBaseFragment}
+                      petition={petition}
                       onRemove={() => remove(index)}
                     />
                   );
@@ -179,7 +229,13 @@ function ConfigureApprovalStepsDialog({
 }
 
 export function useConfigureApprovalStepsDialog() {
-  return useDialog(ConfigureApprovalStepsDialog);
+  return useWizardDialog(
+    {
+      LOADING: ConfigureApprovalStepsLoadingDialog,
+      STEP_1: ConfigureApprovalStepsDialog,
+    },
+    "LOADING",
+  );
 }
 
 useConfigureApprovalStepsDialog.fragments = {
@@ -194,10 +250,12 @@ useConfigureApprovalStepsDialog.fragments = {
         id
         ...PetitionVisibilityEditor_PetitionField
       }
+      ...ApprovalFlowConfigApproverSelect_PetitionBase
     }
     ${Fragments.FullApprovalFlowConfig}
     ${PetitionVisibilityEditor.fragments.PetitionBase}
     ${PetitionVisibilityEditor.fragments.PetitionField}
+    ${ApprovalFlowConfigApproverSelect.fragments.PetitionBase}
   `,
 };
 
@@ -215,7 +273,7 @@ const _queries = [
 
 interface ApprovalCardProps {
   index: number;
-  petition?: ConfigureApprovalStepsDialog_PetitionBaseFragment;
+  petition: ConfigureApprovalStepsDialog_PetitionBaseFragment;
   onRemove: () => void;
 }
 
@@ -256,22 +314,6 @@ function ApprovalCard({ index, petition, onRemove }: ApprovalCardProps) {
     ];
   }, []);
 
-  const searchUsers = useSearchUsers();
-  const searchUserGroups = useSearchUserGroups();
-
-  const handleSearchUsersAndGroups = useCallback(
-    async (search: string, excludeUsers: string[], excludeUserGroups: string[]) => {
-      const [users, groups] = await Promise.all([
-        searchUsers(search, { excludeIds: [...excludeUsers] }),
-        searchUserGroups(search, {
-          excludeIds: [...excludeUserGroups],
-        }),
-      ]);
-
-      return [...groups, ...users];
-    },
-    [searchUsers, searchUserGroups],
-  );
   const validCondition = (c: PetitionFieldLogicCondition) => {
     return ("fieldId" in c && !c.fieldId) || isNullish(c.value) ? false : true;
   };
@@ -320,22 +362,16 @@ function ApprovalCard({ index, petition, onRemove }: ApprovalCardProps) {
               required: true,
             }}
             render={({ field: { onChange, value } }) => (
-              <UserSelect
-                onSearch={handleSearchUsersAndGroups}
+              <ApprovalFlowConfigApproverSelect
+                petition={petition}
                 onChange={(v) => onChange(v.map((u) => u.id))}
                 value={value}
-                isMulti
-                includeGroups
-                placeholder={intl.formatMessage({
-                  id: "component.configure-approval-steps-dialog.select-approvers",
-                  defaultMessage: "Select approvers",
-                })}
               />
             )}
           />
         </FormControl>
       </Grid>
-      {hasVisbility && isNonNullish(petition) ? (
+      {hasVisbility ? (
         <FormControl>
           <Controller
             name={`approvals.${index}.visibility`}

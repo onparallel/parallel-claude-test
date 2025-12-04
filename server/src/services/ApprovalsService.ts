@@ -3,7 +3,10 @@ import { Knex } from "knex";
 import { findLast, isNonNullish, unique, zip } from "remeda";
 import { assert } from "ts-essentials";
 import { PetitionApprovalRequestStep } from "../db/__types";
-import { PetitionApprovalRequestRepository } from "../db/repositories/PetitionApprovalRequestRepository";
+import {
+  ApprovalRequestStepConfig,
+  PetitionApprovalRequestRepository,
+} from "../db/repositories/PetitionApprovalRequestRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { UserGroupRepository } from "../db/repositories/UserGroupRepository";
 import { evaluateVisibilityArray } from "../util/fieldLogic";
@@ -28,6 +31,7 @@ export interface IApprovalsService {
     opts?: { onlyIfPending?: boolean },
     t?: Knex.Transaction,
   ): Promise<(PetitionApprovalRequestStep | null)[]>;
+  extractUserIdsFromApprovalFlowConfig(config: ApprovalRequestStepConfig): Promise<number[]>;
 }
 
 @injectable()
@@ -81,12 +85,7 @@ export class ApprovalsService implements IApprovalsService {
 
     // on each step, insert its approvers
     for (const [step, config] of zip(approvalRequestSteps, composedPetition.approvalFlowConfig)) {
-      const userGroupsIds = config.values.filter((v) => v.type === "UserGroup").map((v) => v.id);
-      const groupMembers = (await this.userGroups.loadUserGroupMembers(userGroupsIds)).flat();
-      const userIds = unique([
-        ...config.values.filter((v) => v.type === "User").map((v) => v.id),
-        ...groupMembers.map((m) => m.user_id),
-      ]);
+      const userIds = await this.extractUserIdsFromApprovalFlowConfig(config);
 
       await this.approvalRequests.createPetitionApprovalRequestStepApprovers(
         step.id,
@@ -194,5 +193,35 @@ export class ApprovalsService implements IApprovalsService {
     );
 
     return canceledSteps;
+  }
+
+  async extractUserIdsFromApprovalFlowConfig(config: ApprovalRequestStepConfig) {
+    const userGroupsIds = unique(
+      config.values.filter((v) => v.type === "UserGroup").map((v) => v.id),
+    );
+    const petitionFieldIds = unique(
+      config.values.filter((v) => v.type === "PetitionField").map((v) => v.id),
+    );
+
+    const groupMembers =
+      userGroupsIds.length > 0
+        ? (await this.userGroups.loadUserGroupMembers(userGroupsIds)).flat()
+        : [];
+
+    const replies =
+      petitionFieldIds.length > 0
+        ? (await this.petitions.loadRepliesForField(petitionFieldIds)).flat()
+        : [];
+
+    assert(
+      replies.every((r) => isNonNullish(r) && r.type === "USER_ASSIGNMENT"),
+      "Expected replies to be user assignments",
+    );
+
+    return unique([
+      ...config.values.filter((v) => v.type === "User").map((v) => v.id),
+      ...groupMembers.map((m) => m.user_id),
+      ...replies.map((r) => r.content.value as number),
+    ]);
   }
 }

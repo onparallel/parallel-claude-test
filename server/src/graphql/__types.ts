@@ -965,7 +965,7 @@ export interface NexusGenObjects {
   ApprovalFlowConfig: {
     name: string;
     type: "ANY" | "ALL";
-    values: { id: number; type: "User" | "UserGroup" }[];
+    values: { id: number; type: "User" | "UserGroup" | "PetitionField" }[];
     visibility?: any;
   };
   AsyncFieldCompletionResponse: {

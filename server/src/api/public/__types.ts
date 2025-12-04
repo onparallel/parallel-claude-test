@@ -177,7 +177,7 @@ export type ApprovalFlowConfig = {
 export type ApprovalFlowConfigInput = {
   name: Scalars["String"]["input"];
   type: ApprovalFlowType;
-  /** User or UserGroup GID */
+  /** globalId of the target User, UserGroup or PetitionField */
   values: Array<Scalars["ID"]["input"]>;
   visibility?: InputMaybe<Scalars["JSONObject"]["input"]>;
 };
@@ -12973,7 +12973,7 @@ export type GetProfilePetitions_profileQuery = {
           external: { approved: number; replied: number; optional: number; total: number };
           internal: { approved: number; replied: number; optional: number; total: number };
         };
-        variablesResult?: Array<{ name: string; value: number | null }>;
+        variablesResult?: Array<{ name: string; value: any | null }>;
         signatures?: Array<{
           id: string;
           status: PetitionSignatureRequestStatus;

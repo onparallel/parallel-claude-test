@@ -3237,7 +3237,8 @@ export class PetitionRepository extends BaseRepository {
               : null,
           standard_list_definition_override: this.json([]), // will be updated later
           approval_flow_config: sourcePetition.approval_flow_config
-            ? this.json(sourcePetition.approval_flow_config)
+            ? // will be updated later, as this config can reference fields that are not yet cloned
+              this.json(sourcePetition.approval_flow_config)
             : null,
           ...data,
         },
@@ -3471,7 +3472,9 @@ export class PetitionRepository extends BaseRepository {
       // in approval flow config logic, update referenced field IDS with new fields
       if (
         isNonNullish(cloned.approval_flow_config) &&
-        cloned.approval_flow_config.some((c) => isNonNullish(c.visibility))
+        cloned.approval_flow_config.some(
+          (c) => isNonNullish(c.visibility) || c.values.some((v) => v.type === "PetitionField"),
+        )
       ) {
         petitionUpdateData.approval_flow_config = JSON.stringify(
           cloned.approval_flow_config.map((c) => {
@@ -3486,6 +3489,9 @@ export class PetitionRepository extends BaseRepository {
             allReferencedLists.push(...(fieldLogic?.referencedLists ?? []));
             return {
               ...c,
+              values: c.values.map((v) =>
+                v.type === "PetitionField" ? { ...v, id: newFieldIds[v.id] } : v,
+              ),
               visibility: fieldLogic?.field.visibility ?? null,
             };
           }),

@@ -817,30 +817,6 @@ const _mutations = [
     ${PetitionApprovalsCard.fragments.Petition}
   `,
   gql`
-    mutation PetitionApprovalsCard_startPetitionApprovalRequestStep(
-      $petitionId: GID!
-      $approvalRequestStepId: GID!
-      $message: String
-      $attachments: [Upload!]
-    ) {
-      startPetitionApprovalRequestStep(
-        petitionId: $petitionId
-        approvalRequestStepId: $approvalRequestStepId
-        message: $message
-        attachments: $attachments
-      ) {
-        id
-        ...PetitionApprovalsCard_PetitionApprovalRequestStep
-        petition {
-          id
-          ...PetitionApprovalsCard_Petition
-        }
-      }
-    }
-    ${PetitionApprovalsCard.fragments.PetitionApprovalRequestStep}
-    ${PetitionApprovalsCard.fragments.Petition}
-  `,
-  gql`
     mutation PetitionApprovalsCard_sendPetitionApprovalRequestStepReminder(
       $petitionId: GID!
       $approvalRequestStepId: GID!
@@ -1241,7 +1217,7 @@ function PetitionApprovalStepRow({
                 defaultMessage: "Send reminder",
               })}
               onClick={onSendReminder}
-              isDisabled={isDisabled || step.status !== "PENDING"}
+              isDisabled={isDisabled || step.status !== "PENDING" || step.approvers.length === 0}
             />
             <MoreOptionsMenuButton
               isDisabled={isDisabled || step.status !== "PENDING"}

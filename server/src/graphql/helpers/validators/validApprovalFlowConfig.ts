@@ -1,4 +1,4 @@
-import { isNonNullish, partition } from "remeda";
+import { isNonNullish, unique } from "remeda";
 import { assert } from "ts-essentials";
 import { mapFieldLogic } from "../../../util/fieldLogic";
 import { fromGlobalId, isGlobalId } from "../../../util/globalId";
@@ -29,6 +29,8 @@ export function validApprovalFlowConfigInput<TypeName extends string, FieldName 
       throw new ArgValidationError(info, argName, "approvalConfig must not be empty");
     }
 
+    const validTargetTypes = ["User", "UserGroup", "PetitionField"] as const;
+
     for (const config of approvalConfig) {
       const index = approvalConfig.indexOf(config);
 
@@ -42,20 +44,33 @@ export function validApprovalFlowConfigInput<TypeName extends string, FieldName 
         );
       }
 
-      const invalid = values.find((v) => !isGlobalId(v, "User") && !isGlobalId(v, "UserGroup"));
-      if (invalid) {
+      const invalidTarget = values.find(
+        (value) => !validTargetTypes.some((type) => isGlobalId(value, type)),
+      );
+
+      if (invalidTarget) {
         throw new ArgValidationError(
           info,
-          `${argName}[${index}].values[${values.indexOf(invalid)}]`,
-          "value must be a valid User or UserGroup id",
+          `${argName}[${index}].values[${values.indexOf(invalidTarget)}]`,
+          "value must be a valid globalId",
         );
       }
 
-      const targets = values.map((v) => fromGlobalId(v));
-      const [userIds, userGroupIds] = partition(targets, (t) => t.type === "User");
-      const [users, userGroups] = await Promise.all([
-        ctx.users.loadUser(userIds.map((u) => u.id)),
-        ctx.userGroups.loadUserGroup(userGroupIds.map((g) => g.id)),
+      const targets = values.map((v) => fromGlobalId(v)) as {
+        id: number;
+        type: (typeof validTargetTypes)[number];
+      }[];
+
+      const userIds = unique(targets.filter((t) => t.type === "User").map((t) => t.id));
+      const userGroupIds = unique(targets.filter((t) => t.type === "UserGroup").map((t) => t.id));
+      const petitionFieldIds = unique(
+        targets.filter((t) => t.type === "PetitionField").map((t) => t.id),
+      );
+
+      const [users, userGroups, petitionFields] = await Promise.all([
+        userIds.length > 0 ? ctx.users.loadUser(userIds) : [],
+        userGroupIds.length > 0 ? ctx.userGroups.loadUserGroup(userGroupIds) : [],
+        petitionFieldIds.length > 0 ? ctx.petitions.loadField(petitionFieldIds) : [],
       ]);
 
       for (const target of targets) {
@@ -77,8 +92,21 @@ export function validApprovalFlowConfigInput<TypeName extends string, FieldName 
               "UserGroup not found",
             );
           }
+        } else if (target.type === "PetitionField") {
+          const petitionField = petitionFields.find((pf) => pf?.id === target.id);
+          if (
+            !petitionField ||
+            petitionField.petition_id !== petitionId ||
+            petitionField.type !== "USER_ASSIGNMENT"
+          ) {
+            throw new ArgValidationError(
+              info,
+              `${argName}[${index}].values[${targets.indexOf(target)}]`,
+              "PetitionField not found",
+            );
+          }
         } else {
-          never("Invalid target type");
+          never(`Invalid target type ${target.type}`);
         }
       }
 

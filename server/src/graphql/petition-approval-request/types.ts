@@ -1,5 +1,5 @@
 import { enumType, inputObjectType, objectType } from "nexus";
-import { isNonNullish, unique } from "remeda";
+import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
 import {
   PetitionApprovalRequestStepApprovalTypeValues,
@@ -15,7 +15,9 @@ export const ApprovalFlowConfigInput = inputObjectType({
     t.nonNull.field("type", {
       type: enumType({ name: "ApprovalFlowType", members: ["ANY", "ALL"] }),
     });
-    t.nonNull.list.nonNull.id("values", { description: "User or UserGroup GID" });
+    t.nonNull.list.nonNull.id("values", {
+      description: "globalId of the target User, UserGroup or PetitionField",
+    });
     t.nullable.field("visibility", { type: "JSONObject" });
   },
 });
@@ -33,12 +35,8 @@ export const ApprovalFlowConfig = objectType({
       description: "List of users that are assigned to approve this step.",
       type: "User",
       resolve: async (o, _, ctx) => {
-        const userIds = unique(o.values.filter((v) => v.type === "User").map((v) => v.id));
-        const userGroupIds = unique(
-          o.values.filter((v) => v.type === "UserGroup").map((v) => v.id),
-        );
-        const members = (await ctx.userGroups.loadUserGroupMembers(userGroupIds)).flat();
-        return await ctx.users.loadUser(unique([...userIds, ...members.map((m) => m.user_id)]));
+        const userIds = await ctx.approvals.extractUserIdsFromApprovalFlowConfig(o);
+        return userIds.length > 0 ? await ctx.users.loadUser(userIds) : [];
       },
     });
     t.nullable.jsonObject("visibility", {
@@ -62,7 +60,7 @@ export const ApprovalFlowConfig = objectType({
     {
       name: string;
       type: "ANY" | "ALL";
-      values: { id: number; type: "User" | "UserGroup" }[];
+      values: { id: number; type: "User" | "UserGroup" | "PetitionField" }[];
       visibility?: any
     }
   `,

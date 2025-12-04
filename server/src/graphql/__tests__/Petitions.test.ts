@@ -6161,6 +6161,7 @@ describe("GraphQL/Petitions", () => {
     let readPetition: Petition;
     let access: PetitionAccess;
     let contact: Contact;
+    let usageLimit: OrganizationUsageLimit;
     beforeAll(async () => {
       [readPetition] = await mocks.createRandomPetitions(
         organization.id,
@@ -6180,9 +6181,23 @@ describe("GraphQL/Petitions", () => {
         [contact.id],
         sessionUser.id,
       );
+      usageLimit = await mocks.createOrganizationUsageLimit(organization.id, "PETITION_SEND", 0);
+    });
+
+    beforeEach(async () => {
+      await mocks.knex
+        .from("organization_usage_limit")
+        .where("id", usageLimit.id)
+        .update({ used: 0, limit: 50 });
     });
 
     describe("sendPetition", () => {
+      afterEach(async () => {
+        await mocks.knex("organization_usage_limit").where("id", usageLimit.id).update({
+          used: 0,
+        });
+      });
+
       it("should send error when trying to send a petition with READ access", async () => {
         const { errors, data } = await testClient.execute(
           gql`

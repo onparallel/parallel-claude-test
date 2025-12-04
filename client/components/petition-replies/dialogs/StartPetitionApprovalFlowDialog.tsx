@@ -78,98 +78,115 @@ export function StartPetitionApprovalFlowDialog({
         </HStack>
       }
       body={
-        <Stack>
-          <Text>
-            <FormattedMessage
-              id="component.start-petition-approval-flow-dialog.body"
-              defaultMessage="The request for approval with an access to this parallel will be sent to the following users:"
-            />
-          </Text>
-          <UnorderedList paddingStart={3}>
-            {step.approvers.map(({ user }, index) => {
-              return user ? (
-                <ListItem
-                  key={index}
-                  fontWeight={500}
-                >{`${user.fullName} (${user.email})`}</ListItem>
-              ) : null;
-            })}
-          </UnorderedList>
-          <FormControl>
-            <Checkbox {...register("includeInformation")}>
+        step.approvers.length === 0 ? (
+          <Stack>
+            <Text>
               <FormattedMessage
-                id="component.start-petition-approval-flow-dialog.checkbox-include-information"
-                defaultMessage="Add additional information"
+                id="component.start-petition-approval-flow-dialog.body-no-approvers"
+                defaultMessage="There are no assigned approvers for this request. You can still start it, but it will not be sent to any user."
               />
-            </Checkbox>
-          </FormControl>
-          {includeInformation ? (
-            <>
-              <FormControl isInvalid={!!errors.message}>
-                <GrowingTextarea
-                  placeholder={intl.formatMessage({
-                    id: "component.start-petition-approval-flow-dialog.message-placeholder",
-                    defaultMessage: "Write a message to be included in the email",
-                  })}
-                  {...register("message", { required: true })}
+            </Text>
+          </Stack>
+        ) : (
+          <Stack>
+            <Text>
+              <FormattedMessage
+                id="component.start-petition-approval-flow-dialog.body"
+                defaultMessage="The request for approval with an access to this parallel will be sent to the following users:"
+              />
+            </Text>
+            <UnorderedList paddingStart={3}>
+              {step.approvers.map(({ user }, index) => {
+                return user ? (
+                  <ListItem
+                    key={index}
+                    fontWeight={500}
+                  >{`${user.fullName} (${user.email})`}</ListItem>
+                ) : null;
+              })}
+            </UnorderedList>
+            <FormControl>
+              <Checkbox {...register("includeInformation")}>
+                <FormattedMessage
+                  id="component.start-petition-approval-flow-dialog.checkbox-include-information"
+                  defaultMessage="Add additional information"
                 />
-              </FormControl>
+              </Checkbox>
+            </FormControl>
+            {includeInformation ? (
+              <>
+                <FormControl isInvalid={!!errors.message}>
+                  <GrowingTextarea
+                    placeholder={intl.formatMessage({
+                      id: "component.start-petition-approval-flow-dialog.message-placeholder",
+                      defaultMessage: "Write a message to be included in the email",
+                    })}
+                    {...register("message", { required: true })}
+                  />
+                </FormControl>
 
-              <FormControl isInvalid={!!errors.attachments}>
-                <Controller
-                  name="attachments"
-                  control={control}
-                  render={({ field: { value, onChange } }) => (
-                    <Stack>
-                      {value?.length ? (
-                        <LocalFileAttachments
-                          files={value}
-                          onRemoveFile={(file) => onChange(value.filter((f) => f !== file))}
-                        />
-                      ) : null}
-
-                      <Box>
-                        <Input
-                          ref={fileInputRef}
-                          id="file-input"
-                          type="file"
-                          multiple
-                          hidden
-                          accept="application/pdf"
-                          onChange={(event) => {
-                            const files = event.target.files;
-                            if (files) {
-                              onChange([...(value ?? []), ...Array.from(files)]);
-                              //Reset the input value to allow uploading the same file again if removed
-                              event.target.value = "";
-                              event.target.files = null;
-                            }
-                          }}
-                        />
-                        <Button
-                          size="sm"
-                          fontSize="md"
-                          fontWeight={500}
-                          onClick={() => fileInputRef?.current?.click()}
-                        >
-                          <FormattedMessage
-                            id="component.start-petition-approval-flow-dialog.upload-documents"
-                            defaultMessage="Upload documents"
+                <FormControl isInvalid={!!errors.attachments}>
+                  <Controller
+                    name="attachments"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                      <Stack>
+                        {value?.length ? (
+                          <LocalFileAttachments
+                            files={value}
+                            onRemoveFile={(file) => onChange(value.filter((f) => f !== file))}
                           />
-                        </Button>
-                      </Box>
-                    </Stack>
-                  )}
-                />
-              </FormControl>
-            </>
-          ) : null}
-        </Stack>
+                        ) : null}
+
+                        <Box>
+                          <Input
+                            ref={fileInputRef}
+                            id="file-input"
+                            type="file"
+                            multiple
+                            hidden
+                            accept="application/pdf"
+                            onChange={(event) => {
+                              const files = event.target.files;
+                              if (files) {
+                                onChange([...(value ?? []), ...Array.from(files)]);
+                                //Reset the input value to allow uploading the same file again if removed
+                                event.target.value = "";
+                                event.target.files = null;
+                              }
+                            }}
+                          />
+                          <Button
+                            size="sm"
+                            fontSize="md"
+                            fontWeight={500}
+                            onClick={() => fileInputRef?.current?.click()}
+                          >
+                            <FormattedMessage
+                              id="component.start-petition-approval-flow-dialog.upload-documents"
+                              defaultMessage="Upload documents"
+                            />
+                          </Button>
+                        </Box>
+                      </Stack>
+                    )}
+                  />
+                </FormControl>
+              </>
+            ) : null}
+          </Stack>
+        )
       }
       confirm={
-        <Button type="submit" colorScheme="primary">
-          <FormattedMessage id="generic.send" defaultMessage="Send" />
-        </Button>
+        step.approvers.length === 0 ? (
+          <Button type="submit" colorScheme="primary">
+            <FormattedMessage id="generic.send-anyway" defaultMessage="Send anyway" />
+          </Button>
+        ) : (
+          <Button type="submit" colorScheme="primary">
+            <FormattedMessage id="generic.send" defaultMessage="Send" />
+          </Button>
+        )
       }
       {...props}
     />
