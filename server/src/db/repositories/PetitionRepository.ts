@@ -4152,25 +4152,38 @@ export class PetitionRepository extends BaseRepository {
   async getPetitionEventsForUser(
     userId: number,
     options: {
+      fromTemplateId?: Maybe<number>;
       eventTypes?: Maybe<PetitionEventType[]>;
       before?: Maybe<number>;
       limit: number;
     },
   ) {
+    const bypassUser = await this.loadUserBypassPetitionPermission(userId);
+
     return await this.raw<PetitionEvent>(
       /* sql */ `
-      select pe.* from user_petition_event_log upel
+      select pe.*
+      from user_petition_event_log upel
       join petition_event pe on upel.petition_event_id = pe.id
+      join petition p on pe.petition_id = p.id
       where upel.user_id = ?
+        ${isNonNullish(options.fromTemplateId) ? /* sql */ `and p.from_template_id = ?` : ""}
         ${isNonNullish(options.before) ? /* sql */ `and upel.petition_event_id < ?` : ""}
         ${isNonNullish(options.eventTypes) ? /* sql */ `and pe.type in ?` : ""}
+        ${isNonNullish(bypassUser) ? "" : /* sql */ `and exists (select 1 from petition_permission pp where p.id = pp.petition_id and pp.user_id = ? and pp.deleted_at is null)`}
+      and p.is_template = false
+      and p.deleted_at is null
+      and p.deletion_scheduled_at is null
       order by pe.id desc
-      limit ${options.limit};
+      limit ?
     `,
       [
         userId,
+        ...(isNonNullish(options.fromTemplateId) ? [options.fromTemplateId] : []),
         ...(isNonNullish(options.before) ? [options.before] : []),
         ...(isNonNullish(options.eventTypes) ? [this.sqlIn(options.eventTypes)] : []),
+        ...(isNonNullish(bypassUser) ? [] : [userId]),
+        options.limit,
       ],
     );
   }

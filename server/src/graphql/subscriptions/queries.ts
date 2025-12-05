@@ -13,6 +13,7 @@ export const PetitionEventsQuery = queryField("petitionEvents", {
   type: nonNull(list("PetitionEvent")),
   authorize: authenticate(),
   args: {
+    fromTemplateId: nullable(globalIdArg("Petition")),
     eventTypes: list(nonNull("PetitionEventType")),
     before: nullable(
       globalIdArg("PetitionEvent", {
@@ -20,11 +21,12 @@ export const PetitionEventsQuery = queryField("petitionEvents", {
       }),
     ),
   },
-  resolve: async (root, { before, eventTypes }, ctx) => {
+  resolve: async (_, { before, eventTypes, fromTemplateId }, ctx) => {
     return await ctx.petitions.getPetitionEventsForUser(ctx.user!.id, {
       limit: 10,
       before,
       eventTypes,
+      fromTemplateId,
     });
   },
 });

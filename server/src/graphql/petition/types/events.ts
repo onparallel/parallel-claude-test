@@ -15,7 +15,7 @@ export const PetitionEvent = interfaceType({
       }),
     });
     t.nullable.field("petition", {
-      type: "PetitionBaseMini",
+      type: "Petition",
       resolve: async (o, _, ctx) => await ctx.petitions.loadPetition(o.petition_id),
     });
     t.datetime("createdAt", {

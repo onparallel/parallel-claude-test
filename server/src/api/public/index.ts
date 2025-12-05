@@ -4208,9 +4208,14 @@ export function publicApi(container: Container) {
       excludeFromSpec: true,
       description: "Returns a list with your latest parallel events",
       query: {
+        fromTemplateId: idParam({
+          type: "Petition",
+          description: "Filter events by petitions created from this template",
+          required: false,
+        }),
         before: idParam({
           type: "PetitionEvent",
-          description: "Fetch events that ocurred before this ID",
+          description: "Fetch events that occurred before this ID",
           required: false,
         }),
         eventTypes: enumParam({
@@ -4219,48 +4224,58 @@ export function publicApi(container: Container) {
           required: false,
           array: true,
         }),
+        ...petitionIncludeParam(),
       },
       responses: { 200: SuccessResponse(ListOfPetitionEvents) },
     },
     async ({ client, query }) => {
       const _query = gql`
-        query GetPetitionEvents_PetitionEvents($before: GID, $eventTypes: [PetitionEventType!]) {
-          petitionEvents(before: $before, eventTypes: $eventTypes) {
+        query GetPetitionEvents_PetitionEvents(
+          $before: GID
+          $eventTypes: [PetitionEventType!]
+          $fromTemplateId: GID
+          $includeRecipients: Boolean!
+          $includeFields: Boolean!
+          $includeTags: Boolean!
+          $includeRecipientUrl: Boolean!
+          $includeReplies: Boolean!
+          $includeProgress: Boolean!
+          $includeSigners: Boolean!
+          $includeVariablesResult: Boolean!
+          $includeSignatureRequests: Boolean!
+          $includeOwner: Boolean!
+        ) {
+          petitionEvents(
+            before: $before
+            eventTypes: $eventTypes
+            fromTemplateId: $fromTemplateId
+          ) {
             id
             data
             petition {
               id
-              type
-              myEffectivePermission {
-                permissionType
-              }
+              ...Petition
             }
             type
             createdAt
           }
         }
+        ${PetitionFragment}
       `;
 
       const result = await client.request(GetPetitionEvents_PetitionEventsDocument, {
         before: query.before,
         eventTypes: query.eventTypes,
+        fromTemplateId: query.fromTemplateId,
+        ...getPetitionIncludesFromQuery(query),
       });
 
       return Ok(
-        result.petitionEvents
-          .filter(
-            (e) =>
-              isNonNullish(e.petition) &&
-              e.petition.type === "PETITION" &&
-              isNonNullish(e.petition.myEffectivePermission),
-          )
-          .map((e) => ({
-            id: e.id,
-            petitionId: e.petition!.id,
-            type: e.type,
-            data: e.data,
-            createdAt: e.createdAt,
-          })),
+        result.petitionEvents.map((e) => ({
+          ...pick(e, ["id", "type", "data", "createdAt"]),
+          petitionId: e.petition!.id,
+          petition: mapPetition(e.petition!),
+        })),
       );
     },
   );

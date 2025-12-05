@@ -14,7 +14,7 @@ type AccessActivatedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -24,7 +24,7 @@ type AccessActivatedFromPublicPetitionLinkEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -41,7 +41,7 @@ type AccessDeactivatedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   reason: String!
   type: PetitionEventType!
   user: User
@@ -53,7 +53,7 @@ type AccessDelegatedEvent implements PetitionEvent {
   id: GID!
   newAccess: PetitionAccess!
   originalAccess: PetitionAccess!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -62,7 +62,7 @@ type AccessOpenedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -529,7 +529,7 @@ type CommentDeletedEvent implements PetitionEvent {
   id: GID!
   isGeneral: Boolean!
   isInternal: Boolean!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -541,7 +541,7 @@ type CommentPublishedEvent implements PetitionEvent {
   id: GID!
   isGeneral: Boolean!
   isInternal: Boolean!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -629,7 +629,7 @@ type ContactlessAccessUsedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -1258,7 +1258,7 @@ type GroupPermissionAddedEvent implements PetitionEvent {
   id: GID!
   permissionGroup: UserGroup
   permissionType: PetitionPermissionType!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -1269,7 +1269,7 @@ type GroupPermissionEditedEvent implements PetitionEvent {
   id: GID!
   permissionGroup: UserGroup
   permissionType: PetitionPermissionType!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -1279,7 +1279,7 @@ type GroupPermissionRemovedEvent implements PetitionEvent {
   data: JSONObject!
   id: GID!
   permissionGroup: UserGroup
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -1488,7 +1488,7 @@ type MessageCancelledEvent implements PetitionEvent {
   data: JSONObject!
   id: GID!
   message: PetitionMessage!
-  petition: PetitionBaseMini
+  petition: Petition
   reason: String!
   type: PetitionEventType!
   user: User
@@ -1507,7 +1507,7 @@ type MessageScheduledEvent implements PetitionEvent {
   data: JSONObject!
   id: GID!
   message: PetitionMessage!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -1516,7 +1516,7 @@ type MessageSentEvent implements PetitionEvent {
   data: JSONObject!
   id: GID!
   message: PetitionMessage!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -4326,7 +4326,7 @@ type OwnershipTransferredEvent implements PetitionEvent {
   data: JSONObject!
   id: GID!
   owner: User
-  petition: PetitionBaseMini
+  petition: Petition
   previousOwner: User
   type: PetitionEventType!
   user: User
@@ -4713,7 +4713,7 @@ type PetitionAnonymizedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -4747,7 +4747,7 @@ type PetitionApprovalRequestStepApprovedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -4767,7 +4767,7 @@ type PetitionApprovalRequestStepCanceledEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -4777,7 +4777,7 @@ type PetitionApprovalRequestStepFinishedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -4788,7 +4788,7 @@ type PetitionApprovalRequestStepRejectedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -4803,7 +4803,7 @@ type PetitionApprovalRequestStepReminderEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -4814,7 +4814,7 @@ type PetitionApprovalRequestStepSkippedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -4825,7 +4825,7 @@ type PetitionApprovalRequestStepStartedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -5133,7 +5133,7 @@ type PetitionClonedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -5142,7 +5142,7 @@ type PetitionClosedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -5157,7 +5157,7 @@ type PetitionClosedNotifiedEvent implements PetitionEvent {
   """
   emailBody: String
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -5179,7 +5179,7 @@ type PetitionCompletedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -5195,7 +5195,7 @@ type PetitionCreatedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -5209,7 +5209,7 @@ type PetitionDeletedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -5227,7 +5227,7 @@ interface PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -6032,7 +6032,7 @@ type PetitionMessageBouncedEvent implements PetitionEvent {
   data: JSONObject!
   id: GID!
   message: PetitionMessage!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -6142,7 +6142,7 @@ type PetitionRecoveredFromDeletionEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -6179,7 +6179,7 @@ type PetitionReminderBouncedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   reminder: PetitionReminder!
   type: PetitionEventType!
 }
@@ -6203,7 +6203,7 @@ type PetitionReopenedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -6212,7 +6212,7 @@ type PetitionScheduledForDeletionEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -6433,7 +6433,7 @@ type PetitionTaggedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   tags: [Tag]!
   type: PetitionEventType!
   user: User
@@ -6653,7 +6653,7 @@ type PetitionUntaggedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   tags: [Tag]!
   type: PetitionEventType!
   user: User
@@ -6895,7 +6895,7 @@ type ProfileAssociatedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   profile: Profile
   type: PetitionEventType!
   user: User
@@ -6928,7 +6928,7 @@ type ProfileDisassociatedEvent implements PetitionEvent {
   data: JSONObject!
   disassociatedBy: UserOrPetitionAccess
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   profile: Profile
   type: PetitionEventType!
   user: User
@@ -8582,6 +8582,7 @@ type Query {
     """
     before: GID
     eventTypes: [PetitionEventType!]
+    fromTemplateId: GID
   ): [PetitionEvent!]!
 
   """
@@ -8931,7 +8932,7 @@ type RecipientSignedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   signer: PetitionSigner
   type: PetitionEventType!
 }
@@ -8948,7 +8949,7 @@ type ReminderSentEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   reminder: PetitionReminder!
   type: PetitionEventType!
 }
@@ -9019,7 +9020,7 @@ type RemindersOptOutEvent implements PetitionEvent {
   data: JSONObject!
   id: GID!
   other: String
-  petition: PetitionBaseMini
+  petition: Petition
   reason: String!
   type: PetitionEventType!
 }
@@ -9040,7 +9041,7 @@ type ReplyCreatedEvent implements PetitionEvent {
   data: JSONObject!
   field: PetitionField
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   reply: PetitionFieldReply
   type: PetitionEventType!
 }
@@ -9051,7 +9052,7 @@ type ReplyDeletedEvent implements PetitionEvent {
   deletedBy: UserOrPetitionAccess
   field: PetitionField
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -9060,7 +9061,7 @@ type ReplyStatusChangedEvent implements PetitionEvent {
   data: JSONObject!
   field: PetitionField
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   reply: PetitionFieldReply
   status: PetitionFieldReplyStatus!
   type: PetitionEventType!
@@ -9072,7 +9073,7 @@ type ReplyUpdatedEvent implements PetitionEvent {
   data: JSONObject!
   field: PetitionField
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   reply: PetitionFieldReply
   type: PetitionEventType!
   updatedBy: UserOrPetitionAccess
@@ -9103,7 +9104,7 @@ type SignatureCancelledEvent implements PetitionEvent {
   errorMessage: String
   extraErrorData: JSON
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -9120,7 +9121,7 @@ type SignatureCompletedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -9275,7 +9276,7 @@ type SignatureDeliveredEvent implements PetitionEvent {
   deliveredAt: DateTime
   id: GID!
   openedAt: DateTime
-  petition: PetitionBaseMini
+  petition: Petition
   signature: PetitionSignatureRequest!
   signer: PetitionSigner
   type: PetitionEventType!
@@ -9285,7 +9286,7 @@ type SignatureOpenedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   signer: PetitionSigner
   type: PetitionEventType!
 }
@@ -9334,7 +9335,7 @@ type SignatureReminderEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -9343,7 +9344,7 @@ type SignatureStartedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   signature: PetitionSignatureRequest!
   type: PetitionEventType!
 }
@@ -9559,7 +9560,7 @@ type TemplateUsedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
   id: GID!
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -9990,7 +9991,7 @@ type UserPermissionAddedEvent implements PetitionEvent {
   id: GID!
   permissionType: PetitionPermissionType!
   permissionUser: User
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -10001,7 +10002,7 @@ type UserPermissionEditedEvent implements PetitionEvent {
   id: GID!
   permissionType: PetitionPermissionType!
   permissionUser: User
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -10011,7 +10012,7 @@ type UserPermissionRemovedEvent implements PetitionEvent {
   data: JSONObject!
   id: GID!
   permissionUser: User
-  petition: PetitionBaseMini
+  petition: Petition
   type: PetitionEventType!
   user: User
 }

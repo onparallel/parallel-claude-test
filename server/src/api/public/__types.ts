@@ -48,7 +48,7 @@ export type AccessActivatedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -58,7 +58,7 @@ export type AccessActivatedFromPublicPetitionLinkEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -75,7 +75,7 @@ export type AccessDeactivatedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   reason: Scalars["String"]["output"];
   type: PetitionEventType;
   user: Maybe<User>;
@@ -87,7 +87,7 @@ export type AccessDelegatedEvent = PetitionEvent & {
   id: Scalars["GID"]["output"];
   newAccess: PetitionAccess;
   originalAccess: PetitionAccess;
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -96,7 +96,7 @@ export type AccessOpenedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -462,7 +462,7 @@ export type CommentDeletedEvent = PetitionEvent & {
   id: Scalars["GID"]["output"];
   isGeneral: Scalars["Boolean"]["output"];
   isInternal: Scalars["Boolean"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -474,7 +474,7 @@ export type CommentPublishedEvent = PetitionEvent & {
   id: Scalars["GID"]["output"];
   isGeneral: Scalars["Boolean"]["output"];
   isInternal: Scalars["Boolean"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -526,7 +526,7 @@ export type ContactlessAccessUsedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -1081,7 +1081,7 @@ export type GroupPermissionAddedEvent = PetitionEvent & {
   id: Scalars["GID"]["output"];
   permissionGroup: Maybe<UserGroup>;
   permissionType: PetitionPermissionType;
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -1092,7 +1092,7 @@ export type GroupPermissionEditedEvent = PetitionEvent & {
   id: Scalars["GID"]["output"];
   permissionGroup: Maybe<UserGroup>;
   permissionType: PetitionPermissionType;
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -1102,7 +1102,7 @@ export type GroupPermissionRemovedEvent = PetitionEvent & {
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   permissionGroup: Maybe<UserGroup>;
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -1247,7 +1247,7 @@ export type MessageCancelledEvent = PetitionEvent & {
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   message: PetitionMessage;
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   reason: Scalars["String"]["output"];
   type: PetitionEventType;
   user: Maybe<User>;
@@ -1266,7 +1266,7 @@ export type MessageScheduledEvent = PetitionEvent & {
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   message: PetitionMessage;
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -1275,7 +1275,7 @@ export type MessageSentEvent = PetitionEvent & {
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   message: PetitionMessage;
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -3823,7 +3823,7 @@ export type OwnershipTransferredEvent = PetitionEvent & {
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   owner: Maybe<User>;
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   previousOwner: Maybe<User>;
   type: PetitionEventType;
   user: Maybe<User>;
@@ -4014,7 +4014,7 @@ export type PetitionAnonymizedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -4042,7 +4042,7 @@ export type PetitionApprovalRequestStepApprovedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -4062,7 +4062,7 @@ export type PetitionApprovalRequestStepCanceledEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -4072,7 +4072,7 @@ export type PetitionApprovalRequestStepFinishedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -4083,7 +4083,7 @@ export type PetitionApprovalRequestStepRejectedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -4095,7 +4095,7 @@ export type PetitionApprovalRequestStepReminderEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -4106,7 +4106,7 @@ export type PetitionApprovalRequestStepSkippedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -4117,7 +4117,7 @@ export type PetitionApprovalRequestStepStartedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -4301,7 +4301,7 @@ export type PetitionClonedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -4310,7 +4310,7 @@ export type PetitionClosedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -4322,7 +4322,7 @@ export type PetitionClosedNotifiedEvent = PetitionEvent & {
   /** The email message on HTML format. */
   emailBody: Maybe<Scalars["String"]["output"]>;
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -4340,7 +4340,7 @@ export type PetitionCompletedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -4356,7 +4356,7 @@ export type PetitionCreatedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -4370,7 +4370,7 @@ export type PetitionDeletedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -4388,7 +4388,7 @@ export type PetitionEvent = {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -4876,7 +4876,7 @@ export type PetitionMessageBouncedEvent = PetitionEvent & {
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   message: PetitionMessage;
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -4935,7 +4935,7 @@ export type PetitionRecoveredFromDeletionEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -4958,7 +4958,7 @@ export type PetitionReminderBouncedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   reminder: PetitionReminder;
   type: PetitionEventType;
 };
@@ -4974,7 +4974,7 @@ export type PetitionReopenedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -4983,7 +4983,7 @@ export type PetitionScheduledForDeletionEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -5138,7 +5138,7 @@ export type PetitionTaggedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   tags: Array<Maybe<Tag>>;
   type: PetitionEventType;
   user: Maybe<User>;
@@ -5259,7 +5259,7 @@ export type PetitionUntaggedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   tags: Array<Maybe<Tag>>;
   type: PetitionEventType;
   user: Maybe<User>;
@@ -5436,7 +5436,7 @@ export type ProfileAssociatedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   profile: Maybe<Profile>;
   type: PetitionEventType;
   user: Maybe<User>;
@@ -5469,7 +5469,7 @@ export type ProfileDisassociatedEvent = PetitionEvent & {
   data: Scalars["JSONObject"]["output"];
   disassociatedBy: Maybe<UserOrPetitionAccess>;
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   profile: Maybe<Profile>;
   type: PetitionEventType;
   user: Maybe<User>;
@@ -6699,6 +6699,7 @@ export type QuerypetitionArgs = {
 export type QuerypetitionEventsArgs = {
   before?: InputMaybe<Scalars["GID"]["input"]>;
   eventTypes?: InputMaybe<Array<PetitionEventType>>;
+  fromTemplateId?: InputMaybe<Scalars["GID"]["input"]>;
 };
 
 export type QuerypetitionFieldArgs = {
@@ -6918,7 +6919,7 @@ export type RecipientSignedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   signer: Maybe<PetitionSigner>;
   type: PetitionEventType;
 };
@@ -6935,7 +6936,7 @@ export type ReminderSentEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   reminder: PetitionReminder;
   type: PetitionEventType;
 };
@@ -6974,7 +6975,7 @@ export type RemindersOptOutEvent = PetitionEvent & {
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   other: Maybe<Scalars["String"]["output"]>;
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   reason: Scalars["String"]["output"];
   type: PetitionEventType;
 };
@@ -6995,7 +6996,7 @@ export type ReplyCreatedEvent = PetitionEvent & {
   data: Scalars["JSONObject"]["output"];
   field: Maybe<PetitionField>;
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   reply: Maybe<PetitionFieldReply>;
   type: PetitionEventType;
 };
@@ -7006,7 +7007,7 @@ export type ReplyDeletedEvent = PetitionEvent & {
   deletedBy: Maybe<UserOrPetitionAccess>;
   field: Maybe<PetitionField>;
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -7015,7 +7016,7 @@ export type ReplyStatusChangedEvent = PetitionEvent & {
   data: Scalars["JSONObject"]["output"];
   field: Maybe<PetitionField>;
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   reply: Maybe<PetitionFieldReply>;
   status: PetitionFieldReplyStatus;
   type: PetitionEventType;
@@ -7027,7 +7028,7 @@ export type ReplyUpdatedEvent = PetitionEvent & {
   data: Scalars["JSONObject"]["output"];
   field: Maybe<PetitionField>;
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   reply: Maybe<PetitionFieldReply>;
   type: PetitionEventType;
   updatedBy: Maybe<UserOrPetitionAccess>;
@@ -7053,7 +7054,7 @@ export type SignatureCancelledEvent = PetitionEvent & {
   errorMessage: Maybe<Scalars["String"]["output"]>;
   extraErrorData: Maybe<Scalars["JSON"]["output"]>;
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -7070,7 +7071,7 @@ export type SignatureCompletedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -7156,7 +7157,7 @@ export type SignatureDeliveredEvent = PetitionEvent & {
   deliveredAt: Maybe<Scalars["DateTime"]["output"]>;
   id: Scalars["GID"]["output"];
   openedAt: Maybe<Scalars["DateTime"]["output"]>;
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   signature: PetitionSignatureRequest;
   signer: Maybe<PetitionSigner>;
   type: PetitionEventType;
@@ -7166,7 +7167,7 @@ export type SignatureOpenedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   signer: Maybe<PetitionSigner>;
   type: PetitionEventType;
 };
@@ -7199,7 +7200,7 @@ export type SignatureReminderEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -7208,7 +7209,7 @@ export type SignatureStartedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   signature: PetitionSignatureRequest;
   type: PetitionEventType;
 };
@@ -7356,7 +7357,7 @@ export type TemplateUsedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"]["output"];
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -7691,7 +7692,7 @@ export type UserPermissionAddedEvent = PetitionEvent & {
   id: Scalars["GID"]["output"];
   permissionType: PetitionPermissionType;
   permissionUser: Maybe<User>;
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -7702,7 +7703,7 @@ export type UserPermissionEditedEvent = PetitionEvent & {
   id: Scalars["GID"]["output"];
   permissionType: PetitionPermissionType;
   permissionUser: Maybe<User>;
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -7712,7 +7713,7 @@ export type UserPermissionRemovedEvent = PetitionEvent & {
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   permissionUser: Maybe<User>;
-  petition: Maybe<PetitionBaseMini>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -11304,6 +11305,17 @@ export type EventSubscriptions_deleteSubscriptionMutation = { deleteEventSubscri
 export type GetPetitionEvents_PetitionEventsQueryVariables = Exact<{
   before?: InputMaybe<Scalars["GID"]["input"]>;
   eventTypes?: InputMaybe<Array<PetitionEventType> | PetitionEventType>;
+  fromTemplateId?: InputMaybe<Scalars["GID"]["input"]>;
+  includeRecipients: Scalars["Boolean"]["input"];
+  includeFields: Scalars["Boolean"]["input"];
+  includeTags: Scalars["Boolean"]["input"];
+  includeRecipientUrl: Scalars["Boolean"]["input"];
+  includeReplies: Scalars["Boolean"]["input"];
+  includeProgress: Scalars["Boolean"]["input"];
+  includeSigners: Scalars["Boolean"]["input"];
+  includeVariablesResult: Scalars["Boolean"]["input"];
+  includeSignatureRequests: Scalars["Boolean"]["input"];
+  includeOwner: Scalars["Boolean"]["input"];
 }>;
 
 export type GetPetitionEvents_PetitionEventsQuery = {
@@ -11315,8 +11327,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11326,8 +11472,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11337,8 +11617,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11348,8 +11762,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11359,8 +11907,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11370,8 +12052,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11381,8 +12197,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11392,8 +12342,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11403,8 +12487,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11414,8 +12632,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11425,8 +12777,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11436,8 +12922,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11447,8 +13067,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11458,8 +13212,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11469,8 +13357,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11480,8 +13502,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11491,8 +13647,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11502,8 +13792,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11513,8 +13937,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11524,8 +14082,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11535,8 +14227,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11546,8 +14372,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11557,8 +14517,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11568,8 +14662,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11579,8 +14807,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11590,8 +14952,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11601,8 +15097,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11612,8 +15242,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11623,8 +15387,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11634,8 +15532,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11645,8 +15677,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11656,8 +15822,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11667,8 +15967,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11678,8 +16112,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11689,8 +16257,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11700,8 +16402,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11711,8 +16547,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11722,8 +16692,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11733,8 +16837,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11744,8 +16982,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11755,8 +17127,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11766,8 +17272,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11777,8 +17417,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11788,8 +17562,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11799,8 +17707,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11810,8 +17852,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11821,8 +17997,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11832,8 +18142,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11843,8 +18287,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11854,8 +18432,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11865,8 +18577,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11876,8 +18722,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11887,8 +18867,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11898,8 +19012,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
     | {
@@ -11909,8 +19157,142 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         createdAt: string;
         petition: {
           id: string;
-          type: PetitionBaseType;
-          myEffectivePermission: { permissionType: PetitionPermissionType } | null;
+          path: string;
+          name: string | null;
+          locale: PetitionLocale;
+          createdAt: string;
+          customProperties: { [key: string]: any };
+          status: PetitionStatus;
+          deadline: string | null;
+          isAnonymized: boolean;
+          fields?: Array<{
+            id: string;
+            title: string | null;
+            description: string | null;
+            type: PetitionFieldType;
+            fromPetitionFieldId: string | null;
+            alias: string | null;
+            options: { [key: string]: any };
+            optional: boolean;
+            multiple: boolean;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
+              createdAt: string;
+              updatedAt: string;
+              associatedProfile: {
+                id: string;
+                name: string;
+                status: ProfileStatus;
+                createdAt: string;
+                profileType: { id: string; name: { [locale in UserLocale]?: string } };
+              } | null;
+              children: Array<{
+                field: { id: string; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  status: PetitionFieldReplyStatus;
+                  metadata: { [key: string]: any };
+                  createdAt: string;
+                  updatedAt: string;
+                }>;
+              }> | null;
+            }>;
+            children: Array<{
+              id: string;
+              title: string | null;
+              description: string | null;
+              type: PetitionFieldType;
+              fromPetitionFieldId: string | null;
+              alias: string | null;
+              options: { [key: string]: any };
+              optional: boolean;
+              multiple: boolean;
+            }> | null;
+          }>;
+          tags?: Array<{ id: string; name: string }>;
+          signatureConfig?: {
+            isEnabled: boolean;
+            signers: Array<{
+              email: string | null;
+              firstName: string;
+              lastName: string | null;
+            } | null>;
+          } | null;
+          owner?: {
+            id: string;
+            email: string;
+            fullName: string | null;
+            firstName: string | null;
+            lastName: string | null;
+          };
+          fromTemplate: { id: string } | null;
+          recipients?: Array<{
+            recipientUrl: string | null;
+            id: string;
+            status: PetitionAccessStatus;
+            reminderCount: number;
+            remindersLeft: number;
+            remindersActive: boolean;
+            nextReminderAt: string | null;
+            createdAt: string;
+            contact: {
+              id: string;
+              email: string;
+              fullName: string;
+              firstName: string;
+              lastName: string | null;
+              createdAt: string;
+              updatedAt: string;
+            } | null;
+            granter: {
+              id: string;
+              email: string;
+              fullName: string | null;
+              firstName: string | null;
+              lastName: string | null;
+            } | null;
+          }>;
+          replies?: Array<{
+            id: string;
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+              children: Array<{
+                field: { id: string; alias: string | null; type: PetitionFieldType };
+                replies: Array<{
+                  id: string;
+                  content: { [key: string]: any };
+                  metadata: { [key: string]: any };
+                }>;
+              }> | null;
+            }>;
+          }>;
+          progress?: {
+            external: { approved: number; replied: number; optional: number; total: number };
+            internal: { approved: number; replied: number; optional: number; total: number };
+          };
+          variablesResult?: Array<{ name: string; value: any | null }>;
+          signatures?: Array<{
+            id: string;
+            status: PetitionSignatureRequestStatus;
+            environment: SignatureOrgIntegrationEnvironment;
+            createdAt: string;
+            updatedAt: string;
+            signatureConfig: {
+              signers: Array<{
+                email: string | null;
+                firstName: string;
+                lastName: string | null;
+              } | null>;
+            };
+          }>;
         } | null;
       }
   >;
@@ -15242,21 +22624,33 @@ export const EventSubscriptions_deleteSubscriptionDocument = gql`
   EventSubscriptions_deleteSubscriptionMutationVariables
 >;
 export const GetPetitionEvents_PetitionEventsDocument = gql`
-  query GetPetitionEvents_PetitionEvents($before: GID, $eventTypes: [PetitionEventType!]) {
-    petitionEvents(before: $before, eventTypes: $eventTypes) {
+  query GetPetitionEvents_PetitionEvents(
+    $before: GID
+    $eventTypes: [PetitionEventType!]
+    $fromTemplateId: GID
+    $includeRecipients: Boolean!
+    $includeFields: Boolean!
+    $includeTags: Boolean!
+    $includeRecipientUrl: Boolean!
+    $includeReplies: Boolean!
+    $includeProgress: Boolean!
+    $includeSigners: Boolean!
+    $includeVariablesResult: Boolean!
+    $includeSignatureRequests: Boolean!
+    $includeOwner: Boolean!
+  ) {
+    petitionEvents(before: $before, eventTypes: $eventTypes, fromTemplateId: $fromTemplateId) {
       id
       data
       petition {
         id
-        type
-        myEffectivePermission {
-          permissionType
-        }
+        ...Petition
       }
       type
       createdAt
     }
   }
+  ${PetitionFragmentDoc}
 ` as unknown as DocumentNode<
   GetPetitionEvents_PetitionEventsQuery,
   GetPetitionEvents_PetitionEventsQueryVariables
