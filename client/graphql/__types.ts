@@ -6965,6 +6965,7 @@ export interface QuerypetitionEventsArgs {
   before?: InputMaybe<Scalars["GID"]["input"]>;
   eventTypes?: InputMaybe<Array<PetitionEventType>>;
   fromTemplateId?: InputMaybe<Scalars["GID"]["input"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
 }
 
 export interface QuerypetitionFieldArgs {

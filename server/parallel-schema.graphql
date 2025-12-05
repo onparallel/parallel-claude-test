@@ -8583,6 +8583,7 @@ type Query {
     before: GID
     eventTypes: [PetitionEventType!]
     fromTemplateId: GID
+    limit: Int
   ): [PetitionEvent!]!
 
   """

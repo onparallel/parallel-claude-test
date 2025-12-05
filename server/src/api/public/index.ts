@@ -26,7 +26,7 @@ import {
   ResourceNotFoundError,
   UnauthorizedError,
 } from "../rest/errors";
-import { booleanParam, enumParam, objectParam, stringParam } from "../rest/params";
+import { booleanParam, enumParam, numberParam, objectParam, stringParam } from "../rest/params";
 import {
   Created,
   ErrorResponse,
@@ -4224,6 +4224,12 @@ export function publicApi(container: Container) {
           required: false,
           array: true,
         }),
+        limit: numberParam({
+          description: "Number of events to return",
+          required: false,
+          minimum: 0,
+          maximum: 100,
+        }),
         ...petitionIncludeParam(),
       },
       responses: { 200: SuccessResponse(ListOfPetitionEvents) },
@@ -4234,6 +4240,7 @@ export function publicApi(container: Container) {
           $before: GID
           $eventTypes: [PetitionEventType!]
           $fromTemplateId: GID
+          $limit: Int
           $includeRecipients: Boolean!
           $includeFields: Boolean!
           $includeTags: Boolean!
@@ -4249,6 +4256,7 @@ export function publicApi(container: Container) {
             before: $before
             eventTypes: $eventTypes
             fromTemplateId: $fromTemplateId
+            limit: $limit
           ) {
             id
             data
@@ -4267,6 +4275,7 @@ export function publicApi(container: Container) {
         before: query.before,
         eventTypes: query.eventTypes,
         fromTemplateId: query.fromTemplateId,
+        limit: query.limit,
         ...getPetitionIncludesFromQuery(query),
       });
 

@@ -1,6 +1,7 @@
-import { list, nonNull, nullable, queryField } from "nexus";
+import { intArg, list, nonNull, nullable, queryField } from "nexus";
 import { authenticate } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
+import { inRange } from "../helpers/validators/inRange";
 
 export const SubscriptionsQuery = queryField("subscriptions", {
   type: nonNull(list("EventSubscription")),
@@ -20,10 +21,12 @@ export const PetitionEventsQuery = queryField("petitionEvents", {
         description: "Filter events that happened before the specified event id",
       }),
     ),
+    limit: nullable(intArg()),
   },
-  resolve: async (_, { before, eventTypes, fromTemplateId }, ctx) => {
+  validateArgs: inRange("limit", 0, 100),
+  resolve: async (_, { before, eventTypes, fromTemplateId, limit }, ctx) => {
     return await ctx.petitions.getPetitionEventsForUser(ctx.user!.id, {
-      limit: 10,
+      limit: limit ?? 10,
       before,
       eventTypes,
       fromTemplateId,

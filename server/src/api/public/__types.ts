@@ -6700,6 +6700,7 @@ export type QuerypetitionEventsArgs = {
   before?: InputMaybe<Scalars["GID"]["input"]>;
   eventTypes?: InputMaybe<Array<PetitionEventType>>;
   fromTemplateId?: InputMaybe<Scalars["GID"]["input"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type QuerypetitionFieldArgs = {
@@ -11306,6 +11307,7 @@ export type GetPetitionEvents_PetitionEventsQueryVariables = Exact<{
   before?: InputMaybe<Scalars["GID"]["input"]>;
   eventTypes?: InputMaybe<Array<PetitionEventType> | PetitionEventType>;
   fromTemplateId?: InputMaybe<Scalars["GID"]["input"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
   includeRecipients: Scalars["Boolean"]["input"];
   includeFields: Scalars["Boolean"]["input"];
   includeTags: Scalars["Boolean"]["input"];
@@ -22628,6 +22630,7 @@ export const GetPetitionEvents_PetitionEventsDocument = gql`
     $before: GID
     $eventTypes: [PetitionEventType!]
     $fromTemplateId: GID
+    $limit: Int
     $includeRecipients: Boolean!
     $includeFields: Boolean!
     $includeTags: Boolean!
@@ -22639,7 +22642,12 @@ export const GetPetitionEvents_PetitionEventsDocument = gql`
     $includeSignatureRequests: Boolean!
     $includeOwner: Boolean!
   ) {
-    petitionEvents(before: $before, eventTypes: $eventTypes, fromTemplateId: $fromTemplateId) {
+    petitionEvents(
+      before: $before
+      eventTypes: $eventTypes
+      fromTemplateId: $fromTemplateId
+      limit: $limit
+    ) {
       id
       data
       petition {
