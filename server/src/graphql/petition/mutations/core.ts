@@ -152,6 +152,7 @@ import {
   fieldIsNotFixed,
   fieldIsNotReferencedInFieldOptions,
   fieldIsNotReferencedInLogicConditions,
+  fieldIsNotReferencedInUpdateProfileOnClose,
   fieldsBelongsToPetition,
   firstChildHasType,
   foldersAreInPath,
@@ -1557,7 +1558,10 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     ),
     ifArgNotUndefined(
       (args) => args.data.options?.format,
-      linkedProfileTypeFieldDoesNotHaveFormat("fieldId"),
+      and(
+        linkedProfileTypeFieldDoesNotHaveFormat("fieldId"),
+        fieldIsNotReferencedInUpdateProfileOnClose("petitionId", "fieldId"),
+      ),
     ),
     ifArgDefined(
       (args) => args.data.multiple,
@@ -3664,7 +3668,12 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
           .map((s) => {
             assert(s.source.type === "FIELD");
             const fieldId = s.source.fieldId;
-            const field = composedPetition.fields.find((f) => f.id === fieldId);
+
+            const field = [
+              ...composedPetition.fields,
+              ...composedPetition.fields.flatMap((f) => f.children ?? []),
+            ].find((f) => f.id === fieldId);
+
             assert(isNonNullish(field), "Field not found");
             const map = s.source.map;
             return {
@@ -3676,10 +3685,18 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
                   type: field.type,
                 },
                 replies: field.replies
+                  .filter(
+                    (r) =>
+                      r.parent_petition_field_reply_id === null ||
+                      r.parent_petition_field_reply_id === args.parentReplyId,
+                  )
                   .map((r) => {
                     const finalValue =
                       field.type === "SELECT" && isNullish(field.options.standardList)
-                        ? map?.[r.content.value]
+                        ? (map?.[r.content.value] ??
+                          field.options.values?.find((v: any) => v.value === r.content.value)
+                            ?.label ??
+                          r.content.value)
                         : r.content.value;
 
                     assert(

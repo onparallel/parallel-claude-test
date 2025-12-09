@@ -695,7 +695,7 @@ export class PetitionValidationService {
   }
 
   private validateUpdateProfileOnClose(
-    field: Pick<PetitionField, "type" | "profile_type_id">,
+    field: Pick<PetitionField, "id" | "type" | "profile_type_id">,
     options: NonNullable<PetitionFieldOptions["FIELD_GROUP"]["updateProfileOnClose"]>,
     petitionFieldsById: Record<number, PetitionField>,
     profileTypeFieldsById: Record<number, ProfileTypeField>,
@@ -774,10 +774,27 @@ export class PetitionValidationService {
           compatibleSources.some((s) => s.source === option.source.type),
           `updateProfileOnClose[${index}].source must be one of the compatible sources for the profile type field type ${profileTypeField.type}`,
         );
+
+        if (
+          profileTypeField.type === "SHORT_TEXT" &&
+          isNonNullish(profileTypeField.options.format)
+        ) {
+          assert(
+            option.source.type === "ASK_USER" ||
+              (option.source.type === "FIELD" &&
+                petitionFieldsById[option.source.fieldId].type === "SHORT_TEXT" &&
+                petitionFieldsById[option.source.fieldId].options.format ===
+                  profileTypeField.options.format),
+            "The petition field and profile type field must have the same format",
+          );
+        }
+
         if (option.source.type === "FIELD") {
           const petitionField = petitionFieldsById[option.source.fieldId];
           assert(
-            isNonNullish(petitionField),
+            isNonNullish(petitionField) &&
+              (petitionField.parent_petition_field_id === null ||
+                petitionField.parent_petition_field_id === field.id),
             `updateProfileOnClose[${index}].source.fieldId must be a valid global id`,
           );
           assert(

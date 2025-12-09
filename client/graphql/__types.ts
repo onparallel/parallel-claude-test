@@ -27383,6 +27383,16 @@ export type PetitionSettings_enableAutomaticNumberingOnPetitionFieldsMutation = 
       };
 };
 
+export type PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  type: PetitionFieldType;
+  title?: string | null;
+  options: { [key: string]: any };
+  multiple: boolean;
+  parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+};
+
 export type PetitionUpdateProfileOnCloseSourceSelect_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   fields: Array<{
@@ -27438,16 +27448,6 @@ export type PetitionUpdateProfileOnCloseSourceSelect_PetitionBase_PetitionTempla
 export type PetitionUpdateProfileOnCloseSourceSelect_PetitionBaseFragment =
   | PetitionUpdateProfileOnCloseSourceSelect_PetitionBase_Petition_Fragment
   | PetitionUpdateProfileOnCloseSourceSelect_PetitionBase_PetitionTemplate_Fragment;
-
-export type PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldInnerFragment = {
-  __typename?: "PetitionField";
-  id: string;
-  type: PetitionFieldType;
-  title?: string | null;
-  options: { [key: string]: any };
-  multiple: boolean;
-  parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
-};
 
 export type PetitionUpdateProfileOnCloseSourceSelect_ProfileTypeFieldFragment = {
   __typename?: "ProfileTypeField";
@@ -27991,13 +27991,14 @@ export type useConfigureUpdateProfileOnCloseDialog_PetitionFieldFragment = {
   id: string;
   type: PetitionFieldType;
   options: { [key: string]: any };
+  title?: string | null;
   multiple: boolean;
-  parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
   profileTypeField?: {
     __typename?: "ProfileTypeField";
     id: string;
     type: ProfileTypeFieldType;
   } | null;
+  parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
 };
 
 export type useConfigureUpdateProfileOnCloseDialog_PetitionVariable_PetitionVariableEnum_Fragment =
@@ -28023,28 +28024,28 @@ export type useConfigureUpdateProfileOnCloseDialog_PetitionBase_Petition_Fragmen
     id: string;
     type: PetitionFieldType;
     options: { [key: string]: any };
-    multiple: boolean;
     title?: string | null;
+    multiple: boolean;
     children?: Array<{
       __typename?: "PetitionField";
       id: string;
       type: PetitionFieldType;
       options: { [key: string]: any };
-      multiple: boolean;
       title?: string | null;
-      parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+      multiple: boolean;
       profileTypeField?: {
         __typename?: "ProfileTypeField";
         id: string;
         type: ProfileTypeFieldType;
       } | null;
+      parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
     }> | null;
-    parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
     profileTypeField?: {
       __typename?: "ProfileTypeField";
       id: string;
       type: ProfileTypeFieldType;
     } | null;
+    parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
   }>;
   variables: Array<
     | {
@@ -28069,28 +28070,28 @@ export type useConfigureUpdateProfileOnCloseDialog_PetitionBase_PetitionTemplate
     id: string;
     type: PetitionFieldType;
     options: { [key: string]: any };
-    multiple: boolean;
     title?: string | null;
+    multiple: boolean;
     children?: Array<{
       __typename?: "PetitionField";
       id: string;
       type: PetitionFieldType;
       options: { [key: string]: any };
-      multiple: boolean;
       title?: string | null;
-      parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+      multiple: boolean;
       profileTypeField?: {
         __typename?: "ProfileTypeField";
         id: string;
         type: ProfileTypeFieldType;
       } | null;
+      parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
     }> | null;
-    parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
     profileTypeField?: {
       __typename?: "ProfileTypeField";
       id: string;
       type: ProfileTypeFieldType;
     } | null;
+    parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
   }>;
   variables: Array<
     | {
@@ -28145,28 +28146,28 @@ export type ConfigureUpdateProfileOnCloseDialog_petitionQuery = {
           id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
-          multiple: boolean;
           title?: string | null;
+          multiple: boolean;
           children?: Array<{
             __typename?: "PetitionField";
             id: string;
             type: PetitionFieldType;
             options: { [key: string]: any };
-            multiple: boolean;
             title?: string | null;
-            parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+            multiple: boolean;
             profileTypeField?: {
               __typename?: "ProfileTypeField";
               id: string;
               type: ProfileTypeFieldType;
             } | null;
+            parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
           }> | null;
-          parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
           profileTypeField?: {
             __typename?: "ProfileTypeField";
             id: string;
             type: ProfileTypeFieldType;
           } | null;
+          parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
         }>;
         variables: Array<
           | {
@@ -28190,28 +28191,28 @@ export type ConfigureUpdateProfileOnCloseDialog_petitionQuery = {
           id: string;
           type: PetitionFieldType;
           options: { [key: string]: any };
-          multiple: boolean;
           title?: string | null;
+          multiple: boolean;
           children?: Array<{
             __typename?: "PetitionField";
             id: string;
             type: PetitionFieldType;
             options: { [key: string]: any };
-            multiple: boolean;
             title?: string | null;
-            parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+            multiple: boolean;
             profileTypeField?: {
               __typename?: "ProfileTypeField";
               id: string;
               type: ProfileTypeFieldType;
             } | null;
+            parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
           }> | null;
-          parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
           profileTypeField?: {
             __typename?: "ProfileTypeField";
             id: string;
             type: ProfileTypeFieldType;
           } | null;
+          parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
         }>;
         variables: Array<
           | {
@@ -79663,21 +79664,34 @@ export const ConfigureBackgroundCheckAutomateSearchDialog_PetitionFieldFragmentD
   ConfigureBackgroundCheckAutomateSearchDialog_PetitionFieldFragment,
   unknown
 >;
-export const useConfigureUpdateProfileOnCloseDialog_PetitionFieldFragmentDoc = gql`
-  fragment useConfigureUpdateProfileOnCloseDialog_PetitionField on PetitionField {
+export const PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldFragmentDoc = gql`
+  fragment PetitionUpdateProfileOnCloseSourceSelect_PetitionField on PetitionField {
     id
     type
+    title
     options
     multiple
     parent {
       id
       multiple
     }
+  }
+` as unknown as DocumentNode<
+  PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldFragment,
+  unknown
+>;
+export const useConfigureUpdateProfileOnCloseDialog_PetitionFieldFragmentDoc = gql`
+  fragment useConfigureUpdateProfileOnCloseDialog_PetitionField on PetitionField {
+    id
+    type
+    options
     profileTypeField {
       id
       type
     }
+    ...PetitionUpdateProfileOnCloseSourceSelect_PetitionField
   }
+  ${PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<useConfigureUpdateProfileOnCloseDialog_PetitionFieldFragment, unknown>;
 export const useConfigureUpdateProfileOnCloseDialog_PetitionVariableFragmentDoc = gql`
   fragment useConfigureUpdateProfileOnCloseDialog_PetitionVariable on PetitionVariable {
@@ -79694,38 +79708,24 @@ export const useConfigureUpdateProfileOnCloseDialog_PetitionVariableFragmentDoc 
   useConfigureUpdateProfileOnCloseDialog_PetitionVariableFragment,
   unknown
 >;
-export const PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldInnerFragmentDoc = gql`
-  fragment PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldInner on PetitionField {
-    id
-    type
-    title
-    options
-    multiple
-    parent {
-      id
-      multiple
-    }
-  }
-` as unknown as DocumentNode<
-  PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldInnerFragment,
-  unknown
->;
 export const PetitionUpdateProfileOnCloseSourceSelect_PetitionBaseFragmentDoc = gql`
   fragment PetitionUpdateProfileOnCloseSourceSelect_PetitionBase on PetitionBase {
     fields {
       id
-      ...PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldInner
+      ...PetitionUpdateProfileOnCloseSourceSelect_PetitionField
       children {
         id
-        ...PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldInner
+        ...PetitionUpdateProfileOnCloseSourceSelect_PetitionField
       }
     }
     variables {
       name
       type
     }
+    ...useAllFieldsWithIndices_PetitionBase
   }
-  ${PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldInnerFragmentDoc}
+  ${PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldFragmentDoc}
+  ${useAllFieldsWithIndices_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<
   PetitionUpdateProfileOnCloseSourceSelect_PetitionBaseFragment,
   unknown

@@ -90,11 +90,13 @@ type ConfigureUpdateProfileOnCloseDialogSteps = {
     petitionId: string;
     profileTypeId: string;
     options?: FieldOptions["FIELD_GROUP"];
+    petitionFieldId: string;
   };
   STEP_1: {
     petition: useConfigureUpdateProfileOnCloseDialog_PetitionBaseFragment;
     profileType: useConfigureUpdateProfileOnCloseDialog_ProfileTypeFragment;
     options?: FieldOptions["FIELD_GROUP"];
+    petitionFieldId: string;
   };
 };
 
@@ -102,6 +104,7 @@ function ConfigureUpdateProfileOnCloseDialogLoading({
   petitionId,
   profileTypeId,
   options,
+  petitionFieldId,
   onStep,
   ...props
 }: WizardStepDialogProps<ConfigureUpdateProfileOnCloseDialogSteps, "LOADING", void>) {
@@ -122,9 +125,9 @@ function ConfigureUpdateProfileOnCloseDialogLoading({
   // Once data is loaded, move to step 1
   useEffect(() => {
     if (!loading && isNonNullish(petition) && !profileTypeLoading && isNonNullish(profileType)) {
-      onStep("STEP_1", { petition, profileType, options });
+      onStep("STEP_1", { petition, profileType, options, petitionFieldId });
     }
-  }, [loading, petition, profileType, onStep]);
+  }, [loading, petition, profileType, onStep, petitionFieldId]);
 
   return (
     <ConfirmDialog
@@ -170,6 +173,7 @@ function ConfigureUpdateProfileOnCloseDialogStep1({
   petition,
   profileType,
   options,
+  petitionFieldId,
   onStep,
   ...props
 }: WizardStepDialogProps<
@@ -280,6 +284,7 @@ function ConfigureUpdateProfileOnCloseDialogStep1({
                   index={index}
                   fieldsLength={fields.length}
                   profileType={profileType}
+                  parentFieldId={petitionFieldId}
                   petition={petition}
                   onRemove={() => remove(index)}
                 />
@@ -335,6 +340,7 @@ interface UpdatePropertyCardProps {
   fieldsLength: number;
   profileType: useConfigureUpdateProfileOnCloseDialog_ProfileTypeFragment;
   petition: useConfigureUpdateProfileOnCloseDialog_PetitionBaseFragment;
+  parentFieldId: string;
   onRemove: () => void;
 }
 
@@ -343,6 +349,7 @@ function UpdatePropertyCard({
   fieldsLength,
   profileType,
   petition,
+  parentFieldId,
   onRemove,
 }: UpdatePropertyCardProps) {
   const intl = useIntl();
@@ -515,6 +522,7 @@ function UpdatePropertyCard({
                   petition={petition}
                   value={currentValue}
                   profileTypeField={profileTypeField}
+                  parentFieldId={parentFieldId}
                   onChange={(v) => {
                     if (!v) {
                       field.onChange({
@@ -649,8 +657,12 @@ function UpdatePropertySelectMapping({
   variable,
 }: UpdatePropertySelectMappingProps) {
   const intl = useIntl();
-  const { control, setValue, watch } =
-    useFormContext<ConfigureUpdateProfileOnCloseDialogFormData>();
+  const {
+    control,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useFormContext<ConfigureUpdateProfileOnCloseDialogFormData>();
   const currentMap = watch(`updates.${index}.source.map`);
   const isVariable = isNonNullish(variable) && variable.__typename === "PetitionVariableEnum";
   const profileTypeFieldOptions = profileTypeField.options as ProfileTypeFieldOptions<"SELECT">;
@@ -769,11 +781,14 @@ function UpdatePropertySelectMapping({
               cursor: "not-allowed",
             }}
           />
-          <FormControl>
+          <FormControl isInvalid={isNonNullish(errors.updates?.[index]?.source)}>
             <Controller
               shouldUnregister={true}
               name={`updates.${index}.source.map.${value}`}
               control={control}
+              rules={{
+                required: true,
+              }}
               render={({ field }) => {
                 return (
                   <SimpleSelect
@@ -835,16 +850,13 @@ useConfigureUpdateProfileOnCloseDialog.fragments = {
         id
         type
         options
-        multiple
-        parent {
-          id
-          multiple
-        }
         profileTypeField {
           id
           type
         }
+        ...PetitionUpdateProfileOnCloseSourceSelect_PetitionField
       }
+      ${PetitionUpdateProfileOnCloseSourceSelect.fragments.PetitionField}
     `;
   },
   get PetitionVariable() {

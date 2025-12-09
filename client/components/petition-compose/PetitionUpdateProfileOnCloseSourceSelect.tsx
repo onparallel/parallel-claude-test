@@ -5,12 +5,12 @@ import { HighlightText } from "@parallel/components/common/HighlightText";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import {
   PetitionUpdateProfileOnCloseSourceSelect_PetitionBaseFragment,
-  PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldInnerFragment,
+  PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldFragment,
   PetitionUpdateProfileOnCloseSourceSelect_ProfileTypeFieldFragment,
   PetitionVariableType,
   ProfileTypeFieldType,
 } from "@parallel/graphql/__types";
-import { PetitionFieldIndex, useFieldsWithIndices } from "@parallel/utils/fieldIndices";
+import { PetitionFieldIndex, useAllFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { never } from "@parallel/utils/never";
 import { UseReactSelectProps, useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { UnwrapArray } from "@parallel/utils/types";
@@ -27,7 +27,7 @@ import Select, {
   SingleValueProps,
   components,
 } from "react-select";
-import { isNonNullish, isNullish, zip } from "remeda";
+import { isNonNullish, isNullish } from "remeda";
 import { PROFILE_TYPE_FIELD_TO_PETITION_FIELD_TYPE } from "./dialogs/ConfigureUpdateProfileOnCloseDialog";
 
 type FieldOf<T extends PetitionUpdateProfileOnCloseSourceSelect_PetitionBaseFragment> = UnwrapArray<
@@ -80,6 +80,7 @@ export interface PetitionUpdateProfileOnCloseSourceSelectProps<
   ) => void;
   petition: T;
   profileTypeField?: PetitionUpdateProfileOnCloseSourceSelect_ProfileTypeFieldFragment;
+  parentFieldId: string;
 }
 
 export function PetitionUpdateProfileOnCloseSourceSelect<
@@ -89,6 +90,7 @@ export function PetitionUpdateProfileOnCloseSourceSelect<
   onChange,
   petition,
   profileTypeField,
+  parentFieldId,
   ...props
 }: PetitionUpdateProfileOnCloseSourceSelectProps<T>) {
   const intl = useIntl();
@@ -115,33 +117,26 @@ export function PetitionUpdateProfileOnCloseSourceSelect<
     },
   });
 
-  const fieldsWithIndices = useFieldsWithIndices(petition);
+  const allFieldsWithIndices = useAllFieldsWithIndices(petition);
   const { options, _value } = useMemo(() => {
     const fieldOptions: PetitionUpdateProfileOnCloseSourceSelectOption<T>[] =
-      fieldsWithIndices.flatMap(([field, fieldIndex, childrenFieldIndices]) => {
-        if (field.type === "FIELD_GROUP") {
-          return [
-            { value: { type: "FIELD" as const, field: field }, fieldIndex },
-            ...zip(field.children!, childrenFieldIndices!).map(([field, fieldIndex]) => ({
-              value: { type: "FIELD" as const, field: field as ChildOf<FieldOf<T>> },
-              fieldIndex,
-            })),
-          ];
-        } else {
-          return { value: { type: "FIELD" as const, field }, fieldIndex };
-        }
+      allFieldsWithIndices.flatMap(([field, fieldIndex]) => {
+        return { value: { type: "FIELD" as const, field }, fieldIndex };
       });
 
     const filterFn = (option: PetitionUpdateProfileOnCloseSourceSelectOption<T>) => {
       if (option.value.type === "FIELD") {
-        const fieldWithIndice = fieldsWithIndices.find(
+        const fieldWithIndice = allFieldsWithIndices.find(
           ([f]) => option.value.type === "FIELD" && f.id === option.value.field.id,
         );
         if (isNullish(fieldWithIndice) || isNullish(profileTypeField)) {
           return false;
         }
         const [petitionField] = fieldWithIndice;
-        return isFieldCompatible(profileTypeField, petitionField);
+        return (
+          isFieldCompatible(profileTypeField, petitionField) &&
+          (isNullish(petitionField.parent) || petitionField.parent.id === parentFieldId)
+        );
       } else {
         return (
           isNonNullish(profileTypeField) &&
@@ -304,33 +299,41 @@ export function PetitionUpdateProfileOnCloseSourceSelect<
 }
 
 PetitionUpdateProfileOnCloseSourceSelect.fragments = {
-  PetitionBase: gql`
-    fragment PetitionUpdateProfileOnCloseSourceSelect_PetitionBase on PetitionBase {
-      fields {
+  get PetitionField() {
+    return gql`
+      fragment PetitionUpdateProfileOnCloseSourceSelect_PetitionField on PetitionField {
         id
-        ...PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldInner
-        children {
+        type
+        title
+        options
+        multiple
+        parent {
           id
-          ...PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldInner
         }
       }
-      variables {
-        name
-        type
+    `;
+  },
+  get PetitionBase() {
+    return gql`
+      fragment PetitionUpdateProfileOnCloseSourceSelect_PetitionBase on PetitionBase {
+        fields {
+          id
+          ...PetitionUpdateProfileOnCloseSourceSelect_PetitionField
+          children {
+            id
+            ...PetitionUpdateProfileOnCloseSourceSelect_PetitionField
+          }
+        }
+        variables {
+          name
+          type
+        }
+        ...useAllFieldsWithIndices_PetitionBase
       }
-    }
-    fragment PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldInner on PetitionField {
-      id
-      type
-      title
-      options
-      multiple
-      parent {
-        id
-        multiple
-      }
-    }
-  `,
+      ${this.PetitionField}
+      ${useAllFieldsWithIndices.fragments.PetitionBase}
+    `;
+  },
   ProfileTypeField: gql`
     fragment PetitionUpdateProfileOnCloseSourceSelect_ProfileTypeField on ProfileTypeField {
       id
@@ -505,7 +508,7 @@ function Option(
 
 export function isFieldCompatible(
   profileTypeField: PetitionUpdateProfileOnCloseSourceSelect_ProfileTypeFieldFragment,
-  petitionField: PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldInnerFragment,
+  petitionField: PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldFragment,
 ) {
   const acceptedTypes = isNonNullish(profileTypeField)
     ? PROFILE_TYPE_FIELD_TO_PETITION_FIELD_TYPE[profileTypeField.type as ProfileTypeFieldType]
@@ -513,11 +516,17 @@ export function isFieldCompatible(
 
   const profileTypeFieldStandardList = profileTypeField?.options?.standardList ?? null;
   const petitionFieldStandardList = petitionField.options?.standardList ?? null;
-  const parentIsMultiple = isNonNullish(petitionField.parent) && petitionField.parent.multiple;
+
+  const hasSameFormat = isNonNullish(profileTypeField?.options?.format)
+    ? isNonNullish(petitionField.options?.format) &&
+      isNonNullish(profileTypeField?.options?.format) &&
+      petitionField.options.format === profileTypeField.options.format
+    : true;
+
   return (
     acceptedTypes.includes(petitionField.type) &&
     (petitionField.multiple === false || petitionField.type === "FILE_UPLOAD") &&
     profileTypeFieldStandardList === petitionFieldStandardList &&
-    !parentIsMultiple
+    hasSameFormat
   );
 }

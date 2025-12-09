@@ -6,6 +6,7 @@ import {
 } from "@parallel/graphql/__types";
 import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
 import { UpdateProfileOnClose } from "@parallel/utils/fieldOptions";
+import { format } from "date-fns";
 import { useMemo } from "react";
 import { difference, flatMap, isNonNullish, isNullish, pipe, sort } from "remeda";
 
@@ -217,14 +218,14 @@ export function useCheckUpdateProfile({
       } else if (petitionFieldType === "FILE_UPLOAD") {
         const petitionFilesToString = petitionReplies.map((reply) => {
           const { filename, size, contentType } = reply.content;
-          return `${filename}-${size}-${contentType})`;
+          return `${filename}-${size}-${contentType}`;
         });
         const profileFilesToString =
           profileField?.files
             ?.map((file) => {
               if (isNullish(file) || isNullish(file.file)) return null;
               const { filename, size, contentType } = file.file;
-              return `${filename}-${size}-${contentType})`;
+              return `${filename}-${size}-${contentType}`;
             })
             .filter(isNonNullish) ?? [];
 
@@ -244,6 +245,20 @@ export function useCheckUpdateProfile({
           replyValue.length !== profileValue.length ||
           replyValue.join(",") !== profileValue.join(",")
         ) {
+          return true;
+        }
+      } else if (petitionFieldType === "DATE") {
+        const normalizeDate = (dateValue: string | null | undefined): string | null => {
+          if (!dateValue) return null;
+          const date = new Date(dateValue);
+          if (isNaN(date.getTime())) return null;
+          return format(date, "yyyy-MM-dd");
+        };
+
+        const petitionDate = normalizeDate(petitionValue?.value);
+        const profileDate = normalizeDate(profileFieldContent?.value);
+
+        if (petitionDate !== profileDate) {
           return true;
         }
       } else {

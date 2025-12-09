@@ -191,7 +191,7 @@ export function PetitionComposeVariables({
               <Text>
                 <FormattedMessage
                   id="component.petition-compose-variables.variable-updates-profile-on-close-message"
-                  defaultMessage="This variable updates a profile on close and cannot be removed."
+                  defaultMessage="This variable updates a profile on close and cannot be removed or edited."
                 />
               </Text>
               <Text>

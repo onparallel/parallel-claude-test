@@ -1744,7 +1744,7 @@ function fieldIsNotReferencedInAutoSearchConfig<
   };
 }
 
-function fieldIsNotReferencedInUpdateProfileOnClose<
+export function fieldIsNotReferencedInUpdateProfileOnClose<
   TypeName extends string,
   FieldName extends string,
   TArgPetitionId extends Arg<TypeName, FieldName, number>,

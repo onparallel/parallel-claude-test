@@ -5,6 +5,7 @@ import { isDialogError } from "@parallel/components/common/dialogs/DialogProvide
 import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { ChangeEvent, useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
@@ -21,6 +22,7 @@ export function PetitionComposeFieldGroupSettings({
   isReadOnly,
 }: Pick<PetitionComposeFieldSettingsProps, "petition" | "field" | "onFieldEdit" | "isReadOnly">) {
   const intl = useIntl();
+  const showGenericErrorToast = useGenericErrorToast();
   const options = field.options as FieldOptions["FIELD_GROUP"];
   const [groupName, setGroupName] = useState(options.groupName ?? "");
 
@@ -68,6 +70,7 @@ export function PetitionComposeFieldGroupSettings({
         const { updates } = await showConfigureUpdateProfileOnCloseDialog({
           petitionId: petition.id,
           profileTypeId: field.profileType!.id,
+          petitionFieldId: field.id,
           options: field.options as FieldOptions["FIELD_GROUP"],
         });
 
@@ -86,7 +89,7 @@ export function PetitionComposeFieldGroupSettings({
             },
           });
         } else if (!isDialogError(e)) {
-          throw e;
+          showGenericErrorToast(e);
         }
       }
     } else {
@@ -99,7 +102,7 @@ export function PetitionComposeFieldGroupSettings({
         });
       } catch (e) {
         if (!isDialogError(e)) {
-          throw e;
+          showGenericErrorToast(e);
         }
       }
     }

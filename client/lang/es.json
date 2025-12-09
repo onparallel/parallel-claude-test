@@ -6585,14 +6585,14 @@
     "context": "Ctrl + enter to send"
   },
   {
-    "term": "component.petition-comments-and-notes-editor.notes",
-    "definition": "Notas internas",
-    "context": "Internal notes"
-  },
-  {
     "term": "component.petition-comments-and-notes-editor.note-placeholder",
     "definition": "Escribe @ para mencionar a otros usuarios",
     "context": "Type @ to mention other users"
+  },
+  {
+    "term": "component.petition-comments-and-notes-editor.notes",
+    "definition": "Notas internas",
+    "context": "Internal notes"
   },
   {
     "term": "component.petition-comments-and-notes-editor.notes-description",
@@ -7456,8 +7456,8 @@
   },
   {
     "term": "component.petition-compose-variables.variable-updates-profile-on-close-message",
-    "definition": "Esta variable actualiza un perfil al cerrar y no se puede eliminar.",
-    "context": "This variable updates a profile on close and cannot be removed."
+    "definition": "Esta variable actualiza un perfil al cerrar y no se puede eliminar o editar.",
+    "context": "This variable updates a profile on close and cannot be removed or edited."
   },
   {
     "term": "component.petition-contents.hidden-fields-divider",
