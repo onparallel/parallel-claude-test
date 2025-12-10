@@ -327,6 +327,7 @@ export class ProfileRepository extends BaseRepository {
                 // when cloning a standard profile_type, set alias to null so cloned fields are not considered standard
                 alias: sourceProfileType.standard_type ? null : field.alias,
                 // remove "isStandard" from options values when cloning a standard profile_type, so the user can edit options
+                // postpone options mapping to after fields are created
                 options:
                   field.type === "SELECT"
                     ? {
@@ -346,6 +347,55 @@ export class ProfileRepository extends BaseRepository {
               })),
               t,
             ).returning("*");
+
+      const fieldIdsMap = Object.fromEntries(
+        zip(sourceFields, fields).map(([sourceField, field]) => [sourceField.id, field.id]),
+      );
+
+      const optionsUpdate = await pMap(
+        fields,
+        async (field) => {
+          const options = await this.profileTypeFields.mapProfileTypeFieldOptions(
+            field.type,
+            field.options,
+            (type, id) => {
+              if (type === "ProfileTypeField") {
+                return fieldIdsMap[id];
+              }
+              return id;
+            },
+          );
+
+          if (options.standardList) {
+            options.values = [];
+          }
+
+          return {
+            id: field.id,
+            options,
+          };
+        },
+        { concurrency: 1 },
+      );
+
+      if (optionsUpdate.length > 0) {
+        await this.raw(
+          /* sql */ `
+          update profile_type_field ptf set
+            options = t.options
+          from (?) as t (id, options)
+          where t.id = ptf.id;
+          `,
+          [
+            this.sqlValues(
+              optionsUpdate.map((o) => [o.id, o.options]),
+              ["int", "jsonb"],
+            ),
+          ],
+          t,
+        );
+      }
+
       // update profile name pattern with new fields
       const [updatedProfileType] = await this.from("profile_type", t)
         .where({ id: profileType.id })

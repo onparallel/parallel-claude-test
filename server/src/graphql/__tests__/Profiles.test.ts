@@ -4375,7 +4375,6 @@ describe("GraphQL/Profiles", () => {
   });
 
   describe("cloneProfileType", () => {
-    // TODO UNIQUE
     it("clones a profile type", async () => {
       const { errors, data } = await testClient.execute(
         gql`
@@ -4533,6 +4532,234 @@ describe("GraphQL/Profiles", () => {
             },
           ],
         },
+      });
+    });
+
+    it("updates property references in options when cloning a profile type", async () => {
+      const [userGroup] = await mocks.createUserGroups(1, organization.id, []);
+      const [profileType] = await mocks.createRandomProfileTypes(organization.id);
+      const [firstName, lastName, birthDate, country, risk] =
+        await mocks.createRandomProfileTypeFields(organization.id, profileType.id, 5, (i) => ({
+          type: ["SHORT_TEXT", "SHORT_TEXT", "DATE", "SELECT", "SELECT"][i] as ProfileTypeFieldType,
+          options:
+            i === 3
+              ? { standardList: "COUNTRIES" }
+              : i === 4
+                ? {
+                    values: [
+                      {
+                        value: "low",
+                        label: { en: "Low", es: "Bajo" },
+                      },
+                      {
+                        value: "medium",
+                        label: { en: "Medium", es: "Medio" },
+                      },
+                      {
+                        value: "high",
+                        label: { en: "High", es: "Alto" },
+                      },
+                    ],
+                  }
+                : {},
+        }));
+
+      await mocks.createRandomProfileTypeFields(organization.id, profileType.id, 1, () => ({
+        type: "BACKGROUND_CHECK",
+        options: {
+          monitoring: {
+            activationCondition: {
+              profileTypeFieldId: risk.id,
+              values: ["medium", "high"],
+            },
+            searchFrequency: {
+              type: "VARIABLE",
+              profileTypeFieldId: risk.id,
+              options: [
+                { frequency: "3_MONTHS", value: "low" },
+                { frequency: "1_MONTHS", value: "medium" },
+                { frequency: "1_DAYS", value: "high" },
+              ],
+            },
+          },
+          autoSearchConfig: {
+            type: "PERSON",
+            name: [firstName.id, lastName.id],
+            date: birthDate.id,
+            country: country.id,
+            birthCountry: null,
+            activationCondition: {
+              profileTypeFieldId: risk.id,
+              values: ["high"],
+            },
+          },
+        },
+      }));
+
+      await mocks.createRandomProfileTypeFields(organization.id, profileType.id, 1, () => ({
+        type: "ADVERSE_MEDIA_SEARCH",
+        options: {
+          monitoring: {
+            activationCondition: {
+              profileTypeFieldId: risk.id,
+              values: ["medium", "high"],
+            },
+            searchFrequency: {
+              type: "VARIABLE",
+              profileTypeFieldId: risk.id,
+              options: [
+                { frequency: "3_MONTHS", value: "low" },
+                { frequency: "1_MONTHS", value: "medium" },
+                { frequency: "1_DAYS", value: "high" },
+              ],
+            },
+          },
+        },
+      }));
+
+      await mocks.createRandomProfileTypeFields(organization.id, profileType.id, 1, () => ({
+        type: "USER_ASSIGNMENT",
+        options: { allowedUserGroupId: userGroup.id },
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileTypeId: GID!) {
+            cloneProfileType(profileTypeId: $profileTypeId) {
+              id
+              fields {
+                id
+                type
+                options
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileType.id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data.cloneProfileType.id).toBeDefined();
+
+      const clonedProfileTypeId = fromGlobalId(data.cloneProfileType.id, "ProfileType").id;
+
+      const clonedFields = await mocks.knex
+        .from("profile_type_field")
+        .where("profile_type_id", clonedProfileTypeId)
+        .whereNull("deleted_at")
+        .orderBy("position", "asc")
+        .select("*");
+
+      expect(data?.cloneProfileType).toEqual({
+        id: toGlobalId("ProfileType", clonedProfileTypeId),
+        fields: [
+          {
+            id: toGlobalId("ProfileTypeField", clonedFields[0].id),
+            type: "SHORT_TEXT",
+            options: {},
+          },
+          {
+            id: toGlobalId("ProfileTypeField", clonedFields[1].id),
+            type: "SHORT_TEXT",
+            options: {},
+          },
+          {
+            id: toGlobalId("ProfileTypeField", clonedFields[2].id),
+            type: "DATE",
+            options: {},
+          },
+          {
+            id: toGlobalId("ProfileTypeField", clonedFields[3].id),
+            type: "SELECT",
+            options: {
+              standardList: "COUNTRIES",
+              values: expect.toBeArrayOfSize(250),
+            },
+          },
+          {
+            id: toGlobalId("ProfileTypeField", clonedFields[4].id),
+            type: "SELECT",
+            options: {
+              values: [
+                {
+                  value: "low",
+                  label: { en: "Low", es: "Bajo" },
+                },
+                {
+                  value: "medium",
+                  label: { en: "Medium", es: "Medio" },
+                },
+                {
+                  value: "high",
+                  label: { en: "High", es: "Alto" },
+                },
+              ],
+            },
+          },
+          {
+            id: toGlobalId("ProfileTypeField", clonedFields[5].id),
+            type: "BACKGROUND_CHECK",
+            options: {
+              monitoring: {
+                activationCondition: {
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", clonedFields[4].id),
+                  values: ["medium", "high"],
+                },
+                searchFrequency: {
+                  type: "VARIABLE",
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", clonedFields[4].id),
+                  options: [
+                    { frequency: "3_MONTHS", value: "low" },
+                    { frequency: "1_MONTHS", value: "medium" },
+                    { frequency: "1_DAYS", value: "high" },
+                  ],
+                },
+              },
+              autoSearchConfig: {
+                type: "PERSON",
+                name: [
+                  toGlobalId("ProfileTypeField", clonedFields[0].id),
+                  toGlobalId("ProfileTypeField", clonedFields[1].id),
+                ],
+                date: toGlobalId("ProfileTypeField", clonedFields[2].id),
+                country: toGlobalId("ProfileTypeField", clonedFields[3].id),
+                birthCountry: null,
+                activationCondition: {
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", clonedFields[4].id),
+                  values: ["high"],
+                },
+              },
+            },
+          },
+          {
+            id: toGlobalId("ProfileTypeField", clonedFields[6].id),
+            type: "ADVERSE_MEDIA_SEARCH",
+            options: {
+              monitoring: {
+                activationCondition: {
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", clonedFields[4].id),
+                  values: ["medium", "high"],
+                },
+                searchFrequency: {
+                  type: "VARIABLE",
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", clonedFields[4].id),
+                  options: [
+                    { frequency: "3_MONTHS", value: "low" },
+                    { frequency: "1_MONTHS", value: "medium" },
+                    { frequency: "1_DAYS", value: "high" },
+                  ],
+                },
+              },
+            },
+          },
+          {
+            id: toGlobalId("ProfileTypeField", clonedFields[7].id),
+            type: "USER_ASSIGNMENT",
+            options: { allowedUserGroupId: toGlobalId("UserGroup", userGroup.id) },
+          },
+        ],
       });
     });
   });

@@ -302,7 +302,7 @@ export class ProfileTypeFieldService {
   async mapProfileTypeFieldOptions(
     type: ProfileTypeFieldType,
     options: any,
-    globalIdMap: (type: string, id: any) => any,
+    idMap: (type: string, id: any) => any,
   ) {
     const _options =
       type === "SELECT" || type === "CHECKBOX"
@@ -320,24 +320,24 @@ export class ProfileTypeFieldService {
     walkObject(result, (key, value, node) => {
       if (key === "profileTypeFieldId" && value !== undefined) {
         // Replace the value in-place with the mapped ID
-        node[key] = globalIdMap("ProfileTypeField", value);
+        node[key] = idMap("ProfileTypeField", value);
       }
 
       if (key === "allowedUserGroupId" && isNonNullish(value)) {
         // Replace the value in-place with the mapped ID
-        node[key] = globalIdMap("UserGroup", value);
+        node[key] = idMap("UserGroup", value);
       }
 
       if (key === "autoSearchConfig" && isNonNullish(value)) {
         if (isNonNullish(value.name) && Array.isArray(value.name)) {
-          value.name = value.name.map((id: any) => globalIdMap("ProfileTypeField", id));
+          value.name = value.name.map((id: any) => idMap("ProfileTypeField", id));
         }
-        value.date = isNonNullish(value.date) ? globalIdMap("ProfileTypeField", value.date) : null;
+        value.date = isNonNullish(value.date) ? idMap("ProfileTypeField", value.date) : null;
         value.country = isNonNullish(value.country)
-          ? globalIdMap("ProfileTypeField", value.country)
+          ? idMap("ProfileTypeField", value.country)
           : null;
         value.birthCountry = isNonNullish(value.birthCountry)
-          ? globalIdMap("ProfileTypeField", value.birthCountry)
+          ? idMap("ProfileTypeField", value.birthCountry)
           : null;
       }
     });
