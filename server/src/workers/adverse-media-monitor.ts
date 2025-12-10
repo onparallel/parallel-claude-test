@@ -61,7 +61,7 @@ export class AdverseMediaMonitorCronWorker extends CronWorker<"adverse-media-mon
             `${JSON.stringify(content.search)}; Found ${searchResponse.totalCount} new articles`,
           );
 
-          await this.profiles.updateProfileFieldValues(
+          const events = await this.profiles.updateProfileFieldValues(
             [
               {
                 profileId: value.profile_id,
@@ -75,10 +75,12 @@ export class AdverseMediaMonitorCronWorker extends CronWorker<"adverse-media-mon
                 pendingReview: true,
               },
             ],
-            null,
             org.id,
-            "PARALLEL_MONITORING",
+            { source: "PARALLEL_MONITORING" },
           );
+          await this.profiles.createProfileUpdatedEvents(events, org.id, {
+            source: "PARALLEL_MONITORING",
+          });
         },
         { concurrency: 10 },
       );

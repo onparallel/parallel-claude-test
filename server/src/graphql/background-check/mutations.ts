@@ -99,7 +99,7 @@ export const updateBackgroundCheckEntity = mutationField("updateBackgroundCheckE
         : null;
 
       if (isNonNullish(entity)) {
-        await ctx.profiles.updateProfileFieldValues(
+        const events = await ctx.profiles.updateProfileFieldValues(
           [
             {
               profileId: params.profileId,
@@ -111,10 +111,17 @@ export const updateBackgroundCheckEntity = mutationField("updateBackgroundCheckE
               },
             },
           ],
-          ctx.user!.id,
           ctx.user!.org_id,
-          "MANUAL",
+          {
+            userId: ctx.user!.id,
+            source: "MANUAL",
+          },
         );
+
+        await ctx.profiles.createProfileUpdatedEvents(events, ctx.user!.org_id, {
+          userId: ctx.user!.id,
+          source: "MANUAL",
+        });
       } else {
         // when removing entity go back to draft without removing value
         await ctx.profiles.upsertDraftProfileFieldValues(
@@ -292,7 +299,7 @@ export const updateBackgroundCheckSearchFalsePositives = mutationField(
           // - if every item is false positive, remove the draft and create a stored value
           // - if not, update the draft
           if (newFalsePositives.length === content.search.totalCount) {
-            await ctx.profiles.updateProfileFieldValues(
+            const events = await ctx.profiles.updateProfileFieldValues(
               [
                 {
                   profileId: params.profileId,
@@ -304,10 +311,16 @@ export const updateBackgroundCheckSearchFalsePositives = mutationField(
                   },
                 },
               ],
-              ctx.user!.id,
               ctx.user!.org_id,
-              "MANUAL",
+              {
+                userId: ctx.user!.id,
+                source: "MANUAL",
+              },
             );
+            await ctx.profiles.createProfileUpdatedEvents(events, ctx.user!.org_id, {
+              userId: ctx.user!.id,
+              source: "MANUAL",
+            });
           } else {
             await ctx.profiles.upsertDraftProfileFieldValues(
               [

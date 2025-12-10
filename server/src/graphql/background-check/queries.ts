@@ -264,7 +264,7 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
             hasStoredValue,
           };
         } else {
-          await ctx.profiles.updateProfileFieldValues(
+          const events = await ctx.profiles.updateProfileFieldValues(
             [
               {
                 profileId: params.profileId,
@@ -273,10 +273,16 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
                 content: newContent,
               },
             ],
-            ctx.user!.id,
             ctx.user!.org_id,
-            "MANUAL",
+            {
+              userId: ctx.user!.id,
+              source: "MANUAL",
+            },
           );
+          await ctx.profiles.createProfileUpdatedEvents(events, ctx.user!.org_id, {
+            userId: ctx.user!.id,
+            source: "MANUAL",
+          });
 
           return {
             ...ctx.backgroundCheck.mapBackgroundCheckSearch(newContent),
@@ -495,7 +501,7 @@ export const backgroundCheckEntityDetails = queryField("backgroundCheckEntityDet
       );
 
       // update the value and trigger events even if nothing has changed
-      await ctx.profiles.updateProfileFieldValues(
+      const events = await ctx.profiles.updateProfileFieldValues(
         [
           {
             profileId: params.profileId,
@@ -507,11 +513,17 @@ export const backgroundCheckEntityDetails = queryField("backgroundCheckEntityDet
             } as BackgroundCheckContent,
           },
         ],
-        ctx.user!.id,
         ctx.user!.org_id,
-        "MANUAL",
+        {
+          userId: ctx.user!.id,
+          source: "MANUAL",
+        },
       );
 
+      await ctx.profiles.createProfileUpdatedEvents(events, ctx.user!.org_id, {
+        userId: ctx.user!.id,
+        source: "MANUAL",
+      });
       return {
         ...ctx.backgroundCheck.mapBackgroundCheckEntity(newDetails, newDetails.id),
         hasPendingReview: false,

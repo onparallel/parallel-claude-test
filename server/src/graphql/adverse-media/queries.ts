@@ -210,7 +210,7 @@ export const adverseMediaArticleSearch = queryField("adverseMediaArticleSearch",
 
       if (isNullish(currentValue)) {
         // no value found on the profile, create a new one
-        await ctx.profiles.updateProfileFieldValues(
+        const events = await ctx.profiles.updateProfileFieldValues(
           [
             {
               profileId: params.profileId,
@@ -219,10 +219,16 @@ export const adverseMediaArticleSearch = queryField("adverseMediaArticleSearch",
               content,
             },
           ],
-          ctx.user!.id,
           ctx.user!.org_id,
-          "MANUAL",
+          {
+            userId: ctx.user!.id,
+            source: "MANUAL",
+          },
         );
+        await ctx.profiles.createProfileUpdatedEvents(events, ctx.user!.org_id, {
+          userId: ctx.user!.id,
+          source: "MANUAL",
+        });
 
         return await ctx.profilesHelper.mapValueContentFromDatabase({
           type: "ADVERSE_MEDIA_SEARCH",

@@ -101,19 +101,22 @@ export class BackgroundCheckMonitorCronWorker extends CronWorker<"background-che
       if (contentsAreEqual || !differences.entity) {
         // no changes or no relevant differences since last execution, no need to update the value
         // create an event to keep track that the monitor has run and there are no changes
-        await this.profiles.createEvent({
-          type: "PROFILE_FIELD_VALUE_MONITORED",
-          data: {
-            profile_type_field_id: value.profile_type_field_id,
+        await this.profiles.createEvent(
+          {
+            type: "PROFILE_FIELD_VALUE_MONITORED",
+            data: {
+              profile_type_field_id: value.profile_type_field_id,
+            },
+            profile_id: value.profile_id,
+            org_id: orgId,
           },
-          profile_id: value.profile_id,
-          org_id: orgId,
-        });
+          "PARALLEL_MONITORING",
+        );
 
         return false;
       }
 
-      await this.profiles.updateProfileFieldValues(
+      const events = await this.profiles.updateProfileFieldValues(
         [
           {
             profileId: value.profile_id,
@@ -125,11 +128,13 @@ export class BackgroundCheckMonitorCronWorker extends CronWorker<"background-che
             reviewReason: [...(value.review_reason ?? []), { reviewedAt: new Date(), differences }],
           },
         ],
-        null,
         orgId,
-        "PARALLEL_MONITORING",
+        { source: "PARALLEL_MONITORING" },
       );
 
+      await this.profiles.createProfileUpdatedEvents(events, orgId, {
+        source: "PARALLEL_MONITORING",
+      });
       return true;
     } catch (error) {
       // if entity is missing, remove it from the value so it returns to the search.
@@ -147,7 +152,7 @@ export class BackgroundCheckMonitorCronWorker extends CronWorker<"background-che
         } as BackgroundCheckContent;
 
         // no need to check if contents are equal: we are updating from a match to a search
-        await this.profiles.updateProfileFieldValues(
+        const events = await this.profiles.updateProfileFieldValues(
           [
             {
               profileId: value.profile_id,
@@ -156,11 +161,13 @@ export class BackgroundCheckMonitorCronWorker extends CronWorker<"background-che
               content: newContent,
             },
           ],
-          null,
           orgId,
-          "PARALLEL_MONITORING",
+          { source: "PARALLEL_MONITORING" },
         );
 
+        await this.profiles.createProfileUpdatedEvents(events, orgId, {
+          source: "PARALLEL_MONITORING",
+        });
         return false;
       }
 
@@ -192,20 +199,23 @@ export class BackgroundCheckMonitorCronWorker extends CronWorker<"background-che
     const differences = this.backgroundCheck.extractRelevantDifferences(content, newContent);
 
     if (contentsAreEqual || !differences.search) {
-      await this.profiles.createEvent({
-        type: "PROFILE_FIELD_VALUE_MONITORED",
-        data: {
-          profile_type_field_id: value.profile_type_field_id,
+      await this.profiles.createEvent(
+        {
+          type: "PROFILE_FIELD_VALUE_MONITORED",
+          data: {
+            profile_type_field_id: value.profile_type_field_id,
+          },
+          profile_id: value.profile_id,
+          org_id: orgId,
         },
-        profile_id: value.profile_id,
-        org_id: orgId,
-      });
+        "PARALLEL_MONITORING",
+      );
 
       return false;
     }
 
     // any difference in search means search items have changed, so we need to mark it for review
-    await this.profiles.updateProfileFieldValues(
+    const events = await this.profiles.updateProfileFieldValues(
       [
         {
           profileId: value.profile_id,
@@ -217,11 +227,13 @@ export class BackgroundCheckMonitorCronWorker extends CronWorker<"background-che
           reviewReason: [...(value.review_reason ?? []), { reviewedAt: new Date(), differences }],
         },
       ],
-      null,
       orgId,
-      "PARALLEL_MONITORING",
+      { source: "PARALLEL_MONITORING" },
     );
 
+    await this.profiles.createProfileUpdatedEvents(events, orgId, {
+      source: "PARALLEL_MONITORING",
+    });
     return true;
   }
 }

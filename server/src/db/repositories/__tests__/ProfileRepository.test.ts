@@ -499,9 +499,8 @@ describe("repositories/ProfileRepository", () => {
             content: { value: "HIGH" },
           },
         ],
-        user.id,
         organization.id,
-        "MANUAL",
+        { userId: user.id, source: "MANUAL" },
       );
 
       const [profileBefore] = await mocks.knex.from("profile").where("id", profile.id).select("*");
@@ -576,7 +575,7 @@ describe("repositories/ProfileRepository", () => {
 
       expect(dbEvents1).toEqual([{ type: "PROFILE_CREATED" }]);
 
-      await repo.updateProfileFieldValues(
+      const events1 = await repo.updateProfileFieldValues(
         [
           {
             profileId: profile.id,
@@ -585,24 +584,27 @@ describe("repositories/ProfileRepository", () => {
             content: { value: "test" },
           },
         ],
-        user.id,
         organization.id,
-        "MANUAL",
+        { userId: user.id, source: "MANUAL" },
       );
 
-      const dbEvents2 = await mocks.knex
-        .from("profile_event")
-        .where("profile_id", profile.id)
-        .orderBy("id", "asc")
-        .select("type");
-
-      expect(dbEvents2).toEqual([
-        { type: "PROFILE_CREATED" },
-        { type: "PROFILE_FIELD_VALUE_UPDATED" },
-        { type: "PROFILE_UPDATED" },
+      expect(events1).toEqual([
+        {
+          org_id: organization.id,
+          profile_id: profile.id,
+          type: "PROFILE_FIELD_VALUE_UPDATED",
+          data: {
+            user_id: user.id,
+            profile_type_field_id: fields[0].id,
+            current_profile_field_value_id: expect.any(Number),
+            previous_profile_field_value_id: null,
+            alias: null,
+            external_source_integration_id: null,
+          },
+        },
       ]);
 
-      await repo.updateProfileFieldValues(
+      const events2 = await repo.updateProfileFieldValues(
         [
           {
             profileId: profile.id,
@@ -611,22 +613,11 @@ describe("repositories/ProfileRepository", () => {
             content: { value: "test" },
           },
         ],
-        user.id,
         organization.id,
-        "MANUAL",
+        { userId: user.id, source: "MANUAL" },
       );
 
-      const dbEvents3 = await mocks.knex
-        .from("profile_event")
-        .where("profile_id", profile.id)
-        .orderBy("id", "asc")
-        .select("type");
-
-      expect(dbEvents3).toEqual([
-        { type: "PROFILE_CREATED" },
-        { type: "PROFILE_FIELD_VALUE_UPDATED" },
-        { type: "PROFILE_UPDATED" },
-      ]);
+      expect(events2).toEqual([]);
 
       const pfvs = await mocks.knex
         .from("profile_field_value")
@@ -650,7 +641,7 @@ describe("repositories/ProfileRepository", () => {
 
       expect(dbEvents1).toEqual([{ type: "PROFILE_CREATED" }]);
 
-      await repo.updateProfileFieldValues(
+      const events1 = await repo.updateProfileFieldValues(
         [
           {
             profileId: profile.id,
@@ -659,24 +650,27 @@ describe("repositories/ProfileRepository", () => {
             content: { value: ["A", "C"] },
           },
         ],
-        user.id,
         organization.id,
-        "MANUAL",
+        { userId: user.id, source: "MANUAL" },
       );
 
-      const dbEvents2 = await mocks.knex
-        .from("profile_event")
-        .where("profile_id", profile.id)
-        .orderBy("id", "asc")
-        .select("type");
-
-      expect(dbEvents2).toEqual([
-        { type: "PROFILE_CREATED" },
-        { type: "PROFILE_FIELD_VALUE_UPDATED" },
-        { type: "PROFILE_UPDATED" },
+      expect(events1).toEqual([
+        {
+          org_id: organization.id,
+          profile_id: profile.id,
+          type: "PROFILE_FIELD_VALUE_UPDATED",
+          data: {
+            user_id: user.id,
+            profile_type_field_id: fields[1].id,
+            current_profile_field_value_id: expect.any(Number),
+            previous_profile_field_value_id: null,
+            alias: null,
+            external_source_integration_id: null,
+          },
+        },
       ]);
 
-      await repo.updateProfileFieldValues(
+      const events2 = await repo.updateProfileFieldValues(
         [
           {
             profileId: profile.id,
@@ -685,22 +679,11 @@ describe("repositories/ProfileRepository", () => {
             content: { value: ["C", "A"] }, // order doesn't matter
           },
         ],
-        user.id,
         organization.id,
-        "MANUAL",
+        { userId: user.id, source: "MANUAL" },
       );
 
-      const dbEvents3 = await mocks.knex
-        .from("profile_event")
-        .where("profile_id", profile.id)
-        .orderBy("id", "asc")
-        .select("type");
-
-      expect(dbEvents3).toEqual([
-        { type: "PROFILE_CREATED" },
-        { type: "PROFILE_FIELD_VALUE_UPDATED" },
-        { type: "PROFILE_UPDATED" },
-      ]);
+      expect(events2).toEqual([]);
 
       const pfvs = await mocks.knex
         .from("profile_field_value")
@@ -724,7 +707,7 @@ describe("repositories/ProfileRepository", () => {
 
       expect(dbEvents1).toEqual([{ type: "PROFILE_CREATED" }]);
 
-      await repo.updateProfileFieldValues(
+      const events1 = await repo.updateProfileFieldValues(
         [
           {
             profileId: profile.id,
@@ -758,24 +741,27 @@ describe("repositories/ProfileRepository", () => {
             },
           },
         ],
-        user.id,
         organization.id,
-        "MANUAL",
+        { userId: user.id, source: "MANUAL" },
       );
 
-      const dbEvents2 = await mocks.knex
-        .from("profile_event")
-        .where("profile_id", profile.id)
-        .orderBy("id", "asc")
-        .select("type");
-
-      expect(dbEvents2).toEqual([
-        { type: "PROFILE_CREATED" },
-        { type: "PROFILE_FIELD_VALUE_UPDATED" },
-        { type: "PROFILE_UPDATED" },
+      expect(events1).toEqual([
+        {
+          org_id: organization.id,
+          profile_id: profile.id,
+          type: "PROFILE_FIELD_VALUE_UPDATED",
+          data: {
+            user_id: user.id,
+            profile_type_field_id: fields[2].id,
+            current_profile_field_value_id: expect.any(Number),
+            previous_profile_field_value_id: null,
+            alias: null,
+            external_source_integration_id: null,
+          },
+        },
       ]);
 
-      await repo.updateProfileFieldValues(
+      const events2 = await repo.updateProfileFieldValues(
         [
           {
             profileId: profile.id,
@@ -809,23 +795,24 @@ describe("repositories/ProfileRepository", () => {
             },
           },
         ],
-        user.id,
         organization.id,
-        "MANUAL",
+        { userId: user.id, source: "MANUAL" },
       );
 
-      const dbEvents3 = await mocks.knex
-        .from("profile_event")
-        .where("profile_id", profile.id)
-        .orderBy("id", "asc")
-        .select("type");
-
-      expect(dbEvents3).toEqual([
-        { type: "PROFILE_CREATED" },
-        { type: "PROFILE_FIELD_VALUE_UPDATED" },
-        { type: "PROFILE_UPDATED" },
-        { type: "PROFILE_FIELD_VALUE_UPDATED" },
-        { type: "PROFILE_UPDATED" },
+      expect(events2).toEqual([
+        {
+          org_id: organization.id,
+          profile_id: profile.id,
+          type: "PROFILE_FIELD_VALUE_UPDATED",
+          data: {
+            user_id: user.id,
+            profile_type_field_id: fields[2].id,
+            current_profile_field_value_id: expect.any(Number),
+            previous_profile_field_value_id: expect.any(Number),
+            alias: null,
+            external_source_integration_id: null,
+          },
+        },
       ]);
 
       const pfvs = await mocks.knex
@@ -916,7 +903,7 @@ describe("repositories/ProfileRepository", () => {
 
       expect(dbEvents1).toEqual([{ type: "PROFILE_CREATED" }]);
 
-      await repo.updateProfileFieldValues(
+      const events1 = await repo.updateProfileFieldValues(
         [
           {
             profileId: profile.id,
@@ -960,24 +947,27 @@ describe("repositories/ProfileRepository", () => {
             },
           },
         ],
-        user.id,
         organization.id,
-        "MANUAL",
+        { userId: user.id, source: "MANUAL" },
       );
 
-      const dbEvents2 = await mocks.knex
-        .from("profile_event")
-        .where("profile_id", profile.id)
-        .orderBy("id", "asc")
-        .select("type");
-
-      expect(dbEvents2).toEqual([
-        { type: "PROFILE_CREATED" },
-        { type: "PROFILE_FIELD_VALUE_UPDATED" },
-        { type: "PROFILE_UPDATED" },
+      expect(events1).toEqual([
+        {
+          org_id: organization.id,
+          profile_id: profile.id,
+          type: "PROFILE_FIELD_VALUE_UPDATED",
+          data: {
+            user_id: user.id,
+            profile_type_field_id: fields[3].id,
+            current_profile_field_value_id: expect.any(Number),
+            previous_profile_field_value_id: null,
+            alias: null,
+            external_source_integration_id: null,
+          },
+        },
       ]);
 
-      await repo.updateProfileFieldValues(
+      const events2 = await repo.updateProfileFieldValues(
         [
           {
             profileId: profile.id,
@@ -1021,23 +1011,24 @@ describe("repositories/ProfileRepository", () => {
             },
           },
         ],
-        user.id,
         organization.id,
-        "MANUAL",
+        { userId: user.id, source: "MANUAL" },
       );
 
-      const dbEvents3 = await mocks.knex
-        .from("profile_event")
-        .where("profile_id", profile.id)
-        .orderBy("id", "asc")
-        .select("type");
-
-      expect(dbEvents3).toEqual([
-        { type: "PROFILE_CREATED" },
-        { type: "PROFILE_FIELD_VALUE_UPDATED" },
-        { type: "PROFILE_UPDATED" },
-        { type: "PROFILE_FIELD_VALUE_UPDATED" },
-        { type: "PROFILE_UPDATED" },
+      expect(events2).toEqual([
+        {
+          org_id: organization.id,
+          profile_id: profile.id,
+          type: "PROFILE_FIELD_VALUE_UPDATED",
+          data: {
+            user_id: user.id,
+            profile_type_field_id: fields[3].id,
+            current_profile_field_value_id: expect.any(Number),
+            previous_profile_field_value_id: expect.any(Number),
+            alias: null,
+            external_source_integration_id: null,
+          },
+        },
       ]);
 
       const pfvs = await mocks.knex
@@ -1166,9 +1157,8 @@ describe("repositories/ProfileRepository", () => {
             content: null,
           },
         ],
-        user.id,
         organization.id,
-        "MANUAL",
+        { userId: user.id, source: "MANUAL" },
       );
 
       const pfvs = await mocks.knex
@@ -1255,9 +1245,8 @@ describe("repositories/ProfileRepository", () => {
             },
           },
         ],
-        user.id,
         organization.id,
-        "MANUAL",
+        { userId: user.id, source: "MANUAL" },
       );
 
       const pfvs = await mocks.knex
@@ -1308,9 +1297,8 @@ describe("repositories/ProfileRepository", () => {
             content: { value: "my edited content" },
           },
         ],
-        user.id,
         organization.id,
-        "MANUAL",
+        { userId: user.id, source: "MANUAL" },
       );
 
       const pfvs = await mocks.knex
@@ -1360,9 +1348,8 @@ describe("repositories/ProfileRepository", () => {
             pendingReview: true,
           },
         ],
-        user.id,
         organization.id,
-        "MANUAL",
+        { userId: user.id, source: "MANUAL" },
       );
 
       const pfvs = await mocks.knex
@@ -1401,9 +1388,8 @@ describe("repositories/ProfileRepository", () => {
             pendingReview: true,
           },
         ],
-        user.id,
         organization.id,
-        "MANUAL",
+        { userId: user.id, source: "MANUAL" },
       );
 
       const pfvs = await mocks.knex

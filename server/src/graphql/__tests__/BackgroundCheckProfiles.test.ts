@@ -2446,6 +2446,7 @@ describe("Background Check - Profiles", () => {
           data: {
             user_id: user.id,
             org_integration_id: null,
+            profile_type_field_ids: [profileTypeField.id],
           },
         },
         {
@@ -2610,6 +2611,7 @@ describe("Background Check - Profiles", () => {
           data: {
             user_id: user.id,
             org_integration_id: null,
+            profile_type_field_ids: [profileTypeField.id],
           },
         },
         {
@@ -2978,6 +2980,7 @@ describe("Background Check - Profiles", () => {
           data: {
             user_id: user.id,
             org_integration_id: null,
+            profile_type_field_ids: [profileTypeField.id],
           },
         },
         {
@@ -3177,6 +3180,7 @@ describe("Background Check - Profiles", () => {
           data: {
             user_id: user.id,
             org_integration_id: null,
+            profile_type_field_ids: [profileTypeField.id],
           },
         },
         {
@@ -3205,6 +3209,7 @@ describe("Background Check - Profiles", () => {
           data: {
             user_id: user.id,
             org_integration_id: null,
+            profile_type_field_ids: [profileTypeField.id],
           },
         },
         {
@@ -3426,6 +3431,7 @@ describe("Background Check - Profiles", () => {
           data: {
             user_id: user.id,
             org_integration_id: null,
+            profile_type_field_ids: [profileTypeField.id],
           },
         },
         {
@@ -3454,6 +3460,7 @@ describe("Background Check - Profiles", () => {
           data: {
             user_id: user.id,
             org_integration_id: null,
+            profile_type_field_ids: [profileTypeField.id],
           },
         },
         {

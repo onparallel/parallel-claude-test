@@ -1232,6 +1232,14 @@ const ProfileEventSchemas = {
         type: ["string", "null"],
         example: toGlobalId("OrgIntegration", 1),
       },
+      profileTypeFieldIds: {
+        description: "The IDs of the profile fields that were updated",
+        type: ["array", "null"],
+        items: {
+          type: "string",
+          example: toGlobalId("ProfileTypeField", 1),
+        },
+      },
     },
   },
   PROFILE_RELATIONSHIP_CREATED: {

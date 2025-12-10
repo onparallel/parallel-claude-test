@@ -714,31 +714,23 @@ export const updateProfileTypeField = mutationField("updateProfileTypeField", {
                     t,
                   );
 
-            const byProfileId = groupBy(
-              pfvfs as (ProfileFieldValue | ProfileFieldFile)[],
-              (v) => v.profile_id,
+            await ctx.profiles.createProfileUpdatedEvents(
+              pfvfs.map((v) => ({
+                type: "PROFILE_FIELD_EXPIRY_UPDATED",
+                profile_id: v.profile_id,
+                org_id: ctx.user!.org_id,
+                data: {
+                  alias: profileTypeField.alias,
+                  expiry_date: null,
+                  profile_type_field_id: profileTypeField.id,
+                  user_id: ctx.user!.id,
+                  org_integration_id: null,
+                },
+              })),
+              ctx.user!.org_id,
+              { userId: ctx.user!.id, source: "MANUAL" },
+              t,
             );
-            for (const [profileId, values] of Object.entries(byProfileId)) {
-              await ctx.profiles.createProfileUpdatedEvents(
-                parseInt(profileId),
-                values.map((v) => ({
-                  type: "PROFILE_FIELD_EXPIRY_UPDATED",
-                  profile_id: v.profile_id,
-                  org_id: ctx.user!.org_id,
-                  data: {
-                    alias: profileTypeField.alias,
-                    expiry_date: null,
-                    profile_type_field_id: profileTypeField.id,
-                    user_id: ctx.user!.id,
-                    org_integration_id: null,
-                  },
-                })),
-                ctx.user!.org_id,
-                ctx.user!.id,
-                undefined,
-                t,
-              );
-            }
           }
           const [updatedProfileTypeField] = await ctx.profiles.updateProfileTypeField(
             args.profileTypeFieldId,
@@ -1403,7 +1395,7 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
     }
 
     try {
-      await ctx.profiles.updateProfileFieldValues(
+      const events = await ctx.profiles.updateProfileFieldValues(
         await pMap(
           updateFieldsData,
           async (field) => ({
@@ -1419,10 +1411,17 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
           }),
           { concurrency: 1 },
         ),
-        ctx.user!.id,
         ctx.user!.org_id,
-        source ?? "MANUAL",
+        {
+          userId: ctx.user!.id,
+          source: source ?? "MANUAL",
+        },
       );
+
+      await ctx.profiles.createProfileUpdatedEvents(events, ctx.user!.org_id, {
+        userId: ctx.user!.id,
+        source: source ?? "MANUAL",
+      });
       ctx.profiles.loadProfileFieldValuesAndDraftsByProfileId.dataloader.clear(profileId);
     } catch (e) {
       if (
@@ -1539,7 +1538,6 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
       );
 
       await ctx.profiles.createProfileUpdatedEvents(
-        profileId,
         [
           ...files.map(
             (pff) =>
@@ -1573,7 +1571,7 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
             : []),
         ],
         ctx.user!.org_id,
-        ctx.user!.id,
+        { userId: ctx.user!.id, source: source ?? "MANUAL" },
       );
     } else {
       // no new files, update expiryDate on all uploaded files
@@ -1584,7 +1582,6 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
       );
 
       await ctx.profiles.createProfileUpdatedEvents(
-        profileId,
         {
           type: "PROFILE_FIELD_EXPIRY_UPDATED",
           org_id: ctx.user!.org_id,
@@ -1598,7 +1595,7 @@ export const createProfileFieldFileUploadLink = mutationField("createProfileFiel
           },
         },
         ctx.user!.org_id,
-        ctx.user!.id,
+        { userId: ctx.user!.id, source: source ?? "MANUAL" },
       );
     }
 
@@ -1704,7 +1701,6 @@ export const deleteProfileFieldFile = mutationField("deleteProfileFieldFile", {
 
       if (deletedProfileFieldFiles.length > 0) {
         await ctx.profiles.createProfileUpdatedEvents(
-          profileId,
           deletedProfileFieldFiles.map((f) => ({
             type: "PROFILE_FIELD_FILE_REMOVED",
             profile_id: profileId,
@@ -1717,7 +1713,7 @@ export const deleteProfileFieldFile = mutationField("deleteProfileFieldFile", {
             },
           })),
           ctx.user!.org_id,
-          ctx.user!.id,
+          { userId: ctx.user!.id, source: "MANUAL" },
         );
       }
 
@@ -1787,7 +1783,6 @@ export const copyFileReplyToProfileFieldFile = mutationField("copyFileReplyToPro
     const profileTypeField = await ctx.profiles.loadProfileTypeField(profileTypeFieldId);
 
     await ctx.profiles.createProfileUpdatedEvents(
-      profileId,
       [
         ...profileFieldFiles.map(
           (pff) =>
@@ -1821,7 +1816,7 @@ export const copyFileReplyToProfileFieldFile = mutationField("copyFileReplyToPro
           : []),
       ],
       ctx.user!.org_id,
-      ctx.user!.id,
+      { userId: ctx.user!.id, source: "PETITION_FIELD_REPLY" },
     );
 
     return profileFieldFiles;
@@ -1883,7 +1878,7 @@ export const copyReplyContentToProfileFieldValue = mutationField(
           "PETITION_FIELD_REPLY",
         );
       } else {
-        await ctx.profiles.updateProfileFieldValues(
+        const events = await ctx.profiles.updateProfileFieldValues(
           [
             {
               profileId,
@@ -1894,10 +1889,16 @@ export const copyReplyContentToProfileFieldValue = mutationField(
               petitionFieldReplyId: reply!.id,
             },
           ],
-          ctx.user!.id,
           ctx.user!.org_id,
-          "PETITION_FIELD_REPLY",
+          {
+            userId: ctx.user!.id,
+            source: "PETITION_FIELD_REPLY",
+          },
         );
+        await ctx.profiles.createProfileUpdatedEvents(events, ctx.user!.org_id, {
+          userId: ctx.user!.id,
+          source: "PETITION_FIELD_REPLY",
+        });
       }
 
       const { value, draftValue } = await ctx.profiles.loadProfileFieldValueWithDraft({
@@ -2663,18 +2664,25 @@ export const completeProfileFromExternalSource = mutationField(
 
       try {
         if (args.profileId) {
-          await ctx.profiles.updateProfileFieldValues(
+          const events = await ctx.profiles.updateProfileFieldValues(
             validatedFields.map((f) => ({
               profileId: args.profileId!,
               profileTypeFieldId: f.profileTypeField.id,
               type: f.profileTypeField.type,
               content: f.content,
             })),
-            ctx.user!.id,
             ctx.user!.org_id,
-            "EXTERNAL",
-            entity.integration_id,
+            {
+              userId: ctx.user!.id,
+              orgIntegrationId: entity.integration_id,
+              source: "EXTERNAL",
+            },
           );
+          await ctx.profiles.createProfileUpdatedEvents(events, ctx.user!.org_id, {
+            userId: ctx.user!.id,
+            orgIntegrationId: entity.integration_id,
+            source: "EXTERNAL",
+          });
 
           return (await ctx.profiles.loadProfile.raw(args.profileId))!;
         } else {
@@ -3045,7 +3053,7 @@ export const saveProfileFieldValueDraft = mutationField("saveProfileFieldValueDr
       return RESULT.SUCCESS;
     }
 
-    await ctx.profiles.updateProfileFieldValues(
+    const events = await ctx.profiles.updateProfileFieldValues(
       [
         {
           profileId: args.profileId,
@@ -3054,11 +3062,17 @@ export const saveProfileFieldValueDraft = mutationField("saveProfileFieldValueDr
           content: removedDraft.content,
         },
       ],
-      ctx.user!.id,
       ctx.user!.org_id,
-      (removedDraft.source as any) ?? "MANUAL",
+      {
+        userId: ctx.user!.id,
+        source: (removedDraft.source as any) ?? "MANUAL",
+      },
     );
 
+    await ctx.profiles.createProfileUpdatedEvents(events, ctx.user!.org_id, {
+      userId: ctx.user!.id,
+      source: (removedDraft.source as any) ?? "MANUAL",
+    });
     return RESULT.SUCCESS;
   },
 });

@@ -497,6 +497,10 @@ export function mapProfileEventPayload(event: ProfileEvent) {
         integrationId: isNonNullish(event.data.org_integration_id)
           ? toGlobalId("OrgIntegration", event.data.org_integration_id)
           : null,
+        profileTypeFieldIds:
+          // check nullish for backward compatibility with existing events where data.profile_type_field_ids is undefined
+          event.data.profile_type_field_ids?.map((id) => toGlobalId("ProfileTypeField", id)) ??
+          null,
       };
     }
     case "PROFILE_RELATIONSHIP_CREATED": {

@@ -182,6 +182,7 @@ export class AnonymizerCronWorker extends CronWorker<"anonymizer"> {
               },
             };
           }),
+          "PARALLEL_MONITORING",
         );
       }
     }

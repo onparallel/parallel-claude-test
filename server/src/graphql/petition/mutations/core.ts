@@ -4316,22 +4316,29 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
         }
       }
 
-      await ctx.profiles.createEvent(profileFileEvents);
-
       const [draftUpdates, valueUpdates] = partition(updateProfileFieldValues, (p) =>
         ctx.profilesHelper.isDraftContent(p.type, p.content),
       );
 
-      await ctx.profiles.updateProfileFieldValues(
+      const profileValueEvents = await ctx.profiles.updateProfileFieldValues(
         valueUpdates,
-        ctx.user!.id,
         ctx.user!.org_id,
-        "PETITION_FIELD_REPLY",
+        {
+          userId: ctx.user!.id,
+          source: "PETITION_FIELD_REPLY",
+        },
       );
+
       await ctx.profiles.upsertDraftProfileFieldValues(
         draftUpdates,
         ctx.user!.id,
         "PETITION_FIELD_REPLY",
+      );
+
+      await ctx.profiles.createProfileUpdatedEvents(
+        [...profileFileEvents, ...profileValueEvents],
+        ctx.user!.org_id,
+        { userId: ctx.user!.id, source: "PETITION_FIELD_REPLY" },
       );
 
       // clear cache so profile.localizable_name is correctly resolved after values update

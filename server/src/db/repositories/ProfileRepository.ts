@@ -73,6 +73,7 @@ import {
   ProfileFieldFileAddedEvent,
   ProfileFieldFileRemovedEvent,
   ProfileFieldValueUpdatedEvent,
+  ProfileUpdatedEvent,
 } from "../events/ProfileEvent";
 import { BaseRepository, PageOpts, Pagination } from "../helpers/BaseRepository";
 import {
@@ -919,6 +920,7 @@ export class ProfileRepository extends BaseRepository {
     data: MaybeArray<CreateProfile>,
     userId: number | null,
     orgIntegrationId?: number,
+    source?: ProfileUpdateSource,
     t?: Knex.Transaction,
   ) {
     const dataArr = unMaybeArray(data);
@@ -950,6 +952,7 @@ export class ProfileRepository extends BaseRepository {
             org_integration_id: orgIntegrationId ?? null,
           },
         })),
+        source,
         t,
       );
       return profiles;
@@ -1253,15 +1256,29 @@ export class ProfileRepository extends BaseRepository {
         },
         userId,
         externalSourceIntegrationId,
+        source,
         t,
       );
       if (fields.length > 0) {
-        await this.updateProfileFieldValues(
+        const events = await this.updateProfileFieldValues(
           fields.map((f) => ({ ...f, profileId: profile.id })),
-          userId,
           orgId,
-          source,
-          externalSourceIntegrationId,
+          {
+            userId,
+            orgIntegrationId: externalSourceIntegrationId,
+            source,
+          },
+          t,
+        );
+
+        await this.createProfileUpdatedEvents(
+          events,
+          orgId,
+          {
+            userId,
+            orgIntegrationId: externalSourceIntegrationId,
+            source,
+          },
           t,
         );
       }
@@ -1303,20 +1320,22 @@ export class ProfileRepository extends BaseRepository {
       reviewReason?: any;
       petitionFieldReplyId?: number | null;
     }[],
-    userId: number | null,
     orgId: number,
-    source: ProfileUpdateSource,
-    externalSourceIntegrationId?: number,
+    from: {
+      userId?: number | null;
+      orgIntegrationId?: number | null;
+      source?: ProfileUpdateSource | null;
+    },
     t?: Knex.Transaction,
-  ) {
+  ): Promise<(ProfileFieldValueUpdatedEvent<true> | ProfileFieldExpiryUpdatedEvent<true>)[]> {
     //ignore fields that have no content and no expiry date
     const _fields = fields.filter((f) => f.content !== undefined || f.expiryDate !== undefined);
     if (_fields.length === 0) {
-      return;
+      return [];
     }
 
-    await this.withTransaction(async (t) => {
-      const events = await this.raw<ProfileEvent>(
+    return await this.withTransaction(async (t) => {
+      const events = await this.raw<Pick<ProfileEvent, "profile_id" | "type" | "data">>(
         /* sql */ `
           with new_values as (
             select * from (:new_values) as t(profile_id, profile_type_field_id, type, content, expiry_date, pending_review, review_reason, petition_field_reply_id)
@@ -1405,8 +1424,7 @@ export class ProfileRepository extends BaseRepository {
             returning *
           ),
           events as (
-            insert into profile_event (org_id, profile_id, type, data)
-            select :org_id::int as org_id, profile_id, type, data from (
+            select profile_id, type, data from (
               -- events for values that did not exist before
               select
                 wnpv.profile_id as profile_id,
@@ -1477,24 +1495,6 @@ export class ProfileRepository extends BaseRepository {
               where wpv.id is not null and rpv.expiry_date is distinct from wpv.expiry_date
             ) e
             order by profile_id asc, position asc, (case when type = 'PROFILE_FIELD_VALUE_UPDATED' then 0 else 1 end) asc
-            returning *
-          ),
-          profile_updated_events as (
-            -- force create PROFILE_UPDATED after all other events
-            insert into profile_event (org_id, profile_id, type, data)
-            select
-              :org_id::int as org_id,
-              t.profile_id as profile_id,
-              'PROFILE_UPDATED'::profile_event_type as type,
-              jsonb_build_object(
-                'user_id', t.user_id,
-                'org_integration_id', :external_source_integration_id::int
-              ) as data from (
-                select distinct profile_id, created_by_user_id as user_id, external_source_integration_id as org_integration_id from with_no_previous_values
-                union
-                select distinct profile_id, removed_by_user_id as user_id, external_source_integration_id as org_integration_id from removed_previous_values
-              ) t
-            returning *
           ),
           update_value_cache as (
             update profile p
@@ -1526,8 +1526,6 @@ export class ProfileRepository extends BaseRepository {
             where p.id = t.profile_id
           )
           select * from events
-          union all
-          select * from profile_updated_events
         `,
         {
           new_values: this.sqlValues(
@@ -1545,19 +1543,13 @@ export class ProfileRepository extends BaseRepository {
             ]),
             ["int", "int", "profile_type_field_type", "jsonb", "date", "boolean", "jsonb", "int"],
           ),
-          created_by_user_id: userId,
-          source,
-          external_source_integration_id: externalSourceIntegrationId ?? null,
+          created_by_user_id: from.userId ?? null,
+          source: from.source ?? null,
+          external_source_integration_id: from.orgIntegrationId ?? null,
           org_id: orgId,
         },
         t,
       );
-
-      if (source === "EXCEL_IMPORT") {
-        await this.queues.enqueueEventsWithLowPriority(events, "profile_event", t);
-      } else {
-        await this.queues.enqueueEvents(events, "profile_event", t);
-      }
 
       const profileValues = await this.raw<{
         profileId: number;
@@ -1597,13 +1589,20 @@ export class ProfileRepository extends BaseRepository {
 
       await this.updateProfileNamesWithPattern(
         profileValues,
-        userId
-          ? `User:${userId}`
-          : externalSourceIntegrationId
-            ? `OrgIntegration:${externalSourceIntegrationId}`
+        from.userId
+          ? `User:${from.userId}`
+          : from.orgIntegrationId
+            ? `OrgIntegration:${from.orgIntegrationId}`
             : null,
         t,
       );
+
+      return events.map((e) => ({
+        org_id: orgId,
+        profile_id: e.profile_id,
+        data: e.data as any,
+        type: e.type as "PROFILE_FIELD_VALUE_UPDATED" | "PROFILE_FIELD_EXPIRY_UPDATED",
+      }));
     }, t);
   }
 
@@ -1808,14 +1807,22 @@ export class ProfileRepository extends BaseRepository {
     );
   }
 
-  async createEvent(events: MaybeArray<CreateProfileEvent>, t?: Knex.Transaction) {
+  async createEvent(
+    events: MaybeArray<CreateProfileEvent>,
+    source: ProfileUpdateSource = "MANUAL",
+    t?: Knex.Transaction,
+  ) {
     const eventsArray = unMaybeArray(events);
     if (eventsArray.length === 0) {
-      return [];
+      return;
     }
     const profileEvents = await this.insert("profile_event", eventsArray, t);
-    await this.queues.enqueueEvents(profileEvents, "profile_event", t);
-    return profileEvents;
+
+    if (source === "EXCEL_IMPORT") {
+      await this.queues.enqueueEventsWithLowPriority(profileEvents, "profile_event", t);
+    } else {
+      await this.queues.enqueueEvents(profileEvents, "profile_event", t);
+    }
   }
 
   async getProfileEvents<T extends ProfileEventType>(
@@ -1859,7 +1866,6 @@ export class ProfileRepository extends BaseRepository {
   }
 
   async createProfileUpdatedEvents(
-    profileId: number,
     events: MaybeArray<
       | ProfileFieldExpiryUpdatedEvent<true>
       | ProfileFieldFileAddedEvent<true>
@@ -1867,8 +1873,11 @@ export class ProfileRepository extends BaseRepository {
       | ProfileFieldValueUpdatedEvent<true>
     >,
     orgId: number,
-    userId: number | null,
-    orgIntegrationId?: number,
+    from: {
+      userId?: number | null;
+      orgIntegrationId?: number | null;
+      source?: ProfileUpdateSource | null;
+    },
     t?: Knex.Transaction,
   ) {
     const eventsArray = unMaybeArray(events);
@@ -1876,20 +1885,27 @@ export class ProfileRepository extends BaseRepository {
       return;
     }
 
-    await this.createEvent(
-      [
-        ...eventsArray,
+    const byProfileId = groupBy(eventsArray, (e) => e.profile_id);
+
+    await pMapChunk(
+      Object.entries(byProfileId).flatMap(([profileId, profileEvents]) => [
+        ...profileEvents,
         {
-          type: "PROFILE_UPDATED",
-          profile_id: profileId,
+          type: "PROFILE_UPDATED" as const,
+          profile_id: parseInt(profileId),
           org_id: orgId,
           data: {
-            user_id: userId,
-            org_integration_id: orgIntegrationId ?? null,
+            user_id: from.userId ?? null,
+            org_integration_id: from.orgIntegrationId ?? null,
+            profile_type_field_ids: unique(profileEvents.map((e) => e.data.profile_type_field_id)),
           },
-        },
-      ],
-      t,
+        } satisfies ProfileUpdatedEvent<true>,
+      ]),
+      async (chunk) => await this.createEvent(chunk, from.source ?? "MANUAL", t),
+      {
+        concurrency: 1,
+        chunkSize: 1000,
+      },
     );
   }
 
@@ -2566,6 +2582,7 @@ export class ProfileRepository extends BaseRepository {
         org_id: p.org_id,
         data: {},
       })),
+      "PARALLEL_MONITORING",
       t,
     );
 
@@ -2768,7 +2785,9 @@ export class ProfileRepository extends BaseRepository {
           content: isNonNullish(value) ? { value } : null,
         };
       });
-      await this.updateProfileFieldValues(updates, userId, orgId, source, undefined, t);
+
+      const events = await this.updateProfileFieldValues(updates, orgId, { userId, source }, t);
+      await this.createProfileUpdatedEvents(events, orgId, { userId, source }, t);
     }, t);
   }
 

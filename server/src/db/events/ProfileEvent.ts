@@ -56,6 +56,7 @@ export type ProfileEventPayload<TType extends ProfileEventType> = {
   PROFILE_UPDATED: {
     user_id: number | null; // null means profile was updated by monitoring rules or an integration
     org_integration_id: number | null;
+    profile_type_field_ids: number[];
   };
   PROFILE_RELATIONSHIP_CREATED: {
     // a profile relationship can be created either by a user or an external source integration

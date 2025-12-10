@@ -1439,9 +1439,37 @@ describe("ProfileLinkedPetitionFields", () => {
               data: {
                 userId: toGlobalId("User", user.id),
                 integrationId: null,
+                profileTypeFieldIds: expect.toIncludeSameMembers(
+                  [
+                    "p_occupation",
+                    "p_background_check",
+                    "p_source_of_funds",
+                    "p_risk",
+                    "p_is_pep",
+                    "p_passport_number",
+                    "p_tax_id",
+                    "p_citizenship",
+                    "p_country_of_residence",
+                    "p_zip",
+                    "p_city",
+                    "p_address",
+                    "p_gender",
+                    "p_birth_date",
+                    "p_mobile_phone_number",
+                    "p_phone_number",
+                    "p_email",
+                    "p_last_name",
+                    "p_first_name",
+                    "p_risk_assessment",
+                    "p_passport_document",
+                    "p_id_document",
+                    "p_proof_of_address_document",
+                  ].map((alias) =>
+                    toGlobalId("ProfileTypeField", individualProfileTypeFields[alias].id),
+                  ),
+                ),
               },
             },
-
             ...[
               "p_occupation",
               "p_background_check",
@@ -1956,6 +1984,35 @@ describe("ProfileLinkedPetitionFields", () => {
               data: {
                 userId: toGlobalId("User", user.id),
                 integrationId: null,
+                profileTypeFieldIds: expect.toIncludeSameMembers(
+                  [
+                    "p_poa_registered",
+                    "p_poa_revocation_conditions",
+                    "p_poa_expiration_date",
+                    "p_poa_effective_date",
+                    "p_poa_scope",
+                    "p_poa_types",
+                    "p_risk",
+                    "p_main_business_activity",
+                    "p_date_of_incorporation",
+                    "p_country_of_incorporation",
+                    "p_zip",
+                    "p_city",
+                    "p_registered_address",
+                    "p_tax_id",
+                    "p_registration_number",
+                    "p_entity_type",
+                    "p_trade_name",
+                    "p_entity_name",
+                    "p_poa_document",
+                    "p_risk_assessment",
+                    "p_financial_statements",
+                    "p_ubo_statement",
+                    "p_ownership_structure",
+                  ].map((alias) =>
+                    toGlobalId("ProfileTypeField", legalEntityProfileTypeFields[alias].id),
+                  ),
+                ),
               },
             },
             ...[
@@ -2478,6 +2535,34 @@ describe("ProfileLinkedPetitionFields", () => {
               data: {
                 userId: toGlobalId("User", user.id),
                 integrationId: null,
+                profileTypeFieldIds: expect.toIncludeSameMembers(
+                  [
+                    "p_legal_contact_email",
+                    "p_legal_contact_full_name",
+                    "p_billing_contact_email",
+                    "p_billing_contact_full_name",
+                    "p_notes",
+                    "p_security_provisions",
+                    "p_compliance_obligations",
+                    "p_dispute_resolution_mechanism",
+                    "p_performance_metrics",
+                    "p_confidentiality_agreement",
+                    "p_termination_clauses",
+                    "p_renewal_terms",
+                    "p_payment_terms",
+                    "p_contract_currency",
+                    "p_contract_value",
+                    "p_jurisdiction",
+                    "p_expiration_date",
+                    "p_effective_date",
+                    "p_contract_type",
+                    "p_counterparty",
+                    "p_amendments",
+                    "p_original_document",
+                  ].map((alias) =>
+                    toGlobalId("ProfileTypeField", contractProfileTypeFields[alias].id),
+                  ),
+                ),
               },
             },
 
@@ -3225,6 +3310,17 @@ describe("ProfileLinkedPetitionFields", () => {
               data: {
                 userId: toGlobalId("User", user.id),
                 integrationId: null,
+                profileTypeFieldIds: expect.toIncludeSameMembers(
+                  [
+                    "p_jurisdiction",
+                    "p_expiration_date",
+                    "p_effective_date",
+                    "p_contract_type",
+                    "p_counterparty",
+                  ].map((alias) =>
+                    toGlobalId("ProfileTypeField", contractProfileTypeFields[alias].id),
+                  ),
+                ),
               },
             },
             {
@@ -3332,6 +3428,29 @@ describe("ProfileLinkedPetitionFields", () => {
                 data: {
                   userId: toGlobalId("User", user.id),
                   integrationId: null,
+                  profileTypeFieldIds: expect.toIncludeSameMembers(
+                    [
+                      "p_notes",
+                      "p_performance_metrics",
+                      "p_renewal_terms",
+                      "p_billing_contact_full_name",
+                      "p_contract_value",
+                      "p_termination_clauses",
+                      "p_confidentiality_agreement",
+                      "p_contract_currency",
+                      "p_compliance_obligations",
+                      "p_legal_contact_full_name",
+                      "p_dispute_resolution_mechanism",
+                      "p_legal_contact_email",
+                      "p_billing_contact_email",
+                      "p_security_provisions",
+                      "p_payment_terms",
+                      "p_amendments",
+                      "p_original_document",
+                    ].map((alias) =>
+                      toGlobalId("ProfileTypeField", contractProfileTypeFields[alias].id),
+                    ),
+                  ),
                 },
               },
               ...[
@@ -3387,6 +3506,17 @@ describe("ProfileLinkedPetitionFields", () => {
                 data: {
                   userId: toGlobalId("User", user.id),
                   integrationId: null,
+                  profileTypeFieldIds: expect.toIncludeSameMembers(
+                    [
+                      "p_jurisdiction",
+                      "p_expiration_date",
+                      "p_effective_date",
+                      "p_contract_type",
+                      "p_counterparty",
+                    ].map((alias) =>
+                      toGlobalId("ProfileTypeField", contractProfileTypeFields[alias].id),
+                    ),
+                  ),
                 },
               },
               {
@@ -3556,6 +3686,31 @@ describe("ProfileLinkedPetitionFields", () => {
               data: {
                 userId: toGlobalId("User", user.id),
                 integrationId: null,
+                profileTypeFieldIds: expect.toIncludeSameMembers(
+                  [
+                    "p_occupation",
+                    "p_background_check",
+                    "p_source_of_funds",
+                    "p_risk",
+                    "p_is_pep",
+                    "p_passport_number",
+                    "p_tax_id",
+                    "p_citizenship",
+                    "p_country_of_residence",
+                    "p_zip",
+                    "p_city",
+                    "p_address",
+                    "p_gender",
+                    "p_birth_date",
+                    "p_mobile_phone_number",
+                    "p_phone_number",
+                    "p_email",
+                    "p_last_name",
+                    "p_first_name",
+                  ].map((alias) =>
+                    toGlobalId("ProfileTypeField", individualProfileTypeFields[alias].id),
+                  ),
+                ),
               },
             },
             ...[
@@ -4563,6 +4718,29 @@ describe("ProfileLinkedPetitionFields", () => {
               data: {
                 userId: toGlobalId("User", user.id),
                 integrationId: null,
+                profileTypeFieldIds: expect.toIncludeSameMembers(
+                  [
+                    "p_poa_registered",
+                    "p_poa_revocation_conditions",
+                    "p_poa_expiration_date",
+                    "p_poa_effective_date",
+                    "p_poa_scope",
+                    "p_poa_types",
+                    "p_risk",
+                    "p_main_business_activity",
+                    "p_date_of_incorporation",
+                    "p_country_of_incorporation",
+                    "p_entity_type",
+                    "p_trade_name",
+                    "p_entity_name",
+                    "p_poa_document",
+                    "p_risk_assessment",
+                    "p_ubo_statement",
+                    "p_ownership_structure",
+                  ].map((alias) =>
+                    toGlobalId("ProfileTypeField", legalEntityProfileTypeFields[alias].id),
+                  ),
+                ),
               },
             },
             ...[
@@ -5121,6 +5299,32 @@ describe("ProfileLinkedPetitionFields", () => {
               data: {
                 userId: toGlobalId("User", user.id),
                 integrationId: null,
+                profileTypeFieldIds: expect.toIncludeSameMembers(
+                  [
+                    "p_occupation",
+                    "p_background_check",
+                    "p_source_of_funds",
+                    "p_risk",
+                    "p_is_pep",
+                    "p_passport_number",
+                    "p_tax_id",
+                    "p_citizenship",
+                    "p_country_of_residence",
+                    "p_zip",
+                    "p_city",
+                    "p_address",
+                    "p_gender",
+                    "p_birth_date",
+                    "p_mobile_phone_number",
+                    "p_phone_number",
+                    "p_email",
+                    "p_risk_assessment",
+                    "p_passport_document",
+                    "p_proof_of_address_document",
+                  ].map((alias) =>
+                    toGlobalId("ProfileTypeField", individualProfileTypeFields[alias].id),
+                  ),
+                ),
               },
             },
             ...[
@@ -5652,6 +5856,35 @@ describe("ProfileLinkedPetitionFields", () => {
               data: {
                 userId: toGlobalId("User", user.id),
                 integrationId: null,
+                profileTypeFieldIds: expect.toIncludeSameMembers(
+                  [
+                    "p_risk",
+                    "p_entity_name",
+                    "p_poa_registered",
+                    "p_poa_revocation_conditions",
+                    "p_poa_expiration_date",
+                    "p_poa_effective_date",
+                    "p_poa_scope",
+                    "p_poa_types",
+                    "p_main_business_activity",
+                    "p_date_of_incorporation",
+                    "p_country_of_incorporation",
+                    "p_zip",
+                    "p_city",
+                    "p_registered_address",
+                    "p_tax_id",
+                    "p_registration_number",
+                    "p_entity_type",
+                    "p_trade_name",
+                    "p_poa_document",
+                    "p_risk_assessment",
+                    "p_financial_statements",
+                    "p_ubo_statement",
+                    "p_ownership_structure",
+                  ].map((alias) =>
+                    toGlobalId("ProfileTypeField", legalEntityProfileTypeFields[alias].id),
+                  ),
+                ),
               },
             },
             ...[
@@ -5721,6 +5954,11 @@ describe("ProfileLinkedPetitionFields", () => {
               data: {
                 userId: toGlobalId("User", user.id),
                 integrationId: null,
+                profileTypeFieldIds: expect.toIncludeSameMembers(
+                  ["p_risk", "p_entity_name"].map((alias) =>
+                    toGlobalId("ProfileTypeField", legalEntityProfileTypeFields[alias].id),
+                  ),
+                ),
               },
             },
             ...["p_risk", "p_entity_name"].map((alias) => ({
@@ -6186,6 +6424,35 @@ describe("ProfileLinkedPetitionFields", () => {
                 data: {
                   userId: toGlobalId("User", user.id),
                   integrationId: null,
+                  profileTypeFieldIds: expect.toIncludeSameMembers(
+                    [
+                      "p_poa_registered",
+                      "p_poa_revocation_conditions",
+                      "p_poa_expiration_date",
+                      "p_poa_effective_date",
+                      "p_poa_scope",
+                      "p_poa_types",
+                      "p_risk",
+                      "p_main_business_activity",
+                      "p_date_of_incorporation",
+                      "p_country_of_incorporation",
+                      "p_zip",
+                      "p_city",
+                      "p_registered_address",
+                      "p_tax_id",
+                      "p_registration_number",
+                      "p_entity_type",
+                      "p_trade_name",
+                      "p_entity_name",
+                      "p_poa_document",
+                      "p_risk_assessment",
+                      "p_financial_statements",
+                      "p_ubo_statement",
+                      "p_ownership_structure",
+                    ].map((alias) =>
+                      toGlobalId("ProfileTypeField", legalEntityProfileTypeFields[alias].id),
+                    ),
+                  ),
                 },
               },
               ...[
@@ -6408,6 +6675,35 @@ describe("ProfileLinkedPetitionFields", () => {
                 data: {
                   userId: toGlobalId("User", user.id),
                   integrationId: null,
+                  profileTypeFieldIds: expect.toIncludeSameMembers(
+                    [
+                      "p_poa_registered",
+                      "p_poa_revocation_conditions",
+                      "p_poa_expiration_date",
+                      "p_poa_effective_date",
+                      "p_poa_scope",
+                      "p_poa_types",
+                      "p_risk",
+                      "p_main_business_activity",
+                      "p_date_of_incorporation",
+                      "p_country_of_incorporation",
+                      "p_zip",
+                      "p_city",
+                      "p_registered_address",
+                      "p_tax_id",
+                      "p_registration_number",
+                      "p_entity_type",
+                      "p_trade_name",
+                      "p_entity_name",
+                      "p_poa_document",
+                      "p_risk_assessment",
+                      "p_financial_statements",
+                      "p_ubo_statement",
+                      "p_ownership_structure",
+                    ].map((alias) =>
+                      toGlobalId("ProfileTypeField", legalEntityProfileTypeFields[alias].id),
+                    ),
+                  ),
                 },
               },
               ...[
@@ -7612,7 +7908,11 @@ describe("ProfileLinkedPetitionFields", () => {
               items: [
                 {
                   type: "PROFILE_UPDATED",
-                  data: { userId: toGlobalId("User", user.id), integrationId: null },
+                  data: {
+                    userId: toGlobalId("User", user.id),
+                    integrationId: null,
+                    profileTypeFieldIds: [toGlobalId("ProfileTypeField", nameField.id)],
+                  },
                 },
                 {
                   type: "PROFILE_FIELD_VALUE_UPDATED",

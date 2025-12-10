@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { firstBy, isNonNullish, zip } from "remeda";
+import { firstBy, intersection, isNonNullish, zip } from "remeda";
 import { Profile, ProfileRelationship } from "../../../db/__types";
 import {
   ProfileClosedEvent,
@@ -152,25 +152,16 @@ export class ClientRiskUpdateListener
       }
 
       if (event.type === "PROFILE_UPDATED") {
-        // get every PROFILE_FIELD_VALUE_UPDATED events for this profile down to the previous PROFILE_UPDATED
-        // this way we can see the reasons of the PROFILE_UPDATED event and value if an update is required
-        const previousEvents = await this.profiles.getProfileEvents(event.profile_id, {
-          type: "PROFILE_FIELD_VALUE_UPDATED",
-          before: { eventId: event.id },
-          after: { type: "PROFILE_UPDATED" },
-        });
-
         if (
-          previousEvents.find((e) =>
+          intersection.multiset(
+            event.data.profile_type_field_ids,
             [
               config.individual.riskProfileTypeFieldId,
               config.legalEntity.riskProfileTypeFieldId,
               config.file.riskProfileTypeFieldId,
-              ...(isNonNullish(config.file.statusProfileTypeFieldId)
-                ? [config.file.statusProfileTypeFieldId]
-                : []),
-            ].includes(e.data.profile_type_field_id),
-          )
+              config.file.statusProfileTypeFieldId,
+            ].filter(isNonNullish),
+          ).length > 0
         ) {
           await this.updateGlobalClientRisk(profile, event.org_id, config);
         }
@@ -305,7 +296,7 @@ export class ClientRiskUpdateListener
 
     // if the max risk is different from the global risk, update the global risk
     if (maxRisk !== globalRisk) {
-      await this.profiles.updateProfileFieldValues(
+      const events = await this.profiles.updateProfileFieldValues(
         [
           {
             profileId: client.id,
@@ -317,10 +308,12 @@ export class ClientRiskUpdateListener
             content: { value: maxRisk },
           },
         ],
-        null,
         orgId,
-        "PARALLEL_MONITORING",
+        { source: "PARALLEL_MONITORING" },
       );
+      await this.profiles.createProfileUpdatedEvents(events, orgId, {
+        source: "PARALLEL_MONITORING",
+      });
     }
   }
 

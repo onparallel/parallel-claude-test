@@ -116,7 +116,11 @@ describe("ProfileEvents", () => {
       expect(dbEvents.map(pick(["type", "data"]))).toEqual([
         {
           type: "PROFILE_UPDATED",
-          data: { user_id: sessionUser.id, org_integration_id: null },
+          data: {
+            user_id: sessionUser.id,
+            org_integration_id: null,
+            profile_type_field_ids: [profileTypeFields[2].id],
+          },
         },
         {
           type: "PROFILE_FIELD_VALUE_UPDATED",
@@ -202,7 +206,11 @@ describe("ProfileEvents", () => {
       expect(dbEvents.map(pick(["type", "data"]))).toEqual([
         {
           type: "PROFILE_UPDATED",
-          data: { user_id: sessionUser.id, org_integration_id: null },
+          data: {
+            user_id: sessionUser.id,
+            org_integration_id: null,
+            profile_type_field_ids: [profileTypeFields[2].id],
+          },
         },
         {
           type: "PROFILE_FIELD_VALUE_UPDATED",
@@ -217,7 +225,11 @@ describe("ProfileEvents", () => {
         },
         {
           type: "PROFILE_UPDATED",
-          data: { user_id: sessionUser.id, org_integration_id: null },
+          data: {
+            user_id: sessionUser.id,
+            org_integration_id: null,
+            profile_type_field_ids: [profileTypeFields[2].id],
+          },
         },
         {
           type: "PROFILE_FIELD_VALUE_UPDATED",
@@ -306,7 +318,11 @@ describe("ProfileEvents", () => {
       expect(dbEvents.map(pick(["type", "data"]))).toEqual([
         {
           type: "PROFILE_UPDATED",
-          data: { user_id: sessionUser.id, org_integration_id: null },
+          data: {
+            user_id: sessionUser.id,
+            org_integration_id: null,
+            profile_type_field_ids: [profileTypeFields[2].id],
+          },
         },
         {
           type: "PROFILE_FIELD_EXPIRY_UPDATED",
@@ -320,7 +336,11 @@ describe("ProfileEvents", () => {
         },
         {
           type: "PROFILE_UPDATED",
-          data: { user_id: sessionUser.id, org_integration_id: null },
+          data: {
+            user_id: sessionUser.id,
+            org_integration_id: null,
+            profile_type_field_ids: [profileTypeFields[2].id],
+          },
         },
         {
           type: "PROFILE_FIELD_VALUE_UPDATED",
@@ -385,7 +405,11 @@ describe("ProfileEvents", () => {
       expect(dbEvents.map(pick(["type", "data"]))).toEqual([
         {
           type: "PROFILE_UPDATED",
-          data: { user_id: sessionUser.id, org_integration_id: null },
+          data: {
+            user_id: sessionUser.id,
+            org_integration_id: null,
+            profile_type_field_ids: [profileTypeFields[2].id],
+          },
         },
         {
           type: "PROFILE_FIELD_EXPIRY_UPDATED",
@@ -459,7 +483,11 @@ describe("ProfileEvents", () => {
       expect(dbEvents.map(pick(["type", "data"]))).toEqual([
         {
           type: "PROFILE_UPDATED",
-          data: { user_id: sessionUser.id, org_integration_id: null },
+          data: {
+            user_id: sessionUser.id,
+            org_integration_id: null,
+            profile_type_field_ids: [profileTypeFields[1].id],
+          },
         },
         {
           type: "PROFILE_FIELD_EXPIRY_UPDATED",
@@ -556,7 +584,11 @@ describe("ProfileEvents", () => {
       expect(dbEvents.map(pick(["type", "data"]))).toEqual([
         {
           type: "PROFILE_UPDATED",
-          data: { user_id: sessionUser.id, org_integration_id: null },
+          data: {
+            user_id: sessionUser.id,
+            org_integration_id: null,
+            profile_type_field_ids: [profileTypeFields[0].id],
+          },
         },
         {
           type: "PROFILE_FIELD_VALUE_UPDATED",
@@ -648,7 +680,11 @@ describe("ProfileEvents", () => {
       expect(dbEvents.map(pick(["type", "data"]))).toEqual([
         {
           type: "PROFILE_UPDATED",
-          data: { user_id: sessionUser.id, org_integration_id: null },
+          data: {
+            user_id: sessionUser.id,
+            org_integration_id: null,
+            profile_type_field_ids: [profileTypeFields[0].id],
+          },
         },
         {
           type: "PROFILE_FIELD_VALUE_UPDATED",
@@ -663,7 +699,11 @@ describe("ProfileEvents", () => {
         },
         {
           type: "PROFILE_UPDATED",
-          data: { user_id: sessionUser.id, org_integration_id: null },
+          data: {
+            user_id: sessionUser.id,
+            org_integration_id: null,
+            profile_type_field_ids: [profileTypeFields[0].id],
+          },
         },
         {
           type: "PROFILE_FIELD_VALUE_UPDATED",
@@ -773,6 +813,7 @@ describe("ProfileEvents", () => {
           data: {
             user_id: sessionUser.id,
             org_integration_id: null,
+            profile_type_field_ids: [profileTypeFields[3].id],
           },
         },
         {
@@ -788,7 +829,11 @@ describe("ProfileEvents", () => {
         },
         {
           type: "PROFILE_UPDATED",
-          data: { user_id: sessionUser.id, org_integration_id: null },
+          data: {
+            user_id: sessionUser.id,
+            org_integration_id: null,
+            profile_type_field_ids: [profileTypeFields[3].id],
+          },
         },
         {
           type: "PROFILE_FIELD_VALUE_UPDATED",

@@ -1,5 +1,6 @@
 import { add, Duration } from "date-fns";
 import { inject, injectable } from "inversify";
+import { intersection } from "remeda";
 import { assert } from "ts-essentials";
 import { ProfileUpdatedEvent } from "../../../db/events/ProfileEvent";
 import { ProfileRepository } from "../../../db/repositories/ProfileRepository";
@@ -155,22 +156,12 @@ export class KycRefreshDateUpdateListener implements EventListener<"PROFILE_UPDA
       return;
     }
 
-    // get every PROFILE_FIELD_VALUE_UPDATED events for this profile down to the previous PROFILE_UPDATED
-    // this way we can see the reasons of the PROFILE_UPDATED event and value if an update is required
-    const previousEvents = await this.profiles.getProfileEvents(event.profile_id, {
-      type: "PROFILE_FIELD_VALUE_UPDATED",
-      before: { eventId: event.id },
-      after: { type: "PROFILE_UPDATED" },
-    });
-
     if (
-      !previousEvents.find((e) =>
-        [
-          profileTypeConfig.statusProfileTypeFieldId,
-          profileTypeConfig.riskProfileTypeFieldId,
-          profileTypeConfig.lastKycDateProfileTypeFieldId,
-        ].includes(e.data.profile_type_field_id),
-      )
+      intersection.multiset(event.data.profile_type_field_ids, [
+        profileTypeConfig.statusProfileTypeFieldId,
+        profileTypeConfig.riskProfileTypeFieldId,
+        profileTypeConfig.lastKycDateProfileTypeFieldId,
+      ]).length === 0
     ) {
       // no update comes from status or risk field, skip
       return;
@@ -202,7 +193,7 @@ export class KycRefreshDateUpdateListener implements EventListener<"PROFILE_UPDA
       !profileTypeConfig.clientStatusValuesForKycRefresh.includes(statusValue.content.value)
     ) {
       // missing required values or status is not a client status value for kyc refresh, set next kyc date to null
-      await this.profiles.updateProfileFieldValues(
+      const events = await this.profiles.updateProfileFieldValues(
         [
           {
             profileId: event.profile_id,
@@ -212,11 +203,12 @@ export class KycRefreshDateUpdateListener implements EventListener<"PROFILE_UPDA
             expiryDate: null,
           },
         ],
-        null,
         event.org_id,
-        "PARALLEL_MONITORING",
+        { source: "PARALLEL_MONITORING" },
       );
-
+      await this.profiles.createProfileUpdatedEvents(events, event.org_id, {
+        source: "PARALLEL_MONITORING",
+      });
       return;
     }
 
@@ -233,7 +225,7 @@ export class KycRefreshDateUpdateListener implements EventListener<"PROFILE_UPDA
       nextKycDate,
     });
 
-    await this.profiles.updateProfileFieldValues(
+    const events = await this.profiles.updateProfileFieldValues(
       [
         {
           profileId: event.profile_id,
@@ -243,9 +235,11 @@ export class KycRefreshDateUpdateListener implements EventListener<"PROFILE_UPDA
           expiryDate: nextKycDate,
         },
       ],
-      null,
       event.org_id,
-      "PARALLEL_MONITORING",
+      { source: "PARALLEL_MONITORING" },
     );
+    await this.profiles.createProfileUpdatedEvents(events, event.org_id, {
+      source: "PARALLEL_MONITORING",
+    });
   }
 }

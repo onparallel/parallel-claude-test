@@ -26,7 +26,7 @@ export class BackgroundCheckProfileSearchQueue extends QueueWorker<BackgroundChe
   override async handler(payload: BackgroundCheckProfileSearchQueuePayload) {
     const search = await this.backgroundCheck.entitySearch(payload.query, payload.orgId);
 
-    await this.profiles.updateProfileFieldValues(
+    const events = await this.profiles.updateProfileFieldValues(
       [
         {
           profileId: payload.profileId,
@@ -40,9 +40,12 @@ export class BackgroundCheckProfileSearchQueue extends QueueWorker<BackgroundChe
           pendingReview: true,
         },
       ],
-      null,
       payload.orgId,
-      "PARALLEL_MONITORING",
+      { source: "PARALLEL_MONITORING" },
     );
+    await this.profiles.createProfileUpdatedEvents(events, payload.orgId, {
+      userId: null,
+      source: "PARALLEL_MONITORING",
+    });
   }
 }

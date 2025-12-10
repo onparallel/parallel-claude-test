@@ -7249,6 +7249,7 @@ describe("GraphQL/Profiles", () => {
           data: {
             user_id: sessionUser.id,
             org_integration_id: null,
+            profile_type_field_ids: [profileTypeField3.id],
           },
         },
         {
@@ -7269,6 +7270,7 @@ describe("GraphQL/Profiles", () => {
           data: {
             user_id: sessionUser.id,
             org_integration_id: null,
+            profile_type_field_ids: [profileTypeField3.id],
           },
         },
         {
@@ -13987,9 +13989,11 @@ describe("GraphQL/Profiles", () => {
             },
           },
         ],
-        sessionUser.id,
         organization.id,
-        "MANUAL",
+        {
+          userId: sessionUser.id,
+          source: "MANUAL",
+        },
       );
 
       await profilesRepo.updateProfileFieldValues(
@@ -14028,9 +14032,11 @@ describe("GraphQL/Profiles", () => {
             },
           },
         ],
-        sessionUser.id,
         organization.id,
-        "MANUAL",
+        {
+          userId: sessionUser.id,
+          source: "MANUAL",
+        },
       );
       await profilesRepo.updateProfileFieldValues(
         [
@@ -14074,9 +14080,11 @@ describe("GraphQL/Profiles", () => {
             },
           },
         ],
-        sessionUser.id,
         organization.id,
-        "MANUAL",
+        {
+          userId: sessionUser.id,
+          source: "MANUAL",
+        },
       );
     });
 
@@ -14525,7 +14533,6 @@ describe("GraphQL/Profiles", () => {
         "MANUAL",
       );
       await profilesRepo.createProfileUpdatedEvents(
-        profile.id,
         pffs1.map((pff) => ({
           org_id: organization.id,
           profile_id: profile.id,
@@ -14538,12 +14545,11 @@ describe("GraphQL/Profiles", () => {
           },
         })),
         organization.id,
-        sessionUser.id,
+        { userId: sessionUser.id },
       );
 
       await profilesRepo.deleteProfileFieldFiles(pffs1[0].id, sessionUser.id);
       await profilesRepo.createProfileUpdatedEvents(
-        profile.id,
         [
           {
             org_id: organization.id,
@@ -14558,7 +14564,7 @@ describe("GraphQL/Profiles", () => {
           },
         ],
         organization.id,
-        sessionUser.id,
+        { userId: sessionUser.id },
       );
 
       pffs2 = await profilesRepo.createProfileFieldFiles(
@@ -14570,7 +14576,6 @@ describe("GraphQL/Profiles", () => {
         "MANUAL",
       );
       await profilesRepo.createProfileUpdatedEvents(
-        profile.id,
         pffs2.map((pff) => ({
           org_id: organization.id,
           profile_id: profile.id,
@@ -14583,7 +14588,7 @@ describe("GraphQL/Profiles", () => {
           },
         })),
         organization.id,
-        sessionUser.id,
+        { userId: sessionUser.id },
       );
     });
 

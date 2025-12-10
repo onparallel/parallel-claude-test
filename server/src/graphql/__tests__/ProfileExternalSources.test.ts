@@ -1214,6 +1214,15 @@ describe("Profile External Sources", () => {
                 data: {
                   userId: toGlobalId("User", user.id),
                   integrationId: toGlobalId("OrgIntegration", orgIntegration.id),
+                  profileTypeFieldIds: expect.toIncludeSameMembers([
+                    toGlobalId("ProfileTypeField", individualPTFsByAlias["p_occupation"].id),
+                    toGlobalId("ProfileTypeField", individualPTFsByAlias["p_tax_id"].id),
+                    toGlobalId("ProfileTypeField", individualPTFsByAlias["p_city"].id),
+                    toGlobalId("ProfileTypeField", individualPTFsByAlias["p_address"].id),
+                    toGlobalId("ProfileTypeField", individualPTFsByAlias["p_email"].id),
+                    toGlobalId("ProfileTypeField", individualPTFsByAlias["p_last_name"].id),
+                    toGlobalId("ProfileTypeField", individualPTFsByAlias["p_first_name"].id),
+                  ]),
                 },
               },
               {
@@ -1460,6 +1469,13 @@ describe("Profile External Sources", () => {
                 data: {
                   userId: toGlobalId("User", user.id),
                   integrationId: toGlobalId("OrgIntegration", orgIntegration.id),
+                  profileTypeFieldIds: expect.toIncludeSameMembers([
+                    toGlobalId(
+                      "ProfileTypeField",
+                      legalEntityPTFsByAlias["p_date_of_incorporation"].id,
+                    ),
+                    toGlobalId("ProfileTypeField", legalEntityPTFsByAlias["p_city"].id),
+                  ]),
                 },
               },
               {
@@ -1633,6 +1649,10 @@ describe("Profile External Sources", () => {
                 data: {
                   userId: toGlobalId("User", user.id),
                   integrationId: toGlobalId("OrgIntegration", orgIntegration.id),
+                  profileTypeFieldIds: expect.toIncludeSameMembers([
+                    toGlobalId("ProfileTypeField", individualPTFsByAlias["p_first_name"].id),
+                    toGlobalId("ProfileTypeField", individualPTFsByAlias["p_last_name"].id),
+                  ]),
                 },
               },
               {
@@ -2147,6 +2167,7 @@ describe("Profile External Sources", () => {
                   data: {
                     userId: toGlobalId("User", user.id),
                     integrationId: toGlobalId("OrgIntegration", orgIntegration.id),
+                    profileTypeFieldIds: [toGlobalId("ProfileTypeField", nameField.id)],
                   },
                 },
                 {
@@ -2307,6 +2328,7 @@ describe("Profile External Sources", () => {
                   data: {
                     userId: toGlobalId("User", user.id),
                     integrationId: toGlobalId("OrgIntegration", orgIntegration.id),
+                    profileTypeFieldIds: [toGlobalId("ProfileTypeField", nameField.id)],
                   },
                 },
                 {
