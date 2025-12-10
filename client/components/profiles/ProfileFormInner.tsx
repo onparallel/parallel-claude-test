@@ -141,7 +141,7 @@ export const ProfileFormInner = Object.assign(
 
     useEffect(() => {
       onFormStateChange?.(formState);
-    }, [formState.errors, formState.dirtyFields, formState.isSubmitting]);
+    }, [formState.errors, formState.dirtyFields, formState.isSubmitting, formState.isDirty]);
 
     const checkPath = useCallback(
       (path: string) => {
