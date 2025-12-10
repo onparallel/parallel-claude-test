@@ -27390,7 +27390,7 @@ export type PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldFragment = {
   title?: string | null;
   options: { [key: string]: any };
   multiple: boolean;
-  parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+  parent?: { __typename?: "PetitionField"; id: string } | null;
 };
 
 export type PetitionUpdateProfileOnCloseSourceSelect_PetitionBase_Petition_Fragment = {
@@ -27409,9 +27409,9 @@ export type PetitionUpdateProfileOnCloseSourceSelect_PetitionBase_Petition_Fragm
       title?: string | null;
       options: { [key: string]: any };
       multiple: boolean;
-      parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+      parent?: { __typename?: "PetitionField"; id: string } | null;
     }> | null;
-    parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+    parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
   variables: Array<
     | { __typename?: "PetitionVariableEnum"; name: string; type: PetitionVariableType }
@@ -27435,9 +27435,9 @@ export type PetitionUpdateProfileOnCloseSourceSelect_PetitionBase_PetitionTempla
       title?: string | null;
       options: { [key: string]: any };
       multiple: boolean;
-      parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+      parent?: { __typename?: "PetitionField"; id: string } | null;
     }> | null;
-    parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+    parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
   variables: Array<
     | { __typename?: "PetitionVariableEnum"; name: string; type: PetitionVariableType }
@@ -27481,16 +27481,16 @@ export type ConfigureAdverseMediaAutomateSearchDialog_PetitionBase_Petition_Frag
     __typename?: "PetitionField";
     id: string;
     type: PetitionFieldType;
+    title?: string | null;
     options: { [key: string]: any };
     multiple: boolean;
-    title?: string | null;
     children?: Array<{
       __typename?: "PetitionField";
       id: string;
       type: PetitionFieldType;
+      title?: string | null;
       options: { [key: string]: any };
       multiple: boolean;
-      title?: string | null;
       parent?: { __typename?: "PetitionField"; id: string } | null;
     }> | null;
     parent?: { __typename?: "PetitionField"; id: string } | null;
@@ -27503,16 +27503,16 @@ export type ConfigureAdverseMediaAutomateSearchDialog_PetitionBase_PetitionTempl
     __typename?: "PetitionField";
     id: string;
     type: PetitionFieldType;
+    title?: string | null;
     options: { [key: string]: any };
     multiple: boolean;
-    title?: string | null;
     children?: Array<{
       __typename?: "PetitionField";
       id: string;
       type: PetitionFieldType;
+      title?: string | null;
       options: { [key: string]: any };
       multiple: boolean;
-      title?: string | null;
       parent?: { __typename?: "PetitionField"; id: string } | null;
     }> | null;
     parent?: { __typename?: "PetitionField"; id: string } | null;
@@ -27551,16 +27551,16 @@ export type ConfigureAdverseMediaAutomateSearchDialog_petitionQuery = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
+          title?: string | null;
           options: { [key: string]: any };
           multiple: boolean;
-          title?: string | null;
           children?: Array<{
             __typename?: "PetitionField";
             id: string;
             type: PetitionFieldType;
+            title?: string | null;
             options: { [key: string]: any };
             multiple: boolean;
-            title?: string | null;
             parent?: { __typename?: "PetitionField"; id: string } | null;
           }> | null;
           parent?: { __typename?: "PetitionField"; id: string } | null;
@@ -27573,16 +27573,16 @@ export type ConfigureAdverseMediaAutomateSearchDialog_petitionQuery = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
+          title?: string | null;
           options: { [key: string]: any };
           multiple: boolean;
-          title?: string | null;
           children?: Array<{
             __typename?: "PetitionField";
             id: string;
             type: PetitionFieldType;
+            title?: string | null;
             options: { [key: string]: any };
             multiple: boolean;
-            title?: string | null;
             parent?: { __typename?: "PetitionField"; id: string } | null;
           }> | null;
           parent?: { __typename?: "PetitionField"; id: string } | null;
@@ -27876,16 +27876,16 @@ export type ConfigureBackgroundCheckAutomateSearchDialog_PetitionBase_Petition_F
     __typename?: "PetitionField";
     id: string;
     type: PetitionFieldType;
+    title?: string | null;
     options: { [key: string]: any };
     multiple: boolean;
-    title?: string | null;
     children?: Array<{
       __typename?: "PetitionField";
       id: string;
       type: PetitionFieldType;
+      title?: string | null;
       options: { [key: string]: any };
       multiple: boolean;
-      title?: string | null;
       parent?: { __typename?: "PetitionField"; id: string } | null;
     }> | null;
     parent?: { __typename?: "PetitionField"; id: string } | null;
@@ -27898,16 +27898,16 @@ export type ConfigureBackgroundCheckAutomateSearchDialog_PetitionBase_PetitionTe
     __typename?: "PetitionField";
     id: string;
     type: PetitionFieldType;
+    title?: string | null;
     options: { [key: string]: any };
     multiple: boolean;
-    title?: string | null;
     children?: Array<{
       __typename?: "PetitionField";
       id: string;
       type: PetitionFieldType;
+      title?: string | null;
       options: { [key: string]: any };
       multiple: boolean;
-      title?: string | null;
       parent?: { __typename?: "PetitionField"; id: string } | null;
     }> | null;
     parent?: { __typename?: "PetitionField"; id: string } | null;
@@ -27946,16 +27946,16 @@ export type ConfigureBackgroundCheckAutomateSearchDialog_petitionQuery = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
+          title?: string | null;
           options: { [key: string]: any };
           multiple: boolean;
-          title?: string | null;
           children?: Array<{
             __typename?: "PetitionField";
             id: string;
             type: PetitionFieldType;
+            title?: string | null;
             options: { [key: string]: any };
             multiple: boolean;
-            title?: string | null;
             parent?: { __typename?: "PetitionField"; id: string } | null;
           }> | null;
           parent?: { __typename?: "PetitionField"; id: string } | null;
@@ -27968,16 +27968,16 @@ export type ConfigureBackgroundCheckAutomateSearchDialog_petitionQuery = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
+          title?: string | null;
           options: { [key: string]: any };
           multiple: boolean;
-          title?: string | null;
           children?: Array<{
             __typename?: "PetitionField";
             id: string;
             type: PetitionFieldType;
+            title?: string | null;
             options: { [key: string]: any };
             multiple: boolean;
-            title?: string | null;
             parent?: { __typename?: "PetitionField"; id: string } | null;
           }> | null;
           parent?: { __typename?: "PetitionField"; id: string } | null;
@@ -27998,7 +27998,7 @@ export type useConfigureUpdateProfileOnCloseDialog_PetitionFieldFragment = {
     id: string;
     type: ProfileTypeFieldType;
   } | null;
-  parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+  parent?: { __typename?: "PetitionField"; id: string } | null;
 };
 
 export type useConfigureUpdateProfileOnCloseDialog_PetitionVariable_PetitionVariableEnum_Fragment =
@@ -28038,14 +28038,14 @@ export type useConfigureUpdateProfileOnCloseDialog_PetitionBase_Petition_Fragmen
         id: string;
         type: ProfileTypeFieldType;
       } | null;
-      parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+      parent?: { __typename?: "PetitionField"; id: string } | null;
     }> | null;
     profileTypeField?: {
       __typename?: "ProfileTypeField";
       id: string;
       type: ProfileTypeFieldType;
     } | null;
-    parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+    parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
   variables: Array<
     | {
@@ -28084,14 +28084,14 @@ export type useConfigureUpdateProfileOnCloseDialog_PetitionBase_PetitionTemplate
         id: string;
         type: ProfileTypeFieldType;
       } | null;
-      parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+      parent?: { __typename?: "PetitionField"; id: string } | null;
     }> | null;
     profileTypeField?: {
       __typename?: "ProfileTypeField";
       id: string;
       type: ProfileTypeFieldType;
     } | null;
-    parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+    parent?: { __typename?: "PetitionField"; id: string } | null;
   }>;
   variables: Array<
     | {
@@ -28160,14 +28160,14 @@ export type ConfigureUpdateProfileOnCloseDialog_petitionQuery = {
               id: string;
               type: ProfileTypeFieldType;
             } | null;
-            parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+            parent?: { __typename?: "PetitionField"; id: string } | null;
           }> | null;
           profileTypeField?: {
             __typename?: "ProfileTypeField";
             id: string;
             type: ProfileTypeFieldType;
           } | null;
-          parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
         }>;
         variables: Array<
           | {
@@ -28205,14 +28205,14 @@ export type ConfigureUpdateProfileOnCloseDialog_petitionQuery = {
               id: string;
               type: ProfileTypeFieldType;
             } | null;
-            parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+            parent?: { __typename?: "PetitionField"; id: string } | null;
           }> | null;
           profileTypeField?: {
             __typename?: "ProfileTypeField";
             id: string;
             type: ProfileTypeFieldType;
           } | null;
-          parent?: { __typename?: "PetitionField"; id: string; multiple: boolean } | null;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
         }>;
         variables: Array<
           | {
@@ -40240,7 +40240,11 @@ export type useArchiveRepliesIntoProfileDialog_PetitionFieldReplyFragment = {
   content: { [key: string]: any };
   children?: Array<{
     __typename?: "PetitionFieldGroupChildReply";
-    field: { __typename?: "PetitionField"; id: string };
+    field: {
+      __typename?: "PetitionField";
+      id: string;
+      profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+    };
     replies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
@@ -40297,7 +40301,11 @@ export type useArchiveRepliesIntoProfileDialog_PetitionFieldInnerFragment = {
     associatedProfile?: { __typename?: "Profile"; id: string } | null;
     children?: Array<{
       __typename?: "PetitionFieldGroupChildReply";
-      field: { __typename?: "PetitionField"; id: string };
+      field: {
+        __typename?: "PetitionField";
+        id: string;
+        profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+      };
       replies: Array<{
         __typename?: "PetitionFieldReply";
         id: string;
@@ -40349,7 +40357,11 @@ export type useArchiveRepliesIntoProfileDialog_PetitionFieldFragment = {
       associatedProfile?: { __typename?: "Profile"; id: string } | null;
       children?: Array<{
         __typename?: "PetitionFieldGroupChildReply";
-        field: { __typename?: "PetitionField"; id: string };
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+          profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+        };
         replies: Array<{
           __typename?: "PetitionFieldReply";
           id: string;
@@ -40444,7 +40456,11 @@ export type useArchiveRepliesIntoProfileDialog_PetitionFragment = {
         associatedProfile?: { __typename?: "Profile"; id: string } | null;
         children?: Array<{
           __typename?: "PetitionFieldGroupChildReply";
-          field: { __typename?: "PetitionField"; id: string };
+          field: {
+            __typename?: "PetitionField";
+            id: string;
+            profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+          };
           replies: Array<{
             __typename?: "PetitionFieldReply";
             id: string;
@@ -40612,7 +40628,11 @@ export type useArchiveRepliesIntoProfileDialog_petitionQuery = {
               associatedProfile?: { __typename?: "Profile"; id: string } | null;
               children?: Array<{
                 __typename?: "PetitionFieldGroupChildReply";
-                field: { __typename?: "PetitionField"; id: string };
+                field: {
+                  __typename?: "PetitionField";
+                  id: string;
+                  profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+                };
                 replies: Array<{
                   __typename?: "PetitionFieldReply";
                   id: string;
@@ -79673,7 +79693,6 @@ export const PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldFragmentDoc =
     multiple
     parent {
       id
-      multiple
     }
   }
 ` as unknown as DocumentNode<
@@ -80994,6 +81013,9 @@ export const useArchiveRepliesIntoProfileDialog_PetitionFieldReplyFragmentDoc = 
     children {
       field {
         id
+        profileTypeField {
+          id
+        }
       }
       replies {
         id

@@ -637,9 +637,9 @@ function ArchiveRepliesIntoProfileRow({
   });
 
   // Helper function to get profile field values from updateProfileOnClose and reply children
-  function getProfileFieldValues(): Record<string, any> {
-    const reply = replies[0];
-
+  function getProfileFieldValues(
+    reply: useArchiveRepliesIntoProfileDialog_PetitionFieldReplyFragment,
+  ): Record<string, any> {
     // Get all petition fields (including children)
     const allPetitionFields = pipe(
       petition.fields,
@@ -703,8 +703,8 @@ function ArchiveRepliesIntoProfileRow({
         }
       } else {
         // Get from reply children
-        const childField = allPetitionFields.find(
-          (f) => f.profileTypeField?.id === profileTypeFieldId,
+        const childField = reply.children?.find(
+          (c) => c.field.profileTypeField?.id === profileTypeFieldId,
         );
 
         if (isNonNullish(childField) && childField.replies.length > 0) {
@@ -720,7 +720,7 @@ function ArchiveRepliesIntoProfileRow({
     return fieldValues;
   }
 
-  const profileFieldValues = getProfileFieldValues();
+  const profileFieldValues = getProfileFieldValues(reply);
 
   return (
     <>
@@ -910,6 +910,9 @@ useArchiveRepliesIntoProfileDialog.fragments = {
         children {
           field {
             id
+            profileTypeField {
+              id
+            }
           }
           replies {
             id
