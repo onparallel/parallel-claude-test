@@ -219,6 +219,11 @@ export function buildConfig() {
       lexidyHost: process.env.BANKFLIP_LEXIDY_HOST!,
       lexidyApiKey: process.env.BANKFLIP_LEXIDY_API_KEY!,
       lexidyWebhookSecret: process.env.BANKFLIP_LEXIDY_WEBHOOK_SECRET!,
+      // asoban
+      asobanOrgId: process.env.BANKFLIP_ASOBAN_ORG_GID,
+      asobanHost: process.env.BANKFLIP_ASOBAN_HOST!,
+      asobanApiKey: process.env.BANKFLIP_ASOBAN_API_KEY!,
+      asobanWebhookSecret: process.env.BANKFLIP_ASOBAN_WEBHOOK_SECRET!,
     },
     oauth: {
       docusign: {

@@ -192,6 +192,8 @@ export class BankflipService implements IBankflipService {
         return this.config.bankflip.mundimotoWebhookSecret;
       case this.config.bankflip.lexidyOrgId:
         return this.config.bankflip.lexidyWebhookSecret;
+      case this.config.bankflip.asobanOrgId:
+        return this.config.bankflip.asobanWebhookSecret;
       default:
         return this.config.bankflip.webhookSecret;
     }
@@ -207,6 +209,8 @@ export class BankflipService implements IBankflipService {
         return this.config.bankflip.mundimotoHost;
       case this.config.bankflip.lexidyOrgId:
         return this.config.bankflip.lexidyHost;
+      case this.config.bankflip.asobanOrgId:
+        return this.config.bankflip.asobanHost;
       default:
         return this.config.bankflip.host;
     }
@@ -222,6 +226,8 @@ export class BankflipService implements IBankflipService {
         return this.config.bankflip.mundimotoApiKey;
       case this.config.bankflip.lexidyOrgId:
         return this.config.bankflip.lexidyApiKey;
+      case this.config.bankflip.asobanOrgId:
+        return this.config.bankflip.asobanApiKey;
       default:
         return this.config.bankflip.apiKey;
     }
