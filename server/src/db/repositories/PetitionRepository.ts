@@ -533,18 +533,11 @@ export class PetitionRepository extends BaseRepository {
       const rows = await this.raw<User>(
         /* sql */ `
         select u.* 
-        from "user_group" ug
-        join "user_group_permission" ugp on ugp.user_group_id = ug.id
-        join "user_group_member" ugm on ugm.user_group_id = ug.id
-        join "user" u on u.id = ugm.user_id
-        where ugp.name = 'PETITIONS:BYPASS_PERMISSIONS'
-        and ugp.deleted_at is null
-        and ug.deleted_at is null
-        and ugm.deleted_at is null
-        and u.deleted_at is null
-        and u.org_id = ug.org_id
-        and u.id in ?
-        group by u.id, ugp.name
+        from "user" u
+        join "user_group_member" ugm on ugm.user_id = u.id and ugm.deleted_at is null
+        join "user_group_permission" ugp on ugp.user_group_id = ugm.user_group_id and ugp.name = 'PETITIONS:BYPASS_PERMISSIONS' and ugp.deleted_at is null
+        where u.id in ? and u.deleted_at is null
+        group by u.id
         having every(ugp.effect = 'GRANT')
       `,
         [this.sqlIn(userIds)],
