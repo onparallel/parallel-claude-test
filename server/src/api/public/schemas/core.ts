@@ -360,6 +360,11 @@ const _PetitionFieldInner = {
       description: "If `true`, this field allows an unlimited amount of replies.",
       example: false,
     },
+    showApprovalButtons: {
+      type: "boolean",
+      description: "If `true`, approval buttons are shown in the UI for the replies on this field.",
+      example: false,
+    },
   },
 } as const;
 

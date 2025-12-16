@@ -7792,6 +7792,7 @@ export type _PetitionFieldFragment = {
   options: { [key: string]: any };
   optional: boolean;
   multiple: boolean;
+  requireApproval: boolean;
 };
 
 export type PetitionFieldFragment = {
@@ -7804,6 +7805,7 @@ export type PetitionFieldFragment = {
   options: { [key: string]: any };
   optional: boolean;
   multiple: boolean;
+  requireApproval: boolean;
   children: Array<{
     id: string;
     title: string | null;
@@ -7814,6 +7816,7 @@ export type PetitionFieldFragment = {
     options: { [key: string]: any };
     optional: boolean;
     multiple: boolean;
+    requireApproval: boolean;
   }> | null;
 };
 
@@ -7863,6 +7866,7 @@ export type PetitionFieldWithRepliesFragment = {
   options: { [key: string]: any };
   optional: boolean;
   multiple: boolean;
+  requireApproval: boolean;
   replies: Array<{
     id: string;
     content: { [key: string]: any };
@@ -7899,6 +7903,7 @@ export type PetitionFieldWithRepliesFragment = {
     options: { [key: string]: any };
     optional: boolean;
     multiple: boolean;
+    requireApproval: boolean;
   }> | null;
 };
 
@@ -7935,6 +7940,7 @@ export type PetitionFragment = {
     options: { [key: string]: any };
     optional: boolean;
     multiple: boolean;
+    requireApproval: boolean;
     replies: Array<{
       id: string;
       content: { [key: string]: any };
@@ -7971,6 +7977,7 @@ export type PetitionFragment = {
       options: { [key: string]: any };
       optional: boolean;
       multiple: boolean;
+      requireApproval: boolean;
     }> | null;
   }>;
   tags?: Array<{ id: string; name: string }>;
@@ -8065,6 +8072,7 @@ export type TemplateFragment = {
     options: { [key: string]: any };
     optional: boolean;
     multiple: boolean;
+    requireApproval: boolean;
     children: Array<{
       id: string;
       title: string | null;
@@ -8075,6 +8083,7 @@ export type TemplateFragment = {
       options: { [key: string]: any };
       optional: boolean;
       multiple: boolean;
+      requireApproval: boolean;
     }> | null;
   }>;
   tags?: Array<{ id: string; name: string }>;
@@ -8101,6 +8110,7 @@ export type PetitionBase_Petition_Fragment = {
     options: { [key: string]: any };
     optional: boolean;
     multiple: boolean;
+    requireApproval: boolean;
     replies: Array<{
       id: string;
       content: { [key: string]: any };
@@ -8137,6 +8147,7 @@ export type PetitionBase_Petition_Fragment = {
       options: { [key: string]: any };
       optional: boolean;
       multiple: boolean;
+      requireApproval: boolean;
     }> | null;
   }>;
   tags?: Array<{ id: string; name: string }>;
@@ -8232,6 +8243,7 @@ export type PetitionBase_PetitionTemplate_Fragment = {
     options: { [key: string]: any };
     optional: boolean;
     multiple: boolean;
+    requireApproval: boolean;
     children: Array<{
       id: string;
       title: string | null;
@@ -8242,6 +8254,7 @@ export type PetitionBase_PetitionTemplate_Fragment = {
       options: { [key: string]: any };
       optional: boolean;
       multiple: boolean;
+      requireApproval: boolean;
     }> | null;
   }>;
   tags?: Array<{ id: string; name: string }>;
@@ -8676,6 +8689,7 @@ export type GetPetitions_petitionsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -8712,6 +8726,7 @@ export type GetPetitions_petitionsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -8837,6 +8852,7 @@ export type CreatePetition_petitionMutation = {
           options: { [key: string]: any };
           optional: boolean;
           multiple: boolean;
+          requireApproval: boolean;
           replies: Array<{
             id: string;
             content: { [key: string]: any };
@@ -8873,6 +8889,7 @@ export type CreatePetition_petitionMutation = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
           }> | null;
         }>;
         tags?: Array<{ id: string; name: string }>;
@@ -8996,6 +9013,7 @@ export type GetPetition_petitionQuery = {
           options: { [key: string]: any };
           optional: boolean;
           multiple: boolean;
+          requireApproval: boolean;
           replies: Array<{
             id: string;
             content: { [key: string]: any };
@@ -9032,6 +9050,7 @@ export type GetPetition_petitionQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
           }> | null;
         }>;
         tags?: Array<{ id: string; name: string }>;
@@ -9194,6 +9213,7 @@ export type UpdatePetition_updatePetitionMutation = {
           options: { [key: string]: any };
           optional: boolean;
           multiple: boolean;
+          requireApproval: boolean;
           replies: Array<{
             id: string;
             content: { [key: string]: any };
@@ -9230,6 +9250,7 @@ export type UpdatePetition_updatePetitionMutation = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
           }> | null;
         }>;
         tags?: Array<{ id: string; name: string }>;
@@ -9332,6 +9353,7 @@ export type UpdatePetition_updatePetitionMutation = {
           options: { [key: string]: any };
           optional: boolean;
           multiple: boolean;
+          requireApproval: boolean;
           children: Array<{
             id: string;
             title: string | null;
@@ -9342,6 +9364,7 @@ export type UpdatePetition_updatePetitionMutation = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
           }> | null;
         }>;
         tags?: Array<{ id: string; name: string }>;
@@ -9390,6 +9413,7 @@ export type ClosePetition_closePetitionMutation = {
       options: { [key: string]: any };
       optional: boolean;
       multiple: boolean;
+      requireApproval: boolean;
       replies: Array<{
         id: string;
         content: { [key: string]: any };
@@ -9426,6 +9450,7 @@ export type ClosePetition_closePetitionMutation = {
         options: { [key: string]: any };
         optional: boolean;
         multiple: boolean;
+        requireApproval: boolean;
       }> | null;
     }>;
     tags?: Array<{ id: string; name: string }>;
@@ -9538,6 +9563,7 @@ export type ReopenPetition_reopenPetitionMutation = {
       options: { [key: string]: any };
       optional: boolean;
       multiple: boolean;
+      requireApproval: boolean;
       replies: Array<{
         id: string;
         content: { [key: string]: any };
@@ -9574,6 +9600,7 @@ export type ReopenPetition_reopenPetitionMutation = {
         options: { [key: string]: any };
         optional: boolean;
         multiple: boolean;
+        requireApproval: boolean;
       }> | null;
     }>;
     tags?: Array<{ id: string; name: string }>;
@@ -9703,6 +9730,7 @@ export type TagPetition_tagPetitionMutation = {
           options: { [key: string]: any };
           optional: boolean;
           multiple: boolean;
+          requireApproval: boolean;
           replies: Array<{
             id: string;
             content: { [key: string]: any };
@@ -9739,6 +9767,7 @@ export type TagPetition_tagPetitionMutation = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
           }> | null;
         }>;
         tags?: Array<{ id: string; name: string }>;
@@ -9930,6 +9959,7 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
         options: { [key: string]: any };
         optional: boolean;
         multiple: boolean;
+        requireApproval: boolean;
         replies: Array<{
           id: string;
           content: { [key: string]: any };
@@ -9966,6 +9996,7 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
           options: { [key: string]: any };
           optional: boolean;
           multiple: boolean;
+          requireApproval: boolean;
         }> | null;
       }>;
       tags?: Array<{ id: string; name: string }>;
@@ -10213,6 +10244,7 @@ export type PetitionReplies_repliesQuery = {
           options: { [key: string]: any };
           optional: boolean;
           multiple: boolean;
+          requireApproval: boolean;
           replies: Array<{
             id: string;
             content: { [key: string]: any };
@@ -10249,6 +10281,7 @@ export type PetitionReplies_repliesQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
           }> | null;
         }>;
       }
@@ -10263,6 +10296,7 @@ export type PetitionReplies_repliesQuery = {
           options: { [key: string]: any };
           optional: boolean;
           multiple: boolean;
+          requireApproval: boolean;
           replies: Array<{
             id: string;
             content: { [key: string]: any };
@@ -10299,6 +10333,7 @@ export type PetitionReplies_repliesQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
           }> | null;
         }>;
       }
@@ -10324,6 +10359,7 @@ export type UpdatePetitionField_updatePetitionFieldMutation = {
     options: { [key: string]: any };
     optional: boolean;
     multiple: boolean;
+    requireApproval: boolean;
     children: Array<{
       id: string;
       title: string | null;
@@ -10334,6 +10370,7 @@ export type UpdatePetitionField_updatePetitionFieldMutation = {
       options: { [key: string]: any };
       optional: boolean;
       multiple: boolean;
+      requireApproval: boolean;
     }> | null;
   };
 };
@@ -11085,6 +11122,7 @@ export type GetTemplates_templatesQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             children: Array<{
               id: string;
               title: string | null;
@@ -11095,6 +11133,7 @@ export type GetTemplates_templatesQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -11132,6 +11171,7 @@ export type GetTemplate_templateQuery = {
           options: { [key: string]: any };
           optional: boolean;
           multiple: boolean;
+          requireApproval: boolean;
           children: Array<{
             id: string;
             title: string | null;
@@ -11142,6 +11182,7 @@ export type GetTemplate_templateQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
           }> | null;
         }>;
         tags?: Array<{ id: string; name: string }>;
@@ -11347,6 +11388,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -11383,6 +11425,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -11492,6 +11535,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -11528,6 +11572,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -11637,6 +11682,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -11673,6 +11719,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -11782,6 +11829,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -11818,6 +11866,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -11927,6 +11976,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -11963,6 +12013,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -12072,6 +12123,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -12108,6 +12160,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -12217,6 +12270,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -12253,6 +12307,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -12362,6 +12417,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -12398,6 +12454,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -12507,6 +12564,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -12543,6 +12601,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -12652,6 +12711,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -12688,6 +12748,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -12797,6 +12858,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -12833,6 +12895,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -12942,6 +13005,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -12978,6 +13042,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -13087,6 +13152,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -13123,6 +13189,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -13232,6 +13299,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -13268,6 +13336,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -13377,6 +13446,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -13413,6 +13483,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -13522,6 +13593,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -13558,6 +13630,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -13667,6 +13740,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -13703,6 +13777,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -13812,6 +13887,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -13848,6 +13924,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -13957,6 +14034,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -13993,6 +14071,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -14102,6 +14181,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -14138,6 +14218,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -14247,6 +14328,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -14283,6 +14365,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -14392,6 +14475,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -14428,6 +14512,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -14537,6 +14622,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -14573,6 +14659,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -14682,6 +14769,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -14718,6 +14806,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -14827,6 +14916,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -14863,6 +14953,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -14972,6 +15063,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -15008,6 +15100,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -15117,6 +15210,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -15153,6 +15247,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -15262,6 +15357,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -15298,6 +15394,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -15407,6 +15504,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -15443,6 +15541,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -15552,6 +15651,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -15588,6 +15688,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -15697,6 +15798,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -15733,6 +15835,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -15842,6 +15945,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -15878,6 +15982,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -15987,6 +16092,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -16023,6 +16129,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -16132,6 +16239,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -16168,6 +16276,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -16277,6 +16386,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -16313,6 +16423,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -16422,6 +16533,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -16458,6 +16570,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -16567,6 +16680,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -16603,6 +16717,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -16712,6 +16827,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -16748,6 +16864,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -16857,6 +16974,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -16893,6 +17011,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -17002,6 +17121,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -17038,6 +17158,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -17147,6 +17268,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -17183,6 +17305,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -17292,6 +17415,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -17328,6 +17452,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -17437,6 +17562,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -17473,6 +17599,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -17582,6 +17709,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -17618,6 +17746,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -17727,6 +17856,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -17763,6 +17893,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -17872,6 +18003,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -17908,6 +18040,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -18017,6 +18150,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -18053,6 +18187,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -18162,6 +18297,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -18198,6 +18334,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -18307,6 +18444,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -18343,6 +18481,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -18452,6 +18591,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -18488,6 +18628,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -18597,6 +18738,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -18633,6 +18775,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -18742,6 +18885,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -18778,6 +18922,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -18887,6 +19032,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -18923,6 +19069,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -19032,6 +19179,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -19068,6 +19216,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -19177,6 +19326,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
             replies: Array<{
               id: string;
               content: { [key: string]: any };
@@ -19213,6 +19363,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
               options: { [key: string]: any };
               optional: boolean;
               multiple: boolean;
+              requireApproval: boolean;
             }> | null;
           }>;
           tags?: Array<{ id: string; name: string }>;
@@ -20254,6 +20405,7 @@ export type GetProfilePetitions_profileQuery = {
           options: { [key: string]: any };
           optional: boolean;
           multiple: boolean;
+          requireApproval: boolean;
           replies: Array<{
             id: string;
             content: { [key: string]: any };
@@ -20290,6 +20442,7 @@ export type GetProfilePetitions_profileQuery = {
             options: { [key: string]: any };
             optional: boolean;
             multiple: boolean;
+            requireApproval: boolean;
           }> | null;
         }>;
         tags?: Array<{ id: string; name: string }>;
@@ -20796,6 +20949,7 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
       options: { [key: string]: any };
       optional: boolean;
       multiple: boolean;
+      requireApproval: boolean;
       replies: Array<{
         id: string;
         content: { [key: string]: any };
@@ -20832,6 +20986,7 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
         options: { [key: string]: any };
         optional: boolean;
         multiple: boolean;
+        requireApproval: boolean;
       }> | null;
     }>;
     tags?: Array<{ id: string; name: string }>;
@@ -21002,6 +21157,7 @@ export const _PetitionFieldFragmentDoc = gql`
     options
     optional
     multiple
+    requireApproval
   }
 ` as unknown as DocumentNode<_PetitionFieldFragment, unknown>;
 export const PetitionFieldFragmentDoc = gql`

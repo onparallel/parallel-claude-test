@@ -217,6 +217,7 @@ export function mapPetitionField<T extends PetitionFieldFragment>(field: T) {
         "multiple",
         "optional",
       ]),
+      showApprovalButtons: field.requireApproval,
       options:
         ["CHECKBOX", "SELECT"].includes(field.type) && isNonNullish(field.options.labels)
           ? zip(field.options.values, field.options.labels).map(([value, label]) => ({

@@ -74,6 +74,7 @@ export const PetitionFieldFragment = gql`
     options
     optional
     multiple
+    requireApproval
   }
   fragment PetitionField on PetitionField {
     ..._PetitionField
