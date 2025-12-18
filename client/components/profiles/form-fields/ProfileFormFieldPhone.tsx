@@ -1,7 +1,7 @@
 import { PhoneInputLazy } from "@parallel/components/common/PhoneInputLazy";
 import { Controller, useFormContext } from "react-hook-form";
 import { isNonNullish } from "remeda";
-import { ProfileFormData } from "../ProfileForm";
+import { ProfileFormInnerData } from "../ProfileFormInner";
 import { ProfileFormFieldProps } from "./ProfileFormField";
 import {
   ProfileFormFieldInputGroup,
@@ -25,7 +25,7 @@ export function ProfileFormFieldPhone({
   onToggleSuggestions,
   showBaseStyles,
 }: ProfileFormFieldPhoneProps) {
-  const { control, clearErrors, setError } = useFormContext<ProfileFormData>();
+  const { control, clearErrors, setError } = useFormContext<ProfileFormInnerData>();
 
   return (
     <ProfileFormFieldInputGroup

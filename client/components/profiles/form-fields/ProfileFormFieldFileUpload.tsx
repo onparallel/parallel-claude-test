@@ -12,7 +12,7 @@ import { nanoid } from "nanoid";
 import { Controller, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { differenceWith, isNullish, sumBy } from "remeda";
-import { ProfileFormData } from "../ProfileForm";
+import { ProfileFormInnerData } from "../ProfileFormInner";
 import { ProfileFormFieldProps } from "./ProfileFormField";
 import { ProfileFieldExpiresAtIcon } from "./ProfileFormFieldInputGroup";
 
@@ -43,7 +43,7 @@ export function ProfileFormFieldFileUpload({
 }: ProfileFormFieldFileUploadProps) {
   const MAX_FILE_SIZE = 1024 * 1024 * 100; // 100 MB
   const intl = useIntl();
-  const { control } = useFormContext<ProfileFormData>();
+  const { control } = useFormContext<ProfileFormInnerData>();
   const downloadProfileFieldFile = useDownloadProfileFieldFile();
 
   const handleDownloadAttachment = async (profileFieldFileId: string, preview?: boolean) => {

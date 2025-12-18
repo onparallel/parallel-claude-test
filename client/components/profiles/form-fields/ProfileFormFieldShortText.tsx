@@ -4,7 +4,7 @@ import { useShortTextFormats } from "@parallel/utils/useShortTextFormats";
 import { Controller, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
-import { ProfileFormData } from "../ProfileForm";
+import { ProfileFormInnerData } from "../ProfileFormInner";
 import { ProfileFormFieldProps } from "./ProfileFormField";
 import {
   ProfileFormFieldInputGroup,
@@ -31,7 +31,7 @@ export function ProfileFormFieldShortText({
   const {
     control,
     formState: { errors },
-  } = useFormContext<ProfileFormData>();
+  } = useFormContext<ProfileFormInnerData>();
   const intl = useIntl();
   const formats = useShortTextFormats();
   const format = isNonNullish(field.options.format)

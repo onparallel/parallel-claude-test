@@ -6,7 +6,7 @@ import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { isPast, sub } from "date-fns";
 import { Controller, useFormContext } from "react-hook-form";
 import { isNonNullish } from "remeda";
-import { ProfileFormData } from "../ProfileForm";
+import { ProfileFormInnerData } from "../ProfileFormInner";
 import { ProfileFormFieldProps } from "./ProfileFormField";
 import {
   ProfileFormFieldInputGroup,
@@ -30,7 +30,7 @@ export function ProfileFormFieldDate({
   showBaseStyles,
 }: ProfileFormFieldDateProps) {
   const { browserName } = useBrowserMetadata();
-  const { control } = useFormContext<ProfileFormData>();
+  const { control } = useFormContext<ProfileFormInnerData>();
   const alertIsActive =
     isNonNullish(expiryDate) &&
     isNonNullish(field.expiryAlertAheadTime) &&

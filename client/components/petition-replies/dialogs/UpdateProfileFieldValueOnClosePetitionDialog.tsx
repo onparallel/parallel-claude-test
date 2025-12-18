@@ -9,8 +9,9 @@ import {
 import { ProfileReference } from "@parallel/components/common/ProfileReference";
 import { getProfileTypeIcon } from "@parallel/components/organization/profiles/getProfileTypeIcon";
 import {
+  buildFormDefaultValue,
   ProfileFormInner,
-  ProfileFormInnerInstance,
+  useProfileFormInnerSubmitHandler,
 } from "@parallel/components/profiles/ProfileFormInner";
 import { HStack } from "@parallel/components/ui";
 import {
@@ -19,9 +20,10 @@ import {
   UpdateProfileFieldValueOnClosePetitionDialog_profileDocument,
   UpdateProfileFieldValueOnClosePetitionDialog_ProfileFragment,
 } from "@parallel/graphql/__types";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish } from "remeda";
+import { isNonNullish, partition } from "remeda";
 
 type UpdateProfileFieldValueOnClosePetitionDialogSteps = {
   LOADING: {
@@ -85,7 +87,16 @@ function UpdateProfileFieldValueOnClosePetitionLoadingDialog({
         profileTypeFieldIds,
       });
     }
-  }, [loading, data, onStep, petitionLoading, petitionData]);
+  }, [
+    intl.locale,
+    profileTypeFieldIds,
+    petitionFieldId,
+    loading,
+    data,
+    onStep,
+    petitionLoading,
+    petitionData,
+  ]);
 
   return (
     <ConfirmDialog
@@ -127,7 +138,6 @@ function UpdateProfileFieldValueOnClosePetitionDialog({
   ...props
 }: WizardStepDialogProps<UpdateProfileFieldValueOnClosePetitionDialogSteps, "STEP_1", void>) {
   const profileIcon = getProfileTypeIcon(profile?.profileType?.icon ?? "DATABASE");
-  const formRef = useRef<ProfileFormInnerInstance>(null);
 
   const { refetch: refetchProfile, data: profileData } = useQuery(
     UpdateProfileFieldValueOnClosePetitionDialog_profileDocument,
@@ -137,12 +147,28 @@ function UpdateProfileFieldValueOnClosePetitionDialog({
     },
   );
 
-  const [formState, setFormState] = useState<{
-    dirtyFields: { fields?: Record<string, any> };
-    isSubmitting: boolean;
-  }>({
-    dirtyFields: {},
-    isSubmitting: false,
+  const currentProfile = profileData?.profile ?? profile;
+
+  const [properties, hiddenProperties] = useMemo(
+    () =>
+      partition(
+        profile.properties.filter((property) => profileTypeFieldIds.includes(property.field.id)),
+        (property) => property.field.myPermission !== "HIDDEN",
+      ),
+    [profile.properties, profileTypeFieldIds],
+  );
+
+  const form = useForm({
+    defaultValues: buildFormDefaultValue(properties),
+  });
+
+  const { formState, handleSubmit } = form;
+
+  const submitHandler = useProfileFormInnerSubmitHandler({
+    properties,
+    profileId: currentProfile.id,
+    petitionId: petition.id,
+    form,
   });
 
   return (
@@ -152,14 +178,10 @@ function UpdateProfileFieldValueOnClosePetitionDialog({
       content={{
         containerProps: {
           as: "form",
-          onSubmit: (e) => {
-            e?.preventDefault();
-            formRef.current?.handleSubmit(async () => {
-              // Form submission handled by ProfileFormInner
-              // After success, resolve dialog
-              props.onResolve();
-            })(e);
-          },
+          onSubmit: handleSubmit(async (data) => {
+            await submitHandler(data);
+            props.onResolve();
+          }),
         },
       }}
       header={
@@ -169,28 +191,23 @@ function UpdateProfileFieldValueOnClosePetitionDialog({
         </HStack>
       }
       body={
-        <Stack spacing={2}>
-          <ProfileReference profile={profile} paddingBottom={4} fontStyle="italic" />
-          <ProfileFormInner
-            ref={formRef}
-            profile={profileData?.profile ?? profile}
-            petition={petition}
-            petitionId={petition.id}
-            filterProperties={(property) => profileTypeFieldIds.includes(property.field.id)}
-            showHiddenProperties={false}
-            enableRouterHooks={false}
-            showBaseStyles
-            onRefetch={async () => {
-              await refetchProfile();
-            }}
-            onFormStateChange={(state) => {
-              setFormState({
-                dirtyFields: state.dirtyFields,
-                isSubmitting: state.isSubmitting,
-              });
-            }}
-          />
-        </Stack>
+        <FormProvider {...form}>
+          <Stack spacing={2}>
+            <ProfileReference profile={profile} paddingBottom={4} fontStyle="italic" />
+            <ProfileFormInner
+              profileId={currentProfile.id}
+              properties={properties}
+              hiddenProperties={hiddenProperties}
+              petition={petition}
+              petitionId={petition.id}
+              showBaseStyles
+              isDisabled={currentProfile.status !== "OPEN"}
+              onRefetch={async () => {
+                await refetchProfile();
+              }}
+            />
+          </Stack>
+        </FormProvider>
       }
       confirm={
         <Button
@@ -231,15 +248,20 @@ useUpdateProfileFieldValueOnClosePetitionDialog.fragments = {
     return gql`
       fragment UpdateProfileFieldValueOnClosePetitionDialog_Profile on Profile {
         id
+        status
         profileType {
           id
           icon
         }
+        properties {
+          ...buildFormDefaultValue_ProfileFieldProperty
+          ...ProfileFormInner_ProfileFieldProperty
+        }
         ...ProfileReference_Profile
-        ...ProfileFormInner_Profile
       }
       ${ProfileReference.fragments.Profile}
-      ${ProfileFormInner.fragments.Profile}
+      ${buildFormDefaultValue.fragments.ProfileFieldProperty}
+      ${ProfileFormInner.fragments.ProfileFieldProperty}
     `;
   },
   get PetitionField() {

@@ -31,7 +31,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
 import { noop } from "ts-essentials";
 import { ProfileFieldSuggestion } from "../ProfileFieldSuggestion";
-import { ProfileFormData } from "../ProfileForm";
+import { ProfileFormInnerData } from "../ProfileFormInner";
 import { useProfileFieldFileHistoryDialog } from "../dialogs/ProfileFieldFileHistoryDialog";
 import { useProfileFieldValueHistoryDialog } from "../dialogs/ProfileFieldValueHistoryDialog";
 import { useUpdateProfileFieldExpirationDialog } from "../dialogs/UpdateProfileFieldExpirationDialog";
@@ -71,7 +71,7 @@ export function ProfileFormField(props: ProfileFormFieldProps) {
   const intl = useIntl();
   const historyButtonRef = useRef<HTMLButtonElement>(null);
 
-  const { control, setValue } = useFormContext<ProfileFormData>();
+  const { control, setValue } = useFormContext<ProfileFormInnerData>();
   const { field, fieldsWithIndices, files } = props;
   const { dirtyFields, errors } = useFormState({ control });
   const isDirty = !!dirtyFields?.fields?.[field.id];
@@ -579,7 +579,7 @@ export function useModifyExpirationDialog({
   isDirty: boolean;
   expiryAlertAheadTime?: Duration | null;
   fieldName: LocalizableUserText;
-  setValue: UseFormSetValue<ProfileFormData>;
+  setValue: UseFormSetValue<ProfileFormInnerData>;
   expiryDate?: string | null;
 }) {
   const hasBeenShown = useRef(false);

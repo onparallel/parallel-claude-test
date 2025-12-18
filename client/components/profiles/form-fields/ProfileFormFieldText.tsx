@@ -1,6 +1,6 @@
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
 import { useFormContext } from "react-hook-form";
-import { ProfileFormData } from "../ProfileForm";
+import { ProfileFormInnerData } from "../ProfileFormInner";
 import { ProfileFormFieldProps } from "./ProfileFormField";
 import {
   ProfileFormFieldInputGroup,
@@ -23,7 +23,7 @@ export function ProfileFormFieldText({
   onToggleSuggestions,
   showBaseStyles,
 }: ProfileFormFieldTextProps) {
-  const { register } = useFormContext<ProfileFormData>();
+  const { register } = useFormContext<ProfileFormInnerData>();
   return (
     <ProfileFormFieldInputGroup
       field={field}

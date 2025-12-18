@@ -6,7 +6,7 @@ import { useCallback } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { IndicatorsContainerProps, ValueContainerProps, components } from "react-select";
 import { isNonNullish } from "remeda";
-import { ProfileFormData } from "../ProfileForm";
+import { ProfileFormInnerData } from "../ProfileFormInner";
 import { ProfileFormFieldProps } from "./ProfileFormField";
 import {
   ProfileFormFieldInputGroup,
@@ -30,7 +30,7 @@ export const ProfileFormFieldUserAssignment = ({
   showBaseStyles,
   isRequired,
 }: ProfileFormFieldUserAssignmentProps) => {
-  const { control } = useFormContext<ProfileFormData>();
+  const { control } = useFormContext<ProfileFormInnerData>();
   const options = field.options as ProfileTypeFieldOptions<"USER_ASSIGNMENT">;
 
   const _handleSearchUsers = useSearchUsers();

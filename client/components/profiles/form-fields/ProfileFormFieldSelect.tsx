@@ -20,7 +20,7 @@ import Select, {
   components,
 } from "react-select";
 import { isNonNullish, sortBy } from "remeda";
-import { ProfileFormData } from "../ProfileForm";
+import { ProfileFormInnerData } from "../ProfileFormInner";
 import { ProfileFormFieldProps } from "./ProfileFormField";
 import {
   ProfileFormFieldInputGroup,
@@ -46,7 +46,7 @@ export function ProfileFormFieldSelect({
   showBaseStyles,
   isRequired,
 }: ProfileFormFieldSelectProps) {
-  const { control } = useFormContext<ProfileFormData>();
+  const { control } = useFormContext<ProfileFormInnerData>();
   return (
     <ProfileFormFieldInputGroup
       field={field}

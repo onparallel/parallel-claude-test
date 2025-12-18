@@ -20,30 +20,31 @@ import { LocalizableUserTextRender } from "@parallel/components/common/Localizab
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import {
   ProfileForm_PetitionBaseFragment,
-  ProfileForm_ProfileFieldPropertyFragment,
   ProfileForm_ProfileFragment,
-  ProfileTypeFieldType,
-  UpdateProfileFieldValueInput,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { MaybePromise } from "@parallel/utils/types";
-import { uploadFile } from "@parallel/utils/uploadFile";
+import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
-import { useRef, useState } from "react";
+import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
+import { useRouter } from "next/router";
+import { useCallback, useMemo } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish } from "remeda";
+import { isNonNullish, partition } from "remeda";
 import { isDialogError } from "../common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { Link } from "../common/Link";
 import { ProfileReference } from "../common/ProfileReference";
 import { RestrictedFeatureAlert } from "../common/RestrictedFeatureAlert";
 import { Spacer } from "../common/Spacer";
+import { useAutoConfirmDiscardChangesDialog } from "../organization/dialogs/ConfirmDiscardChangesDialog";
 import { useImportFromExternalSourceDialog } from "./dialogs/ImportFromExternalSourceDialog";
-import { ProfileFormInner, ProfileFormInnerInstance } from "./ProfileFormInner";
-
-export interface ProfileFormData {
-  fields: Record<string, { type: ProfileTypeFieldType } & UpdateProfileFieldValueInput>;
-}
+import {
+  buildFormDefaultValue,
+  ProfileFormInner,
+  useProfileFormInnerSubmitHandler,
+} from "./ProfileFormInner";
 
 interface ProfileFormProps {
   profile: ProfileForm_ProfileFragment;
@@ -52,7 +53,6 @@ interface ProfileFormProps {
   petitionId?: string;
   onRecover?: () => void;
   onRefetch: () => MaybePromise<void>;
-  filterProperties?: (property: ProfileForm_ProfileFieldPropertyFragment) => boolean;
   includeLinkToProfile?: boolean;
   omitProfileTabNavigation?: boolean;
 }
@@ -66,25 +66,52 @@ export const ProfileForm = Object.assign(
       petition,
       petitionId,
       onRecover,
-      filterProperties = () => true,
       includeLinkToProfile,
       ...props
     },
     ref,
   ) {
     const intl = useIntl();
-    const formInnerRef = useRef<ProfileFormInnerInstance>(null);
-    const [formState, setFormState] = useState<{
-      isSubmitting: boolean;
-      errors: Record<string, any>;
-      dirtyFields: { fields?: Record<string, any> };
-    }>({
-      isSubmitting: false,
-      errors: {},
-      dirtyFields: {},
-    });
+    const router = useRouter();
+    const queryProfileId = router?.query.profileId;
+
     const userCanCreateProfiles = useHasPermission("PROFILES:CREATE_PROFILES");
     const isFormDisabled = !userCanCreateProfiles || profile.status !== "OPEN";
+
+    const [properties, hiddenProperties] = useMemo(
+      () => partition(profile.properties, (property) => property.field.myPermission !== "HIDDEN"),
+      [profile.properties],
+    );
+
+    const form = useForm({
+      defaultValues: buildFormDefaultValue(properties),
+    });
+
+    const { formState, reset, setFocus, handleSubmit } = form;
+
+    const checkPath = useCallback(
+      (path: string) => {
+        if (queryProfileId === profile.id && path.includes(profile.id)) {
+          return false;
+        }
+        return formState.isDirty;
+      },
+      [formState.isDirty, queryProfileId, profile.id],
+    );
+
+    useAutoConfirmDiscardChangesDialog(checkPath);
+
+    useTempQueryParam("field", async (fieldId) => {
+      try {
+        setFocus(`fields.${fieldId}.content.value`);
+      } catch {
+        // ignore FILE .focus() errors
+      }
+    });
+
+    useEffectSkipFirst(() => {
+      reset(buildFormDefaultValue(properties), { keepDirty: true, keepDirtyValues: true });
+    }, [properties, reset]);
 
     const showSelectProfileExternalSourceDialog = useImportFromExternalSourceDialog();
     const toast = useToast();
@@ -119,6 +146,13 @@ export const ProfileForm = Object.assign(
       ? Object.values(formState.dirtyFields.fields).filter((f) => isNonNullish(f)).length
       : 0;
 
+    const submitHandler = useProfileFormInnerSubmitHandler({
+      properties,
+      profileId: profile.id,
+      petitionId,
+      form,
+    });
+
     return (
       <Flex
         ref={ref}
@@ -127,12 +161,10 @@ export const ProfileForm = Object.assign(
         height="100%"
         flex={1}
         {...props}
-        onSubmit={(e) => {
-          e.preventDefault();
-          formInnerRef.current?.handleSubmit(async () => {
-            // Form submission handled by ProfileFormInner
-          })(e);
-        }}
+        onSubmit={handleSubmit(async (data) => {
+          await submitHandler(data);
+          await onRefetch();
+        })}
       >
         <Stack
           spacing={0}
@@ -232,36 +264,28 @@ export const ProfileForm = Object.assign(
             editedFieldsCount={editedFieldsCount}
             isSubmitting={formState.isSubmitting}
             hasErrors={Object.keys(formState.errors).length !== 0}
-            onCancel={() => {
-              formInnerRef.current?.reset();
-            }}
+            onCancel={() => reset(buildFormDefaultValue(properties))}
           />
         ) : null}
-        <Stack
-          divider={<Divider />}
-          padding={4}
-          paddingBottom={overlapsIntercomBadge ? 24 : 4}
-          spacing={4}
-          overflow="auto"
-        >
-          <ProfileFormInner
-            ref={formInnerRef}
-            profile={profile}
-            petition={petition}
-            petitionId={petitionId}
-            onRefetch={onRefetch}
-            filterProperties={filterProperties}
-            showHiddenProperties={true}
-            enableRouterHooks={true}
-            onFormStateChange={(state) => {
-              setFormState({
-                isSubmitting: state.isSubmitting,
-                errors: state.errors,
-                dirtyFields: state.dirtyFields,
-              });
-            }}
-          />
-        </Stack>
+        <FormProvider {...form}>
+          <Stack
+            divider={<Divider />}
+            padding={4}
+            paddingBottom={overlapsIntercomBadge ? 24 : 4}
+            spacing={4}
+            overflow="auto"
+          >
+            <ProfileFormInner
+              profileId={profile.id}
+              petition={petition}
+              petitionId={petitionId}
+              onRefetch={onRefetch}
+              properties={properties}
+              hiddenProperties={hiddenProperties}
+              isDisabled={profile.status !== "OPEN"}
+            />
+          </Stack>
+        </FormProvider>
       </Flex>
     );
   }),
@@ -296,8 +320,22 @@ export const ProfileForm = Object.assign(
         return gql`
           fragment ProfileForm_ProfileFieldProperty on ProfileFieldProperty {
             ...ProfileFormInner_ProfileFieldProperty
+            ...buildFormDefaultValue_ProfileFieldProperty
+            field {
+              ...ProfileForm_ProfileTypeField
+            }
+            value {
+              ...ProfileForm_ProfileFieldValue
+            }
+            files {
+              ...ProfileForm_ProfileFieldFile
+            }
           }
+          ${this.ProfileTypeField}
+          ${this.ProfileFieldFile}
+          ${this.ProfileFieldValue}
           ${ProfileFormInner.fragments.ProfileFieldProperty}
+          ${buildFormDefaultValue.fragments.ProfileFieldProperty}
         `;
       },
       get Profile() {
@@ -312,10 +350,19 @@ export const ProfileForm = Object.assign(
               standardType
               ...useImportFromExternalSourceDialog_ProfileType
             }
-            ...ProfileFormInner_Profile
+            properties {
+              ...ProfileForm_ProfileFieldProperty
+            }
+            relationships {
+              id
+            }
+            petitionsTotalCount: associatedPetitions {
+              totalCount
+            }
+            permanentDeletionAt
           }
+          ${this.ProfileFieldProperty}
           ${ProfileReference.fragments.Profile}
-          ${ProfileFormInner.fragments.Profile}
           ${useImportFromExternalSourceDialog.fragments.ProfileType}
         `;
       },
@@ -436,97 +483,3 @@ function EditedFieldsAlert({
     </Alert>
   );
 }
-
-const _mutations = [
-  gql`
-    mutation ProfileForm_copyFileReplyToProfileFieldFile(
-      $profileId: GID!
-      $profileTypeFieldId: GID!
-      $petitionId: GID!
-      $fileReplyIds: [GID!]!
-      $expiryDate: Date
-    ) {
-      copyFileReplyToProfileFieldFile(
-        profileId: $profileId
-        profileTypeFieldId: $profileTypeFieldId
-        petitionId: $petitionId
-        fileReplyIds: $fileReplyIds
-        expiryDate: $expiryDate
-      ) {
-        ...ProfileForm_ProfileFieldFile
-      }
-    }
-    ${ProfileForm.fragments.ProfileFieldFile}
-  `,
-  gql`
-    mutation ProfileForm_updateProfileFieldValue(
-      $profileId: GID!
-      $fields: [UpdateProfileFieldValueInput!]!
-    ) {
-      updateProfileFieldValue(profileId: $profileId, fields: $fields) {
-        ...ProfileForm_Profile
-      }
-    }
-    ${ProfileForm.fragments.Profile}
-  `,
-  gql`
-    mutation ProfileForm_createProfileFieldFileUploadLink(
-      $profileId: GID!
-      $profileTypeFieldId: GID!
-      $data: [FileUploadInput!]!
-      $expiryDate: Date
-    ) {
-      createProfileFieldFileUploadLink(
-        profileId: $profileId
-        profileTypeFieldId: $profileTypeFieldId
-        data: $data
-        expiryDate: $expiryDate
-      ) {
-        uploads {
-          presignedPostData {
-            ...uploadFile_AWSPresignedPostData
-          }
-          file {
-            ...ProfileForm_ProfileFieldFile
-          }
-        }
-        property {
-          ...ProfileForm_ProfileFieldProperty
-        }
-      }
-    }
-    ${uploadFile.fragments.AWSPresignedPostData}
-    ${ProfileForm.fragments.ProfileFieldProperty}
-    ${ProfileForm.fragments.ProfileFieldFile}
-  `,
-  gql`
-    mutation ProfileForm_profileFieldFileUploadComplete(
-      $profileId: GID!
-      $profileTypeFieldId: GID!
-      $profileFieldFileIds: [GID!]!
-    ) {
-      profileFieldFileUploadComplete(
-        profileId: $profileId
-        profileTypeFieldId: $profileTypeFieldId
-        profileFieldFileIds: $profileFieldFileIds
-      ) {
-        id
-        ...ProfileForm_ProfileFieldFile
-      }
-    }
-    ${ProfileForm.fragments.ProfileFieldFile}
-  `,
-  gql`
-    mutation ProfileForm_deleteProfileFieldFile(
-      $profileId: GID!
-      $profileTypeFieldId: GID!
-      $profileFieldFileIds: [GID!]!
-    ) {
-      deleteProfileFieldFile(
-        profileId: $profileId
-        profileTypeFieldId: $profileTypeFieldId
-        profileFieldFileIds: $profileFieldFileIds
-      )
-    }
-  `,
-];
