@@ -579,6 +579,13 @@ export class PetitionBinder implements IPetitionBinder {
   }
 
   private isPrintableContentType(contentType: string) {
-    return ["application/pdf", "image/png", "image/jpeg", "image/gif"].includes(contentType);
+    return [
+      "application/pdf",
+      "image/png",
+      "image/jpeg",
+      "image/gif",
+      "image/heic",
+      "image/webp",
+    ].includes(contentType);
   }
 }
