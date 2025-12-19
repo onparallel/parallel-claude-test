@@ -8,9 +8,9 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
+  Input,
   Stack,
   Text,
-  useCounter,
 } from "@chakra-ui/react";
 import {
   MapFieldsTable,
@@ -19,43 +19,280 @@ import {
 } from "@parallel/components/common/MapFieldsTable";
 import { PetitionSelect, PetitionSelectInstance } from "@parallel/components/common/PetitionSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
-import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import {
+  WizardStepDialogProps,
+  useWizardDialog,
+} from "@parallel/components/common/dialogs/WizardDialog";
 import {
   CreatePetitionFieldReplyInput,
+  ImportRepliesDialog_PetitionFragment,
   ImportRepliesDialog_createPetitionFieldRepliesDocument,
   ImportRepliesDialog_createPetitionFieldRepliesMutation,
   ImportRepliesDialog_petitionDocument,
-  ImportRepliesDialog_petitionQuery,
 } from "@parallel/graphql/__types";
 import { isReplyContentCompatible, mapReplyContents } from "@parallel/utils/petitionFieldsReplies";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { groupBy, isNonNullish, isNullish, pick } from "remeda";
 
-export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ petitionId: string }>) {
-  const {
-    valueAsNumber: currentStep,
-    increment: nextStep,
-    decrement: prevStep,
-  } = useCounter({ min: 0, max: 1, defaultValue: 0 });
+type ImportRepliesDialogSteps = {
+  LOADING: {
+    petitionId: string;
+  };
+  SELECT_SOURCE: {
+    petition: ImportRepliesDialog_PetitionFragment;
+    sourcePetitionId?: string;
+  };
+  MAPPING: {
+    petition: ImportRepliesDialog_PetitionFragment;
+    sourcePetition: ImportRepliesDialog_PetitionFragment;
+  };
+};
 
+// ================================
+// LOADING PETITION STEP
+// ================================
+
+function ImportRepliesLoadingDialog({
+  petitionId,
+  onStep,
+  ...props
+}: WizardStepDialogProps<ImportRepliesDialogSteps, "LOADING", void>) {
+  const intl = useIntl();
+  const { data, loading } = useQuery(ImportRepliesDialog_petitionDocument, {
+    variables: { petitionId },
+    fetchPolicy: "cache-and-network",
+  });
+
+  useEffect(() => {
+    if (
+      !loading &&
+      isNonNullish(data) &&
+      isNonNullish(data.petition) &&
+      data.petition.__typename === "Petition"
+    ) {
+      onStep("SELECT_SOURCE", {
+        petition: data.petition,
+      });
+    }
+  }, [loading, data, onStep]);
+
+  return (
+    <ConfirmDialog
+      size="xl"
+      closeOnEsc={true}
+      closeOnOverlayClick={false}
+      hasCloseButton={true}
+      header={
+        <Flex alignItems="baseline">
+          <FormattedMessage
+            id="component.import-replies-dialog.title"
+            defaultMessage="Import replies"
+          />
+          <Text marginStart={2} color="gray.600" fontSize="md" fontWeight="400">
+            1/2
+          </Text>
+        </Flex>
+      }
+      body={
+        <FormControl isDisabled>
+          <FormLabel fontWeight={400}>
+            <FormattedMessage
+              id="component.import-replies-dialog.source-petition-label"
+              defaultMessage="Select the parallel to import the replies from"
+            />
+          </FormLabel>
+          <Input
+            placeholder={intl.formatMessage(
+              {
+                id: "component.petition-select.placeholder-petition",
+                defaultMessage: "Select {isMulti, select, true{parallels} other {a parallel}}",
+              },
+              {
+                isMulti: false,
+              },
+            )}
+          />
+        </FormControl>
+      }
+      confirm={
+        <Button colorScheme="primary" isDisabled>
+          <FormattedMessage
+            id="component.import-replies-dialog.next-button"
+            defaultMessage="Next"
+          />
+        </Button>
+      }
+      cancel={
+        <Button disabled>
+          <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
+        </Button>
+      }
+      {...props}
+    />
+  );
+}
+
+// ================================
+// SELECT SOURCE STEP
+// ================================
+
+function ImportRepliesSelectSourceDialog({
+  petition,
+  sourcePetitionId,
+  onStep,
+  ...props
+}: WizardStepDialogProps<ImportRepliesDialogSteps, "SELECT_SOURCE", void>) {
+  const {
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm<{
+    sourcePetitionId: null | string;
+  }>({
+    defaultValues: {
+      sourcePetitionId: sourcePetitionId ?? null,
+    },
+  });
+
+  const [getSelectedPetition, { loading: isLoadingSource }] = useLazyQuery(
+    ImportRepliesDialog_petitionDocument,
+    {
+      fetchPolicy: "cache-and-network",
+    },
+  );
+
+  const petitionSelectorRef = useRef<PetitionSelectInstance<false>>(null);
+
+  return (
+    <ConfirmDialog
+      closeOnEsc={false}
+      closeOnOverlayClick={false}
+      size="xl"
+      initialFocusRef={petitionSelectorRef}
+      hasCloseButton
+      content={{
+        containerProps: {
+          as: "form",
+          onSubmit: handleSubmit(async (data) => {
+            if (data.sourcePetitionId) {
+              const res = await getSelectedPetition({
+                variables: {
+                  petitionId: data.sourcePetitionId,
+                },
+              });
+              if (
+                isNonNullish(res?.data?.petition) &&
+                res.data.petition.__typename === "Petition"
+              ) {
+                onStep(
+                  "MAPPING",
+                  {
+                    petition,
+                    sourcePetition: res.data.petition,
+                  },
+                  {
+                    sourcePetitionId: data.sourcePetitionId,
+                  },
+                );
+              }
+            }
+          }),
+        },
+      }}
+      header={
+        <Flex alignItems="baseline">
+          <FormattedMessage
+            id="component.import-replies-dialog.title"
+            defaultMessage="Import replies"
+          />
+          <Text marginStart={2} color="gray.600" fontSize="md" fontWeight="400">
+            1/2
+          </Text>
+        </Flex>
+      }
+      body={
+        <FormControl isInvalid={!!errors.sourcePetitionId}>
+          <FormLabel fontWeight={400}>
+            <FormattedMessage
+              id="component.import-replies-dialog.source-petition-label"
+              defaultMessage="Select the parallel to import the replies from"
+            />
+          </FormLabel>
+          <Box width="100%">
+            <Controller
+              name="sourcePetitionId"
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { value, onChange, onBlur } }) => (
+                <PetitionSelect
+                  ref={petitionSelectorRef}
+                  value={value}
+                  defaultOptions
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !(e.target as HTMLInputElement).value) {
+                      e.preventDefault();
+                    }
+                  }}
+                  onChange={(petitions) => {
+                    onChange(petitions?.id ?? null);
+                  }}
+                  onBlur={onBlur}
+                  excludePetitions={[petition.id]}
+                />
+              )}
+            />
+          </Box>
+          <FormErrorMessage>
+            <FormattedMessage
+              id="component.import-replies-dialog.select-petition-error"
+              defaultMessage="Please, select a parallel to continue"
+            />
+          </FormErrorMessage>
+        </FormControl>
+      }
+      confirm={
+        <Button colorScheme="primary" type="submit" isLoading={isLoadingSource}>
+          <FormattedMessage
+            id="component.import-replies-dialog.next-button"
+            defaultMessage="Next"
+          />
+        </Button>
+      }
+      cancel={
+        <Button onClick={() => props.onReject("CLOSE")} isDisabled={isLoadingSource}>
+          <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
+        </Button>
+      }
+      {...props}
+    />
+  );
+}
+
+// ================================
+// MAPPING STEP
+// ================================
+
+function ImportRepliesMappingDialog({
+  petition,
+  sourcePetition,
+  onStep,
+  ...props
+}: WizardStepDialogProps<ImportRepliesDialogSteps, "MAPPING", void>) {
   const {
     handleSubmit,
     register,
     control,
     watch,
-    resetField,
     formState: { errors },
     setError,
     setValue,
   } = useForm<{
-    sourcePetitionId: null | string;
     mapping: Record<string, string>;
     overwriteExisting: boolean;
   }>({
     defaultValues: {
-      sourcePetitionId: null,
       mapping: {},
       overwriteExisting: false,
     },
@@ -65,34 +302,21 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
 
   const overwriteExisting = watch("overwriteExisting");
 
-  const [getSelectedPetition, { data: selectedPetitionData }] = useLazyQuery(
-    ImportRepliesDialog_petitionDocument,
-    {
-      fetchPolicy: "cache-and-network",
-    },
-  );
-
-  const { data: petitionData } = useQuery(ImportRepliesDialog_petitionDocument, {
-    variables: { petitionId },
-    fetchPolicy: "cache-and-network",
-  });
-
-  const petitionSelectorRef = useRef<PetitionSelectInstance<false>>(null);
-
   const [createPetitionFieldReplies, { loading: isSubmitting }] = useMutation(
     ImportRepliesDialog_createPetitionFieldRepliesDocument,
   );
 
-  const petitionFields = petitionData?.petition?.fields ?? [];
+  const petitionFields = petition.fields;
+  const sourcePetitionFields = sourcePetition.fields;
 
   const allFields = useMemo(
     () => petitionFields.flatMap((f) => [f, ...(f.children ?? [])]),
-    [petitionData?.petition?.fields],
+    [petitionFields],
   );
 
-  const allSelectedPetitionFields = useMemo(
+  const allSourcePetitionFields = useMemo(
     () =>
-      (selectedPetitionData?.petition?.fields ?? [])
+      sourcePetitionFields
         .flatMap((f) => [f, ...(f.children ?? [])])
         .map((f) => ({
           ...f,
@@ -100,22 +324,11 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
             ? f.replies.filter((r) => isNullish(r.content.error))
             : f.replies,
         })),
-    [selectedPetitionData?.petition?.fields],
+    [sourcePetitionFields],
   );
 
-  const setInitialMapping = (
-    sourcePetition: ImportRepliesDialog_petitionQuery | undefined | null,
-  ) => {
+  useEffect(() => {
     const mapping = {} as Record<string, string>;
-
-    const sourcePetitionFields = (sourcePetition?.petition?.fields ?? [])
-      .flatMap((f) => [f, ...(f.children ?? [])])
-      .map((f) => ({
-        ...f,
-        replies: ["ES_TAX_DOCUMENTS", "ID_VERIFICATION"].includes(f.type)
-          ? f.replies.filter((r) => isNullish(r.content.error))
-          : f.replies,
-      }));
 
     const filteredFields = allFields.filter(
       (f) =>
@@ -123,7 +336,7 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
         mapping[f.id] === undefined &&
         !f.options.replyOnlyFromProfile,
     );
-    const filteredSourceFields = sourcePetitionFields.filter(
+    const filteredSourceFields = allSourcePetitionFields.filter(
       (f) => !excludedFieldsOrigin.includes(f.type),
     );
 
@@ -171,116 +384,100 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
       }
     }
     setValue("mapping", mapping);
-  };
+  }, [allFields, allSourcePetitionFields, overwriteExisting, setValue]);
 
   return (
     <ConfirmDialog
       closeOnEsc={false}
       closeOnOverlayClick={false}
-      size={currentStep === 0 ? "xl" : "6xl"}
-      initialFocusRef={petitionSelectorRef}
+      size="6xl"
       hasCloseButton
       content={{
         containerProps: {
           as: "form",
           onSubmit: handleSubmit(async (data) => {
-            if (currentStep === 0) {
-              if (data.sourcePetitionId) {
-                const res = await getSelectedPetition({
+            const mappedFields = mapReplyContents({
+              mapping: data.mapping,
+              fields: allFields,
+              sourcePetitionFields: allSourcePetitionFields,
+              overwriteExisting: data.overwriteExisting,
+            });
+
+            const fieldGroups = mappedFields.fields.filter(
+              (f) => Object.keys(f.content).length === 0,
+            );
+
+            const groupsWithoutChildren = fieldGroups.length
+              ? fieldGroups
+                  .filter(({ id }) => !mappedFields.children.some((ch) => ch.targetFieldId === id))
+                  .map((r) => r.id)
+              : [];
+
+            if (
+              (mappedFields.fields.length || mappedFields.children.length) &&
+              groupsWithoutChildren.length === 0
+            ) {
+              let res =
+                null as ApolloLink.Result<ImportRepliesDialog_createPetitionFieldRepliesMutation> | null;
+
+              if (mappedFields.fields.length) {
+                res = await createPetitionFieldReplies({
                   variables: {
-                    petitionId: data.sourcePetitionId,
+                    petitionId: petition.id,
+                    fields: mappedFields.fields.map((data) => pick(data, ["id", "content"])),
+                    overwriteExisting: data.overwriteExisting,
                   },
                 });
-
-                setInitialMapping(res.data);
-                nextStep();
               }
-            } else {
-              const mappedFields = mapReplyContents({
-                mapping: data.mapping,
-                fields: allFields,
-                sourcePetitionFields: allSelectedPetitionFields,
-                overwriteExisting: data.overwriteExisting,
-              });
 
-              const fieldGroups = mappedFields.fields.filter(
-                (f) => Object.keys(f.content).length === 0,
+              let childrenFields = [] as CreatePetitionFieldReplyInput[];
+
+              Object.entries(groupBy(mappedFields.children, (ch) => ch.targetFieldId)).forEach(
+                ([targetFieldId, childrenReplyInput]) => {
+                  const field =
+                    res?.data?.createPetitionFieldReplies.filter(
+                      (r) => r.field?.id === targetFieldId,
+                    )[0]?.field ?? petitionFields.find((f) => f.id === targetFieldId);
+
+                  const replies =
+                    field?.replies.filter((reply) =>
+                      reply.children?.every((child) => child.replies.length === 0),
+                    ) ?? [];
+
+                  childrenFields = childrenFields.concat(
+                    Object.values(groupBy(childrenReplyInput, (ch) => ch.replyParentId)).flatMap(
+                      (petitionFieldReplies, index) => {
+                        return petitionFieldReplies.map((reply) => {
+                          return {
+                            id: reply.id,
+                            content: reply.content,
+                            parentReplyId: replies?.[index]?.id,
+                          };
+                        });
+                      },
+                    ),
+                  );
+                },
               );
 
-              const groupsWithoutChildren = fieldGroups.length
-                ? fieldGroups
-                    .filter(
-                      ({ id }) => !mappedFields.children.some((ch) => ch.targetFieldId === id),
-                    )
-                    .map((r) => r.id)
-                : [];
-
-              if (
-                (mappedFields.fields.length || mappedFields.children.length) &&
-                groupsWithoutChildren.length === 0
-              ) {
-                let res =
-                  null as ApolloLink.Result<ImportRepliesDialog_createPetitionFieldRepliesMutation> | null;
-
-                if (mappedFields.fields.length) {
-                  res = await createPetitionFieldReplies({
-                    variables: {
-                      petitionId,
-                      fields: mappedFields.fields.map((data) => pick(data, ["id", "content"])),
-                      overwriteExisting: data.overwriteExisting,
-                    },
-                  });
-                }
-
-                let childrenFields = [] as CreatePetitionFieldReplyInput[];
-
-                Object.entries(groupBy(mappedFields.children, (ch) => ch.targetFieldId)).forEach(
-                  ([targetFieldId, childrenReplyInput]) => {
-                    const field =
-                      res?.data?.createPetitionFieldReplies.filter(
-                        (r) => r.field?.id === targetFieldId,
-                      )[0]?.field ?? petitionFields.find((f) => f.id === targetFieldId);
-
-                    const replies =
-                      field?.replies.filter((reply) =>
-                        reply.children?.every((child) => child.replies.length === 0),
-                      ) ?? [];
-
-                    childrenFields = childrenFields.concat(
-                      Object.values(groupBy(childrenReplyInput, (ch) => ch.replyParentId)).flatMap(
-                        (petitionFieldReplies, index) => {
-                          return petitionFieldReplies.map((reply) => {
-                            return {
-                              id: reply.id,
-                              content: reply.content,
-                              parentReplyId: replies?.[index]?.id,
-                            };
-                          });
-                        },
-                      ),
-                    );
+              if (childrenFields.length) {
+                await createPetitionFieldReplies({
+                  variables: {
+                    petitionId: petition.id,
+                    fields: childrenFields,
+                    overwriteExisting: data.overwriteExisting,
                   },
-                );
+                });
+              }
 
-                if (childrenFields.length) {
-                  await createPetitionFieldReplies({
-                    variables: {
-                      petitionId,
-                      fields: childrenFields,
-                      overwriteExisting: data.overwriteExisting,
-                    },
-                  });
-                }
-
-                props.onResolve();
+              props.onResolve();
+            } else {
+              if (groupsWithoutChildren.length) {
+                setInvalidGroups(groupsWithoutChildren);
               } else {
-                if (groupsWithoutChildren.length) {
-                  setInvalidGroups(groupsWithoutChildren);
-                } else {
-                  setError("mapping", {
-                    type: "no_replies",
-                  });
-                }
+                setError("mapping", {
+                  type: "no_replies",
+                });
               }
             }
           }),
@@ -293,96 +490,54 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
             defaultMessage="Import replies"
           />
           <Text marginStart={2} color="gray.600" fontSize="md" fontWeight="400">
-            {currentStep + 1}/2
+            2/2
           </Text>
         </Flex>
       }
       body={
-        currentStep === 0 ? (
-          <FormControl isInvalid={!!errors.sourcePetitionId}>
-            <FormLabel fontWeight={400}>
+        <Stack spacing={4}>
+          <Text>
+            <FormattedMessage
+              id="component.import-replies-dialog.mapping-despcription"
+              defaultMessage="Map each field of the current parallel to the corresponding field from the source"
+            />
+          </Text>
+          <FormControl isDisabled={isSubmitting}>
+            <Checkbox {...register("overwriteExisting")}>
               <FormattedMessage
-                id="component.import-replies-dialog.source-petition-label"
-                defaultMessage="Select the parallel to import the replies from"
+                id="component.import-replies-dialog.checkbox-overwrite-replies"
+                defaultMessage="Overwrite existing replies"
               />
-            </FormLabel>
-            <Box width="100%">
-              <Controller
-                name="sourcePetitionId"
-                control={control}
-                rules={{ required: true }}
-                render={({ field: { value, onChange, onBlur } }) => (
-                  <PetitionSelect
-                    ref={petitionSelectorRef}
-                    value={value}
-                    defaultOptions
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !(e.target as HTMLInputElement).value) {
-                        e.preventDefault();
-                      }
-                    }}
-                    onChange={(petitions) => {
-                      onChange(petitions?.id ?? null);
-                      resetField("mapping");
-                    }}
-                    onBlur={onBlur}
-                    excludePetitions={[petitionId]}
-                  />
-                )}
-              />
-            </Box>
-            <FormErrorMessage>
-              <FormattedMessage
-                id="component.import-replies-dialog.select-petition-error"
-                defaultMessage="Please, select a parallel to continue"
-              />
-            </FormErrorMessage>
+            </Checkbox>
           </FormControl>
-        ) : (
-          <Stack spacing={4}>
-            <Text>
-              <FormattedMessage
-                id="component.import-replies-dialog.mapping-despcription"
-                defaultMessage="Map each field of the current parallel to the corresponding field from the source"
-              />
-            </Text>
-            <FormControl isDisabled={isSubmitting}>
-              <Checkbox {...register("overwriteExisting")}>
-                <FormattedMessage
-                  id="component.import-replies-dialog.checkbox-overwrite-replies"
-                  defaultMessage="Overwrite existing replies"
-                />
-              </Checkbox>
-            </FormControl>
-            <FormControl isInvalid={!!errors.mapping}>
-              <Controller
-                name="mapping"
-                control={control}
-                rules={{ validate: (value) => Object.keys(value).length > 0 }}
-                render={({ field: { value, onChange } }) => {
-                  return (
-                    <MapFieldsTable
-                      petition={petitionData!.petition!}
-                      sourcePetition={selectedPetitionData!.petition!}
-                      overwriteExisting={overwriteExisting}
-                      value={value}
-                      onChange={(props) => {
-                        setInvalidGroups(null);
-                        onChange(props);
-                      }}
-                      maxHeight="400px"
-                      isDisabled={isSubmitting}
-                      invalidGroups={invalidGroups}
-                    />
-                  );
-                }}
-              />
-            </FormControl>
-          </Stack>
-        )
+          <FormControl isInvalid={!!errors.mapping}>
+            <Controller
+              name="mapping"
+              control={control}
+              rules={{ validate: (value) => Object.keys(value).length > 0 }}
+              render={({ field: { value, onChange } }) => {
+                return (
+                  <MapFieldsTable
+                    petition={petition}
+                    sourcePetition={sourcePetition}
+                    overwriteExisting={overwriteExisting}
+                    value={value}
+                    onChange={(props) => {
+                      setInvalidGroups(null);
+                      onChange(props);
+                    }}
+                    maxHeight="400px"
+                    isDisabled={isSubmitting}
+                    invalidGroups={invalidGroups}
+                  />
+                );
+              }}
+            />
+          </FormControl>
+        </Stack>
       }
       alternative={
-        (isNonNullish(errors.mapping) || invalidGroups) && currentStep === 1 ? (
+        isNonNullish(errors.mapping) || invalidGroups ? (
           <Text color="red.600" aria-live="polite">
             {invalidGroups ? (
               <FormattedMessage
@@ -410,32 +565,12 @@ export function ImportRepliesDialog({ petitionId, ...props }: DialogProps<{ peti
       }
       confirm={
         <Button colorScheme="primary" type="submit" isLoading={isSubmitting}>
-          {currentStep === 0 ? (
-            <FormattedMessage
-              id="component.import-replies-dialog.next-button"
-              defaultMessage="Next"
-            />
-          ) : (
-            <FormattedMessage id="generic.import" defaultMessage="Import" />
-          )}
+          <FormattedMessage id="generic.import" defaultMessage="Import" />
         </Button>
       }
       cancel={
-        <Button
-          onClick={() => {
-            if (currentStep === 1) {
-              prevStep();
-            } else {
-              props.onReject("CLOSE");
-            }
-          }}
-          isDisabled={isSubmitting}
-        >
-          {currentStep === 0 ? (
-            <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
-          ) : (
-            <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
-          )}
+        <Button onClick={() => props.onBack()} isDisabled={isSubmitting}>
+          <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
         </Button>
       }
       {...props}
@@ -462,12 +597,9 @@ const _fragments = {
       }
     `;
   },
-};
-
-const _queries = [
-  gql`
-    query ImportRepliesDialog_petition($petitionId: GID!) {
-      petition(id: $petitionId) {
+  get Petition() {
+    return gql`
+      fragment ImportRepliesDialog_Petition on Petition {
         id
         ...MapFieldsTable_PetitionBase
         fields {
@@ -476,10 +608,22 @@ const _queries = [
           ...ImportRepliesDialog_PetitionField
         }
       }
+      ${mapReplyContents.fragments.PetitionField}
+      ${MapFieldsTable.fragments.PetitionBase}
+      ${this.PetitionField}
+    `;
+  },
+};
+
+const _queries = [
+  gql`
+    query ImportRepliesDialog_petition($petitionId: GID!) {
+      petition(id: $petitionId) {
+        id
+        ...ImportRepliesDialog_Petition
+      }
     }
-    ${mapReplyContents.fragments.PetitionField}
-    ${MapFieldsTable.fragments.PetitionBase}
-    ${_fragments.PetitionField}
+    ${_fragments.Petition}
   `,
 ];
 
@@ -506,5 +650,12 @@ const _mutations = [
 ];
 
 export function useImportRepliesDialog() {
-  return useDialog(ImportRepliesDialog);
+  return useWizardDialog(
+    {
+      LOADING: ImportRepliesLoadingDialog,
+      SELECT_SOURCE: ImportRepliesSelectSourceDialog,
+      MAPPING: ImportRepliesMappingDialog,
+    },
+    "LOADING",
+  );
 }

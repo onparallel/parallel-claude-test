@@ -22715,6 +22715,80 @@ export type ImportRepliesDialog_PetitionFieldFragment = {
   }>;
 };
 
+export type ImportRepliesDialog_PetitionFragment = {
+  __typename?: "Petition";
+  id: string;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+    options: { [key: string]: any };
+    multiple: boolean;
+    visibility?: { [key: string]: any } | null;
+    isInternal: boolean;
+    isReadOnly: boolean;
+    alias?: string | null;
+    fromPetitionFieldId?: string | null;
+    isChild: boolean;
+    children?: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      title?: string | null;
+      options: { [key: string]: any };
+      multiple: boolean;
+      visibility?: { [key: string]: any } | null;
+      isInternal: boolean;
+      isReadOnly: boolean;
+      alias?: string | null;
+      fromPetitionFieldId?: string | null;
+      isChild: boolean;
+      parent?: {
+        __typename?: "PetitionField";
+        id: string;
+        replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+      } | null;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+        status: PetitionFieldReplyStatus;
+        isAnonymized: boolean;
+        parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+        children?: Array<{
+          __typename?: "PetitionFieldGroupChildReply";
+          field: { __typename?: "PetitionField"; id: string };
+          replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+        }> | null;
+        field?: { __typename?: "PetitionField"; id: string; type: PetitionFieldType } | null;
+      }>;
+      profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+      children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
+    }> | null;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      status: PetitionFieldReplyStatus;
+      isAnonymized: boolean;
+      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: { __typename?: "PetitionField"; id: string };
+        replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+      }> | null;
+      field?: { __typename?: "PetitionField"; id: string; type: PetitionFieldType } | null;
+    }>;
+    parent?: {
+      __typename?: "PetitionField";
+      id: string;
+      replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+    } | null;
+    profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+  }>;
+};
+
 export type ImportRepliesDialog_petitionQueryVariables = Exact<{
   petitionId: Scalars["GID"]["input"];
 }>;
@@ -22794,79 +22868,7 @@ export type ImportRepliesDialog_petitionQuery = {
           profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
         }>;
       }
-    | {
-        __typename?: "PetitionTemplate";
-        id: string;
-        fields: Array<{
-          __typename?: "PetitionField";
-          id: string;
-          type: PetitionFieldType;
-          title?: string | null;
-          options: { [key: string]: any };
-          multiple: boolean;
-          visibility?: { [key: string]: any } | null;
-          isInternal: boolean;
-          isReadOnly: boolean;
-          alias?: string | null;
-          fromPetitionFieldId?: string | null;
-          isChild: boolean;
-          children?: Array<{
-            __typename?: "PetitionField";
-            id: string;
-            type: PetitionFieldType;
-            title?: string | null;
-            options: { [key: string]: any };
-            multiple: boolean;
-            visibility?: { [key: string]: any } | null;
-            isInternal: boolean;
-            isReadOnly: boolean;
-            alias?: string | null;
-            fromPetitionFieldId?: string | null;
-            isChild: boolean;
-            parent?: {
-              __typename?: "PetitionField";
-              id: string;
-              replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-            } | null;
-            replies: Array<{
-              __typename?: "PetitionFieldReply";
-              id: string;
-              content: { [key: string]: any };
-              status: PetitionFieldReplyStatus;
-              isAnonymized: boolean;
-              parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-              children?: Array<{
-                __typename?: "PetitionFieldGroupChildReply";
-                field: { __typename?: "PetitionField"; id: string };
-                replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-              }> | null;
-              field?: { __typename?: "PetitionField"; id: string; type: PetitionFieldType } | null;
-            }>;
-            profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
-            children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
-          }> | null;
-          replies: Array<{
-            __typename?: "PetitionFieldReply";
-            id: string;
-            content: { [key: string]: any };
-            status: PetitionFieldReplyStatus;
-            isAnonymized: boolean;
-            parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-            children?: Array<{
-              __typename?: "PetitionFieldGroupChildReply";
-              field: { __typename?: "PetitionField"; id: string };
-              replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-            }> | null;
-            field?: { __typename?: "PetitionField"; id: string; type: PetitionFieldType } | null;
-          }>;
-          parent?: {
-            __typename?: "PetitionField";
-            id: string;
-            replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
-          } | null;
-          profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
-        }>;
-      }
+    | { __typename?: "PetitionTemplate"; id: string }
     | null;
 };
 
@@ -76136,129 +76138,6 @@ export const ContactSelect_ContactFragmentDoc = gql`
     hasBouncedEmail
   }
 ` as unknown as DocumentNode<ContactSelect_ContactFragment, unknown>;
-export const getReplyContents_PetitionFieldReplyFragmentDoc = gql`
-  fragment getReplyContents_PetitionFieldReply on PetitionFieldReply {
-    content
-    isAnonymized
-  }
-` as unknown as DocumentNode<getReplyContents_PetitionFieldReplyFragment, unknown>;
-export const MapFieldsTable_PetitionFieldReplyFragmentDoc = gql`
-  fragment MapFieldsTable_PetitionFieldReply on PetitionFieldReply {
-    id
-    status
-    content
-    isAnonymized
-    parent {
-      id
-    }
-    field {
-      id
-      type
-    }
-    children {
-      replies {
-        id
-      }
-    }
-    ...getReplyContents_PetitionFieldReply
-  }
-  ${getReplyContents_PetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<MapFieldsTable_PetitionFieldReplyFragment, unknown>;
-export const isReplyContentCompatible_PetitionFieldFragmentDoc = gql`
-  fragment isReplyContentCompatible_PetitionField on PetitionField {
-    id
-    type
-    options
-    multiple
-    replies {
-      id
-      content
-    }
-    isChild
-  }
-` as unknown as DocumentNode<isReplyContentCompatible_PetitionFieldFragment, unknown>;
-export const getReplyContents_PetitionFieldFragmentDoc = gql`
-  fragment getReplyContents_PetitionField on PetitionField {
-    type
-    options
-  }
-` as unknown as DocumentNode<getReplyContents_PetitionFieldFragment, unknown>;
-export const MapFieldsTable_PetitionFieldDataFragmentDoc = gql`
-  fragment MapFieldsTable_PetitionFieldData on PetitionField {
-    id
-    title
-    type
-    visibility
-    options
-    multiple
-    isInternal
-    isReadOnly
-    alias
-    fromPetitionFieldId
-    profileTypeField {
-      id
-    }
-    replies {
-      ...MapFieldsTable_PetitionFieldReply
-    }
-    parent {
-      id
-    }
-    children {
-      id
-    }
-    ...isReplyContentCompatible_PetitionField
-    ...getReplyContents_PetitionField
-  }
-  ${MapFieldsTable_PetitionFieldReplyFragmentDoc}
-  ${isReplyContentCompatible_PetitionFieldFragmentDoc}
-  ${getReplyContents_PetitionFieldFragmentDoc}
-` as unknown as DocumentNode<MapFieldsTable_PetitionFieldDataFragment, unknown>;
-export const MapFieldsTable_PetitionFieldFragmentDoc = gql`
-  fragment MapFieldsTable_PetitionField on PetitionField {
-    ...MapFieldsTable_PetitionFieldData
-    children {
-      ...MapFieldsTable_PetitionFieldData
-    }
-  }
-  ${MapFieldsTable_PetitionFieldDataFragmentDoc}
-` as unknown as DocumentNode<MapFieldsTable_PetitionFieldFragment, unknown>;
-export const PetitionFieldSelect_PetitionFieldInnerFragmentDoc = gql`
-  fragment PetitionFieldSelect_PetitionFieldInner on PetitionField {
-    id
-    type
-    title
-    options
-    parent {
-      id
-    }
-  }
-` as unknown as DocumentNode<PetitionFieldSelect_PetitionFieldInnerFragment, unknown>;
-export const PetitionFieldSelect_PetitionBaseFragmentDoc = gql`
-  fragment PetitionFieldSelect_PetitionBase on PetitionBase {
-    fields {
-      id
-      ...PetitionFieldSelect_PetitionFieldInner
-      children {
-        id
-        ...PetitionFieldSelect_PetitionFieldInner
-      }
-    }
-  }
-  ${PetitionFieldSelect_PetitionFieldInnerFragmentDoc}
-` as unknown as DocumentNode<PetitionFieldSelect_PetitionBaseFragment, unknown>;
-export const MapFieldsTable_PetitionBaseFragmentDoc = gql`
-  fragment MapFieldsTable_PetitionBase on PetitionBase {
-    id
-    fields {
-      id
-      ...MapFieldsTable_PetitionField
-    }
-    ...PetitionFieldSelect_PetitionBase
-  }
-  ${MapFieldsTable_PetitionFieldFragmentDoc}
-  ${PetitionFieldSelect_PetitionBaseFragmentDoc}
-` as unknown as DocumentNode<MapFieldsTable_PetitionBaseFragment, unknown>;
 export const MapFieldsTable_ProfileFieldPropertyFragmentDoc = gql`
   fragment MapFieldsTable_ProfileFieldProperty on ProfileFieldProperty {
     field {
@@ -79059,6 +78938,167 @@ export const useEditTagsDialog_TagFragmentDoc = gql`
   }
   ${TagSelect_TagFragmentDoc}
 ` as unknown as DocumentNode<useEditTagsDialog_TagFragment, unknown>;
+export const getReplyContents_PetitionFieldReplyFragmentDoc = gql`
+  fragment getReplyContents_PetitionFieldReply on PetitionFieldReply {
+    content
+    isAnonymized
+  }
+` as unknown as DocumentNode<getReplyContents_PetitionFieldReplyFragment, unknown>;
+export const MapFieldsTable_PetitionFieldReplyFragmentDoc = gql`
+  fragment MapFieldsTable_PetitionFieldReply on PetitionFieldReply {
+    id
+    status
+    content
+    isAnonymized
+    parent {
+      id
+    }
+    field {
+      id
+      type
+    }
+    children {
+      replies {
+        id
+      }
+    }
+    ...getReplyContents_PetitionFieldReply
+  }
+  ${getReplyContents_PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<MapFieldsTable_PetitionFieldReplyFragment, unknown>;
+export const isReplyContentCompatible_PetitionFieldFragmentDoc = gql`
+  fragment isReplyContentCompatible_PetitionField on PetitionField {
+    id
+    type
+    options
+    multiple
+    replies {
+      id
+      content
+    }
+    isChild
+  }
+` as unknown as DocumentNode<isReplyContentCompatible_PetitionFieldFragment, unknown>;
+export const getReplyContents_PetitionFieldFragmentDoc = gql`
+  fragment getReplyContents_PetitionField on PetitionField {
+    type
+    options
+  }
+` as unknown as DocumentNode<getReplyContents_PetitionFieldFragment, unknown>;
+export const MapFieldsTable_PetitionFieldDataFragmentDoc = gql`
+  fragment MapFieldsTable_PetitionFieldData on PetitionField {
+    id
+    title
+    type
+    visibility
+    options
+    multiple
+    isInternal
+    isReadOnly
+    alias
+    fromPetitionFieldId
+    profileTypeField {
+      id
+    }
+    replies {
+      ...MapFieldsTable_PetitionFieldReply
+    }
+    parent {
+      id
+    }
+    children {
+      id
+    }
+    ...isReplyContentCompatible_PetitionField
+    ...getReplyContents_PetitionField
+  }
+  ${MapFieldsTable_PetitionFieldReplyFragmentDoc}
+  ${isReplyContentCompatible_PetitionFieldFragmentDoc}
+  ${getReplyContents_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<MapFieldsTable_PetitionFieldDataFragment, unknown>;
+export const MapFieldsTable_PetitionFieldFragmentDoc = gql`
+  fragment MapFieldsTable_PetitionField on PetitionField {
+    ...MapFieldsTable_PetitionFieldData
+    children {
+      ...MapFieldsTable_PetitionFieldData
+    }
+  }
+  ${MapFieldsTable_PetitionFieldDataFragmentDoc}
+` as unknown as DocumentNode<MapFieldsTable_PetitionFieldFragment, unknown>;
+export const PetitionFieldSelect_PetitionFieldInnerFragmentDoc = gql`
+  fragment PetitionFieldSelect_PetitionFieldInner on PetitionField {
+    id
+    type
+    title
+    options
+    parent {
+      id
+    }
+  }
+` as unknown as DocumentNode<PetitionFieldSelect_PetitionFieldInnerFragment, unknown>;
+export const PetitionFieldSelect_PetitionBaseFragmentDoc = gql`
+  fragment PetitionFieldSelect_PetitionBase on PetitionBase {
+    fields {
+      id
+      ...PetitionFieldSelect_PetitionFieldInner
+      children {
+        id
+        ...PetitionFieldSelect_PetitionFieldInner
+      }
+    }
+  }
+  ${PetitionFieldSelect_PetitionFieldInnerFragmentDoc}
+` as unknown as DocumentNode<PetitionFieldSelect_PetitionBaseFragment, unknown>;
+export const MapFieldsTable_PetitionBaseFragmentDoc = gql`
+  fragment MapFieldsTable_PetitionBase on PetitionBase {
+    id
+    fields {
+      id
+      ...MapFieldsTable_PetitionField
+    }
+    ...PetitionFieldSelect_PetitionBase
+  }
+  ${MapFieldsTable_PetitionFieldFragmentDoc}
+  ${PetitionFieldSelect_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<MapFieldsTable_PetitionBaseFragment, unknown>;
+export const mapReplyContents_PetitionFieldDataFragmentDoc = gql`
+  fragment mapReplyContents_PetitionFieldData on PetitionField {
+    id
+    type
+    options
+    multiple
+    replies {
+      id
+      content
+      parent {
+        id
+      }
+      children {
+        field {
+          id
+        }
+        replies {
+          id
+        }
+      }
+    }
+    parent {
+      id
+      replies {
+        id
+      }
+    }
+  }
+` as unknown as DocumentNode<mapReplyContents_PetitionFieldDataFragment, unknown>;
+export const mapReplyContents_PetitionFieldFragmentDoc = gql`
+  fragment mapReplyContents_PetitionField on PetitionField {
+    ...mapReplyContents_PetitionFieldData
+    children {
+      ...mapReplyContents_PetitionFieldData
+    }
+  }
+  ${mapReplyContents_PetitionFieldDataFragmentDoc}
+` as unknown as DocumentNode<mapReplyContents_PetitionFieldFragment, unknown>;
 export const ImportRepliesDialog_PetitionFieldFragmentDoc = gql`
   fragment ImportRepliesDialog_PetitionField on PetitionField {
     id
@@ -79075,6 +79115,20 @@ export const ImportRepliesDialog_PetitionFieldFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<ImportRepliesDialog_PetitionFieldFragment, unknown>;
+export const ImportRepliesDialog_PetitionFragmentDoc = gql`
+  fragment ImportRepliesDialog_Petition on Petition {
+    id
+    ...MapFieldsTable_PetitionBase
+    fields {
+      id
+      ...mapReplyContents_PetitionField
+      ...ImportRepliesDialog_PetitionField
+    }
+  }
+  ${MapFieldsTable_PetitionBaseFragmentDoc}
+  ${mapReplyContents_PetitionFieldFragmentDoc}
+  ${ImportRepliesDialog_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<ImportRepliesDialog_PetitionFragment, unknown>;
 export const PetitionSharingModal_UserFragmentDoc = gql`
   fragment PetitionSharingModal_User on User {
     id
@@ -88166,44 +88220,6 @@ export const useUpdateIsReadNotification_PetitionFieldCommentFragmentDoc = gql`
     isUnread
   }
 ` as unknown as DocumentNode<useUpdateIsReadNotification_PetitionFieldCommentFragment, unknown>;
-export const mapReplyContents_PetitionFieldDataFragmentDoc = gql`
-  fragment mapReplyContents_PetitionFieldData on PetitionField {
-    id
-    type
-    options
-    multiple
-    replies {
-      id
-      content
-      parent {
-        id
-      }
-      children {
-        field {
-          id
-        }
-        replies {
-          id
-        }
-      }
-    }
-    parent {
-      id
-      replies {
-        id
-      }
-    }
-  }
-` as unknown as DocumentNode<mapReplyContents_PetitionFieldDataFragment, unknown>;
-export const mapReplyContents_PetitionFieldFragmentDoc = gql`
-  fragment mapReplyContents_PetitionField on PetitionField {
-    ...mapReplyContents_PetitionFieldData
-    children {
-      ...mapReplyContents_PetitionFieldData
-    }
-  }
-  ${mapReplyContents_PetitionFieldDataFragmentDoc}
-` as unknown as DocumentNode<mapReplyContents_PetitionFieldFragment, unknown>;
 export const createMentionPlugin_UserOrUserGroupFragmentDoc = gql`
   fragment createMentionPlugin_UserOrUserGroup on UserOrUserGroup {
     ... on User {
@@ -89804,17 +89820,10 @@ export const ImportRepliesDialog_petitionDocument = gql`
   query ImportRepliesDialog_petition($petitionId: GID!) {
     petition(id: $petitionId) {
       id
-      ...MapFieldsTable_PetitionBase
-      fields {
-        id
-        ...mapReplyContents_PetitionField
-        ...ImportRepliesDialog_PetitionField
-      }
+      ...ImportRepliesDialog_Petition
     }
   }
-  ${MapFieldsTable_PetitionBaseFragmentDoc}
-  ${mapReplyContents_PetitionFieldFragmentDoc}
-  ${ImportRepliesDialog_PetitionFieldFragmentDoc}
+  ${ImportRepliesDialog_PetitionFragmentDoc}
 ` as unknown as DocumentNode<
   ImportRepliesDialog_petitionQuery,
   ImportRepliesDialog_petitionQueryVariables
