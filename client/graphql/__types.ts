@@ -42040,190 +42040,6 @@ export type ProfileForm_PetitionBaseFragment =
   | ProfileForm_PetitionBase_Petition_Fragment
   | ProfileForm_PetitionBase_PetitionTemplate_Fragment;
 
-export type ProfileForm_copyFileReplyToProfileFieldFileMutationVariables = Exact<{
-  profileId: Scalars["GID"]["input"];
-  profileTypeFieldId: Scalars["GID"]["input"];
-  petitionId: Scalars["GID"]["input"];
-  fileReplyIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
-  expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
-}>;
-
-export type ProfileForm_copyFileReplyToProfileFieldFileMutation = {
-  copyFileReplyToProfileFieldFile: Array<{
-    __typename?: "ProfileFieldFile";
-    id: string;
-    expiryDate?: string | null;
-    file?: {
-      __typename?: "FileUpload";
-      contentType: string;
-      filename: string;
-      isComplete: boolean;
-      size: number;
-    } | null;
-  }>;
-};
-
-export type ProfileForm_updateProfileFieldValueMutationVariables = Exact<{
-  profileId: Scalars["GID"]["input"];
-  fields: Array<UpdateProfileFieldValueInput> | UpdateProfileFieldValueInput;
-}>;
-
-export type ProfileForm_updateProfileFieldValueMutation = {
-  updateProfileFieldValue: {
-    __typename?: "Profile";
-    id: string;
-    status: ProfileStatus;
-    permanentDeletionAt?: string | null;
-    localizableName: { [locale in UserLocale]?: string };
-    profileType: {
-      __typename?: "ProfileType";
-      id: string;
-      name: { [locale in UserLocale]?: string };
-      standardType?: ProfileTypeStandardType | null;
-    };
-    properties: Array<{
-      __typename?: "ProfileFieldProperty";
-      field: {
-        __typename?: "ProfileTypeField";
-        id: string;
-        type: ProfileTypeFieldType;
-        isExpirable: boolean;
-        name: { [locale in UserLocale]?: string };
-        position: number;
-        myPermission: ProfileTypeFieldPermissionType;
-        alias?: string | null;
-        expiryAlertAheadTime?: Duration | null;
-        options: { [key: string]: any };
-      };
-      value?: {
-        __typename?: "ProfileFieldValue";
-        id: string;
-        content?: { [key: string]: any } | null;
-        expiryDate?: string | null;
-        createdAt: string;
-        isDraft: boolean;
-        hasPendingReview: boolean;
-        hasActiveMonitoring: boolean;
-        hasStoredValue: boolean;
-      } | null;
-      files?: Array<{
-        __typename?: "ProfileFieldFile";
-        id: string;
-        expiryDate?: string | null;
-        file?: {
-          __typename?: "FileUpload";
-          contentType: string;
-          filename: string;
-          isComplete: boolean;
-          size: number;
-        } | null;
-      }> | null;
-    }>;
-    relationships: Array<{ __typename?: "ProfileRelationship"; id: string }>;
-    petitionsTotalCount: { __typename?: "PetitionPagination"; totalCount: number };
-  };
-};
-
-export type ProfileForm_createProfileFieldFileUploadLinkMutationVariables = Exact<{
-  profileId: Scalars["GID"]["input"];
-  profileTypeFieldId: Scalars["GID"]["input"];
-  data: Array<FileUploadInput> | FileUploadInput;
-  expiryDate?: InputMaybe<Scalars["Date"]["input"]>;
-}>;
-
-export type ProfileForm_createProfileFieldFileUploadLinkMutation = {
-  createProfileFieldFileUploadLink: {
-    __typename?: "ProfileFieldPropertyAndFileWithUploadData";
-    uploads: Array<{
-      __typename?: "ProfileFieldFileWithUploadData";
-      presignedPostData: {
-        __typename?: "AWSPresignedPostData";
-        url: string;
-        fields: { [key: string]: any };
-      };
-      file: {
-        __typename?: "ProfileFieldFile";
-        id: string;
-        expiryDate?: string | null;
-        file?: {
-          __typename?: "FileUpload";
-          contentType: string;
-          filename: string;
-          isComplete: boolean;
-          size: number;
-        } | null;
-      };
-    }>;
-    property: {
-      __typename?: "ProfileFieldProperty";
-      field: {
-        __typename?: "ProfileTypeField";
-        id: string;
-        type: ProfileTypeFieldType;
-        isExpirable: boolean;
-        name: { [locale in UserLocale]?: string };
-        position: number;
-        myPermission: ProfileTypeFieldPermissionType;
-        alias?: string | null;
-        expiryAlertAheadTime?: Duration | null;
-        options: { [key: string]: any };
-      };
-      value?: {
-        __typename?: "ProfileFieldValue";
-        id: string;
-        content?: { [key: string]: any } | null;
-        expiryDate?: string | null;
-        createdAt: string;
-        isDraft: boolean;
-        hasPendingReview: boolean;
-        hasActiveMonitoring: boolean;
-        hasStoredValue: boolean;
-      } | null;
-      files?: Array<{
-        __typename?: "ProfileFieldFile";
-        id: string;
-        expiryDate?: string | null;
-        file?: {
-          __typename?: "FileUpload";
-          contentType: string;
-          filename: string;
-          isComplete: boolean;
-          size: number;
-        } | null;
-      }> | null;
-    };
-  };
-};
-
-export type ProfileForm_profileFieldFileUploadCompleteMutationVariables = Exact<{
-  profileId: Scalars["GID"]["input"];
-  profileTypeFieldId: Scalars["GID"]["input"];
-  profileFieldFileIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
-}>;
-
-export type ProfileForm_profileFieldFileUploadCompleteMutation = {
-  profileFieldFileUploadComplete: Array<{
-    __typename?: "ProfileFieldFile";
-    id: string;
-    expiryDate?: string | null;
-    file?: {
-      __typename?: "FileUpload";
-      contentType: string;
-      filename: string;
-      isComplete: boolean;
-      size: number;
-    } | null;
-  }>;
-};
-
-export type ProfileForm_deleteProfileFieldFileMutationVariables = Exact<{
-  profileId: Scalars["GID"]["input"];
-  profileTypeFieldId: Scalars["GID"]["input"];
-  profileFieldFileIds: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
-}>;
-
-export type ProfileForm_deleteProfileFieldFileMutation = { deleteProfileFieldFile: Result };
-
 export type ProfileFormInner_ProfileTypeFieldFragment = {
   __typename?: "ProfileTypeField";
   id: string;
@@ -44863,6 +44679,7 @@ export type ProfileFormField_ProfileFieldPropertyFragment = {
     id: string;
     content?: { [key: string]: any } | null;
     isDraft: boolean;
+    expiryDate?: string | null;
     hasPendingReview: boolean;
     hasActiveMonitoring: boolean;
     hasStoredValue: boolean;
@@ -44884,6 +44701,7 @@ export type ProfileFormField_ProfileFieldValueFragment = {
   id: string;
   content?: { [key: string]: any } | null;
   isDraft: boolean;
+  expiryDate?: string | null;
   hasPendingReview: boolean;
   hasActiveMonitoring: boolean;
   hasStoredValue: boolean;
@@ -76809,6 +76627,7 @@ export const ProfileFormField_ProfileFieldValueFragmentDoc = gql`
     id
     content
     isDraft
+    expiryDate
     hasPendingReview
     hasActiveMonitoring
     hasStoredValue
@@ -91819,112 +91638,6 @@ export const UpdateProfileFieldValueOnClosePetitionDialog_petitionDocument = gql
 ` as unknown as DocumentNode<
   UpdateProfileFieldValueOnClosePetitionDialog_petitionQuery,
   UpdateProfileFieldValueOnClosePetitionDialog_petitionQueryVariables
->;
-export const ProfileForm_copyFileReplyToProfileFieldFileDocument = gql`
-  mutation ProfileForm_copyFileReplyToProfileFieldFile(
-    $profileId: GID!
-    $profileTypeFieldId: GID!
-    $petitionId: GID!
-    $fileReplyIds: [GID!]!
-    $expiryDate: Date
-  ) {
-    copyFileReplyToProfileFieldFile(
-      profileId: $profileId
-      profileTypeFieldId: $profileTypeFieldId
-      petitionId: $petitionId
-      fileReplyIds: $fileReplyIds
-      expiryDate: $expiryDate
-    ) {
-      ...ProfileForm_ProfileFieldFile
-    }
-  }
-  ${ProfileForm_ProfileFieldFileFragmentDoc}
-` as unknown as DocumentNode<
-  ProfileForm_copyFileReplyToProfileFieldFileMutation,
-  ProfileForm_copyFileReplyToProfileFieldFileMutationVariables
->;
-export const ProfileForm_updateProfileFieldValueDocument = gql`
-  mutation ProfileForm_updateProfileFieldValue(
-    $profileId: GID!
-    $fields: [UpdateProfileFieldValueInput!]!
-  ) {
-    updateProfileFieldValue(profileId: $profileId, fields: $fields) {
-      ...ProfileForm_Profile
-    }
-  }
-  ${ProfileForm_ProfileFragmentDoc}
-` as unknown as DocumentNode<
-  ProfileForm_updateProfileFieldValueMutation,
-  ProfileForm_updateProfileFieldValueMutationVariables
->;
-export const ProfileForm_createProfileFieldFileUploadLinkDocument = gql`
-  mutation ProfileForm_createProfileFieldFileUploadLink(
-    $profileId: GID!
-    $profileTypeFieldId: GID!
-    $data: [FileUploadInput!]!
-    $expiryDate: Date
-  ) {
-    createProfileFieldFileUploadLink(
-      profileId: $profileId
-      profileTypeFieldId: $profileTypeFieldId
-      data: $data
-      expiryDate: $expiryDate
-    ) {
-      uploads {
-        presignedPostData {
-          ...uploadFile_AWSPresignedPostData
-        }
-        file {
-          ...ProfileForm_ProfileFieldFile
-        }
-      }
-      property {
-        ...ProfileForm_ProfileFieldProperty
-      }
-    }
-  }
-  ${uploadFile_AWSPresignedPostDataFragmentDoc}
-  ${ProfileForm_ProfileFieldFileFragmentDoc}
-  ${ProfileForm_ProfileFieldPropertyFragmentDoc}
-` as unknown as DocumentNode<
-  ProfileForm_createProfileFieldFileUploadLinkMutation,
-  ProfileForm_createProfileFieldFileUploadLinkMutationVariables
->;
-export const ProfileForm_profileFieldFileUploadCompleteDocument = gql`
-  mutation ProfileForm_profileFieldFileUploadComplete(
-    $profileId: GID!
-    $profileTypeFieldId: GID!
-    $profileFieldFileIds: [GID!]!
-  ) {
-    profileFieldFileUploadComplete(
-      profileId: $profileId
-      profileTypeFieldId: $profileTypeFieldId
-      profileFieldFileIds: $profileFieldFileIds
-    ) {
-      id
-      ...ProfileForm_ProfileFieldFile
-    }
-  }
-  ${ProfileForm_ProfileFieldFileFragmentDoc}
-` as unknown as DocumentNode<
-  ProfileForm_profileFieldFileUploadCompleteMutation,
-  ProfileForm_profileFieldFileUploadCompleteMutationVariables
->;
-export const ProfileForm_deleteProfileFieldFileDocument = gql`
-  mutation ProfileForm_deleteProfileFieldFile(
-    $profileId: GID!
-    $profileTypeFieldId: GID!
-    $profileFieldFileIds: [GID!]!
-  ) {
-    deleteProfileFieldFile(
-      profileId: $profileId
-      profileTypeFieldId: $profileTypeFieldId
-      profileFieldFileIds: $profileFieldFileIds
-    )
-  }
-` as unknown as DocumentNode<
-  ProfileForm_deleteProfileFieldFileMutation,
-  ProfileForm_deleteProfileFieldFileMutationVariables
 >;
 export const ProfileFormInner_copyFileReplyToProfileFieldFileDocument = gql`
   mutation ProfileFormInner_copyFileReplyToProfileFieldFile(

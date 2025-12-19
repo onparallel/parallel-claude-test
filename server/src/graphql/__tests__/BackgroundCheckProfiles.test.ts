@@ -1243,7 +1243,7 @@ describe("Background Check - Profiles", () => {
       });
 
       // mark a false positive
-      await testClient.execute(
+      const { errors: updateFalsePositivesErrors } = await testClient.execute(
         gql`
           mutation ($token: String!, $entityIds: [String!]!) {
             updateBackgroundCheckSearchFalsePositives(
@@ -1258,6 +1258,8 @@ describe("Background Check - Profiles", () => {
           entityIds: ["Q7747", "rupep-company-718"],
         },
       );
+
+      expect(updateFalsePositivesErrors).toBeUndefined();
 
       // force a search update with less results
       backgroundCheckServiceSpy.mockResolvedValueOnce({
@@ -1613,7 +1615,7 @@ describe("Background Check - Profiles", () => {
         items: [{ id: "Q7747" }, { id: "rupep-company-718" }],
       });
 
-      await testClient.execute(
+      const { errors: updateFalsePositivesErrors } = await testClient.execute(
         gql`
           mutation ($token: String!, $entityIds: [String!]!) {
             updateBackgroundCheckSearchFalsePositives(
@@ -1628,6 +1630,8 @@ describe("Background Check - Profiles", () => {
           entityIds: ["Q7747", "rupep-company-718"],
         },
       );
+
+      expect(updateFalsePositivesErrors).toBeUndefined();
 
       backgroundCheckServiceSpy.mockResolvedValueOnce({
         totalCount: 1,

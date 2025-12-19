@@ -10058,6 +10058,175 @@ describe("GraphQL/Profiles", () => {
       expect(errors).toContainGraphQLError("INVALID_PROFILE_FIELD_VALUE");
       expect(data).toBeNull();
     });
+
+    it("setting expiryDate on a draft value should update the expiryDate of the draft and not trigger events", async () => {
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[0].id));
+      await mocks.createProfileFieldValues(fromGlobalId(profile.id).id, [
+        {
+          created_by_user_id: sessionUser.id,
+          type: "BACKGROUND_CHECK",
+          profile_type_field_id: profileType0Fields[8].id,
+          is_draft: true,
+          content: JSON.stringify({
+            query: {
+              date: null,
+              name: "vladimir putin",
+              type: "PERSON",
+              country: null,
+              birthCountry: null,
+            },
+            entity: null,
+            search: {
+              items: [
+                {
+                  id: "Q7747",
+                  name: "Vladimir Putin",
+                  type: "Person",
+                  score: 1,
+                  properties: {
+                    gender: ["male"],
+                    topics: [
+                      "wanted",
+                      "sanction",
+                      "export.control",
+                      "role.pep",
+                      "corp.disqual",
+                      "poi",
+                    ],
+                    country: ["ru"],
+                    birthDate: ["1952-10-07"],
+                    countryOfBirth: ["ru"],
+                  },
+                },
+                {
+                  id: "Q130234762",
+                  name: "Vladimir Putin Jr.",
+                  type: "Person",
+                  score: 1,
+                  properties: {
+                    gender: ["male"],
+                    topics: ["sanction.linked", "role.rca"],
+                    birthDate: ["2019"],
+                  },
+                },
+                {
+                  id: "Q56026303",
+                  name: "Volodymyr Petin",
+                  type: "Person",
+                  score: 0.9,
+                  properties: {
+                    gender: ["male"],
+                    topics: ["role.pep"],
+                    birthDate: ["1949-04-06"],
+                  },
+                },
+                {
+                  id: "ru-inn-253003064647",
+                  name: "ВЛАДИМИР ВЛАДИМИРОВИЧ ПЯТИН",
+                  type: "Person",
+                  score: 0.9,
+                  properties: {
+                    country: ["ru"],
+                  },
+                },
+              ],
+              createdAt: new Date(),
+              totalCount: 4,
+            },
+          }),
+        },
+      ]);
+
+      await mocks.knex.from("profile_type_field").where("id", profileType0Fields[8].id).update({
+        is_expirable: true,
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $profileId: GID!
+            $fields: [UpdateProfileFieldValueInput!]!
+            $profileTypeFieldId: GID!
+          ) {
+            updateProfileFieldValue(profileId: $profileId, fields: $fields) {
+              id
+              properties(filter: [{ profileTypeFieldId: $profileTypeFieldId }]) {
+                field {
+                  type
+                }
+                value {
+                  content
+                  expiryDate
+                  isDraft
+                }
+              }
+              events(limit: 10, offset: 0) {
+                totalCount
+                items {
+                  type
+                  data
+                }
+              }
+            }
+          }
+        `,
+        {
+          profileId: profile.id,
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
+          fields: [
+            {
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
+              expiryDate: "2025-12-18",
+            },
+          ],
+        },
+      );
+
+      await mocks.knex.from("profile_type_field").where("id", profileType0Fields[8].id).update({
+        is_expirable: false,
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateProfileFieldValue).toEqual({
+        id: profile.id,
+        properties: [
+          {
+            field: { type: "BACKGROUND_CHECK" },
+            value: {
+              content: {
+                entity: null,
+                query: {
+                  date: null,
+                  name: "vladimir putin",
+                  type: "PERSON",
+                  country: null,
+                  birthCountry: null,
+                },
+                search: {
+                  createdAt: expect.any(String),
+                  falsePositivesCount: 0,
+                  totalCount: 4,
+                },
+              },
+              expiryDate: "2025-12-18",
+              isDraft: true,
+            },
+          },
+        ],
+        events: {
+          totalCount: 1,
+          items: [
+            {
+              type: "PROFILE_CREATED",
+              data: {
+                userId: toGlobalId("User", sessionUser.id),
+                integrationId: null,
+              },
+            },
+          ],
+        },
+      });
+    });
   });
 
   describe("deleteProfile", () => {

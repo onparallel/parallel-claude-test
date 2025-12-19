@@ -11,10 +11,10 @@ import {
   ProfileFormInner_ProfileFieldPropertyFragment,
   ProfileFormInner_copyFileReplyToProfileFieldFileDocument,
   ProfileFormInner_createProfileFieldFileUploadLinkDocument,
+  ProfileFormInner_deleteProfileFieldFileDocument,
   ProfileFormInner_profileFieldFileUploadCompleteDocument,
   ProfileFormInner_updateProfileFieldValueDocument,
   ProfileForm_PetitionBaseFragment,
-  ProfileForm_deleteProfileFieldFileDocument,
   ProfileTypeFieldType,
   UpdateProfileFieldValueInput,
   buildFormDefaultValue_ProfileFieldPropertyFragment,
@@ -298,7 +298,7 @@ export function useProfileFormInnerSubmitHandler({
     ProfileFormInner_copyFileReplyToProfileFieldFileDocument,
   );
 
-  const [deleteProfileFieldFile] = useMutation(ProfileForm_deleteProfileFieldFileDocument);
+  const [deleteProfileFieldFile] = useMutation(ProfileFormInner_deleteProfileFieldFileDocument);
 
   const showErrorDialog = useErrorDialog();
 
@@ -326,7 +326,9 @@ export function useProfileFormInnerSubmitHandler({
 
                 if (type === "BACKGROUND_CHECK" || type === "ADVERSE_MEDIA_SEARCH") {
                   if (
-                    (content?.search || content?.entity || content?.articles) &&
+                    (property.value?.content?.search ||
+                      property.value?.content?.entity ||
+                      property.value?.content?.articles) &&
                     property.field.isExpirable
                   ) {
                     // BACKGROUND_CHECK and ADVERSE_MEDIA_SEARCH can only update expiryDate through this mutation

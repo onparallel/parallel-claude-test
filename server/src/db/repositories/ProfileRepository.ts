@@ -1683,6 +1683,17 @@ export class ProfileRepository extends BaseRepository {
       /* sql */ `
         with new_values as (
           select * from (?) as t(profile_id, profile_type_field_id, type, content, expiry_date)
+        ),
+        updated_expiry_dates as (
+          update profile_field_value pfv
+            set expiry_date = nv.expiry_date
+          from new_values nv
+          where pfv.profile_id = nv.profile_id and pfv.profile_type_field_id = nv.profile_type_field_id
+          and pfv.removed_at is null 
+          and pfv.deleted_at is null
+          and pfv.is_draft = true
+          and nv.expiry_date is not null
+          and nv.content is null
         )
         insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, active_monitoring, created_by_user_id, source, is_draft)
         select
@@ -1696,6 +1707,7 @@ export class ProfileRepository extends BaseRepository {
           ?, -- source
           true
         from new_values nv
+        where nv.content is not null
         on conflict ("profile_id", "profile_type_field_id") where ((removed_at is null) and (deleted_at is null) and (is_draft = true))
         do update
         set

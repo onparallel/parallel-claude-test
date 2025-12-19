@@ -118,7 +118,7 @@ function ProfileFieldFileContent({ file, field, profileId }: ProfileFieldFileCon
 }
 
 const ProfileFieldFiles = chakraForwardRef<"ul" | "div", ProfilePropertyContentProps>(
-  function ProfileFieldFiles({ files, field, profileId, singleLine, ...props }, ref) {
+  function ProfileFieldFiles({ files, field, profileId, singleLine, fromHistory, ...props }, ref) {
     assert(files !== undefined, "files must be defined if field type is FILE");
     const buttons =
       files?.map((file, key) => (

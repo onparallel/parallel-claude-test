@@ -19,6 +19,7 @@ import {
   indexBy,
   isNonNullish,
   isNullish,
+  partition,
   pipe,
   unique,
   uniqueBy,
@@ -1394,10 +1395,28 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
       });
     }
 
+    const [draftUpdates, valueUpdates] = partition(updateFieldsData, (f) => {
+      const currentDraft = valuesByPtfId[f.profileTypeFieldId]?.find(
+        (v) => v.profile_id === f.profileId && v.is_draft,
+      );
+      return (
+        // updating expiryDate on a draft value maintains current draft
+        (isNullish(f.content) && isNonNullish(f.expiryDate) && isNonNullish(currentDraft)) ||
+        // updating content on a draft value maintains current draft if it's still a draft
+        (isNonNullish(f.content) && ctx.profilesHelper.isDraftContent(f.type, f.content))
+      );
+    });
+
     try {
+      await ctx.profiles.upsertDraftProfileFieldValues(
+        draftUpdates,
+        ctx.user!.id,
+        source ?? "MANUAL",
+      );
+
       const events = await ctx.profiles.updateProfileFieldValues(
         await pMap(
-          updateFieldsData,
+          valueUpdates,
           async (field) => ({
             ...field,
             // map content after being sure there are no INVALID_PROFILE_FIELD_VALUE errors
@@ -1422,6 +1441,7 @@ export const updateProfileFieldValue = mutationField("updateProfileFieldValue", 
         userId: ctx.user!.id,
         source: source ?? "MANUAL",
       });
+
       ctx.profiles.loadProfileFieldValuesAndDraftsByProfileId.dataloader.clear(profileId);
     } catch (e) {
       if (

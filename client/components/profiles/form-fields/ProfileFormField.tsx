@@ -78,7 +78,7 @@ export function ProfileFormField(props: ProfileFormFieldProps) {
   const isInvalid = !!errors.fields?.[field.id];
 
   const fieldValue = useWatch({ control, name: `fields.${field.id}` });
-  const expiryDate = fieldValue?.expiryDate;
+  const expiryDate = fieldValue?.expiryDate ?? props.value?.expiryDate;
   const content = fieldValue?.content;
 
   const fieldHasValue =
@@ -115,28 +115,37 @@ export function ProfileFormField(props: ProfileFormFieldProps) {
     setValue,
   });
 
-  let fieldIsEmpty = true;
-  if ((field.type === "FILE" && files && files?.length > 0) || content?.value?.length > 0) {
-    fieldIsEmpty = false;
-  } else if (
-    field.type !== "FILE" &&
-    isNonNullish(content?.value) &&
-    typeof content?.value === "string" &&
-    content?.value?.length > 0
-  ) {
-    fieldIsEmpty = false;
-  } else if (
-    field.type === "BACKGROUND_CHECK" &&
-    (isNonNullish(content?.search) || isNonNullish(content?.entity))
-  ) {
-    fieldIsEmpty = false;
-  } else if (
-    field.type === "ADVERSE_MEDIA_SEARCH" &&
-    isNonNullish(content?.articles) &&
-    isNonNullish(content?.search)
-  ) {
-    fieldIsEmpty = false;
-  }
+  const fieldIsEmpty = (() => {
+    switch (field.type) {
+      case "FILE":
+        return !(files && files.length > 0);
+
+      case "NUMBER":
+        return !isNonNullish(content?.value);
+
+      case "BACKGROUND_CHECK": {
+        const valueContent = props.value?.content;
+        return !isNonNullish(valueContent?.search) && !isNonNullish(valueContent?.entity);
+      }
+
+      case "ADVERSE_MEDIA_SEARCH": {
+        const valueContent = props.value?.content;
+        return !isNonNullish(valueContent?.articles) || !isNonNullish(valueContent?.search);
+      }
+
+      default: {
+        if (!isNonNullish(content) || !isNonNullish(content.value)) {
+          return true;
+        }
+        const value = content.value;
+        if (typeof value === "string" || Array.isArray(value)) {
+          return value.length === 0;
+        }
+        return false;
+      }
+    }
+  })();
+
   const locales = useSupportedUserLocales();
 
   const needsExpirationDialog =
@@ -536,6 +545,7 @@ ProfileFormField.fragments = {
         id
         content
         isDraft
+        expiryDate
         hasPendingReview
         hasActiveMonitoring
         hasStoredValue

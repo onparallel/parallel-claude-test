@@ -666,61 +666,59 @@ function CreateOrUpdateProfileTypeFieldDialog({
             {selectedType === "USER_ASSIGNMENT" ? <ProfileFieldUserAssignmentSettings /> : null}
           </FormProvider>
 
-          {selectedType === "USER_ASSIGNMENT" ? null : (
-            <Stack spacing={2}>
-              <FormControl as={HStack} isInvalid={!!errors.isExpirable}>
-                <Stack flex={1} spacing={1}>
-                  <FormLabel margin={0}>
+          <Stack spacing={2}>
+            <FormControl as={HStack} isInvalid={!!errors.isExpirable}>
+              <Stack flex={1} spacing={1}>
+                <FormLabel margin={0}>
+                  <FormattedMessage
+                    id="component.create-or-update-property-dialog.expiration"
+                    defaultMessage="Expiration"
+                  />
+                </FormLabel>
+                <FormHelperText margin={0}>
+                  <FormattedMessage
+                    id="component.create-or-update-property-dialog.expiration-description"
+                    defaultMessage="Select if this property will have an expiration date. Example: Passports and contracts."
+                  />
+                </FormHelperText>
+              </Stack>
+              <Center>
+                <Switch {...register("isExpirable")} />
+              </Center>
+            </FormControl>
+            {isExpirable ? (
+              <>
+                {selectedType === "DATE" ? (
+                  <FormControl>
+                    <Checkbox {...register("options.useReplyAsExpiryDate")}>
+                      <FormattedMessage
+                        id="component.create-or-update-property-dialog.use-reply-as-expiry-date"
+                        defaultMessage="Use reply as expiry date"
+                      />
+                    </Checkbox>
+                  </FormControl>
+                ) : null}
+                <FormControl as={HStack} isInvalid={!!errors.expiryAlertAheadTime}>
+                  <FormLabel fontSize="sm" whiteSpace="nowrap" fontWeight="normal" margin={0}>
                     <FormattedMessage
-                      id="component.create-or-update-property-dialog.expiration"
-                      defaultMessage="Expiration"
+                      id="component.create-or-update-property-dialog.expiry-alert-ahead-time-label"
+                      defaultMessage="Remind on:"
                     />
                   </FormLabel>
-                  <FormHelperText margin={0}>
-                    <FormattedMessage
-                      id="component.create-or-update-property-dialog.expiration-description"
-                      defaultMessage="Select if this property will have an expiration date. Example: Passports and contracts."
+                  <Box width="100%">
+                    <Controller
+                      name="expiryAlertAheadTime"
+                      control={control}
+                      rules={{ required: isExpirable ? true : false }}
+                      render={({ field }) => (
+                        <SimpleSelect size="sm" options={expirationOptions} {...field} />
+                      )}
                     />
-                  </FormHelperText>
-                </Stack>
-                <Center>
-                  <Switch {...register("isExpirable")} />
-                </Center>
-              </FormControl>
-              {isExpirable ? (
-                <>
-                  {selectedType === "DATE" ? (
-                    <FormControl>
-                      <Checkbox {...register("options.useReplyAsExpiryDate")}>
-                        <FormattedMessage
-                          id="component.create-or-update-property-dialog.use-reply-as-expiry-date"
-                          defaultMessage="Use reply as expiry date"
-                        />
-                      </Checkbox>
-                    </FormControl>
-                  ) : null}
-                  <FormControl as={HStack} isInvalid={!!errors.expiryAlertAheadTime}>
-                    <FormLabel fontSize="sm" whiteSpace="nowrap" fontWeight="normal" margin={0}>
-                      <FormattedMessage
-                        id="component.create-or-update-property-dialog.expiry-alert-ahead-time-label"
-                        defaultMessage="Remind on:"
-                      />
-                    </FormLabel>
-                    <Box width="100%">
-                      <Controller
-                        name="expiryAlertAheadTime"
-                        control={control}
-                        rules={{ required: isExpirable ? true : false }}
-                        render={({ field }) => (
-                          <SimpleSelect size="sm" options={expirationOptions} {...field} />
-                        )}
-                      />
-                    </Box>
-                  </FormControl>
-                </>
-              ) : null}
-            </Stack>
-          )}
+                  </Box>
+                </FormControl>
+              </>
+            ) : null}
+          </Stack>
         </Stack>
       }
       confirm={
