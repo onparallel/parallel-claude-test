@@ -1,6 +1,6 @@
 # This is already fixed in version 15+ https://github.com/vercel/next.js/pull/69766/files
 diff --git a/node_modules/next/dist/esm/shared/lib/router/router.js b/node_modules/next/dist/esm/shared/lib/router/router.js
-index 619a59d..f4f8c53 100644
+index 619a59d..ac4d598 100644
 --- a/node_modules/next/dist/esm/shared/lib/router/router.js
 +++ b/node_modules/next/dist/esm/shared/lib/router/router.js
 @@ -989,7 +989,6 @@ class Router {
@@ -20,7 +20,7 @@ index 619a59d..f4f8c53 100644
              let props;
              const { page: Component, styleSheets } = await this.fetchComponent("/_error");
 diff --git a/node_modules/next/dist/shared/lib/router/router.js b/node_modules/next/dist/shared/lib/router/router.js
-index 921d2de..111732a 100644
+index 921d2de..f89c1df 100644
 --- a/node_modules/next/dist/shared/lib/router/router.js
 +++ b/node_modules/next/dist/shared/lib/router/router.js
 @@ -1017,7 +1017,6 @@ class Router {
