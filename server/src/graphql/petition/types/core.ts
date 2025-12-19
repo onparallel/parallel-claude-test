@@ -234,7 +234,7 @@ export const PetitionBase = interfaceType({
         const bypassUser = await ctx.petitions.loadUserBypassPetitionPermission(ctx.user!.id);
         return bypassUser && root.org_id === bypassUser.org_id
           ? {
-              type: "WRITE",
+              type: "OWNER",
               user_id: ctx.user!.id,
               petition_id: root.id,
               is_subscribed: false,
@@ -507,7 +507,7 @@ export const PetitionBaseMini = objectType({
         const bypassUser = await ctx.petitions.loadUserBypassPetitionPermission(ctx.user!.id);
         return bypassUser && root.org_id === bypassUser.org_id
           ? {
-              type: "WRITE",
+              type: "OWNER",
               user_id: ctx.user!.id,
               petition_id: root.id,
               is_subscribed: false,

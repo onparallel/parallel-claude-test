@@ -48,6 +48,7 @@ import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterW
 import { usePetitionSharingBackgroundTask } from "@parallel/utils/tasks/usePetitionSharingTask";
 import { Maybe } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
+import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useSearchUserGroups } from "@parallel/utils/useSearchUserGroups";
 import { ReactNode, useCallback, useEffect, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -112,6 +113,7 @@ export function PetitionSharingDialog({
     fetchPolicy: "cache-and-network",
   });
 
+  const userHasBypassPermission = useHasPermission("PETITIONS:BYPASS_PERMISSIONS");
   const sharingInfo = data?.petitionsSharingInfo ?? {
     totalCount: 0,
     ownedCount: 0,
@@ -346,15 +348,17 @@ export function PetitionSharingDialog({
                       onChange={onChange}
                       onBlur={onBlur}
                       onSearch={handleSearchUsersAndGroups}
-                      isDisabled={sharingInfo.ownedOrWriteIds.length === 0}
-                      placeholder={
-                        sharingInfo.ownedOrWriteIds.length
-                          ? undefined
-                          : intl.formatMessage({
+                      isDisabled={
+                        sharingInfo.ownedOrWriteIds.length === 0 && !userHasBypassPermission
+                      }
+                      {...(sharingInfo.ownedOrWriteIds.length === 0 && !userHasBypassPermission
+                        ? {
+                            placeholder: intl.formatMessage({
                               id: "component.petition-sharing-dialog.input-placeholder-not-owner",
                               defaultMessage: "Only the parallel owner can share it",
-                            })
-                      }
+                            }),
+                          }
+                        : {})}
                     />
                   )}
                 />
@@ -368,7 +372,9 @@ export function PetitionSharingDialog({
                       value={value}
                       onChange={(value) => onChange(value! as "READ" | "WRITE")}
                       hideOwner={true}
-                      isDisabled={sharingInfo.ownedOrWriteIds.length === 0}
+                      isDisabled={
+                        sharingInfo.ownedOrWriteIds.length === 0 && !userHasBypassPermission
+                      }
                     />
                   )}
                 />
@@ -440,7 +446,8 @@ export function PetitionSharingDialog({
                         {user.email}
                       </Text>
                     </Box>
-                    {permissionType === "OWNER" || sharingInfo.ownedOrWriteIds.length === 0 ? (
+                    {permissionType === "OWNER" ||
+                    (sharingInfo.ownedOrWriteIds.length === 0 && !userHasBypassPermission) ? (
                       <Box
                         paddingX={3}
                         fontWeight="bold"
@@ -470,7 +477,9 @@ export function PetitionSharingDialog({
                                 permissionType: "WRITE",
                               })
                             }
-                            isDisabled={sharingInfo.ownedOrWriteIds.length === 0}
+                            isDisabled={
+                              sharingInfo.ownedOrWriteIds.length === 0 && !userHasBypassPermission
+                            }
                           >
                             <PetitionPermissionTypeText type="WRITE" />
                           </MenuItem>
@@ -482,7 +491,9 @@ export function PetitionSharingDialog({
                                 permissionType: "READ",
                               })
                             }
-                            isDisabled={sharingInfo.ownedOrWriteIds.length === 0}
+                            isDisabled={
+                              sharingInfo.ownedOrWriteIds.length === 0 && !userHasBypassPermission
+                            }
                           >
                             <PetitionPermissionTypeText type="READ" />
                           </MenuItem>
@@ -494,7 +505,7 @@ export function PetitionSharingDialog({
                                 user,
                               )
                             }
-                            isDisabled={sharingInfo.ownedCount === 0}
+                            isDisabled={sharingInfo.ownedCount === 0 && !userHasBypassPermission}
                           >
                             <FormattedMessage
                               id="generic.transfer-ownership"
@@ -561,7 +572,7 @@ export function PetitionSharingDialog({
                           </UserGroupMembersPopover>
                         </Flex>
                       </Box>
-                      {sharingInfo.ownedOrWriteIds.length === 0 ? (
+                      {sharingInfo.ownedOrWriteIds.length === 0 && !userHasBypassPermission ? (
                         <Box
                           paddingX={3}
                           fontWeight="bold"

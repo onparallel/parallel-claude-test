@@ -22,14 +22,20 @@ describe("Bypass Petition Permissions", () => {
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
-    ({ organization, user } = await mocks.createSessionUserAndOrganization());
+    ({ organization, user: user } = await mocks.createSessionUserAndOrganization());
 
     otherUsers = await mocks.createRandomUsers(organization.id, 2);
     [bypassGroup] = await mocks.createUserGroups(1, organization.id, [
       { effect: "GRANT", name: "PETITIONS:BYPASS_PERMISSIONS" },
     ]);
     await mocks.insertUserGroupMembers(bypassGroup.id, [user.id]);
+  });
 
+  afterAll(async () => {
+    await testClient.stop();
+  });
+
+  beforeEach(async () => {
     petitions = [
       ...(await mocks.createRandomPetitions(organization.id, user.id, 3)),
       ...(await mocks.createRandomPetitions(organization.id, otherUsers[0].id, 2)),
@@ -40,27 +46,11 @@ describe("Bypass Petition Permissions", () => {
     await mocks.sharePetitions([petitions[3].id], otherUsers[1].id, "WRITE");
   });
 
-  afterAll(async () => {
-    await testClient.stop();
-  });
-
   afterEach(async () => {
-    await mocks.knex
-      .from("petition")
-      .whereIn(
-        "id",
-        petitions.map((p) => p.id),
-      )
-      .update(
-        {
-          deletion_scheduled_at: null,
-          path: "/",
-        },
-        "*",
-      );
+    await mocks.knex.from("petition").update({ deleted_at: new Date() });
   });
 
-  it("bypass user should not be present on the petition permissions list but have an effective WRITE permission", async () => {
+  it("bypass user should not be present on the petition permissions list but have an effective OWNER permission", async () => {
     const { errors, data } = await testClient.execute(
       gql`
         query ($petitionId: GID!) {
@@ -105,7 +95,7 @@ describe("Bypass Petition Permissions", () => {
       ]),
       myEffectivePermission: {
         isSubscribed: false,
-        permissionType: "WRITE",
+        permissionType: "OWNER",
         user: {
           id: toGlobalId("User", user.id),
         },
@@ -113,7 +103,7 @@ describe("Bypass Petition Permissions", () => {
     });
   });
 
-  it("user on a group with BYPASS permissions should have WRITE access to all petitions in their organization", async () => {
+  it("user on a group with BYPASS permissions should have OWNER access to all petitions in their organization", async () => {
     const { errors, data } = await testClient.execute(gql`
       query {
         petitions(limit: 100, offset: 0, filters: { type: PETITION }) {
@@ -217,7 +207,7 @@ describe("Bypass Petition Permissions", () => {
             },
           ]),
           myEffectivePermission: {
-            permissionType: "WRITE",
+            permissionType: "OWNER",
             user: {
               id: toGlobalId("User", user.id),
             },
@@ -234,7 +224,7 @@ describe("Bypass Petition Permissions", () => {
             },
           ]),
           myEffectivePermission: {
-            permissionType: "WRITE",
+            permissionType: "OWNER",
             user: {
               id: toGlobalId("User", user.id),
             },
@@ -251,7 +241,7 @@ describe("Bypass Petition Permissions", () => {
             },
           ]),
           myEffectivePermission: {
-            permissionType: "WRITE",
+            permissionType: "OWNER",
             user: {
               id: toGlobalId("User", user.id),
             },
@@ -299,22 +289,15 @@ describe("Bypass Petition Permissions", () => {
     });
   });
 
-  it("bypass user should be able to perform a WRITE action on a petition not shared with them", async () => {
+  it("bypass user should be able to perform an OWNER-only action on a petition not shared with them", async () => {
     const { errors, data } = await testClient.execute(
       gql`
-        mutation ($petitionId: GID!) {
-          createPetitionField(petitionId: $petitionId, type: SHORT_TEXT) {
+        mutation ($petitionId: GID!, $userId: GID!) {
+          transferPetitionOwnership(petitionIds: [$petitionId], userId: $userId) {
             id
-            type
-            petition {
-              effectivePermissions {
-                user {
-                  id
-                }
-                permissionType
-              }
-              myEffectivePermission {
-                permissionType
+            permissions {
+              permissionType
+              ... on PetitionUserPermission {
                 user {
                   id
                 }
@@ -325,55 +308,36 @@ describe("Bypass Petition Permissions", () => {
       `,
       {
         petitionId: toGlobalId("Petition", petitions[3].id),
-      },
-    );
-
-    expect(errors).toBeUndefined();
-    expect(data?.createPetitionField).toEqual({
-      id: expect.any(String),
-      type: "SHORT_TEXT",
-      petition: {
-        effectivePermissions: expect.toIncludeSameMembers([
-          {
-            user: {
-              id: toGlobalId("User", otherUsers[0].id),
-            },
-            permissionType: "OWNER",
-          },
-          {
-            user: {
-              id: toGlobalId("User", otherUsers[1].id),
-            },
-            permissionType: "WRITE",
-          },
-        ]),
-        myEffectivePermission: {
-          permissionType: "WRITE",
-          user: {
-            id: toGlobalId("User", user.id),
-          },
-        },
-      },
-    });
-  });
-
-  it("bypass user should not be able to perform an OWNER-only action on a petition not shared with them", async () => {
-    const { errors, data } = await testClient.execute(
-      gql`
-        mutation ($petitionId: GID!, $userId: GID!) {
-          transferPetitionOwnership(petitionIds: [$petitionId], userId: $userId) {
-            id
-          }
-        }
-      `,
-      {
-        petitionId: toGlobalId("Petition", petitions[3].id),
         userId: toGlobalId("User", user.id),
       },
     );
 
-    expect(errors).toContainGraphQLError("FORBIDDEN");
-    expect(data).toBeNull();
+    expect(errors).toBeUndefined();
+    expect(data.transferPetitionOwnership).toEqual([
+      {
+        id: toGlobalId("Petition", petitions[3].id),
+        permissions: [
+          {
+            permissionType: "OWNER",
+            user: {
+              id: toGlobalId("User", user.id),
+            },
+          },
+          {
+            permissionType: "WRITE",
+            user: {
+              id: toGlobalId("User", otherUsers[0].id),
+            },
+          },
+          {
+            permissionType: "WRITE",
+            user: {
+              id: toGlobalId("User", otherUsers[1].id),
+            },
+          },
+        ],
+      },
+    ]);
   });
 
   it("bypass user should be able to delete a petition not shared with them", async () => {

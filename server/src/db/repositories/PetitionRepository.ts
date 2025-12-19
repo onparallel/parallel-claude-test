@@ -366,7 +366,7 @@ export class PetitionRepository extends BaseRepository {
         .select<{ id: number }[]>(this.knex.raw(`distinct(id)`));
 
       const ids = new Set(rows.map((r) => r.id));
-      return petitionIds.map((id) => ids.has(id) && ["READ", "WRITE"].includes(permissionType));
+      return petitionIds.map((id) => ids.has(id));
     }
 
     const rows = await this.from("petition_permission")
@@ -5584,6 +5584,19 @@ export class PetitionRepository extends BaseRepository {
       return [];
     }
 
+    const bypassUser = await this.loadUserBypassPetitionPermission(user.id);
+    if (bypassUser) {
+      const rows = await this.from("petition")
+        .whereIn("id", ids)
+        .where("org_id", bypassUser.org_id)
+        .whereNull("deleted_at")
+        .select<{ id: number }[]>(this.knex.raw(`distinct(id)`));
+
+      const idsWithPermissions = new Set(rows.map((r) => r.id));
+
+      return ids.filter((id) => idsWithPermissions.has(id));
+    }
+
     const rows = await this.raw<{ petition_id: number }>(
       /* sql */ `
         select distinct(petition_id)
@@ -7875,13 +7888,9 @@ export class PetitionRepository extends BaseRepository {
     paths: string[],
     permissionType: PetitionPermissionType,
   ) {
-    // if the user is part of a "bypass" group, they will have at least WRITE permission on every petition inside any folder
+    // if the user is part of a "bypass" group, they will have at least OWNER permission on every petition inside any folder
     const bypassUser = await this.loadUserBypassPetitionPermission(userId);
-    if (
-      isNonNullish(bypassUser) &&
-      bypassUser.org_id === orgId &&
-      ["READ", "WRITE"].includes(permissionType)
-    ) {
+    if (bypassUser?.org_id === orgId) {
       return true;
     }
 
