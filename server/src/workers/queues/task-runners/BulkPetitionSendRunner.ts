@@ -268,7 +268,12 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
         row.eachCell((cell, colNumber) => {
           const heading = headings[colNumber - 1];
           const COMPOSED_ALIAS_REGEX = /^(.+)\[([0-9]+)\]\.(.+)$/; // e.g. "family_members[0].first_name"
-          if (cell && cell.value !== "") {
+          if (cell) {
+            const value = cell.value?.toString().trim() ?? "";
+            if (value === "") {
+              return;
+            }
+
             const match = heading.match(COMPOSED_ALIAS_REGEX);
             if (match) {
               const [, parentAlias, groupIndex, childAlias] = match;
@@ -276,10 +281,10 @@ export class BulkPetitionSendRunner extends TaskRunner<"BULK_PETITION_SEND"> {
               rowData[parentAlias] ??= [];
               rowData[parentAlias][parseInt(groupIndex)] = {
                 ...rowData[parentAlias][parseInt(groupIndex)],
-                [childAlias]: cell.value,
+                [childAlias]: value,
               };
             } else {
-              rowData[heading] = cell.value;
+              rowData[heading] = value;
             }
           }
         });
