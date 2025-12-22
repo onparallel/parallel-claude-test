@@ -1716,3 +1716,38 @@ export const removeEmailFromSuppressionList = mutationField("removeEmailFromSupp
     }
   },
 });
+
+export const cloneProfileTypeToOrg = mutationField("cloneProfileTypeToOrg", {
+  type: "SupportMethodResponse",
+  description: "Clones a profile type into a specific organization",
+  authorize: superAdminAccess(),
+  args: {
+    profileTypeId: nonNull(globalIdArg("ProfileType")),
+    orgId: nonNull(globalIdArg("Organization")),
+  },
+  resolve: async (_, args, ctx) => {
+    try {
+      const profileType = await ctx.profiles.cloneProfileTypeToOrg(
+        args.profileTypeId,
+        args.orgId,
+        `User:${ctx.realUser!.id}`,
+      );
+
+      await ctx.views.createProfileListViewsByOrgId(
+        args.orgId,
+        profileType,
+        `User:${ctx.realUser!.id}`,
+      );
+
+      return {
+        result: RESULT.SUCCESS,
+        message: `Profile type ${toGlobalId("ProfileType", profileType.id)} cloned successfully`,
+      };
+    } catch (error) {
+      return {
+        result: RESULT.FAILURE,
+        message: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  },
+});

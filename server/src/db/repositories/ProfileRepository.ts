@@ -420,6 +420,126 @@ export class ProfileRepository extends BaseRepository {
     }, t);
   }
 
+  /** Makes an exact copy of a profile type into any organization. Only intended for use on support methods. */
+  async cloneProfileTypeToOrg(
+    id: number,
+    toOrgId: number,
+    createdBy: string,
+    t?: Knex.Transaction,
+  ) {
+    return await this.withTransaction(async (t) => {
+      const sourceProfileType = await this.loadProfileType.raw(id, t);
+      if (!sourceProfileType) {
+        throw new Error("Profile type not found");
+      }
+      if (sourceProfileType.org_id === toOrgId) {
+        throw new Error("Profile type already belongs to the organization");
+      }
+      const [profileType] = await this.createProfileType(
+        {
+          ...pick(sourceProfileType, ["name", "name_plural", "icon", "standard_type"]),
+          org_id: toOrgId,
+        },
+        createdBy,
+        t,
+      );
+      const sourceFields = await this.loadProfileTypeFieldsByProfileTypeId.raw(id, t);
+      const fields =
+        sourceFields.length === 0
+          ? []
+          : await this.insert(
+              "profile_type_field",
+              sourceFields.map((field) => ({
+                ...omit(field, [
+                  "id",
+                  "profile_type_id",
+                  "expiry_alert_ahead_time",
+                  "created_at",
+                  "updated_at",
+                ]),
+                profile_type_id: profileType.id,
+                expiry_alert_ahead_time:
+                  field.is_expirable && field.expiry_alert_ahead_time
+                    ? this.interval(field.expiry_alert_ahead_time)
+                    : null,
+                created_by: createdBy,
+                updated_by: createdBy,
+              })),
+              t,
+            ).returning("*");
+
+      const fieldIdsMap = Object.fromEntries(
+        zip(sourceFields, fields).map(([sourceField, field]) => [sourceField.id, field.id]),
+      );
+
+      const optionsUpdate = await pMap(
+        fields,
+        async (field) => {
+          const options = await this.profileTypeFields.mapProfileTypeFieldOptions(
+            field.type,
+            field.options,
+            (type, id) => {
+              if (type === "ProfileTypeField") {
+                return fieldIdsMap[id];
+              }
+              return id;
+            },
+          );
+
+          if (options.standardList) {
+            options.values = [];
+          }
+
+          return {
+            id: field.id,
+            options,
+          };
+        },
+        { concurrency: 1 },
+      );
+
+      if (optionsUpdate.length > 0) {
+        await this.raw(
+          /* sql */ `
+                update profile_type_field ptf set
+                  options = t.options
+                from (?) as t (id, options)
+                where t.id = ptf.id;
+                `,
+          [
+            this.sqlValues(
+              optionsUpdate.map((o) => [o.id, o.options]),
+              ["int", "jsonb"],
+            ),
+          ],
+          t,
+        );
+      }
+
+      // update profile name pattern with new fields
+      const [updatedProfileType] = await this.from("profile_type", t)
+        .where({ id: profileType.id })
+        .whereNull("deleted_at")
+        .update(
+          {
+            profile_name_pattern: this.json(
+              (sourceProfileType.profile_name_pattern as (number | string)[]).map((p) => {
+                if (typeof p === "string") {
+                  return p;
+                } else {
+                  // find cloned by position
+                  const position = sourceFields.find((sf) => sf.id === p)!.position;
+                  return fields.find((f) => f.position === position)!.id;
+                }
+              }),
+            ),
+          },
+          "*",
+        );
+      return updatedProfileType;
+    }, t);
+  }
+
   async deleteProfileTypeAllowedRelationshipsByProfileTypeId(
     profileTypeIds: number[],
     deletedBy: string,

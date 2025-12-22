@@ -1325,6 +1325,8 @@ export type Mutation = {
   /** Clone petition. */
   clonePetitions: Array<PetitionBase>;
   cloneProfileType: ProfileType;
+  /** Clones a profile type into a specific organization */
+  cloneProfileTypeToOrg: SupportMethodResponse;
   /** Clones the user groups with all its members */
   cloneUserGroups: Array<UserGroup>;
   /** Closes an open petition. */
@@ -1970,6 +1972,11 @@ export type MutationclonePetitionsArgs = {
 export type MutationcloneProfileTypeArgs = {
   name?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
   pluralName?: InputMaybe<Scalars["LocalizableUserText"]["input"]>;
+  profileTypeId: Scalars["GID"]["input"];
+};
+
+export type MutationcloneProfileTypeToOrgArgs = {
+  orgId: Scalars["GID"]["input"];
   profileTypeId: Scalars["GID"]["input"];
 };
 

@@ -2952,6 +2952,7 @@ export interface NexusGenFieldTypes {
     clonePetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     clonePetitions: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
     cloneProfileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
+    cloneProfileTypeToOrg: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     cloneUserGroups: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
     closePetition: NexusGenRootTypes["Petition"]; // Petition!
     closePetitionsFromTemplate: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -6302,6 +6303,7 @@ export interface NexusGenFieldTypeNames {
     clonePetitionField: "PetitionField";
     clonePetitions: "PetitionBase";
     cloneProfileType: "ProfileType";
+    cloneProfileTypeToOrg: "SupportMethodResponse";
     cloneUserGroups: "UserGroup";
     closePetition: "Petition";
     closePetitionsFromTemplate: "SupportMethodResponse";
@@ -8960,6 +8962,11 @@ export interface NexusGenArgTypes {
       // args
       name?: NexusGenScalars["LocalizableUserText"] | null; // LocalizableUserText
       pluralName?: NexusGenScalars["LocalizableUserText"] | null; // LocalizableUserText
+      profileTypeId: NexusGenScalars["GID"]; // GID!
+    };
+    cloneProfileTypeToOrg: {
+      // args
+      orgId: NexusGenScalars["GID"]; // GID!
       profileTypeId: NexusGenScalars["GID"]; // GID!
     };
     cloneUserGroups: {

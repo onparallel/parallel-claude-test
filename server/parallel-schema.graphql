@@ -1682,6 +1682,11 @@ type Mutation {
   ): ProfileType!
 
   """
+  Clones a profile type into a specific organization
+  """
+  cloneProfileTypeToOrg(orgId: GID!, profileTypeId: GID!): SupportMethodResponse!
+
+  """
   Clones the user groups with all its members
   """
   cloneUserGroups(locale: UserLocale!, userGroupIds: [GID!]!): [UserGroup!]!
