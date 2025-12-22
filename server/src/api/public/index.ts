@@ -43,6 +43,7 @@ import {
   BulkSendTemplate_uploadBulkPetitionSendTaskInputFileDocument,
   ClosePetition_closePetitionDocument,
   CloseProfile_closeProfileDocument,
+  CompletePetition_completePetitionDocument,
   CreateContact_contactDocument,
   CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
   CreatePetitionRecipients_petitionDocument,
@@ -1161,6 +1162,73 @@ export function publicApi(container: Container) {
       } catch (error) {
         if (containsGraphQLError(error, "PETITION_STATUS_ERROR")) {
           throw new ConflictError("The parallel is not closed or completed");
+        }
+
+        throw error;
+      }
+    },
+  );
+
+  api.path("/petitions/:petitionId/complete", { params: { petitionId } }).post(
+    {
+      operationId: "CompletePetition",
+      summary: "Complete a parallel",
+      description:
+        "Complete a parallel and move its status to COMPLETED. Any configured automatic processes, like signature or approval requests, will be started.",
+      query: {
+        ...petitionIncludeParam({ includeRecipientUrl: true }),
+      },
+      responses: {
+        200: SuccessResponse(Petition),
+        403: ErrorResponse({ description: "You don't have access to this resource" }),
+        409: ErrorResponse({ description: "You can't complete the parallel in its current state" }),
+      },
+      tags: ["Parallels"],
+    },
+    async ({ client, params, query }) => {
+      const _mutation = gql`
+        mutation CompletePetition_completePetition(
+          $petitionId: GID!
+          $includeRecipients: Boolean!
+          $includeFields: Boolean!
+          $includeTags: Boolean!
+          $includeRecipientUrl: Boolean!
+          $includeReplies: Boolean!
+          $includeProgress: Boolean!
+          $includeSigners: Boolean!
+          $includeVariablesResult: Boolean!
+          $includeSignatureRequests: Boolean!
+          $includeOwner: Boolean!
+        ) {
+          completePetition(petitionId: $petitionId) {
+            ...Petition
+          }
+        }
+        ${PetitionFragment}
+      `;
+
+      try {
+        const result = await client.request(CompletePetition_completePetitionDocument, {
+          petitionId: params.petitionId,
+          ...getPetitionIncludesFromQuery(query),
+        });
+
+        assert("id" in result.completePetition!);
+        return Ok(mapPetition(result.completePetition!));
+      } catch (error) {
+        if (containsGraphQLError(error, "PETITION_STATUS_ERROR")) {
+          throw new ConflictError("You can't complete the parallel in its current state");
+        }
+        if (containsGraphQLError(error, "PETITION_SEND_LIMIT_REACHED")) {
+          throw new ConflictError("Can't complete the parallel due to lack of credits");
+        }
+        if (containsGraphQLError(error, "REQUIRED_SIGNER_INFO_ERROR")) {
+          throw new ConflictError("Can't complete the petition without signers information");
+        }
+        if (containsGraphQLError(error, "CANT_COMPLETE_PETITION_ERROR")) {
+          throw new ConflictError(
+            "Can't transition status to COMPLETED, as some of the required fields are not replied",
+          );
         }
 
         throw error;

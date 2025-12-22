@@ -9685,6 +9685,156 @@ export type ReopenPetition_reopenPetitionMutation = {
   };
 };
 
+export type CompletePetition_completePetitionMutationVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+  includeRecipients: Scalars["Boolean"]["input"];
+  includeFields: Scalars["Boolean"]["input"];
+  includeTags: Scalars["Boolean"]["input"];
+  includeRecipientUrl: Scalars["Boolean"]["input"];
+  includeReplies: Scalars["Boolean"]["input"];
+  includeProgress: Scalars["Boolean"]["input"];
+  includeSigners: Scalars["Boolean"]["input"];
+  includeVariablesResult: Scalars["Boolean"]["input"];
+  includeSignatureRequests: Scalars["Boolean"]["input"];
+  includeOwner: Scalars["Boolean"]["input"];
+}>;
+
+export type CompletePetition_completePetitionMutation = {
+  completePetition: {
+    id: string;
+    path: string;
+    name: string | null;
+    locale: PetitionLocale;
+    createdAt: string;
+    customProperties: { [key: string]: any };
+    status: PetitionStatus;
+    deadline: string | null;
+    isAnonymized: boolean;
+    fields?: Array<{
+      id: string;
+      title: string | null;
+      description: string | null;
+      type: PetitionFieldType;
+      fromPetitionFieldId: string | null;
+      alias: string | null;
+      options: { [key: string]: any };
+      optional: boolean;
+      multiple: boolean;
+      requireApproval: boolean;
+      replies: Array<{
+        id: string;
+        content: { [key: string]: any };
+        status: PetitionFieldReplyStatus;
+        metadata: { [key: string]: any };
+        createdAt: string;
+        updatedAt: string;
+        associatedProfile: {
+          id: string;
+          name: string;
+          status: ProfileStatus;
+          createdAt: string;
+          profileType: { id: string; name: { [locale in UserLocale]?: string } };
+        } | null;
+        children: Array<{
+          field: { id: string; type: PetitionFieldType };
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            status: PetitionFieldReplyStatus;
+            metadata: { [key: string]: any };
+            createdAt: string;
+            updatedAt: string;
+          }>;
+        }> | null;
+      }>;
+      children: Array<{
+        id: string;
+        title: string | null;
+        description: string | null;
+        type: PetitionFieldType;
+        fromPetitionFieldId: string | null;
+        alias: string | null;
+        options: { [key: string]: any };
+        optional: boolean;
+        multiple: boolean;
+        requireApproval: boolean;
+      }> | null;
+    }>;
+    tags?: Array<{ id: string; name: string }>;
+    signatureConfig?: {
+      isEnabled: boolean;
+      signers: Array<{ email: string | null; firstName: string; lastName: string | null } | null>;
+    } | null;
+    owner?: {
+      id: string;
+      email: string;
+      fullName: string | null;
+      firstName: string | null;
+      lastName: string | null;
+    };
+    fromTemplate: { id: string } | null;
+    recipients?: Array<{
+      recipientUrl: string | null;
+      id: string;
+      status: PetitionAccessStatus;
+      reminderCount: number;
+      remindersLeft: number;
+      remindersActive: boolean;
+      nextReminderAt: string | null;
+      createdAt: string;
+      contact: {
+        id: string;
+        email: string;
+        fullName: string;
+        firstName: string;
+        lastName: string | null;
+        createdAt: string;
+        updatedAt: string;
+      } | null;
+      granter: {
+        id: string;
+        email: string;
+        fullName: string | null;
+        firstName: string | null;
+        lastName: string | null;
+      } | null;
+    }>;
+    replies?: Array<{
+      id: string;
+      alias: string | null;
+      type: PetitionFieldType;
+      replies: Array<{
+        id: string;
+        content: { [key: string]: any };
+        metadata: { [key: string]: any };
+        children: Array<{
+          field: { id: string; alias: string | null; type: PetitionFieldType };
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            metadata: { [key: string]: any };
+          }>;
+        }> | null;
+      }>;
+    }>;
+    progress?: {
+      external: { approved: number; replied: number; optional: number; total: number };
+      internal: { approved: number; replied: number; optional: number; total: number };
+    };
+    variablesResult?: Array<{ name: string; value: any | null }>;
+    signatures?: Array<{
+      id: string;
+      status: PetitionSignatureRequestStatus;
+      environment: SignatureOrgIntegrationEnvironment;
+      createdAt: string;
+      updatedAt: string;
+      signatureConfig: {
+        signers: Array<{ email: string | null; firstName: string; lastName: string | null } | null>;
+      };
+    }>;
+  };
+};
+
 export type TagPetition_tagsByNameQueryVariables = Exact<{
   search: Scalars["String"]["input"];
 }>;
@@ -21946,6 +22096,29 @@ export const ReopenPetition_reopenPetitionDocument = gql`
 ` as unknown as DocumentNode<
   ReopenPetition_reopenPetitionMutation,
   ReopenPetition_reopenPetitionMutationVariables
+>;
+export const CompletePetition_completePetitionDocument = gql`
+  mutation CompletePetition_completePetition(
+    $petitionId: GID!
+    $includeRecipients: Boolean!
+    $includeFields: Boolean!
+    $includeTags: Boolean!
+    $includeRecipientUrl: Boolean!
+    $includeReplies: Boolean!
+    $includeProgress: Boolean!
+    $includeSigners: Boolean!
+    $includeVariablesResult: Boolean!
+    $includeSignatureRequests: Boolean!
+    $includeOwner: Boolean!
+  ) {
+    completePetition(petitionId: $petitionId) {
+      ...Petition
+    }
+  }
+  ${PetitionFragmentDoc}
+` as unknown as DocumentNode<
+  CompletePetition_completePetitionMutation,
+  CompletePetition_completePetitionMutationVariables
 >;
 export const TagPetition_tagsByNameDocument = gql`
   query TagPetition_tagsByName($search: String!) {
