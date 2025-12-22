@@ -14,7 +14,6 @@ import {
   BusinessIcon,
   CheckIcon,
   CloseIcon,
-  EditSimpleIcon,
   EyeIcon,
   LockClosedIcon,
   ShortSearchIcon,
@@ -32,7 +31,6 @@ import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { getEntityTypeLabel } from "@parallel/utils/getEntityTypeLabel";
 import { getReplyContents } from "@parallel/utils/getReplyContents";
-import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
 import { Fragment } from "react";
@@ -44,20 +42,19 @@ import { DateTime } from "../common/DateTime";
 import { FileSize } from "../common/FileSize";
 import { HelpPopover } from "../common/HelpPopover";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { NakedLink } from "../common/Link";
 import { LocalizableUserTextRender } from "../common/LocalizableUserTextRender";
 import { UserOrContactReference } from "../common/UserOrContactReference";
 import { BackgroundCheckRiskLabel } from "../petition-common/BackgroundCheckRiskLabel";
 import { DowJonesRiskLabel } from "../petition-common/DowJonesRiskLabel";
 import { EsTaxDocumentsContentErrorMessage } from "../petition-common/EsTaxDocumentsContentErrorMessage";
 import { CopyOrDownloadReplyButton } from "./CopyOrDownloadReplyButton";
+import { EditReplyIconButton } from "./EditReplyIconButton";
 import { PetitionRepliesFieldAdverseMediaSearch } from "./field-replies/PetitionRepliesFieldAdverseMediaSearch";
 import { PetitionRepliesFieldFilePassword } from "./field-replies/PetitionRepliesFieldFilePassword";
 import { PetitionRepliesFieldFileSchema } from "./field-replies/PetitionRepliesFieldFileSchema";
 import { PetitionRepliesFieldFileUploadPayslipReply } from "./field-replies/PetitionRepliesFieldFileUploadPayslipReply";
 import { PetitionRepliesFieldIdVerificationReply } from "./field-replies/PetitionRepliesFieldIdVerificationReply";
 import { PetitionRepliesFieldUserAssignmentReply } from "./field-replies/PetitionRepliesFieldUserAssignmentReply";
-import { PetitionRepliesPopoverField } from "./PetitionRepliesPopoverField";
 
 export interface PetitionRepliesFieldReplyProps {
   petition: PetitionRepliesFieldReply_PetitionFragment;
@@ -94,56 +91,6 @@ export function PetitionRepliesFieldReply({
 
   const currentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const countryNames = useLoadCountryNames(intl.locale);
-
-  const buildUrlToSection = useBuildUrlToPetitionSection();
-  const editReplyIconButton = (idSuffix = "") => {
-    return (
-      <HStack>
-        <Box display={{ base: "block", lg: "none" }}>
-          <NakedLink
-            href={buildUrlToSection("preview", {
-              field: petitionField.id,
-              ...(reply.parent ? { parentReply: reply.parent.id } : {}),
-              ...(idSuffix ? { sufix: idSuffix } : {}),
-            })}
-          >
-            <IconButtonWithTooltip
-              as="a"
-              opacity={0}
-              className="edit-field-reply-button"
-              variant="ghost"
-              size="xs"
-              icon={<EditSimpleIcon />}
-              label={intl.formatMessage({
-                id: "component.petition-replies-field.edit-field-reply",
-                defaultMessage: "Edit reply",
-              })}
-            />
-          </NakedLink>
-        </Box>
-        <Box display={{ base: "none", lg: "block" }}>
-          <PetitionRepliesPopoverField
-            petitionFieldId={petitionField.id}
-            petitionId={petition.id}
-            parentReplyId={reply.parent ? reply.parent.id : undefined}
-            fieldLogic={fieldLogic}
-          >
-            <IconButtonWithTooltip
-              opacity={0}
-              className="edit-field-reply-button"
-              variant="ghost"
-              size="xs"
-              icon={<EditSimpleIcon />}
-              label={intl.formatMessage({
-                id: "component.petition-replies-field.edit-field-reply",
-                defaultMessage: "Edit reply",
-              })}
-            />
-          </PetitionRepliesPopoverField>
-        </Box>
-      </HStack>
-    );
-  };
 
   const handleAction = async (action: PetitionRepliesFieldAction) => {
     onAction(action, reply);
@@ -232,7 +179,12 @@ export function PetitionRepliesFieldReply({
                             <FileSize value={content.size} />
                           </Text>
                           <Box display="inline-block" marginStart={2}>
-                            {editReplyIconButton()}
+                            <EditReplyIconButton
+                              petitionFieldId={petitionField.id}
+                              parentReplyId={reply.parent ? reply.parent.id : undefined}
+                              petitionId={petition.id}
+                              fieldLogic={fieldLogic}
+                            />
                           </Box>
                         </Text>
                       </Flex>
@@ -304,7 +256,12 @@ export function PetitionRepliesFieldReply({
                           </>
                         )}
                         <Box display="inline-block" marginStart={1}>
-                          {editReplyIconButton()}
+                          <EditReplyIconButton
+                            petitionFieldId={petitionField.id}
+                            parentReplyId={reply.parent ? reply.parent.id : undefined}
+                            petitionId={petition.id}
+                            fieldLogic={fieldLogic}
+                          />
                         </Box>
                       </Flex>
                     </Stack>
@@ -332,7 +289,12 @@ export function PetitionRepliesFieldReply({
                           )})`}
                         </Text>
                         <Box display="inline-block" marginStart={1}>
-                          {editReplyIconButton()}
+                          <EditReplyIconButton
+                            petitionFieldId={petitionField.id}
+                            parentReplyId={reply.parent ? reply.parent.id : undefined}
+                            petitionId={petition.id}
+                            fieldLogic={fieldLogic}
+                          />
                         </Box>
                       </Flex>
                       {content?.value.length === 0 ? (
@@ -429,11 +391,23 @@ export function PetitionRepliesFieldReply({
                       )}
                     </Stack>
                   ) : type === "ADVERSE_MEDIA_SEARCH" ? (
-                    <PetitionRepliesFieldAdverseMediaSearch reply={reply} />
+                    <PetitionRepliesFieldAdverseMediaSearch
+                      reply={reply}
+                      petitionFieldId={petitionField.id}
+                      petitionId={petition.id}
+                      fieldLogic={fieldLogic}
+                    />
                   ) : type === "USER_ASSIGNMENT" ? (
                     <>
                       <PetitionRepliesFieldUserAssignmentReply reply={reply} />
-                      <Box marginStart={1}>{editReplyIconButton()}</Box>
+                      <Box marginStart={1}>
+                        <EditReplyIconButton
+                          petitionFieldId={petitionField.id}
+                          parentReplyId={reply.parent ? reply.parent.id : undefined}
+                          petitionId={petition.id}
+                          fieldLogic={fieldLogic}
+                        />
+                      </Box>
                     </>
                   ) : isFileTypeField(type) ? (
                     <Stack flex="1">
@@ -460,7 +434,12 @@ export function PetitionRepliesFieldReply({
                             <FileSize value={content.size} />
                           </Text>
                           <Box display="inline-block" marginStart={2}>
-                            {editReplyIconButton()}
+                            <EditReplyIconButton
+                              petitionFieldId={petitionField.id}
+                              parentReplyId={reply.parent ? reply.parent.id : undefined}
+                              petitionId={petition.id}
+                              fieldLogic={fieldLogic}
+                            />
                           </Box>
                         </Text>
                       </Flex>
@@ -525,9 +504,13 @@ export function PetitionRepliesFieldReply({
                         marginStart={2}
                         verticalAlign="baseline"
                       >
-                        {editReplyIconButton(
-                          petitionField?.type === "DYNAMIC_SELECT" ? `-${i}` : "",
-                        )}
+                        <EditReplyIconButton
+                          petitionFieldId={petitionField.id}
+                          parentReplyId={reply.parent ? reply.parent.id : undefined}
+                          petitionId={petition.id}
+                          fieldLogic={fieldLogic}
+                          idSuffix={petitionField?.type === "DYNAMIC_SELECT" ? `-${i}` : ""}
+                        />
                       </Box>
                     </HStack>
                   )}

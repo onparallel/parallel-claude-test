@@ -7,8 +7,10 @@ import {
   PetitionRepliesFieldReply_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
+import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
+import { EditReplyIconButton } from "../EditReplyIconButton";
 
 interface AdverseMediaSearchArticle {
   id: string;
@@ -21,8 +23,14 @@ interface AdverseMediaSearchArticle {
 
 export function PetitionRepliesFieldAdverseMediaSearch({
   reply,
+  petitionFieldId,
+  petitionId,
+  fieldLogic,
 }: {
   reply: PetitionRepliesFieldReply_PetitionFieldReplyFragment;
+  petitionFieldId: string;
+  petitionId: string;
+  fieldLogic: FieldLogicResult;
 }) {
   const intl = useIntl();
 
@@ -50,7 +58,7 @@ export function PetitionRepliesFieldAdverseMediaSearch({
         >
           <ShortSearchIcon />
         </Center>
-        <Box flex="1" overflow="hidden" paddingBottom="2px">
+        <Box overflow="hidden" paddingBottom="2px">
           <Flex minWidth={0} alignItems="baseline">
             <Flex flexWrap="wrap" gap={2} alignItems="center">
               <Text as="span">
@@ -84,6 +92,12 @@ export function PetitionRepliesFieldAdverseMediaSearch({
             </Flex>
           </Flex>
         </Box>
+        <EditReplyIconButton
+          petitionFieldId={petitionFieldId}
+          parentReplyId={reply.parent ? reply.parent.id : undefined}
+          petitionId={petitionId}
+          fieldLogic={fieldLogic}
+        />
       </HStack>
       {articlesSaved.map((article: AdverseMediaSearchArticle) => {
         const timestamp = article.timestamp

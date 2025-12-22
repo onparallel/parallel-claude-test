@@ -52,7 +52,9 @@ export function PetitionRepliesPopoverField({
       isLazy
       lazyBehavior="keepMounted"
     >
-      <PopoverTrigger>{children}</PopoverTrigger>
+      <PopoverTrigger>
+        <Box sx={{ button: { opacity: isOpen ? 1 : undefined } }}>{children}</Box>
+      </PopoverTrigger>
       <Portal>
         <Wrap
           when={isOpen}
