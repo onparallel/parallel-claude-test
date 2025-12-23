@@ -1,7 +1,6 @@
 import { add, Duration } from "date-fns";
 import { inject, injectable } from "inversify";
 import { intersection } from "remeda";
-import { assert } from "ts-essentials";
 import { ProfileUpdatedEvent } from "../../../db/events/ProfileEvent";
 import { ProfileRepository } from "../../../db/repositories/ProfileRepository";
 import { ILogger, LOGGER } from "../../../services/Logger";
@@ -125,6 +124,29 @@ const CONFIG: Config[] =
               },
             ],
           },
+          // Amesto
+          {
+            orgId: 45326,
+            profileTypes: [
+              // COMPANIES
+              {
+                profileTypeId: 11357,
+                statusProfileTypeFieldId: 198358,
+                riskProfileTypeFieldId: 198345,
+                lastKycDateProfileTypeFieldId: 199329,
+                nextKycDateProfileTypeFieldId: 198607,
+                dateIntervalsByRisk: {
+                  HIGH: { years: 1 },
+                  MEDIUM_HIGH: { years: 2 },
+                  MEDIUM: { years: 2 },
+                  // MEDIUM_LOW: null, they also have MEDIUM_LOW risk, but it's not used for kyc refresh
+                  LOW: { years: 3 },
+                },
+
+                clientStatusValuesForKycRefresh: ["ACTIVE"],
+              },
+            ],
+          },
         ]
       : [];
 
@@ -186,10 +208,13 @@ export class KycRefreshDateUpdateListener implements EventListener<"PROFILE_UPDA
       (v) => v?.profile_type_field_id === profileTypeConfig.lastKycDateProfileTypeFieldId,
     )!;
 
+    const nextRefreshDateInterval = profileTypeConfig.dateIntervalsByRisk[riskValue.content.value];
+
     if (
       !statusValue ||
       !riskValue ||
       !lastKycDateValue ||
+      !nextRefreshDateInterval ||
       !profileTypeConfig.clientStatusValuesForKycRefresh.includes(statusValue.content.value)
     ) {
       // missing required values or status is not a client status value for kyc refresh, set next kyc date to null
@@ -211,9 +236,6 @@ export class KycRefreshDateUpdateListener implements EventListener<"PROFILE_UPDA
       });
       return;
     }
-
-    const nextRefreshDateInterval = profileTypeConfig.dateIntervalsByRisk[riskValue.content.value];
-    assert(nextRefreshDateInterval, "Next refresh date value not found");
 
     const nextKycDate = add(new Date(lastKycDateValue.content.value), nextRefreshDateInterval)
       .toISOString()
