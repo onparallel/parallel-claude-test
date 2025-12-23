@@ -2981,8 +2981,8 @@
   },
   {
     "term": "component.create-or-update-petition-variable-dialog.enum-variable-title",
-    "definition": "Create enum variable",
-    "context": "Create enum variable"
+    "definition": "Create options list variable",
+    "context": "Create options list variable"
   },
   {
     "term": "component.create-or-update-petition-variable-dialog.info-name-variable",
@@ -3081,13 +3081,13 @@
   },
   {
     "term": "component.create-or-update-petition-variable-dialog.variable-type-enum",
-    "definition": "Enum",
-    "context": "Enum"
+    "definition": "Options list",
+    "context": "Options list"
   },
   {
     "term": "component.create-or-update-petition-variable-dialog.variable-type-enum-description",
-    "definition": "An enum variable that can be used to select a value from a list of options.",
-    "context": "An enum variable that can be used to select a value from a list of options."
+    "definition": "A variable that can be used to select a value from a list of options.",
+    "context": "A variable that can be used to select a value from a list of options."
   },
   {
     "term": "component.create-or-update-petition-variable-dialog.variable-type-number",

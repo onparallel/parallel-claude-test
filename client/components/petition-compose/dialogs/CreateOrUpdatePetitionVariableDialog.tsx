@@ -708,7 +708,7 @@ function CreateOrUpdateEnumVariableDialog({
         ) : (
           <FormattedMessage
             id="component.create-or-update-petition-variable-dialog.enum-variable-title"
-            defaultMessage="Create enum variable"
+            defaultMessage="Create options list variable"
           />
         )
       }
@@ -1175,12 +1175,12 @@ const PetitionVariableTypeRadio = forwardRef<HTMLInputElement, PetitionVariableT
             background: "green.100",
             title: intl.formatMessage({
               id: "component.create-or-update-petition-variable-dialog.variable-type-enum",
-              defaultMessage: "Enum",
+              defaultMessage: "Options list",
             }),
             description: intl.formatMessage({
               id: "component.create-or-update-petition-variable-dialog.variable-type-enum-description",
               defaultMessage:
-                "An enum variable that can be used to select a value from a list of options.",
+                "A variable that can be used to select a value from a list of options.",
             }),
           },
         ] as VariableTypeRadioElement[],
