@@ -807,6 +807,7 @@ export function useCreateFieldGroupRepliesFromProfiles() {
     async function _createFieldGroupRepliesFromProfiles({
       petitionId,
       petitionFieldId,
+      profileTypeId,
       parentReplyId,
       profileIds,
       force,
@@ -816,6 +817,7 @@ export function useCreateFieldGroupRepliesFromProfiles() {
     }: {
       petitionId: string;
       petitionFieldId: string;
+      profileTypeId: string;
       parentReplyId?: string;
       profileIds: string[];
       force?: boolean;
@@ -827,7 +829,12 @@ export function useCreateFieldGroupRepliesFromProfiles() {
         let _profiles = [];
 
         if (!profiles) {
-          const { data } = await getProfiles({ variables: { filter: { profileId: profileIds } } });
+          const { data } = await getProfiles({
+            variables: {
+              profileTypeId,
+              filter: { property: "id", operator: "IS_ONE_OF", value: profileIds },
+            },
+          });
           _profiles = data?.profiles.items ?? [];
         } else {
           _profiles = profiles;
@@ -965,6 +972,7 @@ export function usePrefillPetitionFromProfiles() {
     async function _prefillPetitionFromProfiles({
       petitionId,
       parentReplyId,
+      profileTypeId,
       prefill,
       force,
       isCacheOnly,
@@ -972,6 +980,7 @@ export function usePrefillPetitionFromProfiles() {
     }: {
       petitionId: string;
       parentReplyId?: string;
+      profileTypeId: string;
       prefill: {
         petitionFieldId: string;
         profileIds: string[];
@@ -982,12 +991,18 @@ export function usePrefillPetitionFromProfiles() {
     }) {
       if (isCacheOnly) {
         const allProfileIds = prefill.flatMap(({ profileIds }) => profileIds);
-        const { data } = await getProfiles({ variables: { filter: { profileId: allProfileIds } } });
+        const { data } = await getProfiles({
+          variables: {
+            profileTypeId,
+            filter: { property: "id", operator: "IS_ONE_OF", value: allProfileIds },
+          },
+        });
 
         for (const { petitionFieldId, profileIds } of prefill) {
           await createFieldGroupRepliesFromProfiles({
             petitionId,
             petitionFieldId,
+            profileTypeId,
             profileIds,
             force,
             isCacheOnly,
@@ -1084,8 +1099,11 @@ const _getProfilesFragment = {
 };
 
 const _getProfile = gql`
-  query PreviewPetitionFieldMutations_profiles($filter: ProfileFilter) {
-    profiles(offset: 0, limit: 100, filter: $filter) {
+  query PreviewPetitionFieldMutations_profiles(
+    $filter: ProfileQueryFilterInput
+    $profileTypeId: GID!
+  ) {
+    profiles(offset: 0, limit: 100, filter: $filter, profileTypeId: $profileTypeId) {
       items {
         ...PreviewPetitionFieldMutations_Profile
       }

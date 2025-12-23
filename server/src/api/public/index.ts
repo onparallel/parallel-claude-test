@@ -7,7 +7,11 @@ import { Container } from "inversify";
 import { outdent } from "outdent";
 import { isNonNullish, isNullish, omit, pick, unique, zip } from "remeda";
 import { assert } from "ts-essentials";
-import { PetitionEventTypeValues, ProfileEventTypeValues } from "../../db/__types";
+import {
+  PetitionEventTypeValues,
+  ProfileEventTypeValues,
+  ProfileStatusValues,
+} from "../../db/__types";
 import { isValidEmail } from "../../graphql/helpers/validators/validEmail";
 import { ILogger, LOGGER } from "../../services/Logger";
 import { IRedis, REDIS } from "../../services/Redis";
@@ -108,8 +112,7 @@ import {
   PetitionFragment as PetitionFragmentType,
   PetitionReplies_repliesDocument,
   PetitionTagFilter,
-  ProfileFieldValuesFilter,
-  ProfileStatus,
+  ProfileQueryFilterInput,
   ProfileTypeFragmentDoc,
   ReadPetitionCustomPropertiesDocument,
   RemindPetitionRecipient_sendRemindersDocument,
@@ -4422,7 +4425,7 @@ export function publicApi(container: Container) {
         query: {
           ...paginationParams(),
           ...profileIncludeParam,
-          ...sortByParam(["createdAt", "name"]),
+          ...sortByParam(["createdAt", "updatedAt", "closedAt", "name"]),
           search: stringParam({
             description: "Search profiles by name",
             required: false,
@@ -4432,12 +4435,20 @@ export function publicApi(container: Container) {
             example: [toGlobalId("ProfileType", 1), toGlobalId("ProfileType", 2)].join(","),
             required: false,
             array: true,
+            excludeFromSpec: true,
           }),
-          status: stringParam({
+          profileTypeId: stringParam({
+            description: "Profile type ID to filter by",
+            example: toGlobalId("ProfileType", 1),
+            required: false,
+            array: false,
+          }),
+          status: enumParam({
             description: "Filter profiles by status",
             example: "OPEN",
             required: false,
             array: true,
+            values: ProfileStatusValues,
           }),
           values: objectParam({
             description: outdent`
@@ -4457,11 +4468,10 @@ export function publicApi(container: Container) {
           query GetProfiles_profiles(
             $offset: Int
             $limit: Int
-            $sortBy: [QueryProfiles_OrderBy!]
+            $sortBy: [String!]
             $search: String
-            $profileTypeIds: [GID!]
-            $status: [ProfileStatus!]
-            $values: ProfileFieldValuesFilter
+            $profileTypeId: GID!
+            $filter: ProfileQueryFilterInput
             $includeFieldOptions: Boolean!
             $includeRelationships: Boolean!
             $includeSubscribers: Boolean!
@@ -4471,7 +4481,8 @@ export function publicApi(container: Container) {
               limit: $limit
               sortBy: $sortBy
               search: $search
-              filter: { profileTypeId: $profileTypeIds, status: $status, values: $values }
+              profileTypeId: $profileTypeId
+              filter: $filter
             ) {
               totalCount
               items {
@@ -4482,14 +4493,28 @@ export function publicApi(container: Container) {
           ${ProfileFragment}
         `;
 
-        let values: ProfileFieldValuesFilter | undefined = undefined;
-        if (isNonNullish(query.values)) {
-          if (isNullish(query.profileTypeIds) || query.profileTypeIds.length > 1) {
-            throw new BadRequestError(
-              "Must filter by a single profileTypeId when filtering by values",
-            );
-          }
+        const profileTypeId = query.profileTypeId ? [query.profileTypeId] : query.profileTypeIds;
+        if (isNullish(profileTypeId)) {
+          throw new BadRequestError("profileTypeId is required");
+        }
+        if (profileTypeId.length === 0 || profileTypeId.length > 1) {
+          throw new BadRequestError("Must filter by a single profileTypeId");
+        }
 
+        const filter: ProfileQueryFilterInput = {
+          logicalOperator: "AND",
+          conditions: [],
+        };
+
+        if (isNonNullish(query.status)) {
+          filter.conditions!.push({
+            property: "status",
+            operator: "IS_ONE_OF",
+            value: query.status,
+          });
+        }
+
+        if (isNonNullish(query.values)) {
           const profileTypeFieldAliases = (query.values ?? [])
             .filter((c) => "alias" in c)
             .map((c) => c.alias);
@@ -4506,34 +4531,35 @@ export function publicApi(container: Container) {
               }
             `;
             const { profileType } = await client.request(GetProfiles_profileTypeDocument, {
-              profileTypeId: query.profileTypeIds[0],
+              profileTypeId: profileTypeId[0],
             });
 
-            const conditions = query.values.map((c) => {
-              if ("alias" in c) {
-                const profileTypeField = profileType.fields.find((f) => f.alias === c.alias);
-                if (isNullish(profileTypeField)) {
-                  throw new BadRequestError(`Unknown alias ${c.alias} in values filter`);
+            filter.conditions!.push(
+              ...query.values.map((c) => {
+                if ("alias" in c) {
+                  const profileTypeField = profileType.fields.find((f) => f.alias === c.alias);
+                  if (isNullish(profileTypeField)) {
+                    throw new BadRequestError(`Unknown alias ${c.alias} in values filter`);
+                  }
+                  return {
+                    profileTypeFieldId: profileTypeField.id,
+                    operator: c.operator,
+                    value: c.value,
+                  };
+                } else {
+                  return c;
                 }
-                return {
-                  profileTypeFieldId: profileTypeField.id,
-                  operator: c.operator,
-                  value: c.value,
-                };
-              } else {
-                return c;
-              }
-            });
-            values = { logicalOperator: "AND", conditions };
+              }),
+            );
           }
         }
 
         try {
           const includes = getProfileIncludesFromQuery(query);
           const result = await client.request(GetProfiles_profilesDocument, {
-            ...pick(query, ["offset", "limit", "sortBy", "search", "profileTypeIds"]),
-            status: query.status as ProfileStatus[] | undefined,
-            values,
+            ...pick(query, ["offset", "limit", "sortBy", "search"]),
+            profileTypeId: profileTypeId[0],
+            filter: (filter.conditions ?? []).length > 0 ? filter : null,
             ...includes,
           });
           return Ok({

@@ -4,9 +4,10 @@ import { indexBy, unique, zip } from "remeda";
 import { Readable } from "stream";
 import { assert } from "ts-essentials";
 import { Profile, ProfileFieldValue, ProfileTypeField, UserLocale } from "../db/__types";
-import { ProfileFilter, ProfileRepository } from "../db/repositories/ProfileRepository";
+import { ProfileQuerySortBy, ProfileRepository } from "../db/repositories/ProfileRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
 import { toGlobalId } from "../util/globalId";
+import { ProfileQueryFilter } from "../util/ProfileQueryFilter";
 import { isAtLeast } from "../util/profileTypeFieldPermission";
 import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";
 import { I18N_SERVICE, II18nService } from "./I18nService";
@@ -45,8 +46,8 @@ export class ProfileExcelExportService extends ProfileExcelService {
   async export(
     profileTypeId: number,
     search: string | null,
-    filter: Pick<ProfileFilter, "values" | "status"> | null,
-    sortBy: { field: "name" | "createdAt"; direction: "ASC" | "DESC" }[] | null,
+    filter: ProfileQueryFilter | null,
+    sortBy: ProfileQuerySortBy[] | null,
     locale: UserLocale,
     userId: number,
     onProgress?: (count: number, total: number) => Promise<void>,
@@ -98,15 +99,9 @@ export class ProfileExcelExportService extends ProfileExcelService {
           limit,
           offset,
           search,
-          filter: {
-            profileTypeId: [profileTypeId],
-            status: filter?.status,
-            values: filter?.values,
-          },
-          sortBy: sortBy?.map((s) => ({
-            field: s.field,
-            order: s.direction.toLowerCase() as "asc" | "desc",
-          })),
+          profileTypeId: [profileTypeId],
+          filter,
+          sortBy,
         },
         profileTypeFieldsById,
       );

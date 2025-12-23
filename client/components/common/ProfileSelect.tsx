@@ -6,7 +6,7 @@ import {
   ProfileSelect_ProfileFragmentDoc,
   ProfileSelect_ProfileTypesDocument,
   ProfileSelect_profileDocument,
-  ProfileSelect_profilesDocument,
+  ProfileSelect_profilesSimpleDocument,
   useCreateProfileDialog_ProfileFragment,
 } from "@parallel/graphql/__types";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
@@ -73,14 +73,20 @@ const fragments = {
 
 const _queries = [
   gql`
-    query ProfileSelect_profiles(
+    query ProfileSelect_profilesSimple(
       $offset: Int
       $limit: Int
       $search: String
-      $filter: ProfileFilter
-      $sortBy: [QueryProfiles_OrderBy!]
+      $profileTypeId: [GID!]
+      $status: [ProfileStatus!]
     ) {
-      profiles(offset: $offset, limit: $limit, search: $search, filter: $filter, sortBy: $sortBy) {
+      profilesSimple(
+        offset: $offset
+        limit: $limit
+        search: $search
+        profileTypeId: $profileTypeId
+        status: $status
+      ) {
         items {
           ...ProfileSelect_Profile
         }
@@ -186,16 +192,13 @@ export const ProfileSelect = Object.assign(
     const loadProfiles = useDebouncedAsync(
       async (search: string | null | undefined) => {
         const { data } = await apollo.query({
-          query: ProfileSelect_profilesDocument,
+          query: ProfileSelect_profilesSimpleDocument,
           variables: {
             offset: 0,
             limit: 100,
-            filter: {
-              profileTypeId: isNonNullish(profileTypeId) ? unMaybeArray(profileTypeId) : null,
-              status: ["OPEN", "CLOSED"],
-            },
+            profileTypeId: isNonNullish(profileTypeId) ? unMaybeArray(profileTypeId) : null,
+            status: ["OPEN", "CLOSED"],
             search,
-            sortBy: "name_ASC",
           },
           fetchPolicy: "no-cache",
         });
@@ -204,7 +207,7 @@ export const ProfileSelect = Object.assign(
 
         assert(isNonNullish(data), "Result data in ProfileSelect_profilesDocument is missing");
 
-        return data.profiles.items.filter((p) => !exclude.includes(p.id)) as any[];
+        return data.profilesSimple.items.filter((p) => !exclude.includes(p.id)) as any[];
       },
       300,
       [unMaybeArray(profileTypeId ?? []).join(","), hideCreate],

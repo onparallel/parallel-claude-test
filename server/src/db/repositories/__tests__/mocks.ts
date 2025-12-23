@@ -1428,23 +1428,27 @@ export class Mocks {
         r.type === "USER_ASSIGNMENT",
     );
 
-    if (cacheableValues.length > 0) {
-      await this.knex("profile")
-        .where("id", profileId)
-        .update({
-          value_cache: this.knex.raw(
-            /* sql */ `value_cache || ?::jsonb`,
-            JSON.stringify(
-              Object.fromEntries(
-                cacheableValues.map((r) => [
-                  r.profile_type_field_id,
-                  omitBy({ content: r.content, expiry_date: r.expiry_date }, isNullish),
-                ]),
+    await this.knex("profile")
+      .where("id", profileId)
+      .update({
+        updated_at: this.knex.raw("now()"),
+        ...(cacheableValues.length > 0
+          ? {
+              value_cache: this.knex.raw(
+                /* sql */ `value_cache || ?::jsonb`,
+                JSON.stringify(
+                  Object.fromEntries(
+                    cacheableValues.map((r) => [
+                      r.profile_type_field_id,
+                      omitBy({ content: r.content, expiry_date: r.expiry_date }, isNullish),
+                    ]),
+                  ),
+                ),
               ),
-            ),
-          ),
-        });
-    }
+            }
+          : {}),
+      });
+
     return rows;
   }
 }

@@ -234,10 +234,17 @@ function Profiles() {
       limit: queryState.items,
       search: queryState.search,
       sortBy: [`${sort.field}_${sort.direction}` as const],
+      profileTypeId: queryState.type!,
       filter: {
-        profileTypeId: [queryState.type!],
-        status,
-        values,
+        logicalOperator: "AND",
+        conditions: [
+          {
+            property: "status",
+            operator: "IS_ONE_OF",
+            value: status,
+          },
+          ...(values ? [values] : []),
+        ],
       },
       propertiesFilter:
         queryState.columns
@@ -503,10 +510,21 @@ function Profiles() {
                         handleExportProfilesToExcelTask({
                           locale: intl.locale as UserLocale,
                           profileTypeId: queryState.type!,
-                          values: queryState.values,
-                          status,
+                          filter: {
+                            logicalOperator: "AND",
+                            conditions: [
+                              {
+                                property: "status",
+                                operator: "IS_ONE_OF",
+                                value: status,
+                              },
+                              ...(queryState.values ? [queryState.values] : []),
+                            ],
+                          },
                           search: queryState.search,
-                          sortBy: queryState.sort,
+                          sortBy: queryState.sort
+                            ? [`${queryState.sort.field}_${queryState.sort.direction}` as const]
+                            : undefined,
                         })
                       }
                     >
@@ -1152,11 +1170,19 @@ const _queries = [
       $offset: Int
       $limit: Int
       $search: String
-      $sortBy: [QueryProfiles_OrderBy!]
-      $filter: ProfileFilter
+      $profileTypeId: GID!
+      $sortBy: [String!]
+      $filter: ProfileQueryFilterInput
       $propertiesFilter: [ProfileFieldPropertyFilter!]
     ) {
-      profiles(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy, filter: $filter) {
+      profiles(
+        offset: $offset
+        limit: $limit
+        search: $search
+        profileTypeId: $profileTypeId
+        sortBy: $sortBy
+        filter: $filter
+      ) {
         items {
           ...Profiles_Profile
           properties(filter: $propertiesFilter) {

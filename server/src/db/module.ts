@@ -1,13 +1,7 @@
 import { ContainerModule } from "inversify";
 import { Knex } from "knex";
-import {
-  PETITION_FILTER_REPOSITORY_HELPER,
-  PetitionFilterRepositoryHelper,
-} from "./helpers/PetitionFilterRepositoryHelper";
-import {
-  PROFILE_VALUES_FILTER_REPOSITORY_HELPER,
-  ProfileValuesFilterRepositoryHelper,
-} from "./helpers/ProfileValuesFilterRepositoryHelper";
+import { PETITION_QUERY_HELPER, PetitionQueryHelper } from "./helpers/PetitionQueryHelper";
+import { PROFILE_QUERY_HELPER, ProfileQueryHelper } from "./helpers/ProfileQueryHelper";
 import { createKnex, KNEX, KNEX_READ_ONLY } from "./knex";
 import { ContactRepository, ReadOnlyContactRepository } from "./repositories/ContactRepository";
 import { DashboardRepository } from "./repositories/DashboardRepository";
@@ -64,10 +58,6 @@ export const dbModule = new ContainerModule((options) => {
   options.bind<ReadOnlyTagRepository>(ReadOnlyTagRepository).toSelf();
 
   // Repository helpers
-  options
-    .bind<ProfileValuesFilterRepositoryHelper>(PROFILE_VALUES_FILTER_REPOSITORY_HELPER)
-    .to(ProfileValuesFilterRepositoryHelper);
-  options
-    .bind<PetitionFilterRepositoryHelper>(PETITION_FILTER_REPOSITORY_HELPER)
-    .to(PetitionFilterRepositoryHelper);
+  options.bind<ProfileQueryHelper>(PROFILE_QUERY_HELPER).to(ProfileQueryHelper);
+  options.bind<PetitionQueryHelper>(PETITION_QUERY_HELPER).to(PetitionQueryHelper);
 });

@@ -2389,11 +2389,11 @@ export type MutationcreateProfileTypeProcessArgs = {
 };
 
 export type MutationcreateProfilesExcelExportTaskArgs = {
-  filter?: InputMaybe<ProfileFilter>;
+  filter?: InputMaybe<ProfileQueryFilterInput>;
   locale: UserLocale;
   profileTypeId: Scalars["GID"]["input"];
   search?: InputMaybe<Scalars["String"]["input"]>;
-  sortBy?: InputMaybe<Array<SortByInput>>;
+  sortBy?: InputMaybe<Array<Scalars["String"]["input"]>>;
 };
 
 export type MutationcreateProfilesExcelImportTaskArgs = {
@@ -5395,6 +5395,7 @@ export type PetitionsRatioDashboardModuleSettingsInput = {
 
 export type Profile = Timestamps & {
   associatedPetitions: PetitionPagination;
+  closedAt: Maybe<Scalars["DateTime"]["output"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
   /** The events for the profile. */
@@ -5863,6 +5864,49 @@ export type ProfilePropertyFilter = {
   profileTypeFieldId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 };
+
+export type ProfileQueryFilterGroupLogicalOperator = "AND" | "OR";
+
+export type ProfileQueryFilterInput = {
+  conditions?: InputMaybe<Array<ProfileQueryFilterInput>>;
+  logicalOperator?: InputMaybe<ProfileQueryFilterGroupLogicalOperator>;
+  operator?: InputMaybe<ProfileQueryFilterOperator>;
+  profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
+  property?: InputMaybe<ProfileQueryFilterProperty>;
+  value?: InputMaybe<Scalars["JSON"]["input"]>;
+};
+
+export type ProfileQueryFilterOperator =
+  | "CONTAIN"
+  | "END_WITH"
+  | "EQUAL"
+  | "EXPIRES_IN"
+  | "GREATER_THAN"
+  | "GREATER_THAN_OR_EQUAL"
+  | "HAS_ANY_BG_CHECK_TOPICS"
+  | "HAS_BG_CHECK_MATCH"
+  | "HAS_BG_CHECK_RESULTS"
+  | "HAS_BG_CHECK_TOPICS"
+  | "HAS_EXPIRY"
+  | "HAS_PENDING_REVIEW"
+  | "HAS_VALUE"
+  | "IS_EXPIRED"
+  | "IS_ONE_OF"
+  | "LESS_THAN"
+  | "LESS_THAN_OR_EQUAL"
+  | "NOT_CONTAIN"
+  | "NOT_EQUAL"
+  | "NOT_HAS_ANY_BG_CHECK_TOPICS"
+  | "NOT_HAS_BG_CHECK_MATCH"
+  | "NOT_HAS_BG_CHECK_RESULTS"
+  | "NOT_HAS_BG_CHECK_TOPICS"
+  | "NOT_HAS_EXPIRY"
+  | "NOT_HAS_PENDING_REVIEW"
+  | "NOT_HAS_VALUE"
+  | "NOT_IS_ONE_OF"
+  | "START_WITH";
+
+export type ProfileQueryFilterProperty = "closedAt" | "createdAt" | "id" | "status" | "updatedAt";
 
 export type ProfileRelationship = {
   id: Scalars["GID"]["output"];
@@ -6521,6 +6565,7 @@ export type Query = {
   profileTypeFieldValueHistory: ProfileFieldValuePagination;
   profileTypes: ProfileTypePagination;
   profiles: ProfilePagination;
+  profilesSimple: ProfilePagination;
   profilesWithSameContent: Array<ProfilesWithContent>;
   publicLicenseCode: Maybe<PublicLicenseCode>;
   publicOrg: Maybe<PublicOrganization>;
@@ -6788,11 +6833,20 @@ export type QueryprofileTypesArgs = {
 };
 
 export type QueryprofilesArgs = {
-  filter?: InputMaybe<ProfileFilter>;
+  filter?: InputMaybe<ProfileQueryFilterInput>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
+  profileTypeId: Scalars["GID"]["input"];
   search?: InputMaybe<Scalars["String"]["input"]>;
-  sortBy?: InputMaybe<Array<QueryProfiles_OrderBy>>;
+  sortBy?: InputMaybe<Array<Scalars["String"]["input"]>>;
+};
+
+export type QueryprofilesSimpleArgs = {
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  search?: InputMaybe<Scalars["String"]["input"]>;
+  status?: InputMaybe<Array<ProfileStatus>>;
 };
 
 export type QueryprofilesWithSameContentArgs = {
@@ -6916,9 +6970,6 @@ export type QueryProfileTypes_OrderBy =
   | "createdAt_DESC"
   | "name_ASC"
   | "name_DESC";
-
-/** Order to use on Query.profiles */
-export type QueryProfiles_OrderBy = "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
 
 /** Order to use on Query.userGroups */
 export type QueryUserGroups_OrderBy = "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
@@ -7220,13 +7271,6 @@ export type SignatureStartedEvent = PetitionEvent & {
   petition: Maybe<Petition>;
   signature: PetitionSignatureRequest;
   type: PetitionEventType;
-};
-
-export type SortByDirection = "ASC" | "DESC";
-
-export type SortByInput = {
-  direction: SortByDirection;
-  field: Scalars["String"]["input"];
 };
 
 export type StandardListDefinition = {

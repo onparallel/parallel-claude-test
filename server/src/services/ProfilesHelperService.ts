@@ -162,16 +162,14 @@ export class ProfilesHelperService {
         // at most, we will have as much conflicting profiles as there are conflicting fields
         // so we can limit the query to that number of profiles
         limit: possibleConflictingFields.length,
+        profileTypeId: [profileTypeId],
         filter: {
-          profileTypeId: [profileTypeId],
-          values: {
-            logicalOperator: "OR",
-            conditions: possibleConflictingFields.map((f) => ({
-              profileTypeFieldId: f.profileTypeFieldId,
-              operator: "EQUAL" as const,
-              value: f.content.value,
-            })),
-          },
+          logicalOperator: "OR",
+          conditions: possibleConflictingFields.map((f) => ({
+            profileTypeFieldId: f.profileTypeFieldId,
+            operator: "EQUAL" as const,
+            value: f.content.value,
+          })),
         },
       },
       profileTypeFieldsById,

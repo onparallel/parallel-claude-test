@@ -11,6 +11,11 @@ import {
   ProfileTypeStandardTypeValues,
 } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
+import {
+  ProfileQueryFilterGroupLogicalOperatorValues,
+  ProfileQueryFilterOperatorValues,
+  ProfileQueryFilterPropertyValues,
+} from "../../util/ProfileQueryFilter";
 import { authenticateAnd } from "../helpers/authorize";
 import { ApolloError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -361,6 +366,7 @@ export const Profile = objectType({
       },
     });
     t.implements("Timestamps");
+    t.nullable.datetime("closedAt", { resolve: (o) => o.closed_at });
   },
 });
 
@@ -719,6 +725,67 @@ export const ProfileTypeProcess = objectType({
           profileId: args.profileId,
         });
       },
+    });
+  },
+});
+
+export const ProfileQueryFilterInput = inputObjectType({
+  name: "ProfileQueryFilterInput",
+  definition(t) {
+    t.nullable.globalId("profileTypeFieldId", { prefixName: "ProfileTypeField" });
+    t.nullable.field("property", {
+      type: enumType({
+        name: "ProfileQueryFilterProperty",
+        members: ProfileQueryFilterPropertyValues,
+      }),
+    });
+    t.nullable.field("operator", {
+      type: enumType({
+        name: "ProfileQueryFilterOperator",
+        members: ProfileQueryFilterOperatorValues,
+      }),
+    });
+    t.nullable.json("value");
+    t.nullable.field("logicalOperator", {
+      type: enumType({
+        name: "ProfileQueryFilterGroupLogicalOperator",
+        members: ProfileQueryFilterGroupLogicalOperatorValues,
+      }),
+    });
+    t.nullable.list.nonNull.field("conditions", { type: "ProfileQueryFilterInput" });
+  },
+});
+
+/** @deprecated */
+export const _ProfileFilter = inputObjectType({
+  name: "ProfileFilter",
+  definition(t) {
+    t.nullable.list.nonNull.globalId("profileTypeId", {
+      prefixName: "ProfileType",
+    });
+    t.nullable.list.nonNull.globalId("profileId", { prefixName: "Profile" });
+    t.nullable.list.nonNull.field("status", { type: "ProfileStatus" });
+    t.nullable.field("values", {
+      type: inputObjectType({
+        name: "ProfileFieldValuesFilter",
+        definition(t) {
+          t.nullable.globalId("profileTypeFieldId", { prefixName: "ProfileTypeField" });
+          t.nullable.field("operator", {
+            type: enumType({
+              name: "ProfileFieldValuesFilterOperator",
+              members: ProfileQueryFilterOperatorValues,
+            }),
+          });
+          t.nullable.json("value");
+          t.nullable.field("logicalOperator", {
+            type: enumType({
+              name: "ProfileFieldValuesFilterGroupLogicalOperator",
+              members: ["AND", "OR"],
+            }),
+          });
+          t.nullable.list.nonNull.field("conditions", { type: "ProfileFieldValuesFilter" });
+        },
+      }),
     });
   },
 });

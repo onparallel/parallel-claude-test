@@ -103,15 +103,14 @@ useProfilesExcelExportTask.mutations = [
     mutation useProfilesExcelExportTask_createProfilesExcelExportTask(
       $profileTypeId: GID!
       $locale: UserLocale!
-      $values: ProfileFieldValuesFilter
-      $status: [ProfileStatus!]
+      $filter: ProfileQueryFilterInput
       $search: String
-      $sortBy: [SortByInput!]
+      $sortBy: [String!]
     ) {
       createProfilesExcelExportTask(
         profileTypeId: $profileTypeId
         locale: $locale
-        filter: { values: $values, status: $status }
+        filter: $filter
         search: $search
         sortBy: $sortBy
       ) {

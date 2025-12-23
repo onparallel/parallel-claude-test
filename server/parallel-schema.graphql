@@ -2366,11 +2366,11 @@ type Mutation {
   Creates a task for exporting profiles with specific filters
   """
   createProfilesExcelExportTask(
-    filter: ProfileFilter
+    filter: ProfileQueryFilterInput
     locale: UserLocale!
     profileTypeId: GID!
     search: String
-    sortBy: [SortByInput!]
+    sortBy: [String!]
   ): Task!
 
   """
@@ -6852,6 +6852,7 @@ type Profile implements Timestamps {
     """
     offset: Int
   ): PetitionPagination!
+  closedAt: DateTime
 
   """
   Time when the resource was created.
@@ -7410,6 +7411,59 @@ type ProfilePagination {
 input ProfilePropertyFilter {
   profileTypeFieldId: [GID!]
   profileTypeId: [GID!]
+}
+
+enum ProfileQueryFilterGroupLogicalOperator {
+  AND
+  OR
+}
+
+input ProfileQueryFilterInput {
+  conditions: [ProfileQueryFilterInput!]
+  logicalOperator: ProfileQueryFilterGroupLogicalOperator
+  operator: ProfileQueryFilterOperator
+  profileTypeFieldId: GID
+  property: ProfileQueryFilterProperty
+  value: JSON
+}
+
+enum ProfileQueryFilterOperator {
+  CONTAIN
+  END_WITH
+  EQUAL
+  EXPIRES_IN
+  GREATER_THAN
+  GREATER_THAN_OR_EQUAL
+  HAS_ANY_BG_CHECK_TOPICS
+  HAS_BG_CHECK_MATCH
+  HAS_BG_CHECK_RESULTS
+  HAS_BG_CHECK_TOPICS
+  HAS_EXPIRY
+  HAS_PENDING_REVIEW
+  HAS_VALUE
+  IS_EXPIRED
+  IS_ONE_OF
+  LESS_THAN
+  LESS_THAN_OR_EQUAL
+  NOT_CONTAIN
+  NOT_EQUAL
+  NOT_HAS_ANY_BG_CHECK_TOPICS
+  NOT_HAS_BG_CHECK_MATCH
+  NOT_HAS_BG_CHECK_RESULTS
+  NOT_HAS_BG_CHECK_TOPICS
+  NOT_HAS_EXPIRY
+  NOT_HAS_PENDING_REVIEW
+  NOT_HAS_VALUE
+  NOT_IS_ONE_OF
+  START_WITH
+}
+
+enum ProfileQueryFilterProperty {
+  closedAt
+  createdAt
+  id
+  status
+  updatedAt
 }
 
 type ProfileRelationship {
@@ -8723,7 +8777,7 @@ type Query {
     sortBy: [QueryProfileTypes_OrderBy!]
   ): ProfileTypePagination!
   profiles(
-    filter: ProfileFilter
+    filter: ProfileQueryFilterInput
 
     """
     Number of elements to take from the list.
@@ -8734,16 +8788,31 @@ type Query {
     Number of elements to skip from the list.
     """
     offset: Int
+    profileTypeId: GID!
 
     """
     Optional text to search in the collection.
     """
     search: String
+    sortBy: [String!]
+  ): ProfilePagination!
+  profilesSimple(
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
 
     """
-    Sorting to use on the collection
+    Number of elements to skip from the list.
     """
-    sortBy: [QueryProfiles_OrderBy!]
+    offset: Int
+    profileTypeId: [GID!]
+
+    """
+    Optional text to search in the collection.
+    """
+    search: String
+    status: [ProfileStatus!]
   ): ProfilePagination!
   profilesWithSameContent(profileTypeFieldId: GID!, profileTypeId: GID!): [ProfilesWithContent!]!
   publicLicenseCode(code: String!, token: ID!): PublicLicenseCode
@@ -8908,16 +8977,6 @@ enum QueryPetitions_OrderBy {
 Order to use on Query.profileTypes
 """
 enum QueryProfileTypes_OrderBy {
-  createdAt_ASC
-  createdAt_DESC
-  name_ASC
-  name_DESC
-}
-
-"""
-Order to use on Query.profiles
-"""
-enum QueryProfiles_OrderBy {
   createdAt_ASC
   createdAt_DESC
   name_ASC
@@ -9353,16 +9412,6 @@ type SignatureStartedEvent implements PetitionEvent {
   petition: Petition
   signature: PetitionSignatureRequest!
   type: PetitionEventType!
-}
-
-enum SortByDirection {
-  ASC
-  DESC
-}
-
-input SortByInput {
-  direction: SortByDirection!
-  field: String!
 }
 
 type StandardListDefinition {

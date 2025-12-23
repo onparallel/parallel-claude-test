@@ -2,7 +2,7 @@ import { isNullish, pick, pickBy } from "remeda";
 import { assert } from "ts-essentials";
 import { ProfileTypeField } from "../../db/__types";
 import { fromGlobalId, isGlobalId, toGlobalId } from "../../util/globalId";
-import { ProfileFieldValuesFilterOperatorValues } from "../../util/ProfileFieldValuesFilter";
+import { ProfileQueryFilterOperatorValues } from "../../util/ProfileQueryFilter";
 import { NexusGenInputs, NexusGenObjects } from "../__types";
 
 export function mapProfileListViewDataToDatabase(
@@ -54,7 +54,7 @@ function mapValuesFilterFromDatabase(profileTypeFieldsById: Record<number, Profi
       `Invalid logical operator: ${v.logicalOperator}`,
     );
     assert(
-      isNullish(v.operator) || ProfileFieldValuesFilterOperatorValues.includes(v.operator),
+      isNullish(v.operator) || ProfileQueryFilterOperatorValues.includes(v.operator),
       "Invalid operator",
     );
     assert(isNullish(v.conditions) || Array.isArray(v.conditions), "Invalid conditions");

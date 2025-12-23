@@ -1,11 +1,12 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
+import { ProfileQueryFilter } from "../../util/ProfileQueryFilter";
 import { Maybe, Replace } from "../../util/types";
 import { Task as DbTask, TaskName, UserLocale } from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { ProfileFilter } from "./ProfileRepository";
+import { ProfileQuerySortBy } from "./ProfileRepository";
 
 export type TaskInput<TName extends TaskName> = {
   /**
@@ -122,8 +123,8 @@ export type TaskInput<TName extends TaskName> = {
     locale: UserLocale;
     profile_type_id: number;
     search: string | null;
-    filter: Pick<ProfileFilter, "values" | "status"> | null;
-    sort_by: { field: "name" | "createdAt"; direction: "ASC" | "DESC" }[] | null;
+    filter: ProfileQueryFilter | null;
+    sort_by: ProfileQuerySortBy[] | null;
   };
   DASHBOARD_REFRESH: {
     dashboard_id: number;

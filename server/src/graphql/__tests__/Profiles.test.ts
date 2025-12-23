@@ -504,27 +504,6 @@ describe("GraphQL/Profiles", () => {
           content: { value: "Potter" },
         },
       ]);
-      await mocks.createProfileFieldValues(fromGlobalId(harryPotter.id).id, [
-        {
-          created_by_user_id: sessionUser.id,
-          type: "BACKGROUND_CHECK",
-          profile_type_field_id: profileType0Fields[8].id,
-          content: JSON.stringify({
-            query: {
-              name: "Harry Potter",
-              date: null,
-              type: "PERSON",
-            },
-            search: {
-              totalCount: 1,
-              items: [], // doesn't matter
-              createdAt: new Date(),
-            },
-            entity: null,
-          }),
-        },
-      ]);
-
       const harveySpecter = await createProfile(toGlobalId("ProfileType", profileTypes[0].id), [
         {
           profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
@@ -535,6 +514,7 @@ describe("GraphQL/Profiles", () => {
           content: { value: "Specter" },
         },
       ]);
+      const unknownPerson = await createProfile(toGlobalId("ProfileType", profileTypes[0].id));
 
       await mocks.createProfileFieldValues(fromGlobalId(harveySpecter.id).id, [
         {
@@ -564,8 +544,26 @@ describe("GraphQL/Profiles", () => {
           }),
         },
       ]);
-
-      const unknownPerson = await createProfile(toGlobalId("ProfileType", profileTypes[0].id));
+      await mocks.createProfileFieldValues(fromGlobalId(harryPotter.id).id, [
+        {
+          created_by_user_id: sessionUser.id,
+          type: "BACKGROUND_CHECK",
+          profile_type_field_id: profileType0Fields[8].id,
+          content: JSON.stringify({
+            query: {
+              name: "Harry Potter",
+              date: null,
+              type: "PERSON",
+            },
+            search: {
+              totalCount: 1,
+              items: [], // doesn't matter
+              createdAt: new Date(),
+            },
+            entity: null,
+          }),
+        },
+      ]);
       await mocks.createProfileFieldValues(fromGlobalId(unknownPerson.id).id, [
         {
           created_by_user_id: sessionUser.id,
@@ -654,11 +652,11 @@ describe("GraphQL/Profiles", () => {
       expiredContractId = expiredContract.id;
     });
 
-    it("queries profiles filtering by its current values", async () => {
+    it("sorts profiles by createdAt_ASC", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          query ($filter: ProfileFilter) {
-            profiles(limit: 100, offset: 0, filter: $filter) {
+          query ($sortBy: [String!], $profileTypeId: GID!) {
+            profiles(limit: 100, offset: 0, sortBy: $sortBy, profileTypeId: $profileTypeId) {
               totalCount
               items {
                 id
@@ -667,13 +665,253 @@ describe("GraphQL/Profiles", () => {
           }
         `,
         {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          sortBy: ["createdAt_ASC"],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 3,
+        items: [{ id: harryPotterId }, { id: harveySpecterId }, { id: unknownPersonId }],
+      });
+    });
+
+    it("sorts profiles by createdAt_DESC", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($sortBy: [String!], $profileTypeId: GID!) {
+            profiles(limit: 100, offset: 0, sortBy: $sortBy, profileTypeId: $profileTypeId) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          sortBy: ["createdAt_DESC"],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 3,
+        items: [{ id: unknownPersonId }, { id: harveySpecterId }, { id: harryPotterId }],
+      });
+    });
+
+    it("sorts profiles by updatedAt_ASC", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($sortBy: [String!], $profileTypeId: GID!) {
+            profiles(limit: 100, offset: 0, sortBy: $sortBy, profileTypeId: $profileTypeId) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          sortBy: ["updatedAt_ASC"],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 3,
+        items: [{ id: harveySpecterId }, { id: harryPotterId }, { id: unknownPersonId }],
+      });
+    });
+
+    it("sorts profiles by updatedAt_DESC", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($sortBy: [String!], $profileTypeId: GID!) {
+            profiles(limit: 100, offset: 0, sortBy: $sortBy, profileTypeId: $profileTypeId) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          sortBy: ["updatedAt_DESC"],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 3,
+        items: [{ id: unknownPersonId }, { id: harryPotterId }, { id: harveySpecterId }],
+      });
+    });
+
+    it("sorts profiles by name_ASC", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($sortBy: [String!], $profileTypeId: GID!) {
+            profiles(limit: 100, offset: 0, sortBy: $sortBy, profileTypeId: $profileTypeId) {
+              totalCount
+              items {
+                id
+                localizableName
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          sortBy: ["name_ASC"],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 3,
+        items: [
+          { id: unknownPersonId, localizableName: {} },
+          {
+            id: harryPotterId,
+            localizableName: { en: "Harry Potter ( risk)", es: "Harry Potter ( risk)" },
+          },
+          {
+            id: harveySpecterId,
+            localizableName: { en: "Harvey Specter ( risk)", es: "Harvey Specter ( risk)" },
+          },
+        ],
+      });
+    });
+
+    it("sorts profiles by name_DESC", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($sortBy: [String!], $profileTypeId: GID!) {
+            profiles(limit: 100, offset: 0, sortBy: $sortBy, profileTypeId: $profileTypeId) {
+              totalCount
+              items {
+                id
+                localizableName
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          sortBy: ["name_DESC"],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 3,
+        items: [
+          {
+            id: harveySpecterId,
+            localizableName: { en: "Harvey Specter ( risk)", es: "Harvey Specter ( risk)" },
+          },
+          {
+            id: harryPotterId,
+            localizableName: { en: "Harry Potter ( risk)", es: "Harry Potter ( risk)" },
+          },
+          { id: unknownPersonId, localizableName: {} },
+        ],
+      });
+    });
+
+    it("sorts profiles by closedAt_ASC", async () => {
+      await mocks.knex
+        .from("profile")
+        .where("id", fromGlobalId(harryPotterId).id)
+        .update({ closed_at: new Date("2020-10-11"), status: "CLOSED" });
+
+      await mocks.knex
+        .from("profile")
+        .where("id", fromGlobalId(harveySpecterId).id)
+        .update({ closed_at: new Date("2022-10-11"), status: "CLOSED" });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($sortBy: [String!], $profileTypeId: GID!) {
+            profiles(limit: 100, offset: 0, sortBy: $sortBy, profileTypeId: $profileTypeId) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          sortBy: ["closedAt_ASC"],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 3,
+        items: [{ id: harryPotterId }, { id: harveySpecterId }, { id: unknownPersonId }],
+      });
+    });
+
+    it("sorts profiles by closedAt_DESC", async () => {
+      await mocks.knex
+        .from("profile")
+        .where("id", fromGlobalId(harryPotterId).id)
+        .update({ closed_at: new Date("2020-10-11"), status: "CLOSED" });
+
+      await mocks.knex
+        .from("profile")
+        .where("id", fromGlobalId(harveySpecterId).id)
+        .update({ closed_at: new Date("2022-10-11"), status: "CLOSED" });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($sortBy: [String!], $profileTypeId: GID!) {
+            profiles(limit: 100, offset: 0, sortBy: $sortBy, profileTypeId: $profileTypeId) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          sortBy: ["closedAt_DESC"],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 3,
+        items: [{ id: harveySpecterId }, { id: harryPotterId }, { id: unknownPersonId }],
+      });
+    });
+
+    it("queries profiles filtering by its current values", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!) {
+            profiles(limit: 100, offset: 0, filter: $filter, profileTypeId: $profileTypeId) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
           filter: {
-            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-            values: {
-              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
-              operator: "START_WITH",
-              value: "Har",
-            },
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+            operator: "START_WITH",
+            value: "Har",
           },
         },
       );
@@ -688,8 +926,8 @@ describe("GraphQL/Profiles", () => {
     it("queries profiles with multiple value filters", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          query ($filter: ProfileFilter) {
-            profiles(limit: 100, offset: 0, filter: $filter) {
+          query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!) {
+            profiles(limit: 100, offset: 0, filter: $filter, profileTypeId: $profileTypeId) {
               totalCount
               items {
                 id
@@ -698,23 +936,21 @@ describe("GraphQL/Profiles", () => {
           }
         `,
         {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
           filter: {
-            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-            values: {
-              logicalOperator: "AND",
-              conditions: [
-                {
-                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
-                  operator: "START_WITH",
-                  value: "Har",
-                },
-                {
-                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
-                  operator: "EQUAL",
-                  value: "Potter",
-                },
-              ],
-            },
+            logicalOperator: "AND",
+            conditions: [
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+                operator: "START_WITH",
+                value: "Har",
+              },
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[1].id),
+                operator: "EQUAL",
+                value: "Potter",
+              },
+            ],
           },
         },
       );
@@ -729,8 +965,8 @@ describe("GraphQL/Profiles", () => {
     it("queries profiles with numerical value filter", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          query ($filter: ProfileFilter) {
-            profiles(limit: 100, offset: 0, filter: $filter) {
+          query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!) {
+            profiles(limit: 100, offset: 0, filter: $filter, profileTypeId: $profileTypeId) {
               totalCount
               items {
                 id
@@ -739,23 +975,21 @@ describe("GraphQL/Profiles", () => {
           }
         `,
         {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[2].id),
           filter: {
-            profileTypeId: toGlobalId("ProfileType", profileTypes[2].id),
-            values: {
-              logicalOperator: "AND",
-              conditions: [
-                {
-                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[4].id),
-                  operator: "GREATER_THAN_OR_EQUAL",
-                  value: 1000,
-                },
-                {
-                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[0].id),
-                  operator: "CONTAIN",
-                  value: "Main St",
-                },
-              ],
-            },
+            logicalOperator: "AND",
+            conditions: [
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[4].id),
+                operator: "GREATER_THAN_OR_EQUAL",
+                value: 1000,
+              },
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[0].id),
+                operator: "CONTAIN",
+                value: "Main St",
+              },
+            ],
           },
         },
       );
@@ -770,8 +1004,8 @@ describe("GraphQL/Profiles", () => {
     it("queries profiles with an array of possible values", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          query ($filter: ProfileFilter) {
-            profiles(limit: 100, offset: 0, filter: $filter) {
+          query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!) {
+            profiles(limit: 100, offset: 0, filter: $filter, profileTypeId: $profileTypeId) {
               totalCount
               items {
                 id
@@ -780,13 +1014,11 @@ describe("GraphQL/Profiles", () => {
           }
         `,
         {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
           filter: {
-            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-            values: {
-              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
-              operator: "IS_ONE_OF",
-              value: ["Harry", "Harvey"],
-            },
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+            operator: "IS_ONE_OF",
+            value: ["Harry", "Harvey"],
           },
         },
       );
@@ -802,8 +1034,8 @@ describe("GraphQL/Profiles", () => {
       for (const operator of ["IS_ONE_OF", "NOT_IS_ONE_OF"]) {
         const { errors, data } = await testClient.execute(
           gql`
-            query ($filter: ProfileFilter) {
-              profiles(limit: 100, offset: 0, filter: $filter) {
+            query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!) {
+              profiles(limit: 100, offset: 0, filter: $filter, profileTypeId: $profileTypeId) {
                 totalCount
                 items {
                   id
@@ -812,13 +1044,11 @@ describe("GraphQL/Profiles", () => {
             }
           `,
           {
+            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
             filter: {
-              profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-              values: {
-                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
-                operator,
-                value: "Harry",
-              },
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+              operator,
+              value: "Harry",
             },
           },
         );
@@ -843,8 +1073,8 @@ describe("GraphQL/Profiles", () => {
       ]) {
         const { errors, data } = await testClient.execute(
           gql`
-            query ($filter: ProfileFilter) {
-              profiles(limit: 100, offset: 0, filter: $filter) {
+            query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!) {
+              profiles(limit: 100, offset: 0, filter: $filter, profileTypeId: $profileTypeId) {
                 totalCount
                 items {
                   id
@@ -853,18 +1083,16 @@ describe("GraphQL/Profiles", () => {
             }
           `,
           {
+            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
             filter: {
-              profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-              values: {
-                logicalOperator: "OR",
-                conditions: [
-                  {
-                    profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
-                    operator,
-                    value: ["Harry", "Harvey"],
-                  },
-                ],
-              },
+              logicalOperator: "OR",
+              conditions: [
+                {
+                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[0].id),
+                  operator,
+                  value: ["Harry", "Harvey"],
+                },
+              ],
             },
           },
         );
@@ -877,8 +1105,8 @@ describe("GraphQL/Profiles", () => {
     it("queries profiles with HAS_BG_CHECK_MATCH operator", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          query ($filter: ProfileFilter) {
-            profiles(limit: 100, offset: 0, filter: $filter) {
+          query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!) {
+            profiles(limit: 100, offset: 0, filter: $filter, profileTypeId: $profileTypeId) {
               totalCount
               items {
                 id
@@ -887,12 +1115,10 @@ describe("GraphQL/Profiles", () => {
           }
         `,
         {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
           filter: {
-            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-            values: {
-              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
-              operator: "HAS_BG_CHECK_MATCH",
-            },
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
+            operator: "HAS_BG_CHECK_MATCH",
           },
         },
       );
@@ -907,8 +1133,8 @@ describe("GraphQL/Profiles", () => {
     it("queries profiles with NOT_HAS_BG_CHECK_MATCH operator", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          query ($filter: ProfileFilter) {
-            profiles(limit: 100, offset: 0, filter: $filter) {
+          query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!) {
+            profiles(limit: 100, offset: 0, filter: $filter, profileTypeId: $profileTypeId) {
               totalCount
               items {
                 id
@@ -917,12 +1143,10 @@ describe("GraphQL/Profiles", () => {
           }
         `,
         {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
           filter: {
-            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-            values: {
-              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
-              operator: "NOT_HAS_BG_CHECK_MATCH",
-            },
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
+            operator: "NOT_HAS_BG_CHECK_MATCH",
           },
         },
       );
@@ -937,8 +1161,8 @@ describe("GraphQL/Profiles", () => {
     it("queries profiles with HAS_BG_CHECK_RESULTS operator", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          query ($filter: ProfileFilter) {
-            profiles(limit: 100, offset: 0, filter: $filter) {
+          query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!) {
+            profiles(limit: 100, offset: 0, filter: $filter, profileTypeId: $profileTypeId) {
               totalCount
               items {
                 id
@@ -947,12 +1171,10 @@ describe("GraphQL/Profiles", () => {
           }
         `,
         {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
           filter: {
-            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-            values: {
-              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
-              operator: "HAS_BG_CHECK_RESULTS",
-            },
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
+            operator: "HAS_BG_CHECK_RESULTS",
           },
         },
       );
@@ -967,8 +1189,8 @@ describe("GraphQL/Profiles", () => {
     it("queries profiles with NOT_HAS_BG_CHECK_RESULTS operator", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          query ($filter: ProfileFilter) {
-            profiles(limit: 100, offset: 0, filter: $filter) {
+          query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!) {
+            profiles(limit: 100, offset: 0, filter: $filter, profileTypeId: $profileTypeId) {
               totalCount
               items {
                 id
@@ -977,12 +1199,10 @@ describe("GraphQL/Profiles", () => {
           }
         `,
         {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
           filter: {
-            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-            values: {
-              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
-              operator: "NOT_HAS_BG_CHECK_RESULTS",
-            },
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
+            operator: "NOT_HAS_BG_CHECK_RESULTS",
           },
         },
       );
@@ -997,8 +1217,8 @@ describe("GraphQL/Profiles", () => {
     it("queries profiles with HAS_BG_CHECK_TOPICS operator", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          query ($filter: ProfileFilter) {
-            profiles(limit: 100, offset: 0, filter: $filter) {
+          query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!) {
+            profiles(limit: 100, offset: 0, filter: $filter, profileTypeId: $profileTypeId) {
               totalCount
               items {
                 id
@@ -1007,13 +1227,11 @@ describe("GraphQL/Profiles", () => {
           }
         `,
         {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
           filter: {
-            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-            values: {
-              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
-              operator: "HAS_BG_CHECK_TOPICS",
-              value: ["poi"],
-            },
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
+            operator: "HAS_BG_CHECK_TOPICS",
+            value: ["poi"],
           },
         },
       );
@@ -1032,8 +1250,8 @@ describe("GraphQL/Profiles", () => {
       ] as [string[], string[]][]) {
         const { errors, data } = await testClient.execute(
           gql`
-            query ($filter: ProfileFilter) {
-              profiles(limit: 100, offset: 0, filter: $filter) {
+            query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!) {
+              profiles(limit: 100, offset: 0, filter: $filter, profileTypeId: $profileTypeId) {
                 totalCount
                 items {
                   id
@@ -1042,13 +1260,11 @@ describe("GraphQL/Profiles", () => {
             }
           `,
           {
+            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
             filter: {
-              profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-              values: {
-                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
-                operator: "NOT_HAS_BG_CHECK_TOPICS",
-                value,
-              },
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[8].id),
+              operator: "NOT_HAS_BG_CHECK_TOPICS",
+              value,
             },
           },
         );
@@ -1070,8 +1286,8 @@ describe("GraphQL/Profiles", () => {
       ] as [string, string[], string[]][]) {
         const { errors, data } = await testClient.execute(
           gql`
-            query ($filter: ProfileFilter) {
-              profiles(limit: 100, offset: 0, filter: $filter) {
+            query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!) {
+              profiles(limit: 100, offset: 0, filter: $filter, profileTypeId: $profileTypeId) {
                 totalCount
                 items {
                   id
@@ -1080,13 +1296,11 @@ describe("GraphQL/Profiles", () => {
             }
           `,
           {
+            profileTypeId: toGlobalId("ProfileType", profileTypes[3].id),
             filter: {
-              profileTypeId: toGlobalId("ProfileType", profileTypes[3].id),
-              values: {
-                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
-                operator,
-                value,
-              },
+              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
+              operator,
+              value,
             },
           },
         );
@@ -1102,8 +1316,8 @@ describe("GraphQL/Profiles", () => {
     it("queries profiles with values on CHECKBOX field and OR logical operator", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          query ($filter: ProfileFilter) {
-            profiles(limit: 100, offset: 0, filter: $filter) {
+          query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!) {
+            profiles(limit: 100, offset: 0, filter: $filter, profileTypeId: $profileTypeId) {
               totalCount
               items {
                 id
@@ -1112,23 +1326,21 @@ describe("GraphQL/Profiles", () => {
           }
         `,
         {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[3].id),
           filter: {
-            profileTypeId: toGlobalId("ProfileType", profileTypes[3].id),
-            values: {
-              logicalOperator: "OR",
-              conditions: [
-                {
-                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
-                  operator: "EQUAL",
-                  value: ["A"],
-                },
-                {
-                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
-                  operator: "CONTAIN",
-                  value: ["B"],
-                },
-              ],
-            },
+            logicalOperator: "OR",
+            conditions: [
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
+                operator: "EQUAL",
+                value: ["A"],
+              },
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType3Fields[4].id),
+                operator: "CONTAIN",
+                value: ["B"],
+              },
+            ],
           },
         },
       );
@@ -1143,8 +1355,8 @@ describe("GraphQL/Profiles", () => {
     it("queries profiles containing FILE replies", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          query ($filter: ProfileFilter) {
-            profiles(limit: 100, offset: 0, filter: $filter) {
+          query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!) {
+            profiles(limit: 100, offset: 0, filter: $filter, profileTypeId: $profileTypeId) {
               totalCount
               items {
                 id
@@ -1153,12 +1365,10 @@ describe("GraphQL/Profiles", () => {
           }
         `,
         {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[2].id),
           filter: {
-            profileTypeId: toGlobalId("ProfileType", profileTypes[2].id),
-            values: {
-              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
-              operator: "HAS_VALUE",
-            },
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
+            operator: "HAS_VALUE",
           },
         },
       );
@@ -1173,8 +1383,8 @@ describe("GraphQL/Profiles", () => {
     it("queries contracts with multiple filters", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          query ($filter: ProfileFilter) {
-            profiles(limit: 100, offset: 0, filter: $filter) {
+          query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!) {
+            profiles(limit: 100, offset: 0, filter: $filter, profileTypeId: $profileTypeId) {
               totalCount
               items {
                 id
@@ -1183,22 +1393,20 @@ describe("GraphQL/Profiles", () => {
           }
         `,
         {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[2].id),
           filter: {
-            profileTypeId: toGlobalId("ProfileType", profileTypes[2].id),
-            values: {
-              logicalOperator: "OR",
-              conditions: [
-                {
-                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
-                  operator: "NOT_HAS_VALUE",
-                },
-                {
-                  profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[4].id),
-                  operator: "LESS_THAN_OR_EQUAL",
-                  value: 1000,
-                },
-              ],
-            },
+            logicalOperator: "OR",
+            conditions: [
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[1].id),
+                operator: "NOT_HAS_VALUE",
+              },
+              {
+                profileTypeFieldId: toGlobalId("ProfileTypeField", profileType2Fields[4].id),
+                operator: "LESS_THAN_OR_EQUAL",
+                value: 1000,
+              },
+            ],
           },
         },
       );
@@ -1221,8 +1429,8 @@ describe("GraphQL/Profiles", () => {
 
       const { errors, data } = await testClient.execute(
         gql`
-          query ($filter: ProfileFilter) {
-            profiles(limit: 100, offset: 0, filter: $filter) {
+          query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!) {
+            profiles(limit: 100, offset: 0, filter: $filter, profileTypeId: $profileTypeId) {
               totalCount
               items {
                 id
@@ -1231,12 +1439,10 @@ describe("GraphQL/Profiles", () => {
           }
         `,
         {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
           filter: {
-            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-            values: {
-              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
-              operator: "HAS_EXPIRY",
-            },
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+            operator: "HAS_EXPIRY",
           },
         },
       );
@@ -1259,8 +1465,8 @@ describe("GraphQL/Profiles", () => {
 
       const { errors, data } = await testClient.execute(
         gql`
-          query ($filter: ProfileFilter) {
-            profiles(limit: 100, offset: 0, filter: $filter) {
+          query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!) {
+            profiles(limit: 100, offset: 0, filter: $filter, profileTypeId: $profileTypeId) {
               totalCount
               items {
                 id
@@ -1269,12 +1475,10 @@ describe("GraphQL/Profiles", () => {
           }
         `,
         {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
           filter: {
-            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-            values: {
-              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
-              operator: "NOT_HAS_EXPIRY",
-            },
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+            operator: "NOT_HAS_EXPIRY",
           },
         },
       );
@@ -1297,8 +1501,8 @@ describe("GraphQL/Profiles", () => {
 
       const { errors, data } = await testClient.execute(
         gql`
-          query ($filter: ProfileFilter) {
-            profiles(limit: 100, offset: 0, filter: $filter) {
+          query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!) {
+            profiles(limit: 100, offset: 0, filter: $filter, profileTypeId: $profileTypeId) {
               totalCount
               items {
                 id
@@ -1307,13 +1511,332 @@ describe("GraphQL/Profiles", () => {
           }
         `,
         {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
           filter: {
-            profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
-            values: {
-              profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
-              operator: "GREATER_THAN",
-              value: "1990-01-01",
-            },
+            profileTypeFieldId: toGlobalId("ProfileTypeField", profileType0Fields[2].id),
+            operator: "GREATER_THAN",
+            value: "1990-01-01",
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 1,
+        items: [{ id: harryPotterId }],
+      });
+    });
+
+    it("filters by property id IS_ONE_OF", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!, $sortBy: [String!]) {
+            profiles(
+              limit: 100
+              offset: 0
+              filter: $filter
+              profileTypeId: $profileTypeId
+              sortBy: $sortBy
+            ) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          sortBy: ["createdAt_ASC"],
+          filter: {
+            property: "id",
+            operator: "IS_ONE_OF",
+            value: [harryPotterId, unknownPersonId],
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 2,
+        items: [{ id: harryPotterId }, { id: unknownPersonId }],
+      });
+    });
+
+    it("filters by property id EQUAL", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!, $sortBy: [String!]) {
+            profiles(
+              limit: 100
+              offset: 0
+              filter: $filter
+              profileTypeId: $profileTypeId
+              sortBy: $sortBy
+            ) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          sortBy: ["name_ASC"],
+          filter: {
+            logicalOperator: "OR",
+            conditions: [
+              { property: "id", operator: "EQUAL", value: harryPotterId },
+              { property: "id", operator: "EQUAL", value: harveySpecterId },
+            ],
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 2,
+        items: [{ id: harryPotterId }, { id: harveySpecterId }],
+      });
+    });
+
+    it("filters by property HAS_VALUE", async () => {
+      await mocks.knex
+        .from("profile")
+        .where("id", fromGlobalId(harryPotterId).id)
+        .update({ closed_at: new Date("2020-10-11"), status: "CLOSED" });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!, $sortBy: [String!]) {
+            profiles(
+              limit: 100
+              offset: 0
+              filter: $filter
+              profileTypeId: $profileTypeId
+              sortBy: $sortBy
+            ) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          sortBy: ["name_ASC"],
+          filter: {
+            property: "closedAt",
+            operator: "HAS_VALUE",
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 1,
+        items: [{ id: harryPotterId }],
+      });
+    });
+
+    it("filters by closedAt GREATER_THAN", async () => {
+      await mocks.knex
+        .from("profile")
+        .where("id", fromGlobalId(harryPotterId).id)
+        .update({ closed_at: new Date("2020-10-11"), status: "CLOSED" });
+
+      await mocks.knex
+        .from("profile")
+        .where("id", fromGlobalId(harveySpecterId).id)
+        .update({ closed_at: new Date("2019-10-11"), status: "CLOSED" });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!, $sortBy: [String!]) {
+            profiles(
+              limit: 100
+              offset: 0
+              filter: $filter
+              profileTypeId: $profileTypeId
+              sortBy: $sortBy
+            ) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          sortBy: ["name_ASC"],
+          filter: {
+            property: "closedAt",
+            operator: "GREATER_THAN",
+            value: "2019-10-11",
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 1,
+        items: [{ id: harryPotterId }],
+      });
+    });
+
+    it("filters by closedAt GREATER_THAN_OR_EQUAL", async () => {
+      await mocks.knex
+        .from("profile")
+        .where("id", fromGlobalId(harryPotterId).id)
+        .update({ closed_at: new Date("2020-10-11"), status: "CLOSED" });
+
+      await mocks.knex
+        .from("profile")
+        .where("id", fromGlobalId(harveySpecterId).id)
+        .update({ closed_at: new Date("2019-10-11"), status: "CLOSED" });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!, $sortBy: [String!]) {
+            profiles(
+              limit: 100
+              offset: 0
+              filter: $filter
+              profileTypeId: $profileTypeId
+              sortBy: $sortBy
+            ) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          sortBy: ["name_ASC"],
+          filter: {
+            property: "closedAt",
+            operator: "GREATER_THAN_OR_EQUAL",
+            value: "2019-10-11",
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 2,
+        items: [{ id: harryPotterId }, { id: harveySpecterId }],
+      });
+    });
+
+    it("filters by closedAt GREATER_THAN or is not closedAt", async () => {
+      await mocks.knex
+        .from("profile")
+        .where("id", fromGlobalId(harryPotterId).id)
+        .update({ closed_at: new Date("2020-10-11"), status: "CLOSED" });
+
+      await mocks.knex
+        .from("profile")
+        .where("id", fromGlobalId(harveySpecterId).id)
+        .update({ closed_at: new Date("2019-10-11"), status: "CLOSED" });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!, $sortBy: [String!]) {
+            profiles(
+              limit: 100
+              offset: 0
+              filter: $filter
+              profileTypeId: $profileTypeId
+              sortBy: $sortBy
+            ) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          sortBy: ["closedAt_ASC"],
+          filter: {
+            logicalOperator: "OR",
+            conditions: [
+              {
+                property: "closedAt",
+                operator: "GREATER_THAN",
+                value: "2019-10-12",
+              },
+              {
+                property: "closedAt",
+                operator: "NOT_HAS_VALUE",
+              },
+            ],
+          },
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.profiles).toEqual({
+        totalCount: 2,
+        items: [{ id: harryPotterId }, { id: unknownPersonId }],
+      });
+    });
+
+    it("filters by closed profiles after a specific date", async () => {
+      await mocks.knex
+        .from("profile")
+        .where("id", fromGlobalId(harryPotterId).id)
+        .update({ closed_at: new Date("2020-10-11"), status: "CLOSED" });
+
+      await mocks.knex
+        .from("profile")
+        .where("id", fromGlobalId(harveySpecterId).id)
+        .update({ closed_at: new Date("2019-10-11"), status: "CLOSED" });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($filter: ProfileQueryFilterInput, $profileTypeId: GID!, $sortBy: [String!]) {
+            profiles(
+              limit: 100
+              offset: 0
+              filter: $filter
+              profileTypeId: $profileTypeId
+              sortBy: $sortBy
+            ) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+          sortBy: ["closedAt_ASC"],
+          filter: {
+            logicalOperator: "AND",
+            conditions: [
+              {
+                property: "status",
+                operator: "EQUAL",
+                value: "CLOSED",
+              },
+              {
+                property: "closedAt",
+                operator: "HAS_VALUE",
+              },
+              {
+                property: "closedAt",
+                operator: "GREATER_THAN",
+                value: "2019-10-12",
+              },
+            ],
           },
         },
       );
@@ -4132,8 +4655,13 @@ describe("GraphQL/Profiles", () => {
 
       const { data } = await testClient.execute(
         gql`
-          query ($limit: Int, $offset: Int, $sortBy: [QueryProfiles_OrderBy!]) {
-            profiles(limit: $limit, offset: $offset, sortBy: $sortBy) {
+          query ($limit: Int, $offset: Int, $sortBy: [String!], $profileTypeId: GID!) {
+            profiles(
+              limit: $limit
+              offset: $offset
+              sortBy: $sortBy
+              profileTypeId: $profileTypeId
+            ) {
               totalCount
               items {
                 id
@@ -4147,6 +4675,7 @@ describe("GraphQL/Profiles", () => {
           offset: 0,
           sortBy: ["name_DESC"],
           locale: "en",
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
         },
       );
       expect(data.profiles).toEqual({
@@ -10255,16 +10784,21 @@ describe("GraphQL/Profiles", () => {
       expect(errors).toBeUndefined();
       expect(data?.deleteProfile).toEqual("SUCCESS");
 
-      const { errors: query2Errors, data: query2Data } = await testClient.execute(gql`
-        query {
-          profiles(offset: 0, limit: 10) {
-            items {
-              id
+      const { errors: query2Errors, data: query2Data } = await testClient.execute(
+        gql`
+          query ($profileTypeId: GID!) {
+            profiles(offset: 0, limit: 10, profileTypeId: $profileTypeId) {
+              items {
+                id
+              }
+              totalCount
             }
-            totalCount
           }
-        }
-      `);
+        `,
+        {
+          profileTypeId: toGlobalId("ProfileType", profileTypes[0].id),
+        },
+      );
       expect(query2Errors).toBeUndefined();
       expect(query2Data.profiles).toEqual({ items: [], totalCount: 0 });
     });

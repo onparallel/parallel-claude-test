@@ -10,13 +10,13 @@ import { FormattedMessage } from "react-intl";
 
 export function PreviewConfirmImportFromProfileDialog({
   profileIds,
+  profileTypeId,
   ...props
-}: DialogProps<{ profileIds: string[] }, void>) {
+}: DialogProps<{ profileIds: string[]; profileTypeId: string }, void>) {
   const { data } = useQuery(usePreviewConfirmImportFromProfileDialog_profilesDocument, {
     variables: {
-      filter: {
-        profileId: profileIds,
-      },
+      profileTypeId,
+      filter: { property: "id", operator: "IS_ONE_OF", value: profileIds },
     },
   });
 
@@ -72,8 +72,11 @@ export function usePreviewConfirmImportFromProfileDialog() {
 
 const _queries = [
   gql`
-    query usePreviewConfirmImportFromProfileDialog_profiles($filter: ProfileFilter) {
-      profiles(offset: 0, limit: 100, filter: $filter) {
+    query usePreviewConfirmImportFromProfileDialog_profiles(
+      $filter: ProfileQueryFilterInput
+      $profileTypeId: GID!
+    ) {
+      profiles(offset: 0, limit: 100, filter: $filter, profileTypeId: $profileTypeId) {
         items {
           id
           ...ProfileReference_Profile

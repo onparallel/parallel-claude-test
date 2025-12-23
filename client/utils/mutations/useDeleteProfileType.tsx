@@ -7,7 +7,7 @@ import { DialogProps, useDialog } from "@parallel/components/common/dialogs/Dial
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import {
   useDeleteProfileType_deleteProfileTypeDocument,
-  useDeleteProfileType_profilesDocument,
+  useDeleteProfileType_profilesSimpleDocument,
   useDeleteProfileType_ProfileTypeFragment,
 } from "@parallel/graphql/__types";
 import Link from "next/link";
@@ -30,18 +30,16 @@ export function useDeleteProfileType() {
   }) {
     try {
       const { data } = await client.query({
-        query: useDeleteProfileType_profilesDocument,
+        query: useDeleteProfileType_profilesSimpleDocument,
         variables: {
-          filter: {
-            profileTypeId: profileTypes.map((pt) => pt.id),
-          },
+          profileTypeId: profileTypes.map((pt) => pt.id),
         },
         fetchPolicy: "network-only",
       });
 
-      if (data!.profiles.totalCount > 0) {
+      if (data!.profilesSimple.totalCount > 0) {
         await showConfirmDeleteWithProfiles({
-          profileCount: data!.profiles.totalCount,
+          profileCount: data!.profilesSimple.totalCount,
           profileTypes,
         });
       } else {
@@ -103,8 +101,8 @@ useDeleteProfileType.fragments = {
 
 useDeleteProfileType.queries = [
   gql`
-    query useDeleteProfileType_profiles($filter: ProfileFilter) {
-      profiles(filter: $filter) {
+    query useDeleteProfileType_profilesSimple($profileTypeId: [GID!]!) {
+      profilesSimple(profileTypeId: $profileTypeId) {
         totalCount
       }
     }

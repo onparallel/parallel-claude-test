@@ -2,7 +2,7 @@ import { enumType, interfaceType, objectType } from "nexus";
 import { assert } from "ts-essentials";
 import { DashboardModuleSizeValues, DashboardPermissionTypeValues } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
-import { ProfileFieldValuesFilterOperatorValues } from "../../util/ProfileFieldValuesFilter";
+import { ProfileQueryFilterOperatorValues } from "../../util/ProfileQueryFilter";
 
 export const DashboardPermission = objectType({
   name: "DashboardPermission",
@@ -129,7 +129,7 @@ export const DashboardModuleProfileFieldValuesFilter = objectType({
     t.nullable.field("operator", {
       type: enumType({
         name: "DashboardModuleProfileFieldValuesFilterOperator",
-        members: ProfileFieldValuesFilterOperatorValues,
+        members: ProfileQueryFilterOperatorValues,
       }),
     });
     t.nullable.json("value");

@@ -2494,11 +2494,11 @@ export interface MutationcreateProfileTypeProcessArgs {
 }
 
 export interface MutationcreateProfilesExcelExportTaskArgs {
-  filter?: InputMaybe<ProfileFilter>;
+  filter?: InputMaybe<ProfileQueryFilterInput>;
   locale: UserLocale;
   profileTypeId: Scalars["GID"]["input"];
   search?: InputMaybe<Scalars["String"]["input"]>;
-  sortBy?: InputMaybe<Array<SortByInput>>;
+  sortBy?: InputMaybe<Array<Scalars["String"]["input"]>>;
 }
 
 export interface MutationcreateProfilesExcelImportTaskArgs {
@@ -5589,6 +5589,7 @@ export interface PetitionsRatioDashboardModuleSettingsInput {
 export interface Profile extends Timestamps {
   __typename?: "Profile";
   associatedPetitions: PetitionPagination;
+  closedAt?: Maybe<Scalars["DateTime"]["output"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
   /** The events for the profile. */
@@ -6088,6 +6089,49 @@ export interface ProfilePropertyFilter {
   profileTypeFieldId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
 }
+
+export type ProfileQueryFilterGroupLogicalOperator = "AND" | "OR";
+
+export interface ProfileQueryFilterInput {
+  conditions?: InputMaybe<Array<ProfileQueryFilterInput>>;
+  logicalOperator?: InputMaybe<ProfileQueryFilterGroupLogicalOperator>;
+  operator?: InputMaybe<ProfileQueryFilterOperator>;
+  profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
+  property?: InputMaybe<ProfileQueryFilterProperty>;
+  value?: InputMaybe<Scalars["JSON"]["input"]>;
+}
+
+export type ProfileQueryFilterOperator =
+  | "CONTAIN"
+  | "END_WITH"
+  | "EQUAL"
+  | "EXPIRES_IN"
+  | "GREATER_THAN"
+  | "GREATER_THAN_OR_EQUAL"
+  | "HAS_ANY_BG_CHECK_TOPICS"
+  | "HAS_BG_CHECK_MATCH"
+  | "HAS_BG_CHECK_RESULTS"
+  | "HAS_BG_CHECK_TOPICS"
+  | "HAS_EXPIRY"
+  | "HAS_PENDING_REVIEW"
+  | "HAS_VALUE"
+  | "IS_EXPIRED"
+  | "IS_ONE_OF"
+  | "LESS_THAN"
+  | "LESS_THAN_OR_EQUAL"
+  | "NOT_CONTAIN"
+  | "NOT_EQUAL"
+  | "NOT_HAS_ANY_BG_CHECK_TOPICS"
+  | "NOT_HAS_BG_CHECK_MATCH"
+  | "NOT_HAS_BG_CHECK_RESULTS"
+  | "NOT_HAS_BG_CHECK_TOPICS"
+  | "NOT_HAS_EXPIRY"
+  | "NOT_HAS_PENDING_REVIEW"
+  | "NOT_HAS_VALUE"
+  | "NOT_IS_ONE_OF"
+  | "START_WITH";
+
+export type ProfileQueryFilterProperty = "closedAt" | "createdAt" | "id" | "status" | "updatedAt";
 
 export interface ProfileRelationship {
   __typename?: "ProfileRelationship";
@@ -6786,6 +6830,7 @@ export interface Query {
   profileTypeFieldValueHistory: ProfileFieldValuePagination;
   profileTypes: ProfileTypePagination;
   profiles: ProfilePagination;
+  profilesSimple: ProfilePagination;
   profilesWithSameContent: Array<ProfilesWithContent>;
   publicLicenseCode?: Maybe<PublicLicenseCode>;
   publicOrg?: Maybe<PublicOrganization>;
@@ -7053,11 +7098,20 @@ export interface QueryprofileTypesArgs {
 }
 
 export interface QueryprofilesArgs {
-  filter?: InputMaybe<ProfileFilter>;
+  filter?: InputMaybe<ProfileQueryFilterInput>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
+  profileTypeId: Scalars["GID"]["input"];
   search?: InputMaybe<Scalars["String"]["input"]>;
-  sortBy?: InputMaybe<Array<QueryProfiles_OrderBy>>;
+  sortBy?: InputMaybe<Array<Scalars["String"]["input"]>>;
+}
+
+export interface QueryprofilesSimpleArgs {
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+  search?: InputMaybe<Scalars["String"]["input"]>;
+  status?: InputMaybe<Array<ProfileStatus>>;
 }
 
 export interface QueryprofilesWithSameContentArgs {
@@ -7181,9 +7235,6 @@ export type QueryProfileTypes_OrderBy =
   | "createdAt_DESC"
   | "name_ASC"
   | "name_DESC";
-
-/** Order to use on Query.profiles */
-export type QueryProfiles_OrderBy = "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
 
 /** Order to use on Query.userGroups */
 export type QueryUserGroups_OrderBy = "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
@@ -7506,13 +7557,6 @@ export interface SignatureStartedEvent extends PetitionEvent {
   petition?: Maybe<Petition>;
   signature: PetitionSignatureRequest;
   type: PetitionEventType;
-}
-
-export type SortByDirection = "ASC" | "DESC";
-
-export interface SortByInput {
-  direction: SortByDirection;
-  field: Scalars["String"]["input"];
 }
 
 export interface StandardListDefinition {
@@ -9086,16 +9130,16 @@ export type ProfileSelect_ProfileFragment = {
   };
 };
 
-export type ProfileSelect_profilesQueryVariables = Exact<{
+export type ProfileSelect_profilesSimpleQueryVariables = Exact<{
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
   search?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<ProfileFilter>;
-  sortBy?: InputMaybe<Array<QueryProfiles_OrderBy> | QueryProfiles_OrderBy>;
+  profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"]>;
+  status?: InputMaybe<Array<ProfileStatus> | ProfileStatus>;
 }>;
 
-export type ProfileSelect_profilesQuery = {
-  profiles: {
+export type ProfileSelect_profilesSimpleQuery = {
+  profilesSimple: {
     __typename?: "ProfilePagination";
     totalCount: number;
     items: Array<{
@@ -33305,7 +33349,8 @@ export type PreviewPetitionFieldMutations_ProfileFragment = {
 };
 
 export type PreviewPetitionFieldMutations_profilesQueryVariables = Exact<{
-  filter?: InputMaybe<ProfileFilter>;
+  filter?: InputMaybe<ProfileQueryFilterInput>;
+  profileTypeId: Scalars["GID"]["input"];
 }>;
 
 export type PreviewPetitionFieldMutations_profilesQuery = {
@@ -33368,7 +33413,8 @@ export type GeneratePrefilledPublicLinkDialog_PetitionTemplateFragment = {
 };
 
 export type usePreviewConfirmImportFromProfileDialog_profilesQueryVariables = Exact<{
-  filter?: InputMaybe<ProfileFilter>;
+  filter?: InputMaybe<ProfileQueryFilterInput>;
+  profileTypeId: Scalars["GID"]["input"];
 }>;
 
 export type usePreviewConfirmImportFromProfileDialog_profilesQuery = {
@@ -33758,7 +33804,8 @@ export type PreviewImportFromProfileFormatErrorDialog_ProfileTypeFragment = {
 };
 
 export type PreviewImportFromProfileFormatErrorDialog_profilesQueryVariables = Exact<{
-  filter?: InputMaybe<ProfileFilter>;
+  filter?: InputMaybe<ProfileQueryFilterInput>;
+  profileTypeId: Scalars["GID"]["input"];
 }>;
 
 export type PreviewImportFromProfileFormatErrorDialog_profilesQuery = {
@@ -67484,8 +67531,9 @@ export type Profiles_profilesQueryVariables = Exact<{
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
   search?: InputMaybe<Scalars["String"]["input"]>;
-  sortBy?: InputMaybe<Array<QueryProfiles_OrderBy> | QueryProfiles_OrderBy>;
-  filter?: InputMaybe<ProfileFilter>;
+  profileTypeId: Scalars["GID"]["input"];
+  sortBy?: InputMaybe<Array<Scalars["String"]["input"]> | Scalars["String"]["input"]>;
+  filter?: InputMaybe<ProfileQueryFilterInput>;
   propertiesFilter?: InputMaybe<Array<ProfileFieldPropertyFilter> | ProfileFieldPropertyFilter>;
 }>;
 
@@ -72482,12 +72530,12 @@ export type useDeleteProfileType_ProfileTypeFragment = {
   name: { [locale in UserLocale]?: string };
 };
 
-export type useDeleteProfileType_profilesQueryVariables = Exact<{
-  filter?: InputMaybe<ProfileFilter>;
+export type useDeleteProfileType_profilesSimpleQueryVariables = Exact<{
+  profileTypeId: Array<Scalars["GID"]["input"]> | Scalars["GID"]["input"];
 }>;
 
-export type useDeleteProfileType_profilesQuery = {
-  profiles: { __typename?: "ProfilePagination"; totalCount: number };
+export type useDeleteProfileType_profilesSimpleQuery = {
+  profilesSimple: { __typename?: "ProfilePagination"; totalCount: number };
 };
 
 export type useDeleteProfileType_deleteProfileTypeMutationVariables = Exact<{
@@ -73308,10 +73356,9 @@ export type usePrintPdfTask_taskQuery = {
 export type useProfilesExcelExportTask_createProfilesExcelExportTaskMutationVariables = Exact<{
   profileTypeId: Scalars["GID"]["input"];
   locale: UserLocale;
-  values?: InputMaybe<ProfileFieldValuesFilter>;
-  status?: InputMaybe<Array<ProfileStatus> | ProfileStatus>;
+  filter?: InputMaybe<ProfileQueryFilterInput>;
   search?: InputMaybe<Scalars["String"]["input"]>;
-  sortBy?: InputMaybe<Array<SortByInput> | SortByInput>;
+  sortBy?: InputMaybe<Array<Scalars["String"]["input"]> | Scalars["String"]["input"]>;
 }>;
 
 export type useProfilesExcelExportTask_createProfilesExcelExportTaskMutation = {
@@ -88454,15 +88501,21 @@ export const PetitionTagListCellContent_untagPetitionDocument = gql`
   PetitionTagListCellContent_untagPetitionMutation,
   PetitionTagListCellContent_untagPetitionMutationVariables
 >;
-export const ProfileSelect_profilesDocument = gql`
-  query ProfileSelect_profiles(
+export const ProfileSelect_profilesSimpleDocument = gql`
+  query ProfileSelect_profilesSimple(
     $offset: Int
     $limit: Int
     $search: String
-    $filter: ProfileFilter
-    $sortBy: [QueryProfiles_OrderBy!]
+    $profileTypeId: [GID!]
+    $status: [ProfileStatus!]
   ) {
-    profiles(offset: $offset, limit: $limit, search: $search, filter: $filter, sortBy: $sortBy) {
+    profilesSimple(
+      offset: $offset
+      limit: $limit
+      search: $search
+      profileTypeId: $profileTypeId
+      status: $status
+    ) {
       items {
         ...ProfileSelect_Profile
       }
@@ -88470,7 +88523,10 @@ export const ProfileSelect_profilesDocument = gql`
     }
   }
   ${ProfileSelect_ProfileFragmentDoc}
-` as unknown as DocumentNode<ProfileSelect_profilesQuery, ProfileSelect_profilesQueryVariables>;
+` as unknown as DocumentNode<
+  ProfileSelect_profilesSimpleQuery,
+  ProfileSelect_profilesSimpleQueryVariables
+>;
 export const ProfileSelect_profileDocument = gql`
   query ProfileSelect_profile($profileId: GID!) {
     profile(profileId: $profileId) {
@@ -91068,8 +91124,11 @@ export const PreviewPetitionFieldMutations_createFieldGroupRepliesFromProfilesDo
   PreviewPetitionFieldMutations_createFieldGroupRepliesFromProfilesMutationVariables
 >;
 export const PreviewPetitionFieldMutations_profilesDocument = gql`
-  query PreviewPetitionFieldMutations_profiles($filter: ProfileFilter) {
-    profiles(offset: 0, limit: 100, filter: $filter) {
+  query PreviewPetitionFieldMutations_profiles(
+    $filter: ProfileQueryFilterInput
+    $profileTypeId: GID!
+  ) {
+    profiles(offset: 0, limit: 100, filter: $filter, profileTypeId: $profileTypeId) {
       items {
         ...PreviewPetitionFieldMutations_Profile
       }
@@ -91097,8 +91156,11 @@ export const GeneratePrefilledPublicLinkDialog_createPublicPetitionLinkPrefillDa
   GeneratePrefilledPublicLinkDialog_createPublicPetitionLinkPrefillDataMutationVariables
 >;
 export const usePreviewConfirmImportFromProfileDialog_profilesDocument = gql`
-  query usePreviewConfirmImportFromProfileDialog_profiles($filter: ProfileFilter) {
-    profiles(offset: 0, limit: 100, filter: $filter) {
+  query usePreviewConfirmImportFromProfileDialog_profiles(
+    $filter: ProfileQueryFilterInput
+    $profileTypeId: GID!
+  ) {
+    profiles(offset: 0, limit: 100, filter: $filter, profileTypeId: $profileTypeId) {
       items {
         id
         ...ProfileReference_Profile
@@ -91133,8 +91195,11 @@ export const usePreviewImportFromProfileDialog_profileDocument = gql`
   usePreviewImportFromProfileDialog_profileQueryVariables
 >;
 export const PreviewImportFromProfileFormatErrorDialog_profilesDocument = gql`
-  query PreviewImportFromProfileFormatErrorDialog_profiles($filter: ProfileFilter) {
-    profiles(limit: 100, offset: 0, filter: $filter) {
+  query PreviewImportFromProfileFormatErrorDialog_profiles(
+    $filter: ProfileQueryFilterInput
+    $profileTypeId: GID!
+  ) {
+    profiles(limit: 100, offset: 0, filter: $filter, profileTypeId: $profileTypeId) {
       items {
         id
         profileType {
@@ -95261,11 +95326,19 @@ export const Profiles_profilesDocument = gql`
     $offset: Int
     $limit: Int
     $search: String
-    $sortBy: [QueryProfiles_OrderBy!]
-    $filter: ProfileFilter
+    $profileTypeId: GID!
+    $sortBy: [String!]
+    $filter: ProfileQueryFilterInput
     $propertiesFilter: [ProfileFieldPropertyFilter!]
   ) {
-    profiles(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy, filter: $filter) {
+    profiles(
+      offset: $offset
+      limit: $limit
+      search: $search
+      profileTypeId: $profileTypeId
+      sortBy: $sortBy
+      filter: $filter
+    ) {
       items {
         ...Profiles_Profile
         properties(filter: $propertiesFilter) {
@@ -96337,15 +96410,15 @@ export const useDeleteProfile_scheduleProfileForDeletionDocument = gql`
   useDeleteProfile_scheduleProfileForDeletionMutation,
   useDeleteProfile_scheduleProfileForDeletionMutationVariables
 >;
-export const useDeleteProfileType_profilesDocument = gql`
-  query useDeleteProfileType_profiles($filter: ProfileFilter) {
-    profiles(filter: $filter) {
+export const useDeleteProfileType_profilesSimpleDocument = gql`
+  query useDeleteProfileType_profilesSimple($profileTypeId: [GID!]!) {
+    profilesSimple(profileTypeId: $profileTypeId) {
       totalCount
     }
   }
 ` as unknown as DocumentNode<
-  useDeleteProfileType_profilesQuery,
-  useDeleteProfileType_profilesQueryVariables
+  useDeleteProfileType_profilesSimpleQuery,
+  useDeleteProfileType_profilesSimpleQueryVariables
 >;
 export const useDeleteProfileType_deleteProfileTypeDocument = gql`
   mutation useDeleteProfileType_deleteProfileType(
@@ -96782,15 +96855,14 @@ export const useProfilesExcelExportTask_createProfilesExcelExportTaskDocument = 
   mutation useProfilesExcelExportTask_createProfilesExcelExportTask(
     $profileTypeId: GID!
     $locale: UserLocale!
-    $values: ProfileFieldValuesFilter
-    $status: [ProfileStatus!]
+    $filter: ProfileQueryFilterInput
     $search: String
-    $sortBy: [SortByInput!]
+    $sortBy: [String!]
   ) {
     createProfilesExcelExportTask(
       profileTypeId: $profileTypeId
       locale: $locale
-      filter: { values: $values, status: $status }
+      filter: $filter
       search: $search
       sortBy: $sortBy
     ) {

@@ -3,20 +3,16 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { isNonNullish, isNullish } from "remeda";
 import { assert } from "ts-essentials";
+import { ProfileQueryFilterProperty } from "../../api/public/__types";
 import { never } from "../../util/never";
-import {
-  ProfileFieldValuesFilter,
-  ProfileFieldValuesFilterOperator,
-} from "../../util/ProfileFieldValuesFilter";
-import { ProfileTypeField, ProfileTypeFieldType } from "../__types";
+import { ProfileQueryFilter, ProfileQueryFilterOperator } from "../../util/ProfileQueryFilter";
+import { Profile, ProfileTypeField, ProfileTypeFieldType } from "../__types";
 import { KNEX } from "../knex";
 import { sqlArray, sqlIn } from "./sql";
 
-export const PROFILE_VALUES_FILTER_REPOSITORY_HELPER = Symbol.for(
-  "PROFILE_VALUES_FILTER_REPOSITORY_HELPER",
-);
+export const PROFILE_QUERY_HELPER = Symbol.for("PROFILE_QUERY_HELPER");
 
-const CACHED_PROFILE_TYPE_FIELDS = [
+export const CACHED_PROFILE_TYPE_FIELDS = [
   "SHORT_TEXT",
   "SELECT",
   "CHECKBOX",
@@ -29,20 +25,24 @@ const CACHED_PROFILE_TYPE_FIELDS = [
 const DRAFTABLE_PROFILE_TYPE_FIELDS = ["ADVERSE_MEDIA_SEARCH", "BACKGROUND_CHECK"] as const;
 
 @injectable()
-export class ProfileValuesFilterRepositoryHelper {
+export class ProfileQueryHelper {
   constructor(@inject(KNEX) private knex: Knex) {}
 
-  public applyProfileValuesFilterJoins(
+  public applyProfileQueryFilterJoins(
     q: Knex.QueryBuilder,
-    filter: ProfileFieldValuesFilter,
+    filter: ProfileQueryFilter,
     joins: Record<number, string>,
-    profileTypeFieldsById: Record<number, ProfileTypeField>,
+    profileTypeFieldsById: Record<number, ProfileTypeField> | undefined,
   ) {
     if ("conditions" in filter) {
       for (const condition of filter.conditions) {
-        this.applyProfileValuesFilterJoins(q, condition, joins, profileTypeFieldsById);
+        this.applyProfileQueryFilterJoins(q, condition, joins, profileTypeFieldsById);
       }
-    } else {
+    } else if ("profileTypeFieldId" in filter) {
+      assert(
+        isNonNullish(profileTypeFieldsById),
+        "Must filter by a single profileTypeId when applying a profileTypeFieldId filter",
+      );
       const profileTypeField = profileTypeFieldsById[filter.profileTypeFieldId];
       assert(profileTypeField, `ProfileTypeField:${filter.profileTypeFieldId} not found`);
       this.applyProfileTypeFieldJoin(q, joins, profileTypeField);
@@ -59,25 +59,19 @@ export class ProfileValuesFilterRepositoryHelper {
     } else if (DRAFTABLE_PROFILE_TYPE_FIELDS.includes(profileTypeField.type)) {
       return this.knex.raw(`coalesce(??.content, ??.content)`, [`draft_${alias}`, alias]);
     } else if (CACHED_PROFILE_TYPE_FIELDS.includes(profileTypeField.type)) {
-      return this.knex.raw(`coalesce(p.value_cache->?->'content', ??.content)`, [
-        profileTypeField.id,
-        alias,
-      ]);
+      return this.knex.raw(`p.value_cache->?->'content'`, [profileTypeField.id]);
     } else {
       return this.knex.raw(`??.content`, [alias]);
     }
   }
 
-  public getProfileTypeFieldExpiryDate(
+  private getProfileTypeFieldExpiryDate(
     joins: Record<number, string>,
     profileTypeField: ProfileTypeField,
   ) {
     const alias = joins[profileTypeField.id];
     if (CACHED_PROFILE_TYPE_FIELDS.includes(profileTypeField.type)) {
-      return this.knex.raw(`coalesce((p.value_cache->?->>'expiry_date')::date, ??.expiry_date)`, [
-        profileTypeField.id,
-        alias,
-      ]);
+      return this.knex.raw(`(p.value_cache->?->>'expiry_date')::date`, [profileTypeField.id]);
     } else {
       return this.knex.raw(`??.expiry_date`, [alias]);
     }
@@ -124,19 +118,7 @@ export class ProfileValuesFilterRepositoryHelper {
           [profileTypeField.id],
         );
       } else if (CACHED_PROFILE_TYPE_FIELDS.includes(profileTypeField.type)) {
-        // cached fields try to avoid the join if possible
-        q.joinRaw(
-          /* sql */ `
-          left join profile_field_value ${alias}
-            on not jsonb_exists(p.value_cache, ?)
-              and ${alias}.profile_id = p.id
-              and ${alias}.profile_type_field_id = ?
-              and ${alias}.deleted_at is null 
-              and ${alias}.removed_at is null
-              and ${alias}.is_draft = false
-          `,
-          [profileTypeField.id, profileTypeField.id],
-        );
+        // cached fields do not need to be joined
       } else {
         q.joinRaw(
           /* sql */ `
@@ -153,11 +135,11 @@ export class ProfileValuesFilterRepositoryHelper {
     }
   }
 
-  public applyProfileValueFilter(
+  public applyProfileQueryFilter(
     q: Knex.QueryBuilder,
-    filter: ProfileFieldValuesFilter,
+    filter: ProfileQueryFilter,
     joins: Record<number, string>,
-    profileTypeFieldsById: Record<number, ProfileTypeField>,
+    profileTypeFieldsById: Record<number, ProfileTypeField> | undefined,
     currentOp: "AND" | "OR",
   ) {
     if ("conditions" in filter) {
@@ -167,18 +149,22 @@ export class ProfileValuesFilterRepositoryHelper {
       // a OR (b OR c) => a OR b OR c
       if (logicalOperator === currentOp || conditions.length === 1) {
         conditions.forEach((c) =>
-          this.applyProfileValueFilter(q, c, joins, profileTypeFieldsById, logicalOperator),
+          this.applyProfileQueryFilter(q, c, joins, profileTypeFieldsById, logicalOperator),
         );
       } else {
         q.where((q) =>
           conditions.forEach((c) =>
             q[logicalOperator === "AND" ? "andWhere" : "orWhere"]((q) =>
-              this.applyProfileValueFilter(q, c, joins, profileTypeFieldsById, logicalOperator),
+              this.applyProfileQueryFilter(q, c, joins, profileTypeFieldsById, logicalOperator),
             ),
           ),
         );
       }
-    } else {
+    } else if ("profileTypeFieldId" in filter) {
+      assert(
+        isNonNullish(profileTypeFieldsById),
+        "Must filter by a single profileTypeId when applying a profileTypeFieldId filter",
+      );
       const profileTypeField = profileTypeFieldsById[filter.profileTypeFieldId];
       const assertType = (...types: ProfileTypeFieldType[]) => {
         assert(
@@ -189,10 +175,7 @@ export class ProfileValuesFilterRepositoryHelper {
       const content = this.getProfileTypeFieldContent(joins, profileTypeField);
       const expiryDate = this.getProfileTypeFieldExpiryDate(joins, profileTypeField);
       const [negated, operator] = filter.operator.startsWith("NOT_")
-        ? ([
-            true,
-            filter.operator.slice("NOT_".length) as ProfileFieldValuesFilterOperator,
-          ] as const)
+        ? ([true, filter.operator.slice("NOT_".length) as ProfileQueryFilterOperator] as const)
         : ([false, filter.operator] as const);
       const value = filter.value;
       const where = (builder: (q: Knex.QueryBuilder) => void, wrap: boolean) => {
@@ -364,6 +347,46 @@ export class ProfileValuesFilterRepositoryHelper {
         default:
           throw new Error(`Operator ${operator} not implemented`);
       }
+    } else if ("property" in filter) {
+      const { property, operator, value } = filter;
+
+      const columnMap: Record<ProfileQueryFilterProperty, keyof Profile> = {
+        id: "id",
+        status: "status",
+        createdAt: "created_at",
+        updatedAt: "updated_at",
+        closedAt: "closed_at",
+      };
+
+      const column = columnMap[property];
+
+      if (operator === "HAS_VALUE") {
+        q.whereRaw(/* sql */ `?? is not null`, [`p.${column}`]);
+      } else if (operator === "NOT_HAS_VALUE") {
+        q.whereRaw(/* sql */ `?? is null`, [`p.${column}`]);
+      } else if (operator === "EQUAL") {
+        q.whereRaw(/* sql */ `?? = ?`, [`p.${column}`, value]);
+      } else if (operator === "NOT_EQUAL") {
+        q.whereRaw(/* sql */ `?? != ?`, [`p.${column}`, value]);
+      } else if (operator === "IS_ONE_OF") {
+        assert(Array.isArray(value));
+        q.whereRaw(/* sql */ `?? in ?`, [`p.${column}`, sqlIn(this.knex, value)]);
+      } else if (operator === "NOT_IS_ONE_OF") {
+        assert(Array.isArray(value));
+        q.whereRaw(/* sql */ `?? not in ?`, [`p.${column}`, sqlIn(this.knex, value)]);
+      } else if (operator === "LESS_THAN") {
+        q.whereRaw(/* sql */ `?? < ?`, [`p.${column}`, value]);
+      } else if (operator === "LESS_THAN_OR_EQUAL") {
+        q.whereRaw(/* sql */ `?? <= ?`, [`p.${column}`, value]);
+      } else if (operator === "GREATER_THAN") {
+        q.whereRaw(/* sql */ `?? > ?`, [`p.${column}`, value]);
+      } else if (operator === "GREATER_THAN_OR_EQUAL") {
+        q.whereRaw(/* sql */ `?? >= ?`, [`p.${column}`, value]);
+      } else {
+        never(`Invalid operator: ${operator}`);
+      }
+    } else {
+      never(`Unknown filter type: ${JSON.stringify(filter)}`);
     }
   }
 }

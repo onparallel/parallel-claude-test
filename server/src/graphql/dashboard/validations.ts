@@ -5,7 +5,7 @@ import { ApiContext } from "../../context";
 import { ProfileStatusValues } from "../../db/__types";
 import { getAssertionErrorMessage, isAssertionError } from "../../util/assert";
 import { fromGlobalId, isGlobalId } from "../../util/globalId";
-import { validateProfileFieldValuesFilter } from "../../util/ProfileFieldValuesFilter";
+import { mapAndValidateProfileQueryFilter } from "../../util/ProfileQueryFilter";
 import { NexusGenInputs } from "../__types";
 import { ArgWithPath, getArgWithPath } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
@@ -200,7 +200,7 @@ async function validateProfileFilter(
     const profileTypeFields =
       await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(profileTypeId);
     try {
-      validateProfileFieldValuesFilter(
+      mapAndValidateProfileQueryFilter(
         filter.values,
         indexBy(profileTypeFields, (f) => f.id),
       );

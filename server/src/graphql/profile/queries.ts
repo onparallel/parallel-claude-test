@@ -1,29 +1,16 @@
-import {
-  arg,
-  enumType,
-  inputObjectType,
-  list,
-  nonNull,
-  nullable,
-  objectType,
-  queryField,
-} from "nexus";
+import { arg, inputObjectType, list, nonNull, nullable, objectType, queryField } from "nexus";
 import pMap from "p-map";
 import { indexBy, isNonNullish, isNullish } from "remeda";
 import { assert } from "ts-essentials";
-import { ProfileTypeField } from "../../db/__types";
 import { getAssertionErrorMessage, isAssertionError } from "../../util/assert";
-import {
-  ProfileFieldValuesFilterOperatorValues,
-  validateProfileFieldValuesFilter,
-} from "../../util/ProfileFieldValuesFilter";
+import { mapAndValidateProfileQueryFilter } from "../../util/ProfileQueryFilter";
 import { authenticate, authenticateAnd, ifArgDefined, not } from "../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
+import { validSortBy } from "../helpers/validators/validSortBy";
 import { userHasFeatureFlag } from "../petition/authorizers";
 import { contextUserHasPermission } from "../users/authorizers";
-import { mapProfileFieldValuesFilterToDatabase } from "../views/helpers";
 import {
   profileTypeFieldBelongsToProfileType,
   profileTypeFieldIsOfType,
@@ -114,78 +101,78 @@ export const profiles = queryField((t) => {
       contextUserHasPermission("PROFILES:LIST_PROFILES"),
     ),
     searchable: true,
-    sortableBy: ["createdAt", "name"],
     extendArgs: {
-      filter: inputObjectType({
-        name: "ProfileFilter",
-        definition(t) {
-          t.nullable.list.nonNull.globalId("profileTypeId", { prefixName: "ProfileType" });
-          t.nullable.list.nonNull.globalId("profileId", { prefixName: "Profile" });
-          t.nullable.list.nonNull.field("status", { type: "ProfileStatus" });
-          t.nullable.field("values", {
-            type: inputObjectType({
-              name: "ProfileFieldValuesFilter",
-              definition(t) {
-                t.nullable.globalId("profileTypeFieldId", { prefixName: "ProfileTypeField" });
-                t.nullable.field("operator", {
-                  type: enumType({
-                    name: "ProfileFieldValuesFilterOperator",
-                    members: ProfileFieldValuesFilterOperatorValues,
-                  }),
-                });
-                t.nullable.json("value");
-                t.nullable.field("logicalOperator", {
-                  type: enumType({
-                    name: "ProfileFieldValuesFilterGroupLogicalOperator",
-                    members: ["AND", "OR"],
-                  }),
-                });
-                t.nullable.list.nonNull.field("conditions", { type: "ProfileFieldValuesFilter" });
-              },
-            }),
-          });
-        },
-      }),
+      profileTypeId: nonNull(globalIdArg("ProfileType")),
+      filter: nullable("ProfileQueryFilterInput"),
+      sortBy: nullable(list(nonNull("String"))),
     },
-    resolve: async (_, { limit, offset, search, sortBy, filter }, ctx, info) => {
-      let profileTypeFieldsById: Record<number, ProfileTypeField> | undefined = undefined;
+    validateArgs: validSortBy("sortBy", ["name", "createdAt", "updatedAt", "closedAt"]),
+    resolve: async (_, { limit, offset, search, sortBy, profileTypeId, filter }, ctx, info) => {
       try {
-        if (isNonNullish(filter?.values)) {
-          assert(
-            isNonNullish(filter.profileTypeId) && filter.profileTypeId.length === 1,
-            "Must filter by a single profileTypeId when filtering by values",
-          );
-          const profileTypeFields = await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(
-            filter.profileTypeId[0],
-          );
-          profileTypeFieldsById = indexBy(profileTypeFields, (ptf) => ptf.id);
-          validateProfileFieldValuesFilter(filter?.values, profileTypeFieldsById);
-        }
+        const profileTypeFields =
+          await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(profileTypeId);
+        const profileTypeFieldsById = indexBy(profileTypeFields, (ptf) => ptf.id);
+
+        type SortByValue =
+          | "name_ASC"
+          | "name_DESC"
+          | "createdAt_ASC"
+          | "createdAt_DESC"
+          | "updatedAt_ASC"
+          | "updatedAt_DESC"
+          | "closedAt_ASC"
+          | "closedAt_DESC";
+
+        return ctx.profiles.getPaginatedProfileForOrg(
+          ctx.user!.org_id,
+          {
+            limit,
+            offset,
+            search,
+            profileTypeId: [profileTypeId],
+            filter: mapAndValidateProfileQueryFilter(filter, profileTypeFieldsById),
+            sortBy: sortBy?.map((value) => {
+              const [field, order] = parseSortBy(value as SortByValue);
+              return { field, order };
+            }),
+          },
+          profileTypeFieldsById,
+        );
       } catch (e) {
         if (isAssertionError(e)) {
-          throw new ArgValidationError(info, "filter.values", getAssertionErrorMessage(e));
+          throw new ArgValidationError(info, "filter", getAssertionErrorMessage(e));
         } else {
           throw e;
         }
       }
-
-      return ctx.profiles.getPaginatedProfileForOrg(
-        ctx.user!.org_id,
-        {
-          limit,
-          offset,
-          search,
-          filter: {
-            ...filter,
-            values: mapProfileFieldValuesFilterToDatabase(filter?.values),
-          },
-          sortBy: sortBy?.map((value) => {
-            const [field, order] = parseSortBy(value);
-            return { field, order };
-          }),
-        },
-        profileTypeFieldsById,
-      );
+    },
+  });
+  t.paginationField("profilesSimple", {
+    type: "Profile",
+    authorize: authenticateAnd(
+      userHasFeatureFlag("PROFILES"),
+      contextUserHasPermission("PROFILES:LIST_PROFILES"),
+    ),
+    searchable: true,
+    extendArgs: {
+      profileTypeId: nullable(list(nonNull(globalIdArg("ProfileType")))),
+      status: nullable(list(nonNull("ProfileStatus"))),
+    },
+    resolve: async (_, { limit, offset, search, profileTypeId, status }, ctx) => {
+      return ctx.profiles.getPaginatedProfileForOrg(ctx.user!.org_id, {
+        limit,
+        offset,
+        search,
+        profileTypeId,
+        filter: status
+          ? {
+              property: "status",
+              operator: "IS_ONE_OF",
+              value: status,
+            }
+          : null,
+        sortBy: [{ field: "name", order: "asc" }],
+      });
     },
   });
 });

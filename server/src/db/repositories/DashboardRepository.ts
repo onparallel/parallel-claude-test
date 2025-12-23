@@ -23,14 +23,8 @@ import {
   User,
 } from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
-import {
-  PETITION_FILTER_REPOSITORY_HELPER,
-  PetitionFilterRepositoryHelper,
-} from "../helpers/PetitionFilterRepositoryHelper";
-import {
-  PROFILE_VALUES_FILTER_REPOSITORY_HELPER,
-  ProfileValuesFilterRepositoryHelper,
-} from "../helpers/ProfileValuesFilterRepositoryHelper";
+import { PETITION_QUERY_HELPER, PetitionQueryHelper } from "../helpers/PetitionQueryHelper";
+import { PROFILE_QUERY_HELPER, ProfileQueryHelper } from "../helpers/ProfileQueryHelper";
 import { KNEX } from "../knex";
 import { PetitionFilter } from "./PetitionRepository";
 import { ProfileFilter } from "./ProfileRepository";
@@ -105,10 +99,10 @@ const COLORS = ["#E2E8F0", "#F5EFE8", "#FEEBC8", "#FED7D7", "#DDDCF8", "#CEEDFF"
 export class DashboardRepository extends BaseRepository {
   constructor(
     @inject(KNEX) knex: Knex,
-    @inject(PROFILE_VALUES_FILTER_REPOSITORY_HELPER)
-    private profileValuesFilter: ProfileValuesFilterRepositoryHelper,
-    @inject(PETITION_FILTER_REPOSITORY_HELPER)
-    private petitionFilter: PetitionFilterRepositoryHelper,
+    @inject(PROFILE_QUERY_HELPER)
+    private profileQueryHelper: ProfileQueryHelper,
+    @inject(PETITION_QUERY_HELPER)
+    private petitionQueryHelper: PetitionQueryHelper,
     @inject(PROFILE_TYPE_FIELD_SERVICE)
     private profileTypeFields: ProfileTypeFieldService,
     @inject(UserRepository)
@@ -448,7 +442,7 @@ export class DashboardRepository extends BaseRepository {
 
   private petitionsCountQuery(orgId: number, filters: PetitionFilter) {
     const builders: Knex.QueryCallbackWithArgs[] = [];
-    this.petitionFilter.applyPetitionFilter(builders, filters, "PETITION");
+    this.petitionQueryHelper.applyPetitionFilter(builders, filters, "PETITION");
 
     return (
       this.from({ p: "petition" })
@@ -502,8 +496,8 @@ export class DashboardRepository extends BaseRepository {
         if (settings.type === "AGGREGATE") {
           const profileTypeField = profileTypeFieldsById[settings.profileTypeFieldId];
           assert(profileTypeField, `ProfileTypeField:${settings.profileTypeFieldId} not found`);
-          this.profileValuesFilter.applyProfileTypeFieldJoin(q, joins, profileTypeField);
-          const content = this.profileValuesFilter.getProfileTypeFieldContent(
+          this.profileQueryHelper.applyProfileTypeFieldJoin(q, joins, profileTypeField);
+          const content = this.profileQueryHelper.getProfileTypeFieldContent(
             joins,
             profileTypeField,
           );
@@ -518,8 +512,8 @@ export class DashboardRepository extends BaseRepository {
             profileTypeField,
             `ProfileTypeField:${settings.groupByProfileTypeFieldId} not found`,
           );
-          this.profileValuesFilter.applyProfileTypeFieldJoin(q, joins, profileTypeField);
-          const content = this.profileValuesFilter.getProfileTypeFieldContent(
+          this.profileQueryHelper.applyProfileTypeFieldJoin(q, joins, profileTypeField);
+          const content = this.profileQueryHelper.getProfileTypeFieldContent(
             joins,
             profileTypeField,
           );
@@ -538,13 +532,13 @@ export class DashboardRepository extends BaseRepository {
             isNonNullish(profileTypeFieldsById),
             "if filter.values is defined, profileTypeFieldsById is required",
           );
-          this.profileValuesFilter.applyProfileValuesFilterJoins(
+          this.profileQueryHelper.applyProfileQueryFilterJoins(
             q,
             filters.values,
             joins,
             profileTypeFieldsById,
           );
-          this.profileValuesFilter.applyProfileValueFilter(
+          this.profileQueryHelper.applyProfileQueryFilter(
             q,
             filters.values,
             joins,

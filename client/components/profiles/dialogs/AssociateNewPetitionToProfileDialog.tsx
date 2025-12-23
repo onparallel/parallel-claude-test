@@ -180,6 +180,7 @@ function AssociateNewPetitionToProfileDialogSelectTemplate({
                   try {
                     const profileIds = prefill.flatMap((p) => p.profileIds);
                     await showPreviewImportFromProfileFormatErrorDialog({
+                      profileTypeId: profile.profileType.id,
                       profileIds,
                       profileTypeFieldIds: e.errors?.[0].extensions
                         ?.profileTypeFieldIds as string[],
@@ -390,6 +391,7 @@ function AssociateNewPetitionToProfileDialogSelectFieldGroup({
                   try {
                     const profileIds = prefill.flatMap((p) => p.profileIds);
                     await showPreviewImportFromProfileFormatErrorDialog({
+                      profileTypeId: profile.profileType.id,
                       profileIds,
                       profileTypeFieldIds: e.errors?.[0].extensions
                         ?.profileTypeFieldIds as string[],
@@ -568,6 +570,7 @@ export function AssociateNewPetitionToProfileDialogPrefillFieldGroups({
                 try {
                   const profileIds = prefill.flatMap((p) => p.profileIds);
                   await showPreviewImportFromProfileFormatErrorDialog({
+                    profileTypeId: profile.profileType.id,
                     profileIds,
                     profileTypeFieldIds: e.errors?.[0].extensions?.profileTypeFieldIds as string[],
                   });

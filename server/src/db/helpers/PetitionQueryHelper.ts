@@ -6,10 +6,10 @@ import { KNEX } from "../knex";
 import { PetitionFilter } from "../repositories/PetitionRepository";
 import { sqlArray, sqlIn } from "./sql";
 
-export const PETITION_FILTER_REPOSITORY_HELPER = Symbol.for("PETITION_FILTER_REPOSITORY_HELPER");
+export const PETITION_QUERY_HELPER = Symbol.for("PETITION_QUERY_HELPER");
 
 @injectable()
-export class PetitionFilterRepositoryHelper {
+export class PetitionQueryHelper {
   constructor(@inject(KNEX) private knex: Knex) {}
 
   public applyPetitionFilter(

@@ -11,19 +11,24 @@ import { FormattedMessage } from "react-intl";
 import { isNonNullish, unique, uniqueBy } from "remeda";
 
 export interface PreviewImportFromProfileFormatErrorDialogProps {
+  profileTypeId: string;
   profileIds: string[];
   profileTypeFieldIds: string[];
 }
 
 export function PreviewImportFromProfileFormatErrorDialog({
   profileIds,
+  profileTypeId,
   profileTypeFieldIds,
   ...props
 }: DialogProps<PreviewImportFromProfileFormatErrorDialogProps>) {
   const focusRef = useRef<HTMLButtonElement>(null);
 
   const { data } = useQuery(PreviewImportFromProfileFormatErrorDialog_profilesDocument, {
-    variables: { filter: { profileId: unique(profileIds) } },
+    variables: {
+      profileTypeId,
+      filter: { property: "id", operator: "IS_ONE_OF", value: unique(profileIds) },
+    },
   });
 
   const allFields =
@@ -110,8 +115,11 @@ PreviewImportFromProfileFormatErrorDialog.fragments = {
 
 const _queries = [
   gql`
-    query PreviewImportFromProfileFormatErrorDialog_profiles($filter: ProfileFilter) {
-      profiles(limit: 100, offset: 0, filter: $filter) {
+    query PreviewImportFromProfileFormatErrorDialog_profiles(
+      $filter: ProfileQueryFilterInput
+      $profileTypeId: GID!
+    ) {
+      profiles(limit: 100, offset: 0, filter: $filter, profileTypeId: $profileTypeId) {
         items {
           id
           profileType {

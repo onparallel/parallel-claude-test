@@ -324,6 +324,7 @@ function CreatePetitionFromTemplateSelectProfileStep({
                     try {
                       await showPreviewImportFromProfileFormatErrorDialog({
                         profileIds: [profile.id],
+                        profileTypeId: profile.profileType.id,
                         profileTypeFieldIds: e.errors?.[0].extensions
                           ?.profileTypeFieldIds as string[],
                       });

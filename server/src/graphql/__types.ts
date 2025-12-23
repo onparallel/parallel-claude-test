@@ -386,6 +386,15 @@ export interface NexusGenInputs {
     profileTypeFieldId?: NexusGenScalars["GID"][] | null; // [GID!]
     profileTypeId?: NexusGenScalars["GID"][] | null; // [GID!]
   };
+  ProfileQueryFilterInput: {
+    // input type
+    conditions?: NexusGenInputs["ProfileQueryFilterInput"][] | null; // [ProfileQueryFilterInput!]
+    logicalOperator?: NexusGenEnums["ProfileQueryFilterGroupLogicalOperator"] | null; // ProfileQueryFilterGroupLogicalOperator
+    operator?: NexusGenEnums["ProfileQueryFilterOperator"] | null; // ProfileQueryFilterOperator
+    profileTypeFieldId?: NexusGenScalars["GID"] | null; // GID
+    property?: NexusGenEnums["ProfileQueryFilterProperty"] | null; // ProfileQueryFilterProperty
+    value?: NexusGenScalars["JSON"] | null; // JSON
+  };
   ProfileRelationshipFilter: {
     // input type
     fromSide?: NexusGenEnums["ProfileRelationshipSide"] | null; // ProfileRelationshipSide
@@ -470,11 +479,6 @@ export interface NexusGenInputs {
     signWithDigitalCertificate?: boolean | null; // Boolean
     signWithEmbeddedImage?: NexusGenScalars["Upload"] | null; // Upload
     signWithEmbeddedImageFileUploadId?: string | null; // String
-  };
-  SortByInput: {
-    // input type
-    direction: NexusGenEnums["SortByDirection"]; // SortByDirection!
-    field: string; // String!
   };
   UpdateContactInput: {
     // input type
@@ -825,6 +829,37 @@ export interface NexusGenEnums {
     | "NOT_IS_ONE_OF"
     | "START_WITH";
   ProfileListViewSortField: "createdAt" | "name";
+  ProfileQueryFilterGroupLogicalOperator: "AND" | "OR";
+  ProfileQueryFilterOperator:
+    | "CONTAIN"
+    | "END_WITH"
+    | "EQUAL"
+    | "EXPIRES_IN"
+    | "GREATER_THAN"
+    | "GREATER_THAN_OR_EQUAL"
+    | "HAS_ANY_BG_CHECK_TOPICS"
+    | "HAS_BG_CHECK_MATCH"
+    | "HAS_BG_CHECK_RESULTS"
+    | "HAS_BG_CHECK_TOPICS"
+    | "HAS_EXPIRY"
+    | "HAS_PENDING_REVIEW"
+    | "HAS_VALUE"
+    | "IS_EXPIRED"
+    | "IS_ONE_OF"
+    | "LESS_THAN"
+    | "LESS_THAN_OR_EQUAL"
+    | "NOT_CONTAIN"
+    | "NOT_EQUAL"
+    | "NOT_HAS_ANY_BG_CHECK_TOPICS"
+    | "NOT_HAS_BG_CHECK_MATCH"
+    | "NOT_HAS_BG_CHECK_RESULTS"
+    | "NOT_HAS_BG_CHECK_TOPICS"
+    | "NOT_HAS_EXPIRY"
+    | "NOT_HAS_PENDING_REVIEW"
+    | "NOT_HAS_VALUE"
+    | "NOT_IS_ONE_OF"
+    | "START_WITH";
+  ProfileQueryFilterProperty: "closedAt" | "createdAt" | "id" | "status" | "updatedAt";
   ProfileRelationshipDirection: "LEFT_RIGHT" | "RIGHT_LEFT";
   ProfileRelationshipSide: "LEFT" | "RIGHT";
   ProfileStatus: db.ProfileStatus;
@@ -875,13 +910,11 @@ export interface NexusGenEnums {
     | "sentAt_ASC"
     | "sentAt_DESC";
   QueryProfileTypes_OrderBy: "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
-  QueryProfiles_OrderBy: "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
   QueryUserGroups_OrderBy: "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
   Result: "FAILURE" | "SUCCESS";
   SignatureConfigSigningMode: "PARALLEL" | "SEQUENTIAL";
   SignatureOrgIntegrationEnvironment: "DEMO" | "PRODUCTION";
   SignatureOrgIntegrationProvider: "DOCUSIGN" | "SIGNATURIT";
-  SortByDirection: "ASC" | "DESC";
   StandardListDefinitionListType: db.StandardListDefinitionListType;
   Success: "SUCCESS";
   TaskName: db.TaskName;
@@ -4147,6 +4180,7 @@ export interface NexusGenFieldTypes {
   Profile: {
     // field return type
     associatedPetitions: NexusGenRootTypes["PetitionPagination"]; // PetitionPagination!
+    closedAt: NexusGenScalars["DateTime"] | null; // DateTime
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     events: NexusGenRootTypes["ProfileEventPagination"]; // ProfileEventPagination!
     id: NexusGenScalars["GID"]; // GID!
@@ -4834,6 +4868,7 @@ export interface NexusGenFieldTypes {
     profileTypeFieldValueHistory: NexusGenRootTypes["ProfileFieldValuePagination"]; // ProfileFieldValuePagination!
     profileTypes: NexusGenRootTypes["ProfileTypePagination"]; // ProfileTypePagination!
     profiles: NexusGenRootTypes["ProfilePagination"]; // ProfilePagination!
+    profilesSimple: NexusGenRootTypes["ProfilePagination"]; // ProfilePagination!
     profilesWithSameContent: NexusGenRootTypes["ProfilesWithContent"][]; // [ProfilesWithContent!]!
     publicLicenseCode: NexusGenRootTypes["PublicLicenseCode"] | null; // PublicLicenseCode
     publicOrg: NexusGenRootTypes["PublicOrganization"] | null; // PublicOrganization
@@ -7498,6 +7533,7 @@ export interface NexusGenFieldTypeNames {
   Profile: {
     // field return type name
     associatedPetitions: "PetitionPagination";
+    closedAt: "DateTime";
     createdAt: "DateTime";
     events: "ProfileEventPagination";
     id: "GID";
@@ -8185,6 +8221,7 @@ export interface NexusGenFieldTypeNames {
     profileTypeFieldValueHistory: "ProfileFieldValuePagination";
     profileTypes: "ProfileTypePagination";
     profiles: "ProfilePagination";
+    profilesSimple: "ProfilePagination";
     profilesWithSameContent: "ProfilesWithContent";
     publicLicenseCode: "PublicLicenseCode";
     publicOrg: "PublicOrganization";
@@ -9379,11 +9416,11 @@ export interface NexusGenArgTypes {
     };
     createProfilesExcelExportTask: {
       // args
-      filter?: NexusGenInputs["ProfileFilter"] | null; // ProfileFilter
+      filter?: NexusGenInputs["ProfileQueryFilterInput"] | null; // ProfileQueryFilterInput
       locale: NexusGenEnums["UserLocale"]; // UserLocale!
       profileTypeId: NexusGenScalars["GID"]; // GID!
       search?: string | null; // String
-      sortBy?: NexusGenInputs["SortByInput"][] | null; // [SortByInput!]
+      sortBy?: string[] | null; // [String!]
     };
     createProfilesExcelImportTask: {
       // args
@@ -10972,11 +11009,20 @@ export interface NexusGenArgTypes {
     };
     profiles: {
       // args
-      filter?: NexusGenInputs["ProfileFilter"] | null; // ProfileFilter
+      filter?: NexusGenInputs["ProfileQueryFilterInput"] | null; // ProfileQueryFilterInput
       limit?: number | null; // Int
       offset?: number | null; // Int
+      profileTypeId: NexusGenScalars["GID"]; // GID!
       search?: string | null; // String
-      sortBy?: NexusGenEnums["QueryProfiles_OrderBy"][] | null; // [QueryProfiles_OrderBy!]
+      sortBy?: string[] | null; // [String!]
+    };
+    profilesSimple: {
+      // args
+      limit?: number | null; // Int
+      offset?: number | null; // Int
+      profileTypeId?: NexusGenScalars["GID"][] | null; // [GID!]
+      search?: string | null; // String
+      status?: NexusGenEnums["ProfileStatus"][] | null; // [ProfileStatus!]
     };
     profilesWithSameContent: {
       // args

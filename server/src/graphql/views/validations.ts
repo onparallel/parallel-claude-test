@@ -1,7 +1,7 @@
 import { indexBy, unique } from "remeda";
 import { getAssertionErrorMessage, isAssertionError } from "../../util/assert";
 import { isGlobalId, toGlobalId } from "../../util/globalId";
-import { validateProfileFieldValuesFilter } from "../../util/ProfileFieldValuesFilter";
+import { mapAndValidateProfileQueryFilter } from "../../util/ProfileQueryFilter";
 import { NexusGenInputs } from "../__types";
 import { ArgWithPath, getArgWithPath } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
@@ -56,7 +56,7 @@ export function validProfileListViewDataInput<TypeName extends string, FieldName
     if (input.values) {
       try {
         const fieldsById = indexBy(fields, (f) => f.id);
-        validateProfileFieldValuesFilter(input.values, fieldsById);
+        mapAndValidateProfileQueryFilter(input.values, fieldsById);
       } catch (e) {
         if (isAssertionError(e)) {
           throw new ArgValidationError(info, `${argName}.values`, getAssertionErrorMessage(e));

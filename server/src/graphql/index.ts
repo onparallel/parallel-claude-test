@@ -8,7 +8,6 @@ export * from "./helpers/scalars/Duration";
 export * from "./helpers/scalars/JSON";
 export * from "./helpers/scalars/LocalizableUserText";
 export * from "./helpers/scalars/Upload";
-export * from "./helpers/sortBy";
 export * from "./helpers/Success";
 export * from "./helpers/timestamps";
 

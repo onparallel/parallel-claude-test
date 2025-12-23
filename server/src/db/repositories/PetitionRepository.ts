@@ -128,10 +128,7 @@ import {
   TableCreateTypes,
   TableTypes,
 } from "../helpers/BaseRepository";
-import {
-  PETITION_FILTER_REPOSITORY_HELPER,
-  PetitionFilterRepositoryHelper,
-} from "../helpers/PetitionFilterRepositoryHelper";
+import { PETITION_QUERY_HELPER, PetitionQueryHelper } from "../helpers/PetitionQueryHelper";
 import { SortBy } from "../helpers/utils";
 import { KNEX, KNEX_READ_ONLY } from "../knex";
 import {
@@ -284,8 +281,8 @@ export class PetitionRepository extends BaseRepository {
   constructor(
     @inject(KNEX) knex: Knex,
     @inject(LOGGER) private logger: ILogger,
-    @inject(PETITION_FILTER_REPOSITORY_HELPER)
-    private petitionFilter: PetitionFilterRepositoryHelper,
+    @inject(PETITION_QUERY_HELPER)
+    private petitionQueryHelper: PetitionQueryHelper,
     @inject(QUEUES_SERVICE) private queues: QueuesService,
     @inject(FileRepository) private files: FileRepository,
     @inject(PETITION_VALIDATION_SERVICE) private petitionValidation: PetitionValidationService,
@@ -647,7 +644,7 @@ export class PetitionRepository extends BaseRepository {
     }
 
     if (filters) {
-      this.petitionFilter.applyPetitionFilter(builders, omit(filters, ["path"]), type);
+      this.petitionQueryHelper.applyPetitionFilter(builders, omit(filters, ["path"]), type);
       if (isNonNullish(filters.path)) {
         builders.push((q) => q.whereRaw(/* sql */ `starts_with(p.path, ?)`, [filters.path]));
       }
@@ -9811,13 +9808,13 @@ export class ReadOnlyPetitionRepository extends PetitionRepository {
   constructor(
     @inject(KNEX_READ_ONLY) knex: Knex,
     @inject(LOGGER) logger: ILogger,
-    @inject(PETITION_FILTER_REPOSITORY_HELPER)
-    petitionFilter: PetitionFilterRepositoryHelper,
+    @inject(PETITION_QUERY_HELPER)
+    petitionQueryHelper: PetitionQueryHelper,
     @inject(QUEUES_SERVICE) queues: QueuesService,
     @inject(ReadOnlyFileRepository) files: ReadOnlyFileRepository,
     @inject(PETITION_VALIDATION_SERVICE) petitionValidation: PetitionValidationService,
     @inject(PETITION_FIELD_SERVICE) petitionFields: PetitionFieldService,
   ) {
-    super(knex, logger, petitionFilter, queues, files, petitionValidation, petitionFields);
+    super(knex, logger, petitionQueryHelper, queues, files, petitionValidation, petitionFields);
   }
 }

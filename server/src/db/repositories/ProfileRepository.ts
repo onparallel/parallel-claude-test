@@ -17,7 +17,6 @@ import {
   uniqueBy,
   zip,
 } from "remeda";
-import { assert } from "ts-essentials";
 import { LocalizableUserText, ProfileUpdateSource } from "../../graphql";
 import {
   PROFILE_TYPE_FIELD_SERVICE,
@@ -28,7 +27,7 @@ import {
 import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
 import { keyBuilder } from "../../util/keyBuilder";
 import { never } from "../../util/never";
-import { ProfileFieldValuesFilter } from "../../util/ProfileFieldValuesFilter";
+import { ProfileQueryFilter } from "../../util/ProfileQueryFilter";
 import { isAtLeast } from "../../util/profileTypeFieldPermission";
 import { LazyPromise } from "../../util/promises/LazyPromise";
 import { pMapChunk } from "../../util/promises/pMapChunk";
@@ -77,9 +76,10 @@ import {
 } from "../events/ProfileEvent";
 import { BaseRepository, PageOpts, Pagination } from "../helpers/BaseRepository";
 import {
-  PROFILE_VALUES_FILTER_REPOSITORY_HELPER,
-  ProfileValuesFilterRepositoryHelper,
-} from "../helpers/ProfileValuesFilterRepositoryHelper";
+  CACHED_PROFILE_TYPE_FIELDS,
+  PROFILE_QUERY_HELPER,
+  ProfileQueryHelper,
+} from "../helpers/ProfileQueryHelper";
 import { SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 
@@ -89,16 +89,18 @@ export interface ProfileFilter {
   profileId?: number[] | null;
   profileTypeId?: number[] | null;
   status?: ProfileStatus[] | null;
-  values?: ProfileFieldValuesFilter | null;
+  values?: ProfileQueryFilter | null;
 }
+
+export type ProfileQuerySortBy = SortBy<"name" | "createdAt" | "updatedAt" | "closedAt">;
 
 @injectable()
 export class ProfileRepository extends BaseRepository {
   constructor(
     @inject(KNEX) knex: Knex,
     @inject(QUEUES_SERVICE) private queues: IQueuesService,
-    @inject(PROFILE_VALUES_FILTER_REPOSITORY_HELPER)
-    private profileValuesFilter: ProfileValuesFilterRepositoryHelper,
+    @inject(PROFILE_QUERY_HELPER)
+    private profileQueryHelper: ProfileQueryHelper,
     @inject(PROFILE_TYPE_FIELD_SERVICE)
     private profileTypeFields: ProfileTypeFieldService,
   ) {
@@ -1004,13 +1006,16 @@ export class ProfileRepository extends BaseRepository {
     orgId: number,
     opts: {
       search?: string | null;
-      filter?: ProfileFilter | null;
-      sortBy?: SortBy<"createdAt" | "name">[] | null;
+      profileTypeId?: number[] | null;
+      filter?: ProfileQueryFilter | null;
+      sortBy?: ProfileQuerySortBy[] | null;
     } & PageOpts,
     profileTypeFieldsById?: Record<number, ProfileTypeField>,
   ) {
     const columnMap = {
       createdAt: "created_at",
+      updatedAt: "updated_at",
+      closedAt: "closed_at",
       name: "name_en",
     } as const;
 
@@ -1022,7 +1027,7 @@ export class ProfileRepository extends BaseRepository {
             .where("p.org_id", orgId)
             .whereNull("p.deleted_at")
             .mmodify((q) => {
-              const { search, filter } = opts;
+              const { search, filter, profileTypeId } = opts;
               if (search) {
                 q.where((q1) =>
                   q1
@@ -1030,30 +1035,22 @@ export class ProfileRepository extends BaseRepository {
                     .or.whereSearch(this.knex.raw("p.localizable_name->>'es'"), search),
                 );
               }
-              if (isNonNullish(filter?.profileId)) {
-                q.whereIn("p.id", filter!.profileId);
+
+              if (isNonNullish(profileTypeId) && profileTypeId.length > 0) {
+                q.whereIn("p.profile_type_id", profileTypeId);
               }
-              if (isNonNullish(filter?.profileTypeId)) {
-                q.whereIn("p.profile_type_id", unMaybeArray(filter!.profileTypeId));
-              }
-              if (isNonNullish(filter?.status) && filter!.status.length > 0) {
-                q.whereIn("p.status", filter!.status);
-              }
-              if (isNonNullish(filter?.values)) {
-                assert(
-                  isNonNullish(profileTypeFieldsById),
-                  "if filter.values is defined, profileTypeFieldsById is required",
-                );
+
+              if (isNonNullish(filter)) {
                 const joins: Record<number, string> = {};
-                this.profileValuesFilter.applyProfileValuesFilterJoins(
+                this.profileQueryHelper.applyProfileQueryFilterJoins(
                   q,
-                  filter.values,
+                  filter,
                   joins,
                   profileTypeFieldsById,
                 );
-                this.profileValuesFilter.applyProfileValueFilter(
+                this.profileQueryHelper.applyProfileQueryFilter(
                   q,
-                  filter.values,
+                  filter,
                   joins,
                   profileTypeFieldsById,
                   "AND",
@@ -1071,9 +1068,9 @@ export class ProfileRepository extends BaseRepository {
                 .map((s) => {
                   const field = columnMap[s.field];
                   if (field === "name_en") {
-                    return `"localizable_name"->>'en' ${s.order}`;
+                    return `"localizable_name"->>'en' ${s.order} nulls last`;
                   } else {
-                    return `"${field}" ${s.order}`;
+                    return `"${field}" ${s.order} nulls last`;
                   }
                 })
                 .join(", "),
@@ -1668,7 +1665,10 @@ export class ProfileRepository extends BaseRepository {
           ),
           update_value_cache as (
             update profile p
-              set value_cache = (value_cache - t.removed_profile_type_field_ids) || t.values
+              set 
+                value_cache = (value_cache - t.removed_profile_type_field_ids) || t.values,
+                updated_at = now(),
+                updated_by = :updated_by
             from (
               select 
                 nv.profile_id,
@@ -1690,7 +1690,7 @@ export class ProfileRepository extends BaseRepository {
               from new_values nv
               left join with_no_previous_values wnpv on wnpv.profile_id = nv.profile_id and wnpv.profile_type_field_id = nv.profile_type_field_id
               left join with_previous_values wpv on wpv.profile_id = nv.profile_id and wpv.profile_type_field_id = nv.profile_type_field_id
-              where nv.type in ('SHORT_TEXT', 'SELECT', 'CHECKBOX', 'DATE', 'PHONE', 'NUMBER', 'USER_ASSIGNMENT')
+              where nv.type in :cacheable_types
               group by nv.profile_id
             ) t
             where p.id = t.profile_id
@@ -1713,10 +1713,13 @@ export class ProfileRepository extends BaseRepository {
             ]),
             ["int", "int", "profile_type_field_type", "jsonb", "date", "boolean", "jsonb", "int"],
           ),
+
           created_by_user_id: from.userId ?? null,
+          updated_by: from.userId ? `User:${from.userId}` : null,
           source: from.source ?? null,
           external_source_integration_id: from.orgIntegrationId ?? null,
           org_id: orgId,
+          cacheable_types: this.sqlIn(CACHED_PROFILE_TYPE_FIELDS, "profile_type_field_type"),
         },
         t,
       );
