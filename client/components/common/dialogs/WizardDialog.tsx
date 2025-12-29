@@ -1,13 +1,20 @@
 import { ModalProps } from "@chakra-ui/react";
 import { ComponentType, useCallback, useMemo, useState } from "react";
-import { BaseDialogPropsProvider, DialogCallbacks, useDialog } from "./DialogProvider";
+import {
+  BaseDialogPropsProvider,
+  BaseModalProps,
+  DialogCallbacks,
+  useDialog,
+} from "./DialogProvider";
 
 export function useWizardDialog<TSteps extends Record<string, object>>(steps: {
   [K in keyof TSteps]: ComponentType<TSteps[K]>;
 }): TSteps[keyof TSteps] extends DialogCallbacks<infer TResult>
   ? <const TStep extends string & keyof TSteps>(
       step: TStep,
-      props: Omit<TSteps[TStep], keyof DialogCallbacks | WizardStepDialogPropsKeys>,
+      props: Omit<TSteps[TStep], keyof DialogCallbacks | WizardStepDialogPropsKeys> & {
+        modalProps?: BaseModalProps;
+      },
     ) => Promise<TResult>
   : never;
 export function useWizardDialog<
@@ -20,7 +27,9 @@ export function useWizardDialog<
   initialStep: TInitial,
 ): TSteps[keyof TSteps] extends DialogCallbacks<infer TResult>
   ? (
-      props: Omit<TSteps[TInitial], keyof DialogCallbacks | WizardStepDialogPropsKeys>,
+      props: Omit<TSteps[TInitial], keyof DialogCallbacks | WizardStepDialogPropsKeys> & {
+        modalProps?: BaseModalProps;
+      },
     ) => Promise<TResult>
   : never;
 export function useWizardDialog<
@@ -37,7 +46,13 @@ export function useWizardDialog<
     (stepOrProps: any, maybeProps?: any) => {
       const [step, props] =
         typeof stepOrProps === "string" ? [stepOrProps, maybeProps] : [initialStep!, stepOrProps];
-      return showDialog({ steps, initialStep: step, initialProps: props } as any) as any;
+      const { modalProps, ...initialProps } = props ?? {};
+      return showDialog({
+        steps,
+        initialStep: step,
+        initialProps,
+        modalProps,
+      } as any) as any;
     },
     [showDialog],
   ) as any;
