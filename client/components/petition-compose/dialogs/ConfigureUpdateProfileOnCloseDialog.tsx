@@ -420,22 +420,7 @@ function UpdatePropertyCard({
           <Controller
             name={`updates.${index}.profileTypeFieldId`}
             control={control}
-            rules={{
-              required: true,
-              validate: {
-                isUnique: (value) => {
-                  const updates = watch("updates");
-                  return updates
-                    .filter((_, i) => i !== index)
-                    .some((update) => update.profileTypeFieldId === value)
-                    ? intl.formatMessage({
-                        id: "component.configure-update-profile-on-close-dialog.field-already-in-use",
-                        defaultMessage: "This field is already in use",
-                      })
-                    : true;
-                },
-              },
-            }}
+            rules={{ required: true }}
             render={({ field }) => {
               return (
                 <ProfileTypeFieldSelect

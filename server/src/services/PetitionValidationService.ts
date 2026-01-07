@@ -2,7 +2,7 @@ import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import { inject, injectable } from "inversify";
 import { isPossiblePhoneNumber } from "libphonenumber-js";
-import { difference, isNonNullish, isNullish, omit, unique } from "remeda";
+import { difference, isNonNullish, isNullish, omit } from "remeda";
 import { assert } from "ts-essentials";
 import {
   PetitionField,
@@ -750,12 +750,6 @@ export class PetitionValidationService {
     try {
       assert(field.type === "FIELD_GROUP", "field must be a FIELD_GROUP");
       assert(isNonNullish(field.profile_type_id), "field must be linked to a profile type");
-
-      const profileTypeFieldsIds = options.map((o) => o.profileTypeFieldId);
-      assert(
-        unique(profileTypeFieldsIds).length === profileTypeFieldsIds.length,
-        "each item in updateProfileOnClose must have a unique profileTypeFieldId",
-      );
 
       for (const option of options) {
         const index = options.indexOf(option);

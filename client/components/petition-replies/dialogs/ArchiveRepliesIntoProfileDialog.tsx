@@ -275,8 +275,8 @@ function ArchiveRepliesIntoProfileRow({
     const options = field.options as FieldOptions["FIELD_GROUP"];
     mergedOptions.groupName = options.groupName;
     mergedOptions.updateProfileOnClose = uniqueBy(
-      [...(mergedOptions.updateProfileOnClose || []), ...(options.updateProfileOnClose || [])],
-      (update) => update.profileTypeFieldId,
+      [...(mergedOptions.updateProfileOnClose ?? []), ...(options.updateProfileOnClose ?? [])],
+      (update) => update.profileTypeFieldId + update.source.type,
     );
   }
 

@@ -5329,44 +5329,6 @@ describe("GraphQL/Petition Fields", () => {
         expect(data2).toBeNull();
       });
 
-      it("sends error if repeating profileTypeFields", async () => {
-        const { errors, data } = await testClient.execute(
-          gql`
-            mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
-              updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
-                id
-              }
-            }
-          `,
-          {
-            petitionId: toGlobalId("Petition", petition.id),
-            fieldId: toGlobalId("PetitionField", fieldGroup.id),
-            data: {
-              options: {
-                updateProfileOnClose: [
-                  {
-                    profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[0].id),
-                    source: {
-                      type: "ASK_USER",
-                    },
-                  },
-                  {
-                    profileTypeFieldId: toGlobalId("ProfileTypeField", profileTypeFields[0].id),
-                    source: {
-                      type: "ASK_USER",
-                    },
-                  },
-                ],
-              },
-            },
-          },
-        );
-        expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
-          message: "Error: each item in updateProfileOnClose must have a unique profileTypeFieldId",
-        });
-        expect(data).toBeNull();
-      });
-
       it("sets ASK_USER source", async () => {
         const { errors, data } = await testClient.execute(
           gql`
