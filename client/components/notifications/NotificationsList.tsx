@@ -47,7 +47,10 @@ export function NotificationsList({
       case "ArrowUp": {
         event.preventDefault();
         const parent = (event.target as HTMLElement).closest("[data-notification-id]");
-        const notificationId = parent!.getAttribute("data-notification-id");
+        if (!parent) {
+          return;
+        }
+        const notificationId = parent.getAttribute("data-notification-id");
         const index = notificationsRef.current.findIndex((n) => n.id === notificationId);
         if (index === -1) {
           return;
