@@ -200,15 +200,17 @@ export class KycRefreshDateUpdateListener implements EventListener<"PROFILE_UPDA
 
     const statusValue = values.find(
       (v) => v?.profile_type_field_id === profileTypeConfig.statusProfileTypeFieldId,
-    )!;
+    );
     const riskValue = values.find(
       (v) => v?.profile_type_field_id === profileTypeConfig.riskProfileTypeFieldId,
-    )!;
+    );
     const lastKycDateValue = values.find(
       (v) => v?.profile_type_field_id === profileTypeConfig.lastKycDateProfileTypeFieldId,
-    )!;
+    );
 
-    const nextRefreshDateInterval = profileTypeConfig.dateIntervalsByRisk[riskValue.content.value];
+    const nextRefreshDateInterval = riskValue
+      ? profileTypeConfig.dateIntervalsByRisk[riskValue.content.value]
+      : undefined;
 
     if (
       !statusValue ||
