@@ -53,7 +53,21 @@ const PETITION_FIELD_LOGIC_CONDITION_SCHEMA = (fieldIdType: "string" | "number")
             "ANY_IS_IN_LIST",
             "ALL_IS_IN_LIST",
             "NONE_IS_IN_LIST",
+
+            // PROFILE_SEARCH
             "HAS_PROFILE_MATCH",
+
+            // BACKGROUND_CHECK
+            "HAS_BG_CHECK_RESULTS",
+            "NOT_HAS_BG_CHECK_RESULTS",
+            "HAS_BG_CHECK_MATCH",
+            "NOT_HAS_BG_CHECK_MATCH",
+            "HAS_PENDING_REVIEW",
+            "NOT_HAS_PENDING_REVIEW",
+            "HAS_ANY_BG_CHECK_TOPICS",
+            "NOT_HAS_ANY_BG_CHECK_TOPICS",
+            "HAS_BG_CHECK_TOPICS",
+            "NOT_HAS_BG_CHECK_TOPICS",
           ],
         },
         value: {
@@ -312,7 +326,6 @@ export async function validateFieldLogic<
         isFileTypeField(referencedField.type) ||
         (referencedField.type === "DYNAMIC_SELECT" && c.column === undefined) ||
         referencedField.type === "FIELD_GROUP" ||
-        referencedField.type === "BACKGROUND_CHECK" ||
         referencedField.type === "ADVERSE_MEDIA_SEARCH";
 
       if (isOnlyHasReplies) {
@@ -408,6 +421,37 @@ export async function validateFieldLogic<
             ["ANY", "NONE"] as const,
             `Invalid modifier ${c.modifier} for operator ${c.operator}`,
           );
+        } else if (referencedField.type === "BACKGROUND_CHECK") {
+          assertOneOf(
+            c.operator,
+            [
+              "HAS_BG_CHECK_RESULTS",
+              "NOT_HAS_BG_CHECK_RESULTS",
+              "HAS_BG_CHECK_MATCH",
+              "NOT_HAS_BG_CHECK_MATCH",
+              "HAS_PENDING_REVIEW",
+              "NOT_HAS_PENDING_REVIEW",
+              "HAS_BG_CHECK_TOPICS",
+              "NOT_HAS_BG_CHECK_TOPICS",
+              "HAS_ANY_BG_CHECK_TOPICS",
+              "NOT_HAS_ANY_BG_CHECK_TOPICS",
+            ] as const,
+            `Invalid operator ${c.operator} for field of type ${referencedField.type}`,
+          );
+
+          if (["HAS_BG_CHECK_TOPICS", "NOT_HAS_BG_CHECK_TOPICS"].includes(c.operator)) {
+            assert(
+              isNonNullish(c.value) &&
+                Array.isArray(c.value) &&
+                c.value.every((v) => typeof v === "string"),
+              "Value must be an array of strings",
+            );
+          } else {
+            assert(
+              c.value === null,
+              `Invalid value ${c.value} for field of type ${referencedField.type}`,
+            );
+          }
         }
       }
 

@@ -11,6 +11,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { InfoCircleIcon } from "@parallel/chakra/icons";
+import { BackgroundCheckTopicSelect } from "@parallel/components/common/BackgroundCheckTopicSelect";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import {
@@ -18,6 +19,7 @@ import {
   useSimpleSelectOptions,
 } from "@parallel/components/common/SimpleSelect";
 import { ValueProps } from "@parallel/utils/ValueProps";
+import { BACKGROUND_CHECK_TOPICS } from "@parallel/utils/backgroundCheckTopics";
 import { FORMATS, dateToDatetimeLocal, prettifyTimezone } from "@parallel/utils/dates";
 import { defaultFieldConditionValue } from "@parallel/utils/fieldLogic/conditions";
 import {
@@ -526,11 +528,83 @@ function ConditionPredicate({
             }),
             value: "HAS_PROFILE_MATCH",
           });
+        } else if (referencedField.type === "BACKGROUND_CHECK") {
+          options.push(
+            {
+              label: intl.formatMessage({
+                id: "component.petition-field-visibility-editor.has-bg-check-results",
+                defaultMessage: "has results available",
+              }),
+              value: "HAS_BG_CHECK_RESULTS",
+            },
+            {
+              label: intl.formatMessage({
+                id: "component.petition-field-visibility-editor.not-has-bg-check-results",
+                defaultMessage: "does not have results available",
+              }),
+              value: "NOT_HAS_BG_CHECK_RESULTS",
+            },
+            {
+              label: intl.formatMessage({
+                id: "component.petition-field-visibility-editor.has-bg-check-match",
+                defaultMessage: "has selected a profile",
+              }),
+              value: "HAS_BG_CHECK_MATCH",
+            },
+            {
+              label: intl.formatMessage({
+                id: "component.petition-field-visibility-editor.not-has-bg-check-match",
+                defaultMessage: "has not selected a profile",
+              }),
+              value: "NOT_HAS_BG_CHECK_MATCH",
+            },
+            {
+              label: intl.formatMessage({
+                id: "component.petition-field-visibility-editor.has-pending-review",
+                defaultMessage: "has pending review",
+              }),
+              value: "HAS_PENDING_REVIEW",
+            },
+            {
+              label: intl.formatMessage({
+                id: "component.petition-field-visibility-editor.not-has-pending-review",
+                defaultMessage: "does not have pending review",
+              }),
+              value: "NOT_HAS_PENDING_REVIEW",
+            },
+            {
+              label: intl.formatMessage({
+                id: "component.petition-field-visibility-editor.has-bg-check-topics",
+                defaultMessage: "has these topics",
+              }),
+              value: "HAS_BG_CHECK_TOPICS",
+            },
+            {
+              label: intl.formatMessage({
+                id: "component.petition-field-visibility-editor.not-has-bg-check-topics",
+                defaultMessage: "does not have these topics",
+              }),
+              value: "NOT_HAS_BG_CHECK_TOPICS",
+            },
+            {
+              label: intl.formatMessage({
+                id: "component.petition-field-visibility-editor.has-any-bg-check-topics",
+                defaultMessage: "has any topics",
+              }),
+              value: "HAS_ANY_BG_CHECK_TOPICS",
+            },
+            {
+              label: intl.formatMessage({
+                id: "component.petition-field-visibility-editor.not-has-any-bg-check-topics",
+                defaultMessage: "does not have any topics",
+              }),
+              value: "NOT_HAS_ANY_BG_CHECK_TOPICS",
+            },
+          );
         } else if (
           isNonNullish(referencedField) &&
           !isFileTypeField(referencedField.type) &&
           referencedField.type !== "DYNAMIC_SELECT" &&
-          referencedField.type !== "BACKGROUND_CHECK" &&
           referencedField.type !== "ADVERSE_MEDIA_SEARCH" &&
           referencedField.type !== "FIELD_GROUP" &&
           referencedField.type !== "USER_ASSIGNMENT"
@@ -701,6 +775,7 @@ function ConditionPredicate({
     } else if (
       isFieldCondition &&
       isNonNullish(referencedField) &&
+      referencedField.type !== "BACKGROUND_CHECK" &&
       (condition.modifier === "NUMBER_OF_REPLIES" || condition.operator === "NUMBER_OF_SUBREPLIES")
     ) {
       // override existing "has replies/does not have replies"
@@ -725,6 +800,17 @@ function ConditionPredicate({
             ? firstListName
             : defaultValue,
       });
+    } else if (referencedField?.type === "BACKGROUND_CHECK") {
+      onChange({
+        ...condition,
+        modifier: "ANY",
+        operator,
+        value: ["HAS_BG_CHECK_TOPICS", "NOT_HAS_BG_CHECK_TOPICS"].includes(operator)
+          ? Array.isArray(condition.value)
+            ? condition.value
+            : []
+          : null,
+      });
     } else {
       onChange({
         ...condition,
@@ -735,7 +821,9 @@ function ConditionPredicate({
 
   return isFieldCondition &&
     ((!isMultipleValue && condition.modifier === "NUMBER_OF_REPLIES") ||
-      referencedField?.type === "PROFILE_SEARCH") ? (
+      referencedField?.type === "PROFILE_SEARCH" ||
+      (referencedField?.type === "BACKGROUND_CHECK" &&
+        !["HAS_BG_CHECK_TOPICS", "NOT_HAS_BG_CHECK_TOPICS"].includes(condition.operator))) ? (
     isReadOnly ? (
       <Box as="span">{options.find((o) => o.value === operator)?.label}</Box>
     ) : (
@@ -846,6 +934,14 @@ function ConditionPredicate({
           />
         ) : referencedField.type === "DATE_TIME" ? (
           <ConditionPredicateValueDatetime
+            value={condition}
+            onChange={onChange}
+            isReadOnly={isReadOnly}
+            showErrors={showErrors}
+          />
+        ) : referencedField.type === "BACKGROUND_CHECK" &&
+          ["HAS_BG_CHECK_TOPICS", "NOT_HAS_BG_CHECK_TOPICS"].includes(condition.operator) ? (
+          <ConditionPredicateBackgroundCheckTopicSelect
             value={condition}
             onChange={onChange}
             isReadOnly={isReadOnly}
@@ -1329,6 +1425,59 @@ function ConditionPredicateListSelect({
         {conditionOption?.label ?? condition.value}
         {'"'}
       </Box>
+    ) : (
+      <Box as="span" textStyle="hint">
+        <FormattedMessage id="generic.unset-value" defaultMessage="Unset value" />
+      </Box>
+    );
+  }
+}
+
+function ConditionPredicateBackgroundCheckTopicSelect({
+  showErrors,
+  value: condition,
+  onChange,
+  isReadOnly,
+}: ConditionPredicateProps) {
+  const intl = useIntl();
+
+  if (!isReadOnly) {
+    return (
+      <BackgroundCheckTopicSelect
+        size="sm"
+        isReadOnly={isReadOnly}
+        isMulti
+        isInvalid={showErrors && condition.value === null}
+        value={condition.value as string[] | null}
+        onChange={(value) => onChange({ ...condition, value: value })}
+        placeholder={intl.formatMessage({
+          id: "generic.select-an-option",
+          defaultMessage: "Select an option",
+        })}
+        styles={{
+          valueContainer: (styles) => ({ ...styles, gridTemplateColumns: "1fr" }),
+          option: (styles) => ({
+            ...styles,
+            WebkitLineClamp: "3",
+            padding: "5px 8px",
+          }),
+        }}
+      />
+    );
+  } else {
+    return isNonNullish(condition.value) &&
+      Array.isArray(condition.value) &&
+      condition.value.length > 0 ? (
+      <FormattedList
+        value={(condition.value as string[]).map((value, index) => (
+          <Box as="span" key={index} fontStyle="italic">
+            {'"'}
+            {BACKGROUND_CHECK_TOPICS[value]}
+            {'"'}
+          </Box>
+        ))}
+        type="conjunction"
+      />
     ) : (
       <Box as="span" textStyle="hint">
         <FormattedMessage id="generic.unset-value" defaultMessage="Unset value" />

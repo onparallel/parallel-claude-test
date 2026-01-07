@@ -41,7 +41,7 @@ import { PetitionFieldLogicCondition } from "@parallel/utils/fieldLogic/types";
 import { useEffect, useRef, useState } from "react";
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, isNullish, omit } from "remeda";
+import { isNonNullish, omit } from "remeda";
 import { PetitionVisibilityEditor } from "../logic/PetitionVisibilityEditor";
 
 type ConfigureApprovalStepsDialogSteps = {
@@ -287,9 +287,9 @@ function ApprovalCard({ index, petition, onRemove }: ApprovalCardProps) {
   } = useFormContext<ConfigureApprovalStepsDialogFormData>();
   const _conditions = watch(`approvals.${index}.visibility`);
 
-  const [hasVisbility, setHasVisbility] = useState(isNonNullish(_conditions));
+  const [hasVisibility, setHasVisibility] = useState(isNonNullish(_conditions));
   const handleAddCondition = (value: boolean) => {
-    setHasVisbility(value);
+    setHasVisibility(value);
     if (!value) {
       setValue(`approvals.${index}.visibility`, undefined);
     }
@@ -315,7 +315,7 @@ function ApprovalCard({ index, petition, onRemove }: ApprovalCardProps) {
   }, []);
 
   const validCondition = (c: PetitionFieldLogicCondition) => {
-    return ("fieldId" in c && !c.fieldId) || isNullish(c.value) ? false : true;
+    return "fieldId" in c && isNonNullish(c.fieldId);
   };
 
   return (
@@ -371,7 +371,7 @@ function ApprovalCard({ index, petition, onRemove }: ApprovalCardProps) {
           />
         </FormControl>
       </Grid>
-      {hasVisbility ? (
+      {hasVisibility ? (
         <FormControl>
           <Controller
             name={`approvals.${index}.visibility`}
@@ -405,10 +405,10 @@ function ApprovalCard({ index, petition, onRemove }: ApprovalCardProps) {
           size="sm"
           variant="ghost"
           placement="bottom"
-          color={hasVisbility ? "primary.500" : undefined}
+          color={hasVisibility ? "primary.500" : undefined}
           icon={<ConditionIcon />}
           label={
-            hasVisbility
+            hasVisibility
               ? intl.formatMessage({
                   id: "generic.remove-condition",
                   defaultMessage: "Remove condition",
@@ -418,7 +418,7 @@ function ApprovalCard({ index, petition, onRemove }: ApprovalCardProps) {
                   defaultMessage: "Add condition",
                 })
           }
-          onClick={() => handleAddCondition(!hasVisbility)}
+          onClick={() => handleAddCondition(!hasVisibility)}
         />
         <IconButtonWithTooltip
           size="sm"

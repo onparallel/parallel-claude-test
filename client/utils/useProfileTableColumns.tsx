@@ -16,6 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { CloseIcon, PlusCircleFilledIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { BackgroundCheckTopicSelect } from "@parallel/components/common/BackgroundCheckTopicSelect";
 import { DateInput } from "@parallel/components/common/DateInput";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
@@ -24,12 +25,7 @@ import { OverflownText } from "@parallel/components/common/OverflownText";
 import { PhoneInputLazy } from "@parallel/components/common/PhoneInputLazy";
 import { ProfilePropertyContent } from "@parallel/components/common/ProfilePropertyContent";
 import { ProfileReference } from "@parallel/components/common/ProfileReference";
-import {
-  SimpleOption,
-  SimpleSelect,
-  SimpleSelectInstance,
-  SimpleSelectProps,
-} from "@parallel/components/common/SimpleSelect";
+import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { TableColumn, TableColumnFilterProps } from "@parallel/components/common/Table";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
@@ -58,9 +54,8 @@ import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { components, InputActionMeta, InputProps } from "react-select";
 import CreatableSelect, { CreatableProps } from "react-select/creatable";
-import { entries, isNonNullish, isNullish, map, omit, pick, pipe, sortBy, unique } from "remeda";
+import { isNonNullish, isNullish, omit, pick, unique } from "remeda";
 import { assert, Merge } from "ts-essentials";
-import { BACKGROUND_CHECK_TOPICS } from "./backgroundCheckTopics";
 import { never } from "./never";
 import { ProfileTypeFieldOptions } from "./profileFields";
 import {
@@ -789,21 +784,6 @@ const _components = {
     );
   },
 };
-
-const BackgroundCheckTopicSelect = forwardRef<
-  SimpleSelectInstance<string, boolean>,
-  Omit<SimpleSelectProps<string, boolean>, "options">
->(function BackgroundCheckTopicSelect(props, ref) {
-  const options = useMemo(() => {
-    return pipe(
-      BACKGROUND_CHECK_TOPICS,
-      entries(),
-      map(([value, label]) => ({ value, label })),
-      sortBy((i) => i.label),
-    );
-  }, []);
-  return <SimpleSelect ref={ref} options={options} {...props} />;
-});
 
 useProfileTableColumns.fragments = {
   get ProfileTypeField() {

@@ -18,7 +18,6 @@ export function defaultFieldCondition<T extends Pick<PetitionField, "id" | "type
     isFileTypeField(field.type) ||
     (field.type === "DYNAMIC_SELECT" && column === undefined) ||
     field.type === "FIELD_GROUP" ||
-    field.type === "BACKGROUND_CHECK" ||
     field.type === "ADVERSE_MEDIA_SEARCH" ||
     field.type === "USER_ASSIGNMENT";
 
@@ -35,7 +34,9 @@ export function defaultFieldCondition<T extends Pick<PetitionField, "id" | "type
             ? "LESS_THAN"
             : field.type === "PROFILE_SEARCH"
               ? "HAS_PROFILE_MATCH"
-              : "EQUAL",
+              : field.type === "BACKGROUND_CHECK"
+                ? "HAS_BG_CHECK_RESULTS"
+                : "EQUAL",
     value:
       conditionValue === undefined ? defaultFieldConditionValue(field, column) : conditionValue,
     column,
@@ -72,7 +73,6 @@ export function defaultFieldConditionValue<
     isFileTypeField(field.type) ||
     (field.type === "DYNAMIC_SELECT" && column === undefined) ||
     field.type === "FIELD_GROUP" ||
-    field.type === "BACKGROUND_CHECK" ||
     field.type === "ADVERSE_MEDIA_SEARCH"
   ) {
     return 0;

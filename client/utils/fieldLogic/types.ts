@@ -52,7 +52,17 @@ export type PetitionFieldLogicConditionOperator =
   | "ANY_IS_IN_LIST"
   | "ALL_IS_IN_LIST"
   | "NONE_IS_IN_LIST"
-  | "HAS_PROFILE_MATCH";
+  | "HAS_PROFILE_MATCH"
+  | "HAS_BG_CHECK_RESULTS"
+  | "NOT_HAS_BG_CHECK_RESULTS"
+  | "HAS_BG_CHECK_MATCH"
+  | "NOT_HAS_BG_CHECK_MATCH"
+  | "HAS_PENDING_REVIEW"
+  | "NOT_HAS_PENDING_REVIEW"
+  | "HAS_BG_CHECK_TOPICS"
+  | "NOT_HAS_BG_CHECK_TOPICS"
+  | "HAS_ANY_BG_CHECK_TOPICS"
+  | "NOT_HAS_ANY_BG_CHECK_TOPICS";
 
 export type PseudoPetitionFieldVisibilityConditionOperator =
   | PetitionFieldLogicConditionOperator

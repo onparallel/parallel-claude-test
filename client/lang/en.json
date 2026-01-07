@@ -7845,6 +7845,31 @@
     "context": "is after the"
   },
   {
+    "term": "component.petition-field-visibility-editor.has-any-bg-check-topics",
+    "definition": "has any topics",
+    "context": "has any topics"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.has-bg-check-match",
+    "definition": "has selected a profile",
+    "context": "has selected a profile"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.has-bg-check-results",
+    "definition": "has results available",
+    "context": "has results available"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.has-bg-check-topics",
+    "definition": "has these topics",
+    "context": "has these topics"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.has-pending-review",
+    "definition": "has pending review",
+    "context": "has pending review"
+  },
+  {
     "term": "component.petition-field-visibility-editor.has-profile-match",
     "definition": "has a match",
     "context": "has a match"
@@ -7908,6 +7933,31 @@
     "term": "component.petition-field-visibility-editor.not-equal-select",
     "definition": "{modifier, select, ALL {are not} other {is not}}",
     "context": "{modifier, select, ALL {are not} other {is not}}"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.not-has-any-bg-check-topics",
+    "definition": "does not have any topics",
+    "context": "does not have any topics"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.not-has-bg-check-match",
+    "definition": "has not selected a profile",
+    "context": "has not selected a profile"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.not-has-bg-check-results",
+    "definition": "does not have results available",
+    "context": "does not have results available"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.not-has-bg-check-topics",
+    "definition": "does not have these topics",
+    "context": "does not have these topics"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.not-has-pending-review",
+    "definition": "does not have pending review",
+    "context": "does not have pending review"
   },
   {
     "term": "component.petition-field-visibility-editor.not-have-reply",

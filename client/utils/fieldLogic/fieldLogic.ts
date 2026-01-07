@@ -1,10 +1,12 @@
 /**
- * Similar code is also on /server/src/utils/fieldLogic.ts
- * Don't forget to update it as well!
+ * Similar code is also on
+ * - server/src/pdf/utils/fieldLogic.ts
+ * - server/src/util/fieldLogic.ts
+ * Don't forget to update it as well.
  */
 
 import { PetitionFieldType } from "@parallel/graphql/__types";
-import { filter, flatMap, fromEntries, indexBy, isNonNullish, pipe } from "remeda";
+import { filter, flatMap, fromEntries, indexBy, isNonNullish, isNullish, pipe } from "remeda";
 import { assert } from "ts-essentials";
 import { completedFieldReplies } from "../completedFieldReplies";
 import { letters, numbers, romanNumerals } from "../generators";
@@ -324,13 +326,83 @@ function fieldConditionIsMet(
   petition: FieldLogicPetitionInput,
 ) {
   const { operator, value, modifier } = condition;
-  function evaluator(reply: FieldLogicPetitionFieldReplyInner) {
-    const _value =
-      condition.column !== undefined
-        ? (reply.content.value?.[condition.column]?.[1] ?? null)
-        : reply.content.value;
 
-    return evaluateValuePredicate(_value, operator, value, petition, field.type);
+  function evaluator(reply: FieldLogicPetitionFieldReplyInner) {
+    switch (operator) {
+      case "HAS_BG_CHECK_RESULTS":
+        assert(field.type === "BACKGROUND_CHECK");
+        assert(isNonNullish(reply.content?.search?.totalCount));
+        return reply.content.search.totalCount > 0;
+      case "NOT_HAS_BG_CHECK_RESULTS":
+        assert(field.type === "BACKGROUND_CHECK");
+        assert(isNonNullish(reply.content?.search?.totalCount));
+        return reply.content.search.totalCount === 0;
+      case "HAS_BG_CHECK_MATCH":
+        assert(field.type === "BACKGROUND_CHECK");
+        return isNonNullish(reply.content?.entity);
+      case "NOT_HAS_BG_CHECK_MATCH":
+        assert(field.type === "BACKGROUND_CHECK");
+        return isNullish(reply.content?.entity);
+      case "HAS_PENDING_REVIEW":
+        assert(field.type === "BACKGROUND_CHECK");
+        assert(isNonNullish(reply.content.search));
+        return (
+          reply.content.search.totalCount > 0 &&
+          reply.content.search.falsePositivesCount !== reply.content.search.totalCount &&
+          isNullish(reply.content.entity)
+        );
+      case "NOT_HAS_PENDING_REVIEW":
+        assert(field.type === "BACKGROUND_CHECK");
+        assert(isNonNullish(reply.content.search));
+        return (
+          reply.content.search.totalCount === 0 ||
+          reply.content.search.falsePositivesCount === reply.content.search.totalCount ||
+          isNonNullish(reply.content.entity)
+        );
+      case "HAS_BG_CHECK_TOPICS":
+        assert(field.type === "BACKGROUND_CHECK");
+        assert(Array.isArray(value));
+        return (
+          value.length > 0 &&
+          isNonNullish(reply.content.entity?.properties?.topics) &&
+          value.every((topic) => reply.content.entity.properties.topics.includes(topic))
+        );
+      case "NOT_HAS_BG_CHECK_TOPICS":
+        assert(field.type === "BACKGROUND_CHECK");
+        assert(Array.isArray(value));
+        return (
+          value.length > 0 &&
+          isNonNullish(reply.content.entity) &&
+          (isNullish(reply.content.entity?.properties?.topics) ||
+            reply.content.entity.properties.topics.length === 0 ||
+            value.every((topic) => !reply.content.entity.properties.topics.includes(topic)))
+        );
+      case "HAS_ANY_BG_CHECK_TOPICS":
+        assert(field.type === "BACKGROUND_CHECK");
+        return (
+          isNonNullish(reply.content.entity?.properties?.topics) &&
+          reply.content.entity.properties.topics.length > 0
+        );
+      case "NOT_HAS_ANY_BG_CHECK_TOPICS":
+        assert(field.type === "BACKGROUND_CHECK");
+        return (
+          isNullish(reply.content.entity?.properties?.topics) ||
+          reply.content.entity.properties.topics.length === 0
+        );
+      case "HAS_PROFILE_MATCH":
+        assert(field.type === "PROFILE_SEARCH");
+        assert(Array.isArray(reply.content.value));
+        return reply.content.value.length > 0;
+
+      default: {
+        const _value =
+          condition.column !== undefined
+            ? (reply.content.value?.[condition.column]?.[1] ?? null)
+            : reply.content.value;
+
+        return evaluateValuePredicate(_value, operator, value, petition, field.type);
+      }
+    }
   }
 
   const { type, options } = field;
@@ -397,21 +469,7 @@ function evaluateValuePredicate(
   }
 
   try {
-    if (reply === undefined) {
-      return false;
-    }
-
-    // PROFILE_SEARCH
-    if (fieldType === "PROFILE_SEARCH" && Array.isArray(reply)) {
-      switch (operator) {
-        case "HAS_PROFILE_MATCH":
-          return reply.length > 0;
-        default:
-          return false;
-      }
-    }
-
-    if (value === undefined || value === null) {
+    if (reply === undefined || isNullish(value)) {
       return false;
     }
 

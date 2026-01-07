@@ -1,5 +1,5 @@
 import { booleanArg, list, mutationField, nonNull, nullable } from "nexus";
-import { firstBy, zip } from "remeda";
+import { firstBy, isNonNullish, zip } from "remeda";
 import { assert } from "ts-essentials";
 import { mapFieldLogic, PetitionFieldVisibility } from "../../../util/fieldLogic";
 import { toBytes } from "../../../util/fileSize";
@@ -9,7 +9,10 @@ import { authenticateAnd } from "../../helpers/authorize";
 import { ApolloError, ForbiddenError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { RESULT } from "../../helpers/Result";
-import { validateFieldLogicSchema } from "../../helpers/validators/validFieldLogic";
+import {
+  validateFieldLogic,
+  validateFieldLogicSchema,
+} from "../../helpers/validators/validFieldLogic";
 import { validFileUploadInput } from "../../helpers/validators/validFileUploadInput";
 import {
   fieldAttachmentBelongsToField,
@@ -426,56 +429,58 @@ export const updatePetitionAttachmentVisibility = mutationField(
       attachmentId: nonNull(globalIdArg("PetitionAttachment")),
       visibility: nullable("JSONObject"),
     },
-    resolve: async (_, args, ctx) => {
+    resolve: async (_, { attachmentId, petitionId, visibility }, ctx) => {
       let mappedVisibility: PetitionFieldVisibility | null = null;
 
-      if (args.visibility !== null) {
+      if (visibility !== null) {
         try {
-          // Validate JSON schema if not null
-          const logic = { visibility: args.visibility as any, math: null };
+          const logic = { visibility: visibility, math: null };
+          // validate input JSON schema before anything
           validateFieldLogicSchema(logic, "string");
 
-          // Convert globalIds to numeric IDs for database storage
-          const mappedLogic = mapFieldLogic<string>(
-            { visibility: args.visibility as any },
-            (fieldId) => {
-              assert(typeof fieldId === "string", "Expected fieldId to be a string");
-              return fromGlobalId(fieldId, "PetitionField").id;
+          const [allFields, petition] = await Promise.all([
+            ctx.petitions.loadAllFieldsByPetitionId(petitionId),
+            ctx.petitions.loadPetition(petitionId),
+          ]);
+          assert(isNonNullish(petition), "Petition not found");
+
+          const mappedLogic = mapFieldLogic<string>({ visibility: logic.visibility }, (id) => {
+            assert(typeof id === "string", "Expected fieldId to be a string");
+            return fromGlobalId(id, "PetitionField").id;
+          });
+
+          await validateFieldLogic(
+            {
+              petition_id: petitionId,
+              visibility: mappedVisibility,
             },
+            allFields,
+            {
+              variables: petition.variables ?? [],
+              standardListDefinitions:
+                await ctx.petitions.loadResolvedStandardListDefinitionsByPetitionId(petitionId),
+              customLists: petition.custom_lists ?? [],
+              loadSelectOptionsValuesAndLabels: (options) =>
+                ctx.petitionFields.loadSelectOptionsValuesAndLabels(options),
+            },
+            true,
           );
 
-          // Validate that referenced fields belong to the same petition
-          const visibility = mappedLogic.field.visibility as PetitionFieldVisibility;
-          if (visibility?.conditions) {
-            const allFields = await ctx.petitions.loadAllFieldsByPetitionId(args.petitionId);
-
-            for (const condition of visibility.conditions) {
-              if ("fieldId" in condition) {
-                const referencedField = allFields.find((f) => f.id === condition.fieldId);
-                assert(
-                  referencedField !== undefined,
-                  `Can't find PetitionField:${condition.fieldId} referenced in visibility condition`,
-                );
-              }
-            }
-          }
-
-          mappedVisibility = visibility;
+          mappedVisibility = mappedLogic.field.visibility;
         } catch (e) {
           if (e instanceof Error) {
             throw new ForbiddenError(e.message);
           }
-
           throw e;
         }
       }
 
       const petitionAttachment = await ctx.petitions.updatePetitionAttachmentVisibility(
-        args.attachmentId,
+        attachmentId,
         mappedVisibility,
         `User:${ctx.user!.id}`,
       );
-      await ctx.petitions.updatePetitionLastChangeAt(args.petitionId);
+      await ctx.petitions.updatePetitionLastChangeAt(petitionId);
 
       return petitionAttachment;
     },
