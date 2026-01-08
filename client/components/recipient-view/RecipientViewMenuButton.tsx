@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Avatar,
   Button,
   Circle,
   HStack,
@@ -27,6 +26,7 @@ import { usePublicPrintPdfTask } from "@parallel/utils/tasks/usePublicPrintPdfTa
 import { FormattedMessage, useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
 import { useTone } from "../common/ToneProvider";
+import { Avatar } from "../ui";
 import { useRecipientViewHelpDialog } from "./dialogs/RecipientViewHelpDialog";
 export function RecipientViewMenuButton({
   keycode,
@@ -87,12 +87,13 @@ export function RecipientViewMenuButton({
             paddingEnd={0}
             transition="all 200ms"
           >
-            <Avatar
-              name={contact.fullName}
+            <Avatar.Root
               boxSize={10}
               size="md"
               getInitials={contact.initials ? () => contact.initials! : undefined}
-            />
+            >
+              <Avatar.Fallback name={contact.fullName} />
+            </Avatar.Root>
             {pendingPetitions > 0 ? (
               <Circle
                 size="16px"
@@ -109,11 +110,12 @@ export function RecipientViewMenuButton({
         <Portal>
           <MenuList minW="min-content">
             <HStack paddingX={3.5} paddingY={1} position="relative">
-              <Avatar
-                name={contact.fullName}
+              <Avatar.Root
                 size="sm"
                 getInitials={contact.initials ? () => contact.initials! : undefined}
-              />
+              >
+                <Avatar.Fallback name={contact.fullName} />
+              </Avatar.Root>
               <Stack spacing={0}>
                 <Text as="div" fontWeight="semibold">
                   {contact.fullName}

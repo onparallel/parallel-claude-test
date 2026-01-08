@@ -1,20 +1,22 @@
 import { gql } from "@apollo/client";
-import { Avatar, AvatarProps } from "@chakra-ui/react";
+import { Avatar, AvatarRootProps } from "@parallel/components/ui";
 import { UserAvatar_UserFragment } from "@parallel/graphql/__types";
 
-interface UserAvatarProps extends AvatarProps {
+interface UserAvatarProps extends AvatarRootProps {
   user: UserAvatar_UserFragment;
   showImage?: boolean;
 }
 
 export function UserAvatar({ user, showImage, ...props }: UserAvatarProps) {
   return (
-    <Avatar
-      name={user.fullName ?? undefined}
-      src={showImage ? (user.avatarUrl ?? undefined) : undefined}
+    <Avatar.Root
       getInitials={user.initials ? () => user.initials! : undefined}
+      borderless
       {...props}
-    />
+    >
+      <Avatar.Image src={showImage ? (user.avatarUrl ?? undefined) : undefined} />
+      <Avatar.Fallback name={user.fullName} />
+    </Avatar.Root>
   );
 }
 

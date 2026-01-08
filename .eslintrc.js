@@ -72,6 +72,11 @@ module.exports = {
               "AccordionIcon",
               "PinInput",
               "PinInputField",
+              "Avatar",
+              "AvatarBadge",
+              "AvatarGroup",
+              "AvatarImage",
+              "AvatarFallback",
             ],
             message:
               'Please use the Chakra V3 compatible components from "@parallel/components/ui" instead of "@chakra-ui/react"',

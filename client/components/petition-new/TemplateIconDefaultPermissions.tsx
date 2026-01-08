@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Avatar, Flex, List, ListItem, PopoverProps, Stack, Text } from "@chakra-ui/react";
+import { Flex, List, ListItem, PopoverProps, Stack, Text } from "@chakra-ui/react";
 import { ArrowShortRightIcon, UsersIcon } from "@parallel/chakra/icons";
 import { TemplateIconDefaultPermissions_PetitionTemplateFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
@@ -7,6 +7,7 @@ import { SmallPopover } from "../common/SmallPopover";
 import { SubscribedNotificationsIcon } from "../common/SubscribedNotificationsIcon";
 import { UserAvatar } from "../common/UserAvatar";
 import { UserGroupReference } from "../common/UserGroupReference";
+import { Avatar } from "../ui";
 
 export interface TemplateIconDefaultPermissionsProps extends PopoverProps {
   template: TemplateIconDefaultPermissions_PetitionTemplateFragment;
@@ -85,7 +86,7 @@ export function TemplateIconDefaultPermissions({
 
                 return (
                   <Flex key={p.id} as={ListItem} alignItems="center">
-                    <Avatar
+                    <Avatar.Root
                       size="xs"
                       backgroundColor="gray.200"
                       icon={<UsersIcon boxSize={3.5} />}

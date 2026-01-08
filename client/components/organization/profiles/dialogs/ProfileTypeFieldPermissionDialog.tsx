@@ -4,7 +4,6 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Avatar,
   Box,
   Button,
   Flex,
@@ -32,6 +31,7 @@ import { UserAvatar } from "@parallel/components/common/UserAvatar";
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
 import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
 import { UserSelect, UserSelectInstance } from "@parallel/components/common/UserSelect";
+import { Avatar } from "@parallel/components/ui";
 import {
   ProfileTypeField,
   ProfileTypeFieldPermissionType,
@@ -267,7 +267,7 @@ export function ProfileTypeFieldPermissionDialog({
               control={control}
               render={({ field: { value, onChange } }) => (
                 <HStack alignItems="center" height="42px">
-                  <Avatar
+                  <Avatar.Root
                     role="presentation"
                     icon={<BusinessIcon boxSize={4} />}
                     size="sm"
@@ -334,15 +334,16 @@ export function ProfileTypeFieldPermissionDialog({
                   </HStack>
                 ) : target.__typename === "UserGroup" ? (
                   <>
-                    <Avatar
+                    <Avatar.Root
                       role="presentation"
                       getInitials={() => (
                         assertTypename(target, "UserGroup"), target.groupInitials
                       )}
-                      name={target.name}
                       icon={<UsersIcon />}
                       size="sm"
-                    />
+                    >
+                      <Avatar.Fallback name={target.name} />
+                    </Avatar.Root>
                     <Box flex="1" minWidth={0} fontSize="sm" marginStart={2}>
                       <Text noOfLines={1} wordBreak="break-all">
                         <UserGroupReference userGroup={target} />

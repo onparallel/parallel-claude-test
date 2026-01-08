@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Avatar, Box, Flex, useMultiStyleConfig } from "@chakra-ui/react";
+import { Box, Flex, useMultiStyleConfig } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { UsersIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -7,13 +7,14 @@ import {
   UserAvatarList_UserFragment,
   UserAvatarList_UserGroupFragment,
 } from "@parallel/graphql/__types";
+import { Avatar, AvatarRootProps } from "../ui";
 import { UserAvatar } from "./UserAvatar";
 import { UserGroupReference } from "./UserGroupReference";
 import { UserListPopover } from "./UserListPopover";
 
 interface UserAvatarListProps {
   usersOrGroups: (UserAvatarList_UserFragment | UserAvatarList_UserGroupFragment)[];
-  size?: string;
+  size?: AvatarRootProps["size"];
   max?: number;
   boxSize?: number;
 }
@@ -85,9 +86,8 @@ export const UserAvatarList = Object.assign(
                     borderColor="white"
                   />
                 ) : u.__typename === "UserGroup" ? (
-                  <Avatar
+                  <Avatar.Root
                     size={size}
-                    name={u.name}
                     icon={<UsersIcon />}
                     getInitials={() => u.initials}
                     transitionProperty="transform"
@@ -95,7 +95,9 @@ export const UserAvatarList = Object.assign(
                     boxSize={boxSize}
                     borderWidth="2px"
                     borderColor="white"
-                  />
+                  >
+                    <Avatar.Fallback name={u.name} />
+                  </Avatar.Root>
                 ) : null}
               </Box>
             </Tooltip>

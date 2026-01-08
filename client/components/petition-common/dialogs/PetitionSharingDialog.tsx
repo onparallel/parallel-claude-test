@@ -5,7 +5,6 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Avatar,
   Box,
   Button,
   Center,
@@ -33,6 +32,7 @@ import { SubscribedNotificationsIcon } from "@parallel/components/common/Subscri
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
 import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
 import { UserReference } from "@parallel/components/common/UserReference";
+import { Avatar } from "@parallel/components/ui";
 import {
   PetitionActivity_petitionDocument,
   PetitionBaseType,
@@ -531,13 +531,14 @@ export function PetitionSharingDialog({
                 {groupPermissions.map(({ group, permissionType }) => {
                   return (
                     <Flex key={group.id} alignItems="center">
-                      <Avatar
+                      <Avatar.Root
                         role="presentation"
                         getInitials={() => group.initials}
-                        name={group.name!}
                         icon={<UsersIcon />}
                         size="sm"
-                      />
+                      >
+                        <Avatar.Fallback name={group.name} />
+                      </Avatar.Root>
                       <Box flex="1" minWidth={0} fontSize="sm" marginStart={2}>
                         <Text noOfLines={1} wordBreak="break-all">
                           <UserGroupReference userGroup={group} />

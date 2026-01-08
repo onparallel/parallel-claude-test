@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Avatar,
   Box,
   Button,
   Flex,
@@ -15,6 +14,7 @@ import { Menu } from "@parallel/chakra/components";
 import { ChevronDownIcon, DeleteIcon, UserArrowIcon, UserIcon } from "@parallel/chakra/icons";
 import { SubscribedNotificationsIcon } from "@parallel/components/common/SubscribedNotificationsIcon";
 import { UserAvatar } from "@parallel/components/common/UserAvatar";
+import { Avatar } from "@parallel/components/ui";
 import {
   PetitionPermissionTypeRW,
   TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragment,
@@ -45,7 +45,7 @@ export function TemplateDefaultUserPermissionRow({
       {isNonNullish(permission) ? (
         <UserAvatar user={permission?.user ?? {}} role="presentation" size="sm" />
       ) : (
-        <Avatar
+        <Avatar.Root
           backgroundColor="gray.200"
           icon={<UserIcon fontSize="md" />}
           role="presentation"

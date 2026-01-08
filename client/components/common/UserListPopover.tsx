@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Avatar,
   Flex,
   List,
   ListItem,
@@ -19,6 +18,7 @@ import {
   UserListPopover_UserGroupFragment,
 } from "@parallel/graphql/__types";
 import { ReactNode } from "react";
+import { Avatar } from "../ui";
 import { UserAvatar } from "./UserAvatar";
 import { UserGroupReference } from "./UserGroupReference";
 
@@ -59,7 +59,7 @@ export function UserListPopover({
                     </>
                   ) : u.__typename === "UserGroup" ? (
                     <>
-                      <Avatar
+                      <Avatar.Root
                         size="xs"
                         backgroundColor="gray.200"
                         icon={<UsersIcon boxSize={3.5} />}

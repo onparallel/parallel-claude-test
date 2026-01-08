@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  AvatarBadge,
   Box,
   Button,
   HStack,
@@ -32,6 +31,7 @@ import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
 import { UserAvatar } from "../common/UserAvatar";
+import { Avatar } from "../ui";
 
 export interface UserMenuProps extends UserMenu_QueryFragment {
   placement?: UsePopperProps["placement"];
@@ -89,9 +89,9 @@ export function UserMenu({ extended, placement, me, realMe, onToggle }: UserMenu
             <HStack>
               <UserAvatar user={me} boxSize="40px">
                 {realMe && realMe.id !== me.id ? (
-                  <AvatarBadge bgColor="white">
+                  <Avatar.Badge bgColor="white">
                     <UserAvatar user={realMe} size="xs" />
-                  </AvatarBadge>
+                  </Avatar.Badge>
                 ) : null}
               </UserAvatar>
               <Stack spacing={1} minWidth={0}>
@@ -137,9 +137,9 @@ export function UserMenu({ extended, placement, me, realMe, onToggle }: UserMenu
           >
             <UserAvatar user={me} boxSize="40px">
               {realMe && realMe.id !== me.id ? (
-                <AvatarBadge bgColor="white">
+                <Avatar.Badge bgColor="white">
                   <UserAvatar user={realMe} size="xs" />
-                </AvatarBadge>
+                </Avatar.Badge>
               ) : null}
             </UserAvatar>
           </MenuButton>

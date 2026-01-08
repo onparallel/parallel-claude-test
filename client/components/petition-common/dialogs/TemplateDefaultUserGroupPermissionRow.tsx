@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Avatar,
   Box,
   Button,
   Flex,
@@ -16,6 +15,7 @@ import { ChevronDownIcon, DeleteIcon, UsersIcon } from "@parallel/chakra/icons";
 import { SubscribedNotificationsIcon } from "@parallel/components/common/SubscribedNotificationsIcon";
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
 import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
+import { Avatar } from "@parallel/components/ui";
 import {
   PetitionPermissionTypeRW,
   TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment,
@@ -37,13 +37,14 @@ export function TemplateDefaultUserGroupPermissionRow({
   const { group } = permission;
   return (
     <Flex key={group.id} alignItems="center">
-      <Avatar
+      <Avatar.Root
         role="presentation"
         getInitials={() => group.initials}
-        name={group.name}
         icon={<UsersIcon />}
         size="sm"
-      />
+      >
+        <Avatar.Fallback name={group.name} />
+      </Avatar.Root>
       <Box flex="1" minWidth={0} fontSize="sm" marginStart={2}>
         <Stack direction={"row"} spacing={1} align="center">
           <Text noOfLines={1} wordBreak="break-all">

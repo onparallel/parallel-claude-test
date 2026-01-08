@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
 import {
-  Avatar,
   Box,
   Button,
   Circle,
@@ -24,6 +23,7 @@ import { UserGroupReference } from "@parallel/components/common/UserGroupReferen
 import { UserReference } from "@parallel/components/common/UserReference";
 
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
+import { Avatar } from "@parallel/components/ui";
 import {
   DashboardPermissionType,
   DashboardSharingDialog_createDashboardPermissionsDocument,
@@ -415,13 +415,14 @@ export function DashboardSharingDialog({
             {groupPermissions.map(({ id: permissionId, userGroup, type: permissionType }) => {
               return (
                 <Flex key={userGroup.id} alignItems="center">
-                  <Avatar
+                  <Avatar.Root
                     role="presentation"
                     getInitials={() => userGroup.initials}
-                    name={userGroup.name}
                     icon={<UsersIcon />}
                     size="sm"
-                  />
+                  >
+                    <Avatar.Fallback name={userGroup.name} />
+                  </Avatar.Root>
                   <Box flex="1" minWidth={0} fontSize="sm" marginStart={2}>
                     <Text noOfLines={1} wordBreak="break-all">
                       <UserGroupReference userGroup={userGroup} />
