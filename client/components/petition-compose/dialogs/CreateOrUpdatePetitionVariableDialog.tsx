@@ -64,7 +64,7 @@ import {
   useFormContext,
 } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isEmpty, isNonNullish, pick } from "remeda";
+import { isEmpty, isNonNullish, omit, pick } from "remeda";
 
 interface CreateOrUpdatePetitionVariableDialogProps {
   variable?: useCreatePetitionVariableDialog_PetitionVariableFragment;
@@ -220,7 +220,7 @@ function CreateOrUpdateNumericVariableDialog({
       defaultValue: variable?.defaultValue ?? 0,
       showInReplies: variable?.showInReplies ?? true,
       addValueLabels: isEmpty(variable?.valueLabels ?? []) ? false : true,
-      valueLabels: variable?.valueLabels ?? [
+      valueLabels: variable?.valueLabels.map((v) => omit(v, ["__typename"])) ?? [
         {
           value: 0,
           label: "",
