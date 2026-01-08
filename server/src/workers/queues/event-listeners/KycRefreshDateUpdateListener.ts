@@ -147,6 +147,27 @@ const CONFIG: Config[] =
               },
             ],
           },
+          // Easy EP
+          {
+            orgId: 45332,
+            profileTypes: [
+              // COMPANIES
+              {
+                profileTypeId: 11380,
+                statusProfileTypeFieldId: 199180,
+                riskProfileTypeFieldId: 200644,
+                lastKycDateProfileTypeFieldId: 201428,
+                nextKycDateProfileTypeFieldId: 199604,
+                dateIntervalsByRisk: {
+                  HIGH: { years: 1 },
+                  MEDIUM: { years: 3 },
+                  LOW: { years: 5 },
+                },
+
+                clientStatusValuesForKycRefresh: ["ACTIVE"],
+              },
+            ],
+          },
         ]
       : [];
 
