@@ -102,6 +102,7 @@ function UpdateProfileFieldValueOnClosePetitionLoadingDialog({
     <ConfirmDialog
       size="xl"
       hasCloseButton
+      closeOnOverlayClick={false}
       header={<Skeleton height="24px" width="240px" />}
       body={
         <Center padding={8} minHeight="200px">
@@ -175,6 +176,7 @@ function UpdateProfileFieldValueOnClosePetitionDialog({
     <ConfirmDialog
       size="xl"
       hasCloseButton
+      closeOnOverlayClick={false}
       content={{
         containerProps: {
           as: "form",
