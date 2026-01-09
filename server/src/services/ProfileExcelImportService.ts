@@ -262,22 +262,24 @@ export class ProfileExcelImportService extends ProfileExcelService {
 
           const content = this.cellToValueContent(cell, field.type);
 
-          try {
-            await this.profileValidation.validateProfileFieldValueContent(
-              field,
-              content,
-              user.org_id,
-            );
+          if (isNonNullish(content)) {
+            try {
+              await this.profileValidation.validateProfileFieldValueContent(
+                field,
+                content,
+                user.org_id,
+              );
 
-            if (field.is_unique && content?.value && typeof content.value === "string") {
-              possibleConflictingCells.push({
-                profileTypeFieldId: field.id,
-                cell,
-                profileId,
-              });
+              if (field.is_unique && content.value && typeof content.value === "string") {
+                possibleConflictingCells.push({
+                  profileTypeFieldId: field.id,
+                  cell,
+                  profileId,
+                });
+              }
+            } catch (error) {
+              throw new CellError(cell, error instanceof Error ? error.message : "UNKNOWN");
             }
-          } catch (error) {
-            throw new CellError(cell, error instanceof Error ? error.message : "UNKNOWN");
           }
 
           const expiryCell =
