@@ -123,35 +123,25 @@ export function values<const T extends string | number>(values: readonly T[]): Q
 }
 
 export function sorting<const T extends string>(
-  fields: readonly T[],
-  options?: { allowDynamicFields?: string | ((field: string) => boolean) },
+  fields: readonly T[] | ((field: string) => field is T),
 ) {
-  return new QueryItem<TableSorting<T | string> | null>(
+  return new QueryItem<TableSorting<T> | null>(
     (value) => {
-      if (!value) {
-        return null;
-      }
-      const parts = (value as string).split("_");
-      if (parts.length < 2) {
-        return null;
-      }
-      const direction = parts[parts.length - 1];
-      if (!["ASC", "DESC"].includes(direction)) {
-        return null;
-      }
-      const field = parts.slice(0, -1).join("_");
-      const isStaticField = fields.includes(field as any);
-      const isDynamicField = options?.allowDynamicFields
-        ? typeof options.allowDynamicFields === "string"
-          ? field.startsWith(options.allowDynamicFields)
-          : options.allowDynamicFields(field)
-        : false;
-
-      if (isStaticField || isDynamicField) {
-        return {
-          field: field as T | string,
-          direction: direction as TableSortingDirection,
-        };
+      if (value) {
+        const match = (value as string).match(/^(.*)_(ASC|DESC)$/);
+        if (!match) {
+          return null;
+        }
+        const [_, field, direction] = match;
+        if (
+          (Array.isArray(fields) && fields.includes(field as any)) ||
+          (typeof fields === "function" && fields(field))
+        ) {
+          return {
+            field: field as T,
+            direction: direction as TableSortingDirection,
+          };
+        }
       }
       return null;
     },

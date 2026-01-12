@@ -74,7 +74,7 @@ interface ProfileQueryFilterPropertyCondition {
   value?: number | string | string[];
 }
 
-const MAX_GROUP_DEPTH = 3;
+const MAX_GROUP_DEPTH = 4;
 
 export function mapAndValidateProfileQueryFilter(
   value: NexusGenInputs["ProfileQueryFilterInput"] | null | undefined,

@@ -17,7 +17,10 @@ const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
   items: values([10, 25, 50]).orDefault(10),
   search: string(),
-  sort: sorting(["name", "createdAt"], { allowDynamicFields: "field_" }),
+  sort: sorting(
+    (field): field is "name" | "createdAt" | `field_${number}` =>
+      ["name", "createdAt"].includes(field) || !!field.match(/^field_[A-Za-z\d]+$/),
+  ),
   type: string(),
   status: values(["OPEN", "CLOSED", "DELETION_SCHEDULED"]).list(),
   columns: string().list({ allowEmpty: true }),
