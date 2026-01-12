@@ -65,5 +65,18 @@ export function validProfileListViewDataInput<TypeName extends string, FieldName
         }
       }
     }
+
+    if (input.sort) {
+      const validSortFields = ["name", "createdAt", "updatedAt", "closedAt"].concat(
+        validIds.map((id) => `field_${id}`),
+      );
+      if (!validSortFields.includes(input.sort.field)) {
+        throw new ArgValidationError(
+          info,
+          `${argName}.sort.field`,
+          `Invalid sort field: ${input.sort.field}`,
+        );
+      }
+    }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }

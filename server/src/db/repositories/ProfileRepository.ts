@@ -28,6 +28,7 @@ import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
 import { keyBuilder } from "../../util/keyBuilder";
 import { never } from "../../util/never";
 import { ProfileQueryFilter } from "../../util/ProfileQueryFilter";
+import { ProfileQuerySortBy } from "../../util/ProfileQuerySortBy";
 import { isAtLeast } from "../../util/profileTypeFieldPermission";
 import { LazyPromise } from "../../util/promises/LazyPromise";
 import { pMapChunk } from "../../util/promises/pMapChunk";
@@ -91,8 +92,6 @@ export interface ProfileFilter {
   status?: ProfileStatus[] | null;
   values?: ProfileQueryFilter | null;
 }
-
-export type ProfileQuerySortBy = SortBy<"name" | "createdAt" | "updatedAt" | "closedAt">;
 
 @injectable()
 export class ProfileRepository extends BaseRepository {
@@ -1012,13 +1011,6 @@ export class ProfileRepository extends BaseRepository {
     } & PageOpts,
     profileTypeFieldsById?: Record<number, ProfileTypeField>,
   ) {
-    const columnMap = {
-      createdAt: "created_at",
-      updatedAt: "updated_at",
-      closedAt: "closed_at",
-      name: "name_en",
-    } as const;
-
     return this.getPagination<Profile>(
       this.knex
         .with(
@@ -1063,18 +1055,7 @@ export class ProfileRepository extends BaseRepository {
         .from("p")
         .mmodify((q) => {
           if (isNonNullish(opts.sortBy) && opts.sortBy.length > 0) {
-            q.orderByRaw(
-              opts.sortBy
-                .map((s) => {
-                  const field = columnMap[s.field];
-                  if (field === "name_en") {
-                    return `"localizable_name"->>'en' ${s.order} nulls last`;
-                  } else {
-                    return `"${field}" ${s.order} nulls last`;
-                  }
-                })
-                .join(", "),
-            );
+            this.profileQueryHelper.applyProfileQuerySortBy(q, opts.sortBy, profileTypeFieldsById);
           }
         })
         .orderBy("p.id")

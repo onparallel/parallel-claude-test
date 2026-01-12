@@ -2,13 +2,13 @@ import { arg, inputObjectType, list, nonNull, nullable, objectType, queryField }
 import pMap from "p-map";
 import { indexBy, isNonNullish, isNullish } from "remeda";
 import { assert } from "ts-essentials";
-import { getAssertionErrorMessage, isAssertionError } from "../../util/assert";
 import { mapAndValidateProfileQueryFilter } from "../../util/ProfileQueryFilter";
+import { mapAndValidateProfileQuerySortBy } from "../../util/ProfileQuerySortBy";
 import { authenticate, authenticateAnd, ifArgDefined, not } from "../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
-import { validSortBy } from "../helpers/validators/validSortBy";
+import { validateAnd } from "../helpers/validateArgs";
 import { userHasFeatureFlag } from "../petition/authorizers";
 import { contextUserHasPermission } from "../users/authorizers";
 import {
@@ -18,6 +18,7 @@ import {
   userHasAccessToProfileType,
   userHasPermissionOnProfileTypeField,
 } from "./authorizers";
+import { validProfileQueryFilter, validProfileQuerySortBy } from "./validators";
 
 export const profileTypes = queryField((t) => {
   t.paginationField("profileTypes", {
@@ -106,45 +107,27 @@ export const profiles = queryField((t) => {
       filter: nullable("ProfileQueryFilterInput"),
       sortBy: nullable(list(nonNull("String"))),
     },
-    validateArgs: validSortBy("sortBy", ["name", "createdAt", "updatedAt", "closedAt"]),
-    resolve: async (_, { limit, offset, search, sortBy, profileTypeId, filter }, ctx, info) => {
-      try {
-        const profileTypeFields =
-          await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(profileTypeId);
-        const profileTypeFieldsById = indexBy(profileTypeFields, (ptf) => ptf.id);
+    validateArgs: validateAnd(
+      validProfileQueryFilter("profileTypeId", "filter"),
+      validProfileQuerySortBy("profileTypeId", "sortBy"),
+    ),
+    resolve: async (_, { limit, offset, search, sortBy, profileTypeId, filter }, ctx) => {
+      const profileTypeFields =
+        await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(profileTypeId);
+      const profileTypeFieldsById = indexBy(profileTypeFields, (ptf) => ptf.id);
 
-        type SortByValue =
-          | "name_ASC"
-          | "name_DESC"
-          | "createdAt_ASC"
-          | "createdAt_DESC"
-          | "updatedAt_ASC"
-          | "updatedAt_DESC"
-          | "closedAt_ASC"
-          | "closedAt_DESC";
-
-        return ctx.profiles.getPaginatedProfileForOrg(
-          ctx.user!.org_id,
-          {
-            limit,
-            offset,
-            search,
-            profileTypeId: [profileTypeId],
-            filter: mapAndValidateProfileQueryFilter(filter, profileTypeFieldsById),
-            sortBy: sortBy?.map((value) => {
-              const [field, order] = parseSortBy(value as SortByValue);
-              return { field, order };
-            }),
-          },
-          profileTypeFieldsById,
-        );
-      } catch (e) {
-        if (isAssertionError(e)) {
-          throw new ArgValidationError(info, "filter", getAssertionErrorMessage(e));
-        } else {
-          throw e;
-        }
-      }
+      return ctx.profiles.getPaginatedProfileForOrg(
+        ctx.user!.org_id,
+        {
+          limit,
+          offset,
+          search,
+          profileTypeId: [profileTypeId],
+          filter: mapAndValidateProfileQueryFilter(filter, profileTypeFieldsById),
+          sortBy: mapAndValidateProfileQuerySortBy(sortBy, profileTypeFieldsById),
+        },
+        profileTypeFieldsById,
+      );
     },
   });
   t.paginationField("profilesSimple", {

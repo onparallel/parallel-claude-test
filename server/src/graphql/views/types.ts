@@ -219,17 +219,24 @@ export const ProfileListView = objectType({
   sourceType: "db.ProfileListView",
 });
 
-export const ProfileListViewSortField = enumType({
-  name: "ProfileListViewSortField",
-  members: ["name", "createdAt"],
-});
-
 export const ProfileListViewSort = objectType({
   name: "ProfileListViewSort",
   definition(t) {
-    t.nonNull.field("field", { type: "ProfileListViewSortField" });
+    t.nonNull.string("field", {
+      resolve: (o) => {
+        if (o.field.startsWith("field_")) {
+          const id = parseInt(o.field.replace("field_", ""));
+          return `field_${toGlobalId("ProfileTypeField", id)}`;
+        }
+        return o.field;
+      },
+    });
     t.nonNull.field("direction", { type: "ListViewSortDirection" });
   },
+  sourceType: /* ts */ `{
+    field: string;
+    direction: "ASC" | "DESC";
+  }`,
 });
 
 export const ProfileListViewData = objectType({
@@ -255,7 +262,7 @@ export const ProfileListViewDataInput = inputObjectType({
       type: inputObjectType({
         name: "ProfileListViewSortInput",
         definition(t) {
-          t.nonNull.field("field", { type: "ProfileListViewSortField" });
+          t.nonNull.string("field");
           t.nonNull.field("direction", { type: "ListViewSortDirection" });
         },
       }),

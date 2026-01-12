@@ -6,6 +6,7 @@ import { assert } from "ts-essentials";
 import { ProfileQueryFilterProperty } from "../../api/public/__types";
 import { never } from "../../util/never";
 import { ProfileQueryFilter, ProfileQueryFilterOperator } from "../../util/ProfileQueryFilter";
+import { ProfileQuerySortBy } from "../../util/ProfileQuerySortBy";
 import { Profile, ProfileTypeField, ProfileTypeFieldType } from "../__types";
 import { KNEX } from "../knex";
 import { sqlArray, sqlIn } from "./sql";
@@ -388,5 +389,52 @@ export class ProfileQueryHelper {
     } else {
       never(`Unknown filter type: ${JSON.stringify(filter)}`);
     }
+  }
+
+  public applyProfileQuerySortBy(
+    q: Knex.QueryBuilder,
+    sortBy: ProfileQuerySortBy[],
+    profileTypeFieldsById?: Record<number, ProfileTypeField>,
+  ) {
+    if (sortBy.length === 0) {
+      return;
+    }
+
+    const columnMap = {
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+      closedAt: "closed_at",
+      name: "name_en",
+    } as const;
+
+    const castMap = {
+      NUMBER: "float",
+      DATE: "date",
+    } as Record<ProfileTypeFieldType, string>;
+
+    q.orderByRaw(
+      sortBy
+        .map((s) => {
+          if (s.field.startsWith("field_")) {
+            assert(profileTypeFieldsById, "Profile type fields are required");
+
+            const fieldId = parseInt(s.field.split("_")[1]);
+            const profileTypeField = profileTypeFieldsById[fieldId];
+            assert(profileTypeField, `Profile type field with id ${fieldId} not found`);
+
+            const cast = castMap[profileTypeField.type] ?? "text";
+
+            return `("value_cache"->'${fieldId}'->'content'->>'value')::${cast} ${s.order} nulls last`;
+          } else {
+            const field = columnMap[s.field as keyof typeof columnMap];
+            if (field === "name_en") {
+              return `"localizable_name"->>'en' ${s.order} nulls last`;
+            } else {
+              return `"${field}" ${s.order} nulls last`;
+            }
+          }
+        })
+        .join(", "),
+    );
   }
 }

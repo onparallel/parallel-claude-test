@@ -2,11 +2,11 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
 import { ProfileQueryFilter } from "../../util/ProfileQueryFilter";
+import { ProfileQuerySortBy } from "../../util/ProfileQuerySortBy";
 import { Maybe, Replace } from "../../util/types";
 import { Task as DbTask, TaskName, UserLocale } from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { ProfileQuerySortBy } from "./ProfileRepository";
 
 export type TaskInput<TName extends TaskName> = {
   /**

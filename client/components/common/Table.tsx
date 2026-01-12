@@ -126,7 +126,7 @@ export interface TableColumn<
 > {
   key: string;
   align?: BoxProps["textAlign"];
-  isSortable?: true;
+  isSortable?: boolean;
   isFixed?: true;
   Filter?: ComponentType<TableColumnFilterProps<TFilter, TContext>>;
   label: string | ((intl: IntlShape) => string);

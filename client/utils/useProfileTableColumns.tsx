@@ -144,6 +144,7 @@ export function useProfileTableColumns(
       .concat(
         profileTypeFields.map((field) => ({
           key: `field_${field.id}`,
+          isSortable: ["SHORT_TEXT", "NUMBER", "DATE", "SELECT"].includes(field.type),
           label: localizableUserTextRender({
             intl,
             value: field.name,

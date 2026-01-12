@@ -122,17 +122,36 @@ export function values<const T extends string | number>(values: readonly T[]): Q
   });
 }
 
-export function sorting<const T extends string>(fields: readonly T[]) {
-  return new QueryItem<TableSorting<T> | null>(
+export function sorting<const T extends string>(
+  fields: readonly T[],
+  options?: { allowDynamicFields?: string | ((field: string) => boolean) },
+) {
+  return new QueryItem<TableSorting<T | string> | null>(
     (value) => {
-      if (value) {
-        const [field, direction] = (value as string).split("_");
-        if (fields.includes(field as any) && ["ASC", "DESC"].includes(direction)) {
-          return {
-            field: field as T,
-            direction: direction as TableSortingDirection,
-          };
-        }
+      if (!value) {
+        return null;
+      }
+      const parts = (value as string).split("_");
+      if (parts.length < 2) {
+        return null;
+      }
+      const direction = parts[parts.length - 1];
+      if (!["ASC", "DESC"].includes(direction)) {
+        return null;
+      }
+      const field = parts.slice(0, -1).join("_");
+      const isStaticField = fields.includes(field as any);
+      const isDynamicField = options?.allowDynamicFields
+        ? typeof options.allowDynamicFields === "string"
+          ? field.startsWith(options.allowDynamicFields)
+          : options.allowDynamicFields(field)
+        : false;
+
+      if (isStaticField || isDynamicField) {
+        return {
+          field: field as T | string,
+          direction: direction as TableSortingDirection,
+        };
       }
       return null;
     },

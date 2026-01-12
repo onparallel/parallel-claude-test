@@ -379,7 +379,7 @@ export interface NexusGenInputs {
   ProfileListViewSortInput: {
     // input type
     direction: NexusGenEnums["ListViewSortDirection"]; // ListViewSortDirection!
-    field: NexusGenEnums["ProfileListViewSortField"]; // ProfileListViewSortField!
+    field: string; // String!
   };
   ProfilePropertyFilter: {
     // input type
@@ -828,7 +828,6 @@ export interface NexusGenEnums {
     | "NOT_HAS_VALUE"
     | "NOT_IS_ONE_OF"
     | "START_WITH";
-  ProfileListViewSortField: "createdAt" | "name";
   ProfileQueryFilterGroupLogicalOperator: "AND" | "OR";
   ProfileQueryFilterOperator:
     | "CONTAIN"
@@ -1846,9 +1845,8 @@ export interface NexusGenObjects {
     values?: NexusGenScalars["JSONObject"] | null; // JSONObject
   };
   ProfileListViewSort: {
-    // root type
-    direction: NexusGenEnums["ListViewSortDirection"]; // ListViewSortDirection!
-    field: NexusGenEnums["ProfileListViewSortField"]; // ProfileListViewSortField!
+    field: string;
+    direction: "ASC" | "DESC";
   };
   ProfilePagination: {
     // root type
@@ -4443,7 +4441,7 @@ export interface NexusGenFieldTypes {
   ProfileListViewSort: {
     // field return type
     direction: NexusGenEnums["ListViewSortDirection"]; // ListViewSortDirection!
-    field: NexusGenEnums["ProfileListViewSortField"]; // ProfileListViewSortField!
+    field: string; // String!
   };
   ProfilePagination: {
     // field return type
@@ -7796,7 +7794,7 @@ export interface NexusGenFieldTypeNames {
   ProfileListViewSort: {
     // field return type name
     direction: "ListViewSortDirection";
-    field: "ProfileListViewSortField";
+    field: "String";
   };
   ProfilePagination: {
     // field return type name

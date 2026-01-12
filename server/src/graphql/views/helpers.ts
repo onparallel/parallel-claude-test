@@ -5,6 +5,18 @@ import { fromGlobalId, isGlobalId, toGlobalId } from "../../util/globalId";
 import { ProfileQueryFilterOperatorValues } from "../../util/ProfileQueryFilter";
 import { NexusGenInputs, NexusGenObjects } from "../__types";
 
+function mapProfileListViewDataInputSortToDatabase(sort: {
+  field: string;
+  direction: "ASC" | "DESC";
+}) {
+  if (sort.field.startsWith("field_")) {
+    const globalId = sort.field.replace("field_", "");
+    const id = fromGlobalId(globalId, "ProfileTypeField").id;
+    return { field: `field_${id}`, direction: sort.direction };
+  }
+  return { field: sort.field, direction: sort.direction };
+}
+
 export function mapProfileListViewDataToDatabase(
   input: NexusGenInputs["ProfileListViewDataInput"],
 ) {
@@ -20,8 +32,8 @@ export function mapProfileListViewDataToDatabase(
         return col;
       }) ?? null,
     search: input.search ?? null,
-    sort: input.sort ?? null,
     status: input.status ?? null,
+    sort: input.sort ? mapProfileListViewDataInputSortToDatabase(input.sort) : null,
     values: input.values ? mapProfileFieldValuesFilterToDatabase(input.values) : null,
   };
 }

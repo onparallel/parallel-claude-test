@@ -7383,17 +7383,12 @@ input ProfileListViewDataInput {
 
 type ProfileListViewSort {
   direction: ListViewSortDirection!
-  field: ProfileListViewSortField!
-}
-
-enum ProfileListViewSortField {
-  createdAt
-  name
+  field: String!
 }
 
 input ProfileListViewSortInput {
   direction: ListViewSortDirection!
-  field: ProfileListViewSortField!
+  field: String!
 }
 
 type ProfilePagination {

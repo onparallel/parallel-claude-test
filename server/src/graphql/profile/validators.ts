@@ -1,9 +1,12 @@
-import { isNonNullish, isNullish, unique } from "remeda";
+import { indexBy, isNonNullish, isNullish, unique } from "remeda";
+import { getAssertionErrorMessage, isAssertionError } from "../../util/assert";
 import { discriminator } from "../../util/discriminator";
 import { fromGlobalId } from "../../util/globalId";
+import { mapAndValidateProfileQueryFilter } from "../../util/ProfileQueryFilter";
+import { mapAndValidateProfileQuerySortBy } from "../../util/ProfileQuerySortBy";
 import { isAtLeast } from "../../util/profileTypeFieldPermission";
 import { parseTextWithPlaceholders } from "../../util/slate/placeholders";
-import { Maybe } from "../../util/types";
+import { Maybe, MaybeArray, unMaybeArray } from "../../util/types";
 import { NexusGenInputs } from "../__types";
 import { Arg, ArgWithPath, getArg, getArgWithPath, mapArgWithPath } from "../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../helpers/errors";
@@ -13,6 +16,7 @@ import { maxLength } from "../helpers/validators/maxLength";
 import { notEmptyObject } from "../helpers/validators/notEmptyObject";
 import { validateRegex } from "../helpers/validators/validateRegex";
 import { validLocalizableUserText } from "../helpers/validators/validLocalizableUserText";
+import { validSortBy } from "../helpers/validators/validSortBy";
 
 export function validProfileNamePattern<
   TypeName extends string,
@@ -134,4 +138,67 @@ export function validUpdateProfileTypeFieldData<
       }
     },
   ) as FieldValidateArgsResolver<TypeName, FieldName>;
+}
+
+export function validProfileQueryFilter<
+  TypeName extends string,
+  FieldName extends string,
+  TProfileTypeId extends Arg<TypeName, FieldName, number>,
+  TFilterArg extends ArgWithPath<
+    TypeName,
+    FieldName,
+    NexusGenInputs["ProfileQueryFilterInput"] | null | undefined
+  >,
+>(profileTypeIdArg: TProfileTypeId, filterArg: TFilterArg) {
+  return (async (_, args, ctx, info) => {
+    const profileTypeId = getArg(args, profileTypeIdArg);
+    const [filter, argName] = getArgWithPath(args, filterArg);
+    try {
+      if (isNonNullish(filter)) {
+        const profileTypeFields =
+          await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(profileTypeId);
+        mapAndValidateProfileQueryFilter(
+          filter,
+          indexBy(profileTypeFields, (f) => f.id),
+        );
+      }
+    } catch (error) {
+      if (isAssertionError(error)) {
+        throw new ArgValidationError(info, argName, getAssertionErrorMessage(error));
+      }
+      throw error;
+    }
+  }) as FieldValidateArgsResolver<TypeName, FieldName>;
+}
+
+export function validProfileQuerySortBy<
+  TypeName extends string,
+  FieldName extends string,
+  TProfileTypeId extends Arg<TypeName, FieldName, number>,
+  TSortByArg extends ArgWithPath<TypeName, FieldName, MaybeArray<string> | null | undefined>,
+>(profileTypeIdArg: TProfileTypeId, sortByArg: TSortByArg) {
+  return validateAnd(
+    validSortBy(sortByArg, ["name", "createdAt", "updatedAt", "closedAt"], {
+      allowDynamicFields: "field_",
+    }),
+    (async (_, args, ctx, info) => {
+      const profileTypeId = getArg(args, profileTypeIdArg);
+      const [sortBy, argName] = getArgWithPath(args, sortByArg);
+      try {
+        if (isNonNullish(sortBy)) {
+          const profileTypeFields =
+            await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(profileTypeId);
+          mapAndValidateProfileQuerySortBy(
+            unMaybeArray(sortBy),
+            indexBy(profileTypeFields, (f) => f.id),
+          );
+        }
+      } catch (error) {
+        if (isAssertionError(error)) {
+          throw new ArgValidationError(info, argName, getAssertionErrorMessage(error));
+        }
+        throw error;
+      }
+    }) as FieldValidateArgsResolver<TypeName, FieldName>,
+  );
 }

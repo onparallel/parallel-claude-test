@@ -26,16 +26,15 @@ import {
   zip,
 } from "remeda";
 import { Task } from "../../db/repositories/TaskRepository";
-import { getAssertionErrorMessage, isAssertionError } from "../../util/assert";
 import { toBytes } from "../../util/fileSize";
 import { toGlobalId } from "../../util/globalId";
 import { mapAndValidateProfileQueryFilter } from "../../util/ProfileQueryFilter";
+import { mapAndValidateProfileQuerySortBy } from "../../util/ProfileQuerySortBy";
 import { isValidTimezone } from "../../util/time";
 import { random } from "../../util/token";
 import { and, authenticateAnd, ifArgDefined } from "../helpers/authorize";
 import { ApolloError, ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { parseSortBy } from "../helpers/paginationPlugin";
 import { datetimeArg } from "../helpers/scalars/DateTime";
 import { uploadArg } from "../helpers/scalars/Upload";
 import { validateAnd, validateIf } from "../helpers/validateArgs";
@@ -44,7 +43,6 @@ import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { validateFile } from "../helpers/validators/validateFile";
 import { validBooleanValue } from "../helpers/validators/validBooleanValue";
 import { validFileUploadInput } from "../helpers/validators/validFileUploadInput";
-import { validSortBy } from "../helpers/validators/validSortBy";
 import { validExportFileRenamePattern } from "../helpers/validators/validTextWithPlaceholders";
 import { validUrl } from "../helpers/validators/validUrl";
 import {
@@ -64,6 +62,7 @@ import {
 } from "../petition/authorizers";
 import { userHasAccessToUsers } from "../petition/mutations/authorizers";
 import { userHasAccessToProfileType } from "../profile/authorizers";
+import { validProfileQueryFilter, validProfileQuerySortBy } from "../profile/validators";
 import { userHasAccessToUserGroups } from "../user-group/authorizers";
 import { contextUserHasPermission } from "../users/authorizers";
 import { tasksAreOfType, userHasAccessToTasks } from "./authorizers";
@@ -1005,48 +1004,29 @@ export const createProfilesExcelExportTask = mutationField("createProfilesExcelE
     sortBy: list(nonNull("String")),
     locale: nonNull("UserLocale"),
   },
-  validateArgs: validSortBy("sortBy", ["name", "createdAt", "updatedAt", "closedAt"]),
-  resolve: async (_, args, ctx, info) => {
-    try {
-      const profileTypeFields = await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(
-        args.profileTypeId,
-      );
-      const profileTypeFieldsById = indexBy(profileTypeFields, (ptf) => ptf.id);
+  validateArgs: validateAnd(
+    validProfileQueryFilter("profileTypeId", "filter"),
+    validProfileQuerySortBy("profileTypeId", "sortBy"),
+  ),
+  resolve: async (_, args, ctx) => {
+    const profileTypeFields = await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(
+      args.profileTypeId,
+    );
+    const profileTypeFieldsById = indexBy(profileTypeFields, (ptf) => ptf.id);
 
-      type SortByValue =
-        | "name_ASC"
-        | "name_DESC"
-        | "createdAt_ASC"
-        | "createdAt_DESC"
-        | "updatedAt_ASC"
-        | "updatedAt_DESC"
-        | "closedAt_ASC"
-        | "closedAt_DESC";
-
-      return await ctx.tasks.createTask(
-        {
-          name: "PROFILES_EXCEL_EXPORT",
-          input: {
-            profile_type_id: args.profileTypeId,
-            search: args.search ?? null,
-            filter: mapAndValidateProfileQueryFilter(args.filter, profileTypeFieldsById) ?? null,
-            sort_by:
-              args.sortBy?.map((value) => {
-                const [field, order] = parseSortBy(value as SortByValue);
-                return { field, order };
-              }) ?? null,
-            locale: args.locale,
-          },
-          user_id: ctx.user!.id,
+    return await ctx.tasks.createTask(
+      {
+        name: "PROFILES_EXCEL_EXPORT",
+        input: {
+          profile_type_id: args.profileTypeId,
+          search: args.search ?? null,
+          filter: mapAndValidateProfileQueryFilter(args.filter, profileTypeFieldsById) ?? null,
+          sort_by: mapAndValidateProfileQuerySortBy(args.sortBy, profileTypeFieldsById) ?? null,
+          locale: args.locale,
         },
-        `User:${ctx.user!.id}`,
-      );
-    } catch (e) {
-      if (isAssertionError(e)) {
-        throw new ArgValidationError(info, "filter", getAssertionErrorMessage(e));
-      } else {
-        throw e;
-      }
-    }
+        user_id: ctx.user!.id,
+      },
+      `User:${ctx.user!.id}`,
+    );
   },
 });
