@@ -182,6 +182,7 @@ export interface ApprovalFlowConfig {
   __typename?: "ApprovalFlowConfig";
   /** List of users that are assigned to approve this step. */
   approvers: Array<Maybe<User>>;
+  manualStart: Scalars["Boolean"]["output"];
   name: Scalars["String"]["output"];
   type: ApprovalFlowType;
   /** User or UserGroup GID */
@@ -190,6 +191,8 @@ export interface ApprovalFlowConfig {
 }
 
 export interface ApprovalFlowConfigInput {
+  /** Forces step to start manually after completing, signing, or approving a previous step. */
+  manualStart: Scalars["Boolean"]["input"];
   name: Scalars["String"]["input"];
   type: ApprovalFlowType;
   /** globalId of the target User, UserGroup or PetitionField */
@@ -4156,6 +4159,7 @@ export interface PetitionApprovalRequestStep {
   approvalType: PetitionApprovalRequestStepApprovalType;
   approvers: Array<PetitionApprovalRequestStepApprover>;
   id: Scalars["GID"]["output"];
+  manualStart: Scalars["Boolean"]["output"];
   petition: Petition;
   status: PetitionApprovalRequestStepStatus;
   stepName: Scalars["String"]["output"];
@@ -4252,6 +4256,7 @@ export interface PetitionApprovalRequestStepStartedEvent extends PetitionEvent {
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   petition?: Maybe<Petition>;
+  triggeredBy: PetitionEventTriggeredBy;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -4564,6 +4569,8 @@ export interface PetitionEventSubscription extends EventSubscription {
   name?: Maybe<Scalars["String"]["output"]>;
   signatureKeys: Array<EventSubscriptionSignatureKey>;
 }
+
+export type PetitionEventTriggeredBy = "SYSTEM" | "USER";
 
 export type PetitionEventType =
   | "ACCESS_ACTIVATED"
@@ -5179,10 +5186,11 @@ export interface PetitionSharedUserNotification extends PetitionUserNotification
   createdAt: Scalars["DateTime"]["output"];
   id: Scalars["GID"]["output"];
   isRead: Scalars["Boolean"]["output"];
-  owner: User;
+  owner?: Maybe<User>;
   permissionType: PetitionPermissionTypeRW;
   petition: PetitionBase;
   sharedWith?: Maybe<UserOrUserGroup>;
+  triggeredBy: PetitionEventTriggeredBy;
 }
 
 export interface PetitionSharedWithFilter {
@@ -8048,6 +8056,7 @@ export interface UserPermissionAddedEvent extends PetitionEvent {
   permissionType: PetitionPermissionType;
   permissionUser?: Maybe<User>;
   petition?: Maybe<Petition>;
+  triggeredBy: PetitionEventTriggeredBy;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -16292,6 +16301,7 @@ export type NotificationsDrawer_PetitionUserNotification_PetitionCompletedUserNo
 
 export type NotificationsDrawer_PetitionUserNotification_PetitionSharedUserNotification_Fragment = {
   __typename?: "PetitionSharedUserNotification";
+  triggeredBy: PetitionEventTriggeredBy;
   permissionType: PetitionPermissionTypeRW;
   id: string;
   createdAt: string;
@@ -16299,13 +16309,13 @@ export type NotificationsDrawer_PetitionUserNotification_PetitionSharedUserNotif
   petition:
     | { __typename: "Petition"; id: string; name?: string | null }
     | { __typename: "PetitionTemplate"; id: string; name?: string | null };
-  owner: {
+  owner?: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     status: UserStatus;
     isMe: boolean;
-  };
+  } | null;
   sharedWith?:
     | {
         __typename?: "User";
@@ -16505,6 +16515,7 @@ export type NotificationsDrawer_notificationsQuery = {
           }
         | {
             __typename?: "PetitionSharedUserNotification";
+            triggeredBy: PetitionEventTriggeredBy;
             permissionType: PetitionPermissionTypeRW;
             id: string;
             createdAt: string;
@@ -16512,13 +16523,13 @@ export type NotificationsDrawer_notificationsQuery = {
             petition:
               | { __typename: "Petition"; id: string; name?: string | null }
               | { __typename: "PetitionTemplate"; id: string; name?: string | null };
-            owner: {
+            owner?: {
               __typename?: "User";
               id: string;
               fullName?: string | null;
               status: UserStatus;
               isMe: boolean;
-            };
+            } | null;
             sharedWith?:
               | {
                   __typename?: "User";
@@ -16685,6 +16696,7 @@ export type NotificationsList_PetitionUserNotification_PetitionCompletedUserNoti
 
 export type NotificationsList_PetitionUserNotification_PetitionSharedUserNotification_Fragment = {
   __typename?: "PetitionSharedUserNotification";
+  triggeredBy: PetitionEventTriggeredBy;
   permissionType: PetitionPermissionTypeRW;
   id: string;
   createdAt: string;
@@ -16692,13 +16704,13 @@ export type NotificationsList_PetitionUserNotification_PetitionSharedUserNotific
   petition:
     | { __typename: "Petition"; id: string; name?: string | null }
     | { __typename: "PetitionTemplate"; id: string; name?: string | null };
-  owner: {
+  owner?: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     status: UserStatus;
     isMe: boolean;
-  };
+  } | null;
   sharedWith?:
     | {
         __typename?: "User";
@@ -16867,6 +16879,7 @@ export type PetitionCompletedUserNotification_PetitionCompletedUserNotificationF
 
 export type PetitionSharedUserNotification_PetitionSharedUserNotificationFragment = {
   __typename?: "PetitionSharedUserNotification";
+  triggeredBy: PetitionEventTriggeredBy;
   permissionType: PetitionPermissionTypeRW;
   id: string;
   createdAt: string;
@@ -16874,13 +16887,13 @@ export type PetitionSharedUserNotification_PetitionSharedUserNotificationFragmen
   petition:
     | { __typename: "Petition"; id: string; name?: string | null }
     | { __typename: "PetitionTemplate"; id: string; name?: string | null };
-  owner: {
+  owner?: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     status: UserStatus;
     isMe: boolean;
-  };
+  } | null;
   sharedWith?:
     | {
         __typename?: "User";
@@ -18284,6 +18297,7 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionApprovalRequestStepSt
   {
     __typename?: "PetitionApprovalRequestStepStartedEvent";
     id: string;
+    triggeredBy: PetitionEventTriggeredBy;
     createdAt: string;
     approvalRequestStep: {
       __typename?: "PetitionApprovalRequestStep";
@@ -18843,6 +18857,7 @@ export type PetitionActivityTimeline_PetitionEvent_TemplateUsedEvent_Fragment = 
 export type PetitionActivityTimeline_PetitionEvent_UserPermissionAddedEvent_Fragment = {
   __typename?: "UserPermissionAddedEvent";
   id: string;
+  triggeredBy: PetitionEventTriggeredBy;
   permissionType: PetitionPermissionType;
   createdAt: string;
   user?: {
@@ -20249,6 +20264,7 @@ export type TimelinePetitionApprovalRequestStepSkippedEvent_PetitionApprovalRequ
 export type TimelinePetitionApprovalRequestStepStartedEvent_PetitionApprovalRequestStepStartedEventFragment =
   {
     __typename?: "PetitionApprovalRequestStepStartedEvent";
+    triggeredBy: PetitionEventTriggeredBy;
     createdAt: string;
     approvalRequestStep: {
       __typename?: "PetitionApprovalRequestStep";
@@ -20771,6 +20787,7 @@ export type TimelineSignatureStartedEvent_SignatureStartedEventFragment = {
 
 export type TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment = {
   __typename?: "UserPermissionAddedEvent";
+  triggeredBy: PetitionEventTriggeredBy;
   permissionType: PetitionPermissionType;
   createdAt: string;
   user?: {
@@ -23170,6 +23187,7 @@ export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
     type: ApprovalFlowType;
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
+    manualStart: boolean;
   }> | null;
   signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
@@ -23347,6 +23365,7 @@ export type SignatureConfigDialog_PetitionBase_PetitionTemplate_Fragment = {
     type: ApprovalFlowType;
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
+    manualStart: boolean;
   }> | null;
   fields: Array<{
     __typename?: "PetitionField";
@@ -23551,6 +23570,7 @@ export type SignatureConfigDialog_petitionQuery = {
           type: ApprovalFlowType;
           values: Array<string>;
           visibility?: { [key: string]: any } | null;
+          manualStart: boolean;
         }> | null;
         signatureRequests: Array<{
           __typename?: "PetitionSignatureRequest";
@@ -23731,6 +23751,7 @@ export type SignatureConfigDialog_petitionQuery = {
           type: ApprovalFlowType;
           values: Array<string>;
           visibility?: { [key: string]: any } | null;
+          manualStart: boolean;
         }> | null;
         fields: Array<{
           __typename?: "PetitionField";
@@ -26637,6 +26658,7 @@ export type PetitionComposeRightPaneTabs_PetitionBase_Petition_Fragment = {
     type: ApprovalFlowType;
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
+    manualStart: boolean;
   }> | null;
   automaticNumberingConfig?: {
     __typename?: "AutomaticNumberingConfig";
@@ -26755,6 +26777,7 @@ export type PetitionComposeRightPaneTabs_PetitionBase_PetitionTemplate_Fragment 
     type: ApprovalFlowType;
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
+    manualStart: boolean;
   }> | null;
   automaticNumberingConfig?: {
     __typename?: "AutomaticNumberingConfig";
@@ -27121,6 +27144,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
     type: ApprovalFlowType;
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
+    manualStart: boolean;
   }> | null;
   automaticNumberingConfig?: {
     __typename?: "AutomaticNumberingConfig";
@@ -27212,6 +27236,7 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
     type: ApprovalFlowType;
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
+    manualStart: boolean;
   }> | null;
   automaticNumberingConfig?: {
     __typename?: "AutomaticNumberingConfig";
@@ -27653,6 +27678,7 @@ export type ConfigureApprovalStepsDialog_PetitionBase_Petition_Fragment = {
     type: ApprovalFlowType;
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
+    manualStart: boolean;
   }> | null;
   fields: Array<{
     __typename?: "PetitionField";
@@ -27718,6 +27744,7 @@ export type ConfigureApprovalStepsDialog_PetitionBase_PetitionTemplate_Fragment 
     type: ApprovalFlowType;
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
+    manualStart: boolean;
   }> | null;
   fields: Array<{
     __typename?: "PetitionField";
@@ -27793,6 +27820,7 @@ export type ConfigureApprovalStepsDialog_petitionQuery = {
           type: ApprovalFlowType;
           values: Array<string>;
           visibility?: { [key: string]: any } | null;
+          manualStart: boolean;
         }> | null;
         fields: Array<{
           __typename?: "PetitionField";
@@ -27861,6 +27889,7 @@ export type ConfigureApprovalStepsDialog_petitionQuery = {
           type: ApprovalFlowType;
           values: Array<string>;
           visibility?: { [key: string]: any } | null;
+          manualStart: boolean;
         }> | null;
         fields: Array<{
           __typename?: "PetitionField";
@@ -35480,6 +35509,7 @@ export type PetitionApprovalsCard_PetitionApprovalRequestStepFragment = {
   status: PetitionApprovalRequestStepStatus;
   stepName: string;
   approvalType: PetitionApprovalRequestStepApprovalType;
+  manualStart: boolean;
   approvers: Array<{
     __typename?: "PetitionApprovalRequestStepApprover";
     id: string;
@@ -35601,6 +35631,7 @@ export type PetitionApprovalsCard_PetitionFragment = {
     status: PetitionApprovalRequestStepStatus;
     stepName: string;
     approvalType: PetitionApprovalRequestStepApprovalType;
+    manualStart: boolean;
     approvers: Array<{
       __typename?: "PetitionApprovalRequestStepApprover";
       id: string;
@@ -35625,6 +35656,7 @@ export type PetitionApprovalsCard_PetitionFragment = {
     status: PetitionApprovalRequestStepStatus;
     stepName: string;
     approvalType: PetitionApprovalRequestStepApprovalType;
+    manualStart: boolean;
     approvers: Array<{
       __typename?: "PetitionApprovalRequestStepApprover";
       id: string;
@@ -35649,6 +35681,7 @@ export type PetitionApprovalsCard_PetitionFragment = {
     type: ApprovalFlowType;
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
+    manualStart: boolean;
     approvers: Array<{
       __typename?: "User";
       id: string;
@@ -35910,6 +35943,7 @@ export type PetitionApprovalsCard_PetitionPollingFragment = {
     type: ApprovalFlowType;
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
+    manualStart: boolean;
     approvers: Array<{
       __typename?: "User";
       id: string;
@@ -35925,6 +35959,7 @@ export type PetitionApprovalsCard_PetitionPollingFragment = {
     status: PetitionApprovalRequestStepStatus;
     stepName: string;
     approvalType: PetitionApprovalRequestStepApprovalType;
+    manualStart: boolean;
     approvers: Array<{
       __typename?: "PetitionApprovalRequestStepApprover";
       id: string;
@@ -35966,6 +36001,7 @@ export type PetitionApprovalsCard_cancelPetitionApprovalRequestStepMutation = {
     status: PetitionApprovalRequestStepStatus;
     stepName: string;
     approvalType: PetitionApprovalRequestStepApprovalType;
+    manualStart: boolean;
     petition: {
       __typename?: "Petition";
       id: string;
@@ -36068,6 +36104,7 @@ export type PetitionApprovalsCard_cancelPetitionApprovalRequestStepMutation = {
         status: PetitionApprovalRequestStepStatus;
         stepName: string;
         approvalType: PetitionApprovalRequestStepApprovalType;
+        manualStart: boolean;
         approvers: Array<{
           __typename?: "PetitionApprovalRequestStepApprover";
           id: string;
@@ -36092,6 +36129,7 @@ export type PetitionApprovalsCard_cancelPetitionApprovalRequestStepMutation = {
         status: PetitionApprovalRequestStepStatus;
         stepName: string;
         approvalType: PetitionApprovalRequestStepApprovalType;
+        manualStart: boolean;
         approvers: Array<{
           __typename?: "PetitionApprovalRequestStepApprover";
           id: string;
@@ -36116,6 +36154,7 @@ export type PetitionApprovalsCard_cancelPetitionApprovalRequestStepMutation = {
         type: ApprovalFlowType;
         values: Array<string>;
         visibility?: { [key: string]: any } | null;
+        manualStart: boolean;
         approvers: Array<{
           __typename?: "User";
           id: string;
@@ -36318,6 +36357,7 @@ export type PetitionApprovalsCard_skipPetitionApprovalRequestStepMutation = {
     status: PetitionApprovalRequestStepStatus;
     stepName: string;
     approvalType: PetitionApprovalRequestStepApprovalType;
+    manualStart: boolean;
     petition: {
       __typename?: "Petition";
       id: string;
@@ -36420,6 +36460,7 @@ export type PetitionApprovalsCard_skipPetitionApprovalRequestStepMutation = {
         status: PetitionApprovalRequestStepStatus;
         stepName: string;
         approvalType: PetitionApprovalRequestStepApprovalType;
+        manualStart: boolean;
         approvers: Array<{
           __typename?: "PetitionApprovalRequestStepApprover";
           id: string;
@@ -36444,6 +36485,7 @@ export type PetitionApprovalsCard_skipPetitionApprovalRequestStepMutation = {
         status: PetitionApprovalRequestStepStatus;
         stepName: string;
         approvalType: PetitionApprovalRequestStepApprovalType;
+        manualStart: boolean;
         approvers: Array<{
           __typename?: "PetitionApprovalRequestStepApprover";
           id: string;
@@ -36468,6 +36510,7 @@ export type PetitionApprovalsCard_skipPetitionApprovalRequestStepMutation = {
         type: ApprovalFlowType;
         values: Array<string>;
         visibility?: { [key: string]: any } | null;
+        manualStart: boolean;
         approvers: Array<{
           __typename?: "User";
           id: string;
@@ -36672,6 +36715,7 @@ export type PetitionApprovalsCard_rejectPetitionApprovalRequestStepMutation = {
     status: PetitionApprovalRequestStepStatus;
     stepName: string;
     approvalType: PetitionApprovalRequestStepApprovalType;
+    manualStart: boolean;
     petition: {
       __typename?: "Petition";
       id: string;
@@ -36774,6 +36818,7 @@ export type PetitionApprovalsCard_rejectPetitionApprovalRequestStepMutation = {
         status: PetitionApprovalRequestStepStatus;
         stepName: string;
         approvalType: PetitionApprovalRequestStepApprovalType;
+        manualStart: boolean;
         approvers: Array<{
           __typename?: "PetitionApprovalRequestStepApprover";
           id: string;
@@ -36798,6 +36843,7 @@ export type PetitionApprovalsCard_rejectPetitionApprovalRequestStepMutation = {
         status: PetitionApprovalRequestStepStatus;
         stepName: string;
         approvalType: PetitionApprovalRequestStepApprovalType;
+        manualStart: boolean;
         approvers: Array<{
           __typename?: "PetitionApprovalRequestStepApprover";
           id: string;
@@ -36822,6 +36868,7 @@ export type PetitionApprovalsCard_rejectPetitionApprovalRequestStepMutation = {
         type: ApprovalFlowType;
         values: Array<string>;
         visibility?: { [key: string]: any } | null;
+        manualStart: boolean;
         approvers: Array<{
           __typename?: "User";
           id: string;
@@ -37025,6 +37072,7 @@ export type PetitionApprovalsCard_approvePetitionApprovalRequestStepMutation = {
     status: PetitionApprovalRequestStepStatus;
     stepName: string;
     approvalType: PetitionApprovalRequestStepApprovalType;
+    manualStart: boolean;
     petition: {
       __typename?: "Petition";
       id: string;
@@ -37127,6 +37175,7 @@ export type PetitionApprovalsCard_approvePetitionApprovalRequestStepMutation = {
         status: PetitionApprovalRequestStepStatus;
         stepName: string;
         approvalType: PetitionApprovalRequestStepApprovalType;
+        manualStart: boolean;
         approvers: Array<{
           __typename?: "PetitionApprovalRequestStepApprover";
           id: string;
@@ -37151,6 +37200,7 @@ export type PetitionApprovalsCard_approvePetitionApprovalRequestStepMutation = {
         status: PetitionApprovalRequestStepStatus;
         stepName: string;
         approvalType: PetitionApprovalRequestStepApprovalType;
+        manualStart: boolean;
         approvers: Array<{
           __typename?: "PetitionApprovalRequestStepApprover";
           id: string;
@@ -37175,6 +37225,7 @@ export type PetitionApprovalsCard_approvePetitionApprovalRequestStepMutation = {
         type: ApprovalFlowType;
         values: Array<string>;
         visibility?: { [key: string]: any } | null;
+        manualStart: boolean;
         approvers: Array<{
           __typename?: "User";
           id: string;
@@ -37376,6 +37427,7 @@ export type PetitionApprovalsCard_sendPetitionApprovalRequestStepReminderMutatio
     status: PetitionApprovalRequestStepStatus;
     stepName: string;
     approvalType: PetitionApprovalRequestStepApprovalType;
+    manualStart: boolean;
     approvers: Array<{
       __typename?: "PetitionApprovalRequestStepApprover";
       id: string;
@@ -37497,6 +37549,7 @@ export type PetitionApprovalsCard_petitionQuery = {
           type: ApprovalFlowType;
           values: Array<string>;
           visibility?: { [key: string]: any } | null;
+          manualStart: boolean;
           approvers: Array<{
             __typename?: "User";
             id: string;
@@ -37512,6 +37565,7 @@ export type PetitionApprovalsCard_petitionQuery = {
           status: PetitionApprovalRequestStepStatus;
           stepName: string;
           approvalType: PetitionApprovalRequestStepApprovalType;
+          manualStart: boolean;
           approvers: Array<{
             __typename?: "PetitionApprovalRequestStepApprover";
             id: string;
@@ -55105,6 +55159,7 @@ export type PetitionActivity_eventsQuery = {
             | {
                 __typename?: "PetitionApprovalRequestStepStartedEvent";
                 id: string;
+                triggeredBy: PetitionEventTriggeredBy;
                 createdAt: string;
                 approvalRequestStep: {
                   __typename?: "PetitionApprovalRequestStep";
@@ -55696,6 +55751,7 @@ export type PetitionActivity_eventsQuery = {
             | {
                 __typename?: "UserPermissionAddedEvent";
                 id: string;
+                triggeredBy: PetitionEventTriggeredBy;
                 permissionType: PetitionPermissionType;
                 createdAt: string;
                 user?: {
@@ -56412,6 +56468,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     type: ApprovalFlowType;
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
+    manualStart: boolean;
   }> | null;
   selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
   variables: Array<
@@ -56703,6 +56760,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     type: ApprovalFlowType;
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
+    manualStart: boolean;
   }> | null;
   selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
   signatureConfig?: {
@@ -57374,6 +57432,7 @@ export type PetitionCompose_updatePetitionMutation = {
           type: ApprovalFlowType;
           values: Array<string>;
           visibility?: { [key: string]: any } | null;
+          manualStart: boolean;
         }> | null;
         automaticNumberingConfig?: {
           __typename?: "AutomaticNumberingConfig";
@@ -57476,6 +57535,7 @@ export type PetitionCompose_updatePetitionMutation = {
           type: ApprovalFlowType;
           values: Array<string>;
           visibility?: { [key: string]: any } | null;
+          manualStart: boolean;
         }> | null;
         automaticNumberingConfig?: {
           __typename?: "AutomaticNumberingConfig";
@@ -59661,6 +59721,7 @@ export type PetitionCompose_petitionQuery = {
           type: ApprovalFlowType;
           values: Array<string>;
           visibility?: { [key: string]: any } | null;
+          manualStart: boolean;
         }> | null;
         selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
         variables: Array<
@@ -59974,6 +60035,7 @@ export type PetitionCompose_petitionQuery = {
           type: ApprovalFlowType;
           values: Array<string>;
           visibility?: { [key: string]: any } | null;
+          manualStart: boolean;
         }> | null;
         selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
         signatureConfig?: {
@@ -64603,6 +64665,7 @@ export type PetitionReplies_PetitionFragment = {
     type: ApprovalFlowType;
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
+    manualStart: boolean;
     approvers: Array<{
       __typename?: "User";
       id: string;
@@ -64740,6 +64803,7 @@ export type PetitionReplies_PetitionFragment = {
     status: PetitionApprovalRequestStepStatus;
     stepName: string;
     approvalType: PetitionApprovalRequestStepApprovalType;
+    manualStart: boolean;
     approvers: Array<{
       __typename?: "PetitionApprovalRequestStepApprover";
       id: string;
@@ -64764,6 +64828,7 @@ export type PetitionReplies_PetitionFragment = {
     status: PetitionApprovalRequestStepStatus;
     stepName: string;
     approvalType: PetitionApprovalRequestStepApprovalType;
+    manualStart: boolean;
     approvers: Array<{
       __typename?: "PetitionApprovalRequestStepApprover";
       id: string;
@@ -65650,6 +65715,7 @@ export type PetitionReplies_petitionQuery = {
           type: ApprovalFlowType;
           values: Array<string>;
           visibility?: { [key: string]: any } | null;
+          manualStart: boolean;
           approvers: Array<{
             __typename?: "User";
             id: string;
@@ -65791,6 +65857,7 @@ export type PetitionReplies_petitionQuery = {
           status: PetitionApprovalRequestStepStatus;
           stepName: string;
           approvalType: PetitionApprovalRequestStepApprovalType;
+          manualStart: boolean;
           approvers: Array<{
             __typename?: "PetitionApprovalRequestStepApprover";
             id: string;
@@ -65815,6 +65882,7 @@ export type PetitionReplies_petitionQuery = {
           status: PetitionApprovalRequestStepStatus;
           stepName: string;
           approvalType: PetitionApprovalRequestStepApprovalType;
+          manualStart: boolean;
           approvers: Array<{
             __typename?: "PetitionApprovalRequestStepApprover";
             id: string;
@@ -70519,6 +70587,7 @@ export type Fragments_FullApprovalFlowConfigFragment = {
   type: ApprovalFlowType;
   values: Array<string>;
   visibility?: { [key: string]: any } | null;
+  manualStart: boolean;
 };
 
 export type GetMyIdQueryVariables = Exact<{ [key: string]: never }>;
@@ -76879,6 +76948,7 @@ export const PetitionSharedUserNotification_PetitionSharedUserNotificationFragme
     petition {
       __typename
     }
+    triggeredBy
     owner {
       ...UserReference_User
     }
@@ -77570,6 +77640,7 @@ export const TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragmentDo
     user {
       ...UserReference_User
     }
+    triggeredBy
     permissionUser {
       ...UserReference_User
     }
@@ -78053,6 +78124,7 @@ export const TimelinePetitionApprovalRequestStepStartedEvent_PetitionApprovalReq
         id
         stepName
       }
+      triggeredBy
       comment {
         id
       }
@@ -79247,6 +79319,7 @@ export const Fragments_FullApprovalFlowConfigFragmentDoc = gql`
     type
     values
     visibility
+    manualStart
   }
 ` as unknown as DocumentNode<Fragments_FullApprovalFlowConfigFragment, unknown>;
 export const SignatureConfigDialog_PetitionBaseFragmentDoc = gql`
@@ -80702,6 +80775,7 @@ export const PetitionApprovalsCard_PetitionApprovalRequestStepFragmentDoc = gql`
     status
     stepName
     approvalType
+    manualStart
     approvers {
       ...PetitionApprovalsCard_PetitionApprovalRequestStepApprover
     }

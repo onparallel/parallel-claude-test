@@ -19,6 +19,10 @@ export const ApprovalFlowConfigInput = inputObjectType({
       description: "globalId of the target User, UserGroup or PetitionField",
     });
     t.nullable.field("visibility", { type: "JSONObject" });
+    t.nonNull.boolean("manualStart", {
+      description:
+        "Forces step to start manually after completing, signing, or approving a previous step.",
+    });
   },
 });
 
@@ -55,13 +59,17 @@ export const ApprovalFlowConfig = objectType({
         return null;
       },
     });
+    t.nonNull.boolean("manualStart", {
+      resolve: (o) => o.manual_start,
+    });
   },
   sourceType: /* ts */ `
     {
       name: string;
       type: "ANY" | "ALL";
       values: { id: number; type: "User" | "UserGroup" | "PetitionField" }[];
-      visibility?: any
+      visibility?: any;
+      manual_start: boolean;
     }
   `,
 });
@@ -109,5 +117,6 @@ export const PetitionApprovalRequestStep = objectType({
       type: "Petition",
       resolve: async (o, _, ctx) => (await ctx.petitions.loadPetition(o.petition_id))!,
     });
+    t.nonNull.boolean("manualStart", { resolve: (o) => o.manual_start });
   },
 });

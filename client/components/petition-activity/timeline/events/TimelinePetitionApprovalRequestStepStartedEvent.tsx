@@ -25,17 +25,30 @@ export function TimelinePetitionApprovalRequestStepStartedEvent({
     <TimelineItem icon={<TimelineIcon icon={ThumbsUpIcon} backgroundColor="gray.200" />}>
       <Flex align="center">
         <Box>
-          <FormattedMessage
-            id="component.timeline-petition-approval-request-step-started-event.description"
-            defaultMessage='{user} initiated step "{approvalStep}" in this parallel {timeAgo}'
-            values={{
-              user: <UserReference user={event.user} />,
-              timeAgo: (
-                <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
-              ),
-              approvalStep,
-            }}
-          />
+          {event.triggeredBy === "USER" ? (
+            <FormattedMessage
+              id="component.timeline-petition-approval-request-step-started-event.triggered-by-user-description"
+              defaultMessage='{user} initiated step "{approvalStep}" in this parallel {timeAgo}'
+              values={{
+                user: <UserReference user={event.user} />,
+                timeAgo: (
+                  <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+                ),
+                approvalStep,
+              }}
+            />
+          ) : (
+            <FormattedMessage
+              id="component.timeline-petition-approval-request-step-started-event.triggered-by-system-description"
+              defaultMessage='Step "{approvalStep}" has been initiated in this parallel {timeAgo}'
+              values={{
+                timeAgo: (
+                  <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+                ),
+                approvalStep,
+              }}
+            />
+          )}
         </Box>
         {isNonNullish(event.comment?.id) ? (
           <Button
@@ -66,6 +79,7 @@ TimelinePetitionApprovalRequestStepStartedEvent.fragments = {
         id
         stepName
       }
+      triggeredBy
       comment {
         id
       }

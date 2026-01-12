@@ -4031,7 +4031,12 @@ describe("GraphQL/Petitions", () => {
             signingMode: "PARALLEL",
           }),
           approval_flow_config: JSON.stringify([
-            { name: "Step 1", type: "ANY", values: [{ id: sessionUser.id, type: "User" }] },
+            {
+              name: "Step 1",
+              type: "ANY",
+              values: [{ id: sessionUser.id, type: "User" }],
+              manual_start: true,
+            },
           ]),
         }),
       );

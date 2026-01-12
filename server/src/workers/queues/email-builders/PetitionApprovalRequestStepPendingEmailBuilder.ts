@@ -1,5 +1,6 @@
 import { inject, injectable } from "inversify";
-import { zip } from "remeda";
+import { isNonNullish, zip } from "remeda";
+import { assert } from "ts-essentials";
 import { EmailLog } from "../../../db/__types";
 import { EmailLogRepository } from "../../../db/repositories/EmailLogRepository";
 import { PetitionApprovalRequestRepository } from "../../../db/repositories/PetitionApprovalRequestRepository";
@@ -19,7 +20,7 @@ import { renderSlateToText } from "../../../util/slate/render";
 import { EmailBuilder } from "../EmailSenderQueue";
 
 interface PetitionApprovalRequestStepPendingEmailPayload {
-  user_id: number;
+  user_id: number | null;
   petition_approval_request_step_id: number;
   petition_comment_id: number | null;
   is_reminder: boolean;
@@ -41,28 +42,28 @@ export class PetitionApprovalRequestStepPendingEmailBuilder
   ) {}
 
   async build(payload: PetitionApprovalRequestStepPendingEmailPayload) {
-    const [user, userData] = await Promise.all([
-      this.users.loadUser(payload.user_id),
-      this.users.loadUserDataByUserId(payload.user_id),
-    ]);
-    if (!user) {
-      throw new Error(`User:${payload.user_id} not found`);
-    }
-    if (!userData) {
-      throw new Error(`UserData not found for User:${payload.user_id}`);
-    }
-
-    const approvalRequestStep = await this.approvalRequests.loadPetitionApprovalRequestStep(
+    const step = await this.approvalRequests.loadPetitionApprovalRequestStep(
       payload.petition_approval_request_step_id,
     );
-    if (!approvalRequestStep) {
-      throw new Error(`ApprovalRequestStep:${payload.petition_approval_request_step_id} not found`);
-    }
 
-    const petition = await this.petitions.loadPetition(approvalRequestStep.petition_id);
-    if (!petition) {
-      throw new Error(`Petition:${approvalRequestStep.petition_id} not found`);
-    }
+    assert(
+      isNonNullish(step),
+      `ApprovalRequestStep:${payload.petition_approval_request_step_id} not found`,
+    );
+
+    const [petition, petitionOwner, user] = await Promise.all([
+      this.petitions.loadPetition(step.petition_id),
+      this.petitions.loadPetitionOwner(step.petition_id),
+      payload.user_id ? this.users.loadUser(payload.user_id) : null,
+    ]);
+
+    assert(isNonNullish(petition), `Petition:${step.petition_id} not found`);
+
+    const senderUser = user ?? petitionOwner;
+    assert(isNonNullish(senderUser), `Sender User not found for ApprovalRequestStep:${step.id}`);
+
+    const senderUserData = await this.users.loadUserDataByUserId(senderUser.id);
+    assert(isNonNullish(senderUserData), `UserData not found for User:${senderUser.id}`);
 
     const comment = payload.petition_comment_id
       ? await this.petitions.loadPetitionFieldComment(payload.petition_comment_id)
@@ -74,7 +75,7 @@ export class PetitionApprovalRequestStepPendingEmailBuilder
       : [];
 
     const emails: EmailLog[] = [];
-    const { emailFrom, ...layoutProps } = await this.layouts.getLayoutProps(user.org_id);
+    const { emailFrom, ...layoutProps } = await this.layouts.getLayoutProps(senderUser.org_id);
 
     const stepApprovers =
       await this.approvalRequests.loadPetitionApprovalRequestStepApproversByStepId(
@@ -93,15 +94,14 @@ export class PetitionApprovalRequestStepPendingEmailBuilder
     );
 
     for (const [approver, approverUserData] of zip(otherApprovers, approverUserDatas)) {
-      if (!approverUserData) {
-        throw new Error(`UserData not found for User:${approver.user_id}`);
-      }
+      assert(isNonNullish(approverUserData), `UserData not found for User:${approver.user_id}`);
+
       const { html, text, subject, from } = await buildEmail(
         PetitionApprovalRequestStepPendingEmail,
         {
           isReminder: payload.is_reminder,
-          senderEmail: userData.email,
-          senderFullName: fullName(userData.first_name, userData.last_name),
+          senderEmail: senderUserData.email,
+          senderFullName: fullName(senderUserData.first_name, senderUserData.last_name),
           message: comment ? renderSlateToText(comment.content_json) : null,
           userName: approverUserData.first_name,
           petitionId: toGlobalId("Petition", petition.id),
@@ -118,7 +118,7 @@ export class PetitionApprovalRequestStepPendingEmailBuilder
         subject,
         text,
         html,
-        created_from: `User:${user.id}`,
+        created_from: `User:${senderUser.id}`,
       });
 
       emails.push(email);

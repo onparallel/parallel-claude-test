@@ -167,6 +167,7 @@ export type AiCompletionLogStatus = "COMPLETED" | "FAILED" | "PENDING";
 export type ApprovalFlowConfig = {
   /** List of users that are assigned to approve this step. */
   approvers: Array<Maybe<User>>;
+  manualStart: Scalars["Boolean"]["output"];
   name: Scalars["String"]["output"];
   type: ApprovalFlowType;
   /** User or UserGroup GID */
@@ -175,6 +176,8 @@ export type ApprovalFlowConfig = {
 };
 
 export type ApprovalFlowConfigInput = {
+  /** Forces step to start manually after completing, signing, or approving a previous step. */
+  manualStart: Scalars["Boolean"]["input"];
   name: Scalars["String"]["input"];
   type: ApprovalFlowType;
   /** globalId of the target User, UserGroup or PetitionField */
@@ -4037,6 +4040,7 @@ export type PetitionApprovalRequestStep = {
   approvalType: PetitionApprovalRequestStepApprovalType;
   approvers: Array<PetitionApprovalRequestStepApprover>;
   id: Scalars["GID"]["output"];
+  manualStart: Scalars["Boolean"]["output"];
   petition: Petition;
   status: PetitionApprovalRequestStepStatus;
   stepName: Scalars["String"]["output"];
@@ -4125,6 +4129,7 @@ export type PetitionApprovalRequestStepStartedEvent = PetitionEvent & {
   data: Scalars["JSONObject"]["output"];
   id: Scalars["GID"]["output"];
   petition: Maybe<Petition>;
+  triggeredBy: PetitionEventTriggeredBy;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -4418,6 +4423,8 @@ export type PetitionEventSubscription = EventSubscription & {
   name: Maybe<Scalars["String"]["output"]>;
   signatureKeys: Array<EventSubscriptionSignatureKey>;
 };
+
+export type PetitionEventTriggeredBy = "SYSTEM" | "USER";
 
 export type PetitionEventType =
   | "ACCESS_ACTIVATED"
@@ -4999,10 +5006,11 @@ export type PetitionSharedUserNotification = PetitionUserNotification & {
   createdAt: Scalars["DateTime"]["output"];
   id: Scalars["GID"]["output"];
   isRead: Scalars["Boolean"]["output"];
-  owner: User;
+  owner: Maybe<User>;
   permissionType: PetitionPermissionTypeRW;
   petition: PetitionBase;
   sharedWith: Maybe<UserOrUserGroup>;
+  triggeredBy: PetitionEventTriggeredBy;
 };
 
 export type PetitionSharedWithFilter = {
@@ -7745,6 +7753,7 @@ export type UserPermissionAddedEvent = PetitionEvent & {
   permissionType: PetitionPermissionType;
   permissionUser: Maybe<User>;
   petition: Maybe<Petition>;
+  triggeredBy: PetitionEventTriggeredBy;
   type: PetitionEventType;
   user: Maybe<User>;
 };

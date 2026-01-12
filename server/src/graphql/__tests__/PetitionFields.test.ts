@@ -2582,6 +2582,7 @@ describe("GraphQL/Petition Fields", () => {
         .update({
           approval_flow_config: JSON.stringify([
             {
+              manual_start: true,
               name: "Step 1",
               type: "ANY",
               values: [{ type: "User", id: user.id }],
@@ -6236,6 +6237,7 @@ describe("GraphQL/Petition Fields", () => {
         .update({
           approval_flow_config: JSON.stringify([
             {
+              manual_start: true,
               name: "Step 1",
               type: "ANY",
               values: [{ id: user.id, type: "User" }],
@@ -8303,6 +8305,7 @@ describe("GraphQL/Petition Fields", () => {
         .update({
           approval_flow_config: JSON.stringify([
             {
+              manual_start: true,
               name: "Step 1",
               type: "ANY",
               values: [{ id: user.id, type: "User" }],

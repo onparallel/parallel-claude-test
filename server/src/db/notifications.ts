@@ -26,7 +26,7 @@ export type PetitionUserNotificationPayload<TType extends PetitionUserNotificati
     petition_access_id?: number;
   };
   PETITION_SHARED: {
-    owner_id: number;
+    owner_id: number | null; // null for automatic events
     permission_type: "READ" | "WRITE";
     user_id?: number;
     user_group_id?: number;

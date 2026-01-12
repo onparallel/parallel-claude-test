@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Center,
+  Checkbox,
   Editable,
   EditableInput,
   EditablePreview,
@@ -29,6 +30,7 @@ import {
   WizardStepDialogProps,
 } from "@parallel/components/common/dialogs/WizardDialog";
 import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
+import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { SimpleSelect, useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import {
@@ -117,7 +119,7 @@ function ConfigureApprovalStepsDialog({
   const form = useForm<ConfigureApprovalStepsDialogFormData>({
     mode: "onSubmit",
     defaultValues: {
-      approvals: petition.approvalFlowConfig?.map((v) => omit(v, ["__typename"])) ?? [],
+      approvals: petition.approvalFlowConfig?.map(omit(["__typename"])) ?? [],
     },
   });
 
@@ -206,6 +208,7 @@ function ConfigureApprovalStepsDialog({
                     ),
                     type: "ANY",
                     values: [],
+                    manualStart: false,
                   })
                 }
               >
@@ -284,6 +287,7 @@ function ApprovalCard({ index, petition, onRemove }: ApprovalCardProps) {
     formState: { errors },
     watch,
     setValue,
+    register,
   } = useFormContext<ConfigureApprovalStepsDialogFormData>();
   const _conditions = watch(`approvals.${index}.visibility`);
 
@@ -432,6 +436,26 @@ function ApprovalCard({ index, petition, onRemove }: ApprovalCardProps) {
           onClick={onRemove}
         />
       </HStack>
+      <FormControl>
+        <Checkbox {...register(`approvals.${index}.manualStart`)} backgroundColor="white">
+          <HStack spacing={1}>
+            <Text>
+              <FormattedMessage
+                id="component.configure-approval-steps-dialog.checkbox-start-approval-manually"
+                defaultMessage="Start approval manually"
+              />
+            </Text>
+            <HelpPopover>
+              <Text>
+                <FormattedMessage
+                  id="component.configure-approval-steps-dialog.checkbox-start-approval-manually-help"
+                  defaultMessage="Prevents steps from starting automatically after completing, signing, or approving a previous step."
+                />
+              </Text>
+            </HelpPopover>
+          </HStack>
+        </Checkbox>
+      </FormControl>
     </Stack>
   );
 }

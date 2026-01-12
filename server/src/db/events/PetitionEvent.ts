@@ -61,7 +61,7 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     is_internal?: boolean;
   };
   USER_PERMISSION_ADDED: {
-    user_id: number;
+    user_id: number | null; // null if the permission was added by the system
     permission_user_id: number;
     permission_type: PetitionPermissionType;
   };
@@ -208,7 +208,7 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   };
   PETITION_APPROVAL_REQUEST_STEP_STARTED: {
     petition_approval_request_step_id: number;
-    user_id: number;
+    user_id: number | null; // null if the step was automatically started by the system
     petition_comment_id?: number | null;
   };
   PETITION_APPROVAL_REQUEST_STEP_APPROVED: {
@@ -232,6 +232,7 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   PETITION_APPROVAL_REQUEST_STEP_FINISHED: {
     petition_approval_request_step_id: number;
     user_id: number;
+    is_approved: boolean;
   };
   PETITION_APPROVAL_REQUEST_STEP_CANCELED: {
     petition_approval_request_step_id: number;

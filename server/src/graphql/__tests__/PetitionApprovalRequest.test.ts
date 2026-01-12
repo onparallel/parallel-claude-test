@@ -57,11 +57,21 @@ describe("GraphQL/Petition Approval Request", () => {
         approval_flow_config:
           i === 1
             ? JSON.stringify([
-                { name: "Step 1", type: "ANY", values: [{ type: "User", id: user.id }] },
+                {
+                  manual_start: true,
+                  name: "Step 1",
+                  type: "ANY",
+                  values: [{ type: "User", id: user.id }],
+                },
               ])
             : i === 2
               ? JSON.stringify([
-                  { name: "Step 1", type: "ANY", values: [{ type: "User", id: otherUsers[0].id }] },
+                  {
+                    manual_start: true,
+                    name: "Step 1",
+                    type: "ANY",
+                    values: [{ type: "User", id: otherUsers[0].id }],
+                  },
                 ])
               : null,
       }));
@@ -232,11 +242,13 @@ describe("GraphQL/Petition Approval Request", () => {
         status: "COMPLETED",
         approval_flow_config: JSON.stringify([
           {
+            manual_start: true,
             name: "Step 1",
             type: "ANY",
             values: [{ id: user.id, type: "User" }],
           },
           {
+            manual_start: true,
             name: "Step 2",
             type: "ANY",
             values: [],
@@ -253,6 +265,7 @@ describe("GraphQL/Petition Approval Request", () => {
             },
           },
           {
+            manual_start: true,
             name: "Step 3",
             type: "ANY",
             values: [
@@ -261,6 +274,7 @@ describe("GraphQL/Petition Approval Request", () => {
             ],
           },
           {
+            manual_start: true,
             name: "Step 4",
             type: "ANY",
             values: [],
@@ -817,6 +831,194 @@ describe("GraphQL/Petition Approval Request", () => {
               id: expect.any(String),
               status: "NOT_STARTED",
               approvers: [],
+            },
+          ],
+          oldApprovalRequestSteps: [
+            {
+              id: toGlobalId("PetitionApprovalRequestStep", steps[0].id),
+              status: "CANCELED",
+              stepName: "Step 1",
+              approvers: [
+                {
+                  user: { id: toGlobalId("User", user.id) },
+                  approvedAt: expect.any(Date),
+                  canceledAt: expect.any(Date),
+                  rejectedAt: null,
+                  sentAt: null,
+                  skippedAt: null,
+                },
+              ],
+            },
+          ],
+        },
+      });
+    });
+
+    it("forces start of first step manually when a request flow is canceled", async () => {
+      await mocks.knex
+        .from("petition")
+        .where("id", petition.id)
+        .update({
+          approval_flow_config: JSON.stringify([
+            {
+              manual_start: false,
+              name: "Step 1",
+              type: "ANY",
+              values: [{ id: user.id, type: "User" }],
+            },
+            {
+              manual_start: true,
+              name: "Step 2",
+              type: "ANY",
+              values: [],
+              visibility: {
+                type: "SHOW",
+                operator: "OR",
+                conditions: [
+                  {
+                    operator: "EQUAL",
+                    value: 10,
+                    variableName: "price",
+                  },
+                ],
+              },
+            },
+            {
+              manual_start: false,
+              name: "Step 3",
+              type: "ANY",
+              values: [
+                { id: user.id, type: "User" },
+                { id: otherUsers[0].id, type: "User" },
+              ],
+            },
+            {
+              manual_start: true,
+              name: "Step 4",
+              type: "ANY",
+              values: [],
+            },
+          ]),
+        });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!) {
+            cancelPetitionApprovalRequestFlow(petitionId: $petitionId) {
+              id
+              status
+              petition {
+                events(offset: 0, limit: 100) {
+                  totalCount
+                  items {
+                    type
+                    data
+                  }
+                }
+                currentApprovalRequestSteps {
+                  id
+                  status
+                  manualStart
+                  approvers {
+                    user {
+                      id
+                    }
+                    approvedAt
+                    canceledAt
+                    rejectedAt
+                    sentAt
+                    skippedAt
+                  }
+                }
+                oldApprovalRequestSteps {
+                  id
+                  status
+                  stepName
+                  approvers {
+                    user {
+                      id
+                    }
+                    approvedAt
+                    canceledAt
+                    rejectedAt
+                    sentAt
+                    skippedAt
+                  }
+                }
+              }
+            }
+          }
+        `,
+        { petitionId: toGlobalId("Petition", petition.id) },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.cancelPetitionApprovalRequestFlow).toEqual({
+        id: toGlobalId("PetitionApprovalRequestStep", steps[0].id),
+        status: "CANCELED",
+        petition: {
+          events: {
+            totalCount: 1,
+            items: [
+              {
+                type: "PETITION_APPROVAL_REQUEST_STEP_CANCELED",
+                data: {
+                  approvalRequestStepId: toGlobalId("PetitionApprovalRequestStep", steps[0].id),
+                  userId: toGlobalId("User", user.id),
+                },
+              },
+            ],
+          },
+          currentApprovalRequestSteps: [
+            {
+              id: expect.any(String),
+              status: "NOT_STARTED",
+              manualStart: true,
+              approvers: [
+                {
+                  user: { id: toGlobalId("User", user.id) },
+                  approvedAt: null,
+                  canceledAt: null,
+                  rejectedAt: null,
+                  sentAt: null,
+                  skippedAt: null,
+                },
+              ],
+            },
+            {
+              id: expect.any(String),
+              status: "NOT_APPLICABLE",
+              manualStart: true,
+              approvers: [],
+            },
+            {
+              id: expect.any(String),
+              status: "NOT_STARTED",
+              manualStart: false,
+              approvers: [
+                {
+                  user: { id: toGlobalId("User", user.id) },
+                  approvedAt: null,
+                  canceledAt: null,
+                  rejectedAt: null,
+                  sentAt: null,
+                  skippedAt: null,
+                },
+                {
+                  user: { id: toGlobalId("User", otherUsers[0].id) },
+                  approvedAt: null,
+                  canceledAt: null,
+                  rejectedAt: null,
+                  sentAt: null,
+                  skippedAt: null,
+                },
+              ],
+            },
+            {
+              id: expect.any(String),
+              status: "NOT_STARTED",
+              approvers: [],
+              manualStart: true,
             },
           ],
           oldApprovalRequestSteps: [
@@ -2740,6 +2942,7 @@ describe("GraphQL/Petition Approval Request", () => {
         status: "COMPLETED",
         approval_flow_config: JSON.stringify([
           {
+            manual_start: true,
             name: "Step 1",
             type: "ANY",
             values: [
@@ -2748,6 +2951,7 @@ describe("GraphQL/Petition Approval Request", () => {
             ],
           },
           {
+            manual_start: true,
             name: "Step 2",
             type: "ANY",
             values: [
@@ -3264,6 +3468,248 @@ describe("GraphQL/Petition Approval Request", () => {
       expect(deprecatedSteps).toHaveLength(2);
 
       expect(emailSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it("sets first step to start manually if temporally rejecting and first step is automatic", async () => {
+      await mocks.knex
+        .from("petition_approval_request_step")
+        .whereIn(
+          "id",
+          steps.map((s) => s.id),
+        )
+        .update("manual_start", false);
+
+      await mocks.knex
+        .from("petition")
+        .where("id", petition.id)
+        .update({
+          approval_flow_config: JSON.stringify([
+            {
+              manual_start: false,
+              name: "Step 1",
+              type: "ANY",
+              values: [
+                { type: "User", id: user.id },
+                { type: "UserGroup", id: adminsGroup.id },
+              ],
+            },
+            {
+              manual_start: false,
+              name: "Step 2",
+              type: "ANY",
+              values: [
+                { type: "User", id: user.id },
+                { type: "User", id: otherUsers[2].id },
+              ],
+            },
+          ]),
+        });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $approvalRequestStepId: GID!
+            $rejectionType: PetitionApprovalRequestStepRejectionType!
+            $message: String!
+          ) {
+            rejectPetitionApprovalRequestStep(
+              petitionId: $petitionId
+              approvalRequestStepId: $approvalRequestStepId
+              rejectionType: $rejectionType
+              message: $message
+            ) {
+              id
+              status
+              approvers {
+                user {
+                  id
+                }
+                rejectedAt
+              }
+              petition {
+                generalComments {
+                  id
+                  isApproval
+                  approvalMetadata
+                  content
+                }
+                events(limit: 100, offset: 0) {
+                  totalCount
+                  items {
+                    type
+                    data
+                  }
+                }
+                currentApprovalRequestSteps {
+                  id
+                  stepName
+                  approvalType
+                  manualStart
+                  status
+                  approvers {
+                    user {
+                      id
+                    }
+                    approvedAt
+                    canceledAt
+                    rejectedAt
+                    sentAt
+                    skippedAt
+                  }
+                }
+                oldApprovalRequestSteps {
+                  id
+                  status
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          approvalRequestStepId: toGlobalId("PetitionApprovalRequestStep", steps[0].id),
+          rejectionType: "TEMPORARY",
+          message: "Please fix this",
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.rejectPetitionApprovalRequestStep).toEqual({
+        id: toGlobalId("PetitionApprovalRequestStep", steps[0].id),
+        status: "REJECTED",
+        approvers: [
+          {
+            user: { id: toGlobalId("User", user.id) },
+            rejectedAt: expect.any(Date),
+          },
+          {
+            user: { id: toGlobalId("User", otherUsers[0].id) },
+            rejectedAt: null,
+          },
+          {
+            user: { id: toGlobalId("User", otherUsers[1].id) },
+            rejectedAt: null,
+          },
+        ],
+        petition: {
+          generalComments: [
+            {
+              id: expect.any(String),
+              isApproval: true,
+              approvalMetadata: {
+                stepName: "Step 1",
+                status: "REJECTED",
+                rejectionType: "TEMPORARY",
+              },
+              content: [
+                {
+                  type: "paragraph",
+                  children: [{ text: "Please fix this" }],
+                },
+              ],
+            },
+          ],
+          events: {
+            totalCount: 3,
+            items: [
+              {
+                type: "PETITION_APPROVAL_REQUEST_STEP_FINISHED",
+                data: {
+                  approvalRequestStepId: toGlobalId("PetitionApprovalRequestStep", steps[0].id),
+                  userId: toGlobalId("User", user.id),
+                },
+              },
+              {
+                type: "PETITION_APPROVAL_REQUEST_STEP_REJECTED",
+                data: {
+                  approvalRequestStepId: toGlobalId("PetitionApprovalRequestStep", steps[0].id),
+                  userId: toGlobalId("User", user.id),
+                },
+              },
+              {
+                type: "COMMENT_PUBLISHED",
+                data: {
+                  petitionFieldCommentId:
+                    data.rejectPetitionApprovalRequestStep.petition.generalComments[0].id,
+                  petitionFieldId: null,
+                },
+              },
+            ],
+          },
+          currentApprovalRequestSteps: [
+            {
+              id: expect.any(String),
+              stepName: "Step 1",
+              approvalType: "ANY",
+              status: "NOT_STARTED",
+              manualStart: true,
+              approvers: [
+                {
+                  user: { id: toGlobalId("User", user.id) },
+                  approvedAt: null,
+                  canceledAt: null,
+                  rejectedAt: null,
+                  sentAt: null,
+                  skippedAt: null,
+                },
+                {
+                  user: { id: toGlobalId("User", otherUsers[0].id) },
+                  approvedAt: null,
+                  canceledAt: null,
+                  rejectedAt: null,
+                  sentAt: null,
+                  skippedAt: null,
+                },
+                {
+                  user: { id: toGlobalId("User", otherUsers[1].id) },
+                  approvedAt: null,
+                  canceledAt: null,
+                  rejectedAt: null,
+                  sentAt: null,
+                  skippedAt: null,
+                },
+                {
+                  user: { id: toGlobalId("User", otherUsers[2].id) },
+                  approvedAt: null,
+                  canceledAt: null,
+                  rejectedAt: null,
+                  sentAt: null,
+                  skippedAt: null,
+                },
+              ],
+            },
+            {
+              id: expect.any(String),
+              stepName: "Step 2",
+              approvalType: "ANY",
+              status: "NOT_STARTED",
+              manualStart: false,
+              approvers: [
+                {
+                  user: { id: toGlobalId("User", user.id) },
+                  approvedAt: null,
+                  canceledAt: null,
+                  rejectedAt: null,
+                  sentAt: null,
+                  skippedAt: null,
+                },
+                {
+                  user: { id: toGlobalId("User", otherUsers[2].id) },
+                  approvedAt: null,
+                  canceledAt: null,
+                  rejectedAt: null,
+                  sentAt: null,
+                  skippedAt: null,
+                },
+              ],
+            },
+          ],
+          oldApprovalRequestSteps: [
+            { id: toGlobalId("PetitionApprovalRequestStep", steps[0].id), status: "REJECTED" },
+          ],
+        },
+      });
     });
 
     it("permanently rejects the provided step, marking it as REJECTED and not allowing to start a new one", async () => {

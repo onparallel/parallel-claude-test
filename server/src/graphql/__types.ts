@@ -126,6 +126,7 @@ export interface NexusGenInputs {
   };
   ApprovalFlowConfigInput: {
     // input type
+    manualStart: boolean; // Boolean!
     name: string; // String!
     type: NexusGenEnums["ApprovalFlowType"]; // ApprovalFlowType!
     values: string[]; // [ID!]!
@@ -739,6 +740,7 @@ export interface NexusGenEnums {
   PetitionApprovalsFilterOperator: "ASSIGNED_TO" | "STATUS";
   PetitionAttachmentType: db.PetitionAttachmentType;
   PetitionBaseType: "PETITION" | "TEMPLATE";
+  PetitionEventTriggeredBy: "SYSTEM" | "USER";
   PetitionEventType: db.PetitionEventType;
   PetitionFieldReplyStatus: db.PetitionFieldReplyStatus;
   PetitionFieldType: db.PetitionFieldType;
@@ -999,6 +1001,7 @@ export interface NexusGenObjects {
     type: "ANY" | "ALL";
     values: { id: number; type: "User" | "UserGroup" | "PetitionField" }[];
     visibility?: any;
+    manual_start: boolean;
   };
   AsyncFieldCompletionResponse: {
     // root type
@@ -2261,6 +2264,7 @@ export interface NexusGenFieldTypes {
   ApprovalFlowConfig: {
     // field return type
     approvers: Array<NexusGenRootTypes["User"] | null>; // [User]!
+    manualStart: boolean; // Boolean!
     name: string; // String!
     type: NexusGenEnums["ApprovalFlowType"]; // ApprovalFlowType!
     values: string[]; // [ID!]!
@@ -3464,6 +3468,7 @@ export interface NexusGenFieldTypes {
     approvalType: NexusGenEnums["PetitionApprovalRequestStepApprovalType"]; // PetitionApprovalRequestStepApprovalType!
     approvers: NexusGenRootTypes["PetitionApprovalRequestStepApprover"][]; // [PetitionApprovalRequestStepApprover!]!
     id: NexusGenScalars["GID"]; // GID!
+    manualStart: boolean; // Boolean!
     petition: NexusGenRootTypes["Petition"]; // Petition!
     status: NexusGenEnums["PetitionApprovalRequestStepStatus"]; // PetitionApprovalRequestStepStatus!
     stepName: string; // String!
@@ -3548,6 +3553,7 @@ export interface NexusGenFieldTypes {
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
     petition: NexusGenRootTypes["Petition"] | null; // Petition
+    triggeredBy: NexusGenEnums["PetitionEventTriggeredBy"]; // PetitionEventTriggeredBy!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
   };
@@ -3981,10 +3987,11 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     isRead: boolean; // Boolean!
-    owner: NexusGenRootTypes["User"]; // User!
+    owner: NexusGenRootTypes["User"] | null; // User
     permissionType: NexusGenEnums["PetitionPermissionTypeRW"]; // PetitionPermissionTypeRW!
     petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     sharedWith: NexusGenRootTypes["UserOrUserGroup"] | null; // UserOrUserGroup
+    triggeredBy: NexusGenEnums["PetitionEventTriggeredBy"]; // PetitionEventTriggeredBy!
   };
   PetitionSharingInfo: {
     // field return type
@@ -5267,6 +5274,7 @@ export interface NexusGenFieldTypes {
     permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
     permissionUser: NexusGenRootTypes["User"] | null; // User
     petition: NexusGenRootTypes["Petition"] | null; // Petition
+    triggeredBy: NexusGenEnums["PetitionEventTriggeredBy"]; // PetitionEventTriggeredBy!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
   };
@@ -5616,6 +5624,7 @@ export interface NexusGenFieldTypeNames {
   ApprovalFlowConfig: {
     // field return type name
     approvers: "User";
+    manualStart: "Boolean";
     name: "String";
     type: "ApprovalFlowType";
     values: "ID";
@@ -6817,6 +6826,7 @@ export interface NexusGenFieldTypeNames {
     approvalType: "PetitionApprovalRequestStepApprovalType";
     approvers: "PetitionApprovalRequestStepApprover";
     id: "GID";
+    manualStart: "Boolean";
     petition: "Petition";
     status: "PetitionApprovalRequestStepStatus";
     stepName: "String";
@@ -6901,6 +6911,7 @@ export interface NexusGenFieldTypeNames {
     data: "JSONObject";
     id: "GID";
     petition: "Petition";
+    triggeredBy: "PetitionEventTriggeredBy";
     type: "PetitionEventType";
     user: "User";
   };
@@ -7338,6 +7349,7 @@ export interface NexusGenFieldTypeNames {
     permissionType: "PetitionPermissionTypeRW";
     petition: "PetitionBase";
     sharedWith: "UserOrUserGroup";
+    triggeredBy: "PetitionEventTriggeredBy";
   };
   PetitionSharingInfo: {
     // field return type name
@@ -8620,6 +8632,7 @@ export interface NexusGenFieldTypeNames {
     permissionType: "PetitionPermissionType";
     permissionUser: "User";
     petition: "Petition";
+    triggeredBy: "PetitionEventTriggeredBy";
     type: "PetitionEventType";
     user: "User";
   };

@@ -18,6 +18,7 @@ const FullApprovalFlowConfig = gql`
     type
     values
     visibility
+    manualStart
   }
 `;
 

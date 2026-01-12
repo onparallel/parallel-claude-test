@@ -382,8 +382,15 @@ export const UserPermissionAddedEvent = createPetitionEvent("UserPermissionAdded
   t.nullable.field("user", {
     type: "User",
     resolve: async (root, _, ctx) => {
+      if (isNullish(root.data.user_id)) {
+        return null;
+      }
       return await ctx.users.loadUser(root.data.user_id);
     },
+  });
+  t.nonNull.field("triggeredBy", {
+    type: "PetitionEventTriggeredBy",
+    resolve: (root) => (isNonNullish(root.data.user_id) ? "USER" : "SYSTEM"),
   });
   t.field("permissionType", {
     type: "PetitionPermissionType",
@@ -849,8 +856,15 @@ export const PetitionApprovalRequestStepStartedEvent = createPetitionEvent(
     t.nullable.field("user", {
       type: "User",
       resolve: async ({ data }, _, ctx) => {
+        if (isNullish(data.user_id)) {
+          return null;
+        }
         return await ctx.users.loadUser(data.user_id);
       },
+    });
+    t.nonNull.field("triggeredBy", {
+      type: "PetitionEventTriggeredBy",
+      resolve: (o) => (isNonNullish(o.data.user_id) ? "USER" : "SYSTEM"),
     });
     t.nonNull.field("approvalRequestStep", {
       type: "PetitionApprovalRequestStep",

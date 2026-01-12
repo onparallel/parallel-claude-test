@@ -97,8 +97,8 @@ export interface IEmailsService {
   ): Promise<void>;
   sendPetitionApprovalRequestStepPendingEmail(
     approvalRequestStepId: number,
-    petitionCommentId: number | null,
-    userId: number,
+    petitionCommentId?: number | null,
+    userId?: number | null,
   ): Promise<void>;
   sendPetitionApprovalRequestStepReminderEmail(
     approvalRequestStepId: number,
@@ -418,14 +418,17 @@ export class EmailsService implements IEmailsService {
 
   async sendPetitionApprovalRequestStepPendingEmail(
     approvalRequestStepId: number,
-    petitionCommentId: number | null,
-    userId: number,
+    petitionCommentId?: number | null,
+    userId?: number | null,
   ) {
     return await this.enqueueEmail("petition-approval-request-step-pending", {
-      id: this.buildQueueId("PetitionApprovalRequestStepPending", [approvalRequestStepId, userId]),
+      id: this.buildQueueId("PetitionApprovalRequestStepPending", [
+        approvalRequestStepId,
+        userId ?? "",
+      ]),
       petition_approval_request_step_id: approvalRequestStepId,
-      petition_comment_id: petitionCommentId,
-      user_id: userId,
+      petition_comment_id: petitionCommentId ?? null,
+      user_id: userId ?? null,
       is_reminder: false,
     });
   }

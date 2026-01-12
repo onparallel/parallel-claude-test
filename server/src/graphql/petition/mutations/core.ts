@@ -51,6 +51,7 @@ import {
   ProfileFieldFileAddedEvent,
   ProfileFieldFileRemovedEvent,
 } from "../../../db/events/ProfileEvent";
+import { ApprovalRequestStepConfig } from "../../../db/repositories/PetitionApprovalRequestRepository";
 import { PetitionFieldOptions } from "../../../services/PetitionFieldService";
 import { chunkWhile } from "../../../util/arrays";
 import { applyFieldVisibility, evaluateFieldLogic, mapFieldLogic } from "../../../util/fieldLogic";
@@ -1236,10 +1237,18 @@ export const updatePetition = mutationField("updatePetition", {
             }
 
             return {
-              ...config,
-              values: config.values.map((id) => fromGlobalId(id)),
+              name: config.name,
+              type: config.type,
+              values: config.values.map((id) => {
+                assert(
+                  isGlobalId(id, "User") || isGlobalId(id, "UserGroup"),
+                  "Expected globalId to be a User or UserGroup",
+                );
+                return fromGlobalId(id);
+              }),
+              manual_start: config.manualStart ?? false,
               visibility: fieldLogic?.field.visibility ?? null,
-            };
+            } satisfies ApprovalRequestStepConfig;
           }),
         );
 

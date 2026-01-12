@@ -2950,6 +2950,7 @@ export class PetitionRepository extends BaseRepository {
         "custom_lists",
         "automatic_numbering_config",
         "metadata",
+        "signature_config",
         "approval_flow_config",
         "closed_at",
       ]);
@@ -2995,6 +2996,7 @@ export class PetitionRepository extends BaseRepository {
           values: l.values,
         })),
         metadata: petitionProperties?.metadata ?? {},
+        signatureConfig: petitionProperties?.signature_config ?? null,
         approvalFlowConfig: petitionProperties?.approval_flow_config ?? null,
         closedAt: petitionProperties?.closed_at ?? null,
       };
@@ -3051,6 +3053,7 @@ export class PetitionRepository extends BaseRepository {
             "automaticNumberingConfig",
             "standardListDefinitions",
             "metadata",
+            "signatureConfig",
             "approvalFlowConfig",
             "closedAt",
           ]),

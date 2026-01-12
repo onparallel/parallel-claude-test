@@ -108,6 +108,7 @@ export const PetitionApprovalsCard = Object.assign(
     const intl = useIntl();
     const toast = useToast();
     const tabsRefs = useMultipleRefs<HTMLButtonElement>();
+
     const approvalSteps =
       isNonNullish(petition.currentApprovalRequestSteps) &&
       petition.currentApprovalRequestSteps.length > 0
@@ -122,6 +123,7 @@ export const PetitionApprovalsCard = Object.assign(
                 id: index.toString(),
                 user: approver,
               })),
+              manualStart: step.manualStart,
               isMock: true,
             };
           }) ?? []);
@@ -405,9 +407,34 @@ export const PetitionApprovalsCard = Object.assign(
     const petitionSignatureStatus = getPetitionSignatureStatus(petition);
     const petitionSignatureEnvironment = getPetitionSignatureEnvironment(petition);
 
+    const hasPendingSignature =
+      isNonNullish(petition.signatureConfig) &&
+      !petition.signatureConfig.reviewAfterApproval &&
+      isNullish(petition.currentSignatureRequest);
+
+    const hasOngoingSignature =
+      isNonNullish(petition.currentSignatureRequest) &&
+      ["ENQUEUED", "PROCESSING", "PROCESSED"].includes(petition.currentSignatureRequest.status);
+
+    const hasRejectedApproval = approvalSteps.some((s) => s.status === "REJECTED");
+    const hasPendingApproval = approvalSteps.some((s) => s.status === "PENDING");
+    const nextNotStartedApproval = approvalSteps.find((s) => s.status === "NOT_STARTED");
+
+    const hasMockApprovalSteps = approvalSteps.some((s) => (s as any).isMock);
+    const shouldShowMockStepsAlert = !isParallelJustCompleted && hasMockApprovalSteps;
+
+    const isReadyForAutomaticStart =
+      !hasOngoingSignature &&
+      !hasPendingSignature &&
+      !hasRejectedApproval &&
+      !hasPendingApproval &&
+      nextNotStartedApproval?.manualStart === false;
+
+    const shouldShowAboutToStartAlert = shouldShowMockStepsAlert || isReadyForAutomaticStart;
+
     return (
       <>
-        {isParallelJustCompleted && approvalSteps.some((s) => (s as any).isMock) ? (
+        {shouldShowAboutToStartAlert ? (
           <PetitionApprovalsAboutToStartAlert marginBottom={2} borderRadius="md" />
         ) : null}
         <Card ref={ref} padding={0} marginBottom={4} data-section="signature-card">
@@ -541,6 +568,7 @@ export const PetitionApprovalsCard = Object.assign(
                           petition.status !== "COMPLETED" ||
                           isNotCurrentOrNextStep ||
                           stepNotApplicable ||
+                          (step.status === "NOT_STARTED" && !step.manualStart) ||
                           (step as any).isMock
                         }
                         petitionStatus={petition.status}
@@ -587,6 +615,7 @@ export const PetitionApprovalsCard = Object.assign(
             status
             stepName
             approvalType
+            manualStart
             approvers {
               ...PetitionApprovalsCard_PetitionApprovalRequestStepApprover
             }
@@ -1282,7 +1311,32 @@ const POLL_INTERVAL = 30_000;
 function usePetitionApprovalsCardPolling(petition: PetitionApprovalsCard_PetitionFragment) {
   const current = petition.signatureRequests.at(0);
   const isPageVisible = usePageVisibility();
-  const shouldSkip = !isPageVisible || (isNullish(petition?.signatureConfig) && isNullish(current));
+
+  const nextNotStartedApproval = petition.currentApprovalRequestSteps?.find(
+    (step) => step.status === "NOT_STARTED",
+  );
+
+  const hasFinalRejection =
+    isNonNullish(petition.currentApprovalRequestSteps) &&
+    petition.currentApprovalRequestSteps?.some((step) => step.status === "REJECTED");
+
+  const hasPendingApproval =
+    !hasFinalRejection &&
+    (petition.currentApprovalRequestSteps?.length === 0 ||
+      petition.currentApprovalRequestSteps?.some((step) => step.status === "PENDING") ||
+      (isNonNullish(nextNotStartedApproval) && nextNotStartedApproval?.manualStart === false));
+
+  const hasPendingSignature = petition.signatureRequests?.some(
+    (request) => request.status !== "COMPLETED" && request.status !== "CANCELLED",
+  );
+
+  const isSignatureFinalized =
+    (isNullish(petition?.signatureConfig) && isNullish(current)) ||
+    current?.status === "COMPLETED" ||
+    current?.status === "CANCELLED";
+
+  const hasActiveProcess = hasPendingApproval || hasPendingSignature;
+  const shouldSkip = !isPageVisible || (!hasActiveProcess && isSignatureFinalized);
 
   const { startPolling, stopPolling } = useQuery(PetitionApprovalsCard_petitionDocument, {
     pollInterval: POLL_INTERVAL,
@@ -1292,7 +1346,10 @@ function usePetitionApprovalsCardPolling(petition: PetitionApprovalsCard_Petitio
   });
 
   useEffect(() => {
-    if (current && current.status !== "CANCELLED" && isNullish(current.auditTrailFilename)) {
+    if (
+      (current && current.status !== "CANCELLED" && isNullish(current.auditTrailFilename)) ||
+      hasPendingApproval
+    ) {
       startPolling(POLL_INTERVAL);
     } else if (
       (current?.status === "COMPLETED" && isNonNullish(current.auditTrailFilename)) ||
@@ -1302,5 +1359,5 @@ function usePetitionApprovalsCardPolling(petition: PetitionApprovalsCard_Petitio
     }
 
     return stopPolling;
-  }, [current?.status, current?.auditTrailFilename]);
+  }, [current?.status, current?.auditTrailFilename, hasPendingApproval]);
 }

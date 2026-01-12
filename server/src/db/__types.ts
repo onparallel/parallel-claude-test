@@ -1702,11 +1702,12 @@ export interface PetitionApprovalRequestStep {
   updated_at: Date; // timestamptz
   updated_by: Maybe<string>; // varchar
   deprecated_at: Maybe<Date>; // timestamptz
+  manual_start: boolean; // bool
 }
 
 export type CreatePetitionApprovalRequestStep = PartialProps<
   Omit<PetitionApprovalRequestStep, "id">,
-  "created_at" | "created_by" | "updated_at" | "updated_by" | "deprecated_at"
+  "created_at" | "created_by" | "updated_at" | "updated_by" | "deprecated_at" | "manual_start"
 >;
 
 export interface PetitionApprovalRequestStepApprover {

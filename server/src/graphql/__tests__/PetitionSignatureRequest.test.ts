@@ -87,8 +87,14 @@ describe("GraphQL/PetitionSignatureRequest", () => {
         .where("id", petition.id)
         .update({
           approval_flow_config: JSON.stringify([
-            { name: "Step 1", type: "ANY", values: [{ id: user.id, type: "User" }] },
             {
+              manual_start: true,
+              name: "Step 1",
+              type: "ANY",
+              values: [{ id: user.id, type: "User" }],
+            },
+            {
+              manual_start: true,
               name: "Step 2",
               type: "ANY",
               values: [{ id: user.id, type: "User" }],

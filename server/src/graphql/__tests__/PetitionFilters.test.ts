@@ -745,22 +745,34 @@ describe("Petition Filters", () => {
               approval_flow_config: null, // WITHOUT_APPROVAL
             },
             {
-              approval_flow_config: JSON.stringify([{ name: "step 1", type: "ANY", values: [] }]), // NOT_STARTED
+              approval_flow_config: JSON.stringify([
+                { name: "step 1", type: "ANY", values: [], manual_start: true },
+              ]), // NOT_STARTED
             },
             {
-              approval_flow_config: JSON.stringify([{ name: "step 1", type: "ANY", values: [] }]), // NOT_STARTED
+              approval_flow_config: JSON.stringify([
+                { name: "step 1", type: "ANY", values: [], manual_start: true },
+              ]), // NOT_STARTED
             },
             {
-              approval_flow_config: JSON.stringify([{ name: "step 1", type: "ANY", values: [] }]), // PENDING
+              approval_flow_config: JSON.stringify([
+                { name: "step 1", type: "ANY", values: [], manual_start: true },
+              ]), // PENDING
             },
             {
-              approval_flow_config: JSON.stringify([{ name: "step 1", type: "ANY", values: [] }]), // APPROVED
+              approval_flow_config: JSON.stringify([
+                { name: "step 1", type: "ANY", values: [], manual_start: true },
+              ]), // APPROVED
             },
             {
-              approval_flow_config: JSON.stringify([{ name: "step 1", type: "ANY", values: [] }]), // APPROVED
+              approval_flow_config: JSON.stringify([
+                { name: "step 1", type: "ANY", values: [], manual_start: true },
+              ]), // APPROVED
             },
             {
-              approval_flow_config: JSON.stringify([{ name: "step 1", type: "ANY", values: [] }]), // REJECTED
+              approval_flow_config: JSON.stringify([
+                { name: "step 1", type: "ANY", values: [], manual_start: true },
+              ]), // REJECTED
             },
           ][i],
       );

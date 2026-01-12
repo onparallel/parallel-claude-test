@@ -1,7 +1,10 @@
 import { inject, injectable } from "inversify";
 import {
+  PetitionApprovalRequestStepFinishedEvent,
+  PetitionApprovalRequestStepSkippedEvent,
   PetitionCompletedEvent,
   PetitionRecoveredFromDeletionEvent,
+  SignatureCompletedEvent,
 } from "../../../db/events/PetitionEvent";
 import { FeatureFlagRepository } from "../../../db/repositories/FeatureFlagRepository";
 import { PetitionApprovalRequestRepository } from "../../../db/repositories/PetitionApprovalRequestRepository";
@@ -13,11 +16,27 @@ export const PETITION_APPROVAL_PROCESS_LISTENER = Symbol.for("PETITION_APPROVAL_
 
 @injectable()
 export class PetitionApprovalProcessListener
-  implements EventListener<"PETITION_COMPLETED" | "PETITION_RECOVERED_FROM_DELETION">
+  implements
+    EventListener<
+      | "PETITION_COMPLETED"
+      | "PETITION_RECOVERED_FROM_DELETION"
+      | "SIGNATURE_COMPLETED"
+      | "PETITION_APPROVAL_REQUEST_STEP_FINISHED"
+      | "PETITION_APPROVAL_REQUEST_STEP_SKIPPED"
+    >
 {
-  public readonly types: ("PETITION_COMPLETED" | "PETITION_RECOVERED_FROM_DELETION")[] = [
+  public readonly types: (
+    | "PETITION_COMPLETED"
+    | "PETITION_RECOVERED_FROM_DELETION"
+    | "SIGNATURE_COMPLETED"
+    | "PETITION_APPROVAL_REQUEST_STEP_FINISHED"
+    | "PETITION_APPROVAL_REQUEST_STEP_SKIPPED"
+  )[] = [
     "PETITION_COMPLETED",
     "PETITION_RECOVERED_FROM_DELETION",
+    "SIGNATURE_COMPLETED",
+    "PETITION_APPROVAL_REQUEST_STEP_FINISHED",
+    "PETITION_APPROVAL_REQUEST_STEP_SKIPPED",
   ];
 
   constructor(
@@ -29,7 +48,14 @@ export class PetitionApprovalProcessListener
     private readonly approvals: IApprovalsService,
   ) {}
 
-  public async handle(event: PetitionCompletedEvent | PetitionRecoveredFromDeletionEvent) {
+  public async handle(
+    event:
+      | PetitionCompletedEvent
+      | PetitionRecoveredFromDeletionEvent
+      | SignatureCompletedEvent
+      | PetitionApprovalRequestStepFinishedEvent
+      | PetitionApprovalRequestStepSkippedEvent,
+  ) {
     const petition = await this.petitions.loadPetition(event.petition_id);
 
     if (
@@ -49,16 +75,34 @@ export class PetitionApprovalProcessListener
     if (!hasFeatureFlag) {
       return;
     }
-
-    const createdBy =
-      event.data.user_id || event.type === "PETITION_RECOVERED_FROM_DELETION"
-        ? `User:${event.data.user_id}`
-        : `PetitionAccess:${event.data.petition_access_id!}`;
-
     const currentSteps =
       await this.approvalRequests.loadCurrentPetitionApprovalRequestStepsByPetitionId(petition.id);
-    if (currentSteps.length === 0) {
-      await this.approvals.startApprovalRequestFlowByPetitionId(petition.id, createdBy);
+
+    if (event.type === "PETITION_COMPLETED" || event.type === "PETITION_RECOVERED_FROM_DELETION") {
+      if (currentSteps.length === 0) {
+        await this.approvals.startApprovalRequestFlowByPetitionId(
+          petition.id,
+          null,
+          `PetitionEvent:${event.id}`,
+          // do not start automatically if the petition is recovered from deletion
+          { forceStartFirstStepManually: event.type === "PETITION_RECOVERED_FROM_DELETION" },
+        );
+      }
+
+      return;
+    }
+
+    if (
+      event.type === "SIGNATURE_COMPLETED" ||
+      (event.type === "PETITION_APPROVAL_REQUEST_STEP_FINISHED" && event.data.is_approved) ||
+      event.type === "PETITION_APPROVAL_REQUEST_STEP_SKIPPED"
+    ) {
+      const nextStep = currentSteps.find((s) => s.status === "NOT_STARTED");
+      if (nextStep?.manual_start === false) {
+        await this.approvals.startApprovalRequestStep(nextStep.id);
+      }
+
+      return;
     }
   }
 }

@@ -35,30 +35,57 @@ export const PetitionSharedUserNotification = Object.assign(
           path={``}
         >
           {sharedWith?.__typename === "UserGroup" ? (
-            <FormattedMessage
-              id="component.notification-petition-shared-group.body"
-              defaultMessage="{name} has shared the {isTemplate, select, true {template} other {petition}} with the team {group} to which you belong."
-              values={{
-                isTemplate: petition.__typename === "PetitionTemplate",
-                name: <UserReference user={notification.owner} />,
-                group: <UserGroupReference fontWeight="bold" userGroup={sharedWith} />,
-              }}
-            />
+            notification.triggeredBy === "USER" ? (
+              <FormattedMessage
+                id="component.notification-petition-shared-group.triggered-by-user-body"
+                defaultMessage="{name} has shared the {isTemplate, select, true {template} other {petition}} with the team {group} to which you belong."
+                values={{
+                  isTemplate: petition.__typename === "PetitionTemplate",
+                  name: <UserReference user={notification.owner} />,
+                  group: <UserGroupReference fontWeight="bold" userGroup={sharedWith} />,
+                }}
+              />
+            ) : (
+              <FormattedMessage
+                id="component.notification-petition-shared-group.triggered-by-system-body"
+                defaultMessage="The {isTemplate, select, true {template} other {petition}} has been shared with the team {group} to which you belong."
+                values={{
+                  isTemplate: petition.__typename === "PetitionTemplate",
+                  group: <UserGroupReference fontWeight="bold" userGroup={sharedWith} />,
+                }}
+              />
+            )
           ) : sharedWith?.__typename === "User" ? (
-            <FormattedMessage
-              id="component.notification-petition-shared.body"
-              defaultMessage="{name} has shared the {isTemplate, select, true {template} other {parallel}} with you as {permissionType}."
-              values={{
-                isTemplate: petition.__typename === "PetitionTemplate",
-                name: <UserReference user={notification.owner} />,
-                permissionType: (
-                  <PetitionPermissionTypeText
-                    type={notification.permissionType}
-                    textTransform="lowercase"
-                  />
-                ),
-              }}
-            />
+            notification.triggeredBy === "USER" ? (
+              <FormattedMessage
+                id="component.notification-petition-shared.triggered-by-user-body"
+                defaultMessage="{name} has shared the {isTemplate, select, true {template} other {parallel}} with you as {permissionType}."
+                values={{
+                  name: <UserReference user={notification.owner} />,
+                  isTemplate: petition.__typename === "PetitionTemplate",
+                  permissionType: (
+                    <PetitionPermissionTypeText
+                      type={notification.permissionType}
+                      textTransform="lowercase"
+                    />
+                  ),
+                }}
+              />
+            ) : (
+              <FormattedMessage
+                id="component.notification-petition-shared.triggered-by-system-body"
+                defaultMessage="The {isTemplate, select, true {template} other {parallel}} has been shared with you as {permissionType}."
+                values={{
+                  isTemplate: petition.__typename === "PetitionTemplate",
+                  permissionType: (
+                    <PetitionPermissionTypeText
+                      type={notification.permissionType}
+                      textTransform="lowercase"
+                    />
+                  ),
+                }}
+              />
+            )
           ) : null}
         </PetitionUserNotification>
       );
@@ -72,6 +99,7 @@ export const PetitionSharedUserNotification = Object.assign(
           petition {
             __typename
           }
+          triggeredBy
           owner {
             ...UserReference_User
           }

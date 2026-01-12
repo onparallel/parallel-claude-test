@@ -52,7 +52,10 @@ export const cancelPetitionApprovalRequestFlow = mutationField(
       // after canceling current request, we need to recreate the steps in initial state, so user is able to start again
       await ctx.approvals.startApprovalRequestFlowByPetitionId(
         args.petitionId,
+        ctx.user!.id,
         `User:${ctx.user!.id}`,
+        // this is required because when user cancels a process, they will not want the process to start immediately before doing some corrections.
+        { forceStartFirstStepManually: true },
       );
 
       ctx.approvalRequests.loadCurrentPetitionApprovalRequestStepsByPetitionId.dataloader.clear(
@@ -92,20 +95,10 @@ export const startPetitionApprovalRequestStep = mutationField("startPetitionAppr
     maxArrayLength("attachments", 10),
   ),
   resolve: async (_, args, ctx) => {
-    const approvalRequestStep = await ctx.approvalRequests.updatePetitionApprovalRequestStep(
+    const approvalRequestStep = await ctx.approvalRequests.loadPetitionApprovalRequestStep(
       args.approvalRequestStepId,
-      { status: "PENDING" },
-      `User:${ctx.user!.id}`,
     );
     assert(approvalRequestStep, "Approval request step not found");
-
-    const approvers = await ctx.approvalRequests.loadPetitionApprovalRequestStepApproversByStepId(
-      args.approvalRequestStepId,
-    );
-
-    if (approvers.length === 0) {
-      return approvalRequestStep;
-    }
 
     let comment: PetitionFieldComment | undefined;
     if (args.message && args.message !== "") {
@@ -152,46 +145,15 @@ export const startPetitionApprovalRequestStep = mutationField("startPetitionAppr
       );
     }
 
-    await ctx.approvalRequests.updatePetitionApprovalRequestStepApproverTimestamps(
-      approvers.map((a) => a.id),
-      { sent: true },
-      `User:${ctx.user!.id}`,
-    );
-
-    // make sure everybody has at least READ access
-    const newPermissions = await ctx.petitions.ensureMinimalPermissions(
-      args.petitionId,
-      approvers.map((a) => a.user_id),
-      `User:${ctx.user!.id}`,
-    );
-
-    await ctx.petitions.createEvent(
-      newPermissions.map((p) => ({
-        type: "USER_PERMISSION_ADDED",
-        petition_id: args.petitionId,
-        data: {
-          permission_user_id: p.user_id!,
-          permission_type: p.type,
-          user_id: ctx.user!.id,
-        },
-      })),
-    );
-
-    await ctx.emails.sendPetitionApprovalRequestStepPendingEmail(
+    const startedStep = await ctx.approvals.startApprovalRequestStep(
       approvalRequestStep.id,
       comment?.id ?? null,
       ctx.user!.id,
     );
 
-    await ctx.petitions.createEvent({
-      type: "PETITION_APPROVAL_REQUEST_STEP_STARTED",
-      petition_id: args.petitionId,
-      data: {
-        petition_approval_request_step_id: approvalRequestStep.id,
-        petition_comment_id: comment?.id ?? null,
-        user_id: ctx.user!.id,
-      },
-    });
+    ctx.approvalRequests.loadPetitionApprovalRequestStep.dataloader.clear(
+      args.approvalRequestStepId,
+    );
 
     ctx.approvalRequests.loadCurrentPetitionApprovalRequestStepsByPetitionId.dataloader.clear(
       args.petitionId,
@@ -200,7 +162,7 @@ export const startPetitionApprovalRequestStep = mutationField("startPetitionAppr
       args.approvalRequestStepId,
     );
 
-    return approvalRequestStep;
+    return startedStep;
   },
 });
 
@@ -308,7 +270,10 @@ export const cancelPetitionApprovalRequestStep = mutationField(
     resolve: async (_, args, ctx) => {
       const approvalRequestStep = await ctx.approvalRequests.updatePetitionApprovalRequestStep(
         args.approvalRequestStepId,
-        { status: "NOT_STARTED" },
+        {
+          status: "NOT_STARTED",
+          manual_start: true,
+        },
         `User:${ctx.user!.id}`,
       );
       assert(approvalRequestStep, "Approval request step not found");
@@ -505,6 +470,7 @@ export const approvePetitionApprovalRequestStep = mutationField(
           data: {
             petition_approval_request_step_id: approvalRequestStep.id,
             user_id: ctx.user!.id,
+            is_approved: true,
           },
         });
       }
@@ -643,6 +609,7 @@ export const rejectPetitionApprovalRequestStep = mutationField(
         data: {
           petition_approval_request_step_id: approvalRequestStep.id,
           user_id: ctx.user!.id,
+          is_approved: false,
         },
       });
 
@@ -653,14 +620,22 @@ export const rejectPetitionApprovalRequestStep = mutationField(
           );
 
         // after canceling current request, we need to recreate the steps in initial state, so user is able to start again
+        let firstVisibleStepIndex = -1;
         const newSteps = await ctx.approvalRequests.createPetitionApprovalRequestSteps(
-          deprecatedSteps.map((s) => ({
-            approval_type: s.approval_type,
-            step_name: s.step_name,
-            petition_id: s.petition_id,
-            status: s.status === "NOT_APPLICABLE" ? "NOT_APPLICABLE" : "NOT_STARTED",
-            step_number: s.step_number,
-          })),
+          deprecatedSteps.map((s, index) => {
+            if (s.status !== "NOT_APPLICABLE" && firstVisibleStepIndex === -1) {
+              firstVisibleStepIndex = index;
+            }
+            return {
+              approval_type: s.approval_type,
+              step_name: s.step_name,
+              petition_id: s.petition_id,
+              status: s.status === "NOT_APPLICABLE" ? "NOT_APPLICABLE" : "NOT_STARTED",
+              step_number: s.step_number,
+              // when rejecting a request, never start the first step automatically
+              manual_start: index === firstVisibleStepIndex ? true : s.manual_start,
+            };
+          }),
           `User:${ctx.user!.id}`,
         );
 

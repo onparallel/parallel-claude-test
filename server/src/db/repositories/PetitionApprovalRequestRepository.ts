@@ -16,6 +16,7 @@ export interface ApprovalRequestStepConfig {
   type: PetitionApprovalRequestStepApprovalType;
   values: { id: number; type: "User" | "UserGroup" | "PetitionField" }[];
   visibility?: PetitionFieldVisibility | null;
+  manual_start: boolean;
 }
 
 export class PetitionApprovalRequestRepository extends BaseRepository {
@@ -107,7 +108,7 @@ export class PetitionApprovalRequestRepository extends BaseRepository {
 
   async createPetitionApprovalRequestStepApprovers(
     petitionApprovalRequestStepId: number,
-    users: { id: number; skipped?: boolean; canceled?: boolean }[],
+    users: { id: number; skipped?: boolean; canceled?: boolean; sent?: boolean }[],
     createdBy: string,
     t?: Knex.Transaction,
   ) {
@@ -121,6 +122,7 @@ export class PetitionApprovalRequestRepository extends BaseRepository {
         user_id: u.id,
         ...(u.skipped ? { skipped_at: this.now() } : {}),
         ...(u.canceled ? { canceled_at: this.now() } : {}),
+        ...(u.sent ? { sent_at: this.now() } : {}),
         created_at: this.now(),
         created_by: createdBy,
       })),

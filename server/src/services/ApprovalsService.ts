@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { findLast, isNonNullish, unique, zip } from "remeda";
 import { assert } from "ts-essentials";
-import { PetitionApprovalRequestStep } from "../db/__types";
+import { PetitionApprovalRequestStep, PetitionApprovalRequestStepStatus } from "../db/__types";
 import {
   ApprovalRequestStepConfig,
   PetitionApprovalRequestRepository,
@@ -22,8 +22,12 @@ export interface IApprovalsService {
    */
   startApprovalRequestFlowByPetitionId(
     petitionId: number,
-    createdBy: string,
-    t?: Knex.Transaction,
+    userId: number | null,
+    startedBy: string,
+    opts?: {
+      /** Whether to start the first step manually, even if its configured to start automatically. */
+      forceStartFirstStepManually: boolean;
+    },
   ): Promise<void>;
   cancelApprovalRequestFlowByPetitionId(
     petitionId: MaybeArray<number>,
@@ -31,6 +35,11 @@ export interface IApprovalsService {
     opts?: { onlyIfPending?: boolean },
     t?: Knex.Transaction,
   ): Promise<(PetitionApprovalRequestStep | null)[]>;
+  startApprovalRequestStep(
+    stepId: number,
+    commentId?: number | null,
+    userId?: number | null,
+  ): Promise<PetitionApprovalRequestStep>;
   extractUserIdsFromApprovalFlowConfig(config: ApprovalRequestStepConfig): Promise<number[]>;
 }
 
@@ -46,8 +55,9 @@ export class ApprovalsService implements IApprovalsService {
 
   async startApprovalRequestFlowByPetitionId(
     petitionId: number,
-    createdBy: string,
-    t?: Knex.Transaction,
+    userId: number | null,
+    startedBy: string,
+    opts?: { forceStartFirstStepManually: boolean },
   ) {
     const [composedPetition] = await this.petitions.getComposedPetitionFieldsAndVariables([
       petitionId,
@@ -58,29 +68,48 @@ export class ApprovalsService implements IApprovalsService {
       return;
     }
 
+    const { signatureConfig } = composedPetition;
+
+    const signatureIsNext = signatureConfig?.isEnabled && !signatureConfig.reviewAfterApproval;
+
     const approvalLogic = evaluateVisibilityArray(
       composedPetition,
       composedPetition.approvalFlowConfig,
     );
 
-    // create every approval step. Step statuses will be NOT_STARTED or NOT_APPLICABLE, as completing the petition does not starts the approval flow, only calculates its steps
     let firstVisibleStepIndex = -1;
+    // create every approval step with the appropriate status based on the manual_start flag and visibility
     const approvalRequestSteps = await this.approvalRequests.createPetitionApprovalRequestSteps(
       zip(composedPetition.approvalFlowConfig, approvalLogic).map(
         ([step, { isVisible }], index) => {
           if (isVisible && firstVisibleStepIndex === -1) {
             firstVisibleStepIndex = index;
           }
+          const isFirstStep = index === firstVisibleStepIndex;
+
+          let status: PetitionApprovalRequestStepStatus;
+          if (!isVisible) {
+            status = "NOT_APPLICABLE";
+          } else if (signatureIsNext || (isFirstStep && opts?.forceStartFirstStepManually)) {
+            status = "NOT_STARTED";
+          } else if (isFirstStep && !step.manual_start && !signatureIsNext) {
+            status = "PENDING";
+          } else {
+            status = "NOT_STARTED";
+          }
+
           return {
             petition_id: petitionId,
-            status: isVisible ? "NOT_STARTED" : "NOT_APPLICABLE",
+            status,
             approval_type: step.type,
             step_name: step.name,
             step_number: index,
+            manual_start:
+              isFirstStep && opts?.forceStartFirstStepManually ? true : step.manual_start,
           };
         },
       ),
-      createdBy,
+      startedBy,
     );
 
     // on each step, insert its approvers
@@ -89,9 +118,46 @@ export class ApprovalsService implements IApprovalsService {
 
       await this.approvalRequests.createPetitionApprovalRequestStepApprovers(
         step.id,
-        userIds.map((id) => ({ id })),
-        createdBy,
+        userIds.map((id) => ({ id, sent: step.status === "PENDING" })),
+        startedBy,
       );
+
+      if (step.status === "PENDING") {
+        // make sure everybody has at least READ access
+        const newPermissions = await this.petitions.ensureMinimalPermissions(
+          step.petition_id,
+          userIds,
+          startedBy,
+        );
+
+        await this.petitions.createEvent(
+          newPermissions.map((p) => ({
+            type: "USER_PERMISSION_ADDED",
+            petition_id: step.petition_id,
+            data: {
+              permission_user_id: p.user_id!,
+              permission_type: p.type,
+              user_id: userId ?? null,
+            },
+          })),
+        );
+
+        await this.emails.sendPetitionApprovalRequestStepPendingEmail(
+          step.id,
+          null,
+          userId ?? null,
+        );
+
+        await this.petitions.createEvent({
+          type: "PETITION_APPROVAL_REQUEST_STEP_STARTED",
+          petition_id: step.petition_id,
+          data: {
+            petition_approval_request_step_id: step.id,
+            petition_comment_id: null,
+            user_id: userId ?? null,
+          },
+        });
+      }
     }
   }
 
@@ -193,6 +259,64 @@ export class ApprovalsService implements IApprovalsService {
     );
 
     return canceledSteps;
+  }
+
+  async startApprovalRequestStep(
+    stepId: number,
+    commentId?: number | null,
+    userId?: number | null,
+  ) {
+    const step = await this.approvalRequests.updatePetitionApprovalRequestStep(
+      stepId,
+      { status: "PENDING" },
+      `User:${userId}`,
+    );
+    assert(step, "Approval request step not found");
+    const approvers =
+      await this.approvalRequests.loadPetitionApprovalRequestStepApproversByStepId(stepId);
+
+    if (approvers.length === 0) {
+      return step;
+    }
+
+    await this.approvalRequests.updatePetitionApprovalRequestStepApproverTimestamps(
+      approvers.map((a) => a.id),
+      { sent: true },
+      `User:${userId}`,
+    );
+
+    // make sure everybody has at least READ access
+    const newPermissions = await this.petitions.ensureMinimalPermissions(
+      step.petition_id,
+      approvers.map((a) => a.user_id),
+      `User:${userId}`,
+    );
+
+    await this.petitions.createEvent(
+      newPermissions.map((p) => ({
+        type: "USER_PERMISSION_ADDED",
+        petition_id: step.petition_id,
+        data: {
+          permission_user_id: p.user_id!,
+          permission_type: p.type,
+          user_id: userId ?? null,
+        },
+      })),
+    );
+
+    await this.emails.sendPetitionApprovalRequestStepPendingEmail(step.id, commentId, userId);
+
+    await this.petitions.createEvent({
+      type: "PETITION_APPROVAL_REQUEST_STEP_STARTED",
+      petition_id: step.petition_id,
+      data: {
+        petition_approval_request_step_id: step.id,
+        petition_comment_id: commentId ?? null,
+        user_id: userId ?? null,
+      },
+    });
+
+    return step;
   }
 
   async extractUserIdsFromApprovalFlowConfig(config: ApprovalRequestStepConfig) {

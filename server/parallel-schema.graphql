@@ -160,6 +160,7 @@ type ApprovalFlowConfig {
   List of users that are assigned to approve this step.
   """
   approvers: [User]!
+  manualStart: Boolean!
   name: String!
   type: ApprovalFlowType!
 
@@ -171,6 +172,10 @@ type ApprovalFlowConfig {
 }
 
 input ApprovalFlowConfigInput {
+  """
+  Forces step to start manually after completing, signing, or approving a previous step.
+  """
+  manualStart: Boolean!
   name: String!
   type: ApprovalFlowType!
 
@@ -4737,6 +4742,7 @@ type PetitionApprovalRequestStep {
   approvalType: PetitionApprovalRequestStepApprovalType!
   approvers: [PetitionApprovalRequestStepApprover!]!
   id: GID!
+  manualStart: Boolean!
   petition: Petition!
   status: PetitionApprovalRequestStepStatus!
   stepName: String!
@@ -4831,6 +4837,7 @@ type PetitionApprovalRequestStepStartedEvent implements PetitionEvent {
   data: JSONObject!
   id: GID!
   petition: Petition
+  triggeredBy: PetitionEventTriggeredBy!
   type: PetitionEventType!
   user: User
 }
@@ -5259,6 +5266,11 @@ type PetitionEventSubscription implements EventSubscription {
   isFailing: Boolean!
   name: String
   signatureKeys: [EventSubscriptionSignatureKey!]!
+}
+
+enum PetitionEventTriggeredBy {
+  SYSTEM
+  USER
 }
 
 enum PetitionEventType {
@@ -6226,10 +6238,11 @@ type PetitionSharedUserNotification implements PetitionUserNotification {
   createdAt: DateTime!
   id: GID!
   isRead: Boolean!
-  owner: User!
+  owner: User
   permissionType: PetitionPermissionTypeRW!
   petition: PetitionBase!
   sharedWith: UserOrUserGroup
+  triggeredBy: PetitionEventTriggeredBy!
 }
 
 input PetitionSharedWithFilter {
@@ -10042,6 +10055,7 @@ type UserPermissionAddedEvent implements PetitionEvent {
   permissionType: PetitionPermissionType!
   permissionUser: User
   petition: Petition
+  triggeredBy: PetitionEventTriggeredBy!
   type: PetitionEventType!
   user: User
 }

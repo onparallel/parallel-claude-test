@@ -473,7 +473,7 @@ const PetitionEventSchemas = {
     },
   },
   USER_PERMISSION_ADDED: {
-    description: "The user shared their parallel with another user",
+    description: "A parallel was shared with another user",
     properties: {
       permissionType: {
         description: "The type of permission for the new user",
@@ -482,8 +482,9 @@ const PetitionEventSchemas = {
         example: "WRITE",
       },
       userId: {
-        description: "The ID of the user that shared the parallel",
-        type: "string",
+        description:
+          "The ID of the user that shared the parallel, or null if the parallel was shared by the system.",
+        type: ["string", "null"],
         example: toGlobalId("User", 10),
       },
       permissionUserId: {
@@ -834,8 +835,9 @@ const PetitionEventSchemas = {
     description: "An approval request step was started by an user",
     properties: {
       userId: {
-        description: "The ID of the user that started the approval request step",
-        type: "string",
+        description:
+          "The ID of the user that started the approval request step, or null if the step was started by the system.",
+        type: ["string", "null"],
         example: toGlobalId("User", 5),
       },
       approvalRequestStepId: {

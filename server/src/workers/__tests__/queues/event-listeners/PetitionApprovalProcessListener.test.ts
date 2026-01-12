@@ -61,8 +61,14 @@ describe("Worker - Petition Approval Process Listener", () => {
       .where("id", petition.id)
       .update({
         approval_flow_config: JSON.stringify([
-          { name: "Step 1", type: "ALL", values: [{ id: sessionUser.id, type: "User" }] },
           {
+            manual_start: true,
+            name: "Step 1",
+            type: "ALL",
+            values: [{ id: sessionUser.id, type: "User" }],
+          },
+          {
+            manual_start: true,
             name: "Step 2",
             type: "ANY",
             values: [{ id: sessionUser.id, type: "User" }],
@@ -165,6 +171,135 @@ describe("Worker - Petition Approval Process Listener", () => {
           ],
         },
       ],
+    });
+  });
+
+  it("starts first step automatically if the petition has a manual_start flag set to false", async () => {
+    await mocks.knex
+      .from("petition")
+      .where("id", petition.id)
+      .update({
+        approval_flow_config: JSON.stringify([
+          {
+            manual_start: false,
+            name: "Step 1",
+            type: "ALL",
+            values: [{ id: sessionUser.id, type: "User" }],
+          },
+          {
+            manual_start: true,
+            name: "Step 2",
+            type: "ANY",
+            values: [{ id: sessionUser.id, type: "User" }],
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                { modifier: "ANY", fieldId: field.id, operator: "EQUAL", value: "HELLO" },
+              ],
+            },
+          },
+        ]),
+      });
+
+    await approvalsListener.handle({
+      id: 1,
+      created_at: new Date(),
+      petition_id: petition.id,
+      type: "PETITION_COMPLETED",
+      data: {
+        user_id: sessionUser.id,
+      },
+      processed_at: null,
+      processed_by: null,
+    });
+
+    const { errors, data } = await testClient.execute(
+      gql`
+        query ($id: GID!) {
+          petition(id: $id) {
+            id
+            ... on Petition {
+              events(offset: 0, limit: 100) {
+                totalCount
+                items {
+                  type
+                  data
+                }
+              }
+            }
+            ... on Petition {
+              currentApprovalRequestSteps {
+                id
+                status
+                approvalType
+                approvers {
+                  user {
+                    id
+                  }
+                  approvedAt
+                  canceledAt
+                  rejectedAt
+                  skippedAt
+                  sentAt
+                }
+              }
+            }
+          }
+        }
+      `,
+      {
+        id: toGlobalId("Petition", petition.id),
+      },
+    );
+
+    expect(errors).toBeUndefined();
+    expect(data?.petition).toEqual({
+      id: toGlobalId("Petition", petition.id),
+      currentApprovalRequestSteps: [
+        {
+          id: expect.any(String),
+          status: "PENDING",
+          approvalType: "ALL",
+          approvers: [
+            {
+              user: { id: toGlobalId("User", sessionUser.id) },
+              approvedAt: null,
+              canceledAt: null,
+              rejectedAt: null,
+              skippedAt: null,
+              sentAt: expect.any(Date),
+            },
+          ],
+        },
+        {
+          id: expect.any(String),
+          status: "NOT_APPLICABLE",
+          approvalType: "ANY",
+          approvers: [
+            {
+              user: { id: toGlobalId("User", sessionUser.id) },
+              approvedAt: null,
+              canceledAt: null,
+              rejectedAt: null,
+              skippedAt: null,
+              sentAt: null,
+            },
+          ],
+        },
+      ],
+      events: {
+        totalCount: 1,
+        items: [
+          {
+            type: "PETITION_APPROVAL_REQUEST_STEP_STARTED",
+            data: {
+              approvalRequestStepId: expect.any(String),
+              userId: null,
+            },
+          },
+        ],
+      },
     });
   });
 

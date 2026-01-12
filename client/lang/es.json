@@ -1340,6 +1340,16 @@
     "context": "An approval step is activated after completing the form. The parallel cannot be closed until all approval steps have been completed."
   },
   {
+    "term": "component.configure-approval-steps-dialog.checkbox-start-approval-manually",
+    "definition": "Iniciar manualmente la aprobación",
+    "context": "Start approval manually"
+  },
+  {
+    "term": "component.configure-approval-steps-dialog.checkbox-start-approval-manually-help",
+    "definition": "Evita que los pasos se inicien automáticamente tras finalizar, firmar, o aprobar un paso previo.",
+    "context": "Prevents steps from starting automatically after completing, signing, or approving a previous step."
+  },
+  {
     "term": "component.configure-approval-steps-dialog.delete-approval",
     "definition": "Borrar aprobación",
     "context": "Delete approval"
@@ -1573,11 +1583,6 @@
     "term": "component.configure-update-profile-on-close-dialog.complete-label",
     "definition": "Completar",
     "context": "Complete"
-  },
-  {
-    "term": "component.configure-update-profile-on-close-dialog.field-already-in-use",
-    "definition": "Este campo ya está en uso",
-    "context": "This field is already in use"
   },
   {
     "term": "component.configure-update-profile-on-close-dialog.header",
@@ -6075,12 +6080,22 @@
     "context": "{name} completed the parallel."
   },
   {
-    "term": "component.notification-petition-shared-group.body",
+    "term": "component.notification-petition-shared-group.triggered-by-system-body",
+    "definition": "{isTemplate, select, true {La plantilla ha sido compartida} other {El parallel ha sido compartido}} con el equipo {group} al que perteneces.",
+    "context": "The {isTemplate, select, true {template} other {petition}} has been shared with the team {group} to which you belong."
+  },
+  {
+    "term": "component.notification-petition-shared-group.triggered-by-user-body",
     "definition": "{name} ha compartido {isTemplate, select, true {la plantilla} other {el parallel}} con el equipo {group} al que perteneces.",
     "context": "{name} has shared the {isTemplate, select, true {template} other {petition}} with the team {group} to which you belong."
   },
   {
-    "term": "component.notification-petition-shared.body",
+    "term": "component.notification-petition-shared.triggered-by-system-body",
+    "definition": "{isTemplate, select, true {La plantilla te ha sido compartida} other {El parallel te ha sido compartido}} como {permissionType}.",
+    "context": "The {isTemplate, select, true {template} other {parallel}} has been shared with you as {permissionType}."
+  },
+  {
+    "term": "component.notification-petition-shared.triggered-by-user-body",
     "definition": "{name} te ha compartido {isTemplate, select, true {la plantilla} other {el parallel}} como {permissionType}.",
     "context": "{name} has shared the {isTemplate, select, true {template} other {parallel}} with you as {permissionType}."
   },
@@ -13445,7 +13460,12 @@
     "context": "{user} skipped step \"{approvalStep}\" {timeAgo}"
   },
   {
-    "term": "component.timeline-petition-approval-request-step-started-event.description",
+    "term": "component.timeline-petition-approval-request-step-started-event.triggered-by-system-description",
+    "definition": "Se inició el paso \"{approvalStep}\" en el parallel {timeAgo}",
+    "context": "Step \"{approvalStep}\" has been initiated in this parallel {timeAgo}"
+  },
+  {
+    "term": "component.timeline-petition-approval-request-step-started-event.triggered-by-user-description",
     "definition": "{user} inició el paso \"{approvalStep}\" en el parallel {timeAgo}",
     "context": "{user} initiated step \"{approvalStep}\" in this parallel {timeAgo}"
   },
@@ -13715,7 +13735,12 @@
     "context": "We started a {signingMode, select, SEQUENTIAL{sequential} other{}} signature process on the parallel {timeAgo}"
   },
   {
-    "term": "component.timeline-user-permission-added-event.description",
+    "term": "component.timeline-user-permission-added-event.triggered-by-system-description",
+    "definition": "Se compartió este parallel con {other} como {permissionType} {timeAgo}",
+    "context": "This parallel has been shared with {other} as {permissionType} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-user-permission-added-event.triggered-by-user-description",
     "definition": "{user} compartió este parallel con {other} como {permissionType} {timeAgo}",
     "context": "{user} shared this parallel with {other} as {permissionType} {timeAgo}"
   },

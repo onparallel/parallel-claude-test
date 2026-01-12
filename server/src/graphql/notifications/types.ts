@@ -2,6 +2,11 @@ import { core, enumType, interfaceType, objectType } from "nexus";
 import { isNonNullish, isNullish } from "remeda";
 import { userOrPetitionAccessResolver } from "../helpers/userOrPetitionAccessResolver";
 
+export const PetitionEventTriggeredBy = enumType({
+  name: "PetitionEventTriggeredBy",
+  members: ["USER", "SYSTEM"],
+});
+
 export const PetitionUserNotificationFilter = enumType({
   name: "PetitionUserNotificationFilter",
   description: "The types of notifications available for filtering",
@@ -127,9 +132,18 @@ export const SignatureCancelledUserNotification = createPetitionUserNotification
 export const PetitionSharedUserNotification = createPetitionUserNotification(
   "PetitionSharedUserNotification",
   (t) => {
-    t.field("owner", {
+    t.nullable.field("owner", {
       type: "User",
-      resolve: async (root, _, ctx) => (await ctx.users.loadUser(root.data.owner_id))!,
+      resolve: async (root, _, ctx) => {
+        if (isNullish(root.data.owner_id)) {
+          return null;
+        }
+        return await ctx.users.loadUser(root.data.owner_id);
+      },
+    });
+    t.nonNull.field("triggeredBy", {
+      type: "PetitionEventTriggeredBy",
+      resolve: (root) => (isNonNullish(root.data.owner_id) ? "USER" : "SYSTEM"),
     });
     t.field("permissionType", {
       type: "PetitionPermissionTypeRW",
