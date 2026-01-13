@@ -1,5 +1,5 @@
 import { run } from "../utils/run";
-import { request } from "./helpers";
+import { apiRequest } from "./apiHelpers";
 
 const FROM_PROFILE_TYPE_ID = "3gtknhcm5YKAVC7jz7QeoQEK";
 
@@ -10,7 +10,7 @@ async function main() {
   do {
     // always fetch profiles with offset 0, as this script will delete profiles
     // break condition is when there are no more profiles to delete
-    const result = await request<{ items: { id: string }[]; totalCount: number }>("/profiles", {
+    const result = await apiRequest<{ items: { id: string }[]; totalCount: number }>("/profiles", {
       query: new URLSearchParams([
         ["profileTypeIds", FROM_PROFILE_TYPE_ID],
         ["status", "OPEN"],
@@ -30,10 +30,10 @@ async function main() {
 
     for (const item of result.items) {
       console.log(`Closing profile ${item.id}`);
-      await request(`/profiles/${item.id}/close`, { method: "POST" });
+      await apiRequest(`/profiles/${item.id}/close`, { method: "POST" });
 
       console.log(`Deleting profile ${item.id}`);
-      await request(`/profiles/${item.id}`, { method: "DELETE" });
+      await apiRequest(`/profiles/${item.id}`, { method: "DELETE" });
     }
   } while (totalCount > 0);
 }

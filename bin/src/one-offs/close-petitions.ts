@@ -1,5 +1,5 @@
 import { run } from "../utils/run";
-import { paginatedRequest, request } from "./helpers";
+import { apiRequest, paginatedApiRequest } from "./apiHelpers";
 
 /**
  * This script closes all petitions coming from the same template
@@ -8,7 +8,7 @@ import { paginatedRequest, request } from "./helpers";
 const TEMPLATE_IDS = ["6Y8DSH92uxPaJ4BA7uMNQ"];
 
 async function main() {
-  for await (const { item: petition, totalCount, index } of paginatedRequest<{ id: string }>(
+  for await (const { item: petition, totalCount, index } of paginatedApiRequest<{ id: string }>(
     "/petitions",
     {
       query: new URLSearchParams({
@@ -19,7 +19,7 @@ async function main() {
     },
   )) {
     console.log(`Closing petition ${petition.id} (${index + 1}/${totalCount})`);
-    await request(`/petitions/${petition.id}/close`, { method: "POST" });
+    await apiRequest(`/petitions/${petition.id}/close`, { method: "POST" });
   }
 }
 

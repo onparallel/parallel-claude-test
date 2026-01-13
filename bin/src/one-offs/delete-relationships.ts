@@ -1,8 +1,8 @@
 import { run } from "../utils/run";
-import { paginatedRequest, request } from "./helpers";
+import { apiRequest, paginatedApiRequest } from "./apiHelpers";
 
 async function main() {
-  for await (const { item: profile } of paginatedRequest<{
+  for await (const { item: profile } of paginatedApiRequest<{
     id: string;
     name: string;
     relationships: any[];
@@ -18,7 +18,7 @@ async function main() {
       console.log(
         `Deleting relationship ${relationship.id} for profile ${profile.id} (${profile.name})`,
       );
-      await request(`/profiles/${profile.id}/relationships/${relationship.id}`, {
+      await apiRequest(`/profiles/${profile.id}/relationships/${relationship.id}`, {
         method: "DELETE",
       });
     }
