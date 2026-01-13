@@ -995,7 +995,9 @@ function ProfilesListHeader({
           columns: data.createProfileListView.data.columns ?? undefined,
           search: data.createProfileListView.data.search,
           sort: isNonNullish(data.createProfileListView.data.sort)
-            ? omit(data.createProfileListView.data.sort, ["__typename"])
+            ? (omit(data.createProfileListView.data.sort, [
+                "__typename",
+              ]) as ProfilesQueryState["sort"])
             : undefined,
           status:
             state.status ??
@@ -1267,7 +1269,10 @@ Profiles.getInitialProps = async ({ query, pathname, fetchQuery }: WithApolloDat
           view: view.type === "ALL" ? "ALL" : view.id,
           search: state.search ?? view.data.search,
           columns: state.columns ?? view.data.columns ?? undefined,
-          sort: state.sort ?? removeTypenames(view.data.sort) ?? undefined,
+          sort:
+            state.sort ??
+            (removeTypenames(view.data.sort) as ProfilesQueryState["sort"]) ??
+            undefined,
           status: state.status ?? view.data.status ?? undefined,
           values: state.values ?? (view.data.values as ProfileFieldValuesFilter) ?? undefined,
         },

@@ -6075,14 +6075,12 @@ export interface ProfileListViewDataInput {
 export interface ProfileListViewSort {
   __typename?: "ProfileListViewSort";
   direction: ListViewSortDirection;
-  field: ProfileListViewSortField;
+  field: Scalars["String"]["output"];
 }
-
-export type ProfileListViewSortField = "createdAt" | "name";
 
 export interface ProfileListViewSortInput {
   direction: ListViewSortDirection;
-  field: ProfileListViewSortField;
+  field: Scalars["String"]["input"];
 }
 
 export interface ProfilePagination {
@@ -10027,7 +10025,7 @@ export type ProfileViewTabs_ProfileListViewDataFragment = {
   values?: { [key: string]: any } | null;
   sort?: {
     __typename?: "ProfileListViewSort";
-    field: ProfileListViewSortField;
+    field: string;
     direction: ListViewSortDirection;
   } | null;
 };
@@ -10046,7 +10044,7 @@ export type ProfileViewTabs_ProfileListViewFragment = {
     values?: { [key: string]: any } | null;
     sort?: {
       __typename?: "ProfileListViewSort";
-      field: ProfileListViewSortField;
+      field: string;
       direction: ListViewSortDirection;
     } | null;
   };
@@ -10104,7 +10102,7 @@ export type ProfileViewTabs_createProfileListViewMutation = {
       values?: { [key: string]: any } | null;
       sort?: {
         __typename?: "ProfileListViewSort";
-        field: ProfileListViewSortField;
+        field: string;
         direction: ListViewSortDirection;
       } | null;
     };
@@ -10138,7 +10136,7 @@ export type ProfileViewTabs_updateProfileListViewMutation = {
       values?: { [key: string]: any } | null;
       sort?: {
         __typename?: "ProfileListViewSort";
-        field: ProfileListViewSortField;
+        field: string;
         direction: ListViewSortDirection;
       } | null;
     };
@@ -67465,7 +67463,7 @@ export type Profiles_ProfileListViewFragment = {
     values?: { [key: string]: any } | null;
     sort?: {
       __typename?: "ProfileListViewSort";
-      field: ProfileListViewSortField;
+      field: string;
       direction: ListViewSortDirection;
     } | null;
   };
@@ -67509,7 +67507,7 @@ export type Profiles_userQuery = {
         values?: { [key: string]: any } | null;
         sort?: {
           __typename?: "ProfileListViewSort";
-          field: ProfileListViewSortField;
+          field: string;
           direction: ListViewSortDirection;
         } | null;
       };
@@ -67682,7 +67680,7 @@ export type Profiles_createProfileListViewMutation = {
       values?: { [key: string]: any } | null;
       sort?: {
         __typename?: "ProfileListViewSort";
-        field: ProfileListViewSortField;
+        field: string;
         direction: ListViewSortDirection;
       } | null;
     };
@@ -67711,7 +67709,7 @@ export type Profiles_updateProfileListViewMutation = {
       values?: { [key: string]: any } | null;
       sort?: {
         __typename?: "ProfileListViewSort";
-        field: ProfileListViewSortField;
+        field: string;
         direction: ListViewSortDirection;
       } | null;
     };

@@ -11,7 +11,7 @@ import {
   ProfileViewTabs_reorderProfileListViewsDocument,
   ProfileViewTabs_updateProfileListViewDocument,
 } from "@parallel/graphql/__types";
-import { useProfilesQueryState } from "@parallel/utils/profilesQueryState";
+import { ProfilesQueryState, useProfilesQueryState } from "@parallel/utils/profilesQueryState";
 import { unMaybeArray } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useIntl } from "react-intl";
@@ -44,7 +44,9 @@ export const ProfileViewTabs = Object.assign(
           view: view.type === "ALL" ? "ALL" : view.id,
           columns: view.data.columns,
           search: view.data.search,
-          sort: isNonNullish(view.data.sort) ? omit(view.data.sort, ["__typename"]) : undefined,
+          sort: isNonNullish(view.data.sort)
+            ? (omit(view.data.sort, ["__typename"]) as ProfilesQueryState["sort"])
+            : undefined,
           // TODO: remove unMaybeArray after profile views are updated
           status: isNonNullish(view.data.status) ? unMaybeArray(view.data.status) : undefined,
           values: view.data.values as any,
@@ -90,7 +92,7 @@ export const ProfileViewTabs = Object.assign(
             columns: newView.data.columns,
             search: newView.data.search,
             sort: isNonNullish(newView.data.sort)
-              ? omit(newView.data.sort, ["__typename"])
+              ? (omit(newView.data.sort, ["__typename"]) as ProfilesQueryState["sort"])
               : undefined,
             values: newView.data.values as any,
           });

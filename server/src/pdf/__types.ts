@@ -5851,14 +5851,12 @@ export type ProfileListViewDataInput = {
 
 export type ProfileListViewSort = {
   direction: ListViewSortDirection;
-  field: ProfileListViewSortField;
+  field: Scalars["String"]["output"];
 };
-
-export type ProfileListViewSortField = "createdAt" | "name";
 
 export type ProfileListViewSortInput = {
   direction: ListViewSortDirection;
-  field: ProfileListViewSortField;
+  field: Scalars["String"]["input"];
 };
 
 export type ProfilePagination = {
