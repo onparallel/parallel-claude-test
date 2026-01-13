@@ -1241,8 +1241,10 @@ export const updatePetition = mutationField("updatePetition", {
               type: config.type,
               values: config.values.map((id) => {
                 assert(
-                  isGlobalId(id, "User") || isGlobalId(id, "UserGroup"),
-                  "Expected globalId to be a User or UserGroup",
+                  isGlobalId(id, "User") ||
+                    isGlobalId(id, "UserGroup") ||
+                    isGlobalId(id, "PetitionField"),
+                  "Expected globalId to be a User, UserGroup or PetitionField",
                 );
                 return fromGlobalId(id);
               }),

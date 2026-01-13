@@ -319,7 +319,10 @@ function ApprovalCard({ index, petition, onRemove }: ApprovalCardProps) {
   }, []);
 
   const validCondition = (c: PetitionFieldLogicCondition) => {
-    return "fieldId" in c && isNonNullish(c.fieldId);
+    return (
+      ("fieldId" in c && isNonNullish(c.fieldId)) ||
+      ("variableName" in c && isNonNullish(c.variableName))
+    );
   };
 
   return (
@@ -437,7 +440,7 @@ function ApprovalCard({ index, petition, onRemove }: ApprovalCardProps) {
         />
       </HStack>
       <FormControl>
-        <Checkbox {...register(`approvals.${index}.manualStart`)} backgroundColor="white">
+        <Checkbox {...register(`approvals.${index}.manualStart`)}>
           <HStack spacing={1}>
             <Text>
               <FormattedMessage
