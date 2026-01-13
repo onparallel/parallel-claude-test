@@ -118,7 +118,7 @@ class MyDocument extends Document<MyDocumentProps> {
       isRecipientPage ? "recipient/" : ""
     }compiled/${locale}.js?v=${process.env.BUILD_ID}`;
     return (
-      <Html>
+      <Html translate="no">
         <Head>
           <link href={process.env.NEXT_PUBLIC_IMAGES_URL} rel="preconnect" />
           {process.env.NEXT_PUBLIC_ASSETS_URL ? (

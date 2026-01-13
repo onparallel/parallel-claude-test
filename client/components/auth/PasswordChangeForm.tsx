@@ -69,7 +69,6 @@ export function PasswordChangeForm({ onSubmit, backLink, isSubmitting }: Passwor
           </FormErrorMessage>
         </FormControl>
         <Button
-          className="notranslate"
           marginTop={6}
           width="100%"
           colorScheme="primary"

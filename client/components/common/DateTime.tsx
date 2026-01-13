@@ -2,7 +2,6 @@ import { Text, ThemingProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { DateTimeFormatOptions } from "@parallel/utils/dates";
 import { useForceUpdate } from "@parallel/utils/useForceUpdate";
-import classNames from "classnames";
 import { useEffect } from "react";
 import { FormattedDate, FormattedMessage, FormattedRelativeTime, useIntl } from "react-intl";
 
@@ -63,7 +62,6 @@ export const DateTime = chakraForwardRef<"time", DateTimeProps>(function DateTim
       title={_useRelativeTime ? intl.formatDate(date, format) : undefined}
       {...(props as any)}
       {...{ dateTime: date.toISOString() }}
-      className={classNames(props.className, "notranslate")}
       suppressHydrationWarning
     >
       {!_useRelativeTime ? (
