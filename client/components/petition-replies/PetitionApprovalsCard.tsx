@@ -163,14 +163,24 @@ export const PetitionApprovalsCard = Object.assign(
     const pendingOrNotStartedStepIndex = approvalStepsWithSignature.findIndex(
       (s) => s.status === "PENDING" || s.status === "NOT_STARTED",
     );
-    const [tabIndex, setTabIndex] = useState(
-      pendingOrNotStartedStepIndex === -1
-        ? approvalStepsWithSignature.findIndex((s) => s.id === "signature")
-        : pendingOrNotStartedStepIndex,
-    );
-    const showGenericErrorToast = useGenericErrorToast();
 
-    const signatureIndex = approvalStepsWithSignature.findIndex((step) => step.id === "signature");
+    const signatureIndex = approvalStepsWithSignature.findIndex((s) => s.id === "signature");
+
+    const [tabIndex, setTabIndex] = useState(
+      pendingOrNotStartedStepIndex === -1 ? signatureIndex : pendingOrNotStartedStepIndex,
+    );
+    const autoChangeTabIndex = useRef(true);
+
+    useEffect(() => {
+      const pendingOrNotStartedStepIndex = approvalStepsWithSignature.findIndex(
+        (s) => s.status === "PENDING" || s.status === "NOT_STARTED",
+      );
+      if (pendingOrNotStartedStepIndex && autoChangeTabIndex.current) {
+        setTabIndex(pendingOrNotStartedStepIndex);
+      }
+    }, [approvalStepsWithSignature.map((s) => s.status).join(","), autoChangeTabIndex.current]);
+
+    const showGenericErrorToast = useGenericErrorToast();
 
     let currentSignatureRequest: Maybe<
       UnwrapArray<PetitionApprovalsCard_PetitionFragment["signatureRequests"]>
@@ -268,6 +278,7 @@ export const PetitionApprovalsCard = Object.assign(
           },
         });
         showCanceledToast(step.stepName);
+        autoChangeTabIndex.current = true;
       } catch (error) {
         if (!isDialogError(error)) {
           showGenericErrorToast(error);
@@ -306,6 +317,7 @@ export const PetitionApprovalsCard = Object.assign(
             },
           });
           showApprovedToast(step.stepName);
+          autoChangeTabIndex.current = true;
         } else {
           await rejectPetitionApprovalRequestStep({
             variables: {
@@ -317,6 +329,7 @@ export const PetitionApprovalsCard = Object.assign(
             },
           });
           showRejectedToast(step.stepName);
+          autoChangeTabIndex.current = true;
         }
       } catch (error) {
         if (!isDialogError(error)) {
@@ -351,6 +364,7 @@ export const PetitionApprovalsCard = Object.assign(
             },
           });
           showApprovedToast(step.stepName);
+          autoChangeTabIndex.current = true;
         }
       } catch (error) {
         if (!isDialogError(error)) {
@@ -421,9 +435,11 @@ export const PetitionApprovalsCard = Object.assign(
     const nextNotStartedApproval = approvalSteps.find((s) => s.status === "NOT_STARTED");
 
     const hasMockApprovalSteps = approvalSteps.some((s) => (s as any).isMock);
-    const shouldShowMockStepsAlert = !isParallelJustCompleted && hasMockApprovalSteps;
+    const shouldShowMockStepsAlert =
+      petition.status === "COMPLETED" && !isParallelJustCompleted && hasMockApprovalSteps;
 
     const isReadyForAutomaticStart =
+      petition.status === "COMPLETED" &&
       !hasOngoingSignature &&
       !hasPendingSignature &&
       !hasRejectedApproval &&
@@ -432,13 +448,18 @@ export const PetitionApprovalsCard = Object.assign(
 
     const shouldShowAboutToStartAlert = shouldShowMockStepsAlert || isReadyForAutomaticStart;
 
+    const handleTabIndexChange = (index: number) => {
+      autoChangeTabIndex.current = false;
+      setTabIndex(index);
+    };
+
     return (
       <>
         {shouldShowAboutToStartAlert ? (
           <PetitionApprovalsAboutToStartAlert marginBottom={2} borderRadius="md" />
         ) : null}
         <Card ref={ref} padding={0} marginBottom={4} data-section="signature-card">
-          <Tabs index={tabIndex} onChange={(index) => setTabIndex(index)} variant="enclosed">
+          <Tabs index={tabIndex} onChange={handleTabIndexChange} variant="enclosed">
             <HStack spacing={0} overflowX="auto" overflowY="hidden">
               <TabList marginX="-1px" marginTop="-1px" height="52px" flex="1">
                 {approvalStepsWithSignature.map((step, index) => {
