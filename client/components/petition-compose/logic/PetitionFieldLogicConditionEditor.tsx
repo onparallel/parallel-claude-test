@@ -173,7 +173,6 @@ function ConditionMultipleValueModifier({
         isFileTypeField(conditionField.type) ||
         (conditionField.type === "DYNAMIC_SELECT" && condition.column === undefined) ||
         conditionField.type === "FIELD_GROUP" ||
-        conditionField.type === "BACKGROUND_CHECK" ||
         conditionField.type === "ADVERSE_MEDIA_SEARCH"
       ) {
         return [
@@ -269,7 +268,7 @@ function ConditionMultipleValueModifier({
           onChange({
             ...condition,
             modifier,
-            operator: "EQUAL",
+            operator: conditionField.type === "BACKGROUND_CHECK" ? "HAS_BG_CHECK_RESULTS" : "EQUAL",
             value: defaultFieldConditionValue(conditionField, condition.column),
           });
         } else {
@@ -823,6 +822,7 @@ function ConditionPredicate({
     ((!isMultipleValue && condition.modifier === "NUMBER_OF_REPLIES") ||
       referencedField?.type === "PROFILE_SEARCH" ||
       (referencedField?.type === "BACKGROUND_CHECK" &&
+        condition.modifier !== "NUMBER_OF_REPLIES" &&
         !["HAS_BG_CHECK_TOPICS", "NOT_HAS_BG_CHECK_TOPICS"].includes(condition.operator))) ? (
     isReadOnly ? (
       <Box as="span">{options.find((o) => o.value === operator)?.label}</Box>
