@@ -3205,6 +3205,31 @@
     "context": "Remind on:"
   },
   {
+    "term": "component.create-or-update-property-dialog.hidden-options-help",
+    "definition": "Si la opción está oculta, no se mostrará en la interfaz, pero estará disponible para usar en la API.",
+    "context": "If the option is hidden from the user, it will not be displayed in the UI, but it will be available for use in the API."
+  },
+  {
+    "term": "component.create-or-update-property-dialog.hidden-options-help-hidden",
+    "definition": "Opción oculta, pulsa para mostrarla",
+    "context": "Hidden option, press to show it"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.hidden-options-help-visible",
+    "definition": "Opción visible, pulsa para ocultarla",
+    "context": "Visible option, press to hide it"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.hide-option-button",
+    "definition": "Ocultar opción",
+    "context": "Hide option"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.at-least-one-visible-option-error",
+    "definition": "Al menos una opción debe estar visible",
+    "context": "At least one option must be visible"
+  },
+  {
     "term": "component.create-or-update-property-dialog.import-options-button",
     "definition": "Importar opciones...",
     "context": "Import options..."
@@ -3258,6 +3283,11 @@
     "term": "component.create-or-update-property-dialog.reserved-alias-error",
     "definition": "Este identificador está reservado y no puede ser usado",
     "context": "This identifier is reserved and can't be used"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.show-option-button",
+    "definition": "Mostrar opción",
+    "context": "Show option"
   },
   {
     "term": "component.create-or-update-property-dialog.standard-list",

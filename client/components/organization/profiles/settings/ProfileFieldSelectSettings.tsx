@@ -24,7 +24,13 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { DeleteIcon, DragHandleIcon, PlusCircleIcon } from "@parallel/chakra/icons";
+import {
+  DeleteIcon,
+  DragHandleIcon,
+  EyeIcon,
+  EyeOffIcon,
+  PlusCircleIcon,
+} from "@parallel/chakra/icons";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { LocalizableUserTextInput } from "@parallel/components/common/LocalizableUserTextInput";
@@ -110,7 +116,16 @@ export function ProfileFieldSelectSettings({
     name: "options.values",
     keyName: "key",
     control,
-    rules: { required: true, minLength: 1, maxLength: 1000 },
+    rules: {
+      required: true,
+      minLength: 1,
+      maxLength: 1000,
+      validate: {
+        atLeastOneVisible: (values) => {
+          return values?.some((v) => !v.isHidden) ?? false;
+        },
+      },
+    },
     shouldUnregister: true,
   });
 
@@ -337,6 +352,34 @@ export function ProfileFieldSelectSettings({
                       />
                     </Th>
                   ) : null}
+                  <Th paddingInline={1} paddingBlock={2} display="flex" justifyContent="center">
+                    <HelpPopover position="relative" margin="0" top="3px" popoverWidth="280px">
+                      <Stack spacing={2}>
+                        <Text>
+                          <FormattedMessage
+                            id="component.create-or-update-property-dialog.hidden-options-help"
+                            defaultMessage="If the option is hidden from the user, it will not be displayed in the UI, but it will be available for use in the API."
+                          />
+                        </Text>
+                        <List paddingInlineStart={1} listStyleType="disc">
+                          <ListItem display="flex" alignItems="center" gap={2}>
+                            <EyeIcon />
+                            <FormattedMessage
+                              id="component.create-or-update-property-dialog.hidden-options-help-hidden"
+                              defaultMessage="Hidden option, press to show it"
+                            />
+                          </ListItem>
+                          <ListItem display="flex" alignItems="center" gap={2}>
+                            <EyeOffIcon />
+                            <FormattedMessage
+                              id="component.create-or-update-property-dialog.hidden-options-help-visible"
+                              defaultMessage="Visible option, press to hide it"
+                            />
+                          </ListItem>
+                        </List>
+                      </Stack>
+                    </HelpPopover>
+                  </Th>
                   <Th paddingInline={1} paddingBlock={2}></Th>
                 </Tr>
               </Thead>
@@ -360,6 +403,16 @@ export function ProfileFieldSelectSettings({
               </MotionConfig>
             </Table>
           </Box>
+          {errors.options?.values?.root ? (
+            <FormControl isInvalid>
+              <FormErrorMessage>
+                <FormattedMessage
+                  id="component.create-or-update-property-dialog.at-least-one-visible-option-error"
+                  defaultMessage="At least one option must be visible"
+                />
+              </FormErrorMessage>
+            </FormControl>
+          ) : null}
           <HStack>
             <Button
               leftIcon={<PlusCircleIcon />}
@@ -597,7 +650,6 @@ function ProfileFieldSelectOption({
             required: true,
             pattern: REFERENCE_REGEX,
             maxLength: 50,
-
             validate: {
               isAvailable: (value, { options }) => {
                 return !options.values?.some(({ value: v }, i) => v === value && i < index);
@@ -640,6 +692,34 @@ function ProfileFieldSelectOption({
           />
         </FormControl>
       ) : null}
+      <FormControl as={Td} verticalAlign="top" paddingInline={1} paddingBlock={2}>
+        <Controller
+          name={`options.values.${index}.isHidden` as const}
+          control={control}
+          rules={{
+            required: false,
+          }}
+          defaultValue={false}
+          render={({ field }) => (
+            <IconButtonWithTooltip
+              onClick={() => field.onChange(!field.value)}
+              icon={field.value ? <EyeIcon /> : <EyeOffIcon />}
+              variant="outline"
+              label={
+                field.value
+                  ? intl.formatMessage({
+                      id: "component.create-or-update-property-dialog.show-option-button",
+                      defaultMessage: "Show option",
+                    })
+                  : intl.formatMessage({
+                      id: "component.create-or-update-property-dialog.hide-option-button",
+                      defaultMessage: "Hide option",
+                    })
+              }
+            />
+          )}
+        />
+      </FormControl>
       <Td verticalAlign="top" paddingInline={1} paddingBlock={2}>
         <IconButtonWithTooltip
           isDisabled={!canRemoveOption || isOptionDisabled}

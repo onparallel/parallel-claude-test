@@ -3205,6 +3205,26 @@
     "context": "Remind on:"
   },
   {
+    "term": "component.create-or-update-property-dialog.hidden-options-help",
+    "definition": "If the option is hidden from the user, it will not be displayed in the UI, but it will be available for use in the API.",
+    "context": "If the option is hidden from the user, it will not be displayed in the UI, but it will be available for use in the API."
+  },
+  {
+    "term": "component.create-or-update-property-dialog.hidden-options-help-hidden",
+    "definition": "Hidden option, press to show it",
+    "context": "Hidden option, press to show it"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.hidden-options-help-visible",
+    "definition": "Visible option, press to hide it",
+    "context": "Visible option, press to hide it"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.hide-option-button",
+    "definition": "Hide option",
+    "context": "Hide option"
+  },
+  {
     "term": "component.create-or-update-property-dialog.import-options-button",
     "definition": "Import options...",
     "context": "Import options..."
@@ -3258,6 +3278,11 @@
     "term": "component.create-or-update-property-dialog.reserved-alias-error",
     "definition": "This identifier is reserved and can't be used",
     "context": "This identifier is reserved and can't be used"
+  },
+  {
+    "term": "component.create-or-update-property-dialog.show-option-button",
+    "definition": "Show option",
+    "context": "Show option"
   },
   {
     "term": "component.create-or-update-property-dialog.standard-list",

@@ -135,8 +135,11 @@ function _ProfileFieldSelectInner<IsMulti extends boolean = false>(
 
   const valuesOrderedByLocale = useMemo(
     // only sort by locale if options are from standard list
-    () => (standardList ? sortBy(values, (v) => v.label[intl.locale as UserLocale]!) : values),
-    [values],
+    () =>
+      standardList
+        ? sortBy(values, (v) => v.label[intl.locale as UserLocale]!)
+        : values.filter((v) => !v.isHidden),
+    [values, standardList, intl.locale],
   );
 
   const rsProps = useReactSelectProps({
@@ -151,12 +154,13 @@ function _ProfileFieldSelectInner<IsMulti extends boolean = false>(
   });
 
   const _value = useMemo(() => {
+    // Always use all values (including hidden ones) to find the current value
     return props.isMulti
       ? (value as string[])
           .map((value) => values.find((v) => v.value === value))
           .filter(isNonNullish)
       : (values.find((v) => v.value === value) ?? null);
-  }, [props.options, props.isMulti, value]);
+  }, [values, props.isMulti, value]);
 
   const extensions = {
     showOptionsWithColors,

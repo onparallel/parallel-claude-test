@@ -414,27 +414,33 @@ export class ProfileTypeFieldService {
       case "SELECT": {
         const options = profileTypeField.options as ProfileTypeFieldOptions["SELECT"];
         defaultProperties.options.standardList = options.standardList ?? null;
-        defaultProperties.options.values = isNonNullish(options.standardList)
-          ? []
-          : options.values.map((v) => v.value);
-        defaultProperties.options.labels = isNonNullish(options.standardList)
-          ? []
-          : options.values.map(
-              (v) => (v.label as any)[defaultLocale] ?? v.label["en"] ?? v.label["es"] ?? null,
-            );
+
+        if (isNonNullish(options.standardList)) {
+          defaultProperties.options.values = [];
+          defaultProperties.options.labels = [];
+        } else {
+          const visibleValues = options.values.filter((v) => !v.isHidden);
+          defaultProperties.options.values = visibleValues.map((v) => v.value);
+          defaultProperties.options.labels = visibleValues.map(
+            (v) => (v.label as any)[defaultLocale] ?? v.label["en"] ?? v.label["es"] ?? null,
+          );
+        }
         break;
       }
       case "CHECKBOX": {
         const options = profileTypeField.options as ProfileTypeFieldOptions["CHECKBOX"];
         defaultProperties.options.standardList = options.standardList ?? null;
-        defaultProperties.options.values = isNonNullish(options.standardList)
-          ? []
-          : options.values.map((v) => v.value);
-        defaultProperties.options.labels = isNonNullish(options.standardList)
-          ? []
-          : options.values.map(
-              (v) => (v.label as any)[defaultLocale] ?? v.label["en"] ?? v.label["es"] ?? null,
-            );
+
+        if (isNonNullish(options.standardList)) {
+          defaultProperties.options.values = [];
+          defaultProperties.options.labels = [];
+        } else {
+          const visibleValues = options.values.filter((v) => !v.isHidden);
+          defaultProperties.options.values = visibleValues.map((v) => v.value);
+          defaultProperties.options.labels = visibleValues.map(
+            (v) => (v.label as any)[defaultLocale] ?? v.label["en"] ?? v.label["es"] ?? null,
+          );
+        }
         defaultProperties.options.limit = {
           min: 1,
           max: 1,

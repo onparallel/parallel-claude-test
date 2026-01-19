@@ -480,9 +480,32 @@ export class PetitionsHelperService {
               continue;
             }
 
+            if (child.type === "SELECT" && isNullish(child.options.standardList)) {
+              const options = child.options as PetitionFieldOptions["SELECT"];
+              const selectedOption = options.values.find((v) => v === profileValue.content.value);
+              if (!selectedOption) {
+                continue;
+              }
+            }
+
+            let content = profileValue.content;
+
+            if (child.type === "CHECKBOX" && isNullish(child.options.standardList)) {
+              const options = child.options as PetitionFieldOptions["CHECKBOX"];
+              const filteredValue = profileValue.content.value.filter((v: string) =>
+                options.values.some((o) => o === v),
+              );
+              if (filteredValue.length === 0) {
+                continue;
+              }
+              content = {
+                value: filteredValue,
+              };
+            }
+
             childReplies.push({
               petition_field_id: child.id,
-              content: profileValue.content,
+              content,
               type: child.type,
               user_id: userId,
             });

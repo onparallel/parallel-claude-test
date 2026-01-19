@@ -33,6 +33,7 @@ export type ProfileTypeFieldOptions<TType extends ProfileTypeFieldType> = {
       value: string;
       color?: string;
       isStandard?: boolean;
+      isHidden?: boolean;
     }[];
     showOptionsWithColors?: Maybe<boolean>;
     standardList?: Maybe<string>;
@@ -41,6 +42,7 @@ export type ProfileTypeFieldOptions<TType extends ProfileTypeFieldType> = {
     values: {
       label: LocalizableUserText;
       value: string;
+      isHidden?: boolean;
     }[];
     standardList?: Maybe<string>;
   };

@@ -166,11 +166,27 @@ export const ProfileFormFieldCheckboxInner = forwardRef<
       const options = values.map((v) => ({
         value: v.value,
         label: localizableUserTextRender({ intl, value: v.label, default: "" }),
+        isHidden: v.isHidden,
       }));
       return standardList ? sortBy(options, (v) => v.label) : options;
     },
-    [values],
+    [values, standardList, intl.locale],
   );
+
+  const customFilterOption = useMemo(() => {
+    const baseFilter = createFilter({
+      // this improves search performance on long lists
+      ignoreAccents: valuesOrderedByLocale.length > 1000 ? false : true,
+    });
+
+    return (option: any, inputValue: string) => {
+      // Hide options that are hidden and not selected
+      if (option.data.isHidden) {
+        return false;
+      }
+      return baseFilter(option, inputValue);
+    };
+  }, [valuesOrderedByLocale.length]);
 
   return (
     <MultiCheckboxSimpleSelect
@@ -178,10 +194,7 @@ export const ProfileFormFieldCheckboxInner = forwardRef<
       {...props}
       options={valuesOrderedByLocale}
       value={value}
-      filterOption={createFilter({
-        // this improves search performance on long lists
-        ignoreAccents: valuesOrderedByLocale.length > 1000 ? false : true,
-      })}
+      filterOption={customFilterOption}
       components={
         {
           ValueContainer,

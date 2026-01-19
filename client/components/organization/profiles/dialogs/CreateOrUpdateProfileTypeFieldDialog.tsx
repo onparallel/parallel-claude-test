@@ -99,6 +99,7 @@ export interface CreateOrUpdateProfileTypeFieldDialogFormData {
       label: Scalars["LocalizableUserText"]["input"];
       color?: string;
       isStandard?: boolean;
+      isHidden?: boolean;
     }[];
     showOptionsWithColors?: boolean;
     standardList?: string | null;

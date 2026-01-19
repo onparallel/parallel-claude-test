@@ -1,6 +1,6 @@
 import gql from "graphql-tag";
 import { Knex } from "knex";
-import { indexBy, range } from "remeda";
+import { indexBy, isNonNullish, range } from "remeda";
 import {
   Organization,
   Petition,
@@ -6495,6 +6495,23 @@ describe("GraphQL/Profiles to Petitions", () => {
             },
           ][i],
       );
+
+      // Update options for SELECT and CHECKBOX fields to match profile type field options
+      for (const child of groupChildren) {
+        if (
+          (child.type === "SELECT" || child.type === "CHECKBOX") &&
+          isNonNullish(child.profile_type_field_id)
+        ) {
+          const profileTypeField = propertiesIdx[child.type as "SELECT" | "CHECKBOX"];
+          if (profileTypeField) {
+            const mappedField = profileTypeFields.mapToPetitionField(profileTypeField, "en");
+            await mocks.knex
+              .from("petition_field")
+              .where("id", child.id)
+              .update({ options: mappedField.options });
+          }
+        }
+      }
     });
 
     beforeEach(async () => {
@@ -8400,6 +8417,648 @@ describe("GraphQL/Profiles to Petitions", () => {
                     content: { value: 1234 },
                   },
                 ],
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it("does not create reply for SELECT field when profile value is not in petition field options", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      const [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "FIELD_GROUP",
+        profile_type_id: profileType.id,
+      }));
+
+      // Create a field that will have a reply (to avoid NOTHING_TO_IMPORT_ERROR)
+      const [textField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "TEXT" as PetitionFieldType,
+        parent_petition_field_id: fieldGroup.id,
+        profile_type_field_id: propertiesIdx["TEXT"].id,
+      }));
+
+      const [selectField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "SELECT" as PetitionFieldType,
+        parent_petition_field_id: fieldGroup.id,
+        profile_type_field_id: propertiesIdx["SELECT"].id,
+        options: { values: ["OPTION_1", "OPTION_2", "OPTION_3"] }, // Different from profile value "LOW"
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $petitionFieldId: GID!, $profileIds: [GID!]!) {
+            createFieldGroupRepliesFromProfiles(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              profileIds: $profileIds
+            ) {
+              id
+              replies {
+                id
+                children {
+                  field {
+                    id
+                    type
+                    profileTypeField {
+                      id
+                    }
+                  }
+                  replies {
+                    id
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          profileIds: [toGlobalId("Profile", mikeRoss.id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createFieldGroupRepliesFromProfiles).toEqual({
+        id: toGlobalId("PetitionField", fieldGroup.id),
+        replies: [
+          {
+            id: expect.any(String),
+            children: [
+              {
+                field: {
+                  id: toGlobalId("PetitionField", textField.id),
+                  type: "TEXT",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["TEXT"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: { value: "Mike Ross" },
+                  },
+                ],
+              },
+              {
+                field: {
+                  id: toGlobalId("PetitionField", selectField.id),
+                  type: "SELECT",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["SELECT"].id),
+                  },
+                },
+                replies: [], // No reply created because "LOW" is not in ["OPTION_1", "OPTION_2", "OPTION_3"]
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it("creates reply for SELECT field when profile value is in petition field options", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      const [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "FIELD_GROUP",
+        profile_type_id: profileType.id,
+      }));
+
+      const [selectField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "SELECT" as PetitionFieldType,
+        parent_petition_field_id: fieldGroup.id,
+        profile_type_field_id: propertiesIdx["SELECT"].id,
+        options: { values: ["HIGH", "MEDIUM", "LOW"] }, // Includes profile value "LOW"
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $petitionFieldId: GID!, $profileIds: [GID!]!) {
+            createFieldGroupRepliesFromProfiles(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              profileIds: $profileIds
+            ) {
+              id
+              replies {
+                id
+                children {
+                  field {
+                    id
+                    type
+                    profileTypeField {
+                      id
+                    }
+                  }
+                  replies {
+                    id
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          profileIds: [toGlobalId("Profile", mikeRoss.id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createFieldGroupRepliesFromProfiles).toEqual({
+        id: toGlobalId("PetitionField", fieldGroup.id),
+        replies: [
+          {
+            id: expect.any(String),
+            children: [
+              {
+                field: {
+                  id: toGlobalId("PetitionField", selectField.id),
+                  type: "SELECT",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["SELECT"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: { value: "LOW" },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it("creates reply for SELECT field with standardList even if value is not in options", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      const [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "FIELD_GROUP",
+        profile_type_id: profileType.id,
+      }));
+
+      // Create a SELECT field with standardList
+      const [selectField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "SELECT" as PetitionFieldType,
+        parent_petition_field_id: fieldGroup.id,
+        profile_type_field_id: propertiesIdx["SELECT"].id,
+        options: { values: [], standardList: "COUNTRIES" }, // standardList means validation is skipped
+      }));
+
+      // Create a profile with a country value
+      const [testProfile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      await mocks.createProfileFieldValues(testProfile.id, [
+        {
+          type: "SELECT",
+          profile_type_field_id: propertiesIdx["SELECT"].id,
+          content: { value: "US" },
+          created_by_user_id: user.id,
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $petitionFieldId: GID!, $profileIds: [GID!]!) {
+            createFieldGroupRepliesFromProfiles(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              profileIds: $profileIds
+            ) {
+              id
+              replies {
+                id
+                children {
+                  field {
+                    id
+                    type
+                    profileTypeField {
+                      id
+                    }
+                  }
+                  replies {
+                    id
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          profileIds: [toGlobalId("Profile", testProfile.id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createFieldGroupRepliesFromProfiles).toEqual({
+        id: toGlobalId("PetitionField", fieldGroup.id),
+        replies: [
+          {
+            id: expect.any(String),
+            children: [
+              {
+                field: {
+                  id: toGlobalId("PetitionField", selectField.id),
+                  type: "SELECT",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["SELECT"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: { value: "US" },
+                  },
+                ], // Reply created because standardList validation is skipped
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it("does not create reply for CHECKBOX field when profile values are not in petition field options", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      const [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "FIELD_GROUP",
+        profile_type_id: profileType.id,
+      }));
+
+      // Create a field that will have a reply (to avoid NOTHING_TO_IMPORT_ERROR)
+      const [textField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "TEXT" as PetitionFieldType,
+        parent_petition_field_id: fieldGroup.id,
+        profile_type_field_id: propertiesIdx["TEXT"].id,
+      }));
+
+      const [checkboxField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "CHECKBOX" as PetitionFieldType,
+        parent_petition_field_id: fieldGroup.id,
+        profile_type_field_id: propertiesIdx["CHECKBOX"].id,
+        options: {
+          values: ["X", "Y", "Z"], // Different from profile values ["B"]
+          limit: { type: "UNLIMITED", min: 1, max: 1 },
+        },
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $petitionFieldId: GID!, $profileIds: [GID!]!) {
+            createFieldGroupRepliesFromProfiles(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              profileIds: $profileIds
+            ) {
+              id
+              replies {
+                id
+                children {
+                  field {
+                    id
+                    type
+                    profileTypeField {
+                      id
+                    }
+                  }
+                  replies {
+                    id
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          profileIds: [toGlobalId("Profile", harveySpecter.id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createFieldGroupRepliesFromProfiles).toEqual({
+        id: toGlobalId("PetitionField", fieldGroup.id),
+        replies: [
+          {
+            id: expect.any(String),
+            children: [
+              {
+                field: {
+                  id: toGlobalId("PetitionField", textField.id),
+                  type: "TEXT",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["TEXT"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: { value: "Harvey Specter" },
+                  },
+                ],
+              },
+              {
+                field: {
+                  id: toGlobalId("PetitionField", checkboxField.id),
+                  type: "CHECKBOX",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["CHECKBOX"].id),
+                  },
+                },
+                replies: [], // No reply created because "B" is not in ["X", "Y", "Z"]
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it("creates reply for CHECKBOX field when profile values are in petition field options", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      const [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "FIELD_GROUP",
+        profile_type_id: profileType.id,
+      }));
+
+      const [checkboxField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "CHECKBOX" as PetitionFieldType,
+        parent_petition_field_id: fieldGroup.id,
+        profile_type_field_id: propertiesIdx["CHECKBOX"].id,
+        options: {
+          values: ["A", "B", "C"], // Includes profile value "B"
+          limit: { type: "UNLIMITED", min: 1, max: 1 },
+        },
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $petitionFieldId: GID!, $profileIds: [GID!]!) {
+            createFieldGroupRepliesFromProfiles(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              profileIds: $profileIds
+            ) {
+              id
+              replies {
+                id
+                children {
+                  field {
+                    id
+                    type
+                    profileTypeField {
+                      id
+                    }
+                  }
+                  replies {
+                    id
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          profileIds: [toGlobalId("Profile", harveySpecter.id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createFieldGroupRepliesFromProfiles).toEqual({
+        id: toGlobalId("PetitionField", fieldGroup.id),
+        replies: [
+          {
+            id: expect.any(String),
+            children: [
+              {
+                field: {
+                  id: toGlobalId("PetitionField", checkboxField.id),
+                  type: "CHECKBOX",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["CHECKBOX"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: { value: ["B"] },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it("filters CHECKBOX values to only include those in petition field options", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      const [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "FIELD_GROUP",
+        profile_type_id: profileType.id,
+      }));
+
+      // Create a profile with multiple checkbox values
+      const [testProfile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      await mocks.createProfileFieldValues(testProfile.id, [
+        {
+          type: "CHECKBOX",
+          profile_type_field_id: propertiesIdx["CHECKBOX"].id,
+          content: { value: ["A", "B", "D"] }, // "D" is not in petition field options
+          created_by_user_id: user.id,
+        },
+      ]);
+
+      const [checkboxField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "CHECKBOX" as PetitionFieldType,
+        parent_petition_field_id: fieldGroup.id,
+        profile_type_field_id: propertiesIdx["CHECKBOX"].id,
+        options: {
+          values: ["A", "B", "C"], // Only "A" and "B" should be included, "D" should be filtered out
+          limit: { type: "UNLIMITED", min: 1, max: 1 },
+        },
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $petitionFieldId: GID!, $profileIds: [GID!]!) {
+            createFieldGroupRepliesFromProfiles(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              profileIds: $profileIds
+            ) {
+              id
+              replies {
+                id
+                children {
+                  field {
+                    id
+                    type
+                    profileTypeField {
+                      id
+                    }
+                  }
+                  replies {
+                    id
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          profileIds: [toGlobalId("Profile", testProfile.id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createFieldGroupRepliesFromProfiles).toEqual({
+        id: toGlobalId("PetitionField", fieldGroup.id),
+        replies: [
+          {
+            id: expect.any(String),
+            children: [
+              {
+                field: {
+                  id: toGlobalId("PetitionField", checkboxField.id),
+                  type: "CHECKBOX",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["CHECKBOX"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: { value: ["A", "B"] }, // Only "A" and "B", "D" was filtered out
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it("does not create reply for CHECKBOX field when all values are filtered out", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      const [fieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "FIELD_GROUP",
+        profile_type_id: profileType.id,
+      }));
+
+      // Create a profile with checkbox values that don't match petition field options
+      const [testProfile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
+      await mocks.createProfileFieldValues(testProfile.id, [
+        {
+          type: "TEXT",
+          profile_type_field_id: propertiesIdx["TEXT"].id,
+          content: { value: "Test Profile" },
+          created_by_user_id: user.id,
+        },
+        {
+          type: "CHECKBOX",
+          profile_type_field_id: propertiesIdx["CHECKBOX"].id,
+          content: { value: ["X", "Y"] }, // None of these are in petition field options
+          created_by_user_id: user.id,
+        },
+      ]);
+
+      // Create a field that will have a reply (to avoid NOTHING_TO_IMPORT_ERROR)
+      const [textField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "TEXT" as PetitionFieldType,
+        parent_petition_field_id: fieldGroup.id,
+        profile_type_field_id: propertiesIdx["TEXT"].id,
+      }));
+
+      const [checkboxField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "CHECKBOX" as PetitionFieldType,
+        parent_petition_field_id: fieldGroup.id,
+        profile_type_field_id: propertiesIdx["CHECKBOX"].id,
+        options: {
+          values: ["A", "B", "C"], // No match with profile values ["X", "Y"]
+          limit: { type: "UNLIMITED", min: 1, max: 1 },
+        },
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $petitionFieldId: GID!, $profileIds: [GID!]!) {
+            createFieldGroupRepliesFromProfiles(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              profileIds: $profileIds
+            ) {
+              id
+              replies {
+                id
+                children {
+                  field {
+                    id
+                    type
+                    profileTypeField {
+                      id
+                    }
+                  }
+                  replies {
+                    id
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          profileIds: [toGlobalId("Profile", testProfile.id)],
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createFieldGroupRepliesFromProfiles).toEqual({
+        id: toGlobalId("PetitionField", fieldGroup.id),
+        replies: [
+          {
+            id: expect.any(String),
+            children: [
+              {
+                field: {
+                  id: toGlobalId("PetitionField", textField.id),
+                  type: "TEXT",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["TEXT"].id),
+                  },
+                },
+                replies: [
+                  {
+                    id: expect.any(String),
+                    content: { value: "Test Profile" },
+                  },
+                ],
+              },
+              {
+                field: {
+                  id: toGlobalId("PetitionField", checkboxField.id),
+                  type: "CHECKBOX",
+                  profileTypeField: {
+                    id: toGlobalId("ProfileTypeField", propertiesIdx["CHECKBOX"].id),
+                  },
+                },
+                replies: [], // No reply created because all values were filtered out
               },
             ],
           },
