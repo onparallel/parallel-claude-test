@@ -74748,6 +74748,21 @@ export type usePetitionCanFinalize_PublicPetitionFragment = {
   }>;
 };
 
+export type PetitionEventsPolling_petitionQueryVariables = Exact<{
+  petitionId: Scalars["GID"]["input"];
+}>;
+
+export type PetitionEventsPolling_petitionQuery = {
+  petition?:
+    | {
+        __typename?: "Petition";
+        id: string;
+        events: { __typename?: "PetitionEventPagination"; totalCount: number };
+      }
+    | { __typename?: "PetitionTemplate"; id: string }
+    | null;
+};
+
 export type usePetitionMessagePlaceholderOptions_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -97224,6 +97239,21 @@ export const useLoginAs_restoreLoginDocument = gql`
 ` as unknown as DocumentNode<
   useLoginAs_restoreLoginMutation,
   useLoginAs_restoreLoginMutationVariables
+>;
+export const PetitionEventsPolling_petitionDocument = gql`
+  query PetitionEventsPolling_petition($petitionId: GID!) {
+    petition(id: $petitionId) {
+      id
+      ... on Petition {
+        events {
+          totalCount
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  PetitionEventsPolling_petitionQuery,
+  PetitionEventsPolling_petitionQueryVariables
 >;
 export const usePinProfileType_pinProfileTypeDocument = gql`
   mutation usePinProfileType_pinProfileType($profileTypeId: GID!) {

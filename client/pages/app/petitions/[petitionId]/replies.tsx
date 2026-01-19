@@ -83,6 +83,7 @@ import { useDownloadReplyFile } from "@parallel/utils/useDownloadReplyFile";
 import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFiles";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
+import { usePetitionEventsPolling } from "@parallel/utils/usePetitionEventsPolling";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -107,6 +108,10 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     variables: {
       id: petitionId,
     },
+  });
+
+  usePetitionEventsPolling(petitionId, () => {
+    refetch();
   });
 
   const updateIsReadNotification = useUpdateIsReadNotification();

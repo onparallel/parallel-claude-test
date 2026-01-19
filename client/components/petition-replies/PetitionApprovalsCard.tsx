@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { useMutation, useQuery } from "@apollo/client/react";
+import { useMutation } from "@apollo/client/react";
 import {
   Box,
   Button,
@@ -39,7 +39,6 @@ import {
   PetitionApprovalsCard_cancelPetitionApprovalRequestStepDocument,
   PetitionApprovalsCard_PetitionApprovalRequestStepApproverFragment,
   PetitionApprovalsCard_PetitionApprovalRequestStepFragment,
-  PetitionApprovalsCard_petitionDocument,
   PetitionApprovalsCard_PetitionFragment,
   PetitionApprovalsCard_rejectPetitionApprovalRequestStepDocument,
   PetitionApprovalsCard_sendPetitionApprovalRequestStepReminderDocument,
@@ -56,7 +55,6 @@ import { Maybe, UnwrapArray } from "@parallel/utils/types";
 import { useAddNewSignature } from "@parallel/utils/useAddNewSignature";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
-import { usePageVisibility } from "@parallel/utils/usePageVisibility";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
@@ -103,7 +101,6 @@ export const PetitionApprovalsCard = Object.assign(
     },
     ref,
   ) {
-    usePetitionApprovalsCardPolling(petition);
     const intl = useIntl();
     const toast = useToast();
     const tabsRefs = useMultipleRefs<HTMLButtonElement>();
@@ -1320,60 +1317,4 @@ function OlderPetitionApprovalStepRows({
       ))}
     </>
   );
-}
-
-const POLL_INTERVAL = 30_000;
-
-function usePetitionApprovalsCardPolling(petition: PetitionApprovalsCard_PetitionFragment) {
-  const current = petition.signatureRequests.at(0);
-  const isPageVisible = usePageVisibility();
-
-  const nextNotStartedApproval = petition.currentApprovalRequestSteps?.find(
-    (step) => step.status === "NOT_STARTED",
-  );
-
-  const hasFinalRejection =
-    isNonNullish(petition.currentApprovalRequestSteps) &&
-    petition.currentApprovalRequestSteps?.some((step) => step.status === "REJECTED");
-
-  const hasPendingApproval =
-    !hasFinalRejection &&
-    (petition.currentApprovalRequestSteps?.length === 0 ||
-      petition.currentApprovalRequestSteps?.some((step) => step.status === "PENDING") ||
-      (isNonNullish(nextNotStartedApproval) && nextNotStartedApproval?.manualStart === false));
-
-  const hasPendingSignature = petition.signatureRequests?.some(
-    (request) => request.status !== "COMPLETED" && request.status !== "CANCELLED",
-  );
-
-  const isSignatureFinalized =
-    (isNullish(petition?.signatureConfig) && isNullish(current)) ||
-    current?.status === "COMPLETED" ||
-    current?.status === "CANCELLED";
-
-  const hasActiveProcess = hasPendingApproval || hasPendingSignature;
-  const shouldSkip = !isPageVisible || (!hasActiveProcess && isSignatureFinalized);
-
-  const { startPolling, stopPolling } = useQuery(PetitionApprovalsCard_petitionDocument, {
-    pollInterval: POLL_INTERVAL,
-    variables: { petitionId: petition.id },
-    skip: shouldSkip,
-    skipPollAttempt: () => shouldSkip,
-  });
-
-  useEffect(() => {
-    if (
-      (current && current.status !== "CANCELLED" && isNullish(current.auditTrailFilename)) ||
-      hasPendingApproval
-    ) {
-      startPolling(POLL_INTERVAL);
-    } else if (
-      (current?.status === "COMPLETED" && isNonNullish(current.auditTrailFilename)) ||
-      current?.status === "CANCELLED"
-    ) {
-      stopPolling();
-    }
-
-    return stopPolling;
-  }, [current?.status, current?.auditTrailFilename, hasPendingApproval]);
 }

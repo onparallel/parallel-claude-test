@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { useMutation, useQuery } from "@apollo/client/react";
+import { useMutation } from "@apollo/client/react";
 import { Box, Center, Grid, HStack, Text, useToast } from "@chakra-ui/react";
 import { AddIcon, SignatureIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -7,7 +7,6 @@ import {
   PetitionSignaturesCard_PetitionFragment,
   PetitionSignaturesCard_UserFragment,
   PetitionSignaturesCard_cancelSignatureRequestDocument,
-  PetitionSignaturesCard_petitionDocument,
   PetitionSignaturesCard_sendSignatureRequestRemindersDocument,
   PetitionSignaturesCard_signedPetitionDownloadLinkDocument,
 } from "@parallel/graphql/__types";
@@ -17,10 +16,9 @@ import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapArray } from "@parallel/utils/types";
 import { useAddNewSignature } from "@parallel/utils/useAddNewSignature";
 import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFiles";
-import { usePageVisibility } from "@parallel/utils/usePageVisibility";
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isNonNullish, isNullish } from "remeda";
+import { isNonNullish } from "remeda";
 import { Card, CardHeader } from "../common/Card";
 import { HelpPopover } from "../common/HelpPopover";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -163,8 +161,6 @@ export const PetitionSignaturesCard = Object.assign(
     },
     ref,
   ) {
-    usePetitionSignaturesCardPolling(petition);
-
     let current: Maybe<UnwrapArray<PetitionSignaturesCard_PetitionFragment["signatureRequests"]>> =
       petition.signatureRequests[0];
 
@@ -376,31 +372,4 @@ export function PetitionSignaturesCardBody({
       </Text>
     </Center>
   );
-}
-
-const POLL_INTERVAL = 30_000;
-
-function usePetitionSignaturesCardPolling(petition: PetitionSignaturesCard_PetitionFragment) {
-  const current = petition.signatureRequests.at(0);
-  const isPageVisible = usePageVisibility();
-  const shouldSkip = !isPageVisible || (isNullish(petition?.signatureConfig) && isNullish(current));
-  const { startPolling, stopPolling } = useQuery(PetitionSignaturesCard_petitionDocument, {
-    pollInterval: POLL_INTERVAL,
-    variables: { petitionId: petition.id },
-    skip: shouldSkip,
-    skipPollAttempt: () => shouldSkip,
-  });
-
-  useEffect(() => {
-    if (current && current.status !== "CANCELLED" && isNullish(current.auditTrailFilename)) {
-      startPolling(POLL_INTERVAL);
-    } else if (
-      (current?.status === "COMPLETED" && isNonNullish(current.auditTrailFilename)) ||
-      current?.status === "CANCELLED"
-    ) {
-      stopPolling();
-    }
-
-    return stopPolling;
-  }, [current?.status, current?.auditTrailFilename]);
 }

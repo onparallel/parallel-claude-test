@@ -15,6 +15,7 @@ export function useAssertQuery<
   if (result.dataState === "complete") {
     return result as useQuery.Result<TData, TVariables, "complete">;
   } else {
+    console.error("result: ", result);
     throw new Error("Expected data to be present on the Apollo cache");
   }
 }
