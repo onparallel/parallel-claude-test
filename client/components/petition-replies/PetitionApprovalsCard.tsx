@@ -57,7 +57,6 @@ import { useAddNewSignature } from "@parallel/utils/useAddNewSignature";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { usePageVisibility } from "@parallel/utils/usePageVisibility";
-import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
@@ -128,11 +127,6 @@ export const PetitionApprovalsCard = Object.assign(
             };
           }) ?? []);
 
-    const [isParallelJustCompleted, setIsParallelJustCompleted] = useState(false);
-    useTempQueryParam("completed", () => {
-      setIsParallelJustCompleted(true);
-    });
-
     const reviewAfterApproval =
       petition.signatureConfig?.reviewAfterApproval ??
       petition.currentSignatureRequest?.signatureConfig?.reviewAfterApproval ??
@@ -175,7 +169,7 @@ export const PetitionApprovalsCard = Object.assign(
       const pendingOrNotStartedStepIndex = approvalStepsWithSignature.findIndex(
         (s) => s.status === "PENDING" || s.status === "NOT_STARTED",
       );
-      if (pendingOrNotStartedStepIndex && autoChangeTabIndex.current) {
+      if (pendingOrNotStartedStepIndex !== -1 && autoChangeTabIndex.current) {
         setTabIndex(pendingOrNotStartedStepIndex);
       }
     }, [approvalStepsWithSignature.map((s) => s.status).join(","), autoChangeTabIndex.current]);
@@ -435,8 +429,9 @@ export const PetitionApprovalsCard = Object.assign(
     const nextNotStartedApproval = approvalSteps.find((s) => s.status === "NOT_STARTED");
 
     const hasMockApprovalSteps = approvalSteps.some((s) => (s as any).isMock);
-    const shouldShowMockStepsAlert =
-      petition.status === "COMPLETED" && !isParallelJustCompleted && hasMockApprovalSteps;
+
+    // We show the alert when petition is completed and the "currentApprovalRequestSteps" are not yet generated.
+    const shouldShowMockStepsAlert = petition.status === "COMPLETED" && hasMockApprovalSteps;
 
     const isReadyForAutomaticStart =
       petition.status === "COMPLETED" &&
