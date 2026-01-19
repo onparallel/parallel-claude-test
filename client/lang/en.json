@@ -3160,6 +3160,11 @@
     "context": "Add option"
   },
   {
+    "term": "component.create-or-update-property-dialog.at-least-one-visible-option-error",
+    "definition": "At least one option must be visible",
+    "context": "At least one option must be visible"
+  },
+  {
     "term": "component.create-or-update-property-dialog.automate-search",
     "definition": "Automate search",
     "context": "Automate search"

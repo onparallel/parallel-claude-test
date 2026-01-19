@@ -3160,6 +3160,11 @@
     "context": "Add option"
   },
   {
+    "term": "component.create-or-update-property-dialog.at-least-one-visible-option-error",
+    "definition": "Al menos una opción debe estar visible",
+    "context": "At least one option must be visible"
+  },
+  {
     "term": "component.create-or-update-property-dialog.automate-search",
     "definition": "Automatizar búsqueda",
     "context": "Automate search"
@@ -3223,11 +3228,6 @@
     "term": "component.create-or-update-property-dialog.hide-option-button",
     "definition": "Ocultar opción",
     "context": "Hide option"
-  },
-  {
-    "term": "component.create-or-update-property-dialog.at-least-one-visible-option-error",
-    "definition": "Al menos una opción debe estar visible",
-    "context": "At least one option must be visible"
   },
   {
     "term": "component.create-or-update-property-dialog.import-options-button",
