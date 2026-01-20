@@ -236,15 +236,13 @@ export function useConfirmDeactivateUserDialog() {
   return useDialog(ConfirmDeactivateUserDialog);
 }
 
-useConfirmDeactivateUserDialog.fragments = {
-  get User() {
-    return gql`
-      fragment useConfirmDeactivateUserDialog_User on User {
-        id
-        fullName
-        email
-        status
-      }
-    `;
-  },
+const _fragments = {
+  User: gql`
+    fragment useConfirmDeactivateUserDialog_User on User {
+      id
+      fullName
+      email
+      status
+    }
+  `,
 };

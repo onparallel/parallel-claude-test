@@ -80,25 +80,19 @@ export function UserListPopover({
   );
 }
 
-UserListPopover.fragments = {
-  get User() {
-    return gql`
-      fragment UserListPopover_User on User {
-        id
-        fullName
-        ...UserAvatar_User
-      }
-      ${UserAvatar.fragments.User}
-    `;
-  },
-  get UserGroup() {
-    return gql`
-      fragment UserListPopover_UserGroup on UserGroup {
-        id
-        initials
-        ...UserGroupReference_UserGroup
-      }
-      ${UserGroupReference.fragments.UserGroup}
-    `;
-  },
+const _fragments = {
+  User: gql`
+    fragment UserListPopover_User on User {
+      id
+      fullName
+      ...UserAvatar_User
+    }
+  `,
+  UserGroup: gql`
+    fragment UserListPopover_UserGroup on UserGroup {
+      id
+      initials
+      ...UserGroupReference_UserGroup
+    }
+  `,
 };

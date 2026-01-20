@@ -56,7 +56,7 @@ export function PetitionComposeHeadingSettings({
   );
 }
 
-PetitionComposeHeadingSettings.fragments = {
+const _fragments = {
   PetitionField: gql`
     fragment PetitionComposeHeadingSettings_PetitionField on PetitionField {
       id

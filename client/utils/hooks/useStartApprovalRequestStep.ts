@@ -99,7 +99,7 @@ export function useStartApprovalRequestStep({
   return { handleStartApprovalFlow, hasNotStartedApprovals };
 }
 
-useStartApprovalRequestStep.fragments = {
+const _fragments = {
   PetitionApprovalRequestStep: gql`
     fragment useStartApprovalRequestStep_PetitionApprovalRequestStep on PetitionApprovalRequestStep {
       id
@@ -107,7 +107,6 @@ useStartApprovalRequestStep.fragments = {
       status
       ...useStartPetitionApprovalFlowDialog_PetitionApprovalRequestStep
     }
-    ${useStartPetitionApprovalFlowDialog.fragments.PetitionApprovalRequestStep}
   `,
   PetitionBase: gql`
     fragment useStartApprovalRequestStep_PetitionBase on PetitionBase {
@@ -144,7 +143,5 @@ const _mutations = [
         }
       }
     }
-    ${useStartApprovalRequestStep.fragments.PetitionApprovalRequestStep}
-    ${useStartApprovalRequestStep.fragments.PetitionBase}
   `,
 ];

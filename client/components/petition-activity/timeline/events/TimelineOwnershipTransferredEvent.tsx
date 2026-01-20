@@ -35,7 +35,7 @@ export function TimelineOwnershipTransferredEvent({
   );
 }
 
-TimelineOwnershipTransferredEvent.fragments = {
+const _fragments = {
   OwnershipTransferredEvent: gql`
     fragment TimelineOwnershipTransferredEvent_OwnershipTransferredEvent on OwnershipTransferredEvent {
       user {
@@ -49,6 +49,5 @@ TimelineOwnershipTransferredEvent.fragments = {
       }
       createdAt
     }
-    ${UserReference.fragments.User}
   `,
 };

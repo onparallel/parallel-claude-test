@@ -2,10 +2,7 @@ import { gql } from "@apollo/client";
 import { useApolloClient, useMutation } from "@apollo/client/react";
 import { BaseModalProps } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import {
-  TaskProgressDialog,
-  useTaskProgressDialog,
-} from "@parallel/components/common/dialogs/TaskProgressDialog";
+import { useTaskProgressDialog } from "@parallel/components/common/dialogs/TaskProgressDialog";
 import {
   useProfilesExcelExportTask_createProfilesExcelExportTaskDocument,
   useProfilesExcelExportTask_createProfilesExcelExportTaskMutationVariables,
@@ -117,7 +114,6 @@ useProfilesExcelExportTask.mutations = [
         ...TaskProgressDialog_Task
       }
     }
-    ${TaskProgressDialog.fragments.Task}
   `,
   gql`
     mutation useProfilesExcelExportTask_getTaskResultFile($taskId: GID!) {

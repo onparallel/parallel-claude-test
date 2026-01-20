@@ -11,7 +11,6 @@ import {
   RecipientViewSignatureSentAlert_PublicSignatureConfigFragment,
   Tone,
 } from "@parallel/graphql/__types";
-import { Fragments } from "@parallel/utils/apollo/fragments";
 import { Maybe } from "@parallel/utils/types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
@@ -67,7 +66,7 @@ export function RecipientViewPetitionAlerts({
   );
 }
 
-RecipientViewPetitionAlerts.fragments = {
+const _fragmentsRecipientViewPetitionAlerts = {
   PublicSignatureConfig: gql`
     fragment RecipientViewPetitionAlerts_PublicSignatureConfig on PublicSignatureConfig {
       ...RecipientViewSignatureSentAlert_PublicSignatureConfig
@@ -326,7 +325,7 @@ function RecipientViewSignatureSentAlert({
   );
 }
 
-RecipientViewSignatureSentAlert.fragments = {
+const _fragmentsRecipientViewSignatureSentAlert = {
   PublicSignatureConfig: gql`
     fragment RecipientViewSignatureSentAlert_PublicSignatureConfig on PublicSignatureConfig {
       signingMode
@@ -339,7 +338,5 @@ RecipientViewSignatureSentAlert.fragments = {
         ...ContactListPopover_PetitionSigner
       }
     }
-    ${ContactListPopover.fragments.PetitionSigner}
-    ${Fragments.FullPetitionSigner}
   `,
 };

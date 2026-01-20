@@ -38,7 +38,7 @@ export function PetitionSelectOption({
   );
 }
 
-PetitionSelectOption.fragments = {
+const _fragments = {
   PetitionBase: gql`
     fragment PetitionSelectOption_PetitionBase on PetitionBase {
       id

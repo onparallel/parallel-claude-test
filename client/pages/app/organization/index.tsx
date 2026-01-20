@@ -27,7 +27,6 @@ OrganizationSettings.queries = [
     query OrganizationSettings_user {
       ...OrganizationSettingsLayout_Query
     }
-    ${OrganizationSettingsLayout.fragments.Query}
   `,
 ];
 

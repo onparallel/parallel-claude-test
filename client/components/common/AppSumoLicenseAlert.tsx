@@ -75,7 +75,7 @@ export function AppSumoLicenseAlert({ license }: AppSumoLicenseAlertProps) {
   );
 }
 
-AppSumoLicenseAlert.fragments = {
+const _fragments = {
   OrgLicense: gql`
     fragment AppSumoLicenseAlert_OrgLicense on OrgLicense {
       name

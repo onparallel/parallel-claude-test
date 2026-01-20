@@ -450,7 +450,7 @@ function usePetitionAccessesColumns(): TableColumn<
   );
 }
 
-PetitionAccessesTable.fragments = {
+const _fragments = {
   Petition: gql`
     fragment PetitionAccessTable_Petition on Petition {
       status
@@ -478,6 +478,5 @@ PetitionAccessesTable.fragments = {
       recipientUrl
       createdAt
     }
-    ${ContactReference.fragments.Contact}
   `,
 };

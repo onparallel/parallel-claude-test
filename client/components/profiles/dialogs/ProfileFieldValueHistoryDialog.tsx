@@ -190,46 +190,39 @@ function useProfileFieldValueHistoryDialogColumns({
   );
 }
 
-useProfileFieldValueHistoryDialog.fragments = {
-  get ProfileTypeField() {
-    return gql`
-      fragment useProfileFieldValueHistoryDialog_ProfileTypeField on ProfileTypeField {
+const _fragments = {
+  ProfileTypeField: gql`
+    fragment useProfileFieldValueHistoryDialog_ProfileTypeField on ProfileTypeField {
+      id
+      ...ProfilePropertyContent_ProfileTypeField
+    }
+  `,
+  ProfileFieldValue: gql`
+    fragment useProfileFieldValueHistoryDialog_ProfileFieldValue on ProfileFieldValue {
+      id
+      createdAt
+      createdBy {
         id
-        ...ProfilePropertyContent_ProfileTypeField
+        fullName
+        ...UserReference_User
       }
-      ${ProfilePropertyContent.fragments.ProfileTypeField}
-    `;
-  },
-  get ProfileFieldValue() {
-    return gql`
-      fragment useProfileFieldValueHistoryDialog_ProfileFieldValue on ProfileFieldValue {
+      source
+      externalSourceName
+      petitionFieldReply {
         id
-        createdAt
-        createdBy {
+        parent {
           id
-          fullName
-          ...UserReference_User
         }
-        source
-        externalSourceName
-        petitionFieldReply {
+        field {
           id
-          parent {
+          petition {
             id
           }
-          field {
-            id
-            petition {
-              id
-            }
-          }
         }
-        ...ProfilePropertyContent_ProfileFieldValue
       }
-      ${ProfilePropertyContent.fragments.ProfileFieldValue}
-      ${UserReference.fragments.User}
-    `;
-  },
+      ...ProfilePropertyContent_ProfileFieldValue
+    }
+  `,
 };
 
 const _query = gql`
@@ -251,7 +244,6 @@ const _query = gql`
       }
     }
   }
-  ${useProfileFieldValueHistoryDialog.fragments.ProfileFieldValue}
 `;
 
 export function useProfileFieldValueHistoryDialog() {

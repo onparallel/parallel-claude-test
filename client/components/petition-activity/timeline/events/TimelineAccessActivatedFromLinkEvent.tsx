@@ -34,7 +34,7 @@ export function TimelineAccessActivatedFromLinkEvent({
   );
 }
 
-TimelineAccessActivatedFromLinkEvent.fragments = {
+const _fragments = {
   AccessActivatedFromPublicPetitionLinkEvent: gql`
     fragment TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetitionLinkEvent on AccessActivatedFromPublicPetitionLinkEvent {
       access {
@@ -44,6 +44,5 @@ TimelineAccessActivatedFromLinkEvent.fragments = {
       }
       createdAt
     }
-    ${ContactReference.fragments.Contact}
   `,
 };

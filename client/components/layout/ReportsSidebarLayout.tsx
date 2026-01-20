@@ -23,11 +23,10 @@ export function ReportsSidebarLayout({ children, basePath, ...props }: ReportsSi
   );
 }
 
-ReportsSidebarLayout.fragments = {
+const _fragments = {
   Query: gql`
     fragment ReportsSidebarLayout_Query on Query {
       ...SidebarLayout_Query
     }
-    ${SidebarLayout.fragments.Query}
   `,
 };

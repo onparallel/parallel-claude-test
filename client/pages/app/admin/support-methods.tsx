@@ -113,7 +113,6 @@ AdminSupportMethods.queries = [
     query AdminSupportMethods_user {
       ...AdminSettingsLayout_Query
     }
-    ${AdminSettingsLayout.fragments.Query}
   `,
 ];
 

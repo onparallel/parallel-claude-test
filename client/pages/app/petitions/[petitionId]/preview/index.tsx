@@ -11,10 +11,7 @@ import { SupportButton } from "@parallel/components/common/SupportButton";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import {
-  FieldErrorDialog,
-  useFieldErrorDialog,
-} from "@parallel/components/common/dialogs/FieldErrorDialog";
+import { useFieldErrorDialog } from "@parallel/components/common/dialogs/FieldErrorDialog";
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import {
   PetitionLayout,
@@ -24,25 +21,18 @@ import {
 import { PetitionComposeAndPreviewAlerts } from "@parallel/components/petition-common/alerts/PetitionComposeAndPreviewAlerts";
 import { PetitionPreviewOnlyAlert } from "@parallel/components/petition-common/alerts/PetitionPreviewOnlyAlert";
 import {
-  ConfirmPetitionSignersDialog,
   ConfirmPetitionSignersDialogResult,
   useConfirmPetitionSignersDialog,
 } from "@parallel/components/petition-common/dialogs/ConfirmPetitionSignersDialog";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { PetitionPermanentDeletionAlert } from "@parallel/components/petition-compose/PetitionPermanentDeletionAlert";
-import {
-  HiddenFieldDialog,
-  useHiddenFieldDialog,
-} from "@parallel/components/petition-compose/dialogs/HiddenFieldDialog";
+import { useHiddenFieldDialog } from "@parallel/components/petition-compose/dialogs/HiddenFieldDialog";
 import { useHandledTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
 import { PetitionPreviewRightPaneTabs } from "@parallel/components/petition-preview/PetitionPreviewRightPaneTabs";
 import { PetitionPreviewStartSignatureButton } from "@parallel/components/petition-preview/PetitionPreviewStartSignatureButton";
 import { PreviewPetitionField } from "@parallel/components/petition-preview/PreviewPetitionField";
-import {
-  GeneratePrefilledPublicLinkDialog,
-  useGeneratePrefilledPublicLinkDialog,
-} from "@parallel/components/petition-preview/dialogs/GeneratePrefilledPublicLinkDialog";
+import { useGeneratePrefilledPublicLinkDialog } from "@parallel/components/petition-preview/dialogs/GeneratePrefilledPublicLinkDialog";
 import { PetitionRepliesFieldComments } from "@parallel/components/petition-replies/PetitionRepliesFieldComments";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
 import { RecipientViewProgressBar } from "@parallel/components/recipient-view/RecipientViewProgressBar";
@@ -1029,33 +1019,6 @@ const _fragments = {
       ...PetitionPreviewRightPaneTabs_PetitionBase
       ...PetitionRepliesFieldComments_PetitionBase
     }
-    ${focusPetitionField.fragments.PetitionField}
-    ${PetitionPreviewStartSignatureButton.fragments.Petition}
-    ${ConfirmPetitionSignersDialog.fragments.SignatureConfig}
-    ${RecipientViewProgressBar.fragments.Petition}
-    ${useSendPetitionHandler.fragments.Petition}
-    ${useGetPetitionPages.fragments.PetitionBase}
-    ${PetitionLayout.fragments.PetitionBase}
-    ${PreviewPetitionField.fragments.PetitionBase}
-    ${PreviewPetitionField.fragments.PetitionField}
-    ${useAllFieldsWithIndices.fragments.PetitionBase}
-    ${validatePetitionFields.fragments.PetitionField}
-    ${FieldErrorDialog.fragments.PetitionField}
-    ${LiquidPetitionScopeProvider.fragments.PetitionBase}
-    ${HiddenFieldDialog.fragments.PetitionBase}
-    ${HiddenFieldDialog.fragments.PetitionField}
-    ${GeneratePrefilledPublicLinkDialog.fragments.PetitionTemplate}
-    ${usePetitionCanFinalize.fragments.PetitionBase}
-    ${validatePetitionFields.fragments.PetitionBase}
-    ${getPetitionSignatureStatus.fragments.Petition}
-    ${useStartSignatureRequest.fragments.Petition}
-    ${useStartApprovalRequestStep.fragments.PetitionBase}
-    ${useClosePetition.fragments.PetitionBase}
-    ${PetitionPreviewRightPaneTabs.fragments.PetitionField}
-    ${PetitionPreviewRightPaneTabs.fragments.PetitionBase}
-    ${PetitionRepliesFieldComments.fragments.PetitionField}
-    ${PetitionRepliesFieldComments.fragments.PetitionBase}
-    ${LiquidPetitionVariableProvider.fragments.PetitionVariable}
   `,
   Query: gql`
     fragment PetitionPreview_Query on Query {
@@ -1077,11 +1040,6 @@ const _fragments = {
         ...PreviewPetitionField_User
       }
     }
-    ${PetitionLayout.fragments.Query}
-    ${PreviewPetitionField.fragments.User}
-    ${OverrideWithOrganizationTheme.fragments.OrganizationBrandThemeData}
-    ${useSendPetitionHandler.fragments.User}
-    ${ConfirmPetitionSignersDialog.fragments.User}
   `,
 };
 
@@ -1092,7 +1050,6 @@ const _mutations = [
         ...PetitionPreview_PetitionBase
       }
     }
-    ${_fragments.PetitionBase}
   `,
   gql`
     mutation PetitionPreview_completePetition($petitionId: GID!, $message: String) {
@@ -1100,7 +1057,6 @@ const _mutations = [
         ...PetitionPreview_PetitionBase
       }
     }
-    ${_fragments.PetitionBase}
   `,
   gql`
     mutation PetitionPreview_cancelSignatureRequest($petitionSignatureRequestId: GID!) {
@@ -1124,7 +1080,6 @@ const _queries = [
         ...PetitionPreview_PetitionBase
       }
     }
-    ${_fragments.PetitionBase}
   `,
   gql`
     query PetitionPreview_user {
@@ -1134,7 +1089,6 @@ const _queries = [
         hasPublicLinkPrefill: hasFeatureFlag(featureFlag: PUBLIC_PETITION_LINK_PREFILL_DATA)
       }
     }
-    ${_fragments.Query}
   `,
 ];
 

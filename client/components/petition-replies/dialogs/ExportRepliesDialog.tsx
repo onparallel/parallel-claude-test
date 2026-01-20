@@ -405,7 +405,7 @@ export function useExportRepliesDialog() {
   );
 }
 
-useExportRepliesDialog.fragments = {
+const _fragments = {
   User: gql`
     fragment ExportRepliesDialog_User on User {
       hasExportCuatrecasas: hasFeatureFlag(featureFlag: EXPORT_CUATRECASAS)
@@ -427,7 +427,6 @@ useExportRepliesDialog.fragments = {
         }
       }
     }
-    ${useFilenamePlaceholdersRename.fragments.PetitionBase}
   `,
   PetitionField: gql`
     fragment ExportRepliesDialog_PetitionField on PetitionField {
@@ -441,8 +440,6 @@ useExportRepliesDialog.fragments = {
         ...useFilenamePlaceholdersRename_PetitionFieldReply
       }
     }
-    ${useFilenamePlaceholdersRename.fragments.PetitionField}
-    ${useFilenamePlaceholdersRename.fragments.PetitionFieldReply}
   `,
 };
 
@@ -454,7 +451,6 @@ const _queries = [
         ...ExportRepliesDialog_User
       }
     }
-    ${useExportRepliesDialog.fragments.User}
   `,
   gql`
     query ExportRepliesDialog_petition($petitionId: GID!) {
@@ -462,6 +458,5 @@ const _queries = [
         ...ExportRepliesDialog_Petition
       }
     }
-    ${useExportRepliesDialog.fragments.Petition}
   `,
 ];

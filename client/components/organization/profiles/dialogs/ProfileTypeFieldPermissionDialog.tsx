@@ -418,64 +418,50 @@ export function ProfileTypeFieldPermissionDialog({
   );
 }
 
-useProfileTypeFieldPermissionDialog.fragments = {
-  get User() {
-    return gql`
-      fragment useProfileTypeFieldPermissionDialog_User on User {
-        id
-        fullName
-        email
-        ...UserAvatar_User
-      }
-      ${UserAvatar.fragments.User}
-    `;
-  },
-  get UserGroup() {
-    return gql`
-      fragment useProfileTypeFieldPermissionDialog_UserGroup on UserGroup {
-        id
-        name
-        groupInitials: initials
-        memberCount
-        ...UserSelect_UserGroup
-        ...UserGroupReference_UserGroup
-      }
-      ${UserSelect.fragments.UserGroup}
-      ${UserGroupReference.fragments.UserGroup}
-    `;
-  },
-  get ProfileTypeFieldPermission() {
-    return gql`
-      fragment useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermission on ProfileTypeFieldPermission {
-        id
-        permission
-        target {
-          ... on User {
-            ...useProfileTypeFieldPermissionDialog_User
-          }
-          ... on UserGroup {
-            ...useProfileTypeFieldPermissionDialog_UserGroup
-          }
+const _fragments = {
+  User: gql`
+    fragment useProfileTypeFieldPermissionDialog_User on User {
+      id
+      fullName
+      email
+      ...UserAvatar_User
+    }
+  `,
+  UserGroup: gql`
+    fragment useProfileTypeFieldPermissionDialog_UserGroup on UserGroup {
+      id
+      name
+      groupInitials: initials
+      memberCount
+      ...UserSelect_UserGroup
+      ...UserGroupReference_UserGroup
+    }
+  `,
+  ProfileTypeFieldPermission: gql`
+    fragment useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermission on ProfileTypeFieldPermission {
+      id
+      permission
+      target {
+        ... on User {
+          ...useProfileTypeFieldPermissionDialog_User
+        }
+        ... on UserGroup {
+          ...useProfileTypeFieldPermissionDialog_UserGroup
         }
       }
-      ${this.User}
-      ${this.UserGroup}
-    `;
-  },
-  get ProfileTypeField() {
-    return gql`
-      fragment useProfileTypeFieldPermissionDialog_ProfileTypeField on ProfileTypeField {
-        id
-        myPermission
-        defaultPermission
-        isUsedInProfileName
-        permissions {
-          ...useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermission
-        }
+    }
+  `,
+  ProfileTypeField: gql`
+    fragment useProfileTypeFieldPermissionDialog_ProfileTypeField on ProfileTypeField {
+      id
+      myPermission
+      defaultPermission
+      isUsedInProfileName
+      permissions {
+        ...useProfileTypeFieldPermissionDialog_ProfileTypeFieldPermission
       }
-      ${this.ProfileTypeFieldPermission}
-    `;
-  },
+    }
+  `,
 };
 
 const _queries = [
@@ -498,7 +484,6 @@ const _queries = [
         }
       }
     }
-    ${useProfileTypeFieldPermissionDialog.fragments.User}
   `,
   gql`
     query useProfileTypeFieldPermissionDialog_userGroups($search: String!, $excludeIds: [GID!]) {
@@ -508,7 +493,6 @@ const _queries = [
         }
       }
     }
-    ${useProfileTypeFieldPermissionDialog.fragments.UserGroup}
   `,
 ];
 

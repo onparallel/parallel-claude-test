@@ -1,10 +1,7 @@
 import { gql } from "@apollo/client";
 import { useApolloClient, useMutation } from "@apollo/client/react";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import {
-  TaskProgressDialog,
-  useTaskProgressDialog,
-} from "@parallel/components/common/dialogs/TaskProgressDialog";
+import { useTaskProgressDialog } from "@parallel/components/common/dialogs/TaskProgressDialog";
 import {
   useDowJonesProfileDownloadTask_createDowJonesProfileDownloadTaskDocument,
   useDowJonesProfileDownloadTask_getTaskResultFileDocument,
@@ -89,7 +86,6 @@ useDowJonesProfileDownloadTask.mutations = [
         ...TaskProgressDialog_Task
       }
     }
-    ${TaskProgressDialog.fragments.Task}
   `,
   gql`
     mutation useDowJonesProfileDownloadTask_getTaskResultFile($taskId: GID!) {

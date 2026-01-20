@@ -129,7 +129,7 @@ export function TemplateDefaultUserPermissionRow({
   );
 }
 
-TemplateDefaultUserPermissionRow.fragments = {
+const _fragments = {
   TemplateDefaultUserPermission: gql`
     fragment TemplateDefaultUserPermissionRow_TemplateDefaultUserPermission on TemplateDefaultUserPermission {
       id
@@ -142,6 +142,5 @@ TemplateDefaultUserPermissionRow.fragments = {
       }
       isSubscribed
     }
-    ${UserAvatar.fragments.User}
   `,
 };

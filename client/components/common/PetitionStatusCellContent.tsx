@@ -19,12 +19,11 @@ export function PetitionStatusCellContent({
   );
 }
 
-PetitionStatusCellContent.fragments = {
+const _fragments = {
   Petition: gql`
     fragment PetitionStatusCellContent_Petition on Petition {
       ...PetitionProgressBar_Petition
       status
     }
-    ${PetitionProgressBar.fragments.Petition}
   `,
 };

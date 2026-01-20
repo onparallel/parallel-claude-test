@@ -10,11 +10,8 @@ interface PetitionNameWithPathProps {
   relativePath?: string;
 }
 
-export const PetitionNameWithPath = Object.assign(
-  chakraForwardRef<"div", PetitionNameWithPathProps>(function PetitionName(
-    { children, petition, relativePath, ...props },
-    ref,
-  ) {
+export const PetitionNameWithPath = chakraForwardRef<"div", PetitionNameWithPathProps>(
+  function PetitionName({ children, petition, relativePath, ...props }, ref) {
     const intl = useIntl();
     return (
       <Text as="span" {...props}>
@@ -37,15 +34,14 @@ export const PetitionNameWithPath = Object.assign(
         </Text>
       </Text>
     );
-  }),
-  {
-    fragments: {
-      PetitionBase: gql`
-        fragment PetitionName_PetitionBase on PetitionBase {
-          name
-          path
-        }
-      `,
-    },
   },
 );
+
+const _fragments = {
+  PetitionBase: gql`
+    fragment PetitionName_PetitionBase on PetitionBase {
+      name
+      path
+    }
+  `,
+};

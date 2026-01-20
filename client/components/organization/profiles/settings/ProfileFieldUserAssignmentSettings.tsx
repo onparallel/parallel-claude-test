@@ -73,15 +73,13 @@ export function ProfileFieldUserAssignmentSettings() {
   );
 }
 
-ProfileFieldUserAssignmentSettings.fragments = {
-  get ProfileTypeField() {
-    return gql`
-      fragment ProfileFieldUserAssignmentSettings_ProfileTypeField on ProfileTypeField {
-        id
-        options
-      }
-    `;
-  },
+const _fragments = {
+  ProfileTypeField: gql`
+    fragment ProfileFieldUserAssignmentSettings_ProfileTypeField on ProfileTypeField {
+      id
+      options
+    }
+  `,
 };
 
 const _queries = [

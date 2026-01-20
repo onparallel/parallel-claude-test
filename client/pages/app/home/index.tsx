@@ -38,10 +38,7 @@ import {
 } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { withPermission } from "@parallel/components/common/withPermission";
-import {
-  DashboardModule,
-  DashboardModule as DashboardModuleComponent,
-} from "@parallel/components/dashboard/DashboardModule";
+import { DashboardModule as DashboardModuleComponent } from "@parallel/components/dashboard/DashboardModule";
 import { DashboardTabs } from "@parallel/components/dashboard/DashboardTabs";
 import { useConfirmDeleteDashboardDialog } from "@parallel/components/dashboard/dialogs/ConfirmDeleteDashboardDialog";
 import { DashboardModuleDrawer } from "@parallel/components/dashboard/drawer/DashboardModuleDrawer";
@@ -461,32 +458,25 @@ function Home() {
   );
 }
 
-Home.fragments = {
-  get User() {
-    return gql`
-      fragment Home_User on User {
+const _fragments = {
+  User: gql`
+    fragment Home_User on User {
+      id
+      dashboards {
         id
-        dashboards {
-          id
-          ...DashboardTabs_Dashboard
-        }
+        ...DashboardTabs_Dashboard
       }
-      ${DashboardTabs.fragments.Dashboard}
-    `;
-  },
-  get DashboardModule() {
-    return gql`
-      fragment Home_DashboardModule on DashboardModule {
-        id
-        title
-        size
-        ...DashboardModule_DashboardModule
-        ...DashboardModuleDrawer_DashboardModule
-      }
-      ${DashboardModule.fragments.DashboardModule}
-      ${DashboardModuleDrawer.fragments.DashboardModule}
-    `;
-  },
+    }
+  `,
+  DashboardModule: gql`
+    fragment Home_DashboardModule on DashboardModule {
+      id
+      title
+      size
+      ...DashboardModule_DashboardModule
+      ...DashboardModuleDrawer_DashboardModule
+    }
+  `,
 };
 
 const _queries = [
@@ -500,8 +490,6 @@ const _queries = [
         }
       }
     }
-    ${AppLayout.fragments.Query}
-    ${Home.fragments.User}
   `,
   gql`
     query Home_dashboard($id: GID!) {
@@ -517,7 +505,6 @@ const _queries = [
         }
       }
     }
-    ${Home.fragments.DashboardModule}
   `,
 ];
 
@@ -529,7 +516,6 @@ const _mutations = [
         ...DashboardTabs_Dashboard
       }
     }
-    ${DashboardTabs.fragments.Dashboard}
   `,
   gql`
     mutation Home_deleteDashboardModule($dashboardId: GID!, $moduleId: GID!) {

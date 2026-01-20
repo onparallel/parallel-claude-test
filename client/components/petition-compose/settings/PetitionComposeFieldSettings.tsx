@@ -95,397 +95,384 @@ const ONLY_ONE_REPLY_FIELD_TYPES = [
   "ADVERSE_MEDIA_SEARCH",
 ] as PetitionFieldType[];
 
-export const PetitionComposeFieldSettings = Object.assign(
-  chakraForwardRef<"section", PetitionComposeFieldSettingsProps>(
-    function PetitionComposeFieldSettings(
-      {
-        petition,
-        user,
-        field,
-        fieldIndex,
-        onFieldEdit,
-        onFieldTypeChange,
-        onClose,
-        isReadOnly,
-        ...props
-      },
-      ref,
-    ) {
-      const showErrorDialog = useErrorDialog();
+export const PetitionComposeFieldSettings = chakraForwardRef<
+  "section",
+  PetitionComposeFieldSettingsProps
+>(function PetitionComposeFieldSettings(
+  {
+    petition,
+    user,
+    field,
+    fieldIndex,
+    onFieldEdit,
+    onFieldTypeChange,
+    onClose,
+    isReadOnly,
+    ...props
+  },
+  ref,
+) {
+  const showErrorDialog = useErrorDialog();
 
-      const isFieldGroupChild = isNonNullish(field.parent);
+  const isFieldGroupChild = isNonNullish(field.parent);
 
-      const parentIsInternal = isFieldGroupChild ? field.parent!.isInternal : false;
+  const parentIsInternal = isFieldGroupChild ? field.parent!.isInternal : false;
 
-      const parentHasShowInPdf = isFieldGroupChild ? field.parent!.showInPdf : false;
-      const disableChildShowInPdf = isFieldGroupChild && !parentHasShowInPdf;
+  const parentHasShowInPdf = isFieldGroupChild ? field.parent!.showInPdf : false;
+  const disableChildShowInPdf = isFieldGroupChild && !parentHasShowInPdf;
 
-      const canOnlyBeInternal = ONLY_INTERNAL_FIELD_TYPES.includes(field.type);
+  const canOnlyBeInternal = ONLY_INTERNAL_FIELD_TYPES.includes(field.type);
 
-      const isInternalFieldDisabled =
-        isReadOnly ||
-        field.isFixed ||
-        canOnlyBeInternal ||
-        parentIsInternal ||
-        (isFieldGroupChild && field.position === 0);
+  const isInternalFieldDisabled =
+    isReadOnly ||
+    field.isFixed ||
+    canOnlyBeInternal ||
+    parentIsInternal ||
+    (isFieldGroupChild && field.position === 0);
 
-      const canChangeFieldType = !["FIELD_GROUP"].includes(field.type);
+  const canChangeFieldType = !["FIELD_GROUP"].includes(field.type);
 
-      const canChangeMultiple = !["HEADING", ...ONLY_ONE_REPLY_FIELD_TYPES].includes(field.type);
+  const canChangeMultiple = !["HEADING", ...ONLY_ONE_REPLY_FIELD_TYPES].includes(field.type);
 
-      const canShowInPdf = !ONLY_INTERNAL_FIELD_TYPES.includes(field.type);
+  const canShowInPdf = !ONLY_INTERNAL_FIELD_TYPES.includes(field.type);
 
-      const isReplyable = !["HEADING", "FIELD_GROUP"].includes(field.type);
+  const isReplyable = !["HEADING", "FIELD_GROUP"].includes(field.type);
 
-      const hasPlaceholder = (
-        ["SHORT_TEXT", "TEXT", "PHONE", "NUMBER", "SELECT"] as PetitionFieldType[]
-      ).includes(field.type);
+  const hasPlaceholder = (
+    ["SHORT_TEXT", "TEXT", "PHONE", "NUMBER", "SELECT"] as PetitionFieldType[]
+  ).includes(field.type);
 
-      const hasAlias = !["HEADING"].includes(field.type);
+  const hasAlias = !["HEADING"].includes(field.type);
 
-      const handleFieldEdit = (data: UpdatePetitionFieldInput) => {
-        onFieldEdit(field.id, data);
-      };
+  const handleFieldEdit = (data: UpdatePetitionFieldInput) => {
+    onFieldEdit(field.id, data);
+  };
 
-      const SettingsComponent = COMPONENTS[field.type] ?? EmptySettings;
+  const SettingsComponent = COMPONENTS[field.type] ?? EmptySettings;
 
-      return (
-        <Box ref={ref} display="flex" flexDirection="column" {...props}>
-          <CloseableCardHeader onClose={onClose}>
-            <Text as="span" noOfLines={1} wordBreak="break-all">
-              <Text as="span">{`${fieldIndex}. `}</Text>
-              {field.title ? (
-                <Text as="span">{field.title}</Text>
-              ) : (
-                <Text as="span" textStyle="hint" fontWeight={500}>
-                  <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
-                </Text>
-              )}
+  return (
+    <Box ref={ref} display="flex" flexDirection="column" {...props}>
+      <CloseableCardHeader onClose={onClose}>
+        <Text as="span" noOfLines={1} wordBreak="break-all">
+          <Text as="span">{`${fieldIndex}. `}</Text>
+          {field.title ? (
+            <Text as="span">{field.title}</Text>
+          ) : (
+            <Text as="span" textStyle="hint" fontWeight={500}>
+              <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
             </Text>
-          </CloseableCardHeader>
+          )}
+        </Text>
+      </CloseableCardHeader>
 
-          <Stack
-            as="section"
-            padding={4}
-            paddingBottom="80px"
-            spacing={5}
-            flex={1}
-            minHeight={0}
-            overflow="auto"
-          >
-            <Stack>
-              {canChangeFieldType ? (
-                <Box>
-                  <PetitionFieldTypeSelect
-                    type={field.type}
-                    onChange={async (type) => {
-                      if (type !== field.type) {
-                        const isTypeChangeNotAllowed =
-                          isFieldGroupChild &&
-                          ONLY_INTERNAL_FIELD_TYPES.includes(type) &&
-                          field.position === 0 &&
-                          !field.parent!.isInternal;
+      <Stack
+        as="section"
+        padding={4}
+        paddingBottom="80px"
+        spacing={5}
+        flex={1}
+        minHeight={0}
+        overflow="auto"
+      >
+        <Stack>
+          {canChangeFieldType ? (
+            <Box>
+              <PetitionFieldTypeSelect
+                type={field.type}
+                onChange={async (type) => {
+                  if (type !== field.type) {
+                    const isTypeChangeNotAllowed =
+                      isFieldGroupChild &&
+                      ONLY_INTERNAL_FIELD_TYPES.includes(type) &&
+                      field.position === 0 &&
+                      !field.parent!.isInternal;
 
-                        if (isTypeChangeNotAllowed) {
-                          try {
-                            await showErrorDialog({
-                              message: (
-                                <FormattedMessage
-                                  id="component.petition-compose-field-settings.first-child-is-internal-error"
-                                  defaultMessage="The first field of a group cannot be internal if the group is not."
-                                />
-                              ),
-                            });
-                          } catch {}
-                        } else {
-                          onFieldTypeChange(field.id, type);
-                        }
-                      }
-                    }}
-                    isDisabled={isReadOnly || field.isFixed || field.isLinkedToProfileTypeField}
-                    user={user}
-                    isFieldGroupChild={isFieldGroupChild}
-                  />
-                </Box>
-              ) : null}
-              <SettingsComponent
-                petition={petition}
-                field={field}
-                onFieldEdit={onFieldEdit}
-                isReadOnly={isReadOnly}
+                    if (isTypeChangeNotAllowed) {
+                      try {
+                        await showErrorDialog({
+                          message: (
+                            <FormattedMessage
+                              id="component.petition-compose-field-settings.first-child-is-internal-error"
+                              defaultMessage="The first field of a group cannot be internal if the group is not."
+                            />
+                          ),
+                        });
+                      } catch {}
+                    } else {
+                      onFieldTypeChange(field.id, type);
+                    }
+                  }
+                }}
+                isDisabled={isReadOnly || field.isFixed || field.isLinkedToProfileTypeField}
                 user={user}
+                isFieldGroupChild={isFieldGroupChild}
               />
-              {canChangeMultiple ? (
-                field.type === "FILE_UPLOAD" ? (
-                  <AllowMultipleFilesSettingsRow
-                    isDisabled={isReadOnly || field.isLinkedToProfileTypeField}
-                    isChecked={field.multiple}
-                    onChange={handleFieldEdit}
-                  />
-                ) : (
-                  <AllowMultipleRepliesSettingsRow
-                    isDisabled={isReadOnly || field.isLinkedToProfileTypeField}
-                    isChecked={field.multiple}
-                    onChange={handleFieldEdit}
-                  />
-                )
-              ) : null}
+            </Box>
+          ) : null}
+          <SettingsComponent
+            petition={petition}
+            field={field}
+            onFieldEdit={onFieldEdit}
+            isReadOnly={isReadOnly}
+            user={user}
+          />
+          {canChangeMultiple ? (
+            field.type === "FILE_UPLOAD" ? (
+              <AllowMultipleFilesSettingsRow
+                isDisabled={isReadOnly || field.isLinkedToProfileTypeField}
+                isChecked={field.multiple}
+                onChange={handleFieldEdit}
+              />
+            ) : (
+              <AllowMultipleRepliesSettingsRow
+                isDisabled={isReadOnly || field.isLinkedToProfileTypeField}
+                isChecked={field.multiple}
+                onChange={handleFieldEdit}
+              />
+            )
+          ) : null}
 
-              {hasPlaceholder ? (
-                <SettingsRowPlaceholder
-                  field={field}
-                  onFieldEdit={onFieldEdit}
-                  isReadOnly={isReadOnly}
+          {hasPlaceholder ? (
+            <SettingsRowPlaceholder
+              field={field}
+              onFieldEdit={onFieldEdit}
+              isReadOnly={isReadOnly}
+            />
+          ) : null}
+
+          {hasAlias ? (
+            <SettingsRowAlias field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
+          ) : null}
+
+          {field.isLinkedToProfileTypeField ? (
+            <SettingsRowSwitch
+              isDisabled={isReadOnly || field.position === 0}
+              isChecked={field.options.replyOnlyFromProfile ?? false}
+              onChange={(value) =>
+                onFieldEdit(field.id, {
+                  options: {
+                    replyOnlyFromProfile: value,
+                  },
+                  ...(!field.optional && value ? { optional: true } : {}),
+                  ...(!field.isInternal && value ? { isInternal: true } : {}),
+                })
+              }
+              label={
+                <FormattedMessage
+                  id="component.petition-compose-field-settings.reply-only-from-profile-label"
+                  defaultMessage="Only pre-filled from profile"
                 />
-              ) : null}
+              }
+              description={
+                <Text fontSize="sm">
+                  <FormattedMessage
+                    id="component.petition-compose-field-settings.reply-only-from-profile-description"
+                    defaultMessage="When this option is enabled, the field cannot be completed by users or recipients and will only be pre-filled with the data available in a profile. If enabled, the field will be optional."
+                  />
+                </Text>
+              }
+              disabledReadon={
+                field.position === 0 ? (
+                  <Text fontSize="sm">
+                    <FormattedMessage
+                      id="component.petition-compose-field-settings.reply-only-from-profile-disabled-readonly"
+                      defaultMessage="This option cannot be changed because the field is the first child of a group."
+                    />
+                  </Text>
+                ) : undefined
+              }
+              controlId="reply-only-from-profile"
+            />
+          ) : null}
+        </Stack>
 
-              {hasAlias ? (
-                <SettingsRowAlias field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
-              ) : null}
+        {petition.isInteractionWithRecipientsEnabled ? (
+          <SettingsRowGroup
+            isReadOnly={isReadOnly}
+            label={
+              <FormattedMessage
+                id="component.petition-compose-field-settings.interaction-with-recipients"
+                defaultMessage="Interaction with recipients"
+              />
+            }
+          >
+            <InternalFieldSettingsRow
+              isChecked={field.isInternal}
+              isDisabled={isInternalFieldDisabled}
+              isRestricted={canOnlyBeInternal}
+              onChange={handleFieldEdit}
+            />
+            {isFieldGroupChild || canOnlyBeInternal ? null : (
+              <AllowCommentSettingsRow
+                isDisabled={isReadOnly || field.isInternal}
+                isChecked={field.isInternal ? false : field.hasCommentsEnabled}
+                onChange={handleFieldEdit}
+              />
+            )}
+          </SettingsRowGroup>
+        ) : null}
 
-              {field.isLinkedToProfileTypeField ? (
+        {isReplyable && petition.isReviewFlowEnabled ? (
+          <SettingsRowGroup
+            label={
+              <FormattedMessage
+                id="component.petition-compose-field-settings.review-flow"
+                defaultMessage="Review flow"
+              />
+            }
+            isReadOnly={isReadOnly}
+          >
+            <IncludeApprovalSettingsRow
+              isDisabled={isReadOnly}
+              isChecked={field.requireApproval}
+              onChange={handleFieldEdit}
+            />
+          </SettingsRowGroup>
+        ) : null}
+
+        {((!isFileTypeField(field.type) || canOnlyBeInternal) &&
+          !petition.isDocumentGenerationEnabled) ||
+        !canShowInPdf ? null : (
+          <SettingsRowGroup
+            label={
+              <FormattedMessage
+                id="component.petition-compose-field-settings.document-generation"
+                defaultMessage="Document generation"
+              />
+            }
+            isReadOnly={isReadOnly}
+          >
+            <ShowPdfSettingsRow
+              isDisabled={isReadOnly || disableChildShowInPdf}
+              isChecked={field.showInPdf && !disableChildShowInPdf}
+              onChange={handleFieldEdit}
+            />
+
+            {field.showInPdf && (field.type === "FIELD_GROUP" || isReplyable) ? (
+              <ShowReplyActivitySettingsRow
+                isDisabled={isReadOnly || disableChildShowInPdf}
+                isChecked={field.showActivityInPdf && !disableChildShowInPdf}
+                onChange={handleFieldEdit}
+              />
+            ) : null}
+            {isFileTypeField(field.type) ? (
+              <AttachFilesToPdfSettingsRow
+                isDisabled={isReadOnly}
+                isChecked={field.options.attachToPdf}
+                onChange={handleFieldEdit}
+              />
+            ) : null}
+            {field.type === "HEADING" && petition.automaticNumberingConfig ? (
+              <>
                 <SettingsRowSwitch
-                  isDisabled={isReadOnly || field.position === 0}
-                  isChecked={field.options.replyOnlyFromProfile ?? false}
+                  isDisabled={isReadOnly}
+                  isChecked={field.options.showNumbering ?? false}
                   onChange={(value) =>
                     onFieldEdit(field.id, {
                       options: {
-                        replyOnlyFromProfile: value,
+                        ...field.options,
+                        showNumbering: value,
                       },
-                      ...(!field.optional && value ? { optional: true } : {}),
-                      ...(!field.isInternal && value ? { isInternal: true } : {}),
                     })
                   }
                   label={
                     <FormattedMessage
-                      id="component.petition-compose-field-settings.reply-only-from-profile-label"
-                      defaultMessage="Only pre-filled from profile"
+                      id="component.petition-compose-field-settings.show-numbering-label"
+                      defaultMessage="Show numbering"
                     />
                   }
                   description={
                     <Text fontSize="sm">
                       <FormattedMessage
-                        id="component.petition-compose-field-settings.reply-only-from-profile-description"
-                        defaultMessage="When this option is enabled, the field cannot be completed by users or recipients and will only be pre-filled with the data available in a profile. If enabled, the field will be optional."
+                        id="component.petition-compose-field-settings.how-numbering-description"
+                        defaultMessage="Enable this setting to include the text block in automatic numbering."
                       />
                     </Text>
                   }
-                  disabledReadon={
-                    field.position === 0 ? (
-                      <Text fontSize="sm">
-                        <FormattedMessage
-                          id="component.petition-compose-field-settings.reply-only-from-profile-disabled-readonly"
-                          defaultMessage="This option cannot be changed because the field is the first child of a group."
-                        />
-                      </Text>
-                    ) : undefined
-                  }
-                  controlId="reply-only-from-profile"
+                  controlId="heading-show-numbering"
                 />
-              ) : null}
-            </Stack>
-
-            {petition.isInteractionWithRecipientsEnabled ? (
-              <SettingsRowGroup
-                isReadOnly={isReadOnly}
-                label={
-                  <FormattedMessage
-                    id="component.petition-compose-field-settings.interaction-with-recipients"
-                    defaultMessage="Interaction with recipients"
+                {field.options.showNumbering ? (
+                  <SettingsRowAlias
+                    field={field}
+                    onFieldEdit={onFieldEdit}
+                    isReadOnly={isReadOnly}
                   />
-                }
-              >
-                <InternalFieldSettingsRow
-                  isChecked={field.isInternal}
-                  isDisabled={isInternalFieldDisabled}
-                  isRestricted={canOnlyBeInternal}
-                  onChange={handleFieldEdit}
-                />
-                {isFieldGroupChild || canOnlyBeInternal ? null : (
-                  <AllowCommentSettingsRow
-                    isDisabled={isReadOnly || field.isInternal}
-                    isChecked={field.isInternal ? false : field.hasCommentsEnabled}
-                    onChange={handleFieldEdit}
-                  />
-                )}
-              </SettingsRowGroup>
+                ) : null}
+              </>
             ) : null}
+          </SettingsRowGroup>
+        )}
+      </Stack>
+    </Box>
+  );
+});
 
-            {isReplyable && petition.isReviewFlowEnabled ? (
-              <SettingsRowGroup
-                label={
-                  <FormattedMessage
-                    id="component.petition-compose-field-settings.review-flow"
-                    defaultMessage="Review flow"
-                  />
-                }
-                isReadOnly={isReadOnly}
-              >
-                <IncludeApprovalSettingsRow
-                  isDisabled={isReadOnly}
-                  isChecked={field.requireApproval}
-                  onChange={handleFieldEdit}
-                />
-              </SettingsRowGroup>
-            ) : null}
-
-            {((!isFileTypeField(field.type) || canOnlyBeInternal) &&
-              !petition.isDocumentGenerationEnabled) ||
-            !canShowInPdf ? null : (
-              <SettingsRowGroup
-                label={
-                  <FormattedMessage
-                    id="component.petition-compose-field-settings.document-generation"
-                    defaultMessage="Document generation"
-                  />
-                }
-                isReadOnly={isReadOnly}
-              >
-                <ShowPdfSettingsRow
-                  isDisabled={isReadOnly || disableChildShowInPdf}
-                  isChecked={field.showInPdf && !disableChildShowInPdf}
-                  onChange={handleFieldEdit}
-                />
-
-                {field.showInPdf && (field.type === "FIELD_GROUP" || isReplyable) ? (
-                  <ShowReplyActivitySettingsRow
-                    isDisabled={isReadOnly || disableChildShowInPdf}
-                    isChecked={field.showActivityInPdf && !disableChildShowInPdf}
-                    onChange={handleFieldEdit}
-                  />
-                ) : null}
-                {isFileTypeField(field.type) ? (
-                  <AttachFilesToPdfSettingsRow
-                    isDisabled={isReadOnly}
-                    isChecked={field.options.attachToPdf}
-                    onChange={handleFieldEdit}
-                  />
-                ) : null}
-                {field.type === "HEADING" && petition.automaticNumberingConfig ? (
-                  <>
-                    <SettingsRowSwitch
-                      isDisabled={isReadOnly}
-                      isChecked={field.options.showNumbering ?? false}
-                      onChange={(value) =>
-                        onFieldEdit(field.id, {
-                          options: {
-                            ...field.options,
-                            showNumbering: value,
-                          },
-                        })
-                      }
-                      label={
-                        <FormattedMessage
-                          id="component.petition-compose-field-settings.show-numbering-label"
-                          defaultMessage="Show numbering"
-                        />
-                      }
-                      description={
-                        <Text fontSize="sm">
-                          <FormattedMessage
-                            id="component.petition-compose-field-settings.how-numbering-description"
-                            defaultMessage="Enable this setting to include the text block in automatic numbering."
-                          />
-                        </Text>
-                      }
-                      controlId="heading-show-numbering"
-                    />
-                    {field.options.showNumbering ? (
-                      <SettingsRowAlias
-                        field={field}
-                        onFieldEdit={onFieldEdit}
-                        isReadOnly={isReadOnly}
-                      />
-                    ) : null}
-                  </>
-                ) : null}
-              </SettingsRowGroup>
-            )}
-          </Stack>
-        </Box>
-      );
-    },
-  ),
-  {
-    fragments: {
-      User: gql`
-        fragment PetitionComposeFieldSettings_User on User {
-          ...PetitionFieldTypeSelect_User
-          ...PetitionComposeFileUploadSettings_User
-        }
-        ${PetitionFieldTypeSelect.fragments.User}
-        ${PetitionComposeFileUploadSettings.fragments.User}
-      `,
-      PetitionBase: gql`
-        fragment PetitionComposeFieldSettings_PetitionBase on PetitionBase {
+const _fragments = {
+  User: gql`
+    fragment PetitionComposeFieldSettings_User on User {
+      ...PetitionFieldTypeSelect_User
+      ...PetitionComposeFileUploadSettings_User
+    }
+  `,
+  PetitionBase: gql`
+    fragment PetitionComposeFieldSettings_PetitionBase on PetitionBase {
+      id
+      isInteractionWithRecipientsEnabled
+      isReviewFlowEnabled
+      isDocumentGenerationEnabled
+      fieldRelationships {
+        id
+        leftSidePetitionField {
           id
-          isInteractionWithRecipientsEnabled
-          isReviewFlowEnabled
-          isDocumentGenerationEnabled
-          fieldRelationships {
-            id
-            leftSidePetitionField {
-              id
-            }
-            rightSidePetitionField {
-              id
-            }
-          }
-          automaticNumberingConfig {
-            numberingType
-          }
         }
-      `,
-      PetitionField: gql`
-        fragment PetitionComposeFieldSettings_PetitionField on PetitionField {
+        rightSidePetitionField {
+          id
+        }
+      }
+      automaticNumberingConfig {
+        numberingType
+      }
+    }
+  `,
+  PetitionField: gql`
+    fragment PetitionComposeFieldSettings_PetitionField on PetitionField {
+      id
+      type
+      title
+      multiple
+      options
+      optional
+      isInternal
+      isReadOnly
+      showInPdf
+      showActivityInPdf
+      isFixed
+      position
+      alias
+      hasCommentsEnabled
+      requireApproval
+      isLinkedToProfileType
+      isLinkedToProfileTypeField
+      parent {
+        id
+        showInPdf
+        isInternal
+        children {
           id
           type
-          title
-          multiple
-          options
-          optional
-          isInternal
-          isReadOnly
-          showInPdf
-          showActivityInPdf
-          isFixed
-          position
-          alias
-          hasCommentsEnabled
-          requireApproval
-          isLinkedToProfileType
-          isLinkedToProfileTypeField
-          parent {
-            id
-            showInPdf
-            isInternal
-            children {
-              id
-              type
-            }
-          }
-          ...SettingsRowAlias_PetitionField
-          ...PetitionComposeShortTextSettings_PetitionField
-          ...PetitionComposeSelectSettings_PetitionField
-          ...PetitionComposeIdVerificationSettings_PetitionField
-          ...PetitionComposeHeadingSettings_PetitionField
-          ...PetitionComposeFileUploadSettings_PetitionField
-          ...PetitionComposeFieldGroupSettings_PetitionField
-          ...PetitionComposeCheckboxSettings_PetitionField
         }
-        ${SettingsRowAlias.fragments.PetitionField}
-        ${PetitionComposeShortTextSettings.fragments.PetitionField}
-        ${PetitionComposeSelectSettings.fragments.PetitionField}
-        ${PetitionComposeIdVerificationSettings.fragments.PetitionField}
-        ${PetitionComposeHeadingSettings.fragments.PetitionField}
-        ${PetitionComposeFileUploadSettings.fragments.PetitionField}
-        ${PetitionComposeFieldGroupSettings.fragments.PetitionField}
-        ${PetitionComposeDynamicSelectFieldSettings.fragments.PetitionField}
-        ${PetitionComposeCheckboxSettings.fragments.PetitionField}
-      `,
-    },
-  },
-);
+      }
+      ...SettingsRowAlias_PetitionField
+      ...PetitionComposeShortTextSettings_PetitionField
+      ...PetitionComposeSelectSettings_PetitionField
+      ...PetitionComposeIdVerificationSettings_PetitionField
+      ...PetitionComposeHeadingSettings_PetitionField
+      ...PetitionComposeFileUploadSettings_PetitionField
+      ...PetitionComposeFieldGroupSettings_PetitionField
+      ...PetitionComposeCheckboxSettings_PetitionField
+    }
+  `,
+};
 
 function EmptySettings({
   children,

@@ -36,7 +36,7 @@ export function PetitionRepliesFieldUserAssignmentReply({
   );
 }
 
-PetitionRepliesFieldUserAssignmentReply.fragments = {
+const _fragments = {
   PetitionFieldReply: gql`
     fragment PetitionRepliesFieldUserAssignmentReply_PetitionFieldReply on PetitionFieldReply {
       id

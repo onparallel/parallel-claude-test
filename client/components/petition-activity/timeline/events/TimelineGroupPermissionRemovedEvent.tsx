@@ -35,7 +35,7 @@ export function TimelineGroupPermissionRemovedEvent({
   );
 }
 
-TimelineGroupPermissionRemovedEvent.fragments = {
+const _fragments = {
   GroupPermissionRemovedEvent: gql`
     fragment TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEvent on GroupPermissionRemovedEvent {
       user {
@@ -46,7 +46,5 @@ TimelineGroupPermissionRemovedEvent.fragments = {
       }
       createdAt
     }
-    ${UserReference.fragments.User}
-    ${UserGroupReference.fragments.UserGroup}
   `,
 };

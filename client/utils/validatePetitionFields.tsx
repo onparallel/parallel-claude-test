@@ -208,7 +208,7 @@ export function validatePetitionFields<T extends PartialField>(
   return { error: null };
 }
 
-validatePetitionFields.fragments = {
+const _fragments = {
   PetitionField: gql`
     fragment validatePetitionFields_PetitionField on PetitionField {
       id

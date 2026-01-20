@@ -12,7 +12,6 @@ import {
   RecipientViewPetitionFieldLayout_PublicPetitionFieldFragment,
   RecipientViewPetitionFieldLayout_PublicPetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
-import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
 import { MouseEvent, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -128,95 +127,81 @@ export function RecipientViewPetitionFieldLayout({
   );
 }
 
-RecipientViewPetitionFieldLayout.fragments = {
-  get PetitionField() {
-    return gql`
-      fragment RecipientViewPetitionFieldLayout_PetitionField on PetitionField {
-        id
-        type
-        title
-        description
-        options
-        optional
-        multiple
-        isInternal
-        replies {
-          ...RecipientViewPetitionFieldLayout_PetitionFieldReply
-        }
-        attachments {
-          id
-          file {
-            ...FileAttachmentButton_FileUpload
-          }
-        }
-        commentCount
-        unreadCommentCount
-        hasCommentsEnabled
-        ...completedFieldReplies_PetitionField
+const _fragments = {
+  PetitionField: gql`
+    fragment RecipientViewPetitionFieldLayout_PetitionField on PetitionField {
+      id
+      type
+      title
+      description
+      options
+      optional
+      multiple
+      isInternal
+      replies {
+        ...RecipientViewPetitionFieldLayout_PetitionFieldReply
       }
-      ${this.PetitionFieldReply}
-      ${FileAttachmentButton.fragments.FileUpload}
-      ${completedFieldReplies.fragments.PetitionField}
-    `;
-  },
-  get PetitionFieldReply() {
-    return gql`
-      fragment RecipientViewPetitionFieldLayout_PetitionFieldReply on PetitionFieldReply {
+      attachments {
         id
-        status
-        content
-        createdAt
-        updatedAt
-        isAnonymized
-        parent {
-          id
+        file {
+          ...FileAttachmentButton_FileUpload
         }
       }
-    `;
-  },
-  get PublicPetitionField() {
-    return gql`
-      fragment RecipientViewPetitionFieldLayout_PublicPetitionField on PublicPetitionField {
+      commentCount
+      unreadCommentCount
+      hasCommentsEnabled
+      ...completedFieldReplies_PetitionField
+    }
+  `,
+  PetitionFieldReply: gql`
+    fragment RecipientViewPetitionFieldLayout_PetitionFieldReply on PetitionFieldReply {
+      id
+      status
+      content
+      createdAt
+      updatedAt
+      isAnonymized
+      parent {
         id
-        type
-        title
-        description
-        options
-        optional
-        multiple
-        isInternal
-        replies {
-          ...RecipientViewPetitionFieldLayout_PublicPetitionFieldReply
-        }
-        attachments {
-          id
-          file {
-            ...FileAttachmentButton_FileUpload
-          }
-        }
-        commentCount
-        unreadCommentCount
-        hasCommentsEnabled
-        ...completedFieldReplies_PublicPetitionField
       }
-      ${this.PublicPetitionFieldReply}
-      ${FileAttachmentButton.fragments.FileUpload}
-      ${completedFieldReplies.fragments.PublicPetitionField}
-    `;
-  },
-  get PublicPetitionFieldReply() {
-    return gql`
-      fragment RecipientViewPetitionFieldLayout_PublicPetitionFieldReply on PublicPetitionFieldReply {
+    }
+  `,
+  PublicPetitionField: gql`
+    fragment RecipientViewPetitionFieldLayout_PublicPetitionField on PublicPetitionField {
+      id
+      type
+      title
+      description
+      options
+      optional
+      multiple
+      isInternal
+      replies {
+        ...RecipientViewPetitionFieldLayout_PublicPetitionFieldReply
+      }
+      attachments {
         id
-        status
-        content
-        createdAt
-        updatedAt
-        isAnonymized
-        parent {
-          id
+        file {
+          ...FileAttachmentButton_FileUpload
         }
       }
-    `;
-  },
+      commentCount
+      unreadCommentCount
+      hasCommentsEnabled
+      ...completedFieldReplies_PublicPetitionField
+    }
+  `,
+  PublicPetitionFieldReply: gql`
+    fragment RecipientViewPetitionFieldLayout_PublicPetitionFieldReply on PublicPetitionFieldReply {
+      id
+      status
+      content
+      createdAt
+      updatedAt
+      isAnonymized
+      parent {
+        id
+      }
+    }
+  `,
 };

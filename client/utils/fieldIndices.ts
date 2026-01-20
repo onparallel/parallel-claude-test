@@ -63,7 +63,7 @@ export function useFieldsWithIndices<
   }, [petition.fields]);
 }
 
-useFieldsWithIndices.fragments = {
+const _fragmentsUseFieldsWithIndices = {
   PetitionBase: gql`
     fragment useFieldsWithIndices_PetitionBase on PetitionBase {
       fields {
@@ -115,11 +115,10 @@ export function useAllFieldsWithIndices<T extends useAllFieldsWithIndices_Petiti
   }, [fieldsWithIndices]);
 }
 
-useAllFieldsWithIndices.fragments = {
+const _fragmentsUseAllFieldsWithIndices = {
   PetitionBase: gql`
     fragment useAllFieldsWithIndices_PetitionBase on PetitionBase {
       ...useFieldsWithIndices_PetitionBase
     }
-    ${useFieldsWithIndices.fragments.PetitionBase}
   `,
 };

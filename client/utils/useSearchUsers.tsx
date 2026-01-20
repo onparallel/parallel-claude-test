@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { useApolloClient } from "@apollo/client/react";
 import { useSearchUsers_usersDocument } from "@parallel/graphql/__types";
-import { UserSelect, UserSelectSelection } from "../components/common/UserSelect";
+import { UserSelectSelection } from "../components/common/UserSelect";
 import { useDebouncedAsync } from "./useDebouncedAsync";
 
 interface UserSearchUsersOptions {
@@ -66,6 +66,5 @@ const _queries = [
         }
       }
     }
-    ${UserSelect.fragments.User}
   `,
 ];

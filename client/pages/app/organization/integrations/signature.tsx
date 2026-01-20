@@ -462,7 +462,7 @@ function useSignatureTokensTableColumns() {
   );
 }
 
-IntegrationsSignature.fragments = {
+const _fragments = {
   SignatureOrgIntegration: gql`
     fragment IntegrationsSignature_SignatureOrgIntegration on SignatureOrgIntegration {
       id
@@ -482,7 +482,6 @@ IntegrationsSignature.mutations = [
         ...IntegrationsSignature_SignatureOrgIntegration
       }
     }
-    ${IntegrationsSignature.fragments.SignatureOrgIntegration}
   `,
   gql`
     mutation IntegrationsSignature_deleteSignatureIntegration($id: GID!, $force: Boolean) {
@@ -513,9 +512,6 @@ IntegrationsSignature.queries = [
         }
       }
     }
-    ${OrganizationSettingsLayout.fragments.Query}
-    ${useAddSignatureCredentialsDialog.fragments.User}
-    ${IntegrationsSignature.fragments.SignatureOrgIntegration}
   `,
 ];
 

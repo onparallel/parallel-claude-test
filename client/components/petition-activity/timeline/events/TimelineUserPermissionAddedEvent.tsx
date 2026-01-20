@@ -60,7 +60,7 @@ export function TimelineUserPermissionAddedEvent({ event }: TimelineUserPermissi
   );
 }
 
-TimelineUserPermissionAddedEvent.fragments = {
+const _fragments = {
   UserPermissionAddedEvent: gql`
     fragment TimelineUserPermissionAddedEvent_UserPermissionAddedEvent on UserPermissionAddedEvent {
       user {
@@ -73,6 +73,5 @@ TimelineUserPermissionAddedEvent.fragments = {
       permissionType
       createdAt
     }
-    ${UserReference.fragments.User}
   `,
 };

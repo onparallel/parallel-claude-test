@@ -309,7 +309,7 @@ export function PetitionComposeNumberSettings({
   );
 }
 
-PetitionComposeNumberSettings.fragments = {
+const _fragments = {
   PetitionField: gql`
     fragment PetitionComposeNumberSettings_PetitionField on PetitionField {
       id

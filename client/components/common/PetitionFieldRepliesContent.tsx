@@ -38,37 +38,16 @@ export interface PetitionFieldRepliesContentProps {
   sample?: number;
 }
 
-export const PetitionFieldRepliesContent = Object.assign(
-  chakraForwardRef<"p" | "span" | "ul" | "div", PetitionFieldRepliesContentProps>(
-    function PetitionFieldRepliesContent(props, ref) {
-      if (isFileTypeField(props.field.type)) {
-        return <PetitionFieldRepliesContentFile ref={ref} {...(props as any)} />;
-      } else {
-        return <PetitionFieldRepliesContentNonFile ref={ref} {...(props as any)} />;
-      }
-    },
-  ),
-  {
-    fragments: {
-      PetitionField: gql`
-        fragment PetitionFieldRepliesContent_PetitionField on PetitionField {
-          id
-          type
-          options
-        }
-      `,
-      PetitionFieldReply: gql`
-        fragment PetitionFieldRepliesContent_PetitionFieldReply on PetitionFieldReply {
-          id
-          content
-          parent {
-            id
-          }
-        }
-      `,
-    },
-  },
-);
+export const PetitionFieldRepliesContent = chakraForwardRef<
+  "p" | "span" | "ul" | "div",
+  PetitionFieldRepliesContentProps
+>(function PetitionFieldRepliesContent(props, ref) {
+  if (isFileTypeField(props.field.type)) {
+    return <PetitionFieldRepliesContentFile ref={ref} {...(props as any)} />;
+  } else {
+    return <PetitionFieldRepliesContentNonFile ref={ref} {...(props as any)} />;
+  }
+});
 
 const PetitionFieldRepliesContentFile = chakraForwardRef<"ul", PetitionFieldRepliesContentProps>(
   function PetitionFieldRepliesContentFile({ petitionId, field, replies, sample, ...props }, ref) {
@@ -473,3 +452,22 @@ function PetitionFieldAdverseMediaSearch({
     </Button>
   );
 }
+
+const _fragments = {
+  PetitionField: gql`
+    fragment PetitionFieldRepliesContent_PetitionField on PetitionField {
+      id
+      type
+      options
+    }
+  `,
+  PetitionFieldReply: gql`
+    fragment PetitionFieldRepliesContent_PetitionFieldReply on PetitionFieldReply {
+      id
+      content
+      parent {
+        id
+      }
+    }
+  `,
+};

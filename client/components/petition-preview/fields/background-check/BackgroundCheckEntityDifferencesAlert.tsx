@@ -138,7 +138,7 @@ export function BackgroundCheckEntityDifferencesAlert({
   );
 }
 
-BackgroundCheckEntityDifferencesAlert.fragments = {
+const _fragments = {
   BackgroundCheckEntityDetailsReviewDiff: gql`
     fragment BackgroundCheckEntityDifferencesAlert_BackgroundCheckEntityDetailsReviewDiff on BackgroundCheckEntityDetailsReviewDiff {
       properties {

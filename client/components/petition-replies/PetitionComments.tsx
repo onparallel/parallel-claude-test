@@ -224,58 +224,47 @@ export function PetitionComments({ petition, onSelectField }: PetitionCommentsPr
   );
 }
 
-PetitionComments.fragments = {
-  get PetitionFieldComment() {
-    return gql`
-      fragment PetitionComments_PetitionFieldComment on PetitionFieldComment {
-        id
-        createdAt
-        isInternal
-        isApproval
-        author {
-          ...UserOrContactReference_UserOrPetitionAccess
-        }
-        ...PetitionFieldCommentExcerpt_PetitionFieldComment
+const _fragments = {
+  PetitionFieldComment: gql`
+    fragment PetitionComments_PetitionFieldComment on PetitionFieldComment {
+      id
+      createdAt
+      isInternal
+      isApproval
+      author {
+        ...UserOrContactReference_UserOrPetitionAccess
       }
-      ${PetitionFieldCommentExcerpt.fragments.PetitionFieldComment}
-      ${UserOrContactReference.fragments.UserOrPetitionAccess}
-    `;
-  },
-  get PetitionField() {
-    return gql`
-      fragment PetitionComments_PetitionField on PetitionField {
+      ...PetitionFieldCommentExcerpt_PetitionFieldComment
+    }
+  `,
+  PetitionField: gql`
+    fragment PetitionComments_PetitionField on PetitionField {
+      id
+      title
+      commentCount
+      unreadCommentCount
+      hasCommentsEnabled
+      lastComment {
         id
-        title
-        commentCount
-        unreadCommentCount
-        hasCommentsEnabled
-        lastComment {
+        ...PetitionComments_PetitionFieldComment
+      }
+    }
+  `,
+  PetitionBase: gql`
+    fragment PetitionComments_PetitionBase on PetitionBase {
+      id
+      fields {
+        id
+        ...PetitionComments_PetitionField
+      }
+      ... on Petition {
+        generalCommentCount
+        unreadGeneralCommentCount
+        lastGeneralComment {
           id
           ...PetitionComments_PetitionFieldComment
         }
       }
-      ${this.PetitionFieldComment}
-    `;
-  },
-  get PetitionBase() {
-    return gql`
-      fragment PetitionComments_PetitionBase on PetitionBase {
-        id
-        fields {
-          id
-          ...PetitionComments_PetitionField
-        }
-        ... on Petition {
-          generalCommentCount
-          unreadGeneralCommentCount
-          lastGeneralComment {
-            id
-            ...PetitionComments_PetitionFieldComment
-          }
-        }
-      }
-      ${this.PetitionField}
-      ${this.PetitionFieldComment}
-    `;
-  },
+    }
+  `,
 };

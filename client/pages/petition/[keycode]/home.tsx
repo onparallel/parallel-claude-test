@@ -61,7 +61,6 @@ import { generateCssStripe } from "@parallel/utils/css";
 import { FORMATS } from "@parallel/utils/dates";
 import { parseQuery, string, useQueryState, values } from "@parallel/utils/queryState";
 import { UnwrapPromise } from "@parallel/utils/types";
-import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import Head from "next/head";
 import { Fragment, useCallback, useRef, useState } from "react";
@@ -531,73 +530,59 @@ function RadioCard(props: RadioProps) {
 }
 
 const _fragments = {
-  get PublicPetition() {
-    return gql`
-      fragment RecipientPortal_PublicPetition on PublicPetition {
+  PublicPetition: gql`
+    fragment RecipientPortal_PublicPetition on PublicPetition {
+      id
+      status
+      tone
+      hasUnreadComments
+      progress {
+        total
+        replied
+        optional
+      }
+      organization {
         id
-        status
-        tone
-        hasUnreadComments
-        progress {
-          total
-          replied
-          optional
+        name
+        hasRemoveParallelBranding
+        brandTheme {
+          ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
         }
-        organization {
-          id
-          name
-          hasRemoveParallelBranding
-          brandTheme {
-            ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
-          }
-          ...RecipientPortalHeader_PublicOrganization
-        }
+        ...RecipientPortalHeader_PublicOrganization
       }
-      ${OverrideWithOrganizationTheme.fragments.OrganizationBrandThemeData}
-      ${RecipientPortalHeader.fragments.PublicOrganization}
-    `;
-  },
-  get PublicPetitionMessage() {
-    return gql`
-      fragment RecipientPortal_PublicPetitionMessage on PublicPetitionMessage {
-        id
-        subject
-        sentAt
+    }
+  `,
+  PublicPetitionMessage: gql`
+    fragment RecipientPortal_PublicPetitionMessage on PublicPetitionMessage {
+      id
+      subject
+      sentAt
+    }
+  `,
+  PublicUser: gql`
+    fragment RecipientPortal_PublicUser on PublicUser {
+      id
+      fullName
+    }
+  `,
+  PublicPetitionAccess: gql`
+    fragment RecipientPortal_PublicPetitionAccess on PublicPetitionAccess {
+      keycode
+      petition {
+        ...RecipientPortal_PublicPetition
       }
-    `;
-  },
-  get PublicUser() {
-    return gql`
-      fragment RecipientPortal_PublicUser on PublicUser {
-        id
-        fullName
+      granter {
+        ...RecipientPortal_PublicUser
       }
-    `;
-  },
-  get PublicPetitionAccess() {
-    return gql`
-      fragment RecipientPortal_PublicPetitionAccess on PublicPetitionAccess {
-        keycode
-        petition {
-          ...RecipientPortal_PublicPetition
-        }
-        granter {
-          ...RecipientPortal_PublicUser
-        }
-        contact {
-          ...RecipientPortalHeader_PublicContact
-        }
-        message {
-          ...RecipientPortal_PublicPetitionMessage
-        }
-        createdAt
+      contact {
+        ...RecipientPortalHeader_PublicContact
       }
-      ${this.PublicPetition}
-      ${this.PublicPetitionMessage}
-      ${this.PublicUser}
-      ${RecipientPortalHeader.fragments.PublicContact}
-    `;
-  },
+      message {
+        ...RecipientPortal_PublicPetitionMessage
+      }
+      createdAt
+    }
+  `,
 };
 
 const _queries = [
@@ -610,8 +595,6 @@ const _queries = [
       }
       ...useBrowserMetadata_PublicQuery
     }
-    ${_fragments.PublicPetitionAccess}
-    ${useBrowserMetadata.fragments.PublicQuery}
   `,
   gql`
     query RecipientPortal_stats($keycode: ID!, $search: String) {
@@ -625,7 +608,6 @@ const _queries = [
         totalCount
       }
     }
-    ${_fragments.PublicPetitionAccess}
   `,
   gql`
     query RecipientPortal_accesses(
@@ -648,7 +630,6 @@ const _queries = [
         }
       }
     }
-    ${_fragments.PublicPetitionAccess}
   `,
 ];
 

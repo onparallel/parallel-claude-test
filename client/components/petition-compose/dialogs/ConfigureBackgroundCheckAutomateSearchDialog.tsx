@@ -328,7 +328,7 @@ export function useConfigureBackgroundCheckAutomateSearchDialog() {
   return useDialog(ConfigureBackgroundCheckAutomateSearchDialog);
 }
 
-ConfigureBackgroundCheckAutomateSearchDialog.fragments = {
+const _fragments = {
   PetitionBase: gql`
     fragment ConfigureBackgroundCheckAutomateSearchDialog_PetitionBase on PetitionBase {
       fields {
@@ -341,7 +341,6 @@ ConfigureBackgroundCheckAutomateSearchDialog.fragments = {
       }
       ...PetitionFieldSelect_PetitionBase
     }
-    ${PetitionFieldSelect.fragments.PetitionBase}
 
     fragment ConfigureBackgroundCheckAutomateSearchDialog_InnerPetitionField on PetitionField {
       id
@@ -371,6 +370,5 @@ const _queries = [
         ...ConfigureBackgroundCheckAutomateSearchDialog_PetitionBase
       }
     }
-    ${ConfigureBackgroundCheckAutomateSearchDialog.fragments.PetitionBase}
   `,
 ];

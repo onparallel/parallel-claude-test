@@ -68,7 +68,7 @@ export function TimelineAccessDeactivatedEvent({ event }: TimelineAccessDeactiva
   );
 }
 
-TimelineAccessDeactivatedEvent.fragments = {
+const _fragments = {
   AccessDeactivatedEvent: gql`
     fragment TimelineAccessDeactivatedEvent_AccessDeactivatedEvent on AccessDeactivatedEvent {
       reason
@@ -83,7 +83,5 @@ TimelineAccessDeactivatedEvent.fragments = {
       }
       createdAt
     }
-    ${UserReference.fragments.User}
-    ${ContactReference.fragments.Contact}
   `,
 };

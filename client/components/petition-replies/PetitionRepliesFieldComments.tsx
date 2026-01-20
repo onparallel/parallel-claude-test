@@ -366,7 +366,7 @@ export function PetitionRepliesFieldComments({
   );
 }
 
-PetitionRepliesFieldComments.fragments = {
+const _fragments = {
   PetitionBase: gql`
     fragment PetitionRepliesFieldComments_PetitionBase on PetitionBase {
       id
@@ -396,7 +396,6 @@ const _queries = [
         }
       }
     }
-    ${PetitionFieldComment.fragments.PetitionFieldComment}
   `,
   gql`
     query PetitionRepliesFieldComments_petitionQuery($petitionId: GID!) {
@@ -409,7 +408,6 @@ const _queries = [
         }
       }
     }
-    ${PetitionFieldComment.fragments.PetitionFieldComment}
   `,
 ];
 const _mutations = [

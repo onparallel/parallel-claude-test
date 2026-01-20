@@ -4,7 +4,6 @@ import { ChevronRightIcon, ImportIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { NakedLink } from "@parallel/components/common/Link";
 import { isDialogError } from "@parallel/components/common/dialogs/DialogProvider";
-import { RecipientViewPetitionFieldCard } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldCard";
 import { RecipientViewPetitionFieldCheckbox } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldCheckbox";
 import { RecipientViewPetitionFieldDate } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldDate";
 import { RecipientViewPetitionFieldDateTime } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldDateTime";
@@ -15,10 +14,7 @@ import {
   RecipientViewPetitionFieldGroupLayout,
 } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldGroup";
 import { RecipientViewPetitionFieldIdVerification } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldIdVerification";
-import {
-  RecipientViewPetitionFieldLayout,
-  RecipientViewPetitionFieldLayoutProps,
-} from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldLayout";
+import { RecipientViewPetitionFieldLayoutProps } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldNumber } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldNumber";
 import { RecipientViewPetitionFieldPhone } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldPhone";
 import { RecipientViewPetitionFieldSelect } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldSelect";
@@ -38,7 +34,6 @@ import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useHasIdVerification } from "@parallel/utils/useHasIdVerification";
-import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
 import { useIntl } from "react-intl";
 import { isNonNullish, isNullish, zip } from "remeda";
 import { assert } from "ts-essentials";
@@ -594,14 +589,12 @@ function PreviewPetitionFieldGroupField(props: {
   );
 }
 
-PreviewPetitionFieldGroup.fragments = {
+const _fragments = {
   User: gql`
     fragment PreviewPetitionFieldGroup_User on User {
       ...PreviewPetitionFieldBackgroundCheck_User
       ...PreviewPetitionFieldProfileSearch_User
     }
-    ${PreviewPetitionFieldBackgroundCheck.fragments.User}
-    ${PreviewPetitionFieldProfileSearch.fragments.User}
   `,
   PetitionBase: gql`
     fragment PreviewPetitionFieldGroup_PetitionBase on PetitionBase {
@@ -615,10 +608,6 @@ PreviewPetitionFieldGroup.fragments = {
         ...LiquidPetitionVariableProvider_PetitionVariable
       }
     }
-    ${PreviewPetitionFieldBackgroundCheck.fragments.PetitionBase}
-    ${PreviewPetitionFieldKyc.fragments.PetitionBase}
-    ${usePetitionCanFinalize.fragments.PetitionBase}
-    ${LiquidPetitionVariableProvider.fragments.PetitionVariable}
   `,
   PetitionField: gql`
     fragment PreviewPetitionFieldGroup_PetitionField on PetitionField {
@@ -660,9 +649,5 @@ PreviewPetitionFieldGroup.fragments = {
     fragment PreviewPetitionFieldGroup_PetitionFieldData on PetitionField {
       ...RecipientViewPetitionFieldLayout_PetitionField
     }
-    ${RecipientViewPetitionFieldCard.fragments.PetitionField}
-    ${RecipientViewPetitionFieldLayout.fragments.PetitionField}
-    ${RecipientViewPetitionFieldLayout.fragments.PetitionFieldReply}
-    ${useCreateFieldGroupRepliesFromProfiles.fragments.PetitionField}
   `,
 };

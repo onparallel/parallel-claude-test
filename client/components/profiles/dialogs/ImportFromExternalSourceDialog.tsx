@@ -1003,8 +1003,6 @@ const _fragments = {
         content
       }
     }
-    ${ProfileReference.fragments.Profile}
-    ${ProfilePropertyContent.fragments.ProfileTypeField}
   `,
 };
 
@@ -1087,7 +1085,6 @@ const _mutations = [
         label
       }
     }
-    ${_fragments.ProfileExternalSourceSearchSingleResult}
   `,
   gql`
     mutation ImportFromExternalSourceDialog_profileExternalSourceDetails(
@@ -1105,7 +1102,6 @@ const _mutations = [
         ...ImportFromExternalSourceDialog_ProfileExternalSourceSearchSingleResult
       }
     }
-    ${_fragments.ProfileExternalSourceSearchSingleResult}
   `,
   gql`
     mutation ImportFromExternalSourceDialog_completeProfileFromExternalSource(
@@ -1149,7 +1145,7 @@ export function useImportFromExternalSourceDialog() {
   );
 }
 
-useImportFromExternalSourceDialog.fragments = {
+const _fragmentsImportFromExternalSourceDialog = {
   ProfileType: gql`
     fragment useImportFromExternalSourceDialog_ProfileType on ProfileType {
       id

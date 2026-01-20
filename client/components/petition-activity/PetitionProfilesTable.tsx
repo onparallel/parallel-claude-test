@@ -215,43 +215,36 @@ function usePetitionProfilesColumns(): TableColumn<
   );
 }
 
-PetitionProfilesTable.fragments = {
-  get Profile() {
-    return gql`
-      fragment PetitionProfilesTable_Profile on Profile {
+const _fragments = {
+  Profile: gql`
+    fragment PetitionProfilesTable_Profile on Profile {
+      id
+      status
+      profileType {
         id
-        status
-        profileType {
-          id
-          name
-        }
-        subscribers {
-          id
-          user {
-            ...UserAvatarList_User
-          }
-        }
-        createdAt
-        ...ProfileReference_Profile
+        name
       }
-      ${UserAvatarList.fragments.User}
-      ${ProfileReference.fragments.Profile}
-    `;
-  },
-  get Petition() {
-    return gql`
-      fragment PetitionProfilesTable_Petition on Petition {
+      subscribers {
         id
-        isAnonymized
-        permanentDeletionAt
-        myEffectivePermission {
-          permissionType
-        }
-        profiles {
-          ...PetitionProfilesTable_Profile
+        user {
+          ...UserAvatarList_User
         }
       }
-      ${this.Profile}
-    `;
-  },
+      createdAt
+      ...ProfileReference_Profile
+    }
+  `,
+  Petition: gql`
+    fragment PetitionProfilesTable_Petition on Petition {
+      id
+      isAnonymized
+      permanentDeletionAt
+      myEffectivePermission {
+        permissionType
+      }
+      profiles {
+        ...PetitionProfilesTable_Profile
+      }
+    }
+  `,
 };

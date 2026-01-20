@@ -107,8 +107,6 @@ OrganizationUsage.queries = [
         }
       }
     }
-    ${OrganizationSettingsLayout.fragments.Query}
-    ${AppSumoLicenseAlert.fragments.OrgLicense}
   `,
 ];
 

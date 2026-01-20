@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import { useApolloClient } from "@apollo/client/react";
-import { ContactSelect } from "@parallel/components/common/ContactSelect";
 import { useSearchContacts_contactsDocument } from "@parallel/graphql/__types";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { isNonNullish } from "remeda";
@@ -34,6 +33,5 @@ useSearchContacts.queries = [
         }
       }
     }
-    ${ContactSelect.fragments.Contact}
   `,
 ];

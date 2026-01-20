@@ -19,12 +19,11 @@ export function ProfileSubscribers({ users }: { users: ProfileSubscribers_UserFr
   return <UserAvatarList size="sm" boxSize={9} usersOrGroups={users} />;
 }
 
-ProfileSubscribers.fragments = {
+const _fragments = {
   User: gql`
     fragment ProfileSubscribers_User on User {
       id
       ...UserAvatarList_User
     }
-    ${UserAvatarList.fragments.User}
   `,
 };

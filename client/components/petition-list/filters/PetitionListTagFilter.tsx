@@ -14,7 +14,6 @@ import {
 import { CloseIcon, PlusCircleFilledIcon } from "@parallel/chakra/icons";
 import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { Tag } from "@parallel/components/common/Tag";
 import { TagSelect } from "@parallel/components/common/TagSelect";
 import {
   PetitionTagFilter,
@@ -114,13 +113,12 @@ export function PetitionListTagFilter() {
   );
 }
 
-PetitionListTagFilter.fragments = {
+const _fragments = {
   Tag: gql`
     fragment PetitionListTagFilter_Tag on Tag {
       id
       ...Tag_Tag
     }
-    ${Tag.fragments.Tag}
   `,
 };
 

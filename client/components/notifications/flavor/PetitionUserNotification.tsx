@@ -17,11 +17,8 @@ export interface PetitionUserNotificationProps {
   children: ReactNode;
 }
 
-export const PetitionUserNotification = Object.assign(
-  forwardRef<HTMLElement, PetitionUserNotificationProps>(function PetitionUserNotification(
-    { isFirst, icon, path, notification, children },
-    ref,
-  ) {
+export const PetitionUserNotification = forwardRef<HTMLElement, PetitionUserNotificationProps>(
+  function PetitionUserNotification({ isFirst, icon, path, notification, children }, ref) {
     const { isRead, petition, createdAt } = notification;
     const intl = useIntl();
     const markAsReadText = isRead
@@ -171,20 +168,19 @@ export const PetitionUserNotification = Object.assign(
         </Box>
       </LinkBox>
     );
-  }),
-  {
-    fragments: {
-      PetitionUserNotification: gql`
-        fragment PetitionUserNotification_PetitionUserNotification on PetitionUserNotification {
-          id
-          petition {
-            id
-            name
-          }
-          createdAt
-          isRead
-        }
-      `,
-    },
   },
 );
+
+const _fragments = {
+  PetitionUserNotification: gql`
+    fragment PetitionUserNotification_PetitionUserNotification on PetitionUserNotification {
+      id
+      petition {
+        id
+        name
+      }
+      createdAt
+      isRead
+    }
+  `,
+};

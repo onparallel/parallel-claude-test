@@ -1088,8 +1088,6 @@ const _queries = [
         }
       }
     }
-    ${_fragments.BackgroundCheckEntitySearchSchema}
-    ${BackgroundCheckSearchDifferencesAlert.fragments.BackgroundCheckEntitySearchReviewDiff}
   `,
 ];
 

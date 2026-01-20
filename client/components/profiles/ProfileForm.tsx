@@ -57,327 +57,297 @@ interface ProfileFormProps {
   omitProfileTabNavigation?: boolean;
 }
 
-export const ProfileForm = Object.assign(
-  chakraForwardRef<"div", ProfileFormProps>(function ProfileForm(
-    {
-      profile,
-      onRefetch,
-      overlapsIntercomBadge,
-      petition,
-      petitionId,
-      onRecover,
-      includeLinkToProfile,
-      ...props
-    },
-    ref,
-  ) {
-    const intl = useIntl();
-    const router = useRouter();
-    const queryProfileId = router?.query.profileId;
+export const ProfileForm = chakraForwardRef<"div", ProfileFormProps>(function ProfileForm(
+  {
+    profile,
+    onRefetch,
+    overlapsIntercomBadge,
+    petition,
+    petitionId,
+    onRecover,
+    includeLinkToProfile,
+    ...props
+  },
+  ref,
+) {
+  const intl = useIntl();
+  const router = useRouter();
+  const queryProfileId = router?.query.profileId;
 
-    const userCanCreateProfiles = useHasPermission("PROFILES:CREATE_PROFILES");
-    const isFormDisabled = !userCanCreateProfiles || profile.status !== "OPEN";
+  const userCanCreateProfiles = useHasPermission("PROFILES:CREATE_PROFILES");
+  const isFormDisabled = !userCanCreateProfiles || profile.status !== "OPEN";
 
-    const [properties, hiddenProperties] = useMemo(
-      () => partition(profile.properties, (property) => property.field.myPermission !== "HIDDEN"),
-      [profile.properties],
-    );
+  const [properties, hiddenProperties] = useMemo(
+    () => partition(profile.properties, (property) => property.field.myPermission !== "HIDDEN"),
+    [profile.properties],
+  );
 
-    const form = useForm({
-      defaultValues: buildFormDefaultValue(properties),
-    });
+  const form = useForm({
+    defaultValues: buildFormDefaultValue(properties),
+  });
 
-    const { formState, reset, setFocus, handleSubmit } = form;
+  const { formState, reset, setFocus, handleSubmit } = form;
 
-    const checkPath = useCallback(
-      (path: string) => {
-        if (queryProfileId === profile.id && path.includes(profile.id)) {
-          return false;
-        }
-        return formState.isDirty;
-      },
-      [formState.isDirty, queryProfileId, profile.id],
-    );
-
-    useAutoConfirmDiscardChangesDialog(checkPath);
-
-    useTempQueryParam("field", async (fieldId) => {
-      try {
-        setFocus(`fields.${fieldId}.content.value`);
-      } catch {
-        // ignore FILE .focus() errors
+  const checkPath = useCallback(
+    (path: string) => {
+      if (queryProfileId === profile.id && path.includes(profile.id)) {
+        return false;
       }
-    });
+      return formState.isDirty;
+    },
+    [formState.isDirty, queryProfileId, profile.id],
+  );
 
-    useEffectSkipFirst(() => {
-      reset(buildFormDefaultValue(properties), { keepDirty: true, keepDirtyValues: true });
-    }, [properties, reset]);
+  useAutoConfirmDiscardChangesDialog(checkPath);
 
-    const showSelectProfileExternalSourceDialog = useImportFromExternalSourceDialog();
-    const toast = useToast();
-    async function handleCheckExternalSourcesClick() {
-      try {
-        await showSelectProfileExternalSourceDialog({
-          profileType: profile.profileType,
-          profileId: profile.id,
-        });
-        toast({
-          title: intl.formatMessage({
-            id: "component.profile-form.success-toast-header",
-            defaultMessage: "Information imported successfully",
-          }),
-          description: intl.formatMessage({
-            id: "component.profile-form.success-toast-description",
-            defaultMessage:
-              "The profile has been updated with the information from the external source",
-          }),
-          status: "success",
-          isClosable: true,
-        });
-        await onRefetch();
-      } catch (e) {
-        if (!isDialogError(e)) {
-          throw e;
-        }
+  useTempQueryParam("field", async (fieldId) => {
+    try {
+      setFocus(`fields.${fieldId}.content.value`);
+    } catch {
+      // ignore FILE .focus() errors
+    }
+  });
+
+  useEffectSkipFirst(() => {
+    reset(buildFormDefaultValue(properties), { keepDirty: true, keepDirtyValues: true });
+  }, [properties, reset]);
+
+  const showSelectProfileExternalSourceDialog = useImportFromExternalSourceDialog();
+  const toast = useToast();
+  async function handleCheckExternalSourcesClick() {
+    try {
+      await showSelectProfileExternalSourceDialog({
+        profileType: profile.profileType,
+        profileId: profile.id,
+      });
+      toast({
+        title: intl.formatMessage({
+          id: "component.profile-form.success-toast-header",
+          defaultMessage: "Information imported successfully",
+        }),
+        description: intl.formatMessage({
+          id: "component.profile-form.success-toast-description",
+          defaultMessage:
+            "The profile has been updated with the information from the external source",
+        }),
+        status: "success",
+        isClosable: true,
+      });
+      await onRefetch();
+    } catch (e) {
+      if (!isDialogError(e)) {
+        throw e;
       }
     }
+  }
 
-    const editedFieldsCount = formState.dirtyFields.fields
-      ? Object.values(formState.dirtyFields.fields).filter((f) => isNonNullish(f)).length
-      : 0;
+  const editedFieldsCount = formState.dirtyFields.fields
+    ? Object.values(formState.dirtyFields.fields).filter((f) => isNonNullish(f)).length
+    : 0;
 
-    const submitHandler = useProfileFormInnerSubmitHandler({
-      properties,
-      profileId: profile.id,
-      petitionId,
-      form,
-    });
+  const submitHandler = useProfileFormInnerSubmitHandler({
+    properties,
+    profileId: profile.id,
+    petitionId,
+    form,
+  });
 
-    return (
-      <Flex
-        ref={ref}
-        direction="column"
-        as="form"
-        height="100%"
-        flex={1}
-        {...props}
-        onSubmit={handleSubmit(async (data) => {
-          await submitHandler(data);
-          await onRefetch();
-        })}
+  return (
+    <Flex
+      ref={ref}
+      direction="column"
+      as="form"
+      height="100%"
+      flex={1}
+      {...props}
+      onSubmit={handleSubmit(async (data) => {
+        await submitHandler(data);
+        await onRefetch();
+      })}
+    >
+      <Stack
+        spacing={0}
+        paddingX={4}
+        paddingY={2}
+        borderBottom="1px solid"
+        borderColor="gray.200"
+        minHeight="65px"
+        justifyContent="center"
       >
-        <Stack
-          spacing={0}
-          paddingX={4}
-          paddingY={2}
-          borderBottom="1px solid"
-          borderColor="gray.200"
-          minHeight="65px"
-          justifyContent="center"
+        <HStack alignItems="center">
+          <OverflownText as="h2" fontSize="xl" fontWeight={400}>
+            <ProfileReference profile={profile} />
+          </OverflownText>
+          {profile.status === "CLOSED" ? (
+            <Badge>
+              <FormattedMessage id="component.profile-form.closed-status" defaultMessage="Closed" />
+            </Badge>
+          ) : profile.status === "DELETION_SCHEDULED" ? (
+            <Badge colorScheme="red">
+              <FormattedMessage
+                id="component.profile-form.deleted-status"
+                defaultMessage="Deleted"
+              />
+            </Badge>
+          ) : null}
+          {includeLinkToProfile ? (
+            <Link href={`/app/profiles/${profile.id}/general`} display="flex">
+              <ExternalLinkIcon fontSize="lg" />
+            </Link>
+          ) : null}
+          <Spacer />
+          {profile.profileType.standardType === "INDIVIDUAL" ||
+          profile.profileType.standardType === "LEGAL_ENTITY" ? (
+            <IconButtonWithTooltip
+              isDisabled={isFormDisabled}
+              onClick={handleCheckExternalSourcesClick}
+              icon={<SearchIcon />}
+              size="sm"
+              label={intl.formatMessage({
+                id: "component.profile-form.check-external-sources-tooltip",
+                defaultMessage: "Check external data sources",
+              })}
+            />
+          ) : null}
+        </HStack>
+        <HStack
+          divider={<Divider isVertical height={3.5} color="gray.500" />}
+          fontSize="sm"
+          color="gray.600"
+          lineHeight="18px"
         >
-          <HStack alignItems="center">
-            <OverflownText as="h2" fontSize="xl" fontWeight={400}>
-              <ProfileReference profile={profile} />
-            </OverflownText>
-            {profile.status === "CLOSED" ? (
-              <Badge>
-                <FormattedMessage
-                  id="component.profile-form.closed-status"
-                  defaultMessage="Closed"
-                />
-              </Badge>
-            ) : profile.status === "DELETION_SCHEDULED" ? (
-              <Badge colorScheme="red">
-                <FormattedMessage
-                  id="component.profile-form.deleted-status"
-                  defaultMessage="Deleted"
-                />
-              </Badge>
-            ) : null}
-            {includeLinkToProfile ? (
-              <Link href={`/app/profiles/${profile.id}/general`} display="flex">
-                <ExternalLinkIcon fontSize="lg" />
-              </Link>
-            ) : null}
-            <Spacer />
-            {profile.profileType.standardType === "INDIVIDUAL" ||
-            profile.profileType.standardType === "LEGAL_ENTITY" ? (
-              <IconButtonWithTooltip
-                isDisabled={isFormDisabled}
-                onClick={handleCheckExternalSourcesClick}
-                icon={<SearchIcon />}
-                size="sm"
-                label={intl.formatMessage({
-                  id: "component.profile-form.check-external-sources-tooltip",
-                  defaultMessage: "Check external data sources",
-                })}
-              />
-            ) : null}
-          </HStack>
-          <HStack
-            divider={<Divider isVertical height={3.5} color="gray.500" />}
-            fontSize="sm"
-            color="gray.600"
-            lineHeight="18px"
-          >
-            <OverflownText>
-              <LocalizableUserTextRender
-                value={profile.profileType.name}
-                default={intl.formatMessage({
-                  id: "generic.unnamed-profile-type",
-                  defaultMessage: "Unnamed profile type",
-                })}
-              />
-            </OverflownText>
-            <Box whiteSpace="nowrap">
-              <FormattedMessage
-                id="component.profile-form.associated-profiles-count"
-                defaultMessage="{count, plural, =1 {# association} other {# associations}}"
-                values={{ count: profile.relationships.length }}
-              />
-            </Box>
-            <Box whiteSpace="nowrap">
-              <FormattedMessage
-                id="generic.petition-count"
-                defaultMessage="{count, plural, =1 {# parallel} other {# parallels}}"
-                values={{ count: profile.petitionsTotalCount.totalCount }}
-              />
-            </Box>
-          </HStack>
-        </Stack>
-        {profile.status === "DELETION_SCHEDULED" ? (
-          <ProfileDeletedAlert
-            onRecoverClick={onRecover}
-            permanentDeletionAt={profile.permanentDeletionAt!}
-          />
-        ) : null}
-        {!userCanCreateProfiles && profile.status === "OPEN" ? (
-          <RestrictedFeatureAlert rounded="none">
+          <OverflownText>
+            <LocalizableUserTextRender
+              value={profile.profileType.name}
+              default={intl.formatMessage({
+                id: "generic.unnamed-profile-type",
+                defaultMessage: "Unnamed profile type",
+              })}
+            />
+          </OverflownText>
+          <Box whiteSpace="nowrap">
             <FormattedMessage
-              id="component.profile-form.cant-edit-profiles"
-              defaultMessage="You don't have permission to edit profiles."
+              id="component.profile-form.associated-profiles-count"
+              defaultMessage="{count, plural, =1 {# association} other {# associations}}"
+              values={{ count: profile.relationships.length }}
             />
-          </RestrictedFeatureAlert>
-        ) : null}
-        {editedFieldsCount ? (
-          <EditedFieldsAlert
-            editedFieldsCount={editedFieldsCount}
-            isSubmitting={formState.isSubmitting}
-            hasErrors={Object.keys(formState.errors).length !== 0}
-            onCancel={() => reset(buildFormDefaultValue(properties))}
+          </Box>
+          <Box whiteSpace="nowrap">
+            <FormattedMessage
+              id="generic.petition-count"
+              defaultMessage="{count, plural, =1 {# parallel} other {# parallels}}"
+              values={{ count: profile.petitionsTotalCount.totalCount }}
+            />
+          </Box>
+        </HStack>
+      </Stack>
+      {profile.status === "DELETION_SCHEDULED" ? (
+        <ProfileDeletedAlert
+          onRecoverClick={onRecover}
+          permanentDeletionAt={profile.permanentDeletionAt!}
+        />
+      ) : null}
+      {!userCanCreateProfiles && profile.status === "OPEN" ? (
+        <RestrictedFeatureAlert rounded="none">
+          <FormattedMessage
+            id="component.profile-form.cant-edit-profiles"
+            defaultMessage="You don't have permission to edit profiles."
           />
-        ) : null}
-        <FormProvider {...form}>
-          <Stack
-            divider={<Divider />}
-            padding={4}
-            paddingBottom={overlapsIntercomBadge ? 24 : 4}
-            spacing={4}
-            overflow="auto"
-          >
-            <ProfileFormInner
-              profileId={profile.id}
-              petition={petition}
-              petitionId={petitionId}
-              onRefetch={onRefetch}
-              properties={properties}
-              hiddenProperties={hiddenProperties}
-              isDisabled={profile.status !== "OPEN"}
-            />
-          </Stack>
-        </FormProvider>
-      </Flex>
-    );
-  }),
-  {
-    fragments: {
-      get ProfileTypeField() {
-        return gql`
-          fragment ProfileForm_ProfileTypeField on ProfileTypeField {
-            id
-            ...ProfileFormInner_ProfileTypeField
-          }
-          ${ProfileFormInner.fragments.ProfileTypeField}
-        `;
-      },
-      get ProfileFieldFile() {
-        return gql`
-          fragment ProfileForm_ProfileFieldFile on ProfileFieldFile {
-            ...ProfileFormInner_ProfileFieldFile
-          }
-          ${ProfileFormInner.fragments.ProfileFieldFile}
-        `;
-      },
-      get ProfileFieldValue() {
-        return gql`
-          fragment ProfileForm_ProfileFieldValue on ProfileFieldValue {
-            ...ProfileFormInner_ProfileFieldValue
-          }
-          ${ProfileFormInner.fragments.ProfileFieldValue}
-        `;
-      },
-      get ProfileFieldProperty() {
-        return gql`
-          fragment ProfileForm_ProfileFieldProperty on ProfileFieldProperty {
-            ...ProfileFormInner_ProfileFieldProperty
-            ...buildFormDefaultValue_ProfileFieldProperty
-            field {
-              ...ProfileForm_ProfileTypeField
-            }
-            value {
-              ...ProfileForm_ProfileFieldValue
-            }
-            files {
-              ...ProfileForm_ProfileFieldFile
-            }
-          }
-          ${this.ProfileTypeField}
-          ${this.ProfileFieldFile}
-          ${this.ProfileFieldValue}
-          ${ProfileFormInner.fragments.ProfileFieldProperty}
-          ${buildFormDefaultValue.fragments.ProfileFieldProperty}
-        `;
-      },
-      get Profile() {
-        return gql`
-          fragment ProfileForm_Profile on Profile {
-            id
-            status
-            ...ProfileReference_Profile
-            profileType {
-              id
-              name
-              standardType
-              ...useImportFromExternalSourceDialog_ProfileType
-            }
-            properties {
-              ...ProfileForm_ProfileFieldProperty
-            }
-            relationships {
-              id
-            }
-            petitionsTotalCount: associatedPetitions {
-              totalCount
-            }
-            permanentDeletionAt
-          }
-          ${this.ProfileFieldProperty}
-          ${ProfileReference.fragments.Profile}
-          ${useImportFromExternalSourceDialog.fragments.ProfileType}
-        `;
-      },
-      get PetitionBase() {
-        return gql`
-          fragment ProfileForm_PetitionBase on PetitionBase {
-            id
-            ...ProfileFormInner_PetitionBase
-          }
-          ${ProfileFormInner.fragments.PetitionBase}
-        `;
-      },
-    },
-  },
-);
+        </RestrictedFeatureAlert>
+      ) : null}
+      {editedFieldsCount ? (
+        <EditedFieldsAlert
+          editedFieldsCount={editedFieldsCount}
+          isSubmitting={formState.isSubmitting}
+          hasErrors={Object.keys(formState.errors).length !== 0}
+          onCancel={() => reset(buildFormDefaultValue(properties))}
+        />
+      ) : null}
+      <FormProvider {...form}>
+        <Stack
+          divider={<Divider />}
+          padding={4}
+          paddingBottom={overlapsIntercomBadge ? 24 : 4}
+          spacing={4}
+          overflow="auto"
+        >
+          <ProfileFormInner
+            profileId={profile.id}
+            petition={petition}
+            petitionId={petitionId}
+            onRefetch={onRefetch}
+            properties={properties}
+            hiddenProperties={hiddenProperties}
+            isDisabled={profile.status !== "OPEN"}
+          />
+        </Stack>
+      </FormProvider>
+    </Flex>
+  );
+});
+
+const _fragments = {
+  ProfileTypeField: gql`
+    fragment ProfileForm_ProfileTypeField on ProfileTypeField {
+      id
+      ...ProfileFormInner_ProfileTypeField
+    }
+  `,
+  ProfileFieldFile: gql`
+    fragment ProfileForm_ProfileFieldFile on ProfileFieldFile {
+      ...ProfileFormInner_ProfileFieldFile
+    }
+  `,
+  ProfileFieldValue: gql`
+    fragment ProfileForm_ProfileFieldValue on ProfileFieldValue {
+      ...ProfileFormInner_ProfileFieldValue
+    }
+  `,
+  ProfileFieldProperty: gql`
+    fragment ProfileForm_ProfileFieldProperty on ProfileFieldProperty {
+      ...ProfileFormInner_ProfileFieldProperty
+      ...buildFormDefaultValue_ProfileFieldProperty
+      field {
+        ...ProfileForm_ProfileTypeField
+      }
+      value {
+        ...ProfileForm_ProfileFieldValue
+      }
+      files {
+        ...ProfileForm_ProfileFieldFile
+      }
+    }
+  `,
+  Profile: gql`
+    fragment ProfileForm_Profile on Profile {
+      id
+      status
+      ...ProfileReference_Profile
+      profileType {
+        id
+        name
+        standardType
+        ...useImportFromExternalSourceDialog_ProfileType
+      }
+      properties {
+        ...ProfileForm_ProfileFieldProperty
+      }
+      relationships {
+        id
+      }
+      petitionsTotalCount: associatedPetitions {
+        totalCount
+      }
+      permanentDeletionAt
+    }
+  `,
+  PetitionBase: gql`
+    fragment ProfileForm_PetitionBase on PetitionBase {
+      id
+      ...ProfileFormInner_PetitionBase
+    }
+  `,
+};
 
 function ProfileDeletedAlert({
   permanentDeletionAt,

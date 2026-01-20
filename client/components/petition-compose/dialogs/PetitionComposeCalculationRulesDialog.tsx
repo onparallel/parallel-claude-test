@@ -530,41 +530,33 @@ function FieldWithVariableRenderer({
 
 // GraphQL fragments and queries
 const _fragments = {
-  get Petition() {
-    return gql`
-      fragment PetitionComposeCalculationRulesDialog_Petition on PetitionBase {
-        id
-        variables {
-          name
-        }
-        fields {
+  Petition: gql`
+    fragment PetitionComposeCalculationRulesDialog_Petition on PetitionBase {
+      id
+      variables {
+        name
+      }
+      fields {
+        ...PetitionComposeCalculationRulesDialog_PetitionField
+        children {
           ...PetitionComposeCalculationRulesDialog_PetitionField
-          children {
-            ...PetitionComposeCalculationRulesDialog_PetitionField
-          }
         }
-        ...useFieldsWithIndices_PetitionBase
-        ...PetitionFieldLogicContext_PetitionBase
-        ...useFieldLogic_PetitionBase
       }
-      ${this.PetitionField}
-      ${useFieldsWithIndices.fragments.PetitionBase}
-      ${PetitionFieldLogicContext.fragments.PetitionBase}
-      ${useFieldLogic.fragments.PetitionBase}
-    `;
-  },
-  get PetitionField() {
-    return gql`
-      fragment PetitionComposeCalculationRulesDialog_PetitionField on PetitionField {
-        id
-        type
-        title
-        description
-        math
-        options
-      }
-    `;
-  },
+      ...useFieldsWithIndices_PetitionBase
+      ...PetitionFieldLogicContext_PetitionBase
+      ...useFieldLogic_PetitionBase
+    }
+  `,
+  PetitionField: gql`
+    fragment PetitionComposeCalculationRulesDialog_PetitionField on PetitionField {
+      id
+      type
+      title
+      description
+      math
+      options
+    }
+  `,
 };
 
 const _queries = [
@@ -575,6 +567,5 @@ const _queries = [
         ...PetitionComposeCalculationRulesDialog_Petition
       }
     }
-    ${_fragments.Petition}
   `,
 ];

@@ -182,13 +182,12 @@ function EditPetitionFieldCalculationsDialog({
   );
 }
 
-useEditPetitionFieldCalculationsDialog.fragments = {
+const _fragments = {
   PetitionField: gql`
     fragment useEditPetitionFieldCalculationsDialog_PetitionField on PetitionField {
       id
       ...PetitionFieldMathEditor_PetitionField
     }
-    ${PetitionFieldMathEditor.fragments.PetitionField}
   `,
   PetitionBase: gql`
     fragment useEditPetitionFieldCalculationsDialog_PetitionBase on PetitionBase {
@@ -198,7 +197,6 @@ useEditPetitionFieldCalculationsDialog.fragments = {
       }
       ...PetitionFieldMathEditor_PetitionBase
     }
-    ${PetitionFieldMathEditor.fragments.PetitionBase}
   `,
 };
 

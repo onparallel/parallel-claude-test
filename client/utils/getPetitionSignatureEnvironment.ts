@@ -14,7 +14,7 @@ export function getPetitionSignatureEnvironment(
   );
 }
 
-getPetitionSignatureEnvironment.fragments = {
+const _fragments = {
   Petition: gql`
     fragment getPetitionSignatureEnvironment_Petition on Petition {
       currentSignatureRequest {

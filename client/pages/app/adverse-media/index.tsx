@@ -522,17 +522,14 @@ function SearchInputWithSuggestions({
 }
 
 const _fragments = {
-  get AdverseMediaArticle() {
-    return gql`
-      fragment AdverseMediaSearch_AdverseMediaArticle on AdverseMediaArticle {
-        id
-        classification
-        classifiedAt
-        ...AdverseMediaArticleCard_AdverseMediaArticleListItem
-      }
-      ${AdverseMediaArticleCard.fragments.AdverseMediaArticleListItem}
-    `;
-  },
+  AdverseMediaArticle: gql`
+    fragment AdverseMediaSearch_AdverseMediaArticle on AdverseMediaArticle {
+      id
+      classification
+      classifiedAt
+      ...AdverseMediaArticleCard_AdverseMediaArticleListItem
+    }
+  `,
 };
 
 const _queries = [
@@ -559,7 +556,6 @@ const _queries = [
         }
       }
     }
-    ${_fragments.AdverseMediaArticle}
   `,
   gql`
     query AdverseMediaSearch_adverseMediaAlternativeSearchSuggestions(

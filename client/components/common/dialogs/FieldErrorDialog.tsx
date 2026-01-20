@@ -113,7 +113,7 @@ export function useFieldErrorDialog() {
   return useDialog(FieldErrorDialog);
 }
 
-FieldErrorDialog.fragments = {
+const _fragments = {
   PetitionField: gql`
     fragment FieldErrorDialog_PetitionField on PetitionField {
       id

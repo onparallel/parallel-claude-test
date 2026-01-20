@@ -22,11 +22,7 @@ import { ProfileSelect, ProfileSelectInstance } from "@parallel/components/commo
 import { ProfileTypeReference } from "@parallel/components/common/ProfileTypeReference";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import { usePreviewImportFromProfileFormatErrorDialog } from "@parallel/components/petition-preview/dialogs/PreviewImportFromProfileFormatErrorDialog";
-import {
-  AssociateNewPetitionToProfileDialogPrefillFieldGroups,
-  useAssociateNewPetitionToProfileDialog,
-} from "@parallel/components/profiles/dialogs/AssociateNewPetitionToProfileDialog";
-import { ProfileRelationshipsAssociationTable } from "@parallel/components/profiles/ProfileRelationshipsAssociationTable";
+import { AssociateNewPetitionToProfileDialogPrefillFieldGroups } from "@parallel/components/profiles/dialogs/AssociateNewPetitionToProfileDialog";
 import {
   useCreatePetitionFromTemplateWithPrefillDialog_createPetitionFromProfileDocument,
   useCreatePetitionFromTemplateWithPrefillDialog_PetitionBaseFragment,
@@ -445,7 +441,7 @@ export function useCreatePetitionFromTemplateWithPrefillDialog() {
 }
 
 // Reuse fragments from the original dialog
-useCreatePetitionFromTemplateWithPrefillDialog.fragments = {
+const _fragments = {
   PetitionBase: gql`
     fragment useCreatePetitionFromTemplateWithPrefillDialog_PetitionBase on PetitionBase {
       id
@@ -465,12 +461,6 @@ useCreatePetitionFromTemplateWithPrefillDialog.fragments = {
       ...ProfileRelationshipsAssociationTable_PetitionBase
       ...useAssociateNewPetitionToProfileDialog_PetitionBase
     }
-    ${PetitionFieldReference.fragments.PetitionField}
-    ${useFieldsWithIndices.fragments.PetitionBase}
-    ${ProfileRelationshipsAssociationTable.fragments.PetitionBase}
-    ${ProfileTypeReference.fragments.ProfileType}
-    ${useAssociateNewPetitionToProfileDialog.fragments.PetitionBase}
-    ${groupFieldsWithProfileTypes.fragments.PetitionField}
   `,
   Profile: gql`
     fragment useCreatePetitionFromTemplateWithPrefillDialog_Profile on Profile {
@@ -479,9 +469,6 @@ useCreatePetitionFromTemplateWithPrefillDialog.fragments = {
       ...calculateRelatedFieldGroupsWithCompatibleProfiles_Profile
       ...useAssociateNewPetitionToProfileDialog_Profile
     }
-    ${calculateCompatibleFieldGroups.fragments.Profile}
-    ${calculateRelatedFieldGroupsWithCompatibleProfiles.fragments.Profile}
-    ${useAssociateNewPetitionToProfileDialog.fragments.Profile}
   `,
 };
 
@@ -493,7 +480,6 @@ const _queries = [
         ...useCreatePetitionFromTemplateWithPrefillDialog_Profile
       }
     }
-    ${useCreatePetitionFromTemplateWithPrefillDialog.fragments.Profile}
   `,
 ];
 

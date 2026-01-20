@@ -255,7 +255,7 @@ export function useClosePetition({ onRefetch }: useClosePetitionProps) {
 }
 
 // GraphQL fragments to ensure all necessary data is available
-useClosePetition.fragments = {
+const _fragments = {
   PetitionBase: gql`
     fragment useClosePetition_PetitionBase on PetitionBase {
       id
@@ -287,7 +287,6 @@ useClosePetition.fragments = {
         ...useClosePetitionDialog_Petition
       }
     }
-    ${useClosePetitionDialog.fragments.Petition}
   `,
 };
 

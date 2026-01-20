@@ -332,7 +332,7 @@ const RecipientViewSidebarBody = chakraForwardRef<
   );
 });
 
-RecipientViewSidebar.fragments = {
+const _fragments = {
   PublicPetitionAccess: gql`
     fragment RecipientViewSidebar_PublicPetitionAccess on PublicPetitionAccess {
       hasClientPortalAccess
@@ -353,9 +353,5 @@ RecipientViewSidebar.fragments = {
       ...RecipientViewComments_PublicPetitionAccess
       ...RecipientViewInformation_PublicPetitionAccess
     }
-    ${RecipientViewComments.fragments.PublicPetitionAccess}
-    ${RecipientViewContents.fragments.PublicPetition}
-    ${RecipientViewMenuButton.fragments.PublicContact}
-    ${RecipientViewInformation.fragments.PublicPetitionAccess}
   `,
 };

@@ -122,7 +122,7 @@ export function PetitionComposeBackgroundCheckSettings({
   );
 }
 
-PetitionComposeBackgroundCheckSettings.fragments = {
+const _fragments = {
   PetitionField: gql`
     fragment PetitionComposeBackgroundCheckSettings_PetitionField on PetitionField {
       id

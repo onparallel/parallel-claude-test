@@ -1,10 +1,7 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import { useToast } from "@chakra-ui/react";
-import {
-  ConfirmPetitionSignersDialog,
-  useConfirmPetitionSignersDialog,
-} from "@parallel/components/petition-common/dialogs/ConfirmPetitionSignersDialog";
+import { useConfirmPetitionSignersDialog } from "@parallel/components/petition-common/dialogs/ConfirmPetitionSignersDialog";
 import { useHandledTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
 import {
   useStartSignatureRequest_PetitionFragment,
@@ -180,7 +177,7 @@ export function useStartSignatureRequest({
   };
 }
 
-useStartSignatureRequest.fragments = {
+const _fragments = {
   Petition: gql`
     fragment useStartSignatureRequest_Petition on Petition {
       id
@@ -200,8 +197,6 @@ useStartSignatureRequest.fragments = {
       }
       ...usePetitionCanFinalize_PetitionBase
     }
-    ${ConfirmPetitionSignersDialog.fragments.SignatureConfig}
-    ${usePetitionCanFinalize.fragments.PetitionBase}
   `,
 };
 
@@ -215,7 +210,6 @@ const _mutations = [
         ...useStartSignatureRequest_Petition
       }
     }
-    ${useStartSignatureRequest.fragments.Petition}
   `,
   gql`
     mutation useStartSignatureRequest_completePetition($petitionId: GID!, $message: String) {
@@ -223,7 +217,6 @@ const _mutations = [
         ...useStartSignatureRequest_Petition
       }
     }
-    ${useStartSignatureRequest.fragments.Petition}
   `,
   gql`
     mutation useStartSignatureRequest_startSignatureRequest(

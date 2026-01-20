@@ -14,77 +14,71 @@ export interface TemplateCardProps {
   onPress: () => void;
 }
 
-export const TemplateCard = Object.assign(
-  chakraForwardRef<"div", TemplateCardProps>(function TemplateCard(
-    { template, onPress, ...props },
-    ref,
-  ) {
-    const buttonProps = useRoleButton(onPress);
+export const TemplateCard = chakraForwardRef<"div", TemplateCardProps>(function TemplateCard(
+  { template, onPress, ...props },
+  ref,
+) {
+  const buttonProps = useRoleButton(onPress);
 
-    return (
-      <Card
-        ref={ref}
-        as={Stack}
-        padding={4}
-        minHeight="160px"
-        outline="none"
-        isInteractive
-        minWidth={0}
-        {...buttonProps}
-        {...props}
-      >
-        {template.name ? (
-          <Text as="h2" fontSize="lg" noOfLines={2} fontWeight="bold">
-            {template.name}
-          </Text>
-        ) : (
-          <Text as="h2" fontSize="lg" noOfLines={2} fontWeight="normal" fontStyle="italic">
-            <FormattedMessage id="generic.unnamed-template" defaultMessage="Unnamed template" />
-          </Text>
-        )}
+  return (
+    <Card
+      ref={ref}
+      as={Stack}
+      padding={4}
+      minHeight="160px"
+      outline="none"
+      isInteractive
+      minWidth={0}
+      {...buttonProps}
+      {...props}
+    >
+      {template.name ? (
+        <Text as="h2" fontSize="lg" noOfLines={2} fontWeight="bold">
+          {template.name}
+        </Text>
+      ) : (
+        <Text as="h2" fontSize="lg" noOfLines={2} fontWeight="normal" fontStyle="italic">
+          <FormattedMessage id="generic.unnamed-template" defaultMessage="Unnamed template" />
+        </Text>
+      )}
+      <Spacer />
+      <Flex alignItems="center">
+        <TemplateActiveSettingsIcons template={template} spacing={2.5} />
         <Spacer />
-        <Flex alignItems="center">
-          <TemplateActiveSettingsIcons template={template} spacing={2.5} />
-          <Spacer />
-          <UserAvatarList
-            usersOrGroups={template!.permissions.map((p) =>
-              p.__typename === "PetitionUserPermission"
-                ? p.user
-                : p.__typename === "PetitionUserGroupPermission"
-                  ? p.group
-                  : (null as never),
-            )}
-          />
-        </Flex>
-      </Card>
-    );
-  }),
-  {
-    fragments: {
-      PetitionTemplate: gql`
-        fragment TemplateCard_PetitionTemplate on PetitionTemplate {
-          id
-          name
-          permissions {
-            ... on PetitionUserPermission {
-              user {
-                id
-                ...UserAvatarList_User
-              }
-            }
-            ... on PetitionUserGroupPermission {
-              group {
-                id
-                ...UserAvatarList_UserGroup
-              }
-            }
+        <UserAvatarList
+          usersOrGroups={template!.permissions.map((p) =>
+            p.__typename === "PetitionUserPermission"
+              ? p.user
+              : p.__typename === "PetitionUserGroupPermission"
+                ? p.group
+                : (null as never),
+          )}
+        />
+      </Flex>
+    </Card>
+  );
+});
+
+const _fragments = {
+  PetitionTemplate: gql`
+    fragment TemplateCard_PetitionTemplate on PetitionTemplate {
+      id
+      name
+      permissions {
+        ... on PetitionUserPermission {
+          user {
+            id
+            ...UserAvatarList_User
           }
-          ...TemplateActiveSettingsIcons_PetitionTemplate
         }
-        ${UserAvatarList.fragments.User}
-        ${UserAvatarList.fragments.UserGroup}
-        ${TemplateActiveSettingsIcons.fragments.PetitionTemplate}
-      `,
-    },
-  },
-);
+        ... on PetitionUserGroupPermission {
+          group {
+            id
+            ...UserAvatarList_UserGroup
+          }
+        }
+      }
+      ...TemplateActiveSettingsIcons_PetitionTemplate
+    }
+  `,
+};

@@ -97,7 +97,7 @@ export function useOrganizationSections(user: useOrganizationSections_UserFragme
   );
 }
 
-useOrganizationSections.fragments = {
+const _fragments = {
   User: gql`
     fragment useOrganizationSections_User on User {
       hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)

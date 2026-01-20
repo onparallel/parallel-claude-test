@@ -68,7 +68,7 @@ function ProfileTypeFieldReferencedAutoSearchConfigDialog({
   );
 }
 
-useProfileTypeFieldReferencedAutoSearchConfigDialog.fragments = {
+const _fragments = {
   ProfileTypeField: gql`
     fragment useProfileTypeFieldReferencedAutoSearchConfigDialog_ProfileTypeField on ProfileTypeField {
       id

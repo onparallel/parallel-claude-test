@@ -178,7 +178,6 @@ const _queries = [
         }
       }
     }
-    ${_fragments.Organization}
   `,
   gql`
     query ChooseOrg_Query {

@@ -145,30 +145,24 @@ export function BrandingGeneralPreview({ user, brand, logo }: BrandingGeneralPre
   );
 }
 
-BrandingGeneralPreview.fragments = {
-  get OrganizationBrandThemeData() {
-    return gql`
-      fragment BrandingGeneralPreview_OrganizationBrandThemeData on OrganizationBrandThemeData {
-        preferredTone
-        ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
-      }
-      ${OverrideWithOrganizationTheme.fragments.OrganizationBrandThemeData}
-    `;
-  },
-  get User() {
-    return gql`
-      fragment BrandingGeneralPreview_User on User {
-        fullName
-        organization {
-          id
-          name
-          logoUrl(options: { resize: { width: 600 }, toFormat: png })
-          brandTheme {
-            ...BrandingGeneralPreview_OrganizationBrandThemeData
-          }
+const _fragments = {
+  OrganizationBrandThemeData: gql`
+    fragment BrandingGeneralPreview_OrganizationBrandThemeData on OrganizationBrandThemeData {
+      preferredTone
+      ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
+    }
+  `,
+  User: gql`
+    fragment BrandingGeneralPreview_User on User {
+      fullName
+      organization {
+        id
+        name
+        logoUrl(options: { resize: { width: 600 }, toFormat: png })
+        brandTheme {
+          ...BrandingGeneralPreview_OrganizationBrandThemeData
         }
       }
-      ${this.OrganizationBrandThemeData}
-    `;
-  },
+    }
+  `,
 };

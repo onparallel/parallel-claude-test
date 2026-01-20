@@ -99,16 +99,13 @@ export function useConfirmDiscardDraftDialog(
   });
 }
 
-useConfirmDiscardDraftDialog.fragments = {
-  get PetitionBase() {
-    return gql`
-      fragment useConfirmDiscardDraftDialog_PetitionBase on PetitionBase {
-        ...useDeletePetitions_PetitionBase
-        ... on Petition {
-          status
-        }
+const _fragments = {
+  PetitionBase: gql`
+    fragment useConfirmDiscardDraftDialog_PetitionBase on PetitionBase {
+      ...useDeletePetitions_PetitionBase
+      ... on Petition {
+        status
       }
-      ${useDeletePetitions.fragments.PetitionBase}
-    `;
-  },
+    }
+  `,
 };

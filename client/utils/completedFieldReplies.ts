@@ -84,80 +84,70 @@ function _completedFieldReplies(
   }
 }
 
-completedFieldReplies.fragments = {
-  get PetitionField() {
-    return gql`
-      fragment completedFieldReplies_PetitionField on PetitionField {
-        type
-        options
-        previewReplies @client {
-          ...completedFieldReplies_PetitionFieldReply
-          children {
-            field {
-              type
-              options
-              optional
-            }
-            replies {
-              ...completedFieldReplies_PetitionFieldReply
-            }
+const _fragments = {
+  PetitionField: gql`
+    fragment completedFieldReplies_PetitionField on PetitionField {
+      type
+      options
+      previewReplies @client {
+        ...completedFieldReplies_PetitionFieldReply
+        children {
+          field {
+            type
+            options
+            optional
           }
-        }
-        replies {
-          ...completedFieldReplies_PetitionFieldReply
-          children {
-            field {
-              type
-              options
-              optional
-            }
-            replies {
-              ...completedFieldReplies_PetitionFieldReply
-            }
+          replies {
+            ...completedFieldReplies_PetitionFieldReply
           }
         }
       }
-      ${this.PetitionFieldReply}
-    `;
-  },
-  get PetitionFieldReply() {
-    return gql`
-      fragment completedFieldReplies_PetitionFieldReply on PetitionFieldReply {
-        id
-        content
-        isAnonymized
-      }
-    `;
-  },
-  get PublicPetitionField() {
-    return gql`
-      fragment completedFieldReplies_PublicPetitionField on PublicPetitionField {
-        type
-        options
-        replies {
-          ...completedFieldReplies_PublicPetitionFieldReply
-          children {
-            field {
-              type
-              options
-              optional
-            }
-            replies {
-              ...completedFieldReplies_PublicPetitionFieldReply
-            }
+      replies {
+        ...completedFieldReplies_PetitionFieldReply
+        children {
+          field {
+            type
+            options
+            optional
+          }
+          replies {
+            ...completedFieldReplies_PetitionFieldReply
           }
         }
       }
-      ${this.PublicPetitionFieldReply}
-    `;
-  },
-  get PublicPetitionFieldReply() {
-    return gql`
-      fragment completedFieldReplies_PublicPetitionFieldReply on PublicPetitionFieldReply {
-        id
-        content
-        isAnonymized
+    }
+  `,
+  PetitionFieldReply: gql`
+    fragment completedFieldReplies_PetitionFieldReply on PetitionFieldReply {
+      id
+      content
+      isAnonymized
+    }
+  `,
+  PublicPetitionField: gql`
+    fragment completedFieldReplies_PublicPetitionField on PublicPetitionField {
+      type
+      options
+      replies {
+        ...completedFieldReplies_PublicPetitionFieldReply
+        children {
+          field {
+            type
+            options
+            optional
+          }
+          replies {
+            ...completedFieldReplies_PublicPetitionFieldReply
+          }
+        }
       }
-    `;
-  },
+    }
+  `,
+  PublicPetitionFieldReply: gql`
+    fragment completedFieldReplies_PublicPetitionFieldReply on PublicPetitionFieldReply {
+      id
+      content
+      isAnonymized
+    }
+  `,
 };

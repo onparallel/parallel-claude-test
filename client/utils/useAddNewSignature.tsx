@@ -76,7 +76,7 @@ export function useAddNewSignature({ petition }: useAddNewSignatureProps) {
   };
 }
 
-useAddNewSignature.fragments = {
+const _fragments = {
   Petition: gql`
     fragment useAddNewSignature_Petition on Petition {
       id
@@ -122,6 +122,5 @@ const _mutations = [
         }
       }
     }
-    ${useAddNewSignature.fragments.Petition}
   `,
 ];

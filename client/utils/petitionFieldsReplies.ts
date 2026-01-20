@@ -144,44 +144,42 @@ export const mapReplyContents = ({
   };
 };
 
-mapReplyContents.fragments = {
-  get PetitionField() {
-    return gql`
-      fragment mapReplyContents_PetitionField on PetitionField {
+const _fragmentsMapReplyContents = {
+  PetitionField: gql`
+    fragment mapReplyContents_PetitionField on PetitionField {
+      ...mapReplyContents_PetitionFieldData
+      children {
         ...mapReplyContents_PetitionFieldData
-        children {
-          ...mapReplyContents_PetitionFieldData
-        }
       }
-      fragment mapReplyContents_PetitionFieldData on PetitionField {
+    }
+    fragment mapReplyContents_PetitionFieldData on PetitionField {
+      id
+      type
+      options
+      multiple
+      replies {
         id
-        type
-        options
-        multiple
-        replies {
-          id
-          content
-          parent {
-            id
-          }
-          children {
-            field {
-              id
-            }
-            replies {
-              id
-            }
-          }
-        }
+        content
         parent {
           id
+        }
+        children {
+          field {
+            id
+          }
           replies {
             id
           }
         }
       }
-    `;
-  },
+      parent {
+        id
+        replies {
+          id
+        }
+      }
+    }
+  `,
 };
 
 export const isReplyContentCompatible = (
@@ -357,20 +355,18 @@ export const isReplyContentCompatible = (
   return isCompatible;
 };
 
-isReplyContentCompatible.fragments = {
-  get PetitionField() {
-    return gql`
-      fragment isReplyContentCompatible_PetitionField on PetitionField {
+const _fragments = {
+  PetitionField: gql`
+    fragment isReplyContentCompatible_PetitionField on PetitionField {
+      id
+      type
+      options
+      multiple
+      replies {
         id
-        type
-        options
-        multiple
-        replies {
-          id
-          content
-        }
-        isChild
+        content
       }
-    `;
-  },
+      isChild
+    }
+  `,
 };

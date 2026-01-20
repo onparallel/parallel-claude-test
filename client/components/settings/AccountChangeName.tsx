@@ -109,7 +109,7 @@ export function AccountChangeName({ user, onSubmit, ...props }: AccountChangeNam
   );
 }
 
-AccountChangeName.fragments = {
+const _fragments = {
   User: gql`
     fragment AccountChangeName_User on User {
       firstName

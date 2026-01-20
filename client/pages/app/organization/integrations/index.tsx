@@ -482,7 +482,6 @@ OrganizationIntegrations.queries = [
         }
       }
     }
-    ${OrganizationSettingsLayout.fragments.Query}
   `,
 ];
 

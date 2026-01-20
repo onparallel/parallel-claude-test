@@ -215,7 +215,6 @@ Security.queries = [
         isSsoUser
       }
     }
-    ${UserSettingsLayout.fragments.Query}
   `,
 ];
 

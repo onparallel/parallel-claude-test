@@ -111,10 +111,6 @@ const _fragments = {
       ...useStartApprovalRequestStep_PetitionBase
       ...useClosePetition_PetitionBase
     }
-    ${getPetitionSignatureStatus.fragments.Petition}
-    ${useStartSignatureRequest.fragments.Petition}
-    ${useStartApprovalRequestStep.fragments.PetitionBase}
-    ${useClosePetition.fragments.PetitionBase}
   `,
 };
 
@@ -125,6 +121,5 @@ const _queries = [
         ...PetitionComposeAlertsContainer_Petition
       }
     }
-    ${_fragments.Petition}
   `,
 ];

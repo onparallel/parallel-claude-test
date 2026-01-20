@@ -88,7 +88,7 @@ export function PetitionComposeUserAssignmentSettings({
   );
 }
 
-PetitionComposeUserAssignmentSettings.fragments = {
+const _fragments = {
   PetitionField: gql`
     fragment PetitionComposeUserAssignmentSettings_PetitionField on PetitionField {
       id

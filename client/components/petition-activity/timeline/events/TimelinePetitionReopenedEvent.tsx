@@ -29,7 +29,7 @@ export function TimelinePetitionReopenedEvent({ event }: TimelinePetitionReopene
   );
 }
 
-TimelinePetitionReopenedEvent.fragments = {
+const _fragments = {
   PetitionReopenedEvent: gql`
     fragment TimelinePetitionReopenedEvent_PetitionReopenedEvent on PetitionReopenedEvent {
       user {
@@ -37,6 +37,5 @@ TimelinePetitionReopenedEvent.fragments = {
       }
       createdAt
     }
-    ${UserReference.fragments.User}
   `,
 };

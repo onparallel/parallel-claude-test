@@ -139,13 +139,12 @@ export function PetitionComposeRightPaneTabs({
   );
 }
 
-PetitionComposeRightPaneTabs.fragments = {
+const _fragments = {
   User: gql`
     fragment PetitionComposeRightPaneTabs_User on User {
       id
       ...PetitionSettings_User
     }
-    ${PetitionSettings.fragments.User}
   `,
   PetitionField: gql`
     fragment PetitionComposeRightPaneTabs_PetitionField on PetitionField {
@@ -153,8 +152,6 @@ PetitionComposeRightPaneTabs.fragments = {
       ...PetitionComposeContents_PetitionField
       ...PetitionComposeVariables_PetitionField
     }
-    ${PetitionComposeContents.fragments.PetitionField}
-    ${PetitionComposeVariables.fragments.PetitionField}
   `,
   PetitionBase: gql`
     fragment PetitionComposeRightPaneTabs_PetitionBase on PetitionBase {
@@ -162,7 +159,5 @@ PetitionComposeRightPaneTabs.fragments = {
       ...PetitionSettings_PetitionBase
       ...PetitionComposeVariables_PetitionBase
     }
-    ${PetitionSettings.fragments.PetitionBase}
-    ${PetitionComposeVariables.fragments.PetitionBase}
   `,
 };

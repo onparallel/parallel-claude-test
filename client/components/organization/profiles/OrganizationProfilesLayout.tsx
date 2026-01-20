@@ -63,13 +63,10 @@ export function OrganizationProfilesLayout({
   );
 }
 
-OrganizationProfilesLayout.fragments = {
-  get Query() {
-    return gql`
-      fragment OrganizationProfilesLayout_Query on Query {
-        ...OrganizationSettingsLayout_Query
-      }
-      ${OrganizationSettingsLayout.fragments.Query}
-    `;
-  },
+const _fragments = {
+  Query: gql`
+    fragment OrganizationProfilesLayout_Query on Query {
+      ...OrganizationSettingsLayout_Query
+    }
+  `,
 };

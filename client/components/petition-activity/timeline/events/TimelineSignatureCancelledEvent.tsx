@@ -144,7 +144,7 @@ export function TimelineSignatureCancelledEvent({ event }: TimelineSignatureCanc
   );
 }
 
-TimelineSignatureCancelledEvent.fragments = {
+const _fragments = {
   SignatureCancelledEvent: gql`
     fragment TimelineSignatureCancelledEvent_SignatureCancelledEvent on SignatureCancelledEvent {
       ...useSignatureCancelledRequestErrorMessage_SignatureCancelledEvent
@@ -160,8 +160,5 @@ TimelineSignatureCancelledEvent.fragments = {
       cancellerReason
       createdAt
     }
-    ${useSignatureCancelledRequestErrorMessage.fragments.SignatureCancelledEvent}
-    ${UserOrContactReference.fragments.UserOrPetitionAccess}
-    ${SignerReference.fragments.PetitionSigner}
   `,
 };

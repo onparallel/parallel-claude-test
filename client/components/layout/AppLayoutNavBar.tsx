@@ -102,357 +102,343 @@ export interface AppLayoutNavBarProps {
   onHelpCenterClick: () => void;
 }
 
-export const AppLayoutNavBar = Object.assign(
-  function AppLayoutNavBar({ queryObject, onHelpCenterClick }: AppLayoutNavBarProps) {
-    const { me, realMe, appLayoutNavBarProfileTypes: profileTypes } = queryObject;
-    const intl = useIntl();
+export function AppLayoutNavBar({ queryObject, onHelpCenterClick }: AppLayoutNavBarProps) {
+  const { me, realMe, appLayoutNavBarProfileTypes: profileTypes } = queryObject;
+  const intl = useIntl();
 
-    const closeRef = useRef<HTMLButtonElement>(null);
-    const navRef = useRef<HTMLElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const navRef = useRef<HTMLElement>(null);
 
-    const [isForceOpen, setIsForceOpen] = useCookie(`navbar-expanded-${realMe.id}`, false);
-    const isFocusWithin = useIsFocusWithin(navRef);
-    const isHovered = useIsMouseOver(navRef);
-    const [isOpenMobile, setIsOpenMobile] = useState(false);
-    // keep track of the state of the different menus to prevent the navbar to hide when the menu is open
-    const [subMenuIsOpen, setSubMenuIsOpen] = useState(false);
-    function handleSubMenuToggle(isOpen: boolean) {
-      setSubMenuIsOpen(isOpen);
-      if (!isOpen && !isForceOpen) {
-        setTimeout(() => {
-          (document.activeElement as any)?.blur?.();
-        });
-      }
+  const [isForceOpen, setIsForceOpen] = useCookie(`navbar-expanded-${realMe.id}`, false);
+  const isFocusWithin = useIsFocusWithin(navRef);
+  const isHovered = useIsMouseOver(navRef);
+  const [isOpenMobile, setIsOpenMobile] = useState(false);
+  // keep track of the state of the different menus to prevent the navbar to hide when the menu is open
+  const [subMenuIsOpen, setSubMenuIsOpen] = useState(false);
+  function handleSubMenuToggle(isOpen: boolean) {
+    setSubMenuIsOpen(isOpen);
+    if (!isOpen && !isForceOpen) {
+      setTimeout(() => {
+        (document.activeElement as any)?.blur?.();
+      });
     }
-    const { deviceType } = useBrowserMetadata();
-    const isMobile = useBreakpointValue(
-      { base: true, sm: false },
-      { fallback: deviceType === "mobile" ? "base" : "sm" },
-    )!;
+  }
+  const { deviceType } = useBrowserMetadata();
+  const isMobile = useBreakpointValue(
+    { base: true, sm: false },
+    { fallback: deviceType === "mobile" ? "base" : "sm" },
+  )!;
 
-    // use local storage to store the state so that  it persists between page changes
-    const [isOpenDesktop, setIsOpenDesktop] = useLocalStorage("navbar-opened", false);
-    useEffect(() => {
-      if (!isMobile) {
-        setIsOpenDesktop((isFocusWithin || isHovered || subMenuIsOpen) && !isForceOpen);
-      }
-    }, [isMobile, isFocusWithin, isHovered, subMenuIsOpen]);
+  // use local storage to store the state so that  it persists between page changes
+  const [isOpenDesktop, setIsOpenDesktop] = useLocalStorage("navbar-opened", false);
+  useEffect(() => {
+    if (!isMobile) {
+      setIsOpenDesktop((isFocusWithin || isHovered || subMenuIsOpen) && !isForceOpen);
+    }
+  }, [isMobile, isFocusWithin, isHovered, subMenuIsOpen]);
 
-    const isNavBarOpen = isMobile ? isOpenMobile : isForceOpen || isOpenDesktop;
+  const isNavBarOpen = isMobile ? isOpenMobile : isForceOpen || isOpenDesktop;
 
-    const handlePinNavbarClick: MouseEventHandler<HTMLButtonElement> = (e) => {
-      if (isForceOpen) {
-        // after unpinning feels strange that the menu wont close when moving the mouse away.
-        e.currentTarget.blur();
-      }
-      setIsForceOpen(!isForceOpen);
-    };
+  const handlePinNavbarClick: MouseEventHandler<HTMLButtonElement> = (e) => {
+    if (isForceOpen) {
+      // after unpinning feels strange that the menu wont close when moving the mouse away.
+      e.currentTarget.blur();
+    }
+    setIsForceOpen(!isForceOpen);
+  };
 
-    return (
-      <Box
-        as="nav"
-        className="no-print"
-        ref={navRef}
-        id="nav-bar"
-        zIndex={isOpenDesktop ? 41 : 2}
-        data-nav-bar-expanded={isNavBarOpen}
-        position="relative"
-        width={{ base: "100%", sm: isForceOpen ? "200px" : "64px" }}
-        transition={{ sm: "width 150ms ease-out" }}
-        sx={{
+  return (
+    <Box
+      as="nav"
+      className="no-print"
+      ref={navRef}
+      id="nav-bar"
+      zIndex={isOpenDesktop ? 41 : 2}
+      data-nav-bar-expanded={isNavBarOpen}
+      position="relative"
+      width={{ base: "100%", sm: isForceOpen ? "200px" : "64px" }}
+      transition={{ sm: "width 150ms ease-out" }}
+      sx={{
+        ".show-on-expand": {
+          transition: {
+            sm: `opacity ${ANIMATION_DURATION} ${ANIMATION_TIMING} ${ANIMATION_DELAY}`,
+          },
+          opacity: { sm: 0 },
+        },
+        ".expand-button": {
+          opacity: 0,
+          // prevent tooltip showing when hovering the menu close to the button
+          pointerEvents: "none",
+          transition: `opacity ${ANIMATION_DURATION} ${ANIMATION_TIMING} ${ANIMATION_DELAY}`,
+        },
+        '&[data-nav-bar-expanded="true"]': {
           ".show-on-expand": {
-            transition: {
-              sm: `opacity ${ANIMATION_DURATION} ${ANIMATION_TIMING} ${ANIMATION_DELAY}`,
-            },
-            opacity: { sm: 0 },
+            opacity: { sm: 1 },
+          },
+          "#nav-bar-menu": {
+            minWidth: { sm: "200px" },
+            boxShadow: { sm: isForceOpen ? "none" : "xl" },
           },
           ".expand-button": {
-            opacity: 0,
-            // prevent tooltip showing when hovering the menu close to the button
-            pointerEvents: "none",
-            transition: `opacity ${ANIMATION_DURATION} ${ANIMATION_TIMING} ${ANIMATION_DELAY}`,
+            opacity: 1,
+            pointerEvents: "unset",
           },
-          '&[data-nav-bar-expanded="true"]': {
-            ".show-on-expand": {
-              opacity: { sm: 1 },
-            },
-            "#nav-bar-menu": {
-              minWidth: { sm: "200px" },
-              boxShadow: { sm: isForceOpen ? "none" : "xl" },
-            },
-            ".expand-button": {
-              opacity: 1,
-              pointerEvents: "unset",
-            },
-          },
-        }}
+        },
+      }}
+    >
+      <HStack
+        display={{ base: "flex", sm: "none" }}
+        height="48px"
+        paddingX={4}
+        borderBottom={{ base: "1px solid", sm: "none" }}
+        borderColor="gray.200"
+        background={{ base: "white", sm: undefined }}
       >
-        <HStack
-          display={{ base: "flex", sm: "none" }}
-          height="48px"
-          paddingX={4}
-          borderBottom={{ base: "1px solid", sm: "none" }}
-          borderColor="gray.200"
-          background={{ base: "white", sm: undefined }}
-        >
-          <IconButton
-            size="sm"
-            variant="ghost"
-            icon={<HamburgerMenuIcon boxSize={5} />}
-            aria-label={intl.formatMessage({
-              id: "component.new-layout.open-navigation",
-              defaultMessage: "Open navigation",
-            })}
-            onClick={() => setIsOpenMobile(true)}
-          />
-          <Spacer />
-          <NotificationsSectionMobile onHelpCenterClick={onHelpCenterClick} />
-          <UserMenu placement={isMobile ? "bottom-end" : "right-end"} me={me} realMe={realMe} />
-        </HStack>
-        <Wrap
-          when={isMobile ?? false}
-          wrapper={({ children }) => (
-            <Drawer
-              isOpen={isOpenMobile}
-              onClose={() => setIsOpenMobile(false)}
-              placement="left"
-              closeOnOverlayClick
-              closeOnEsc
-              initialFocusRef={closeRef}
-            >
-              <DrawerOverlay />
-              <DrawerContent width="200px !important">{children}</DrawerContent>
-            </Drawer>
-          )}
-        >
-          <Stack
-            id="nav-bar-menu"
-            backgroundColor="white"
-            zIndex={isMobile ? "modal" : 1}
-            minWidth={isNavBarOpen ? "200px" : "64px"}
-            maxWidth="100%"
-            height="100vh"
-            position="absolute"
-            top={0}
-            insetStart={0}
-            paddingX={0}
-            borderEnd="1px solid"
-            borderColor="gray.200"
-            transitionDelay={{ base: "0s", sm: ANIMATION_DELAY }}
-            transitionDuration={ANIMATION_DURATION}
-            transitionTimingFunction={ANIMATION_TIMING}
-            transitionProperty={{
-              base: "none",
-              sm: [`min-width`, `box-shadow`].join(", "),
-            }}
+        <IconButton
+          size="sm"
+          variant="ghost"
+          icon={<HamburgerMenuIcon boxSize={5} />}
+          aria-label={intl.formatMessage({
+            id: "component.new-layout.open-navigation",
+            defaultMessage: "Open navigation",
+          })}
+          onClick={() => setIsOpenMobile(true)}
+        />
+        <Spacer />
+        <NotificationsSectionMobile onHelpCenterClick={onHelpCenterClick} />
+        <UserMenu placement={isMobile ? "bottom-end" : "right-end"} me={me} realMe={realMe} />
+      </HStack>
+      <Wrap
+        when={isMobile ?? false}
+        wrapper={({ children }) => (
+          <Drawer
+            isOpen={isOpenMobile}
+            onClose={() => setIsOpenMobile(false)}
+            placement="left"
+            closeOnOverlayClick
+            closeOnEsc
+            initialFocusRef={closeRef}
           >
-            <Stack spacing={4} flex="1" minHeight={0}>
-              <HStack
-                paddingTop={4}
-                paddingX={3}
-                width="100%"
-                justify="space-between"
-                position="relative"
-              >
-                <NakedLink href="/app">
-                  <Box as="a" width="40px" height="40px" position="relative" zIndex={1}>
-                    <Tooltip
-                      label={intl.formatMessage({
-                        id: "component.app-layout-nav-bar.switch-organization",
-                        defaultMessage: "Switch organization",
-                      })}
-                      placement="right"
-                      isDisabled={realMe.organizations.length === 1}
-                      openDelay={600}
-                    >
-                      <Box
-                        position="absolute"
-                        cursor="pointer"
-                        transition="transform 150ms"
-                        width="40px"
-                        height="40px"
-                        borderRadius="full"
-                        _hover={{
-                          color: "gray.900",
-                          shadow: "lg",
-                          transform: "scale(1.1)",
-                        }}
-                        overflow="hidden"
-                      >
-                        {me.organization.iconUrl80 ? (
-                          <Image
-                            boxSize="40px"
-                            objectFit="contain"
-                            alt={me.organization.name}
-                            src={me.organization.iconUrl80}
-                          />
-                        ) : (
-                          <Logo width="40px" hideText={true} color="gray.800" padding={1.5} />
-                        )}
-                      </Box>
-                    </Tooltip>
-                  </Box>
-                </NakedLink>
-                {/* This Center adds a bit of margin around to make it the button easier to click, preventing the menu from closing when the mouse goes by a slight margin. Uncomment background to see */}
-                <Center
-                  rounded="100%"
-                  boxSize={10}
-                  // background="red"
-                  display={{ base: "none", sm: "inline-flex" }}
-                  position="absolute"
-                  insetEnd={0}
-                  transform="translateX(50%)"
-                  top={4}
-                  className="expand-button"
-                >
-                  <IconButtonWithTooltip
-                    size="xs"
-                    variant="outline"
-                    aria-expanded={isForceOpen}
-                    aria-controls="nav-bar"
-                    borderRadius="full"
-                    backgroundColor="white"
-                    icon={isForceOpen ? <ChevronLeftIcon boxSize={5} /> : <PinIcon boxSize={3} />}
-                    label={
-                      isForceOpen
-                        ? intl.formatMessage({
-                            id: "component.new-layout.hide-navigation",
-                            defaultMessage: "Hide navigation",
-                          })
-                        : intl.formatMessage({
-                            id: "component.new-layout.keep-navigation-open",
-                            defaultMessage: "Pin navigation",
-                          })
-                    }
+            <DrawerOverlay />
+            <DrawerContent width="200px !important">{children}</DrawerContent>
+          </Drawer>
+        )}
+      >
+        <Stack
+          id="nav-bar-menu"
+          backgroundColor="white"
+          zIndex={isMobile ? "modal" : 1}
+          minWidth={isNavBarOpen ? "200px" : "64px"}
+          maxWidth="100%"
+          height="100vh"
+          position="absolute"
+          top={0}
+          insetStart={0}
+          paddingX={0}
+          borderEnd="1px solid"
+          borderColor="gray.200"
+          transitionDelay={{ base: "0s", sm: ANIMATION_DELAY }}
+          transitionDuration={ANIMATION_DURATION}
+          transitionTimingFunction={ANIMATION_TIMING}
+          transitionProperty={{
+            base: "none",
+            sm: [`min-width`, `box-shadow`].join(", "),
+          }}
+        >
+          <Stack spacing={4} flex="1" minHeight={0}>
+            <HStack
+              paddingTop={4}
+              paddingX={3}
+              width="100%"
+              justify="space-between"
+              position="relative"
+            >
+              <NakedLink href="/app">
+                <Box as="a" width="40px" height="40px" position="relative" zIndex={1}>
+                  <Tooltip
+                    label={intl.formatMessage({
+                      id: "component.app-layout-nav-bar.switch-organization",
+                      defaultMessage: "Switch organization",
+                    })}
                     placement="right"
-                    onClick={handlePinNavbarClick}
-                  />
-                </Center>
-                <CloseButton
-                  ref={closeRef}
-                  display={{ base: "inline-flex", sm: "none" }}
-                  size="sm"
-                  onClick={() => setIsOpenMobile(false)}
+                    isDisabled={realMe.organizations.length === 1}
+                    openDelay={600}
+                  >
+                    <Box
+                      position="absolute"
+                      cursor="pointer"
+                      transition="transform 150ms"
+                      width="40px"
+                      height="40px"
+                      borderRadius="full"
+                      _hover={{
+                        color: "gray.900",
+                        shadow: "lg",
+                        transform: "scale(1.1)",
+                      }}
+                      overflow="hidden"
+                    >
+                      {me.organization.iconUrl80 ? (
+                        <Image
+                          boxSize="40px"
+                          objectFit="contain"
+                          alt={me.organization.name}
+                          src={me.organization.iconUrl80}
+                        />
+                      ) : (
+                        <Logo width="40px" hideText={true} color="gray.800" padding={1.5} />
+                      )}
+                    </Box>
+                  </Tooltip>
+                </Box>
+              </NakedLink>
+              {/* This Center adds a bit of margin around to make it the button easier to click, preventing the menu from closing when the mouse goes by a slight margin. Uncomment background to see */}
+              <Center
+                rounded="100%"
+                boxSize={10}
+                // background="red"
+                display={{ base: "none", sm: "inline-flex" }}
+                position="absolute"
+                insetEnd={0}
+                transform="translateX(50%)"
+                top={4}
+                className="expand-button"
+              >
+                <IconButtonWithTooltip
+                  size="xs"
+                  variant="outline"
+                  aria-expanded={isForceOpen}
+                  aria-controls="nav-bar"
+                  borderRadius="full"
+                  backgroundColor="white"
+                  icon={isForceOpen ? <ChevronLeftIcon boxSize={5} /> : <PinIcon boxSize={3} />}
+                  label={
+                    isForceOpen
+                      ? intl.formatMessage({
+                          id: "component.new-layout.hide-navigation",
+                          defaultMessage: "Hide navigation",
+                        })
+                      : intl.formatMessage({
+                          id: "component.new-layout.keep-navigation-open",
+                          defaultMessage: "Pin navigation",
+                        })
+                  }
+                  placement="right"
+                  onClick={handlePinNavbarClick}
                 />
-              </HStack>
-              <Box paddingX={3}>
-                <CreateMenuButtonSection
+              </Center>
+              <CloseButton
+                ref={closeRef}
+                display={{ base: "inline-flex", sm: "none" }}
+                size="sm"
+                onClick={() => setIsOpenMobile(false)}
+              />
+            </HStack>
+            <Box paddingX={3}>
+              <CreateMenuButtonSection
+                onToggle={handleSubMenuToggle}
+                isMobile={isMobile}
+                me={me}
+                isForceOpen={isForceOpen}
+              />
+            </Box>
+            <Stack
+              spacing={4}
+              overflowY="auto"
+              overflowX="hidden"
+              minHeight={0}
+              paddingBottom={4}
+              flex={1}
+            >
+              <Stack flex={1} spacing={4} paddingX={3}>
+                <SectionsAndProfilesList
                   onToggle={handleSubMenuToggle}
                   isMobile={isMobile}
                   me={me}
-                  isForceOpen={isForceOpen}
+                  profileTypes={profileTypes}
+                />
+                <Spacer />
+                <NotificationsSection
+                  display={{ base: "none", sm: "flex" }}
+                  onHelpCenterClick={onHelpCenterClick}
+                />
+              </Stack>
+              <Box display={{ base: "none", sm: "flex" }}>
+                <UserMenu
+                  placement={isMobile ? "bottom-end" : "right-end"}
+                  me={me}
+                  realMe={realMe}
+                  extended
+                  onToggle={handleSubMenuToggle}
                 />
               </Box>
-              <Stack
-                spacing={4}
-                overflowY="auto"
-                overflowX="hidden"
-                minHeight={0}
-                paddingBottom={4}
-                flex={1}
-              >
-                <Stack flex={1} spacing={4} paddingX={3}>
-                  <SectionsAndProfilesList
-                    onToggle={handleSubMenuToggle}
-                    isMobile={isMobile}
-                    me={me}
-                    profileTypes={profileTypes}
-                  />
-                  <Spacer />
-                  <NotificationsSection
-                    display={{ base: "none", sm: "flex" }}
-                    onHelpCenterClick={onHelpCenterClick}
-                  />
-                </Stack>
-                <Box display={{ base: "none", sm: "flex" }}>
-                  <UserMenu
-                    placement={isMobile ? "bottom-end" : "right-end"}
-                    me={me}
-                    realMe={realMe}
-                    extended
-                    onToggle={handleSubMenuToggle}
-                  />
-                </Box>
-              </Stack>
             </Stack>
           </Stack>
-        </Wrap>
-      </Box>
-    );
-  },
-  {
-    fragments: {
-      get ProfileType() {
-        return gql`
-          fragment AppLayoutNavBar_ProfileType on ProfileType {
-            id
-            name
-            icon
-            isPinned
-            canCreate
-            ...ProfileTypeReference_ProfileType
-          }
-          ${ProfileTypeReference.fragments.ProfileType}
-        `;
-      },
-      get User() {
-        return gql`
-          fragment AppLayoutNavBar_User on User {
-            id
-            hasDashboardsAccess: hasFeatureFlag(featureFlag: DASHBOARDS)
-            hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
-            hasShowContactsButton: hasFeatureFlag(featureFlag: SHOW_CONTACTS_BUTTON)
-            organization {
-              id
-              name
-              iconUrl80: iconUrl(options: { resize: { width: 80 } })
-              isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
-              currentUsagePeriod(limitName: PETITION_SEND) {
-                id
-                limit
-              }
-            }
-            pinnedProfileTypes {
-              id
-              ...AppLayoutNavBar_ProfileType
-            }
-          }
-          ${this.ProfileType}
-        `;
-      },
-      get Query() {
-        return gql`
-          fragment AppLayoutNavBar_Query on Query {
-            realMe {
-              id
-              organizations {
-                id
-              }
-            }
-            me {
-              ...AppLayoutNavBar_User
-            }
-            appLayoutNavBarProfileTypes: profileTypes(
-              limit: 100
-              offset: 0
-              filter: { includeArchived: true }
-            ) {
-              totalCount
-              items {
-                id
-                ...AppLayoutNavBar_ProfileType
-              }
-            }
-            ...UserMenu_Query
-          }
-          ${this.ProfileType}
-          ${this.User}
-          ${UserMenu.fragments.Query}
-        `;
-      },
-    },
-  },
-);
+        </Stack>
+      </Wrap>
+    </Box>
+  );
+}
+
+const _fragments = {
+  ProfileType: gql`
+    fragment AppLayoutNavBar_ProfileType on ProfileType {
+      id
+      name
+      icon
+      isPinned
+      canCreate
+      ...ProfileTypeReference_ProfileType
+    }
+  `,
+  User: gql`
+    fragment AppLayoutNavBar_User on User {
+      id
+      hasDashboardsAccess: hasFeatureFlag(featureFlag: DASHBOARDS)
+      hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
+      hasShowContactsButton: hasFeatureFlag(featureFlag: SHOW_CONTACTS_BUTTON)
+      organization {
+        id
+        name
+        iconUrl80: iconUrl(options: { resize: { width: 80 } })
+        isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
+        currentUsagePeriod(limitName: PETITION_SEND) {
+          id
+          limit
+        }
+      }
+      pinnedProfileTypes {
+        id
+        ...AppLayoutNavBar_ProfileType
+      }
+    }
+  `,
+  Query: gql`
+    fragment AppLayoutNavBar_Query on Query {
+      realMe {
+        id
+        organizations {
+          id
+        }
+      }
+      me {
+        ...AppLayoutNavBar_User
+      }
+      appLayoutNavBarProfileTypes: profileTypes(
+        limit: 100
+        offset: 0
+        filter: { includeArchived: true }
+      ) {
+        totalCount
+        items {
+          id
+          ...AppLayoutNavBar_ProfileType
+        }
+      }
+      ...UserMenu_Query
+    }
+  `,
+};
 
 interface SectionsAndProfilesListProps {
   me: AppLayoutNavBar_QueryFragment["me"];

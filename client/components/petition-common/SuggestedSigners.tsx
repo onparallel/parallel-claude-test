@@ -8,7 +8,6 @@ import {
   SuggestedSigners_UserFragment,
   Tone,
 } from "@parallel/graphql/__types";
-import { Fragments } from "@parallel/utils/apollo/fragments";
 import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
 import { ArrayUnionToUnion } from "@parallel/utils/types";
 import { isValidEmail } from "@parallel/utils/validation";
@@ -326,143 +325,128 @@ function SuggestedSignersRow({
   );
 }
 
-SuggestedSigners.fragments = {
-  get PetitionSigner() {
-    return gql`
-      fragment SuggestedSigners_PetitionSigner on PetitionSigner {
-        ...Fragments_FullPetitionSigner
+const _fragments = {
+  PetitionSigner: gql`
+    fragment SuggestedSigners_PetitionSigner on PetitionSigner {
+      ...Fragments_FullPetitionSigner
+    }
+  `,
+  PublicContact: gql`
+    fragment SuggestedSigners_PublicContact on PublicContact {
+      firstName
+      lastName
+      email
+      isMe
+    }
+  `,
+  PublicPetition: gql`
+    fragment SuggestedSigners_PublicPetition on PublicPetition {
+      id
+      signatureConfig {
+        signers {
+          ...SuggestedSigners_PetitionSigner
+        }
       }
-      ${Fragments.FullPetitionSigner}
-    `;
-  },
-  get PublicContact() {
-    return gql`
-      fragment SuggestedSigners_PublicContact on PublicContact {
-        firstName
-        lastName
-        email
-        isMe
+      recipients {
+        ...SuggestedSigners_PublicContact
       }
-    `;
-  },
-  get PublicPetition() {
-    return gql`
-      fragment SuggestedSigners_PublicPetition on PublicPetition {
+      fields {
         id
-        signatureConfig {
-          signers {
-            ...SuggestedSigners_PetitionSigner
-          }
-        }
-        recipients {
-          ...SuggestedSigners_PublicContact
-        }
-        fields {
+        type
+        title
+        options
+        alias
+        profileType {
           id
-          type
-          title
-          options
-          alias
-          profileType {
-            id
-            profileNamePatternFields
-          }
-          replies {
-            id
-            content
-            children {
-              field {
-                id
-                type
-                alias
-                options
-                profileTypeField {
-                  id
-                  alias
-                }
-              }
-              replies {
-                id
-                content
-              }
-            }
-          }
+          profileNamePatternFields
         }
-        ...useFieldLogic_PublicPetition
-      }
-      ${useFieldLogic.fragments.PublicPetition}
-      ${this.PetitionSigner}
-    `;
-  },
-  get User() {
-    return gql`
-      fragment SuggestedSigners_User on User {
-        id
-        email
-        firstName
-        lastName
-      }
-    `;
-  },
-  get PetitionBase() {
-    return gql`
-      fragment SuggestedSigners_PetitionBase on PetitionBase {
-        id
-        fields {
+        replies {
           id
-          type
-          title
-          options
-          alias
-          profileType {
-            id
-            profileNamePatternFields
-          }
-          replies {
-            id
-            content
-            children {
-              field {
-                id
-                type
-                alias
-                options
-                profileTypeField {
-                  id
-                  alias
-                }
-              }
-              replies {
-                id
-                content
-              }
-            }
-          }
-        }
-        ... on Petition {
-          accesses {
-            id
-            status
-            contact {
+          content
+          children {
+            field {
               id
-              email
-              firstName
-              lastName
-            }
-          }
-          signatureRequests {
-            id
-            signatureConfig {
-              signers {
-                ...SuggestedSigners_PetitionSigner
+              type
+              alias
+              options
+              profileTypeField {
+                id
+                alias
               }
+            }
+            replies {
+              id
+              content
             }
           }
         }
-        ...useFieldLogic_PetitionBase
       }
-      ${useFieldLogic.fragments.PetitionBase}
-      ${this.PetitionSigner}
-    `;
-  },
+      ...useFieldLogic_PublicPetition
+    }
+  `,
+  User: gql`
+    fragment SuggestedSigners_User on User {
+      id
+      email
+      firstName
+      lastName
+    }
+  `,
+  PetitionBase: gql`
+    fragment SuggestedSigners_PetitionBase on PetitionBase {
+      id
+      fields {
+        id
+        type
+        title
+        options
+        alias
+        profileType {
+          id
+          profileNamePatternFields
+        }
+        replies {
+          id
+          content
+          children {
+            field {
+              id
+              type
+              alias
+              options
+              profileTypeField {
+                id
+                alias
+              }
+            }
+            replies {
+              id
+              content
+            }
+          }
+        }
+      }
+      ... on Petition {
+        accesses {
+          id
+          status
+          contact {
+            id
+            email
+            firstName
+            lastName
+          }
+        }
+        signatureRequests {
+          id
+          signatureConfig {
+            signers {
+              ...SuggestedSigners_PetitionSigner
+            }
+          }
+        }
+      }
+      ...useFieldLogic_PetitionBase
+    }
+  `,
 };

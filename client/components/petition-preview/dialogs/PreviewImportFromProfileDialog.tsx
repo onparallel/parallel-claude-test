@@ -255,33 +255,23 @@ export function usePreviewImportFromProfileDialog() {
   );
 }
 
-usePreviewImportFromProfileDialog.fragments = {
-  get PetitionBase() {
-    return gql`
-      fragment usePreviewImportFromProfileDialog_PetitionBase on PetitionBase {
-        id
-        ...calculateCompatibleFieldGroups_PetitionBase
-        ...calculateRelatedFieldGroupsWithCompatibleProfiles_PetitionBase
-        ...ProfileRelationshipsAssociationTable_PetitionBase
-      }
-      ${calculateCompatibleFieldGroups.fragments.PetitionBase}
-      ${calculateRelatedFieldGroupsWithCompatibleProfiles.fragments.PetitionBase}
-      ${ProfileRelationshipsAssociationTable.fragments.PetitionBase}
-    `;
-  },
-  get Profile() {
-    return gql`
-      fragment usePreviewImportFromProfileDialog_Profile on Profile {
-        id
-        ...calculateCompatibleFieldGroups_Profile
-        ...calculateRelatedFieldGroupsWithCompatibleProfiles_Profile
-        ...ProfileRelationshipsAssociationTable_Profile
-      }
-      ${calculateCompatibleFieldGroups.fragments.Profile}
-      ${calculateRelatedFieldGroupsWithCompatibleProfiles.fragments.Profile}
-      ${ProfileRelationshipsAssociationTable.fragments.Profile}
-    `;
-  },
+const _fragments = {
+  PetitionBase: gql`
+    fragment usePreviewImportFromProfileDialog_PetitionBase on PetitionBase {
+      id
+      ...calculateCompatibleFieldGroups_PetitionBase
+      ...calculateRelatedFieldGroupsWithCompatibleProfiles_PetitionBase
+      ...ProfileRelationshipsAssociationTable_PetitionBase
+    }
+  `,
+  Profile: gql`
+    fragment usePreviewImportFromProfileDialog_Profile on Profile {
+      id
+      ...calculateCompatibleFieldGroups_Profile
+      ...calculateRelatedFieldGroupsWithCompatibleProfiles_Profile
+      ...ProfileRelationshipsAssociationTable_Profile
+    }
+  `,
 };
 
 const _queries = [
@@ -291,7 +281,6 @@ const _queries = [
         ...usePreviewImportFromProfileDialog_PetitionBase
       }
     }
-    ${usePreviewImportFromProfileDialog.fragments.PetitionBase}
   `,
   gql`
     query usePreviewImportFromProfileDialog_profile($profileId: GID!) {
@@ -299,6 +288,5 @@ const _queries = [
         ...usePreviewImportFromProfileDialog_Profile
       }
     }
-    ${usePreviewImportFromProfileDialog.fragments.Profile}
   `,
 ];

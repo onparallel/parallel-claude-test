@@ -1,10 +1,7 @@
 import { gql } from "@apollo/client";
 import { useApolloClient, useMutation } from "@apollo/client/react";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import {
-  TaskProgressDialog,
-  useTaskProgressDialog,
-} from "@parallel/components/common/dialogs/TaskProgressDialog";
+import { useTaskProgressDialog } from "@parallel/components/common/dialogs/TaskProgressDialog";
 import {
   useExportRepliesTask_createExportRepliesTaskDocument,
   useExportRepliesTask_getTaskResultFileDocument,
@@ -97,7 +94,6 @@ useExportRepliesTask.mutations = [
         ...TaskProgressDialog_Task
       }
     }
-    ${TaskProgressDialog.fragments.Task}
   `,
   gql`
     mutation useExportRepliesTask_getTaskResultFile($taskId: GID!) {

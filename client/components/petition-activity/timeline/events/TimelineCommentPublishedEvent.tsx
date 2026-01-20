@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { Box, Button, Stack, Text, useTheme } from "@chakra-ui/react";
 import { CommentIcon, NoteIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
-import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { Divider } from "@parallel/components/common/Divider";
 import { NakedLink } from "@parallel/components/common/Link";
@@ -15,7 +14,6 @@ import { FormattedMessage } from "react-intl";
 import { assert } from "ts-essentials";
 import { PetitionFieldReference } from "../../../common/PetitionFieldReference";
 import { UserOrContactReference } from "../../../common/UserOrContactReference";
-import { UserReference } from "../../../common/UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
@@ -199,7 +197,7 @@ export function TimelineCommentPublishedEvent({ event }: TimelineCommentPublishe
   }
 }
 
-TimelineCommentPublishedEvent.fragments = {
+const _fragments = {
   CommentPublishedEvent: gql`
     fragment TimelineCommentPublishedEvent_CommentPublishedEvent on CommentPublishedEvent {
       field {
@@ -219,10 +217,5 @@ TimelineCommentPublishedEvent.fragments = {
       isGeneral
       createdAt
     }
-    ${PetitionFieldReference.fragments.PetitionField}
-    ${UserOrContactReference.fragments.UserOrPetitionAccess}
-    ${UserReference.fragments.User}
-    ${ContactReference.fragments.Contact}
-    ${PetitionFieldCommentContent.fragments.PetitionFieldComment}
   `,
 };

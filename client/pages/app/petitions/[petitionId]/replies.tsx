@@ -30,7 +30,6 @@ import {
   PetitionRepliesFieldProps,
 } from "@parallel/components/petition-replies/PetitionRepliesField";
 import { PetitionRepliesFieldComments } from "@parallel/components/petition-replies/PetitionRepliesFieldComments";
-import { PetitionRepliesFieldReply } from "@parallel/components/petition-replies/PetitionRepliesFieldReply";
 import { PetitionRepliesFilteredFields } from "@parallel/components/petition-replies/PetitionRepliesFilteredFields";
 import { PetitionRepliesRightPaneTabs } from "@parallel/components/petition-replies/PetitionRepliesRightPaneTabs";
 import { PetitionSignaturesCard } from "@parallel/components/petition-replies/PetitionSignaturesCard";
@@ -48,7 +47,6 @@ import {
   PetitionReplies_updatePetitionFieldRepliesStatusDocument,
   PetitionReplies_userDocument,
 } from "@parallel/graphql/__types";
-import { Fragments } from "@parallel/utils/apollo/fragments";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
@@ -786,100 +784,76 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   );
 }
 
-PetitionReplies.fragments = {
-  get Petition() {
-    return gql`
-      fragment PetitionReplies_Petition on Petition {
+const _fragments = {
+  Petition: gql`
+    fragment PetitionReplies_Petition on Petition {
+      id
+      isDocumentGenerationEnabled
+      organization {
         id
-        isDocumentGenerationEnabled
-        organization {
-          id
-          brandTheme {
-            preferredTone
-          }
+        brandTheme {
+          preferredTone
         }
-        fields {
-          id
-          isLinkedToProfileType
-          ...PetitionReplies_PetitionField
-        }
-        myEffectivePermission {
-          permissionType
-        }
-        isAnonymized
-        profiles {
-          id
-          ...ProfileDrawer_Profile
-        }
-        variables {
-          name
-          showInReplies
-          ...LiquidPetitionVariableProvider_PetitionVariable
-        }
-        approvalFlowConfig {
-          ...Fragments_FullApprovalFlowConfig
-        }
-        permanentDeletionAt
-        ...PetitionLayout_PetitionBase
-        ...PetitionRepliesField_Petition
-        ...PetitionVariablesCard_PetitionBase
-        ...PetitionSignaturesCard_Petition
-        ...useFieldLogic_PetitionBase
-        ...LiquidPetitionScopeProvider_PetitionBase
-        ...PetitionRepliesFieldComments_PetitionBase
-        ...ProfileDrawer_PetitionBase
-        ...ShareButton_PetitionBase
-        ...useFieldsWithIndices_PetitionBase
-        ...PetitionApprovalsCard_Petition
-        ...useClosePetition_PetitionBase
-        ...PetitionRepliesRightPaneTabs_Petition
       }
-      ${this.PetitionField}
-      ${Fragments.FullApprovalFlowConfig}
-      ${PetitionLayout.fragments.PetitionBase}
-      ${PetitionRepliesField.fragments.Petition}
-      ${ShareButton.fragments.PetitionBase}
-      ${PetitionSignaturesCard.fragments.Petition}
-      ${useFieldLogic.fragments.PetitionBase}
-      ${LiquidPetitionScopeProvider.fragments.PetitionBase}
-      ${ProfileDrawer.fragments.Profile}
-      ${ProfileDrawer.fragments.PetitionBase}
-      ${PetitionVariablesCard.fragments.PetitionBase}
-      ${PetitionRepliesFieldComments.fragments.PetitionBase}
-      ${useFieldsWithIndices.fragments.PetitionBase}
-      ${PetitionApprovalsCard.fragments.Petition}
-      ${useClosePetition.fragments.PetitionBase}
-      ${PetitionRepliesRightPaneTabs.fragments.Petition}
-      ${LiquidPetitionVariableProvider.fragments.PetitionVariable}
-    `;
-  },
-  get PetitionField() {
-    return gql`
-      fragment PetitionReplies_PetitionField on PetitionField {
+      fields {
         id
-        isReadOnly
-        commentCount
-        options
         isLinkedToProfileType
-        isLinkedToProfileTypeField
-        children {
-          id
-          isLinkedToProfileTypeField
-        }
-        replies {
-          associatedProfile {
-            id
-          }
-        }
-        ...PetitionRepliesField_PetitionField
-        ...PetitionRepliesFieldComments_PetitionField
-        ...groupFieldsWithProfileTypes_PetitionField
+        ...PetitionReplies_PetitionField
       }
-      ${PetitionRepliesField.fragments.PetitionField}
-      ${PetitionRepliesFieldComments.fragments.PetitionField}
-      ${groupFieldsWithProfileTypes.fragments.PetitionField}
-    `;
-  },
+      myEffectivePermission {
+        permissionType
+      }
+      isAnonymized
+      profiles {
+        id
+        ...ProfileDrawer_Profile
+      }
+      variables {
+        name
+        showInReplies
+        ...LiquidPetitionVariableProvider_PetitionVariable
+      }
+      approvalFlowConfig {
+        ...Fragments_FullApprovalFlowConfig
+      }
+      permanentDeletionAt
+      ...PetitionLayout_PetitionBase
+      ...PetitionRepliesField_Petition
+      ...PetitionVariablesCard_PetitionBase
+      ...PetitionSignaturesCard_Petition
+      ...useFieldLogic_PetitionBase
+      ...LiquidPetitionScopeProvider_PetitionBase
+      ...PetitionRepliesFieldComments_PetitionBase
+      ...ProfileDrawer_PetitionBase
+      ...ShareButton_PetitionBase
+      ...useFieldsWithIndices_PetitionBase
+      ...PetitionApprovalsCard_Petition
+      ...useClosePetition_PetitionBase
+      ...PetitionRepliesRightPaneTabs_Petition
+    }
+  `,
+  PetitionField: gql`
+    fragment PetitionReplies_PetitionField on PetitionField {
+      id
+      isReadOnly
+      commentCount
+      options
+      isLinkedToProfileType
+      isLinkedToProfileTypeField
+      children {
+        id
+        isLinkedToProfileTypeField
+      }
+      replies {
+        associatedProfile {
+          id
+        }
+      }
+      ...PetitionRepliesField_PetitionField
+      ...PetitionRepliesFieldComments_PetitionField
+      ...groupFieldsWithProfileTypes_PetitionField
+    }
+  `,
 };
 
 const _mutations = [
@@ -889,7 +863,6 @@ const _mutations = [
         ...PetitionLayout_PetitionBase
       }
     }
-    ${PetitionLayout.fragments.PetitionBase}
   `,
   gql`
     mutation PetitionReplies_updatePetitionFieldRepliesStatus(
@@ -918,7 +891,6 @@ const _mutations = [
         }
       }
     }
-    ${PetitionRepliesFieldReply.fragments.PetitionFieldReply}
   `,
 
   gql`
@@ -975,11 +947,6 @@ PetitionReplies.queries = [
         ...PetitionRepliesRightPaneTabs_User
       }
     }
-    ${PetitionLayout.fragments.Query}
-    ${PetitionSignaturesCard.fragments.User}
-    ${useUpdateIsReadNotification.fragments.User}
-    ${PetitionApprovalsCard.fragments.User}
-    ${PetitionRepliesRightPaneTabs.fragments.User}
   `,
   gql`
     query PetitionReplies_petition($id: GID!) {
@@ -987,7 +954,6 @@ PetitionReplies.queries = [
         ...PetitionReplies_Petition
       }
     }
-    ${PetitionReplies.fragments.Petition}
   `,
 ];
 

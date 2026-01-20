@@ -298,42 +298,36 @@ export function PetitionUpdateProfileOnCloseSourceSelect<
   );
 }
 
-PetitionUpdateProfileOnCloseSourceSelect.fragments = {
-  get PetitionField() {
-    return gql`
-      fragment PetitionUpdateProfileOnCloseSourceSelect_PetitionField on PetitionField {
+const _fragments = {
+  PetitionField: gql`
+    fragment PetitionUpdateProfileOnCloseSourceSelect_PetitionField on PetitionField {
+      id
+      type
+      title
+      options
+      multiple
+      parent {
         id
-        type
-        title
-        options
-        multiple
-        parent {
-          id
-        }
       }
-    `;
-  },
-  get PetitionBase() {
-    return gql`
-      fragment PetitionUpdateProfileOnCloseSourceSelect_PetitionBase on PetitionBase {
-        fields {
+    }
+  `,
+  PetitionBase: gql`
+    fragment PetitionUpdateProfileOnCloseSourceSelect_PetitionBase on PetitionBase {
+      fields {
+        id
+        ...PetitionUpdateProfileOnCloseSourceSelect_PetitionField
+        children {
           id
           ...PetitionUpdateProfileOnCloseSourceSelect_PetitionField
-          children {
-            id
-            ...PetitionUpdateProfileOnCloseSourceSelect_PetitionField
-          }
         }
-        variables {
-          name
-          type
-        }
-        ...useAllFieldsWithIndices_PetitionBase
       }
-      ${this.PetitionField}
-      ${useAllFieldsWithIndices.fragments.PetitionBase}
-    `;
-  },
+      variables {
+        name
+        type
+      }
+      ...useAllFieldsWithIndices_PetitionBase
+    }
+  `,
   ProfileTypeField: gql`
     fragment PetitionUpdateProfileOnCloseSourceSelect_ProfileTypeField on ProfileTypeField {
       id

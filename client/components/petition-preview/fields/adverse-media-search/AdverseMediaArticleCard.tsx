@@ -318,7 +318,7 @@ export function AdverseMediaArticleCard({
   );
 }
 
-AdverseMediaArticleCard.fragments = {
+const _fragments = {
   AdverseMediaArticleListItem: gql`
     fragment AdverseMediaArticleCard_AdverseMediaArticleListItem on AdverseMediaArticle {
       id
@@ -338,8 +338,6 @@ AdverseMediaArticleCard.fragments = {
       ...AdverseMediaArticleDetails_AdverseMediaArticle
       ...AdverseMediaArticleHeader_AdverseMediaArticle
     }
-    ${AdverseMediaArticleDetails.fragments.AdverseMediaArticle}
-    ${AdverseMediaArticleHeader.fragments.AdverseMediaArticle}
   `,
 };
 
@@ -356,6 +354,5 @@ const _queries = [
         ...AdverseMediaArticleCard_AdverseMediaArticle
       }
     }
-    ${AdverseMediaArticleCard.fragments.AdverseMediaArticle}
   `,
 ];

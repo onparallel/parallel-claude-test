@@ -139,7 +139,7 @@ export function PublicPetitionFieldComment({
   );
 }
 
-PublicPetitionFieldComment.fragments = {
+const _fragments = {
   PublicPetitionFieldComment: gql`
     fragment PublicPetitionFieldComment_PublicPetitionFieldComment on PublicPetitionFieldComment {
       id
@@ -160,6 +160,5 @@ PublicPetitionFieldComment.fragments = {
       }
       isAnonymized
     }
-    ${PublicPetitionFieldCommentContent.fragments.PetitionFieldComment}
   `,
 };

@@ -378,46 +378,36 @@ function useContactPetitionAccessesColumns() {
   );
 }
 
-Contact.fragments = {
-  get Contact() {
-    return gql`
-      fragment Contact_Contact on Contact {
-        id
-        ...Contact_Contact_Profile
-        ...useDeleteContacts_Contact
-        accesses(limit: 100) {
-          items {
-            ...Contact_PetitionAccess
-          }
+const _fragments = {
+  Contact: gql`
+    fragment Contact_Contact on Contact {
+      id
+      ...Contact_Contact_Profile
+      ...useDeleteContacts_Contact
+      accesses(limit: 100) {
+        items {
+          ...Contact_PetitionAccess
         }
       }
-      ${this.Contact_Profile}
-      ${useDeleteContacts.fragments.Contact}
-      ${this.PetitionAccess}
-    `;
-  },
-  get Contact_Profile() {
-    return gql`
-      fragment Contact_Contact_Profile on Contact {
-        id
-        email
-        fullName
-        firstName
-        lastName
+    }
+  `,
+  Contact_Profile: gql`
+    fragment Contact_Contact_Profile on Contact {
+      id
+      email
+      fullName
+      firstName
+      lastName
+    }
+  `,
+  PetitionAccess: gql`
+    fragment Contact_PetitionAccess on PetitionAccess {
+      id
+      petition {
+        ...Contact_Petition
       }
-    `;
-  },
-  get PetitionAccess() {
-    return gql`
-      fragment Contact_PetitionAccess on PetitionAccess {
-        id
-        petition {
-          ...Contact_Petition
-        }
-      }
-      ${this.Petition}
-    `;
-  },
+    }
+  `,
   Petition: gql`
     fragment Contact_Petition on Petition {
       id
@@ -440,10 +430,6 @@ Contact.fragments = {
       ...PetitionStatusCellContent_Petition
       ...PetitionSignatureCellContent_Petition
     }
-    ${UserAvatarList.fragments.User}
-    ${UserAvatarList.fragments.UserGroup}
-    ${PetitionStatusCellContent.fragments.Petition}
-    ${PetitionSignatureCellContent.fragments.Petition}
   `,
 };
 
@@ -454,7 +440,6 @@ Contact.mutations = [
         ...Contact_Contact_Profile
       }
     }
-    ${Contact.fragments.Contact_Profile}
   `,
 ];
 
@@ -463,7 +448,6 @@ Contact.queries = [
     query Contact_user {
       ...AppLayout_Query
     }
-    ${AppLayout.fragments.Query}
   `,
   gql`
     query Contact_contact($id: GID!) {
@@ -471,7 +455,6 @@ Contact.queries = [
         ...Contact_Contact
       }
     }
-    ${Contact.fragments.Contact}
   `,
 ];
 

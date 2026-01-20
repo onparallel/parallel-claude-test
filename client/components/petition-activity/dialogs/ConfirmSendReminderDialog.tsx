@@ -162,7 +162,7 @@ export function useConfirmSendReminderDialog() {
   return useDialog(ConfirmSendReminderDialog);
 }
 
-useConfirmSendReminderDialog.fragments = {
+const _fragments = {
   Petition: gql`
     fragment useConfirmSendReminderDialog_Petition on Petition {
       status
@@ -175,7 +175,5 @@ useConfirmSendReminderDialog.fragments = {
       }
       ...usePetitionMessagePlaceholderOptions_PetitionBase
     }
-    ${usePetitionMessagePlaceholderOptions.fragments.PetitionBase}
-    ${ContactReference.fragments.Contact}
   `,
 };

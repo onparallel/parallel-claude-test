@@ -12,11 +12,8 @@ type DashboardSimpleModuleCardProps = PropsWithChildren<
   } & Omit<DashboardModuleCardProps, "title" | "children">
 >;
 
-export const DashboardSimpleModuleCard = Object.assign(
-  forwardRef<HTMLDivElement, DashboardSimpleModuleCardProps>(function DashboardSimpleModuleCard(
-    { module, alignment, children, ...props },
-    ref,
-  ) {
+export const DashboardSimpleModuleCard = forwardRef<HTMLDivElement, DashboardSimpleModuleCardProps>(
+  function DashboardSimpleModuleCard({ module, alignment, children, ...props }, ref) {
     return (
       <DashboardModuleCard ref={ref} module={module} {...props}>
         {isNonNullish(children) ? (
@@ -43,15 +40,13 @@ export const DashboardSimpleModuleCard = Object.assign(
         )}
       </DashboardModuleCard>
     );
-  }),
-  {
-    fragments: {
-      DashboardModule: gql`
-        fragment DashboardSimpleModuleCard_DashboardModule on DashboardModule {
-          ...DashboardModuleCard_DashboardModule
-        }
-        ${DashboardModuleCard.fragments.DashboardModule}
-      `,
-    },
   },
 );
+
+const _fragments = {
+  DashboardModule: gql`
+    fragment DashboardSimpleModuleCard_DashboardModule on DashboardModule {
+      ...DashboardModuleCard_DashboardModule
+    }
+  `,
+};

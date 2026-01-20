@@ -30,7 +30,7 @@ function useUpdatePetition() {
         ...PetitionReplies_Petition
       }
     }
-    ${PetitionReplies.fragments.Petition}
+
   `);
 }
 ```
@@ -53,7 +53,7 @@ function useUpdatePetition() {
         ...PetitionReplies_Petition
       }
     }
-    ${PetitionReplies.fragments.Petition}
+
   `);
 }
 ```

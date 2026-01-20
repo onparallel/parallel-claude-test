@@ -28,7 +28,6 @@ import { customAlphabet } from "nanoid";
 import pMap from "p-map";
 import { MutableRefObject, useCallback } from "react";
 import { isNonNullish } from "remeda";
-import { RecipientViewPetitionFieldLayout } from "../recipient-view/fields/RecipientViewPetitionFieldLayout";
 
 function getRandomId() {
   const nanoid = customAlphabet("1234567890abcdefgihjklmnopqrstvwxyz", 6);
@@ -239,7 +238,6 @@ const _createPetitionFieldReplies = gql`
       }
     }
   }
-  ${RecipientViewPetitionFieldLayout.fragments.PetitionFieldReply}
 `;
 
 export function useCreatePetitionFieldReply() {
@@ -410,8 +408,6 @@ const _createFileUploadReply = gql`
       }
     }
   }
-  ${uploadFile.fragments.AWSPresignedPostData}
-  ${RecipientViewPetitionFieldLayout.fragments.PetitionFieldReply}
 `;
 const _createFileUploadReplyComplete = gql`
   mutation PreviewPetitionFieldMutations_createFileUploadReplyComplete(
@@ -722,47 +718,42 @@ export function cleanPreviewFieldReplies(proxy: ApolloCache, fieldId: string) {
   });
 }
 
-updatePreviewFieldReplies.fragments = {
-  get PetitionFieldReply() {
-    return gql`
-      fragment PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReply on PetitionFieldReply {
+const _fragmentsUpdatePreviewFieldReplies = {
+  PetitionFieldReply: gql`
+    fragment PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReply on PetitionFieldReply {
+      id
+      content
+      status
+      isAnonymized
+      createdAt
+      updatedAt
+      parent {
         id
-        content
-        status
-        isAnonymized
-        createdAt
-        updatedAt
-        parent {
+      }
+      children {
+        field {
           id
-        }
-        children {
-          field {
-            id
-            multiple
-            replies {
-              id
-            }
-          }
+          multiple
           replies {
             id
           }
         }
-      }
-    `;
-  },
-  get PetitionField() {
-    return gql`
-      fragment PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionField on PetitionField {
-        previewReplies @client {
-          ...PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReply
-        }
         replies {
-          ...PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReply
+          id
         }
       }
-      ${this.PetitionFieldReply}
-    `;
-  },
+    }
+  `,
+  PetitionField: gql`
+    fragment PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionField on PetitionField {
+      previewReplies @client {
+        ...PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReply
+      }
+      replies {
+        ...PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldReply
+      }
+    }
+  `,
 };
 
 function updateReplyContent(
@@ -780,7 +771,7 @@ function updateReplyContent(
   });
 }
 
-updateReplyContent.fragments = {
+const _fragmentsUpdateReplyContent = {
   PetitionFieldReply: gql`
     fragment PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReply on PetitionFieldReply {
       content
@@ -923,7 +914,7 @@ export function useCreateFieldGroupRepliesFromProfiles() {
   );
 }
 
-useCreateFieldGroupRepliesFromProfiles.fragments = {
+const _fragments = {
   PetitionField: gql`
     fragment useCreateFieldGroupRepliesFromProfiles_PetitionField on PetitionField {
       id
@@ -1046,7 +1037,6 @@ const _prefillPetitionFromProfiles = gql`
       }
     }
   }
-  ${useCreateFieldGroupRepliesFromProfiles.fragments.PetitionField}
 `;
 
 const _createFieldGroupRepliesFromProfiles = gql`
@@ -1069,7 +1059,6 @@ const _createFieldGroupRepliesFromProfiles = gql`
       ...useCreateFieldGroupRepliesFromProfiles_PetitionField
     }
   }
-  ${useCreateFieldGroupRepliesFromProfiles.fragments.PetitionField}
 `;
 
 const _getProfilesFragment = {

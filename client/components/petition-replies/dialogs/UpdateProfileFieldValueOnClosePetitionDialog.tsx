@@ -245,49 +245,39 @@ export function useUpdateProfileFieldValueOnClosePetitionDialog() {
   );
 }
 
-useUpdateProfileFieldValueOnClosePetitionDialog.fragments = {
-  get Profile() {
-    return gql`
-      fragment UpdateProfileFieldValueOnClosePetitionDialog_Profile on Profile {
+const _fragments = {
+  Profile: gql`
+    fragment UpdateProfileFieldValueOnClosePetitionDialog_Profile on Profile {
+      id
+      status
+      profileType {
         id
-        status
-        profileType {
-          id
-          icon
-        }
-        properties {
-          ...buildFormDefaultValue_ProfileFieldProperty
-          ...ProfileFormInner_ProfileFieldProperty
-        }
-        ...ProfileReference_Profile
+        icon
       }
-      ${ProfileReference.fragments.Profile}
-      ${buildFormDefaultValue.fragments.ProfileFieldProperty}
-      ${ProfileFormInner.fragments.ProfileFieldProperty}
-    `;
-  },
-  get PetitionField() {
-    return gql`
-      fragment UpdateProfileFieldValueOnClosePetitionDialog_PetitionField on PetitionField {
+      properties {
+        ...buildFormDefaultValue_ProfileFieldProperty
+        ...ProfileFormInner_ProfileFieldProperty
+      }
+      ...ProfileReference_Profile
+    }
+  `,
+  PetitionField: gql`
+    fragment UpdateProfileFieldValueOnClosePetitionDialog_PetitionField on PetitionField {
+      id
+      title
+      options
+    }
+  `,
+  PetitionBase: gql`
+    fragment UpdateProfileFieldValueOnClosePetitionDialog_PetitionBase on PetitionBase {
+      id
+      fields {
         id
-        title
-        options
+        ...UpdateProfileFieldValueOnClosePetitionDialog_PetitionField
       }
-    `;
-  },
-  get PetitionBase() {
-    return gql`
-      fragment UpdateProfileFieldValueOnClosePetitionDialog_PetitionBase on PetitionBase {
-        id
-        fields {
-          id
-          ...UpdateProfileFieldValueOnClosePetitionDialog_PetitionField
-        }
-        ...ProfileFormInner_PetitionBase
-      }
-      ${ProfileFormInner.fragments.PetitionBase}
-    `;
-  },
+      ...ProfileFormInner_PetitionBase
+    }
+  `,
 };
 
 const _queries = {
@@ -298,7 +288,6 @@ const _queries = {
         ...UpdateProfileFieldValueOnClosePetitionDialog_Profile
       }
     }
-    ${useUpdateProfileFieldValueOnClosePetitionDialog.fragments.Profile}
   `,
   petition: gql`
     query UpdateProfileFieldValueOnClosePetitionDialog_petition($petitionId: GID!) {
@@ -307,6 +296,5 @@ const _queries = {
         ...UpdateProfileFieldValueOnClosePetitionDialog_PetitionBase
       }
     }
-    ${useUpdateProfileFieldValueOnClosePetitionDialog.fragments.PetitionBase}
   `,
 };

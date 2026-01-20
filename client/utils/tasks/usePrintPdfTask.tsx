@@ -2,10 +2,7 @@ import { gql } from "@apollo/client";
 import { useApolloClient, useMutation } from "@apollo/client/react";
 import { BaseModalProps } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import {
-  TaskProgressDialog,
-  useTaskProgressDialog,
-} from "@parallel/components/common/dialogs/TaskProgressDialog";
+import { useTaskProgressDialog } from "@parallel/components/common/dialogs/TaskProgressDialog";
 import {
   usePrintPdfTask_createPrintPdfTaskDocument,
   usePrintPdfTask_createPrintPdfTaskMutationVariables,
@@ -145,7 +142,6 @@ usePrintPdfTask.mutations = [
         ...TaskProgressDialog_Task
       }
     }
-    ${TaskProgressDialog.fragments.Task}
   `,
   gql`
     mutation usePrintPdfTask_getTaskResultFile($taskId: GID!) {

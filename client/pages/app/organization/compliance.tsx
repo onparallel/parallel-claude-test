@@ -370,7 +370,6 @@ const _mutations = [
         ...OrganizationCompliance_Organization
       }
     }
-    ${_fragments.Organization}
   `,
 ];
 
@@ -386,8 +385,6 @@ OrganizationCompliance.queries = [
         }
       }
     }
-    ${OrganizationSettingsLayout.fragments.Query}
-    ${_fragments.Organization}
   `,
 ];
 

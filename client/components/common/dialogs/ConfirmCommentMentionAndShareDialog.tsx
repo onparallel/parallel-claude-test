@@ -195,7 +195,7 @@ function ConfirmCommentMentionAndShareDialog({
   );
 }
 
-ConfirmCommentMentionAndShareDialog.fragments = {
+const _fragments = {
   Petition: gql`
     fragment ConfirmCommentMentionAndShareDialog_Petition on Petition {
       myEffectivePermission {

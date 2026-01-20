@@ -380,11 +380,10 @@ export function DocumentThemeEditor({ user, isDisabled, themeId }: DocumentTheme
   );
 }
 
-DocumentThemeEditor.fragments = {
+const _fragments = {
   User: gql`
     fragment DocumentThemeEditor_User on User {
       ...useAvailablePetitionLocales_User
     }
-    ${useAvailablePetitionLocales.fragments.User}
   `,
 };

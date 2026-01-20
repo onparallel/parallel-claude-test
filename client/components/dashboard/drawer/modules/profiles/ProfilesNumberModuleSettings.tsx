@@ -30,7 +30,7 @@ export function ProfilesNumberModuleSettings({
   );
 }
 
-ProfilesNumberModuleSettings.fragments = {
+const _fragments = {
   ProfileType: gql`
     fragment ProfilesNumberModuleSettings_ProfileType on ProfileType {
       id
@@ -39,6 +39,5 @@ ProfilesNumberModuleSettings.fragments = {
         ...ProfilesModuleFilterEditor_ProfileTypeField
       }
     }
-    ${ProfilesModuleFilterEditor.fragments.ProfileTypeField}
   `,
 };

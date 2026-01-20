@@ -42,25 +42,20 @@ export function useUnpinProfileType() {
 }
 
 const _fragments = {
-  get ProfileType() {
-    return gql`
-      fragment useUnpinProfileType_ProfileType on ProfileType {
-        id
-        isPinned
+  ProfileType: gql`
+    fragment useUnpinProfileType_ProfileType on ProfileType {
+      id
+      isPinned
+    }
+  `,
+  User: gql`
+    fragment useUnpinProfileType_User on User {
+      id
+      pinnedProfileTypes {
+        ...useUnpinProfileType_ProfileType
       }
-    `;
-  },
-  get User() {
-    return gql`
-      fragment useUnpinProfileType_User on User {
-        id
-        pinnedProfileTypes {
-          ...useUnpinProfileType_ProfileType
-        }
-      }
-      ${this.ProfileType}
-    `;
-  },
+    }
+  `,
 };
 
 const _mutations = [
@@ -70,6 +65,5 @@ const _mutations = [
         ...useUnpinProfileType_ProfileType
       }
     }
-    ${_fragments.ProfileType}
   `,
 ];

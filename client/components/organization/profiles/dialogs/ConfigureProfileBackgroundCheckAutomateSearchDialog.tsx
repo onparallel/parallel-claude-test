@@ -448,29 +448,24 @@ export function useConfigureProfileBackgroundCheckAutomateSearchDialog() {
   return useDialog(ConfigureProfileBackgroundCheckAutomateSearchDialog);
 }
 
-ConfigureProfileBackgroundCheckAutomateSearchDialog.fragments = {
-  get ProfileType() {
-    return gql`
-      fragment ConfigureProfileBackgroundCheckAutomateSearchDialog_ProfileType on ProfileType {
+const _fragments = {
+  ProfileType: gql`
+    fragment ConfigureProfileBackgroundCheckAutomateSearchDialog_ProfileType on ProfileType {
+      id
+      fields {
         id
-        fields {
-          id
-          ...ConfigureProfileBackgroundCheckAutomateSearchDialog_ProfileTypeField
-          ...ProfileTypeFieldSelect_ProfileTypeField
-        }
+        ...ConfigureProfileBackgroundCheckAutomateSearchDialog_ProfileTypeField
+        ...ProfileTypeFieldSelect_ProfileTypeField
       }
-      ${ProfileTypeFieldSelect.fragments.ProfileTypeField}
-    `;
-  },
-  get ProfileTypeField() {
-    return gql`
-      fragment ConfigureProfileBackgroundCheckAutomateSearchDialog_ProfileTypeField on ProfileTypeField {
-        id
-        type
-        options
-      }
-    `;
-  },
+    }
+  `,
+  ProfileTypeField: gql`
+    fragment ConfigureProfileBackgroundCheckAutomateSearchDialog_ProfileTypeField on ProfileTypeField {
+      id
+      type
+      options
+    }
+  `,
 };
 
 const _queries = [
@@ -481,6 +476,5 @@ const _queries = [
         ...ConfigureProfileBackgroundCheckAutomateSearchDialog_ProfileType
       }
     }
-    ${ConfigureProfileBackgroundCheckAutomateSearchDialog.fragments.ProfileType}
   `,
 ];

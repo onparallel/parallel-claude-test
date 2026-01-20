@@ -108,7 +108,7 @@ export function useFilenamePlaceholdersRename(
   );
 }
 
-useFilenamePlaceholdersRename.fragments = {
+const _fragments = {
   PetitionBase: gql`
     fragment useFilenamePlaceholdersRename_PetitionBase on PetitionBase {
       ...useFieldsWithIndices_PetitionBase
@@ -116,7 +116,6 @@ useFilenamePlaceholdersRename.fragments = {
         id
       }
     }
-    ${useFieldsWithIndices.fragments.PetitionBase}
   `,
   PetitionField: gql`
     fragment useFilenamePlaceholdersRename_PetitionField on PetitionField {

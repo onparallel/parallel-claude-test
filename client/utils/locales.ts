@@ -148,7 +148,7 @@ export function useAvailablePetitionLocales(user: useAvailablePetitionLocales_Us
   );
 }
 
-useAvailablePetitionLocales.fragments = {
+const _fragments = {
   User: gql`
     fragment useAvailablePetitionLocales_User on User {
       hasRecipientLangCA: hasFeatureFlag(featureFlag: RECIPIENT_LANG_CA)

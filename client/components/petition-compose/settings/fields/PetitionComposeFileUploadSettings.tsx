@@ -223,7 +223,7 @@ function ValueContainer({
   );
 }
 
-PetitionComposeFileUploadSettings.fragments = {
+const _fragments = {
   User: gql`
     fragment PetitionComposeFileUploadSettings_User on User {
       hasDocumentProcessingAccess: hasFeatureFlag(featureFlag: DOCUMENT_PROCESSING)

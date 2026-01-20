@@ -455,29 +455,24 @@ export function removePlaceholderInputElements<T extends SlateElement<any, any>[
     ) as T;
 }
 
-createPlaceholderPlugin.fragments = {
-  get PetitionBase() {
-    return gql`
-      fragment createPlaceholderPlugin_PetitionBase on PetitionBase {
-        id
-        fields {
-          ...createPlaceholderPlugin_PetitionField
-        }
+const _fragments = {
+  PetitionBase: gql`
+    fragment createPlaceholderPlugin_PetitionBase on PetitionBase {
+      id
+      fields {
+        ...createPlaceholderPlugin_PetitionField
       }
-      ${this.PetitionField}
-    `;
-  },
-  get PetitionField() {
-    return gql`
-      fragment createPlaceholderPlugin_PetitionField on PetitionField {
+    }
+  `,
+  PetitionField: gql`
+    fragment createPlaceholderPlugin_PetitionField on PetitionField {
+      id
+      title
+      alias
+      type
+      replies {
         id
-        title
-        alias
-        type
-        replies {
-          id
-        }
       }
-    `;
-  },
+    }
+  `,
 };

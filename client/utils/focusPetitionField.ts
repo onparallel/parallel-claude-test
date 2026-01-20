@@ -56,7 +56,7 @@ export function focusPetitionField({
   }
 }
 
-focusPetitionField.fragments = {
+const _fragments = {
   PetitionField: gql`
     fragment focusPetitionField_PetitionField on PetitionField {
       id

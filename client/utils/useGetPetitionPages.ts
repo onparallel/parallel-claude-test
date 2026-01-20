@@ -87,7 +87,7 @@ export function useGetPetitionPages<T extends PetitionSelection>(
   }, [petition.fields, fieldLogic, usePreviewReplies, hideInternalFields]);
 }
 
-useGetPetitionPages.fragments = {
+const _fragments = {
   PublicPetition: gql`
     fragment useGetPetitionPages_PublicPetition on PublicPetition {
       ...useFieldLogic_PublicPetition
@@ -107,7 +107,6 @@ useGetPetitionPages.fragments = {
         }
       }
     }
-    ${useFieldLogic.fragments.PublicPetition}
   `,
   PetitionBase: gql`
     fragment useGetPetitionPages_PetitionBase on PetitionBase {
@@ -128,6 +127,5 @@ useGetPetitionPages.fragments = {
         }
       }
     }
-    ${useFieldLogic.fragments.PetitionBase}
   `,
 };

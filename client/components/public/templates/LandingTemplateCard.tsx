@@ -56,7 +56,7 @@ export function LandingTemplateCard({ template }: LandingTemplateCardProps) {
   );
 }
 
-LandingTemplateCard.fragments = {
+const _fragments = {
   LandingTemplate: gql`
     fragment LandingTemplateCard_LandingTemplate on LandingTemplate {
       id

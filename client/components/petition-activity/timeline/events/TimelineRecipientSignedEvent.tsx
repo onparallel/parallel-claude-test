@@ -31,7 +31,7 @@ export function TimelineRecipientSignedEvent({
   );
 }
 
-TimelineRecipientSignedEvent.fragments = {
+const _fragments = {
   RecipientSignedEvent: gql`
     fragment TimelineRecipientSignedEvent_RecipientSignedEvent on RecipientSignedEvent {
       signer {
@@ -39,6 +39,5 @@ TimelineRecipientSignedEvent.fragments = {
       }
       createdAt
     }
-    ${SignerReference.fragments.PetitionSigner}
   `,
 };

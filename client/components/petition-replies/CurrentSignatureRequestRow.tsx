@@ -211,7 +211,7 @@ export function CurrentSignatureRequestRow({
   );
 }
 
-CurrentSignatureRequestRow.fragments = {
+const _fragments = {
   PetitionSignatureRequest: gql`
     fragment CurrentSignatureRequestRow_PetitionSignatureRequest on PetitionSignatureRequest {
       id
@@ -240,8 +240,5 @@ CurrentSignatureRequestRow.fragments = {
       extraErrorData
       latestSignatureReminderAt
     }
-    ${PetitionSignatureRequestStatusText.fragments.PetitionSignatureRequest}
-    ${SignerReference.fragments.PetitionSigner}
-    ${PetitionSignatureRequestSignerStatusIcon.fragments.SignerStatus}
   `,
 };

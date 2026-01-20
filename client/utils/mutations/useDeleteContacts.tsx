@@ -47,7 +47,7 @@ useDeleteContacts.mutations = [
   `,
 ];
 
-useDeleteContacts.fragments = {
+const _fragments = {
   Contact: gql`
     fragment useDeleteContacts_Contact on Contact {
       id

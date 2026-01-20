@@ -83,7 +83,7 @@ export function LiquidPetitionVariableProvider({
   return <LiquidScopeProvider scope={scope}>{children}</LiquidScopeProvider>;
 }
 
-LiquidPetitionVariableProvider.fragments = {
+const _fragments = {
   PetitionVariable: gql`
     fragment LiquidPetitionVariableProvider_PetitionVariable on PetitionVariable {
       __typename

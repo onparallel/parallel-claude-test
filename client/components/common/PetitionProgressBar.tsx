@@ -25,11 +25,8 @@ const STYLES = (() => {
   return styles as Record<keyof typeof styles, any>;
 })();
 
-export const PetitionProgressBar = Object.assign(
-  chakraForwardRef<"div", PetitionProgressBarProps>(function PetitionProgressBar(
-    { petition: { progress, status }, ...props },
-    ref,
-  ) {
+export const PetitionProgressBar = chakraForwardRef<"div", PetitionProgressBarProps>(
+  function PetitionProgressBar({ petition: { progress, status }, ...props }, ref) {
     const { external, internal } = progress;
     const sum = {
       approved: external.approved + internal.approved,
@@ -115,36 +112,6 @@ export const PetitionProgressBar = Object.assign(
         </Box>
       </SmallPopover>
     );
-  }),
-  {
-    fragments: {
-      get PetitionFieldProgress() {
-        return gql`
-          fragment PetitionProgressBar_PetitionFieldProgress on PetitionFieldProgress {
-            approved
-            replied
-            optional
-            total
-          }
-        `;
-      },
-      get Petition() {
-        return gql`
-          fragment PetitionProgressBar_Petition on Petition {
-            status
-            progress {
-              external {
-                ...PetitionProgressBar_PetitionFieldProgress
-              }
-              internal {
-                ...PetitionProgressBar_PetitionFieldProgress
-              }
-            }
-          }
-          ${this.PetitionFieldProgress}
-        `;
-      },
-    },
   },
 );
 
@@ -260,3 +227,27 @@ const ProgressText = chakraForwardRef<"li", { type: keyof typeof STYLES }>(funct
     </HStack>
   );
 });
+
+const _fragments = {
+  PetitionFieldProgress: gql`
+    fragment PetitionProgressBar_PetitionFieldProgress on PetitionFieldProgress {
+      approved
+      replied
+      optional
+      total
+    }
+  `,
+  Petition: gql`
+    fragment PetitionProgressBar_Petition on Petition {
+      status
+      progress {
+        external {
+          ...PetitionProgressBar_PetitionFieldProgress
+        }
+        internal {
+          ...PetitionProgressBar_PetitionFieldProgress
+        }
+      }
+    }
+  `,
+};

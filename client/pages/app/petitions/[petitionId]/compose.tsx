@@ -10,17 +10,13 @@ import { SupportButton } from "@parallel/components/common/SupportButton";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import { isDialogError, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import {
-  FieldErrorDialog,
-  useFieldErrorDialog,
-} from "@parallel/components/common/dialogs/FieldErrorDialog";
+import { useFieldErrorDialog } from "@parallel/components/common/dialogs/FieldErrorDialog";
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import {
   PetitionLayout,
   usePetitionStateWrapper,
   withPetitionLayoutContext,
 } from "@parallel/components/layout/PetitionLayout";
-import { AddPetitionAccessDialog } from "@parallel/components/petition-activity/dialogs/AddPetitionAccessDialog";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import { PetitionComposeAlertsContainer } from "@parallel/components/petition-common/alerts/PetitionComposeAlertsContainer";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
@@ -43,10 +39,7 @@ import { useCreatePetitionFieldGroupProfileTypeDialog } from "@parallel/componen
 import { useFieldUsedForSearchesDialog } from "@parallel/components/petition-compose/dialogs/FieldUsedForSearchesDialog";
 import { useHandledPetitionFromTemplateDialog } from "@parallel/components/petition-compose/dialogs/PetitionFromTemplateDialog";
 import { usePublicTemplateDialog } from "@parallel/components/petition-compose/dialogs/PublicTemplateDialog";
-import {
-  ReferencedFieldDialog,
-  useReferencedFieldDialog,
-} from "@parallel/components/petition-compose/dialogs/ReferencedFieldDialog";
+import { useReferencedFieldDialog } from "@parallel/components/petition-compose/dialogs/ReferencedFieldDialog";
 import {
   ONLY_INTERNAL_FIELD_TYPES,
   PetitionComposeFieldSettings,
@@ -1465,166 +1458,131 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 }
 
 const _fragments = {
-  get PetitionBase() {
-    return gql`
-      fragment PetitionCompose_PetitionBase on PetitionBase {
+  PetitionBase: gql`
+    fragment PetitionCompose_PetitionBase on PetitionBase {
+      id
+      isInteractionWithRecipientsEnabled
+      isDocumentGenerationEnabled
+      organization {
         id
-        isInteractionWithRecipientsEnabled
-        isDocumentGenerationEnabled
-        organization {
-          id
-          brandTheme {
-            preferredTone
-          }
+        brandTheme {
+          preferredTone
         }
-        isRestricted
-        fields {
-          id
-          ...PetitionCompose_PetitionField
-        }
-        myEffectivePermission {
-          permissionType
-        }
-        isAnonymized
-        permanentDeletionAt
-        ... on Petition {
-          status
-          hasStartedProcess
-          accesses {
-            id
-            status
-            isContactless
-          }
-          status
-          signatureConfig {
-            reviewAfterApproval
-          }
-          currentApprovalRequestStatus
-          currentSignatureRequest {
-            id
-          }
-          ...useSendPetitionHandler_Petition
-        }
-        ... on PetitionTemplate {
-          isPublic
-          description
-        }
-        ...PetitionLayout_PetitionBase
-        ...PetitionComposeFieldList_PetitionBase
-        ...PetitionComposeAttachments_PetitionBase
-        ...validatePetitionFields_PetitionBase
-        ...PetitionComposeFieldSettings_PetitionBase
-        ...useFieldsWithIndices_PetitionBase
-        ...PetitionComposeNewFieldDrawer_PetitionBase
-        ...PetitionComposeRightPaneTabs_PetitionBase
       }
-      ${this.PetitionField}
-      ${PetitionLayout.fragments.PetitionBase}
-      ${PetitionComposeFieldList.fragments.PetitionBase}
-      ${PetitionComposeAttachments.fragments.PetitionBase}
-      ${useSendPetitionHandler.fragments.Petition}
-      ${validatePetitionFields.fragments.PetitionBase}
-      ${PetitionComposeFieldSettings.fragments.PetitionBase}
-      ${useFieldsWithIndices.fragments.PetitionBase}
-      ${PetitionComposeNewFieldDrawer.fragments.PetitionBase}
-      ${PetitionComposeRightPaneTabs.fragments.PetitionBase}
-    `;
-  },
-  get PetitionField() {
-    return gql`
-      fragment PetitionCompose_PetitionField on PetitionField {
+      isRestricted
+      fields {
         id
-        ...PetitionComposeFieldList_PetitionField
+        ...PetitionCompose_PetitionField
+      }
+      myEffectivePermission {
+        permissionType
+      }
+      isAnonymized
+      permanentDeletionAt
+      ... on Petition {
+        status
+        hasStartedProcess
+        accesses {
+          id
+          status
+          isContactless
+        }
+        status
+        signatureConfig {
+          reviewAfterApproval
+        }
+        currentApprovalRequestStatus
+        currentSignatureRequest {
+          id
+        }
+        ...useSendPetitionHandler_Petition
+      }
+      ... on PetitionTemplate {
+        isPublic
+        description
+      }
+      ...PetitionLayout_PetitionBase
+      ...PetitionComposeFieldList_PetitionBase
+      ...PetitionComposeAttachments_PetitionBase
+      ...validatePetitionFields_PetitionBase
+      ...PetitionComposeFieldSettings_PetitionBase
+      ...useFieldsWithIndices_PetitionBase
+      ...PetitionComposeNewFieldDrawer_PetitionBase
+      ...PetitionComposeRightPaneTabs_PetitionBase
+    }
+  `,
+  PetitionField: gql`
+    fragment PetitionCompose_PetitionField on PetitionField {
+      id
+      ...PetitionComposeFieldList_PetitionField
+      ...PetitionComposeFieldSettings_PetitionField
+      ...validatePetitionFields_PetitionField
+      ...FieldErrorDialog_PetitionField
+      ...ReferencedFieldDialog_PetitionField
+      ...PetitionComposeRightPaneTabs_PetitionField
+      parent {
+        id
+        position
+      }
+      children {
+        id
+
         ...PetitionComposeFieldSettings_PetitionField
         ...validatePetitionFields_PetitionField
         ...FieldErrorDialog_PetitionField
         ...ReferencedFieldDialog_PetitionField
-        ...PetitionComposeRightPaneTabs_PetitionField
         parent {
           id
           position
         }
-        children {
+        replies {
           id
-
-          ...PetitionComposeFieldSettings_PetitionField
-          ...validatePetitionFields_PetitionField
-          ...FieldErrorDialog_PetitionField
-          ...ReferencedFieldDialog_PetitionField
-          parent {
-            id
-            position
-          }
-          replies {
-            id
-          }
         }
-        ...PetitionFieldReference_PetitionField
       }
-      ${PetitionFieldReference.fragments.PetitionField}
-      ${PetitionComposeFieldList.fragments.PetitionField}
-      ${PetitionComposeFieldSettings.fragments.PetitionField}
-      ${validatePetitionFields.fragments.PetitionField}
-      ${FieldErrorDialog.fragments.PetitionField}
-      ${ReferencedFieldDialog.fragments.PetitionField}
-      ${PetitionComposeRightPaneTabs.fragments.PetitionField}
-    `;
-  },
-  get updatePetitionFieldFragment() {
-    return gql`
-      fragment PetitionCompose_updatePetitionFieldFragment on PetitionField {
+      ...PetitionFieldReference_PetitionField
+    }
+  `,
+  updatePetitionFieldFragment: gql`
+    fragment PetitionCompose_updatePetitionFieldFragment on PetitionField {
+      id
+      ...PetitionCompose_PetitionField
+      petition {
         id
-        ...PetitionCompose_PetitionField
-        petition {
-          id
-          lastChangeAt
-          ... on Petition {
-            status
-          }
+        lastChangeAt
+        ... on Petition {
+          status
         }
       }
-      ${this.PetitionField}
-    `;
-  },
-  get Query() {
-    return gql`
-      fragment PetitionCompose_Query on Query {
-        ...PetitionLayout_Query
-        me {
+    }
+  `,
+  Query: gql`
+    fragment PetitionCompose_Query on Query {
+      ...PetitionLayout_Query
+      me {
+        id
+        organization {
           id
-          organization {
-            id
-            isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
-            petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
-              limit
-            }
+          isPetitionUsageLimitReached: isUsageLimitReached(limitName: PETITION_SEND)
+          petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
+            limit
           }
-          ...useUpdateIsReadNotification_User
-          ...useSendPetitionHandler_User
-          ...PetitionComposeFieldSettings_User
-          ...PetitionComposeNewFieldDrawer_User
-          ...PetitionComposeRightPaneTabs_User
         }
-        petitionComposeProfileTypes: profileTypes(limit: 100, offset: 0) {
-          totalCount
-          items {
-            id
-            ...PetitionComposeNewFieldDrawer_ProfileType
-            ...useCreatePetitionFieldGroupProfileTypeDialog_ProfileType
-          }
+        ...useUpdateIsReadNotification_User
+        ...useSendPetitionHandler_User
+        ...PetitionComposeFieldSettings_User
+        ...PetitionComposeNewFieldDrawer_User
+        ...PetitionComposeRightPaneTabs_User
+      }
+      petitionComposeProfileTypes: profileTypes(limit: 100, offset: 0) {
+        totalCount
+        items {
+          id
+          ...PetitionComposeNewFieldDrawer_ProfileType
+          ...useCreatePetitionFieldGroupProfileTypeDialog_ProfileType
         }
       }
-
-      ${PetitionLayout.fragments.Query}
-      ${useSendPetitionHandler.fragments.User}
-      ${useUpdateIsReadNotification.fragments.User}
-      ${PetitionComposeFieldSettings.fragments.User}
-      ${PetitionComposeNewFieldDrawer.fragments.User}
-      ${PetitionComposeNewFieldDrawer.fragments.ProfileType}
-      ${useCreatePetitionFieldGroupProfileTypeDialog.fragments.ProfileType}
-      ${PetitionComposeRightPaneTabs.fragments.User}
-    `;
-  },
+    }
+  `,
 };
 
 const _mutations = [
@@ -1636,9 +1594,6 @@ const _mutations = [
         ...PetitionComposeRightPaneTabs_PetitionBase
       }
     }
-    ${PetitionLayout.fragments.PetitionBase}
-    ${AddPetitionAccessDialog.fragments.Petition}
-    ${PetitionComposeRightPaneTabs.fragments.PetitionBase}
   `,
   gql`
     mutation PetitionCompose_updateFieldPositions(
@@ -1664,7 +1619,6 @@ const _mutations = [
         }
       }
     }
-    ${PetitionLayout.fragments.PetitionBase}
   `,
   gql`
     mutation PetitionCompose_createPetitionField(
@@ -1700,10 +1654,6 @@ const _mutations = [
         }
       }
     }
-    ${updatePreviewFieldReplies.fragments.PetitionField}
-    ${PetitionLayout.fragments.PetitionBase}
-    ${PetitionComposeNewFieldDrawer.fragments.PetitionBase}
-    ${_fragments.PetitionField}
   `,
   gql`
     mutation PetitionCompose_clonePetitionField($petitionId: GID!, $fieldId: GID!) {
@@ -1725,10 +1675,6 @@ const _mutations = [
         }
       }
     }
-    ${updatePreviewFieldReplies.fragments.PetitionField}
-    ${PetitionLayout.fragments.PetitionBase}
-    ${PetitionComposeNewFieldDrawer.fragments.PetitionBase}
-    ${_fragments.PetitionField}
   `,
   gql`
     mutation PetitionCompose_deletePetitionField(
@@ -1748,7 +1694,6 @@ const _mutations = [
         }
       }
     }
-    ${PetitionLayout.fragments.PetitionBase}
   `,
   gql`
     mutation PetitionCompose_updatePetitionField(
@@ -1761,7 +1706,6 @@ const _mutations = [
         ...PetitionCompose_updatePetitionFieldFragment
       }
     }
-    ${_fragments.updatePetitionFieldFragment}
   `,
   gql`
     mutation PetitionCompose_changePetitionFieldType(
@@ -1787,7 +1731,6 @@ const _mutations = [
         }
       }
     }
-    ${_fragments.PetitionField}
   `,
   gql`
     mutation PetitionCompose_linkPetitionFieldChildren(
@@ -1813,7 +1756,6 @@ const _mutations = [
         }
       }
     }
-    ${_fragments.PetitionField}
   `,
   gql`
     mutation PetitionCompose_unlinkPetitionFieldChildren(
@@ -1842,7 +1784,6 @@ const _mutations = [
         }
       }
     }
-    ${_fragments.PetitionField}
   `,
   gql`
     mutation PetitionCompose_createProfileLinkedPetitionField(
@@ -1874,10 +1815,6 @@ const _mutations = [
         }
       }
     }
-    ${updatePreviewFieldReplies.fragments.PetitionField}
-    ${PetitionLayout.fragments.PetitionBase}
-    ${PetitionComposeNewFieldDrawer.fragments.PetitionBase}
-    ${_fragments.PetitionField}
   `,
   gql`
     mutation PetitionCompose_cancelSignatureRequest($petitionSignatureRequestId: GID!) {
@@ -1899,7 +1836,6 @@ const _queries = [
     query PetitionCompose_user {
       ...PetitionCompose_Query
     }
-    ${_fragments.Query}
   `,
   gql`
     query PetitionCompose_petition($id: GID!) {
@@ -1907,7 +1843,6 @@ const _queries = [
         ...PetitionCompose_PetitionBase
       }
     }
-    ${_fragments.PetitionBase}
   `,
 ];
 

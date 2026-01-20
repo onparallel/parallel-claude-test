@@ -284,14 +284,12 @@ const _queries = [
         }
       }
     }
-    ${_fragments.UserAuthenticationToken}
   `,
 
   gql`
     query Tokens_user {
       ...DevelopersLayout_Query
     }
-    ${DevelopersLayout.fragments.Query}
   `,
 ];
 

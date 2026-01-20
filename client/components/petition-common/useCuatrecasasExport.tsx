@@ -340,56 +340,45 @@ export function useCuatrecasasExport(clientId: string) {
   };
 }
 
-useCuatrecasasExport.fragments = {
-  get Petition() {
-    return gql`
-      fragment useCuatrecasasExport_Petition on Petition {
+const _fragments = {
+  Petition: gql`
+    fragment useCuatrecasasExport_Petition on Petition {
+      id
+      name
+      metadata
+      fields {
         id
-        name
-        metadata
-        fields {
-          id
-          ...useCuatrecasasExport_PetitionField
-          replies {
-            ...useCuatrecasasExport_PetitionFieldReply
-          }
-        }
-        currentSignatureRequest {
-          ...useCuatrecasasExport_PetitionSignatureRequest
+        ...useCuatrecasasExport_PetitionField
+        replies {
+          ...useCuatrecasasExport_PetitionFieldReply
         }
       }
-      ${this.PetitionField}
-      ${this.PetitionFieldReply}
-      ${this.PetitionSignatureRequest}
-    `;
-  },
-  get PetitionSignatureRequest() {
-    return gql`
-      fragment useCuatrecasasExport_PetitionSignatureRequest on PetitionSignatureRequest {
-        id
-        metadata
-        auditTrailFilename
-        signedDocumentFilename
+      currentSignatureRequest {
+        ...useCuatrecasasExport_PetitionSignatureRequest
       }
-    `;
-  },
-  get PetitionField() {
-    return gql`
-      fragment useCuatrecasasExport_PetitionField on PetitionField {
-        title
-        type
-      }
-    `;
-  },
-  get PetitionFieldReply() {
-    return gql`
-      fragment useCuatrecasasExport_PetitionFieldReply on PetitionFieldReply {
-        id
-        metadata
-        content
-      }
-    `;
-  },
+    }
+  `,
+  PetitionSignatureRequest: gql`
+    fragment useCuatrecasasExport_PetitionSignatureRequest on PetitionSignatureRequest {
+      id
+      metadata
+      auditTrailFilename
+      signedDocumentFilename
+    }
+  `,
+  PetitionField: gql`
+    fragment useCuatrecasasExport_PetitionField on PetitionField {
+      title
+      type
+    }
+  `,
+  PetitionFieldReply: gql`
+    fragment useCuatrecasasExport_PetitionFieldReply on PetitionFieldReply {
+      id
+      metadata
+      content
+    }
+  `,
 };
 
 const _mutations = [

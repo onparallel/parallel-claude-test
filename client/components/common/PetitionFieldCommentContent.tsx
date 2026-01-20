@@ -11,62 +11,58 @@ interface PetitionFieldCommentContentProps {
   comment: PetitionFieldCommentContent_PetitionFieldCommentFragment;
 }
 
-export const PetitionFieldCommentContent = Object.assign(
-  chakraForwardRef<"div", PetitionFieldCommentContentProps>(function CommentContent(
-    { comment, ...props },
-    ref,
-  ) {
-    const options: HTMLReactParserOptions = {
-      replace(domNode) {
-        if (domNode instanceof Element && domNode.name === "mention") {
-          const mention = comment.mentions.find(
-            (m) => m.mentionedId === domNode.attribs["data-mention-id"],
-          )!;
-          return <Mention mention={mention} />;
-        } else if (domNode instanceof Element && domNode.name === "a") {
-          return (
-            <Link href={domNode.attribs.href} isExternal>
-              {domToReact(domNode.children as any, options)}
-            </Link>
-          );
-        }
-      },
-    };
-    const memoizedHtml = useMemo(() => {
-      return comment.contentHtml
-        ? parse(
-            sanitizeHtml(comment.contentHtml, {
-              ADD_TAGS: ["mention", "a"],
-              ADD_ATTR: ["data-mention-id"],
-            }),
-            options,
-          )
-        : null;
-    }, [comment.contentHtml]);
-
-    return (
-      <Box ref={ref} {...props}>
-        {memoizedHtml}
-      </Box>
-    );
-  }),
-  {
-    fragments: {
-      PetitionFieldComment: gql`
-        fragment PetitionFieldCommentContent_PetitionFieldComment on PetitionFieldComment {
-          contentHtml
-          mentions {
-            ... on PetitionFieldCommentUserMention {
-              mentionedId
-            }
-            ... on PetitionFieldCommentUserGroupMention {
-              mentionedId
-            }
-            ...Mention_PetitionFieldCommentMention
-          }
-        }
-        ${Mention.fragments.PetitionFieldCommentMention}
-      `,
+export const PetitionFieldCommentContent = chakraForwardRef<
+  "div",
+  PetitionFieldCommentContentProps
+>(function CommentContent({ comment, ...props }, ref) {
+  const options: HTMLReactParserOptions = {
+    replace(domNode) {
+      if (domNode instanceof Element && domNode.name === "mention") {
+        const mention = comment.mentions.find(
+          (m) => m.mentionedId === domNode.attribs["data-mention-id"],
+        )!;
+        return <Mention mention={mention} />;
+      } else if (domNode instanceof Element && domNode.name === "a") {
+        return (
+          <Link href={domNode.attribs.href} isExternal>
+            {domToReact(domNode.children as any, options)}
+          </Link>
+        );
+      }
     },
-  },
-);
+  };
+  const memoizedHtml = useMemo(() => {
+    return comment.contentHtml
+      ? parse(
+          sanitizeHtml(comment.contentHtml, {
+            ADD_TAGS: ["mention", "a"],
+            ADD_ATTR: ["data-mention-id"],
+          }),
+          options,
+        )
+      : null;
+  }, [comment.contentHtml]);
+
+  return (
+    <Box ref={ref} {...props}>
+      {memoizedHtml}
+    </Box>
+  );
+});
+
+const _fragments = {
+  PetitionFieldComment: gql`
+    fragment PetitionFieldCommentContent_PetitionFieldComment on PetitionFieldComment {
+      contentHtml
+      mentions {
+        ... on PetitionFieldCommentUserMention {
+          mentionedId
+        }
+        ... on PetitionFieldCommentUserGroupMention {
+          mentionedId
+        }
+        ...Mention_PetitionFieldCommentMention
+      }
+    }
+  `,
+};

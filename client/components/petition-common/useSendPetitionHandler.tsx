@@ -2,10 +2,7 @@ import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import { Progress, Stack, Text, useToast } from "@chakra-ui/react";
 import { useBlockingDialog } from "@parallel/components/common/dialogs/BlockingDialog";
-import {
-  AddPetitionAccessDialog,
-  useAddPetitionAccessDialog,
-} from "@parallel/components/petition-activity/dialogs/AddPetitionAccessDialog";
+import { useAddPetitionAccessDialog } from "@parallel/components/petition-activity/dialogs/AddPetitionAccessDialog";
 import { useHandledTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
 import {
   UpdatePetitionInput,
@@ -205,12 +202,11 @@ export function useSendPetitionHandler(
   ]);
 }
 
-useSendPetitionHandler.fragments = {
+const _fragments = {
   User: gql`
     fragment useSendPetitionHandler_User on User {
       ...AddPetitionAccessDialog_User
     }
-    ${AddPetitionAccessDialog.fragments.User}
   `,
   Petition: gql`
     fragment useSendPetitionHandler_Petition on Petition {

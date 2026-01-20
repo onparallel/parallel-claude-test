@@ -33,7 +33,7 @@ export function TemplateIconReminders({ remindersConfig, ...props }: TemplateIco
   );
 }
 
-TemplateIconReminders.fragments = {
+const _fragments = {
   RemindersConfig: gql`
     fragment TemplateIconReminders_RemindersConfig on RemindersConfig {
       offset

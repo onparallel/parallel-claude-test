@@ -39,7 +39,9 @@ import {
 } from "@parallel/chakra/icons";
 import {
   PetitionSettings_PetitionBaseFragment,
+  PetitionSettings_PetitionBaseFragmentDoc,
   PetitionSettings_UserFragment,
+  PetitionSettings_UserFragmentDoc,
   PetitionSettings_createPublicPetitionLinkDocument,
   PetitionSettings_enableAutomaticNumberingOnPetitionFieldsDocument,
   PetitionSettings_updatePetitionRestrictionDocument,
@@ -48,7 +50,6 @@ import {
   PetitionSettings_updateTemplateDocumentThemeDocument,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
-import { Fragments } from "@parallel/utils/apollo/fragments";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { assertTypename } from "@parallel/utils/apollo/typename";
 import { FORMATS } from "@parallel/utils/dates";
@@ -71,20 +72,11 @@ import { ConfirmDialog } from "../common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/dialogs/DialogProvider";
 import { useConfigureRemindersDialog } from "../petition-activity/dialogs/ConfigureRemindersDialog";
 import { TestModeSignatureBadge } from "../petition-common/TestModeSignatureBadge";
-import {
-  PublicLinkSettingsDialog,
-  usePublicLinkSettingsDialog,
-} from "../petition-common/dialogs/PublicLinkSettingsDialog";
+import { usePublicLinkSettingsDialog } from "../petition-common/dialogs/PublicLinkSettingsDialog";
 import { useSelectFolderDialog } from "../petition-common/dialogs/SelectFolderDialog";
 import { useSignatureConfigDialog } from "../petition-common/dialogs/SignatureConfigDialog";
-import {
-  TemplateDefaultPermissionsDialog,
-  useTemplateDefaultPermissionsDialog,
-} from "../petition-common/dialogs/TemplateDefaultPermissionsDialog";
-import {
-  CompliancePeriodDialog,
-  useCompliancePeriodDialog,
-} from "./dialogs/CompliancePeriodDialog";
+import { useTemplateDefaultPermissionsDialog } from "../petition-common/dialogs/TemplateDefaultPermissionsDialog";
+import { useCompliancePeriodDialog } from "./dialogs/CompliancePeriodDialog";
 import { useConfigureApprovalStepsDialog } from "./dialogs/ConfigureApprovalStepsDialog";
 import { useConfigureAutomaticNumberingDialog } from "./dialogs/ConfigureAutomaticNumberingDialog";
 import { usePetitionDeadlineDialog } from "./dialogs/PetitionDeadlineDialog";
@@ -1102,144 +1094,129 @@ function _PetitionSettings({
   );
 }
 
-const fragments = {
-  get User() {
-    return gql`
-      fragment PetitionSettings_User on User {
+const _fragments = {
+  User: gql`
+    fragment PetitionSettings_User on User {
+      id
+      hasPetitionApprovalFlow: hasFeatureFlag(featureFlag: PETITION_APPROVAL_FLOW)
+      hasSettingDelegateAccess: hasFeatureFlag(featureFlag: SETTING_DELEGATE_ACCESS)
+      hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
+      hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
+      hasAutoAnonymize: hasFeatureFlag(featureFlag: AUTO_ANONYMIZE)
+      ...useAvailablePetitionLocales_User
+      ...TestModeSignatureBadge_User
+      ...PublicLinkSettingsDialog_User
+      organization {
         id
-        hasPetitionApprovalFlow: hasFeatureFlag(featureFlag: PETITION_APPROVAL_FLOW)
-        hasSettingDelegateAccess: hasFeatureFlag(featureFlag: SETTING_DELEGATE_ACCESS)
-        hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
-        hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
-        hasAutoAnonymize: hasFeatureFlag(featureFlag: AUTO_ANONYMIZE)
-        ...useAvailablePetitionLocales_User
-        ...TestModeSignatureBadge_User
-        ...PublicLinkSettingsDialog_User
-        organization {
-          id
-          signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
-            items {
-              ... on SignatureOrgIntegration {
-                id
-                environment
-              }
+        signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
+          items {
+            ... on SignatureOrgIntegration {
+              id
+              environment
             }
           }
-          pdfDocumentThemes {
-            id
-            name
-          }
         }
-      }
-      ${useAvailablePetitionLocales.fragments.User}
-      ${TestModeSignatureBadge.fragments.User}
-      ${PublicLinkSettingsDialog.fragments.User}
-    `;
-  },
-  get SignatureConfig() {
-    return gql`
-      fragment PetitionSettings_SignatureConfig on SignatureConfig {
-        useCustomDocument
-        title
-        timezone
-        signingMode
-        signers {
-          contactId
-          email
-          firstName
-          fullName
-          isPreset
-          lastName
-          signWithDigitalCertificate
-          signWithEmbeddedImageFileUploadId
-        }
-        reviewAfterApproval
-        review
-        minSigners
-        message
-        isEnabled
-        integration {
-          id
-          environment
-        }
-        instructions
-        allowAdditionalSigners
-      }
-    `;
-  },
-  get PetitionBase() {
-    return gql`
-      fragment PetitionSettings_PetitionBase on PetitionBase {
-        id
-        locale
-        skipForwardSecurity
-        isDelegateAccessEnabled
-        isInteractionWithRecipientsEnabled
-        isReviewFlowEnabled
-        isDocumentGenerationEnabled
-        isRecipientViewContentsHidden
-        isRestricted
-        isRestrictedWithPassword
-        permanentDeletionAt
-        approvalFlowConfig {
-          ...Fragments_FullApprovalFlowConfig
-        }
-        automaticNumberingConfig {
-          numberingType
-        }
-        selectedDocumentTheme {
+        pdfDocumentThemes {
           id
           name
         }
-        myEffectivePermission {
-          permissionType
-        }
-        signatureConfig {
-          ...PetitionSettings_SignatureConfig
-        }
-        ...CompliancePeriodDialog_PetitionBase
-        ... on Petition {
-          status
-          deadline
-          currentSignatureRequest {
-            id
-            status
-          }
-          fromTemplate {
-            id
-            name
-          }
-        }
-        ... on PetitionTemplate {
-          isPublic
-          ...PublicLinkSettingsDialog_PetitionTemplate
-          remindersConfig {
-            ...PetitionRemindersConfig_RemindersConfig
-          }
-          publicLink {
-            id
-            url
-            isActive
-            ...PublicLinkSettingsDialog_PublicPetitionLink
-          }
-          defaultPermissions {
-            id
-          }
-          defaultPath
-        }
-        isAnonymized
       }
-      ${this.SignatureConfig}
-      ${Fragments.FullApprovalFlowConfig}
-      ${CompliancePeriodDialog.fragments.PetitionBase}
-      ${PublicLinkSettingsDialog.fragments.PetitionTemplate}
-      ${useConfigureRemindersDialog.fragments.RemindersConfig}
-      ${PublicLinkSettingsDialog.fragments.PublicPetitionLink}
-    `;
-  },
+    }
+  `,
+  SignatureConfig: gql`
+    fragment PetitionSettings_SignatureConfig on SignatureConfig {
+      useCustomDocument
+      title
+      timezone
+      signingMode
+      signers {
+        contactId
+        email
+        firstName
+        fullName
+        isPreset
+        lastName
+        signWithDigitalCertificate
+        signWithEmbeddedImageFileUploadId
+      }
+      reviewAfterApproval
+      review
+      minSigners
+      message
+      isEnabled
+      integration {
+        id
+        environment
+      }
+      instructions
+      allowAdditionalSigners
+    }
+  `,
+  PetitionBase: gql`
+    fragment PetitionSettings_PetitionBase on PetitionBase {
+      id
+      locale
+      skipForwardSecurity
+      isDelegateAccessEnabled
+      isInteractionWithRecipientsEnabled
+      isReviewFlowEnabled
+      isDocumentGenerationEnabled
+      isRecipientViewContentsHidden
+      isRestricted
+      isRestrictedWithPassword
+      permanentDeletionAt
+      approvalFlowConfig {
+        ...Fragments_FullApprovalFlowConfig
+      }
+      automaticNumberingConfig {
+        numberingType
+      }
+      selectedDocumentTheme {
+        id
+        name
+      }
+      myEffectivePermission {
+        permissionType
+      }
+      signatureConfig {
+        ...PetitionSettings_SignatureConfig
+      }
+      ...CompliancePeriodDialog_PetitionBase
+      ... on Petition {
+        status
+        deadline
+        currentSignatureRequest {
+          id
+          status
+        }
+        fromTemplate {
+          id
+          name
+        }
+      }
+      ... on PetitionTemplate {
+        isPublic
+        ...PublicLinkSettingsDialog_PetitionTemplate
+        remindersConfig {
+          ...PetitionRemindersConfig_RemindersConfig
+        }
+        publicLink {
+          id
+          url
+          isActive
+          ...PublicLinkSettingsDialog_PublicPetitionLink
+        }
+        defaultPermissions {
+          id
+        }
+        defaultPath
+      }
+      isAnonymized
+    }
+  `,
 };
 
-const mutations = [
+const _mutations = [
   gql`
     mutation PetitionSettings_updateTemplateDocumentTheme($templateId: GID!, $orgThemeId: GID!) {
       updateTemplateDocumentTheme(templateId: $templateId, orgThemeId: $orgThemeId) {
@@ -1295,7 +1272,6 @@ const mutations = [
         }
       }
     }
-    ${PublicLinkSettingsDialog.fragments.PublicPetitionLink}
   `,
   gql`
     mutation PetitionSettings_updatePublicPetitionLink(
@@ -1328,7 +1304,6 @@ const mutations = [
         }
       }
     }
-    ${PublicLinkSettingsDialog.fragments.PublicPetitionLink}
   `,
   gql`
     mutation PetitionSettings_updateTemplateDefaultPermissions(
@@ -1340,7 +1315,6 @@ const mutations = [
         ...TemplateDefaultPermissionsDialog_PetitionTemplate
       }
     }
-    ${TemplateDefaultPermissionsDialog.fragments.PetitionTemplate}
   `,
   gql`
     mutation PetitionSettings_enableAutomaticNumberingOnPetitionFields($petitionId: GID!) {
@@ -1355,13 +1329,10 @@ const mutations = [
   `,
 ];
 
-export const PetitionSettings = Object.assign(
-  memoWithFragments(_PetitionSettings, {
-    user: fragments.User,
-    petition: fragments.PetitionBase,
-  }),
-  { fragments, mutations },
-);
+export const PetitionSettings = memoWithFragments(_PetitionSettings, {
+  user: PetitionSettings_UserFragmentDoc,
+  petition: PetitionSettings_PetitionBaseFragmentDoc,
+});
 
 function DeadlineInput({
   value,

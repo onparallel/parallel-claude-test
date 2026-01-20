@@ -47,13 +47,10 @@ export function DevelopersLayout({ currentTabKey, queryObject, children }: Devel
   );
 }
 
-DevelopersLayout.fragments = {
-  get Query() {
-    return gql`
-      fragment DevelopersLayout_Query on Query {
-        ...UserSettingsLayout_Query
-      }
-      ${UserSettingsLayout.fragments.Query}
-    `;
-  },
+const _fragments = {
+  Query: gql`
+    fragment DevelopersLayout_Query on Query {
+      ...UserSettingsLayout_Query
+    }
+  `,
 };

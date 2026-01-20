@@ -14,11 +14,8 @@ interface FileAttachmentButtonProps {
   showDownloadIcon?: boolean;
 }
 
-export const FileAttachmentButton = Object.assign(
-  chakraForwardRef<"button", FileAttachmentButtonProps>(function FileAttachmentButton(
-    { file, showDownloadIcon, ...props },
-    ref,
-  ) {
+export const FileAttachmentButton = chakraForwardRef<"button", FileAttachmentButtonProps>(
+  function FileAttachmentButton({ file, showDownloadIcon, ...props }, ref) {
     const intl = useIntl();
     return (
       <Button
@@ -53,17 +50,16 @@ export const FileAttachmentButton = Object.assign(
         {showDownloadIcon ? <DownloadIcon /> : null}
       </Button>
     );
-  }),
-  {
-    fragments: {
-      FileUpload: gql`
-        fragment FileAttachmentButton_FileUpload on FileUpload {
-          filename
-          contentType
-          size
-          isComplete
-        }
-      `,
-    },
   },
 );
+
+const _fragments = {
+  FileUpload: gql`
+    fragment FileAttachmentButton_FileUpload on FileUpload {
+      filename
+      contentType
+      size
+      isComplete
+    }
+  `,
+};

@@ -2,10 +2,7 @@ import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
 import { VariablesOf } from "@graphql-typed-document-node/core";
 import { useConfirmCommentMentionAndShareDialog } from "@parallel/components/common/dialogs/ConfirmCommentMentionAndShareDialog";
-import { PetitionFieldComment } from "@parallel/components/common/PetitionFieldComment";
 import { removeMentionInputElements } from "@parallel/components/common/slate/CommentEditor";
-import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
-import { UserReference } from "@parallel/components/common/UserReference";
 import {
   usePetitionCommentsMutations_createPetitionCommentDocument,
   usePetitionCommentsMutations_deletePetitionCommentDocument,
@@ -154,8 +151,6 @@ const _queries = {
         }
       }
     }
-    ${UserReference.fragments.User}
-    ${UserGroupReference.fragments.UserGroup}
   `,
 };
 
@@ -178,7 +173,6 @@ const _fragments = {
       id
       ...PetitionFieldComment_PetitionFieldComment
     }
-    ${PetitionFieldComment.fragments.PetitionFieldComment}
   `,
 };
 
@@ -222,8 +216,6 @@ const _mutations = [
         }
       }
     }
-    ${_fragments.PetitionFieldComment}
-    ${_fragments.PetitionField}
   `,
   gql`
     mutation usePetitionCommentsMutations_updatePetitionComment(
@@ -258,8 +250,6 @@ const _mutations = [
         }
       }
     }
-    ${_fragments.PetitionFieldComment}
-    ${_fragments.PetitionField}
   `,
   gql`
     mutation usePetitionCommentsMutations_deletePetitionComment(
@@ -285,6 +275,5 @@ const _mutations = [
         }
       }
     }
-    ${_fragments.PetitionField}
   `,
 ];

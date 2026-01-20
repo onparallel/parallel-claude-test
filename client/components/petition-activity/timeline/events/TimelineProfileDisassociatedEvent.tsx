@@ -6,7 +6,6 @@ import { TimelineProfileDisassociatedEvent_ProfileDisassociatedEventFragment } f
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import { UserOrContactReference } from "../../../common/UserOrContactReference";
-import { UserReference } from "../../../common/UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
@@ -36,7 +35,7 @@ export function TimelineProfileDisassociatedEvent({
   );
 }
 
-TimelineProfileDisassociatedEvent.fragments = {
+const _fragments = {
   ProfileDisassociatedEvent: gql`
     fragment TimelineProfileDisassociatedEvent_ProfileDisassociatedEvent on ProfileDisassociatedEvent {
       disassociatedBy {
@@ -47,8 +46,5 @@ TimelineProfileDisassociatedEvent.fragments = {
       }
       createdAt
     }
-    ${UserOrContactReference.fragments.UserOrPetitionAccess}
-    ${UserReference.fragments.User}
-    ${ProfileReference.fragments.Profile}
   `,
 };

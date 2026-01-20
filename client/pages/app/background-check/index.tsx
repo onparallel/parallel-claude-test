@@ -31,7 +31,6 @@ import {
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { UnwrapPromise } from "@parallel/utils/types";
-import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -318,7 +317,6 @@ const _queries = [
       }
       ...useBrowserMetadata_Query
     }
-    ${useBrowserMetadata.fragments.Query}
   `,
 ];
 

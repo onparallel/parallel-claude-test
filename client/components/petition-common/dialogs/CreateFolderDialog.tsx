@@ -243,7 +243,6 @@ const _queries = [
         }
       }
     }
-    ${_fragments.PetitionBase}
   `,
 ];
 

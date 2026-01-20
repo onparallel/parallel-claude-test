@@ -33,21 +33,17 @@ export function RecipientViewPetitionFieldCard({
   );
 }
 
-RecipientViewPetitionFieldCard.fragments = {
-  get PetitionField() {
-    return gql`
-      fragment RecipientViewPetitionFieldCard_PetitionField on PetitionField {
-        id
-        type
-      }
-    `;
-  },
-  get PublicPetitionField() {
-    return gql`
-      fragment RecipientViewPetitionFieldCard_PublicPetitionField on PublicPetitionField {
-        id
-        type
-      }
-    `;
-  },
+const _fragments = {
+  PetitionField: gql`
+    fragment RecipientViewPetitionFieldCard_PetitionField on PetitionField {
+      id
+      type
+    }
+  `,
+  PublicPetitionField: gql`
+    fragment RecipientViewPetitionFieldCard_PublicPetitionField on PublicPetitionField {
+      id
+      type
+    }
+  `,
 };

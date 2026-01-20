@@ -131,7 +131,7 @@ export function TaskProgressDialog({
   );
 }
 
-TaskProgressDialog.fragments = {
+const _fragments = {
   Task: gql`
     fragment TaskProgressDialog_Task on Task {
       id
@@ -150,7 +150,6 @@ const _queries = [
         ...TaskProgressDialog_Task
       }
     }
-    ${TaskProgressDialog.fragments.Task}
   `,
   gql`
     query TaskProgressDialog_publicTask($taskId: GID!, $keycode: ID!) {
@@ -158,7 +157,6 @@ const _queries = [
         ...TaskProgressDialog_Task
       }
     }
-    ${TaskProgressDialog.fragments.Task}
   `,
 ];
 

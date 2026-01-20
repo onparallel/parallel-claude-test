@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { Center, ListItem, ListItemProps, Stack, Text } from "@chakra-ui/react";
 import { DeleteIcon, EditIcon } from "@parallel/chakra/icons";
 import { SelectedSignerRow_PetitionSignerFragment } from "@parallel/graphql/__types";
-import { Fragments } from "@parallel/utils/apollo/fragments";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 
@@ -85,11 +84,10 @@ export function SelectedSignerRow({
   );
 }
 
-SelectedSignerRow.fragments = {
+const _fragments = {
   PetitionSigner: gql`
     fragment SelectedSignerRow_PetitionSigner on PetitionSigner {
       ...Fragments_FullPetitionSigner
     }
-    ${Fragments.FullPetitionSigner}
   `,
 };

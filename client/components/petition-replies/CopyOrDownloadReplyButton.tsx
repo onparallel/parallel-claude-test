@@ -114,7 +114,7 @@ export function CopyOrDownloadReplyButton({
   );
 }
 
-CopyOrDownloadReplyButton.fragments = {
+const _fragments = {
   PetitionFieldReply: gql`
     fragment CopyOrDownloadReplyButton_PetitionFieldReply on PetitionFieldReply {
       metadata

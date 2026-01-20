@@ -81,13 +81,12 @@ export function useEditTagsDialog() {
   return useDialog(EditTagsDialog);
 }
 
-useEditTagsDialog.fragments = {
+const _fragments = {
   Tag: gql`
     fragment useEditTagsDialog_Tag on Tag {
       id
       ...TagSelect_Tag
     }
-    ${TagSelect.fragments.Tag}
   `,
   PetitionBase: gql`
     fragment useEditTagsDialog_PetitionBase on PetitionBase {
@@ -98,7 +97,6 @@ useEditTagsDialog.fragments = {
       }
       lastChangeAt
     }
-    ${TagSelect.fragments.Tag}
   `,
 };
 
@@ -109,7 +107,6 @@ useEditTagsDialog.mutations = [
         ...useEditTagsDialog_PetitionBase
       }
     }
-    ${useEditTagsDialog.fragments.PetitionBase}
   `,
   gql`
     mutation useEditTagsDialog_untagPetition($tagId: GID!, $petitionId: GID!) {
@@ -117,7 +114,6 @@ useEditTagsDialog.mutations = [
         ...useEditTagsDialog_PetitionBase
       }
     }
-    ${useEditTagsDialog.fragments.PetitionBase}
   `,
 ];
 
@@ -128,6 +124,5 @@ const _queries = [
         ...useEditTagsDialog_PetitionBase
       }
     }
-    ${useEditTagsDialog.fragments.PetitionBase}
   `,
 ];

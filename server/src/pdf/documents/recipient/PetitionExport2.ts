@@ -23,14 +23,8 @@ import {
 } from "../../__types";
 import { documentSignatures } from "../../utils/documentSignatures";
 import { evaluateFieldLogic } from "../../utils/fieldLogic";
-import {
-  LiquidPetitionScopeProvider,
-  buildPetitionFieldsLiquidScope,
-} from "../../utils/liquid/LiquidPetitionScopeProvider";
-import {
-  LiquidPetitionVariableProvider,
-  buildPetitionVariablesLiquidScope,
-} from "../../utils/liquid/LiquidPetitionVariableProvider";
+import { buildPetitionFieldsLiquidScope } from "../../utils/liquid/LiquidPetitionScopeProvider";
+import { buildPetitionVariablesLiquidScope } from "../../utils/liquid/LiquidPetitionVariableProvider";
 import { PdfDocument, PdfDocumentGetPropsContext } from "../../utils/pdf";
 import { block, box, element, heading, image, t, text, tt } from "../../utils/typst";
 
@@ -875,132 +869,113 @@ function groupFieldsByPages<T extends PetitionExport2_PetitionBaseFragment>(
   return pages;
 }
 
-PetitionExport2.fragments = {
-  get PetitionBase() {
-    return gql`
-      fragment PetitionExport2_PetitionBase on PetitionBase {
-        id
+const _fragments = {
+  PetitionBase: gql`
+    fragment PetitionExport2_PetitionBase on PetitionBase {
+      id
+      name
+      fields {
+        ...PetitionExport2_PetitionField
+        replies {
+          ...PetitionExport2_PetitionFieldReply
+        }
+      }
+      organization {
         name
-        fields {
-          ...PetitionExport2_PetitionField
-          replies {
-            ...PetitionExport2_PetitionFieldReply
+        logoUrl
+      }
+      selectedDocumentTheme {
+        data
+      }
+      ... on Petition {
+        fromTemplate {
+          id
+        }
+        currentSignatureRequest {
+          signatureConfig {
+            ...documentSignatures_SignatureConfig
           }
         }
-        organization {
-          name
-          logoUrl
-        }
-        selectedDocumentTheme {
-          data
-        }
-        ... on Petition {
-          fromTemplate {
-            id
-          }
-          currentSignatureRequest {
-            signatureConfig {
-              ...documentSignatures_SignatureConfig
-            }
-          }
-        }
-        ...LiquidPetitionScopeProvider_PetitionBase
-        variables {
-          ...LiquidPetitionVariableProvider_PetitionVariable
-        }
+      }
+      ...LiquidPetitionScopeProvider_PetitionBase
+      variables {
+        ...LiquidPetitionVariableProvider_PetitionVariable
+      }
+      __typename
+    }
+  `,
+  PetitionFieldInner: gql`
+    fragment PetitionExport2_PetitionFieldInner on PetitionField {
+      id
+      type
+      title
+      options
+      description
+      showInPdf
+      showActivityInPdf
+      visibility
+      math
+      multiple
+      requireApproval
+    }
+  `,
+  PetitionFieldReplyInner: gql`
+    fragment PetitionExport2_PetitionFieldReplyInner on PetitionFieldReply {
+      id
+      status
+      content
+      metadata
+      isAnonymized
+      status
+      repliedBy {
         __typename
-      }
-      ${this.PetitionField}
-      ${this.PetitionFieldReply}
-      ${documentSignatures.fragments.SignatureConfig}
-      ${LiquidPetitionScopeProvider.fragments.PetitionBase}
-      ${LiquidPetitionVariableProvider.fragments.PetitionVariable}
-    `;
-  },
-  get PetitionFieldInner() {
-    return gql`
-      fragment PetitionExport2_PetitionFieldInner on PetitionField {
-        id
-        type
-        title
-        options
-        description
-        showInPdf
-        showActivityInPdf
-        visibility
-        math
-        multiple
-        requireApproval
-      }
-    `;
-  },
-  get PetitionFieldReplyInner() {
-    return gql`
-      fragment PetitionExport2_PetitionFieldReplyInner on PetitionFieldReply {
-        id
-        status
-        content
-        metadata
-        isAnonymized
-        status
-        repliedBy {
-          __typename
-          ... on User {
-            fullName
-          }
-          ... on PetitionAccess {
-            contact {
-              fullName
-            }
-          }
-        }
-        repliedAt
-        lastReviewedBy {
+        ... on User {
           fullName
         }
-        lastReviewedAt
+        ... on PetitionAccess {
+          contact {
+            fullName
+          }
+        }
       }
-    `;
-  },
-  get PetitionField() {
-    return gql`
-      fragment PetitionExport2_PetitionField on PetitionField {
+      repliedAt
+      lastReviewedBy {
+        fullName
+      }
+      lastReviewedAt
+    }
+  `,
+  PetitionField: gql`
+    fragment PetitionExport2_PetitionField on PetitionField {
+      ...PetitionExport2_PetitionFieldInner
+      parent {
+        id
+        showActivityInPdf
+      }
+      children {
         ...PetitionExport2_PetitionFieldInner
         parent {
           id
-          showActivityInPdf
         }
-        children {
-          ...PetitionExport2_PetitionFieldInner
-          parent {
-            id
-          }
-          replies {
-            ...PetitionExport2_PetitionFieldReplyInner
-          }
+        replies {
+          ...PetitionExport2_PetitionFieldReplyInner
         }
       }
-      ${this.PetitionFieldInner}
-      ${this.PetitionFieldReplyInner}
-    `;
-  },
-  get PetitionFieldReply() {
-    return gql`
-      fragment PetitionExport2_PetitionFieldReply on PetitionFieldReply {
-        ...PetitionExport2_PetitionFieldReplyInner
-        children {
-          field {
-            ...PetitionExport2_PetitionField
-          }
-          replies {
-            ...PetitionExport2_PetitionFieldReplyInner
-          }
+    }
+  `,
+  PetitionFieldReply: gql`
+    fragment PetitionExport2_PetitionFieldReply on PetitionFieldReply {
+      ...PetitionExport2_PetitionFieldReplyInner
+      children {
+        field {
+          ...PetitionExport2_PetitionField
+        }
+        replies {
+          ...PetitionExport2_PetitionFieldReplyInner
         }
       }
-      ${this.PetitionFieldReplyInner}
-      ${this.PetitionField}
-    `;
-  },
+    }
+  `,
 };
 
 PetitionExport2.queries = [
@@ -1010,7 +985,6 @@ PetitionExport2.queries = [
         ...PetitionExport2_PetitionBase
       }
     }
-    ${PetitionExport2.fragments.PetitionBase}
   `,
 ];
 

@@ -43,13 +43,12 @@ export function AlreadyLoggedIn({ me, onRelogin, onContinueAs }: AlreadyLoggedIn
   );
 }
 
-AlreadyLoggedIn.fragments = {
+const _fragments = {
   User: gql`
     fragment AlreadyLoggedIn_User on User {
       email
       fullName
       ...UserAvatar_User
     }
-    ${UserAvatar.fragments.User}
   `,
 };

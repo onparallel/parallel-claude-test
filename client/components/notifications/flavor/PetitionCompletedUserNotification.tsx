@@ -12,50 +12,46 @@ export interface PetitionCompletedUserNotificationProps {
   notification: PetitionCompletedUserNotification_PetitionCompletedUserNotificationFragment;
 }
 
-export const PetitionCompletedUserNotification = Object.assign(
-  forwardRef<HTMLElement, PetitionCompletedUserNotificationProps>(
-    function PetitionCompletedUserNotification({ isFirst, notification }, ref) {
-      return (
-        <PetitionUserNotification
-          ref={ref}
-          isFirst={isFirst}
-          notification={notification}
-          icon={
-            <Circle size="36px" background="green.600">
-              <CheckIcon color="white" fontSize="1rem" />
-            </Circle>
-          }
-          path={`/replies`}
-        >
-          <FormattedMessage
-            id="component.notification-petition-completed.body"
-            defaultMessage="{name} completed the parallel."
-            values={{
-              name: (
-                <UserOrContactReference
-                  userOrAccess={notification.completedBy}
-                  draggable="false"
-                  tabIndex={-1}
-                />
-              ),
-            }}
-          />
-        </PetitionUserNotification>
-      );
-    },
-  ),
-  {
-    fragments: {
-      PetitionCompletedUserNotification: gql`
-        fragment PetitionCompletedUserNotification_PetitionCompletedUserNotification on PetitionCompletedUserNotification {
-          ...PetitionUserNotification_PetitionUserNotification
-          completedBy {
-            ...UserOrContactReference_UserOrPetitionAccess
-          }
-        }
-        ${PetitionUserNotification.fragments.PetitionUserNotification}
-        ${UserOrContactReference.fragments.UserOrPetitionAccess}
-      `,
-    },
-  },
-);
+export const PetitionCompletedUserNotification = forwardRef<
+  HTMLElement,
+  PetitionCompletedUserNotificationProps
+>(function PetitionCompletedUserNotification({ isFirst, notification }, ref) {
+  return (
+    <PetitionUserNotification
+      ref={ref}
+      isFirst={isFirst}
+      notification={notification}
+      icon={
+        <Circle size="36px" background="green.600">
+          <CheckIcon color="white" fontSize="1rem" />
+        </Circle>
+      }
+      path={`/replies`}
+    >
+      <FormattedMessage
+        id="component.notification-petition-completed.body"
+        defaultMessage="{name} completed the parallel."
+        values={{
+          name: (
+            <UserOrContactReference
+              userOrAccess={notification.completedBy}
+              draggable="false"
+              tabIndex={-1}
+            />
+          ),
+        }}
+      />
+    </PetitionUserNotification>
+  );
+});
+
+const _fragments = {
+  PetitionCompletedUserNotification: gql`
+    fragment PetitionCompletedUserNotification_PetitionCompletedUserNotification on PetitionCompletedUserNotification {
+      ...PetitionUserNotification_PetitionUserNotification
+      completedBy {
+        ...UserOrContactReference_UserOrPetitionAccess
+      }
+    }
+  `,
+};

@@ -301,21 +301,19 @@ export function BackgroundCheckEntityDetailsPersonBasic({
   );
 }
 
-BackgroundCheckEntityDetailsPersonBasic.fragments = {
-  get BackgroundCheckEntityDetailsPersonBasic() {
-    return gql`
-      fragment BackgroundCheckEntityDetailsPersonBasic_BackgroundCheckEntityDetailsPerson on BackgroundCheckEntityDetailsPerson {
-        id
-        name
-        properties {
-          country
-          countryOfBirth
-          dateOfBirth
-          gender
-          nationality
-          topics
-        }
+const _fragments = {
+  BackgroundCheckEntityDetailsPersonBasic: gql`
+    fragment BackgroundCheckEntityDetailsPersonBasic_BackgroundCheckEntityDetailsPerson on BackgroundCheckEntityDetailsPerson {
+      id
+      name
+      properties {
+        country
+        countryOfBirth
+        dateOfBirth
+        gender
+        nationality
+        topics
       }
-    `;
-  },
+    }
+  `,
 };

@@ -146,15 +146,13 @@ export const ProfileFieldExpiresAtIcon = chakraForwardRef<"div", ProfileFieldExp
   },
 );
 
-ProfileFormFieldInputGroup.fragments = {
-  get ProfileTypeField() {
-    return gql`
-      fragment ProfileFormFieldInputGroup_ProfileTypeField on ProfileTypeField {
-        id
-        type
-        isExpirable
-        expiryAlertAheadTime
-      }
-    `;
-  },
+const _fragments = {
+  ProfileTypeField: gql`
+    fragment ProfileFormFieldInputGroup_ProfileTypeField on ProfileTypeField {
+      id
+      type
+      isExpirable
+      expiryAlertAheadTime
+    }
+  `,
 };

@@ -421,7 +421,7 @@ export function Overview() {
   );
 }
 
-Overview.fragments = {
+const _fragments = {
   PetitionTemplate: gql`
     fragment Overview_PetitionTemplate on PetitionTemplate {
       id
@@ -435,7 +435,6 @@ Overview.queries = [
     query Overview_user {
       ...ReportsSidebarLayout_Query
     }
-    ${ReportsSidebarLayout.fragments.Query}
   `,
 ];
 

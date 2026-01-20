@@ -15,8 +15,8 @@ interface ProfileReferenceProps {
   showNameEvenIfDeleted?: boolean;
 }
 
-export const ProfileReference = Object.assign(
-  chakraForwardRef<"span" | "a", ProfileReferenceProps>(function ProfileReference(
+export const ProfileReference = chakraForwardRef<"span" | "a", ProfileReferenceProps>(
+  function ProfileReference(
     { profile, asLink, _notDeleted, showNameEvenIfDeleted, ...props },
     ref,
   ) {
@@ -56,16 +56,15 @@ export const ProfileReference = Object.assign(
         </Text>
       );
     }
-  }),
-  {
-    fragments: {
-      Profile: gql`
-        fragment ProfileReference_Profile on Profile {
-          id
-          localizableName
-          status
-        }
-      `,
-    },
   },
 );
+
+const _fragments = {
+  Profile: gql`
+    fragment ProfileReference_Profile on Profile {
+      id
+      localizableName
+      status
+    }
+  `,
+};

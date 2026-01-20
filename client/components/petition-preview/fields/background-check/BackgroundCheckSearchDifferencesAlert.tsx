@@ -56,7 +56,7 @@ export function BackgroundCheckSearchDifferencesAlert({
   );
 }
 
-BackgroundCheckSearchDifferencesAlert.fragments = {
+const _fragments = {
   BackgroundCheckEntitySearchReviewDiff: gql`
     fragment BackgroundCheckSearchDifferencesAlert_BackgroundCheckEntitySearchReviewDiff on BackgroundCheckEntitySearchReviewDiff {
       items {

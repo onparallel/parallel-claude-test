@@ -136,7 +136,7 @@ function ThanksFooter() {
   );
 }
 
-ThanksForSigning.fragments = {
+const _fragments = {
   PublicOrganization: gql`
     fragment ThanksForSigning_PublicOrganization on PublicOrganization {
       name
@@ -146,7 +146,6 @@ ThanksForSigning.fragments = {
         ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
       }
     }
-    ${OverrideWithOrganizationTheme.fragments.OrganizationBrandThemeData}
   `,
 };
 
@@ -157,7 +156,6 @@ ThanksForSigning.queries = [
         ...ThanksForSigning_PublicOrganization
       }
     }
-    ${ThanksForSigning.fragments.PublicOrganization}
   `,
 ];
 

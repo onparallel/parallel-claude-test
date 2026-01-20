@@ -29,7 +29,7 @@ export function AccountLocaleChange({ user, onChange, ...props }: AccountLocaleC
   );
 }
 
-AccountLocaleChange.fragments = {
+const _fragments = {
   User: gql`
     fragment AccountLocaleChange_User on User {
       preferredLocale

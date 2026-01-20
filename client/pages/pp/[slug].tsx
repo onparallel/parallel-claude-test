@@ -310,7 +310,7 @@ function PublicPetitionLink({
   );
 }
 
-PublicPetitionLink.fragments = {
+const _fragments = {
   PublicPublicPetitionLink: gql`
     fragment PublicPetitionLink_PublicPublicPetitionLink on PublicPublicPetitionLink {
       title
@@ -370,7 +370,6 @@ PublicPetitionLink.queries = [
         ...PublicPetitionLink_PublicPublicPetitionLink
       }
     }
-    ${PublicPetitionLink.fragments.PublicPublicPetitionLink}
   `,
 ];
 

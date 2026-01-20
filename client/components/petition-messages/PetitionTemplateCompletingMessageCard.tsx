@@ -52,154 +52,149 @@ const messagesBody: Record<PetitionLocale, string> = {
   pt: "Informámos {{ user-first-name }} de que completou a informação para continuar com o processo",
 };
 
-export const PetitionTemplateCompletingMessageCard = Object.assign(
-  chakraForwardRef<"section", PetitionTemplateCompletingMessageCardProps>(
-    function PetitionTemplateCompletingMessageCard(
-      { petition, onUpdatePetition, isDisabled, ...props },
-      ref,
-    ) {
-      const intl = useIntl();
-      const placeholders = usePetitionMessagePlaceholderOptions({ petition });
-      const [isEnabled, setIsEnabled] = useState(petition.isCompletingMessageEnabled);
-      const [subject, setSubject] = useState(
-        petition.completingMessageSubject ?? messagesSubject[petition.locale],
-      );
-      const [body, setBody] = useState(
-        petition.completingMessageBody ??
-          textWithPlaceholderToSlateNodes(messagesBody[petition.locale], placeholders),
-      );
+export const PetitionTemplateCompletingMessageCard = chakraForwardRef<
+  "section",
+  PetitionTemplateCompletingMessageCardProps
+>(function PetitionTemplateCompletingMessageCard(
+  { petition, onUpdatePetition, isDisabled, ...props },
+  ref,
+) {
+  const intl = useIntl();
+  const placeholders = usePetitionMessagePlaceholderOptions({ petition });
+  const [isEnabled, setIsEnabled] = useState(petition.isCompletingMessageEnabled);
+  const [subject, setSubject] = useState(
+    petition.completingMessageSubject ?? messagesSubject[petition.locale],
+  );
+  const [body, setBody] = useState(
+    petition.completingMessageBody ??
+      textWithPlaceholderToSlateNodes(messagesBody[petition.locale], placeholders),
+  );
 
-      const handleSubjectChange = (completingMessageSubject: string) => {
-        if (completingMessageSubject === subject) return;
-        setSubject(completingMessageSubject);
-        onUpdatePetition({
-          completingMessageSubject,
-          isCompletingMessageEnabled: !!completingMessageSubject || !isEmptyRTEValue(body),
-        });
-      };
+  const handleSubjectChange = (completingMessageSubject: string) => {
+    if (completingMessageSubject === subject) return;
+    setSubject(completingMessageSubject);
+    onUpdatePetition({
+      completingMessageSubject,
+      isCompletingMessageEnabled: !!completingMessageSubject || !isEmptyRTEValue(body),
+    });
+  };
 
-      const handleBodyChange = (completingMessageBody: RichTextEditorValue) => {
-        setBody(completingMessageBody);
-        onUpdatePetition({
-          completingMessageBody: isEmptyRTEValue(completingMessageBody)
-            ? null
-            : completingMessageBody,
-          isCompletingMessageEnabled: !!subject || !isEmptyRTEValue(completingMessageBody),
-        });
-      };
+  const handleBodyChange = (completingMessageBody: RichTextEditorValue) => {
+    setBody(completingMessageBody);
+    onUpdatePetition({
+      completingMessageBody: isEmptyRTEValue(completingMessageBody) ? null : completingMessageBody,
+      isCompletingMessageEnabled: !!subject || !isEmptyRTEValue(completingMessageBody),
+    });
+  };
 
-      const handleSwitchChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setIsEnabled(event.target.checked);
+  const handleSwitchChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setIsEnabled(event.target.checked);
 
-        onUpdatePetition({
-          completingMessageSubject: subject,
-          completingMessageBody: isEmptyRTEValue(body) ? null : body,
-          isCompletingMessageEnabled: event.target.checked,
-        });
-      };
+    onUpdatePetition({
+      completingMessageSubject: subject,
+      completingMessageBody: isEmptyRTEValue(body) ? null : body,
+      isCompletingMessageEnabled: event.target.checked,
+    });
+  };
 
-      return (
-        <Card {...props}>
-          <CardHeader
-            leftIcon={<AppWindowIcon marginEnd={2} role="presentation" />}
-            rightAction={
-              <Switch isChecked={isEnabled} onChange={handleSwitchChange} isDisabled={isDisabled} />
-            }
-          >
-            <HStack>
-              <FormattedMessage
-                id="component.petition-template-completing-message.card-header"
-                defaultMessage="Thank you message"
-              />
-              <HelpPopover>
-                <FormattedMessage
-                  id="component.petition-template-completing-message.popover"
-                  defaultMessage="Your message will be displayed in a pop-up upon completion."
-                />
-                <Image
-                  marginTop={2}
-                  src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/templates/thankyou_message_${intl.locale}.gif`}
-                />
-              </HelpPopover>
-            </HStack>
-          </CardHeader>
-          <Box padding={4}>
-            <Text marginBottom={2}>
-              <FormattedMessage
-                id="component.petition-template-completing-message.card-explainer"
-                defaultMessage="This message will be shown when the recipient <b>completes</b> the parallel. Use it to thank them or to include further instructions."
-              />
-            </Text>
-            <PaddedCollapse open={isEnabled}>
-              {petition.signatureConfig?.isEnabled ? (
-                <CloseableAlert status="info" rounded="md" marginBottom={2}>
-                  <AlertIcon />
-                  <AlertDescription>
-                    <FormattedMessage
-                      id="component.petition-template-completing-message.card-signature-alert"
-                      defaultMessage="There is a signature added in this template. We recommend that you take this into account in your message, as it will appear before the recipient receives the signature email."
-                    />
-                  </AlertDescription>
-                </CloseableAlert>
-              ) : null}
-              <FormControl isDisabled={isDisabled}>
-                <FormLabel paddingBottom={0}>
-                  <FormattedMessage
-                    id="component.petition-template-completing-message.subject-label"
-                    defaultMessage="Title of the window"
-                  />
-                </FormLabel>
-                <Input
-                  id="input-message-email-editor-subject"
-                  type="text"
-                  value={subject}
-                  maxLength={255}
-                  onChange={(event) => handleSubjectChange(event.target.value)}
-                  onBlur={() => handleSubjectChange(subject.trim())}
-                  placeholder={intl.formatMessage({
-                    id: "component.petition-template-completing-message.subject-placeholder",
-                    defaultMessage: "Enter a title or subject for your message",
-                  })}
-                />
-              </FormControl>
-              <FormControl
-                marginTop={4}
-                id={`completing-message-${petition.id}`}
-                isDisabled={isDisabled}
-              >
-                <RichTextEditor
-                  value={body}
-                  onChange={handleBodyChange}
-                  placeholder={intl.formatMessage({
-                    id: "component.petition-template-completing-message.body-placeholder",
-                    defaultMessage:
-                      "Write the message that your recipients will see when they finalize",
-                  })}
-                  placeholderOptions={placeholders}
-                />
-              </FormControl>
-            </PaddedCollapse>
-          </Box>
-        </Card>
-      );
-    },
-  ),
-  {
-    fragments: {
-      PetitionTemplate: gql`
-        fragment PetitionTemplateCompletingMessageCard_PetitionTemplate on PetitionTemplate {
-          id
-          isCompletingMessageEnabled
-          completingMessageSubject
-          completingMessageBody
-          locale
-          signatureConfig {
-            isEnabled
-          }
-          ...usePetitionMessagePlaceholderOptions_PetitionBase
+  return (
+    <Card {...props}>
+      <CardHeader
+        leftIcon={<AppWindowIcon marginEnd={2} role="presentation" />}
+        rightAction={
+          <Switch isChecked={isEnabled} onChange={handleSwitchChange} isDisabled={isDisabled} />
         }
-        ${usePetitionMessagePlaceholderOptions.fragments.PetitionBase}
-      `,
-    },
-  },
-);
+      >
+        <HStack>
+          <FormattedMessage
+            id="component.petition-template-completing-message.card-header"
+            defaultMessage="Thank you message"
+          />
+          <HelpPopover>
+            <FormattedMessage
+              id="component.petition-template-completing-message.popover"
+              defaultMessage="Your message will be displayed in a pop-up upon completion."
+            />
+            <Image
+              marginTop={2}
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/templates/thankyou_message_${intl.locale}.gif`}
+            />
+          </HelpPopover>
+        </HStack>
+      </CardHeader>
+      <Box padding={4}>
+        <Text marginBottom={2}>
+          <FormattedMessage
+            id="component.petition-template-completing-message.card-explainer"
+            defaultMessage="This message will be shown when the recipient <b>completes</b> the parallel. Use it to thank them or to include further instructions."
+          />
+        </Text>
+        <PaddedCollapse open={isEnabled}>
+          {petition.signatureConfig?.isEnabled ? (
+            <CloseableAlert status="info" rounded="md" marginBottom={2}>
+              <AlertIcon />
+              <AlertDescription>
+                <FormattedMessage
+                  id="component.petition-template-completing-message.card-signature-alert"
+                  defaultMessage="There is a signature added in this template. We recommend that you take this into account in your message, as it will appear before the recipient receives the signature email."
+                />
+              </AlertDescription>
+            </CloseableAlert>
+          ) : null}
+          <FormControl isDisabled={isDisabled}>
+            <FormLabel paddingBottom={0}>
+              <FormattedMessage
+                id="component.petition-template-completing-message.subject-label"
+                defaultMessage="Title of the window"
+              />
+            </FormLabel>
+            <Input
+              id="input-message-email-editor-subject"
+              type="text"
+              value={subject}
+              maxLength={255}
+              onChange={(event) => handleSubjectChange(event.target.value)}
+              onBlur={() => handleSubjectChange(subject.trim())}
+              placeholder={intl.formatMessage({
+                id: "component.petition-template-completing-message.subject-placeholder",
+                defaultMessage: "Enter a title or subject for your message",
+              })}
+            />
+          </FormControl>
+          <FormControl
+            marginTop={4}
+            id={`completing-message-${petition.id}`}
+            isDisabled={isDisabled}
+          >
+            <RichTextEditor
+              value={body}
+              onChange={handleBodyChange}
+              placeholder={intl.formatMessage({
+                id: "component.petition-template-completing-message.body-placeholder",
+                defaultMessage:
+                  "Write the message that your recipients will see when they finalize",
+              })}
+              placeholderOptions={placeholders}
+            />
+          </FormControl>
+        </PaddedCollapse>
+      </Box>
+    </Card>
+  );
+});
+
+const _fragments = {
+  PetitionTemplate: gql`
+    fragment PetitionTemplateCompletingMessageCard_PetitionTemplate on PetitionTemplate {
+      id
+      isCompletingMessageEnabled
+      completingMessageSubject
+      completingMessageBody
+      locale
+      signatureConfig {
+        isEnabled
+      }
+      ...usePetitionMessagePlaceholderOptions_PetitionBase
+    }
+  `,
+};

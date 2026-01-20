@@ -470,7 +470,7 @@ export function useCreateProfileRelationshipsDialog() {
   return useDialog(CreateProfileRelationshipsDialog);
 }
 
-useCreateProfileRelationshipsDialog.fragments = {
+const _fragments = {
   Profile: gql`
     fragment useCreateProfileRelationshipsDialog_Profile on Profile {
       id
@@ -489,14 +489,11 @@ useCreateProfileRelationshipsDialog.fragments = {
         }
       }
     }
-    ${ProfileSelect.fragments.Profile}
-    ${ProfileReference.fragments.Profile}
   `,
   ProfileRelationshipTypeWithDirection: gql`
     fragment useCreateProfileRelationshipsDialog_ProfileRelationshipTypeWithDirection on ProfileRelationshipTypeWithDirection {
       ...ProfileRelationshipTypeWithDirectionSelect_ProfileRelationshipTypeWithDirection
     }
-    ${ProfileRelationshipTypeWithDirectionSelect.fragments.ProfileRelationshipTypeWithDirection}
   `,
 };
 
@@ -509,6 +506,5 @@ const _queries = [
         ...useCreateProfileRelationshipsDialog_ProfileRelationshipTypeWithDirection
       }
     }
-    ${useCreateProfileRelationshipsDialog.fragments.ProfileRelationshipTypeWithDirection}
   `,
 ];

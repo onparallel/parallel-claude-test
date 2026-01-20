@@ -68,21 +68,17 @@ export function getReplyContents({
   }
 }
 
-getReplyContents.fragments = {
-  get PetitionFieldReply() {
-    return gql`
-      fragment getReplyContents_PetitionFieldReply on PetitionFieldReply {
-        content
-        isAnonymized
-      }
-    `;
-  },
-  get PetitionField() {
-    return gql`
-      fragment getReplyContents_PetitionField on PetitionField {
-        type
-        options
-      }
-    `;
-  },
+const _fragments = {
+  PetitionFieldReply: gql`
+    fragment getReplyContents_PetitionFieldReply on PetitionFieldReply {
+      content
+      isAnonymized
+    }
+  `,
+  PetitionField: gql`
+    fragment getReplyContents_PetitionField on PetitionField {
+      type
+      options
+    }
+  `,
 };

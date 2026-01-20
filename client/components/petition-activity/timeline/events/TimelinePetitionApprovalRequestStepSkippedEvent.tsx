@@ -61,7 +61,7 @@ export function TimelinePetitionApprovalRequestStepSkippedEvent({
   );
 }
 
-TimelinePetitionApprovalRequestStepSkippedEvent.fragments = {
+const _fragments = {
   PetitionApprovalRequestStepSkippedEvent: gql`
     fragment TimelinePetitionApprovalRequestStepSkippedEvent_PetitionApprovalRequestStepSkippedEvent on PetitionApprovalRequestStepSkippedEvent {
       approvalRequestStep {
@@ -76,6 +76,5 @@ TimelinePetitionApprovalRequestStepSkippedEvent.fragments = {
       }
       createdAt
     }
-    ${UserReference.fragments.User}
   `,
 };

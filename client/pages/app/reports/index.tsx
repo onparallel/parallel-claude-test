@@ -224,7 +224,6 @@ Reports.queries = [
     query Reports_user {
       ...AppLayout_Query
     }
-    ${AppLayout.fragments.Query}
   `,
 ];
 

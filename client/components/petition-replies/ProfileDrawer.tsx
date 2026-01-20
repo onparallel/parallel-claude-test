@@ -29,8 +29,8 @@ interface ProfileDrawerProps {
   canAddProfiles?: boolean;
 }
 
-export const ProfileDrawer = Object.assign(
-  forwardRef<ProfileSelectInstance<false>, ProfileDrawerProps>(function ProfileDrawer(
+export const ProfileDrawer = forwardRef<ProfileSelectInstance<false>, ProfileDrawerProps>(
+  function ProfileDrawer(
     {
       profileId,
       petitionId,
@@ -107,29 +107,26 @@ export const ProfileDrawer = Object.assign(
         ) : null}
       </Flex>
     );
-  }),
-  {
-    fragments: {
-      Profile: gql`
-        fragment ProfileDrawer_Profile on Profile {
-          id
-          profileType {
-            id
-            name
-          }
-          ...ProfileSelect_Profile
-        }
-        ${ProfileSelect.fragments.Profile}
-      `,
-      PetitionBase: gql`
-        fragment ProfileDrawer_PetitionBase on PetitionBase {
-          ...ProfileForm_PetitionBase
-        }
-        ${ProfileForm.fragments.PetitionBase}
-      `,
-    },
   },
 );
+
+const _fragments = {
+  Profile: gql`
+    fragment ProfileDrawer_Profile on Profile {
+      id
+      profileType {
+        id
+        name
+      }
+      ...ProfileSelect_Profile
+    }
+  `,
+  PetitionBase: gql`
+    fragment ProfileDrawer_PetitionBase on PetitionBase {
+      ...ProfileForm_PetitionBase
+    }
+  `,
+};
 
 function MenuList(props: MenuListProps<ProfileSelectSelection>) {
   const canAddProfiles = (props.selectProps as any).canAddProfiles as boolean;
@@ -168,6 +165,5 @@ const _queries = [
         ...ProfileForm_Profile
       }
     }
-    ${ProfileForm.fragments.Profile}
   `,
 ];

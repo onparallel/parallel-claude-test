@@ -135,12 +135,11 @@ export function SidebarLayout({
   );
 }
 
-SidebarLayout.fragments = {
+const _fragments = {
   Query: gql`
     fragment SidebarLayout_Query on Query {
       ...AppLayout_Query
     }
-    ${AppLayout.fragments.Query}
   `,
 };
 

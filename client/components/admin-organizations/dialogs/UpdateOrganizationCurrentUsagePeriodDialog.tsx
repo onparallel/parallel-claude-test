@@ -119,7 +119,7 @@ export function useUpdateOrganizationCurrentUsagePeriodDialog() {
   return useDialog(UpdateOrganizationCurrentUsagePeriodDialog);
 }
 
-UpdateOrganizationCurrentUsagePeriodDialog.fragments = {
+const _fragments = {
   OrganizationUsageLimit: gql`
     fragment UpdateOrganizationCurrentUsagePeriodDialog_OrganizationUsageLimit on OrganizationUsageLimit {
       limit

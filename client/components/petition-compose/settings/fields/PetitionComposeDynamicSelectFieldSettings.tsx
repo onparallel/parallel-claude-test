@@ -332,7 +332,7 @@ function DynamicSelectOptionsDropzone({
   );
 }
 
-PetitionComposeDynamicSelectFieldSettings.fragments = {
+const _fragments = {
   PetitionField: gql`
     fragment PetitionComposeDynamicSelectFieldSettings_PetitionField on PetitionField {
       id

@@ -217,7 +217,7 @@ export function RecipientViewNewDevice({ organization, email }: RecipientViewNew
   );
 }
 
-RecipientViewNewDevice.fragments = {
+const _fragments = {
   PublicOrganization: gql`
     fragment RecipientViewNewDevice_PublicOrganization on PublicOrganization {
       name

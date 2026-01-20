@@ -9,7 +9,6 @@ import {
   PetitionFieldType,
 } from "@parallel/graphql/__types";
 import { PetitionFieldIndex, useAllFieldsWithIndices } from "@parallel/utils/fieldIndices";
-import { getReplyContents } from "@parallel/utils/getReplyContents";
 import { isReplyContentCompatible } from "@parallel/utils/petitionFieldsReplies";
 import useMergedRef from "@react-hook/merged-ref";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -50,8 +49,8 @@ export const excludedFieldsOrigin = [
   "PROFILE_SEARCH",
 ] as PetitionFieldType[];
 
-export const MapFieldsTable = Object.assign(
-  chakraForwardRef<"table", MapFieldsTableProps>(function MapFieldsTable(
+export const MapFieldsTable = chakraForwardRef<"table", MapFieldsTableProps>(
+  function MapFieldsTable(
     {
       petition,
       sourcePetition,
@@ -176,112 +175,97 @@ export const MapFieldsTable = Object.assign(
         </Table>
       </ScrollTableContainer>
     );
-  }),
-  {
-    fragments: {
-      get PetitionFieldReply() {
-        return gql`
-          fragment MapFieldsTable_PetitionFieldReply on PetitionFieldReply {
-            id
-            status
-            content
-            isAnonymized
-            parent {
-              id
-            }
-            field {
-              id
-              type
-            }
-            children {
-              replies {
-                id
-              }
-            }
-            ...getReplyContents_PetitionFieldReply
-          }
-          ${getReplyContents.fragments.PetitionFieldReply}
-        `;
-      },
-      get PetitionField() {
-        return gql`
-          fragment MapFieldsTable_PetitionField on PetitionField {
-            ...MapFieldsTable_PetitionFieldData
-            children {
-              ...MapFieldsTable_PetitionFieldData
-            }
-          }
-          fragment MapFieldsTable_PetitionFieldData on PetitionField {
-            id
-            title
-            type
-            visibility
-            options
-            multiple
-            isInternal
-            isReadOnly
-            alias
-            fromPetitionFieldId
-            profileTypeField {
-              id
-            }
-            replies {
-              ...MapFieldsTable_PetitionFieldReply
-            }
-            parent {
-              id
-            }
-            children {
-              id
-            }
-            ...isReplyContentCompatible_PetitionField
-            ...getReplyContents_PetitionField
-          }
-          ${this.PetitionFieldReply}
-          ${isReplyContentCompatible.fragments.PetitionField}
-          ${getReplyContents.fragments.PetitionField}
-        `;
-      },
-      get PetitionBase() {
-        return gql`
-          fragment MapFieldsTable_PetitionBase on PetitionBase {
-            id
-            fields {
-              id
-              ...MapFieldsTable_PetitionField
-            }
-            ...PetitionFieldSelect_PetitionBase
-          }
-          ${this.PetitionField}
-          ${PetitionFieldSelect.fragments.PetitionBase}
-        `;
-      },
-      get ProfileFieldProperty() {
-        return gql`
-          fragment MapFieldsTable_ProfileFieldProperty on ProfileFieldProperty {
-            field {
-              id
-              name
-              type
-            }
-            files {
-              id
-              file {
-                filename
-                contentType
-                size
-              }
-            }
-            value {
-              id
-              content
-            }
-          }
-        `;
-      },
-    },
   },
 );
+
+const _fragments = {
+  PetitionFieldReply: gql`
+    fragment MapFieldsTable_PetitionFieldReply on PetitionFieldReply {
+      id
+      status
+      content
+      isAnonymized
+      parent {
+        id
+      }
+      field {
+        id
+        type
+      }
+      children {
+        replies {
+          id
+        }
+      }
+      ...getReplyContents_PetitionFieldReply
+    }
+  `,
+  PetitionField: gql`
+    fragment MapFieldsTable_PetitionField on PetitionField {
+      ...MapFieldsTable_PetitionFieldData
+      children {
+        ...MapFieldsTable_PetitionFieldData
+      }
+    }
+    fragment MapFieldsTable_PetitionFieldData on PetitionField {
+      id
+      title
+      type
+      visibility
+      options
+      multiple
+      isInternal
+      isReadOnly
+      alias
+      fromPetitionFieldId
+      profileTypeField {
+        id
+      }
+      replies {
+        ...MapFieldsTable_PetitionFieldReply
+      }
+      parent {
+        id
+      }
+      children {
+        id
+      }
+      ...isReplyContentCompatible_PetitionField
+      ...getReplyContents_PetitionField
+    }
+  `,
+  PetitionBase: gql`
+    fragment MapFieldsTable_PetitionBase on PetitionBase {
+      id
+      fields {
+        id
+        ...MapFieldsTable_PetitionField
+      }
+      ...PetitionFieldSelect_PetitionBase
+    }
+  `,
+  ProfileFieldProperty: gql`
+    fragment MapFieldsTable_ProfileFieldProperty on ProfileFieldProperty {
+      field {
+        id
+        name
+        type
+      }
+      files {
+        id
+        file {
+          filename
+          contentType
+          size
+        }
+      }
+      value {
+        id
+        content
+      }
+    }
+  `,
+};
 
 function TableRow({
   field,

@@ -9,11 +9,8 @@ interface PetitionFieldReferenceProps {
   field: Maybe<PetitionFieldReference_PetitionFieldFragment> | undefined;
 }
 
-export const PetitionFieldReference = Object.assign(
-  chakraForwardRef<"span", PetitionFieldReferenceProps>(function PetitionFieldReference(
-    { field, ...props },
-    ref,
-  ) {
+export const PetitionFieldReference = chakraForwardRef<"span", PetitionFieldReferenceProps>(
+  function PetitionFieldReference({ field, ...props }, ref) {
     return field ? (
       field.title ? (
         <Text ref={ref as any} as="strong" {...props}>
@@ -29,15 +26,14 @@ export const PetitionFieldReference = Object.assign(
         <FormattedMessage id="generic.deleted-field" defaultMessage="Deleted field" />
       </Text>
     );
-  }),
-  {
-    fragments: {
-      PetitionField: gql`
-        fragment PetitionFieldReference_PetitionField on PetitionField {
-          id
-          title
-        }
-      `,
-    },
   },
 );
+
+const _fragments = {
+  PetitionField: gql`
+    fragment PetitionFieldReference_PetitionField on PetitionField {
+      id
+      title
+    }
+  `,
+};

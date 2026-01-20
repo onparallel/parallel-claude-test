@@ -43,7 +43,7 @@ export function TimelineGroupPermissionEditedEvent({
   );
 }
 
-TimelineGroupPermissionEditedEvent.fragments = {
+const _fragments = {
   GroupPermissionEditedEvent: gql`
     fragment TimelineGroupPermissionEditedEvent_GroupPermissionEditedEvent on GroupPermissionEditedEvent {
       user {
@@ -55,7 +55,5 @@ TimelineGroupPermissionEditedEvent.fragments = {
       permissionType
       createdAt
     }
-    ${UserReference.fragments.User}
-    ${UserGroupReference.fragments.UserGroup}
   `,
 };

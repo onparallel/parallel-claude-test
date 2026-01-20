@@ -286,7 +286,7 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
   );
 }
 
-Contacts.fragments = {
+const _fragments = {
   Contacts: gql`
     fragment Contacts_ContactsList on ContactPagination {
       items {
@@ -300,7 +300,6 @@ Contacts.fragments = {
       }
       totalCount
     }
-    ${useDeleteContacts.fragments.Contact}
   `,
 };
 
@@ -316,13 +315,11 @@ Contacts.queries = [
         ...Contacts_ContactsList
       }
     }
-    ${Contacts.fragments.Contacts}
   `,
   gql`
     query Contacts_user {
       ...AppLayout_Query
     }
-    ${AppLayout.fragments.Query}
   `,
 ];
 

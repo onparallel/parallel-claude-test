@@ -73,7 +73,7 @@ export class UploadFileError extends Error {
   }
 }
 
-uploadFile.fragments = {
+const _fragments = {
   AWSPresignedPostData: gql`
     fragment uploadFile_AWSPresignedPostData on AWSPresignedPostData {
       url

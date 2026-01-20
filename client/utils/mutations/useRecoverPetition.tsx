@@ -43,40 +43,31 @@ export function useRecoverPetition() {
   };
 }
 
-useRecoverPetition.fragments = {
-  get PetitionBaseOrFolder() {
-    return gql`
-      fragment useRecoverPetition_PetitionBaseOrFolder on PetitionBaseOrFolder {
-        ... on PetitionBase {
-          ...useRecoverPetition_PetitionBase
-        }
-        ... on PetitionFolder {
-          ...useRecoverPetition_PetitionFolder
-        }
+const _fragments = {
+  PetitionBaseOrFolder: gql`
+    fragment useRecoverPetition_PetitionBaseOrFolder on PetitionBaseOrFolder {
+      ... on PetitionBase {
+        ...useRecoverPetition_PetitionBase
       }
-      ${this.PetitionBase}
-      ${this.PetitionFolder}
-    `;
-  },
-  get PetitionBase() {
-    return gql`
-      fragment useRecoverPetition_PetitionBase on PetitionBase {
-        id
-        path
-        ...PetitionName_PetitionBase
+      ... on PetitionFolder {
+        ...useRecoverPetition_PetitionFolder
       }
-      ${PetitionNameWithPath.fragments.PetitionBase}
-    `;
-  },
-  get PetitionFolder() {
-    return gql`
-      fragment useRecoverPetition_PetitionFolder on PetitionFolder {
-        folderId: id
-        path
-        petitionCount
-      }
-    `;
-  },
+    }
+  `,
+  PetitionBase: gql`
+    fragment useRecoverPetition_PetitionBase on PetitionBase {
+      id
+      path
+      ...PetitionName_PetitionBase
+    }
+  `,
+  PetitionFolder: gql`
+    fragment useRecoverPetition_PetitionFolder on PetitionFolder {
+      folderId: id
+      path
+      petitionCount
+    }
+  `,
 };
 
 useRecoverPetition.mutations = [

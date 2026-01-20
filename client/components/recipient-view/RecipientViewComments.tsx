@@ -391,58 +391,49 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
   );
 }
 
-RecipientViewComments.fragments = {
-  get PublicPetitionFieldComment() {
-    return gql`
-      fragment RecipientViewComments_PublicPetitionFieldComment on PublicPetitionFieldComment {
+const _fragments = {
+  PublicPetitionFieldComment: gql`
+    fragment RecipientViewComments_PublicPetitionFieldComment on PublicPetitionFieldComment {
+      id
+      ...PublicPetitionFieldComment_PublicPetitionFieldComment
+    }
+  `,
+  PublicPetitionAccess: gql`
+    fragment RecipientViewComments_PublicPetitionAccess on PublicPetitionAccess {
+      granter {
         id
-        ...PublicPetitionFieldComment_PublicPetitionFieldComment
+        fullName
       }
-      ${PublicPetitionFieldComment.fragments.PublicPetitionFieldComment}
-    `;
-  },
-  get PublicPetitionAccess() {
-    return gql`
-      fragment RecipientViewComments_PublicPetitionAccess on PublicPetitionAccess {
-        granter {
-          id
-          fullName
-        }
-        contact {
-          id
-        }
-      }
-    `;
-  },
-  get PublicPetitionField() {
-    return gql`
-      fragment RecipientViewComments_PublicPetitionField on PublicPetitionField {
+      contact {
         id
-        type
-        title
-        unreadCommentCount
-        hasCommentsEnabled
-        lastComment {
-          ...RecipientViewComments_PublicPetitionFieldComment
-          ...PublicPetitionFieldCommentExcerpt_PetitionFieldComment
-          createdAt
-          author {
-            ... on PublicUser {
-              id
-              fullName
-            }
-            ... on PublicContact {
-              id
-              fullName
-              isMe
-            }
+      }
+    }
+  `,
+  PublicPetitionField: gql`
+    fragment RecipientViewComments_PublicPetitionField on PublicPetitionField {
+      id
+      type
+      title
+      unreadCommentCount
+      hasCommentsEnabled
+      lastComment {
+        ...RecipientViewComments_PublicPetitionFieldComment
+        ...PublicPetitionFieldCommentExcerpt_PetitionFieldComment
+        createdAt
+        author {
+          ... on PublicUser {
+            id
+            fullName
+          }
+          ... on PublicContact {
+            id
+            fullName
+            isMe
           }
         }
       }
-      ${PublicPetitionFieldCommentExcerpt.fragments.PetitionFieldComment}
-      ${this.PublicPetitionFieldComment}
-    `;
-  },
+    }
+  `,
 };
 
 const _queries = [
@@ -469,8 +460,6 @@ const _queries = [
         }
       }
     }
-    ${RecipientViewComments.fragments.PublicPetitionField}
-    ${RecipientViewComments.fragments.PublicPetitionFieldComment}
   `,
   gql`
     query RecipientViewComments_publicPetitionField($keycode: ID!, $petitionFieldId: GID!) {
@@ -482,8 +471,6 @@ const _queries = [
         }
       }
     }
-    ${RecipientViewComments.fragments.PublicPetitionField}
-    ${RecipientViewComments.fragments.PublicPetitionFieldComment}
   `,
 ];
 
@@ -542,7 +529,6 @@ const _mutations = [
         }
       }
     }
-    ${PublicPetitionFieldComment.fragments.PublicPetitionFieldComment}
   `,
   gql`
     mutation RecipientViewComments_publicUpdatePetitionComment(
@@ -558,7 +544,6 @@ const _mutations = [
         ...PublicPetitionFieldComment_PublicPetitionFieldComment
       }
     }
-    ${PublicPetitionFieldComment.fragments.PublicPetitionFieldComment}
   `,
   gql`
     mutation RecipientViewComments_publicDeletePetitionComment(

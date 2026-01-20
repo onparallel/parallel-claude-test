@@ -29,7 +29,7 @@ export function TimelinePetitionAnonymizedEvent({ event }: TimelinePetitionAnony
   );
 }
 
-TimelinePetitionAnonymizedEvent.fragments = {
+const _fragments = {
   PetitionAnonymizedEvent: gql`
     fragment TimelinePetitionAnonymizedEvent_PetitionAnonymizedEvent on PetitionAnonymizedEvent {
       createdAt

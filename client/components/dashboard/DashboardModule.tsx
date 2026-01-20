@@ -23,8 +23,8 @@ export interface DashboardModuleProps extends BoxProps {
   listeners?: SyntheticListenerMap;
 }
 
-export const DashboardModule = Object.assign(
-  forwardRef<HTMLDivElement, DashboardModuleProps>(({ module, ...rest }, ref) => {
+export const DashboardModule = forwardRef<HTMLDivElement, DashboardModuleProps>(
+  ({ module, ...rest }, ref) => {
     return (
       <>
         {module.__typename === "DashboardPetitionsNumberModule" && (
@@ -50,42 +50,34 @@ export const DashboardModule = Object.assign(
         )}
       </>
     );
-  }),
-  {
-    fragments: {
-      DashboardModule: gql`
-        fragment DashboardModule_DashboardModule on DashboardModule {
-          id
-          ... on DashboardPetitionsNumberModule {
-            ...DashboardPetitionsNumberModule_DashboardPetitionsNumberModule
-          }
-          ... on DashboardProfilesNumberModule {
-            ...DashboardProfilesNumberModule_DashboardProfilesNumberModule
-          }
-          ... on DashboardPetitionsRatioModule {
-            ...DashboardPetitionsRatioModule_DashboardPetitionsRatioModule
-          }
-          ... on DashboardProfilesRatioModule {
-            ...DashboardProfilesRatioModule_DashboardProfilesRatioModule
-          }
-          ... on DashboardPetitionsPieChartModule {
-            ...DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModule
-          }
-          ... on DashboardProfilesPieChartModule {
-            ...DashboardProfilesPieChartModule_DashboardProfilesPieChartModule
-          }
-          ... on DashboardCreatePetitionButtonModule {
-            ...DashboardCreatePetitionButtonModule_DashboardCreatePetitionButtonModule
-          }
-        }
-        ${DashboardPetitionsNumberModule.fragments.DashboardPetitionsNumberModule}
-        ${DashboardProfilesNumberModule.fragments.DashboardProfilesNumberModule}
-        ${DashboardPetitionsRatioModule.fragments.DashboardPetitionsRatioModule}
-        ${DashboardProfilesRatioModule.fragments.DashboardProfilesRatioModule}
-        ${DashboardPetitionsPieChartModule.fragments.DashboardPetitionsPieChartModule}
-        ${DashboardProfilesPieChartModule.fragments.DashboardProfilesPieChartModule}
-        ${DashboardCreatePetitionButtonModule.fragments.DashboardCreatePetitionButtonModule}
-      `,
-    },
   },
 );
+
+const _fragments = {
+  DashboardModule: gql`
+    fragment DashboardModule_DashboardModule on DashboardModule {
+      id
+      ... on DashboardPetitionsNumberModule {
+        ...DashboardPetitionsNumberModule_DashboardPetitionsNumberModule
+      }
+      ... on DashboardProfilesNumberModule {
+        ...DashboardProfilesNumberModule_DashboardProfilesNumberModule
+      }
+      ... on DashboardPetitionsRatioModule {
+        ...DashboardPetitionsRatioModule_DashboardPetitionsRatioModule
+      }
+      ... on DashboardProfilesRatioModule {
+        ...DashboardProfilesRatioModule_DashboardProfilesRatioModule
+      }
+      ... on DashboardPetitionsPieChartModule {
+        ...DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModule
+      }
+      ... on DashboardProfilesPieChartModule {
+        ...DashboardProfilesPieChartModule_DashboardProfilesPieChartModule
+      }
+      ... on DashboardCreatePetitionButtonModule {
+        ...DashboardCreatePetitionButtonModule_DashboardCreatePetitionButtonModule
+      }
+    }
+  `,
+};

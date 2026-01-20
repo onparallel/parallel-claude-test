@@ -38,7 +38,6 @@ import {
   ConfigureApprovalStepsDialog_PetitionBaseFragment,
   ConfigureApprovalStepsDialog_petitionDocument,
 } from "@parallel/graphql/__types";
-import { Fragments } from "@parallel/utils/apollo/fragments";
 import { PetitionFieldLogicCondition } from "@parallel/utils/fieldLogic/types";
 import { useEffect, useRef, useState } from "react";
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
@@ -241,7 +240,7 @@ export function useConfigureApprovalStepsDialog() {
   );
 }
 
-useConfigureApprovalStepsDialog.fragments = {
+const _fragments = {
   PetitionBase: gql`
     fragment ConfigureApprovalStepsDialog_PetitionBase on PetitionBase {
       id
@@ -255,10 +254,6 @@ useConfigureApprovalStepsDialog.fragments = {
       }
       ...ApprovalFlowConfigApproverSelect_PetitionBase
     }
-    ${Fragments.FullApprovalFlowConfig}
-    ${PetitionVisibilityEditor.fragments.PetitionBase}
-    ${PetitionVisibilityEditor.fragments.PetitionField}
-    ${ApprovalFlowConfigApproverSelect.fragments.PetitionBase}
   `,
 };
 
@@ -270,7 +265,6 @@ const _queries = [
         ...ConfigureApprovalStepsDialog_PetitionBase
       }
     }
-    ${useConfigureApprovalStepsDialog.fragments.PetitionBase}
   `,
 ];
 

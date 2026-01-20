@@ -79,9 +79,6 @@ OrganizationBranding.queries = [
         ...BrandingDocumentTheme_User
       }
     }
-    ${OrganizationSettingsLayout.fragments.Query}
-    ${BrandingGeneral.fragments.User}
-    ${BrandingDocumentTheme.fragments.User}
   `,
 ];
 

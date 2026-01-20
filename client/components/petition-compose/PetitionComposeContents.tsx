@@ -3,6 +3,7 @@ import { Box, Center, LinkBox, LinkOverlay, Stack, Text } from "@chakra-ui/react
 import { ProfilesIcon } from "@parallel/chakra/icons";
 import {
   PetitionComposeContents_PetitionFieldFragment,
+  PetitionComposeContents_PetitionFieldFragmentDoc,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
@@ -15,10 +16,7 @@ import { Divider } from "../common/Divider";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { CopyLiquidReferenceButton } from "../petition-common/CopyLiquidReferenceButton";
 import { MoreLiquidReferencesButton } from "../petition-common/MoreLiquidReferencesButton";
-import {
-  AddAliasToFieldDialog,
-  useAddAliasToFieldDialog,
-} from "../petition-common/dialogs/AddAliasToFieldDialog";
+import { useAddAliasToFieldDialog } from "../petition-common/dialogs/AddAliasToFieldDialog";
 
 export interface PetitionComposeContentsProps<
   T extends PetitionComposeContents_PetitionFieldFragment,
@@ -65,7 +63,7 @@ export function PetitionComposeContents<T extends PetitionComposeContents_Petiti
   );
 }
 
-PetitionComposeContents.fragments = {
+const _fragments = {
   PetitionField: gql`
     fragment PetitionComposeContents_PetitionField on PetitionField {
       id
@@ -80,9 +78,6 @@ PetitionComposeContents.fragments = {
       ...CopyLiquidReferenceButton_PetitionField
       ...AddAliasToFieldDialog_PetitionField
     }
-    ${MoreLiquidReferencesButton.fragments.PetitionField}
-    ${CopyLiquidReferenceButton.fragments.PetitionField}
-    ${AddAliasToFieldDialog.fragments.PetitionField}
   `,
 };
 
@@ -206,7 +201,7 @@ function _PetitionComposeContentsItem<T extends PetitionComposeContents_Petition
 }
 
 const PetitionComposeContentsItem = memoWithFragments(_PetitionComposeContentsItem, {
-  field: PetitionComposeContents.fragments.PetitionField,
+  field: PetitionComposeContents_PetitionFieldFragmentDoc,
 });
 
 function PetitionComposeContentsDivider({

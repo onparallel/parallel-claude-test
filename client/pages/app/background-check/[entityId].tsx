@@ -447,83 +447,61 @@ function BackgroundCheckProfileDetails({
 }
 
 const _fragments = {
-  get BackgroundCheckEntityDetailsPerson() {
-    return gql`
-      fragment BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsPerson on BackgroundCheckEntityDetailsPerson {
-        id
-        ...BackgroundCheckEntityDetailsPersonBasic_BackgroundCheckEntityDetailsPerson
-        ...BackgroundCheckEntityDetailsPersonOverview_BackgroundCheckEntityDetailsPerson
-        properties {
-          relationships {
-            ...BackgroundCheckEntityDetailsRelationships_BackgroundCheckEntityDetailsRelationship
-          }
-          sanctions {
-            ...BackgroundCheckEntityDetailsSanctions_BackgroundCheckEntityDetailsSanction
-          }
+  BackgroundCheckEntityDetailsPerson: gql`
+    fragment BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsPerson on BackgroundCheckEntityDetailsPerson {
+      id
+      ...BackgroundCheckEntityDetailsPersonBasic_BackgroundCheckEntityDetailsPerson
+      ...BackgroundCheckEntityDetailsPersonOverview_BackgroundCheckEntityDetailsPerson
+      properties {
+        relationships {
+          ...BackgroundCheckEntityDetailsRelationships_BackgroundCheckEntityDetailsRelationship
+        }
+        sanctions {
+          ...BackgroundCheckEntityDetailsSanctions_BackgroundCheckEntityDetailsSanction
         }
       }
-      ${BackgroundCheckEntityDetailsPersonBasic.fragments.BackgroundCheckEntityDetailsPersonBasic}
-      ${BackgroundCheckEntityDetailsPersonOverview.fragments
-        .BackgroundCheckEntityDetailsPersonOverview}
-      ${BackgroundCheckEntityDetailsRelationships.fragments
-        .BackgroundCheckEntityDetailsRelationship}
-      ${BackgroundCheckEntityDetailsSanctions.fragments.BackgroundCheckEntityDetailsSanction}
-    `;
-  },
+    }
+  `,
 
-  get BackgroundCheckEntityDetailsCompany() {
-    return gql`
-      fragment BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsCompany on BackgroundCheckEntityDetailsCompany {
-        id
-        ...BackgroundCheckEntityDetailsCompanyBasic_BackgroundCheckEntityDetailsCompany
-        ...BackgroundCheckEntityDetailsCompanyOverview_BackgroundCheckEntityDetailsCompany
-        properties {
-          relationships {
-            ...BackgroundCheckEntityDetailsRelationships_BackgroundCheckEntityDetailsRelationship
-          }
-          sanctions {
-            ...BackgroundCheckEntityDetailsSanctions_BackgroundCheckEntityDetailsSanction
-          }
+  BackgroundCheckEntityDetailsCompany: gql`
+    fragment BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsCompany on BackgroundCheckEntityDetailsCompany {
+      id
+      ...BackgroundCheckEntityDetailsCompanyBasic_BackgroundCheckEntityDetailsCompany
+      ...BackgroundCheckEntityDetailsCompanyOverview_BackgroundCheckEntityDetailsCompany
+      properties {
+        relationships {
+          ...BackgroundCheckEntityDetailsRelationships_BackgroundCheckEntityDetailsRelationship
+        }
+        sanctions {
+          ...BackgroundCheckEntityDetailsSanctions_BackgroundCheckEntityDetailsSanction
         }
       }
-      ${BackgroundCheckEntityDetailsCompanyBasic.fragments.BackgroundCheckEntityDetailsCompanyBasic}
-      ${BackgroundCheckEntityDetailsCompanyOverview.fragments
-        .BackgroundCheckEntityDetailsCompanyOverview}
-      ${BackgroundCheckEntityDetailsRelationships.fragments
-        .BackgroundCheckEntityDetailsRelationship}
-      ${BackgroundCheckEntityDetailsSanctions.fragments.BackgroundCheckEntityDetailsSanction}
-    `;
-  },
+    }
+  `,
 
-  get BackgroundCheckEntityDetails() {
-    return gql`
-      fragment BackgroundCheckProfileDetails_BackgroundCheckEntityDetails on BackgroundCheckEntityDetails {
-        id
-        type
-        name
-        ... on BackgroundCheckEntityDetailsPerson {
-          ...BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsPerson
-        }
-        ... on BackgroundCheckEntityDetailsCompany {
-          ...BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsCompany
-        }
-        datasets {
-          ...BackgroundCheckEntityDetailsDatasets_BackgroundCheckEntityDetailsDataset
-        }
-        createdAt
-        hasStoredEntity
-        isStoredEntity
-        hasPendingReview
-        reviewDiff {
-          ...BackgroundCheckEntityDifferencesAlert_BackgroundCheckEntityDetailsReviewDiff
-        }
+  BackgroundCheckEntityDetails: gql`
+    fragment BackgroundCheckProfileDetails_BackgroundCheckEntityDetails on BackgroundCheckEntityDetails {
+      id
+      type
+      name
+      ... on BackgroundCheckEntityDetailsPerson {
+        ...BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsPerson
       }
-      ${BackgroundCheckEntityDetailsDatasets.fragments.BackgroundCheckEntityDetailsDataset}
-      ${this.BackgroundCheckEntityDetailsPerson}
-      ${this.BackgroundCheckEntityDetailsCompany}
-      ${BackgroundCheckEntityDifferencesAlert.fragments.BackgroundCheckEntityDetailsReviewDiff}
-    `;
-  },
+      ... on BackgroundCheckEntityDetailsCompany {
+        ...BackgroundCheckProfileDetails_BackgroundCheckEntityDetailsCompany
+      }
+      datasets {
+        ...BackgroundCheckEntityDetailsDatasets_BackgroundCheckEntityDetailsDataset
+      }
+      createdAt
+      hasStoredEntity
+      isStoredEntity
+      hasPendingReview
+      reviewDiff {
+        ...BackgroundCheckEntityDifferencesAlert_BackgroundCheckEntityDetailsReviewDiff
+      }
+    }
+  `,
 };
 
 const _queries = [
@@ -537,7 +515,6 @@ const _queries = [
         ...BackgroundCheckProfileDetails_BackgroundCheckEntityDetails
       }
     }
-    ${_fragments.BackgroundCheckEntityDetails}
   `,
 ];
 

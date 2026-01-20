@@ -7,10 +7,7 @@ import {
   PlateCombobox,
 } from "@parallel/components/common/slate/PlateCombobox";
 import { UserDropdownEmpty } from "@parallel/components/common/UserDropdownEmpty";
-import {
-  UserGroupReference,
-  userGroupReferenceText,
-} from "@parallel/components/common/UserGroupReference";
+import { userGroupReferenceText } from "@parallel/components/common/UserGroupReference";
 import { UserSelectOption } from "@parallel/components/common/UserSelectOption";
 import { UserLocale, createMentionPlugin_UserOrUserGroupFragment } from "@parallel/graphql/__types";
 import {
@@ -203,7 +200,7 @@ export const MentionInputElement = (props: any) => {
   );
 };
 
-createMentionPlugin.fragments = {
+const _fragments = {
   UserOrUserGroup: gql`
     fragment createMentionPlugin_UserOrUserGroup on UserOrUserGroup {
       ... on User {
@@ -220,8 +217,5 @@ createMentionPlugin.fragments = {
         ...UserGroupReference_UserGroup
       }
     }
-    ${UserSelectOption.fragments.User}
-    ${UserSelectOption.fragments.UserGroup}
-    ${UserGroupReference.fragments.UserGroup}
   `,
 };

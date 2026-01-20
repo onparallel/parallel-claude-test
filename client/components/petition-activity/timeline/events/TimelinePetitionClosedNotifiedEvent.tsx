@@ -83,7 +83,7 @@ export function TimelinePetitionClosedNotifiedEvent({
   );
 }
 
-TimelinePetitionClosedNotifiedEvent.fragments = {
+const _fragments = {
   PetitionClosedNotifiedEvent: gql`
     fragment TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEvent on PetitionClosedNotifiedEvent {
       user {
@@ -103,7 +103,5 @@ TimelinePetitionClosedNotifiedEvent.fragments = {
       emailBody
       createdAt
     }
-    ${UserReference.fragments.User}
-    ${ContactReference.fragments.Contact}
   `,
 };

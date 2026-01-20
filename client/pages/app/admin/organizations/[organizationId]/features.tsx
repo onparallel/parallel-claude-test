@@ -165,20 +165,17 @@ function AdminOrganizationsFeatures({ organizationId }: AdminOrganizationsFeatur
   );
 }
 
-AdminOrganizationsFeatures.fragments = {
-  get Organization() {
-    return gql`
-      fragment AdminOrganizationsFeatures_Organization on Organization {
-        id
-        features {
-          name
-          value
-        }
-        ...AdminOrganizationsLayout_Organization
+const _fragments = {
+  Organization: gql`
+    fragment AdminOrganizationsFeatures_Organization on Organization {
+      id
+      features {
+        name
+        value
       }
-      ${AdminOrganizationsLayout.fragments.Organization}
-    `;
-  },
+      ...AdminOrganizationsLayout_Organization
+    }
+  `,
 };
 
 const _queries = [
@@ -189,8 +186,6 @@ const _queries = [
         ...AdminOrganizationsFeatures_Organization
       }
     }
-    ${AdminOrganizationsLayout.fragments.Query}
-    ${AdminOrganizationsFeatures.fragments.Organization}
   `,
 ];
 
@@ -204,7 +199,6 @@ const _mutations = [
         ...AdminOrganizationsFeatures_Organization
       }
     }
-    ${AdminOrganizationsFeatures.fragments.Organization}
   `,
 ];
 

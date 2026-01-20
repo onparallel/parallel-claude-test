@@ -376,7 +376,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
   );
 }
 
-BrandingGeneral.fragments = {
+const _fragments = {
   User: gql`
     fragment BrandingGeneral_User on User {
       id
@@ -393,7 +393,6 @@ BrandingGeneral.fragments = {
       }
       ...BrandingGeneralPreview_User
     }
-    ${BrandingGeneralPreview.fragments.User}
   `,
 };
 

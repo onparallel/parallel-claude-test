@@ -23,7 +23,6 @@ import {
   withApolloData,
 } from "@parallel/components/common/withApolloData";
 import { LastSavedProvider } from "@parallel/components/recipient-view/LastSavedProvider";
-import { RecipientViewContents } from "@parallel/components/recipient-view/RecipientViewContents";
 import { RecipientViewFooter } from "@parallel/components/recipient-view/RecipientViewFooter";
 import { RecipientViewHeader } from "@parallel/components/recipient-view/RecipientViewHeader";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
@@ -50,7 +49,6 @@ import {
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useAssertQuery, withApolloQuery } from "@parallel/utils/apollo/useAssertQuery";
-import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { compose } from "@parallel/utils/compose";
 import { focusPetitionField } from "@parallel/utils/focusPetitionField";
 import { getPetitionSignatureStatus } from "@parallel/utils/getPetitionSignatureStatus";
@@ -58,7 +56,6 @@ import { LiquidPetitionScopeProvider } from "@parallel/utils/liquid/LiquidPetiti
 import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
 import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
-import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useGetPetitionPages } from "@parallel/utils/useGetPetitionPages";
@@ -469,112 +466,80 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
 }
 
 const _fragments = {
-  get PublicPetitionAccess() {
-    return gql`
-      fragment RecipientView_PublicPetitionAccess on PublicPetitionAccess {
-        petition {
-          ...RecipientView_PublicPetition
-          isDelegateAccessEnabled
-          organization {
-            id
-            name
-            hasRemoveParallelBranding
-            brandTheme {
-              ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
-            }
+  PublicPetitionAccess: gql`
+    fragment RecipientView_PublicPetitionAccess on PublicPetitionAccess {
+      petition {
+        ...RecipientView_PublicPetition
+        isDelegateAccessEnabled
+        organization {
+          id
+          name
+          hasRemoveParallelBranding
+          brandTheme {
+            ...OverrideWithOrganizationTheme_OrganizationBrandThemeData
           }
         }
-        granter {
-          ...RecipientView_PublicUser
-        }
-        message {
-          ...RecipientView_PublicPetitionMessage
-        }
-        ...RecipientViewPetitionField_PublicPetitionAccess
-        ...RecipientViewSidebar_PublicPetitionAccess
-        ...RecipientViewHeader_PublicPetitionAccess
-        ...useRecipientViewConfirmPetitionSignersDialog_PublicPetitionAccess
       }
-      ${this.PublicPetition}
-      ${this.PublicUser}
-      ${useRecipientViewConfirmPetitionSignersDialog.fragments.PublicPetitionAccess}
-      ${RecipientViewPetitionField.fragments.PublicPetitionAccess}
-      ${this.PublicPetitionMessage}
-      ${OverrideWithOrganizationTheme.fragments.OrganizationBrandThemeData}
-      ${RecipientViewSidebar.fragments.PublicPetitionAccess}
-      ${RecipientViewHeader.fragments.PublicPetitionAccess}
-    `;
-  },
-  get PublicPetitionMessage() {
-    return gql`
-      fragment RecipientView_PublicPetitionMessage on PublicPetitionMessage {
+      granter {
+        ...RecipientView_PublicUser
+      }
+      message {
+        ...RecipientView_PublicPetitionMessage
+      }
+      ...RecipientViewPetitionField_PublicPetitionAccess
+      ...RecipientViewSidebar_PublicPetitionAccess
+      ...RecipientViewHeader_PublicPetitionAccess
+      ...useRecipientViewConfirmPetitionSignersDialog_PublicPetitionAccess
+    }
+  `,
+  PublicPetitionMessage: gql`
+    fragment RecipientView_PublicPetitionMessage on PublicPetitionMessage {
+      id
+      subject
+    }
+  `,
+  PublicPetition: gql`
+    fragment RecipientView_PublicPetition on PublicPetition {
+      id
+      status
+      deadline
+      tone
+      fields {
         id
-        subject
+        ...RecipientViewPetitionField_PublicPetitionField
+        ...completedFieldReplies_PublicPetitionField
+        ...focusPetitionField_PublicPetitionField
       }
-    `;
-  },
-  get PublicPetition() {
-    return gql`
-      fragment RecipientView_PublicPetition on PublicPetition {
-        id
-        status
-        deadline
-        tone
-        fields {
-          id
-          ...RecipientViewPetitionField_PublicPetitionField
-          ...completedFieldReplies_PublicPetitionField
-          ...focusPetitionField_PublicPetitionField
-        }
-        signatureConfig {
-          isEnabled
-          review
-          ...RecipientViewPetitionAlerts_PublicSignatureConfig
-        }
-        recipients {
-          ...RecipientViewHeader_PublicContact
-        }
-        isCompletingMessageEnabled
-        currentApprovalRequestStatus
-        hasStartedProcess
-        variables {
-          ...LiquidPetitionVariableProvider_PetitionVariable
-        }
-        ...RecipientViewContents_PublicPetition
-        ...RecipientViewProgressBar_PublicPetition
-        ...useGetPetitionPages_PublicPetition
-        ...LiquidPetitionScopeProvider_PublicPetition
-        ...useCompletingMessageDialog_PublicPetition
-        ...RecipientViewFooter_PublicPetition
-        ...usePetitionCanFinalize_PublicPetition
-        ...getPetitionSignatureStatus_PublicPetition
-        ...RecipientViewSignatureStatusDialog_PublicPetition
+      signatureConfig {
+        isEnabled
+        review
+        ...RecipientViewPetitionAlerts_PublicSignatureConfig
       }
-      ${focusPetitionField.fragments.PublicPetitionField}
-      ${RecipientViewContents.fragments.PublicPetition}
-      ${RecipientViewProgressBar.fragments.PublicPetition}
-      ${RecipientViewHeader.fragments.PublicContact}
-      ${RecipientViewFooter.fragments.PublicPetition}
-      ${useGetPetitionPages.fragments.PublicPetition}
-      ${LiquidPetitionScopeProvider.fragments.PublicPetition}
-      ${useCompletingMessageDialog.fragments.PublicPetition}
-      ${usePetitionCanFinalize.fragments.PublicPetition}
-      ${RecipientViewPetitionField.fragments.PublicPetitionField}
-      ${completedFieldReplies.fragments.PublicPetitionField}
-      ${getPetitionSignatureStatus.fragments.PublicPetition}
-      ${RecipientViewPetitionAlerts.fragments.PublicSignatureConfig}
-      ${useSignatureStatusDialog.fragments.PublicPetition}
-      ${LiquidPetitionVariableProvider.fragments.PetitionVariable}
-    `;
-  },
-  get PublicUser() {
-    return gql`
-      fragment RecipientView_PublicUser on PublicUser {
-        ...RecipientViewContents_PublicUser
+      recipients {
+        ...RecipientViewHeader_PublicContact
       }
-      ${RecipientViewContents.fragments.PublicUser}
-    `;
-  },
+      isCompletingMessageEnabled
+      currentApprovalRequestStatus
+      hasStartedProcess
+      variables {
+        ...LiquidPetitionVariableProvider_PetitionVariable
+      }
+      ...RecipientViewContents_PublicPetition
+      ...RecipientViewProgressBar_PublicPetition
+      ...useGetPetitionPages_PublicPetition
+      ...LiquidPetitionScopeProvider_PublicPetition
+      ...useCompletingMessageDialog_PublicPetition
+      ...RecipientViewFooter_PublicPetition
+      ...usePetitionCanFinalize_PublicPetition
+      ...getPetitionSignatureStatus_PublicPetition
+      ...RecipientViewSignatureStatusDialog_PublicPetition
+    }
+  `,
+  PublicUser: gql`
+    fragment RecipientView_PublicUser on PublicUser {
+      ...RecipientViewContents_PublicUser
+    }
+  `,
 };
 
 const _mutations = [
@@ -593,7 +558,6 @@ const _mutations = [
         ...RecipientView_PublicPetition
       }
     }
-    ${_fragments.PublicPetition}
   `,
 ];
 
@@ -607,8 +571,6 @@ const _queries = [
       }
       ...useBrowserMetadata_PublicQuery
     }
-    ${_fragments.PublicPetitionAccess}
-    ${useBrowserMetadata.fragments.PublicQuery}
   `,
   gql`
     query RecipientView_accesses($keycode: ID!) {

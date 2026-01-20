@@ -17,11 +17,8 @@ export interface PetitionSignaturesCardProps {
   finalVariables: Record<string, number | string>;
 }
 
-export const PetitionVariablesCard = Object.assign(
-  chakraForwardRef<"section", PetitionSignaturesCardProps>(function PetitionVariablesCard(
-    { petition, finalVariables, ...props },
-    ref,
-  ) {
+export const PetitionVariablesCard = chakraForwardRef<"section", PetitionSignaturesCardProps>(
+  function PetitionVariablesCard({ petition, finalVariables, ...props }, ref) {
     const intl = useIntl();
 
     const showCalculationRulesDialog = usePetitionComposeCalculationRulesDialog();
@@ -92,34 +89,32 @@ export const PetitionVariablesCard = Object.assign(
         </Stack>
       </Card>
     );
-  }),
-  {
-    fragments: {
-      PetitionBase: gql`
-        fragment PetitionVariablesCard_PetitionBase on PetitionBase {
-          id
-          variables {
-            name
-            showInReplies
-            ... on PetitionVariableNumber {
-              defaultValue
-              valueLabels {
-                value
-                label
-              }
-            }
-            ... on PetitionVariableEnum {
-              defaultEnum: defaultValue
-              enumLabels: valueLabels {
-                value
-                label
-              }
-            }
-            ...VariableReference_PetitionVariable
-          }
-        }
-        ${VariableReference.fragments.PetitionVariable}
-      `,
-    },
   },
 );
+
+const _fragments = {
+  PetitionBase: gql`
+    fragment PetitionVariablesCard_PetitionBase on PetitionBase {
+      id
+      variables {
+        name
+        showInReplies
+        ... on PetitionVariableNumber {
+          defaultValue
+          valueLabels {
+            value
+            label
+          }
+        }
+        ... on PetitionVariableEnum {
+          defaultEnum: defaultValue
+          enumLabels: valueLabels {
+            value
+            label
+          }
+        }
+        ...VariableReference_PetitionVariable
+      }
+    }
+  `,
+};

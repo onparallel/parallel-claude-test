@@ -179,7 +179,7 @@ export function ReportsReplies() {
   );
 }
 
-ReportsReplies.fragments = {
+const _fragments = {
   PetitionTemplate: gql`
     fragment ReportsReplies_PetitionTemplate on PetitionTemplate {
       id
@@ -193,7 +193,6 @@ ReportsReplies.queries = [
     query ReportsReplies_user {
       ...ReportsSidebarLayout_Query
     }
-    ${ReportsSidebarLayout.fragments.Query}
   `,
 ];
 

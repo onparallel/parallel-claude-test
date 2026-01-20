@@ -1002,57 +1002,41 @@ function useConfirmDeleteProfileTypeFieldDialog() {
 }
 
 const _fragments = {
-  get ProfileTypeField() {
-    return gql`
-      fragment OrganizationProfileType_ProfileTypeField on ProfileTypeField {
-        id
-        name
-        type
-        isStandard
-        ...useProfileTypeFieldPermissionDialog_ProfileTypeField
-        ...useUpdateProfileTypeFieldDialog_ProfileTypeField
-        ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
-        ...ProfileTypeSettings_ProfileTypeField
-        ...useProfileTypeFieldReferencedMonitoringDialog_ProfileTypeField
-        ...useProfileTypeFieldReferencedAutoSearchConfigDialog_ProfileTypeField
-        ...getFieldsReferencedInMonitoring_ProfileTypeField
-        ...getFieldsReferencedInAutoSearchConfig_ProfileTypeField
+  ProfileTypeField: gql`
+    fragment OrganizationProfileType_ProfileTypeField on ProfileTypeField {
+      id
+      name
+      type
+      isStandard
+      ...useProfileTypeFieldPermissionDialog_ProfileTypeField
+      ...useUpdateProfileTypeFieldDialog_ProfileTypeField
+      ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
+      ...ProfileTypeSettings_ProfileTypeField
+      ...useProfileTypeFieldReferencedMonitoringDialog_ProfileTypeField
+      ...useProfileTypeFieldReferencedAutoSearchConfigDialog_ProfileTypeField
+      ...getFieldsReferencedInMonitoring_ProfileTypeField
+      ...getFieldsReferencedInAutoSearchConfig_ProfileTypeField
+    }
+  `,
+  ProfileType: gql`
+    fragment OrganizationProfileType_ProfileType on ProfileType {
+      id
+      name
+      pluralName
+      icon
+      isStandard
+      standardType
+      fields {
+        ...OrganizationProfileType_ProfileTypeField
       }
-      ${useProfileTypeFieldPermissionDialog.fragments.ProfileTypeField}
-      ${useUpdateProfileTypeFieldDialog.fragments.ProfileTypeField}
-      ${useCreateOrUpdateProfileTypeFieldDialog.fragments.ProfileTypeField}
-      ${ProfileTypeSettings.fragments.ProfileTypeField}
-      ${useProfileTypeFieldReferencedMonitoringDialog.fragments.ProfileTypeField}
-      ${useProfileTypeFieldReferencedAutoSearchConfigDialog.fragments.ProfileTypeField}
-      ${getFieldsReferencedInMonitoring.fragments.ProfileTypeField}
-      ${getFieldsReferencedInAutoSearchConfig.fragments.ProfileTypeField}
-    `;
-  },
-  get ProfileType() {
-    return gql`
-      fragment OrganizationProfileType_ProfileType on ProfileType {
-        id
-        name
-        pluralName
-        icon
-        isStandard
-        standardType
-        fields {
-          ...OrganizationProfileType_ProfileTypeField
-        }
-        profileNamePattern
-        createdAt
-        archivedAt
-        ...ProfileTypeSettings_ProfileType
-        ...useArchiveProfileType_ProfileType
-        ...useUnarchiveProfileType_ProfileType
-      }
-      ${this.ProfileTypeField}
-      ${ProfileTypeSettings.fragments.ProfileType}
-      ${useArchiveProfileType.fragments.ProfileType}
-      ${useUnarchiveProfileType.fragments.ProfileType}
-    `;
-  },
+      profileNamePattern
+      createdAt
+      archivedAt
+      ...ProfileTypeSettings_ProfileType
+      ...useArchiveProfileType_ProfileType
+      ...useUnarchiveProfileType_ProfileType
+    }
+  `,
 };
 
 const _queries = [
@@ -1062,7 +1046,6 @@ const _queries = [
         ...OrganizationProfileType_ProfileType
       }
     }
-    ${_fragments.ProfileType}
   `,
   gql`
     query OrganizationProfileType_user {
@@ -1072,7 +1055,6 @@ const _queries = [
         hasKeyProcessesFeature: hasFeatureFlag(featureFlag: KEY_PROCESSES)
       }
     }
-    ${OrganizationSettingsLayout.fragments.Query}
   `,
 ];
 
@@ -1096,7 +1078,6 @@ const _mutations = [
         }
       }
     }
-    ${useProfileTypeFieldPermissionDialog.fragments.ProfileTypeField}
   `,
   gql`
     mutation OrganizationProfileType_updateProfileType(
@@ -1116,7 +1097,6 @@ const _mutations = [
         ...OrganizationProfileType_ProfileType
       }
     }
-    ${_fragments.ProfileType}
   `,
   gql`
     mutation OrganizationProfileType_cloneProfileType(
@@ -1128,7 +1108,6 @@ const _mutations = [
         ...OrganizationProfileType_ProfileType
       }
     }
-    ${_fragments.ProfileType}
   `,
   gql`
     mutation OrganizationProfileType_updateProfileTypeFieldPositions(
@@ -1142,7 +1121,6 @@ const _mutations = [
         ...OrganizationProfileType_ProfileType
       }
     }
-    ${_fragments.ProfileType}
   `,
   gql`
     mutation OrganizationProfileType_updateProfileTypeField(
@@ -1160,7 +1138,6 @@ const _mutations = [
         ...OrganizationProfileType_ProfileTypeField
       }
     }
-    ${_fragments.ProfileTypeField}
   `,
   gql`
     mutation OrganizationProfileType_deleteProfileTypeField(
@@ -1176,7 +1153,6 @@ const _mutations = [
         ...OrganizationProfileType_ProfileType
       }
     }
-    ${_fragments.ProfileType}
   `,
 ];
 

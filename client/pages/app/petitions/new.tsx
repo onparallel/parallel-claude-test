@@ -524,7 +524,7 @@ function NewPetition() {
   );
 }
 
-NewPetition.fragments = {
+const _fragments = {
   PetitionBaseOrFolder: gql`
     fragment NewPetition_PetitionBaseOrFolder on PetitionBaseOrFolder {
       ... on PetitionTemplate {
@@ -535,9 +535,6 @@ NewPetition.fragments = {
         ...FolderCard_PetitionFolder
       }
     }
-    ${FolderCard.fragments.PetitionFolder}
-    ${TemplateCard.fragments.PetitionTemplate}
-    ${PublicTemplateCard.fragments.PetitionTemplate}
   `,
 };
 
@@ -569,7 +566,6 @@ NewPetition.queries = [
         totalCount
       }
     }
-    ${NewPetition.fragments.PetitionBaseOrFolder}
   `,
   gql`
     query NewPetition_user {
@@ -582,8 +578,6 @@ NewPetition.queries = [
         ...NewPetitionLanguageFilter_User
       }
     }
-    ${AppLayout.fragments.Query}
-    ${NewPetitionLanguageFilter.fragments.User}
   `,
   gql`
     query NewPetition_template($templateId: GID!) {
@@ -591,7 +585,6 @@ NewPetition.queries = [
         ...TemplateDetailsModal_PetitionTemplate
       }
     }
-    ${TemplateDetailsModal.fragments.PetitionTemplate}
   `,
 ];
 

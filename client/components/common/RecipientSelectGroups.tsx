@@ -667,13 +667,12 @@ function MultipleEmailsPastedDialog(props: DialogProps<{}, MultipleEmailsPastedA
   );
 }
 
-RecipientSelectGroups.fragments = {
+const _fragments = {
   PetitionField: gql`
     fragment RecipientSelectGroups_PetitionField on PetitionField {
       id
       ...RecipientSuggestion_PetitionField
     }
-    ${RecipientSuggestion.fragments.PetitionField}
   `,
   Petition: gql`
     fragment RecipientSelectGroups_Petition on Petition {
@@ -715,7 +714,5 @@ RecipientSelectGroups.fragments = {
       ...useFieldsWithIndices_PetitionBase
       ...useFieldLogic_PetitionBase
     }
-    ${useFieldsWithIndices.fragments.PetitionBase}
-    ${useFieldLogic.fragments.PetitionBase}
   `,
 };

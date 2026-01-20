@@ -33,7 +33,7 @@ export function OrganizationSettingsLayout({
   );
 }
 
-OrganizationSettingsLayout.fragments = {
+const _fragments = {
   Query: gql`
     fragment OrganizationSettingsLayout_Query on Query {
       ...SidebarLayout_Query
@@ -42,7 +42,5 @@ OrganizationSettingsLayout.fragments = {
         ...useOrganizationSections_User
       }
     }
-    ${SidebarLayout.fragments.Query}
-    ${useOrganizationSections.fragments.User}
   `,
 };

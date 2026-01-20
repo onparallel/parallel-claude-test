@@ -97,7 +97,7 @@ export function TemplateDefaultUserGroupPermissionRow({
   );
 }
 
-TemplateDefaultUserGroupPermissionRow.fragments = {
+const _fragments = {
   TemplateDefaultUserGroupPermission: gql`
     fragment TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermission on TemplateDefaultUserGroupPermission {
       id
@@ -111,6 +111,5 @@ TemplateDefaultUserGroupPermissionRow.fragments = {
       }
       isSubscribed
     }
-    ${UserGroupReference.fragments.UserGroup}
   `,
 };

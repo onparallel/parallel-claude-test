@@ -11,49 +11,46 @@ interface PublicPetitionFieldCommentContentProps {
   useExcerpt?: boolean;
 }
 
-export const PublicPetitionFieldCommentContent = Object.assign(
-  chakraForwardRef<"div", PublicPetitionFieldCommentContentProps>(function CommentContent(
-    { comment, useExcerpt, ...props },
-    ref,
-  ) {
-    const contentHtml = useExcerpt ? comment.excerptHtml : comment.contentHtml;
-    const options: HTMLReactParserOptions = {
-      replace(domNode) {
-        if (domNode instanceof Element && domNode.name === "a") {
-          return (
-            <Link href={domNode.attribs.href} isExternal>
-              {domToReact(domNode.children as any, options)}
-            </Link>
-          );
-        }
-      },
-    };
-
-    const memoizedHtml = useMemo(() => {
-      return contentHtml
-        ? parse(
-            sanitizeHtml(contentHtml, {
-              FORBID_TAGS: useExcerpt ? ["p", "a"] : [],
-            }),
-            options,
-          )
-        : null;
-    }, [contentHtml]);
-
-    return (
-      <Box ref={ref} {...props}>
-        {memoizedHtml}
-      </Box>
-    );
-  }),
-  {
-    fragments: {
-      PetitionFieldComment: gql`
-        fragment PublicPetitionFieldCommentContent_PetitionFieldComment on PublicPetitionFieldComment {
-          contentHtml
-          excerptHtml
-        }
-      `,
+export const PublicPetitionFieldCommentContent = chakraForwardRef<
+  "div",
+  PublicPetitionFieldCommentContentProps
+>(function CommentContent({ comment, useExcerpt, ...props }, ref) {
+  const contentHtml = useExcerpt ? comment.excerptHtml : comment.contentHtml;
+  const options: HTMLReactParserOptions = {
+    replace(domNode) {
+      if (domNode instanceof Element && domNode.name === "a") {
+        return (
+          <Link href={domNode.attribs.href} isExternal>
+            {domToReact(domNode.children as any, options)}
+          </Link>
+        );
+      }
     },
-  },
-);
+  };
+
+  const memoizedHtml = useMemo(() => {
+    return contentHtml
+      ? parse(
+          sanitizeHtml(contentHtml, {
+            FORBID_TAGS: useExcerpt ? ["p", "a"] : [],
+          }),
+          options,
+        )
+      : null;
+  }, [contentHtml]);
+
+  return (
+    <Box ref={ref} {...props}>
+      {memoizedHtml}
+    </Box>
+  );
+});
+
+const _fragments = {
+  PetitionFieldComment: gql`
+    fragment PublicPetitionFieldCommentContent_PetitionFieldComment on PublicPetitionFieldComment {
+      contentHtml
+      excerptHtml
+    }
+  `,
+};

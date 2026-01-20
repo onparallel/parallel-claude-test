@@ -71,65 +71,62 @@ export const PETITION_CLOSING_DEFAULT_MESSAGE: Record<PetitionLocale, string> = 
   `,
 };
 
-export const PetitionTemplateClosingMessageCard = Object.assign(
-  chakraForwardRef<"section", PetitionTemplateClosingMessageCardProps>(
-    function PetitionTemplateClosingMessageCard(
-      { petition, onUpdatePetition, isDisabled, ...props },
-      ref,
-    ) {
-      const placeholders = usePetitionMessagePlaceholderOptions({ petition });
-      const [closingEmailBody, setClosingEmailBody] = useState<RichTextEditorValue>(
-        petition.closingEmailBody ??
-          textWithPlaceholderToSlateNodes(
-            PETITION_CLOSING_DEFAULT_MESSAGE[petition.locale],
-            placeholders,
-          ),
-      );
+export const PetitionTemplateClosingMessageCard = chakraForwardRef<
+  "section",
+  PetitionTemplateClosingMessageCardProps
+>(function PetitionTemplateClosingMessageCard(
+  { petition, onUpdatePetition, isDisabled, ...props },
+  ref,
+) {
+  const placeholders = usePetitionMessagePlaceholderOptions({ petition });
+  const [closingEmailBody, setClosingEmailBody] = useState<RichTextEditorValue>(
+    petition.closingEmailBody ??
+      textWithPlaceholderToSlateNodes(
+        PETITION_CLOSING_DEFAULT_MESSAGE[petition.locale],
+        placeholders,
+      ),
+  );
 
-      const handleclosingEmailBodyChange = (value: RichTextEditorValue) => {
-        setClosingEmailBody(value);
-        onUpdatePetition({ closingEmailBody: isEmptyRTEValue(value) ? null : value });
-      };
+  const handleclosingEmailBodyChange = (value: RichTextEditorValue) => {
+    setClosingEmailBody(value);
+    onUpdatePetition({ closingEmailBody: isEmptyRTEValue(value) ? null : value });
+  };
 
-      return (
-        <Card ref={ref} {...props}>
-          <CardHeader leftIcon={<EmailIcon marginEnd={2} role="presentation" />}>
-            <FormattedMessage
-              id="component.petition-template-closing-message.card-header"
-              defaultMessage="Closing message"
-            />
-          </CardHeader>
-          <Box padding={4}>
-            <Text marginBottom={2}>
-              <FormattedMessage
-                id="component.petition-template-closing-message.card-explainer"
-                defaultMessage="This message will be used when selecting the option <b>notify recipients</b> to notify that it has been reviewed and closed."
-              />
-            </Text>
-            <MessageClosingEmailEditor
-              id={`completing-message-${petition.id}`}
-              showErrors={false}
-              body={closingEmailBody}
-              onBodyChange={handleclosingEmailBodyChange}
-              petition={petition}
-              isReadOnly={isDisabled}
-            />
-          </Box>
-        </Card>
-      );
-    },
-  ),
-  {
-    fragments: {
-      PetitionTemplate: gql`
-        fragment PetitionTemplateClosingMessageCard_PetitionTemplate on PetitionTemplate {
-          id
-          closingEmailBody
-          locale
-          ...usePetitionMessagePlaceholderOptions_PetitionBase
-        }
-        ${usePetitionMessagePlaceholderOptions.fragments.PetitionBase}
-      `,
-    },
-  },
-);
+  return (
+    <Card ref={ref} {...props}>
+      <CardHeader leftIcon={<EmailIcon marginEnd={2} role="presentation" />}>
+        <FormattedMessage
+          id="component.petition-template-closing-message.card-header"
+          defaultMessage="Closing message"
+        />
+      </CardHeader>
+      <Box padding={4}>
+        <Text marginBottom={2}>
+          <FormattedMessage
+            id="component.petition-template-closing-message.card-explainer"
+            defaultMessage="This message will be used when selecting the option <b>notify recipients</b> to notify that it has been reviewed and closed."
+          />
+        </Text>
+        <MessageClosingEmailEditor
+          id={`completing-message-${petition.id}`}
+          showErrors={false}
+          body={closingEmailBody}
+          onBodyChange={handleclosingEmailBodyChange}
+          petition={petition}
+          isReadOnly={isDisabled}
+        />
+      </Box>
+    </Card>
+  );
+});
+
+const _fragments = {
+  PetitionTemplate: gql`
+    fragment PetitionTemplateClosingMessageCard_PetitionTemplate on PetitionTemplate {
+      id
+      closingEmailBody
+      locale
+      ...usePetitionMessagePlaceholderOptions_PetitionBase
+    }
+  `,
+};

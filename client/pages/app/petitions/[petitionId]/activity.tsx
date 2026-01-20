@@ -6,10 +6,7 @@ import { ShareButton } from "@parallel/components/common/ShareButton";
 import { SupportButton } from "@parallel/components/common/SupportButton";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import {
-  FieldErrorDialog,
-  useFieldErrorDialog,
-} from "@parallel/components/common/dialogs/FieldErrorDialog";
+import { useFieldErrorDialog } from "@parallel/components/common/dialogs/FieldErrorDialog";
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import {
   PetitionLayout,
@@ -19,17 +16,10 @@ import {
 import { PetitionAccessesTable } from "@parallel/components/petition-activity/PetitionAccessesTable";
 import { PetitionActivityTimeline } from "@parallel/components/petition-activity/PetitionActivityTimeline";
 import { PetitionProfilesTable } from "@parallel/components/petition-activity/PetitionProfilesTable";
-import { AddPetitionAccessDialog } from "@parallel/components/petition-activity/dialogs/AddPetitionAccessDialog";
 import { useConfigureRemindersDialog } from "@parallel/components/petition-activity/dialogs/ConfigureRemindersDialog";
-import {
-  ConfirmDeactivateAccessDialog,
-  useConfirmDeactivateAccessDialog,
-} from "@parallel/components/petition-activity/dialogs/ConfirmDeactivateAccessDialog";
+import { useConfirmDeactivateAccessDialog } from "@parallel/components/petition-activity/dialogs/ConfirmDeactivateAccessDialog";
 import { useConfirmDisassociateProfileDialog } from "@parallel/components/petition-activity/dialogs/ConfirmDisassociateProfileDialog";
-import {
-  ConfirmReactivateAccessDialog,
-  useConfirmReactivateAccessDialog,
-} from "@parallel/components/petition-activity/dialogs/ConfirmReactivateAccessDialog";
+import { useConfirmReactivateAccessDialog } from "@parallel/components/petition-activity/dialogs/ConfirmReactivateAccessDialog";
 import { useConfirmSendReminderDialog } from "@parallel/components/petition-activity/dialogs/ConfirmSendReminderDialog";
 import { useAssociateProfileToPetitionDialog } from "@parallel/components/petition-common/dialogs/AssociateProfileToPetitionDialog";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
@@ -538,20 +528,6 @@ const _fragments = {
       ...PetitionProfilesTable_Petition
       ...validatePetitionFields_PetitionBase
     }
-    ${PetitionLayout.fragments.PetitionBase}
-    ${PetitionAccessesTable.fragments.Petition}
-    ${PetitionProfilesTable.fragments.Petition}
-    ${ShareButton.fragments.PetitionBase}
-    ${AddPetitionAccessDialog.fragments.Petition}
-    ${useSendPetitionHandler.fragments.Petition}
-    ${useAllFieldsWithIndices.fragments.PetitionBase}
-    ${validatePetitionFields.fragments.PetitionField}
-    ${validatePetitionFields.fragments.PetitionBase}
-    ${FieldErrorDialog.fragments.PetitionField}
-    ${ConfirmDeactivateAccessDialog.fragments.PetitionAccess}
-    ${ConfirmReactivateAccessDialog.fragments.PetitionAccess}
-    ${useConfirmSendReminderDialog.fragments.Petition}
-    ${useConfigureRemindersDialog.fragments.PetitionAccess}
   `,
   Query: gql`
     fragment PetitionActivity_Query on Query {
@@ -569,9 +545,6 @@ const _fragments = {
         ...useSendPetitionHandler_User
       }
     }
-    ${PetitionLayout.fragments.Query}
-    ${useUpdateIsReadNotification.fragments.User}
-    ${useSendPetitionHandler.fragments.User}
   `,
 };
 
@@ -582,7 +555,6 @@ PetitionActivity.mutations = [
         ...PetitionActivity_Petition
       }
     }
-    ${_fragments.Petition}
   `,
   gql`
     mutation PetitionActivity_sendReminders($petitionId: GID!, $accessIds: [GID!]!, $body: JSON) {
@@ -660,7 +632,6 @@ const _queries = [
         }
       }
     }
-    ${PetitionActivityTimeline.fragments.PetitionEvent}
   `,
   gql`
     query PetitionActivity_petition($id: GID!) {
@@ -668,7 +639,6 @@ const _queries = [
         ...PetitionActivity_Petition
       }
     }
-    ${_fragments.Petition}
   `,
   gql`
     query PetitionActivity_user {
@@ -678,7 +648,6 @@ const _queries = [
         hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
       }
     }
-    ${_fragments.Query}
   `,
 ];
 

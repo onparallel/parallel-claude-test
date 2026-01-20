@@ -19,11 +19,8 @@ interface NewPetitionLanguageFilterProps extends ValueProps<PetitionLocale> {
   user: NewPetitionLanguageFilter_UserFragment;
 }
 
-export const NewPetitionLanguageFilter = Object.assign(
-  chakraForwardRef<"button", NewPetitionLanguageFilterProps>(function NewPetitionLanguageFilter(
-    { value, onChange, user, ...props },
-    ref,
-  ) {
+export const NewPetitionLanguageFilter = chakraForwardRef<"button", NewPetitionLanguageFilterProps>(
+  function NewPetitionLanguageFilter({ value, onChange, user, ...props }, ref) {
     const locales = useAvailablePetitionLocales(user);
 
     return (
@@ -64,15 +61,13 @@ export const NewPetitionLanguageFilter = Object.assign(
         </Portal>
       </Menu>
     );
-  }),
-  {
-    fragments: {
-      User: gql`
-        fragment NewPetitionLanguageFilter_User on User {
-          ...useAvailablePetitionLocales_User
-        }
-        ${useAvailablePetitionLocales.fragments.User}
-      `,
-    },
   },
 );
+
+const _fragments = {
+  User: gql`
+    fragment NewPetitionLanguageFilter_User on User {
+      ...useAvailablePetitionLocales_User
+    }
+  `,
+};

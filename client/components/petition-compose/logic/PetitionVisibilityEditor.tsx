@@ -290,28 +290,24 @@ export function PetitionVisibilityEditor({
   );
 }
 
-PetitionVisibilityEditor.fragments = {
-  get PetitionBase() {
-    return gql`
-      fragment PetitionVisibilityEditor_PetitionBase on PetitionBase {
-        fields {
+const _fragments = {
+  PetitionBase: gql`
+    fragment PetitionVisibilityEditor_PetitionBase on PetitionBase {
+      fields {
+        id
+        type
+        visibility
+        ...PetitionVisibilityEditor_PetitionField
+        children {
           id
           type
           visibility
           ...PetitionVisibilityEditor_PetitionField
-          children {
-            id
-            type
-            visibility
-            ...PetitionVisibilityEditor_PetitionField
-          }
         }
-        ...PetitionFieldLogicContext_PetitionBase
       }
-      ${PetitionFieldLogicContext.fragments.PetitionBase}
-      ${this.PetitionField}
-    `;
-  },
+      ...PetitionFieldLogicContext_PetitionBase
+    }
+  `,
   PetitionField: gql`
     fragment PetitionVisibilityEditor_PetitionField on PetitionField {
       id

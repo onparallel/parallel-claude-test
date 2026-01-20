@@ -27,7 +27,6 @@ import {
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
-import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
@@ -195,7 +194,6 @@ const _queries = [
       }
       ...useBrowserMetadata_Query
     }
-    ${useBrowserMetadata.fragments.Query}
   `,
 ];
 

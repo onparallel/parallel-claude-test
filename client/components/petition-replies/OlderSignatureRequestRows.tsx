@@ -138,7 +138,7 @@ export function OlderSignatureRequestRows({
   );
 }
 
-OlderSignatureRequestRows.fragments = {
+const _fragments = {
   PetitionSignatureRequest: gql`
     fragment OlderSignatureRequestRows_PetitionSignatureRequest on PetitionSignatureRequest {
       id
@@ -161,8 +161,5 @@ OlderSignatureRequestRows.fragments = {
       extraErrorData
       createdAt
     }
-    ${PetitionSignatureRequestStatusText.fragments.PetitionSignatureRequest}
-    ${SignerReference.fragments.PetitionSigner}
-    ${PetitionSignatureRequestSignerStatusIcon.fragments.SignerStatus}
   `,
 };

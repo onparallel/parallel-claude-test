@@ -1265,7 +1265,7 @@ export function useCreatePetitionVariableDialog() {
   );
 }
 
-useCreatePetitionVariableDialog.fragments = {
+const _fragments = {
   PetitionVariable: gql`
     fragment useCreatePetitionVariableDialog_PetitionVariable on PetitionVariable {
       name
@@ -1312,7 +1312,6 @@ const _queries = [
         }
       }
     }
-    ${useCreatePetitionVariableDialog.fragments.PetitionVariable}
   `,
   gql`
     mutation useCreatePetitionVariableDialog_updatePetitionVariable(
@@ -1327,6 +1326,5 @@ const _queries = [
         }
       }
     }
-    ${useCreatePetitionVariableDialog.fragments.PetitionVariable}
   `,
 ];

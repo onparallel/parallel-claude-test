@@ -87,172 +87,168 @@ export type TagSelectInstance<IsMulti extends boolean = false> = SelectInstance<
   never
 >;
 
-export const TagSelect = Object.assign(
-  forwardRef(function TagSelect<IsMulti extends boolean = false>(
-    { value, maxItems, allowCreatingTags, allowUpdatingTags, ...props }: TagSelectProps<IsMulti>,
-    ref: ForwardedRef<TagSelectInstance<IsMulti>>,
-  ) {
-    const intl = useIntl();
-    const [newTagColor, setNewTagColor] = useState(randomColor());
-    const apollo = useApolloClient();
-    const [key, rerender] = useRerender();
-    const _value = useGetTagValues(value, props.isMulti ?? false, [key]);
-    const canCreateTags = useHasPermission("TAGS:CREATE_TAGS") && allowCreatingTags;
-    const canUpdateTags = useHasPermission("TAGS:UPDATE_TAGS") && allowUpdatingTags;
-    // The following code makes sure the component is rerendered whenever the tag search is invalidated
-    const firstLoadRef = useRef(true);
-    useEffect(() => {
-      const subscription = apollo
-        .watchQuery({
-          query: TagSelect_tagsDocument,
-          variables: { search: "" },
-          fetchPolicy: "cache-only",
-        })
-        .subscribe(({ data, partial }) => {
-          if (firstLoadRef.current) {
-            firstLoadRef.current = false;
-          } else {
-            if (isNullish(data?.tags) && partial) {
-              rerender();
-            }
+export const TagSelect = forwardRef(function TagSelect<IsMulti extends boolean = false>(
+  { value, maxItems, allowCreatingTags, allowUpdatingTags, ...props }: TagSelectProps<IsMulti>,
+  ref: ForwardedRef<TagSelectInstance<IsMulti>>,
+) {
+  const intl = useIntl();
+  const [newTagColor, setNewTagColor] = useState(randomColor());
+  const apollo = useApolloClient();
+  const [key, rerender] = useRerender();
+  const _value = useGetTagValues(value, props.isMulti ?? false, [key]);
+  const canCreateTags = useHasPermission("TAGS:CREATE_TAGS") && allowCreatingTags;
+  const canUpdateTags = useHasPermission("TAGS:UPDATE_TAGS") && allowUpdatingTags;
+  // The following code makes sure the component is rerendered whenever the tag search is invalidated
+  const firstLoadRef = useRef(true);
+  useEffect(() => {
+    const subscription = apollo
+      .watchQuery({
+        query: TagSelect_tagsDocument,
+        variables: { search: "" },
+        fetchPolicy: "cache-only",
+      })
+      .subscribe(({ data, partial }) => {
+        if (firstLoadRef.current) {
+          firstLoadRef.current = false;
+        } else {
+          if (isNullish(data?.tags) && partial) {
+            rerender();
           }
-        });
-      return () => subscription.unsubscribe();
-    }, []);
-
-    const loadOptions = useDebouncedAsync(
-      async (search: string) => {
-        const { data } = await apollo.query({
-          query: TagSelect_tagsDocument,
-          variables: { search },
-          fetchPolicy: "network-only",
-        });
-        return data!.tags.items;
-      },
-      150,
-      [],
-    );
-    const rsProps = useReactSelectProps<TagSelection, IsMulti, never>({
-      ...props,
-      components: {
-        ...({
-          MultiValue,
-          SingleValue,
-          Option,
-          NoOptionsMessage,
-          MenuList,
-        } as unknown as SelectComponentsConfig<TagSelection, IsMulti, never>),
-        ...props.components,
-      },
-      styles: {
-        ...({
-          valueContainer: (styles: CSSObjectWithLabel) => ({
-            ...styles,
-            paddingInlineStart: "0.5rem",
-            paddingInlineEnd: "0.5rem",
-            paddingTop: "2px",
-            paddingBottom: "2px",
-            gridGap: "0.25rem",
-          }),
-          option: (styles: CSSObjectWithLabel) => ({
-            ...styles,
-            display: "flex",
-            padding: "0.25rem 1rem",
-          }),
-          menuList: (
-            styles: CSSObjectWithLabel,
-            { selectProps }: MenuListProps<TagSelection> & ReactSelectExtraProps,
-          ) => {
-            return {
-              ...styles,
-              ...((selectProps as any).canUpdateTags ? { paddingBottom: 0 } : {}),
-            };
-          },
-        } as any),
-        ...props.styles,
-      },
-    });
-
-    const valueRef = useUpdatingRef(_value);
-    const handleCreateTag = useCallback(
-      async (name: string) => {
-        const { data } = await apollo.mutate({
-          mutation: TagSelect_createTagDocument,
-          variables: { name, color: newTagColor },
-          fetchPolicy: "network-only",
-        });
-        setNewTagColor(randomColor());
-        const tag = data!.createTag;
-        props.onChange((props.isMulti ? [...((valueRef.current as any) ?? []), tag] : tag) as any, {
-          action: "select-option",
-          option: tag,
-        });
-      },
-      [props.isMulti, newTagColor],
-    );
-
-    const Component = canCreateTags
-      ? AsyncCreatableSelect<TagSelection, IsMulti, never>
-      : AsyncSelect<TagSelection, IsMulti, never>;
-
-    return (
-      <Component
-        key={key}
-        ref={ref}
-        getOptionValue={(o) => o.id}
-        getOptionLabel={(o) => o.name}
-        isClearable={false}
-        closeMenuOnSelect={!props.isMulti}
-        placeholder={
-          props.isMulti
-            ? intl.formatMessage({
-                id: "component.tag-select.placeholder-multi",
-                defaultMessage: "Enter tags...",
-              })
-            : intl.formatMessage({
-                id: "component.tag-select.placeholder-single",
-                defaultMessage: "Select a tag...",
-              })
         }
-        isOptionDisabled={(_, selection) => {
-          if (isNonNullish(maxItems) && selection.length >= maxItems) {
-            return true;
-          }
-          return false;
-        }}
-        value={_value}
-        isValidNewOption={(value, _, options) => {
-          const name = value.trim().replace(/\s+/g, " ");
-          return name.length > 0 && !options.some((o) => o.name === name);
-        }}
-        loadOptions={loadOptions}
-        defaultOptions
-        onMenuOpen={() => setNewTagColor(randomColor())}
-        onCreateOption={handleCreateTag}
-        {...props}
-        {...rsProps}
-        {...({
-          canCreateTags,
-          newTagColor,
-          canUpdateTags,
-        } as any)}
-      />
-    );
-  }) as <IsMulti extends boolean = false>(
-    props: TagSelectProps<IsMulti> & RefAttributes<TagSelectInstance<IsMulti>>,
-  ) => ReactElement,
-  {
-    fragments: {
-      Tag: gql`
-        fragment TagSelect_Tag on Tag {
-          id
-          ...Tag_Tag
-        }
-        ${Tag.fragments.Tag}
-      `,
+      });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const loadOptions = useDebouncedAsync(
+    async (search: string) => {
+      const { data } = await apollo.query({
+        query: TagSelect_tagsDocument,
+        variables: { search },
+        fetchPolicy: "network-only",
+      });
+      return data!.tags.items;
     },
-  },
-);
+    150,
+    [],
+  );
+  const rsProps = useReactSelectProps<TagSelection, IsMulti, never>({
+    ...props,
+    components: {
+      ...({
+        MultiValue,
+        SingleValue,
+        Option,
+        NoOptionsMessage,
+        MenuList,
+      } as unknown as SelectComponentsConfig<TagSelection, IsMulti, never>),
+      ...props.components,
+    },
+    styles: {
+      ...({
+        valueContainer: (styles: CSSObjectWithLabel) => ({
+          ...styles,
+          paddingInlineStart: "0.5rem",
+          paddingInlineEnd: "0.5rem",
+          paddingTop: "2px",
+          paddingBottom: "2px",
+          gridGap: "0.25rem",
+        }),
+        option: (styles: CSSObjectWithLabel) => ({
+          ...styles,
+          display: "flex",
+          padding: "0.25rem 1rem",
+        }),
+        menuList: (
+          styles: CSSObjectWithLabel,
+          { selectProps }: MenuListProps<TagSelection> & ReactSelectExtraProps,
+        ) => {
+          return {
+            ...styles,
+            ...((selectProps as any).canUpdateTags ? { paddingBottom: 0 } : {}),
+          };
+        },
+      } as any),
+      ...props.styles,
+    },
+  });
+
+  const valueRef = useUpdatingRef(_value);
+  const handleCreateTag = useCallback(
+    async (name: string) => {
+      const { data } = await apollo.mutate({
+        mutation: TagSelect_createTagDocument,
+        variables: { name, color: newTagColor },
+        fetchPolicy: "network-only",
+      });
+      setNewTagColor(randomColor());
+      const tag = data!.createTag;
+      props.onChange((props.isMulti ? [...((valueRef.current as any) ?? []), tag] : tag) as any, {
+        action: "select-option",
+        option: tag,
+      });
+    },
+    [props.isMulti, newTagColor],
+  );
+
+  const Component = canCreateTags
+    ? AsyncCreatableSelect<TagSelection, IsMulti, never>
+    : AsyncSelect<TagSelection, IsMulti, never>;
+
+  return (
+    <Component
+      key={key}
+      ref={ref}
+      getOptionValue={(o) => o.id}
+      getOptionLabel={(o) => o.name}
+      isClearable={false}
+      closeMenuOnSelect={!props.isMulti}
+      placeholder={
+        props.isMulti
+          ? intl.formatMessage({
+              id: "component.tag-select.placeholder-multi",
+              defaultMessage: "Enter tags...",
+            })
+          : intl.formatMessage({
+              id: "component.tag-select.placeholder-single",
+              defaultMessage: "Select a tag...",
+            })
+      }
+      isOptionDisabled={(_, selection) => {
+        if (isNonNullish(maxItems) && selection.length >= maxItems) {
+          return true;
+        }
+        return false;
+      }}
+      value={_value}
+      isValidNewOption={(value, _, options) => {
+        const name = value.trim().replace(/\s+/g, " ");
+        return name.length > 0 && !options.some((o) => o.name === name);
+      }}
+      loadOptions={loadOptions}
+      defaultOptions
+      onMenuOpen={() => setNewTagColor(randomColor())}
+      onCreateOption={handleCreateTag}
+      {...props}
+      {...rsProps}
+      {...({
+        canCreateTags,
+        newTagColor,
+        canUpdateTags,
+      } as any)}
+    />
+  );
+}) as <IsMulti extends boolean = false>(
+  props: TagSelectProps<IsMulti> & RefAttributes<TagSelectInstance<IsMulti>>,
+) => ReactElement;
+
+const _fragments = {
+  Tag: gql`
+    fragment TagSelect_Tag on Tag {
+      id
+      ...Tag_Tag
+    }
+  `,
+};
 
 const _queries = [
   gql`
@@ -263,7 +259,6 @@ const _queries = [
         }
       }
     }
-    ${TagSelect.fragments.Tag}
   `,
 ];
 
@@ -275,7 +270,6 @@ const _mutations = [
         ...TagSelect_Tag
       }
     }
-    ${TagSelect.fragments.Tag}
   `,
 ];
 
@@ -664,7 +658,6 @@ ManageTagsDialog.mutations = [
         ...TagSelect_Tag
       }
     }
-    ${TagSelect.fragments.Tag}
   `,
 ];
 

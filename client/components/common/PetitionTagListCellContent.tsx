@@ -195,29 +195,22 @@ export function PetitionTagListCellContent({
   );
 }
 
-PetitionTagListCellContent.fragments = {
-  get Tag() {
-    return gql`
-      fragment PetitionTagListCellContent_Tag on Tag {
-        id
-        ...Tag_Tag
-        ...TagSelect_Tag
+const _fragments = {
+  Tag: gql`
+    fragment PetitionTagListCellContent_Tag on Tag {
+      id
+      ...Tag_Tag
+      ...TagSelect_Tag
+    }
+  `,
+  PetitionBase: gql`
+    fragment PetitionTagListCellContent_PetitionBase on PetitionBase {
+      id
+      tags {
+        ...PetitionTagListCellContent_Tag
       }
-      ${Tag.fragments.Tag}
-      ${TagSelect.fragments.Tag}
-    `;
-  },
-  get PetitionBase() {
-    return gql`
-      fragment PetitionTagListCellContent_PetitionBase on PetitionBase {
-        id
-        tags {
-          ...PetitionTagListCellContent_Tag
-        }
-      }
-      ${this.Tag}
-    `;
-  },
+    }
+  `,
 };
 
 PetitionTagListCellContent.mutations = [
@@ -230,7 +223,6 @@ PetitionTagListCellContent.mutations = [
         }
       }
     }
-    ${PetitionTagListCellContent.fragments.Tag}
   `,
   gql`
     mutation PetitionTagListCellContent_untagPetition($tagId: GID!, $petitionId: GID!) {
@@ -241,7 +233,6 @@ PetitionTagListCellContent.mutations = [
         }
       }
     }
-    ${PetitionTagListCellContent.fragments.Tag}
   `,
 ];
 

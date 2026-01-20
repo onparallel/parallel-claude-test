@@ -33,7 +33,7 @@ export function TimelineProfileAssociatedEvent({ event }: TimelineProfileAssocia
   );
 }
 
-TimelineProfileAssociatedEvent.fragments = {
+const _fragments = {
   ProfileAssociatedEvent: gql`
     fragment TimelineProfileAssociatedEvent_ProfileAssociatedEvent on ProfileAssociatedEvent {
       user {
@@ -44,7 +44,5 @@ TimelineProfileAssociatedEvent.fragments = {
       }
       createdAt
     }
-    ${UserReference.fragments.User}
-    ${ProfileReference.fragments.Profile}
   `,
 };

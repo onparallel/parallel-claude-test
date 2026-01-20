@@ -27,28 +27,11 @@ export type ProfileRelationshipTypeWithDirectionSelectSelectionInstance = Select
   never
 >;
 
-const fragments = {
-  ProfileRelationshipTypeWithDirection: gql`
-    fragment ProfileRelationshipTypeWithDirectionSelect_ProfileRelationshipTypeWithDirection on ProfileRelationshipTypeWithDirection {
-      direction
-      profileRelationshipType {
-        id
-        alias
-        isReciprocal
-        allowedLeftRightProfileTypeIds
-        allowedRightLeftProfileTypeIds
-        leftRightName
-        rightLeftName
-      }
-    }
-  `,
-};
-
 export interface ProfileRelationshipTypeWithDirectionSelectProps
   extends CustomSelectProps<ProfileRelationshipTypeWithDirectionSelectSelection, false, never> {}
 
-export const ProfileRelationshipTypeWithDirectionSelect = Object.assign(
-  forwardRef(function ProfileRelationshipTypeWithDirectionSelect(
+export const ProfileRelationshipTypeWithDirectionSelect = forwardRef(
+  function ProfileRelationshipTypeWithDirectionSelect(
     {
       value,
       onChange,
@@ -131,8 +114,7 @@ export const ProfileRelationshipTypeWithDirectionSelect = Object.assign(
         {...rsProps}
       />
     );
-  }),
-  { fragments },
+  },
 );
 
 function SingleValue(props: SingleValueProps<ProfileRelationshipTypeWithDirectionSelectSelection>) {
@@ -262,3 +244,20 @@ function IndicatorsContainer({
     </components.IndicatorsContainer>
   );
 }
+
+const _fragments = {
+  ProfileRelationshipTypeWithDirection: gql`
+    fragment ProfileRelationshipTypeWithDirectionSelect_ProfileRelationshipTypeWithDirection on ProfileRelationshipTypeWithDirection {
+      direction
+      profileRelationshipType {
+        id
+        alias
+        isReciprocal
+        allowedLeftRightProfileTypeIds
+        allowedRightLeftProfileTypeIds
+        leftRightName
+        rightLeftName
+      }
+    }
+  `,
+};

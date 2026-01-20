@@ -521,8 +521,6 @@ const _fragments = {
       ...ProfileReference_Profile
       ...useAssociateNewPetitionToProfileDialog_Profile
     }
-    ${ProfileReference.fragments.Profile}
-    ${useAssociateNewPetitionToProfileDialog.fragments.Profile}
   `,
   Petition: gql`
     fragment ProfilePetitionsTable_Petition on Petition {
@@ -557,9 +555,6 @@ const _fragments = {
         isPublicTemplate
       }
     }
-    ${ContactReference.fragments.Contact}
-    ${PetitionStatusCellContent.fragments.Petition}
-    ${PetitionSignatureCellContent.fragments.Petition}
   `,
 };
 
@@ -572,7 +567,6 @@ const _mutations = [
         }
       }
     }
-    ${_fragments.Profile}
   `,
   gql`
     mutation ProfilePetitionsTable_disassociateProfilesFromPetitions(
@@ -602,7 +596,5 @@ const _queries = [
         }
       }
     }
-    ${_fragments.Profile}
-    ${_fragments.Petition}
   `,
 ];

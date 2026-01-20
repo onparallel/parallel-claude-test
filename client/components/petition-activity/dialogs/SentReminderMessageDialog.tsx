@@ -60,7 +60,7 @@ export function useSentReminderMessageDialog() {
   return useDialog(SentReminderMessageDialog);
 }
 
-SentReminderMessageDialog.fragments = {
+const _fragments = {
   PetitionReminder: gql`
     fragment SentReminderMessageDialog_PetitionReminder on PetitionReminder {
       access {
@@ -71,6 +71,5 @@ SentReminderMessageDialog.fragments = {
       createdAt
       emailBody
     }
-    ${ContactReference.fragments.Contact}
   `,
 };

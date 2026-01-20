@@ -309,30 +309,25 @@ export function PetitionComposeNewFieldDrawerPetitionFields({
   );
 }
 
-PetitionComposeNewFieldDrawerPetitionFields.fragments = {
-  get ProfileType() {
-    return gql`
-      fragment PetitionComposeNewFieldDrawerPetitionFields_ProfileType on ProfileType {
-        id
-        name
-        icon
-        pluralName
-        standardType
-        ...ProfileTypeReference_ProfileType
-      }
-      ${ProfileTypeReference.fragments.ProfileType}
-    `;
-  },
-  get User() {
-    return gql`
-      fragment PetitionComposeNewFieldDrawerPetitionFields_User on User {
-        id
-        hasEsTaxDocumentsField: hasFeatureFlag(featureFlag: ES_TAX_DOCUMENTS_FIELD)
-        hasDowJonesField: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
-        hasProfileSearchField: hasFeatureFlag(featureFlag: PROFILE_SEARCH_FIELD)
-      }
-    `;
-  },
+const _fragments = {
+  ProfileType: gql`
+    fragment PetitionComposeNewFieldDrawerPetitionFields_ProfileType on ProfileType {
+      id
+      name
+      icon
+      pluralName
+      standardType
+      ...ProfileTypeReference_ProfileType
+    }
+  `,
+  User: gql`
+    fragment PetitionComposeNewFieldDrawerPetitionFields_User on User {
+      id
+      hasEsTaxDocumentsField: hasFeatureFlag(featureFlag: ES_TAX_DOCUMENTS_FIELD)
+      hasDowJonesField: hasFeatureFlag(featureFlag: DOW_JONES_KYC)
+      hasProfileSearchField: hasFeatureFlag(featureFlag: PROFILE_SEARCH_FIELD)
+    }
+  `,
 };
 
 interface PetitionComposeNewFieldDrawerFieldProps {

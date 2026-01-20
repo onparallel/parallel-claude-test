@@ -70,8 +70,8 @@ export interface PetitionRepliesFieldProps extends Omit<BoxProps, "filter"> {
   isDisabled?: boolean;
 }
 
-export const PetitionRepliesField = Object.assign(
-  forwardRef<HTMLElement, PetitionRepliesFieldProps>(function PetitionRepliesField(
+export const PetitionRepliesField = forwardRef<HTMLElement, PetitionRepliesFieldProps>(
+  function PetitionRepliesField(
     {
       petition,
       field,
@@ -650,78 +650,67 @@ export const PetitionRepliesField = Object.assign(
         )}
       </Card>
     );
-  }),
-  {
-    fragments: {
-      get Petition() {
-        return gql`
-          fragment PetitionRepliesField_Petition on Petition {
-            id
-            ...PetitionRepliesFieldReply_Petition
-            fields {
-              id
-              ...PetitionRepliesField_PetitionField
-              children {
-                id
-                ...PetitionRepliesField_PetitionField
-              }
-            }
-            variables {
-              ...LiquidPetitionVariableProvider_PetitionVariable
-            }
-          }
-          ${PetitionRepliesFieldReply.fragments.Petition}
-          ${PetitionRepliesFieldReply.fragments.PetitionField}
-          ${this.PetitionField}
-          ${LiquidPetitionVariableProvider.fragments.PetitionVariable}
-        `;
-      },
-      get PetitionField() {
-        return gql`
-          fragment PetitionRepliesField_PetitionField on PetitionField {
-            id
-            type
-            title
-            multiple
-            description
-            optional
-            options
-            isInternal
-            commentCount
-            unreadCommentCount
-            replies {
-              ...PetitionRepliesField_PetitionFieldReply
-            }
-            attachments {
-              id
-              file {
-                ...FileAttachmentButton_FileUpload
-              }
-            }
-            ...filterPetitionFields_PetitionField
-            ...PetitionRepliesFieldReply_PetitionField
-          }
-          fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
-            id
-            ...PetitionRepliesFieldReply_PetitionFieldReply
-            children {
-              field {
-                id
-              }
-              replies {
-                ...PetitionRepliesFieldReply_PetitionFieldReply
-              }
-            }
-          }
-          ${FileAttachmentButton.fragments.FileUpload}
-          ${PetitionRepliesFieldReply.fragments.PetitionFieldReply}
-          ${filterPetitionFields.fragments.PetitionField}
-          ${PetitionRepliesFieldReply.fragments.PetitionField}
-        `;
-      },
-    },
   },
 );
+
+const _fragments = {
+  Petition: gql`
+    fragment PetitionRepliesField_Petition on Petition {
+      id
+      ...PetitionRepliesFieldReply_Petition
+      fields {
+        id
+        ...PetitionRepliesField_PetitionField
+        children {
+          id
+          ...PetitionRepliesField_PetitionField
+        }
+      }
+      variables {
+        ...LiquidPetitionVariableProvider_PetitionVariable
+      }
+    }
+  `,
+  PetitionField: gql`
+    fragment PetitionRepliesField_PetitionField on PetitionField {
+      id
+      type
+      title
+      multiple
+      description
+      optional
+      options
+      isInternal
+      commentCount
+      unreadCommentCount
+      replies {
+        ...PetitionRepliesField_PetitionFieldReply
+      }
+      attachments {
+        id
+        file {
+          ...FileAttachmentButton_FileUpload
+        }
+      }
+      ...filterPetitionFields_PetitionField
+      ...PetitionRepliesFieldReply_PetitionField
+    }
+  `,
+  PetitionFieldReply: gql`
+    fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
+      id
+      ...PetitionRepliesFieldReply_PetitionFieldReply
+      children {
+        field {
+          id
+        }
+        replies {
+          ...PetitionRepliesFieldReply_PetitionFieldReply
+        }
+      }
+    }
+  `,
+};
 
 const _mutations = gql`
   mutation PetitionRepliesField_petitionFieldAttachmentDownloadLink(

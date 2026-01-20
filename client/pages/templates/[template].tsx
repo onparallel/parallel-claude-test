@@ -372,7 +372,7 @@ function LandingTemplateDetails({
   );
 }
 
-LandingTemplateDetails.fragments = {
+const _fragments = {
   LandingTemplate: gql`
     fragment LandingTemplateDetails_LandingTemplate on LandingTemplate {
       id
@@ -403,8 +403,6 @@ LandingTemplateDetails.fragments = {
       }
       ...useFieldsWithIndices_LandingTemplate
     }
-    ${useFieldsWithIndices.fragments.LandingTemplate}
-    ${PetitionFieldTitleContent.fragments.LandingTemplateField}
   `,
 };
 
@@ -415,7 +413,6 @@ LandingTemplateDetails.queries = [
         ...LandingTemplateDetails_LandingTemplate
       }
     }
-    ${LandingTemplateDetails.fragments.LandingTemplate}
   `,
   gql`
     query LandingTemplateDetails_landingTemplates(
@@ -431,7 +428,6 @@ LandingTemplateDetails.queries = [
         totalCount
       }
     }
-    ${LandingTemplateCard.fragments.LandingTemplate}
   `,
 ];
 

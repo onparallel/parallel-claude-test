@@ -44,11 +44,10 @@ export function MessageClosingEmailEditor({
   );
 }
 
-MessageClosingEmailEditor.fragments = {
+const _fragments = {
   PetitionBase: gql`
     fragment MessageClosingEmailEditor_PetitionBase on PetitionBase {
       ...usePetitionMessagePlaceholderOptions_PetitionBase
     }
-    ${usePetitionMessagePlaceholderOptions.fragments.PetitionBase}
   `,
 };

@@ -292,7 +292,7 @@ export function useProfileFieldValueFilterOperators(
   }, [intl.locale, field.type]);
 }
 
-useProfileFieldValueFilterOperators.fragments = {
+const _fragments = {
   ProfileTypeField: gql`
     fragment useProfileFieldValueFilterOperators_ProfileTypeField on ProfileTypeField {
       id

@@ -13,6 +13,7 @@ import {
 import { CommentIcon, EyeOffIcon } from "@parallel/chakra/icons";
 import {
   PetitionRepliesContents_PetitionFieldFragment,
+  PetitionRepliesContents_PetitionFieldFragmentDoc,
   PetitionSignatureStatusFilter,
   SignatureOrgIntegrationEnvironment,
 } from "@parallel/graphql/__types";
@@ -146,7 +147,7 @@ function SignatureStatusInfo({
   );
 }
 
-PetitionRepliesContents.fragments = {
+const _fragments = {
   PetitionField: gql`
     fragment PetitionRepliesContents_PetitionField on PetitionField {
       id
@@ -162,7 +163,6 @@ PetitionRepliesContents.fragments = {
       unreadCommentCount
       ...filterPetitionFields_PetitionField
     }
-    ${filterPetitionFields.fragments.PetitionField}
   `,
 };
 
@@ -278,7 +278,7 @@ function _PetitionRepliesContentsItem<T extends PetitionRepliesContents_Petition
 }
 
 const PetitionRepliesContentsItem = memoWithFragments(_PetitionRepliesContentsItem, {
-  field: PetitionRepliesContents.fragments.PetitionField,
+  field: PetitionRepliesContents_PetitionFieldFragmentDoc,
 });
 
 export function PetitionRepliesContentsDivider({

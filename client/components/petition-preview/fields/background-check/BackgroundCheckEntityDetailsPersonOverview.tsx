@@ -179,23 +179,21 @@ export function BackgroundCheckEntityDetailsPersonOverview({
   );
 }
 
-BackgroundCheckEntityDetailsPersonOverview.fragments = {
-  get BackgroundCheckEntityDetailsPersonOverview() {
-    return gql`
-      fragment BackgroundCheckEntityDetailsPersonOverview_BackgroundCheckEntityDetailsPerson on BackgroundCheckEntityDetailsPerson {
-        id
-        properties {
-          alias
-          birthPlace
-          education
-          ethnicity
-          name
-          position
-          religion
-          status
-          sourceUrl
-        }
+const _fragments = {
+  BackgroundCheckEntityDetailsPersonOverview: gql`
+    fragment BackgroundCheckEntityDetailsPersonOverview_BackgroundCheckEntityDetailsPerson on BackgroundCheckEntityDetailsPerson {
+      id
+      properties {
+        alias
+        birthPlace
+        education
+        ethnicity
+        name
+        position
+        religion
+        status
+        sourceUrl
       }
-    `;
-  },
+    }
+  `,
 };

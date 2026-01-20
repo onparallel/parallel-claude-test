@@ -199,7 +199,7 @@ export function DocumentThemePreview({ organization, theme }: DocumentThemePrevi
   );
 }
 
-DocumentThemePreview.fragments = {
+const _fragments = {
   Organization: gql`
     fragment DocumentThemePreview_Organization on Organization {
       id

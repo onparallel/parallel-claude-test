@@ -33,7 +33,7 @@ export function TimelinePetitionUntaggedEvent({ event }: TimelinePetitionUntagge
   );
 }
 
-TimelinePetitionUntaggedEvent.fragments = {
+const _fragments = {
   PetitionUntaggedEvent: gql`
     fragment TimelinePetitionUntaggedEvent_PetitionUntaggedEvent on PetitionUntaggedEvent {
       user {
@@ -44,7 +44,5 @@ TimelinePetitionUntaggedEvent.fragments = {
       }
       createdAt
     }
-    ${UserReference.fragments.User}
-    ${TagReference.fragments.Tag}
   `,
 };

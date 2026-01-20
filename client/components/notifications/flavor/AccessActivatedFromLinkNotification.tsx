@@ -12,52 +12,48 @@ interface AccessActivatedFromLinkNotificationProps {
   notification: AccessActivatedFromLinkNotification_AccessActivatedFromPublicPetitionLinkUserNotificationFragment;
 }
 
-export const AccessActivatedFromLinkNotification = Object.assign(
-  forwardRef<HTMLElement, AccessActivatedFromLinkNotificationProps>(
-    function AccessActivatedFromLinkNotification({ isFirst, notification }, ref) {
-      return (
-        <PetitionUserNotification
-          ref={ref}
-          isFirst={isFirst}
-          notification={notification}
-          icon={
-            <Circle size="36px" background="primary.500">
-              <LinkIcon color="white" fontSize="1rem" />
-            </Circle>
-          }
-          path={`/activity`}
-        >
-          <FormattedMessage
-            id="component.notification-access-activated-link.body"
-            defaultMessage="{name} created the parallel from a public link."
-            values={{
-              name: (
-                <ContactReference
-                  draggable="false"
-                  tabIndex={-1}
-                  contact={notification.access.contact}
-                />
-              ),
-            }}
-          />
-        </PetitionUserNotification>
-      );
-    },
-  ),
-  {
-    fragments: {
-      AccessActivatedFromPublicPetitionLinkUserNotification: gql`
-        fragment AccessActivatedFromLinkNotification_AccessActivatedFromPublicPetitionLinkUserNotification on AccessActivatedFromPublicPetitionLinkUserNotification {
-          ...PetitionUserNotification_PetitionUserNotification
-          access {
-            contact {
-              ...ContactReference_Contact
-            }
-          }
+export const AccessActivatedFromLinkNotification = forwardRef<
+  HTMLElement,
+  AccessActivatedFromLinkNotificationProps
+>(function AccessActivatedFromLinkNotification({ isFirst, notification }, ref) {
+  return (
+    <PetitionUserNotification
+      ref={ref}
+      isFirst={isFirst}
+      notification={notification}
+      icon={
+        <Circle size="36px" background="primary.500">
+          <LinkIcon color="white" fontSize="1rem" />
+        </Circle>
+      }
+      path={`/activity`}
+    >
+      <FormattedMessage
+        id="component.notification-access-activated-link.body"
+        defaultMessage="{name} created the parallel from a public link."
+        values={{
+          name: (
+            <ContactReference
+              draggable="false"
+              tabIndex={-1}
+              contact={notification.access.contact}
+            />
+          ),
+        }}
+      />
+    </PetitionUserNotification>
+  );
+});
+
+const _fragments = {
+  AccessActivatedFromPublicPetitionLinkUserNotification: gql`
+    fragment AccessActivatedFromLinkNotification_AccessActivatedFromPublicPetitionLinkUserNotification on AccessActivatedFromPublicPetitionLinkUserNotification {
+      ...PetitionUserNotification_PetitionUserNotification
+      access {
+        contact {
+          ...ContactReference_Contact
         }
-        ${PetitionUserNotification.fragments.PetitionUserNotification}
-        ${ContactReference.fragments.Contact}
-      `,
-    },
-  },
-);
+      }
+    }
+  `,
+};

@@ -338,7 +338,7 @@ export function PreviewPetitionFieldProfileSearchReply({
   );
 }
 
-PreviewPetitionFieldProfileSearch.fragments = {
+const _fragments = {
   User: gql`
     fragment PreviewPetitionFieldProfileSearch_User on User {
       id

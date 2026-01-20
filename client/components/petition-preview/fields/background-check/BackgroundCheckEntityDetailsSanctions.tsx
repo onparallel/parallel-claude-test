@@ -51,25 +51,23 @@ export function BackgroundCheckEntityDetailsSanctions({
   );
 }
 
-BackgroundCheckEntityDetailsSanctions.fragments = {
-  get BackgroundCheckEntityDetailsSanction() {
-    return gql`
-      fragment BackgroundCheckEntityDetailsSanctions_BackgroundCheckEntityDetailsSanction on BackgroundCheckEntityDetailsSanction {
-        id
-        type
-        datasets {
-          title
-        }
-        properties {
-          authority
-          startDate
-          endDate
-          program
-          sourceUrl
-        }
+const _fragments = {
+  BackgroundCheckEntityDetailsSanction: gql`
+    fragment BackgroundCheckEntityDetailsSanctions_BackgroundCheckEntityDetailsSanction on BackgroundCheckEntityDetailsSanction {
+      id
+      type
+      datasets {
+        title
       }
-    `;
-  },
+      properties {
+        authority
+        startDate
+        endDate
+        program
+        sourceUrl
+      }
+    }
+  `,
 };
 
 function useBackgroundCheckSanctionsColumns() {

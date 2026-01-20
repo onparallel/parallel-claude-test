@@ -21,8 +21,8 @@ interface PetitionViewTabsProps {
   views: PetitionViewTabs_PetitionListViewFragment[];
 }
 
-export const PetitionViewTabs = Object.assign(
-  chakraForwardRef<"div", PetitionViewTabsProps>(function PetitionViewTabs({ views }, ref) {
+export const PetitionViewTabs = chakraForwardRef<"div", PetitionViewTabsProps>(
+  function PetitionViewTabs({ views }, ref) {
     const [queryState, setQueryState] = usePetitionsQueryState();
     const intl = useIntl();
     const toast = useToast();
@@ -169,67 +169,60 @@ export const PetitionViewTabs = Object.assign(
         onReorder={handleReorderViews}
       />
     );
-  }),
-  {
-    fragments: {
-      get PetitionListViewData() {
-        return gql`
-          fragment PetitionViewTabs_PetitionListViewData on PetitionListViewData {
-            status
-            sharedWith {
-              operator
-              filters {
-                value
-                operator
-              }
-            }
-            tagsFilters {
-              operator
-              filters {
-                value
-                operator
-              }
-            }
-            signature
-            fromTemplateId
-            search
-            searchIn
-            path
-            approvals {
-              operator
-              filters {
-                operator
-                value
-              }
-            }
-            sort {
-              field
-              direction
-            }
-            columns
-            scheduledForDeletion
-          }
-        `;
-      },
-      get PetitionListView() {
-        return gql`
-          fragment PetitionViewTabs_PetitionListView on PetitionListView {
-            id
-            name
-            isDefault
-            type
-            data {
-              ...PetitionViewTabs_PetitionListViewData
-            }
-            ...ViewTabs_ListView
-          }
-          ${this.PetitionListViewData}
-          ${ViewTabs.fragments.ListView}
-        `;
-      },
-    },
   },
 );
+
+const _fragments = {
+  PetitionListViewData: gql`
+    fragment PetitionViewTabs_PetitionListViewData on PetitionListViewData {
+      status
+      sharedWith {
+        operator
+        filters {
+          value
+          operator
+        }
+      }
+      tagsFilters {
+        operator
+        filters {
+          value
+          operator
+        }
+      }
+      signature
+      fromTemplateId
+      search
+      searchIn
+      path
+      approvals {
+        operator
+        filters {
+          operator
+          value
+        }
+      }
+      sort {
+        field
+        direction
+      }
+      columns
+      scheduledForDeletion
+    }
+  `,
+  PetitionListView: gql`
+    fragment PetitionViewTabs_PetitionListView on PetitionListView {
+      id
+      name
+      isDefault
+      type
+      data {
+        ...PetitionViewTabs_PetitionListViewData
+      }
+      ...ViewTabs_ListView
+    }
+  `,
+};
 
 const _mutations = [
   gql`
@@ -267,7 +260,6 @@ const _mutations = [
         }
       }
     }
-    ${PetitionViewTabs.fragments.PetitionListView}
   `,
   gql`
     mutation PetitionViewTabs_updatePetitionListView(
@@ -285,7 +277,6 @@ const _mutations = [
         }
       }
     }
-    ${PetitionViewTabs.fragments.PetitionListView}
   `,
   gql`
     mutation PetitionViewTabs_markPetitionListViewAsDefault($petitionListViewId: GID) {

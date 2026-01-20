@@ -14,8 +14,8 @@ import { NavBarButton } from "../layout/NavBarButton";
 
 const POLL_INTERVAL = 30_000;
 
-export const NotificationsButton = Object.assign(
-  chakraForwardRef<"button", { extended?: boolean }>(function NotificationsBell(props, ref) {
+export const NotificationsButton = chakraForwardRef<"button", { extended?: boolean }>(
+  function NotificationsBell(props, ref) {
     const intl = useIntl();
     const isPageVisible = usePageVisibility();
     const { data, startPolling, stopPolling } = useQuery(
@@ -127,18 +127,17 @@ export const NotificationsButton = Object.assign(
         />
       );
     }
-  }),
-  {
-    fragments: {
-      User: gql`
-        fragment NotificationsButton_User on User {
-          unreadNotificationIds
-          unreadNotificationCount
-        }
-      `,
-    },
   },
 );
+
+const _fragments = {
+  User: gql`
+    fragment NotificationsButton_User on User {
+      unreadNotificationIds
+      unreadNotificationCount
+    }
+  `,
+};
 
 const _queries = [
   gql`
@@ -148,6 +147,5 @@ const _queries = [
         ...NotificationsButton_User
       }
     }
-    ${NotificationsButton.fragments.User}
   `,
 ];

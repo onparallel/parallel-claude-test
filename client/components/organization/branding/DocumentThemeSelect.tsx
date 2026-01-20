@@ -22,59 +22,56 @@ export interface DocumentThemeSelectProps<T extends Selection>
   isCreateNewThemeDisabled?: boolean;
 }
 
-export const DocumentThemeSelect = Object.assign(
-  forwardRef(function DocumentThemeSelect<T extends Selection>(
-    {
-      value,
-      onChange,
-      options,
-      placeholder,
-      onCreateNewTheme,
-      isCreateNewThemeDisabled,
-      ...props
-    }: DocumentThemeSelectProps<T>,
-    ref: ForwardedRef<DocumentThemeSelectInstance>,
-  ) {
-    const rsProps = useReactSelectProps({
-      ...props,
-      components: {
-        NoOptionsMessage,
-        SingleValue,
-        Option,
-        ...props.components,
-      } as any,
-    });
-
-    const extensions = { onCreateNewTheme, isCreateNewThemeDisabled };
-
-    return (
-      <Select<Selection, false, never>
-        ref={ref as any}
-        value={value}
-        onChange={onChange}
-        options={options}
-        getOptionLabel={(o) => o.name}
-        getOptionValue={(o) => o.id}
-        placeholder={placeholder}
-        {...rsProps}
-        {...(extensions as any)}
-      />
-    );
-  }) as <T extends Selection>(
-    props: DocumentThemeSelectProps<T> & RefAttributes<DocumentThemeSelectInstance>,
-  ) => ReactElement,
+export const DocumentThemeSelect = forwardRef(function DocumentThemeSelect<T extends Selection>(
   {
-    fragments: {
-      OrganizationTheme: gql`
-        fragment DocumentThemeSelect_OrganizationTheme on OrganizationTheme {
-          id
-          name
-          isDefault
-        }
-      `,
-    },
-  },
-);
+    value,
+    onChange,
+    options,
+    placeholder,
+    onCreateNewTheme,
+    isCreateNewThemeDisabled,
+    ...props
+  }: DocumentThemeSelectProps<T>,
+  ref: ForwardedRef<DocumentThemeSelectInstance>,
+) {
+  const rsProps = useReactSelectProps({
+    ...props,
+    components: {
+      NoOptionsMessage,
+      SingleValue,
+      Option,
+      ...props.components,
+    } as any,
+  });
+
+  const extensions = { onCreateNewTheme, isCreateNewThemeDisabled };
+
+  return (
+    <Select<Selection, false, never>
+      ref={ref as any}
+      value={value}
+      onChange={onChange}
+      options={options}
+      getOptionLabel={(o) => o.name}
+      getOptionValue={(o) => o.id}
+      placeholder={placeholder}
+      {...rsProps}
+      {...(extensions as any)}
+    />
+  );
+}) as <T extends Selection>(
+  props: DocumentThemeSelectProps<T> & RefAttributes<DocumentThemeSelectInstance>,
+) => ReactElement;
+
+const _fragments = {
+  OrganizationTheme: gql`
+    fragment DocumentThemeSelect_OrganizationTheme on OrganizationTheme {
+      id
+      name
+      isDefault
+    }
+  `,
+};
 
 interface ReactSelectExtraProps {
   onCreateNewTheme: () => void;

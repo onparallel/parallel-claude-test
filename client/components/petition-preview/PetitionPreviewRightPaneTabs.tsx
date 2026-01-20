@@ -142,36 +142,27 @@ export function PetitionPreviewRightPaneTabs({
   );
 }
 
-PetitionPreviewRightPaneTabs.fragments = {
-  get PetitionField() {
-    return gql`
-      fragment PetitionPreviewRightPaneTabs_PetitionField on PetitionField {
+const _fragments = {
+  PetitionField: gql`
+    fragment PetitionPreviewRightPaneTabs_PetitionField on PetitionField {
+      id
+      unreadCommentCount
+      ...PetitionRepliesFieldComments_PetitionField
+    }
+  `,
+  PetitionBase: gql`
+    fragment PetitionPreviewRightPaneTabs_PetitionBase on PetitionBase {
+      id
+      fields {
         id
-        unreadCommentCount
-        ...PetitionRepliesFieldComments_PetitionField
+        ...PetitionPreviewRightPaneTabs_PetitionField
       }
-      ${PetitionRepliesFieldComments.fragments.PetitionField}
-    `;
-  },
-  get PetitionBase() {
-    return gql`
-      fragment PetitionPreviewRightPaneTabs_PetitionBase on PetitionBase {
-        id
-        fields {
-          id
-          ...PetitionPreviewRightPaneTabs_PetitionField
-        }
-        ... on Petition {
-          unreadGeneralCommentCount
-        }
-        ...PetitionRepliesFieldComments_PetitionBase
-        ...PetitionComments_PetitionBase
-        ...RecipientViewContents_PetitionBase
+      ... on Petition {
+        unreadGeneralCommentCount
       }
-      ${this.PetitionField}
-      ${PetitionRepliesFieldComments.fragments.PetitionBase}
-      ${PetitionComments.fragments.PetitionBase}
-      ${RecipientViewContents.fragments.PetitionBase}
-    `;
-  },
+      ...PetitionRepliesFieldComments_PetitionBase
+      ...PetitionComments_PetitionBase
+      ...RecipientViewContents_PetitionBase
+    }
+  `,
 };

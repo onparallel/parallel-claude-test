@@ -38,15 +38,13 @@ export function useArchiveProfileType() {
   };
 }
 
-useArchiveProfileType.fragments = {
-  get ProfileType() {
-    return gql`
-      fragment useArchiveProfileType_ProfileType on ProfileType {
-        id
-        name
-      }
-    `;
-  },
+const _fragments = {
+  ProfileType: gql`
+    fragment useArchiveProfileType_ProfileType on ProfileType {
+      id
+      name
+    }
+  `,
 };
 
 useArchiveProfileType.mutations = [

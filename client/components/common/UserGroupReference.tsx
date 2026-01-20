@@ -13,11 +13,8 @@ interface UserGroupReferenceProps {
   disablePopover?: boolean;
 }
 
-export const UserGroupReference = Object.assign(
-  chakraForwardRef<"span", UserGroupReferenceProps>(function UserGroupReference(
-    { userGroup, disablePopover, ...props },
-    ref,
-  ) {
+export const UserGroupReference = chakraForwardRef<"span", UserGroupReferenceProps>(
+  function UserGroupReference({ userGroup, disablePopover, ...props }, ref) {
     if (userGroup) {
       return (
         <Text ref={ref} as="span" {...props}>
@@ -49,19 +46,18 @@ export const UserGroupReference = Object.assign(
         </Text>
       );
     }
-  }),
-  {
-    fragments: {
-      UserGroup: gql`
-        fragment UserGroupReference_UserGroup on UserGroup {
-          name
-          localizableName
-          type
-        }
-      `,
-    },
   },
 );
+
+const _fragments = {
+  UserGroup: gql`
+    fragment UserGroupReference_UserGroup on UserGroup {
+      name
+      localizableName
+      type
+    }
+  `,
+};
 
 export function userGroupReferenceText(
   userGroup: UserGroupReference_UserGroupFragment,

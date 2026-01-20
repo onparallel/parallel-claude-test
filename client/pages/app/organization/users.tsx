@@ -909,32 +909,27 @@ function useOrganizationUsersTableColumns() {
   );
 }
 
-OrganizationUsers.fragments = {
-  get User() {
-    return gql`
-      fragment OrganizationUsers_User on User {
+const _fragments = {
+  User: gql`
+    fragment OrganizationUsers_User on User {
+      id
+      ...UserReference_User
+      email
+      isOrgOwner
+      createdAt
+      lastActiveAt
+      status
+      isSsoUser
+      userGroups {
         id
-        ...UserReference_User
-        email
-        isOrgOwner
-        createdAt
-        lastActiveAt
-        status
-        isSsoUser
-        userGroups {
-          id
-          hasPermissions
-          name
-          localizableName
-        }
-        ...useCreateOrUpdateUserDialog_User
-        ...useConfirmDeactivateUserDialog_User
+        hasPermissions
+        name
+        localizableName
       }
-      ${UserReference.fragments.User}
-      ${useCreateOrUpdateUserDialog.fragments.User}
-      ${useConfirmDeactivateUserDialog.fragments.User}
-    `;
-  },
+      ...useCreateOrUpdateUserDialog_User
+      ...useConfirmDeactivateUserDialog_User
+    }
+  `,
 };
 
 const _mutations = [
@@ -956,7 +951,6 @@ const _mutations = [
         ...OrganizationUsers_User
       }
     }
-    ${OrganizationUsers.fragments.User}
   `,
   gql`
     mutation OrganizationUsers_updateUserGroupMembership($userId: GID!, $userGroupIds: [GID!]!) {
@@ -964,7 +958,6 @@ const _mutations = [
         ...OrganizationUsers_User
       }
     }
-    ${OrganizationUsers.fragments.User}
   `,
   gql`
     mutation OrganizationUsers_activateUser($userIds: [GID!]!) {
@@ -1015,7 +1008,6 @@ OrganizationUsers.queries = [
         }
       }
     }
-    ${OrganizationSettingsLayout.fragments.Query}
   `,
   gql`
     query OrganizationUsers_orgUsers(
@@ -1044,7 +1036,6 @@ OrganizationUsers.queries = [
         }
       }
     }
-    ${OrganizationUsers.fragments.User}
   `,
 ];
 

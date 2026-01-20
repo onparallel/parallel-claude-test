@@ -90,7 +90,7 @@ export function TimelineReplyDeletedEvent({
   );
 }
 
-TimelineReplyDeletedEvent.fragments = {
+const _fragments = {
   ReplyDeletedEvent: gql`
     fragment TimelineReplyDeletedEvent_ReplyDeletedEvent on ReplyDeletedEvent {
       field {
@@ -105,7 +105,5 @@ TimelineReplyDeletedEvent.fragments = {
       }
       createdAt
     }
-    ${UserOrContactReference.fragments.UserOrPetitionAccess}
-    ${PetitionFieldReference.fragments.PetitionField}
   `,
 };

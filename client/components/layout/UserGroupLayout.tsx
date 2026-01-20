@@ -2,10 +2,7 @@ import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import { Flex, MenuDivider, MenuItem, MenuList } from "@chakra-ui/react";
 import { CopyIcon, DeleteIcon } from "@parallel/chakra/icons";
-import {
-  UserGroupReference,
-  userGroupReferenceText,
-} from "@parallel/components/common/UserGroupReference";
+import { userGroupReferenceText } from "@parallel/components/common/UserGroupReference";
 import {
   SettingsTabsInnerLayout,
   TabDefinition,
@@ -175,7 +172,7 @@ export function UserGroupLayout({
   );
 }
 
-UserGroupLayout.fragments = {
+const _fragments = {
   Query: gql`
     fragment UserGroupLayout_Query on Query {
       ...OrganizationSettingsLayout_Query
@@ -184,7 +181,6 @@ UserGroupLayout.fragments = {
         hasPermissionManagement: hasFeatureFlag(featureFlag: PERMISSION_MANAGEMENT)
       }
     }
-    ${OrganizationSettingsLayout.fragments.Query}
   `,
   UserGroup: gql`
     fragment UserGroupLayout_UserGroup on UserGroup {
@@ -193,7 +189,6 @@ UserGroupLayout.fragments = {
       type
       ...UserGroupReference_UserGroup
     }
-    ${UserGroupReference.fragments.UserGroup}
   `,
 };
 
@@ -204,7 +199,6 @@ const _mutations = [
         ...UserGroupLayout_UserGroup
       }
     }
-    ${UserGroupLayout.fragments.UserGroup}
   `,
   gql`
     mutation UserGroupLayout_deleteUserGroup($ids: [GID!]!) {
@@ -217,6 +211,5 @@ const _mutations = [
         ...UserGroupLayout_UserGroup
       }
     }
-    ${UserGroupLayout.fragments.UserGroup}
   `,
 ];

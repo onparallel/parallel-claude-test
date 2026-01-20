@@ -14,13 +14,11 @@ export function PetitionSignatureCellContent({ petition }: PetitionSignatureCell
   return <PetitionSignatureStatusIcon status={status} environment={environment} />;
 }
 
-PetitionSignatureCellContent.fragments = {
+const _fragments = {
   Petition: gql`
     fragment PetitionSignatureCellContent_Petition on Petition {
       ...getPetitionSignatureStatus_Petition
       ...getPetitionSignatureEnvironment_Petition
     }
-    ${getPetitionSignatureStatus.fragments.Petition}
-    ${getPetitionSignatureEnvironment.fragments.Petition}
   `,
 };

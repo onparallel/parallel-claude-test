@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
-import { LandingTemplateCard } from "@parallel/components/public/templates/LandingTemplateCard";
 import { PublicTemplateCategoryPreview } from "@parallel/components/public/templates/PublicTemplateCategoryPreview";
 import { PublicTemplatesContainer } from "@parallel/components/public/templates/PublicTemplatesContainer";
 import { PublicTemplatesHero } from "@parallel/components/public/templates/PublicTemplatesHero";
@@ -65,7 +64,6 @@ Templates.queries = [
         }
       }
     }
-    ${LandingTemplateCard.fragments.LandingTemplate}
   `,
 ];
 

@@ -72,7 +72,7 @@ export function TimelinePetitionApprovalRequestStepStartedEvent({
   );
 }
 
-TimelinePetitionApprovalRequestStepStartedEvent.fragments = {
+const _fragments = {
   PetitionApprovalRequestStepStartedEvent: gql`
     fragment TimelinePetitionApprovalRequestStepStartedEvent_PetitionApprovalRequestStepStartedEvent on PetitionApprovalRequestStepStartedEvent {
       approvalRequestStep {
@@ -88,6 +88,5 @@ TimelinePetitionApprovalRequestStepStartedEvent.fragments = {
       }
       createdAt
     }
-    ${UserReference.fragments.User}
   `,
 };

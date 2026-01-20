@@ -114,7 +114,6 @@ const _fragments = {
       }
       ...useCreatePetitionFromTemplateWithPrefillDialog_PetitionBase
     }
-    ${useCreatePetitionFromTemplateWithPrefillDialog.fragments.PetitionBase}
   `,
 };
 
@@ -126,7 +125,6 @@ const _queries = [
         ...useCreatePetition_PetitionBase
       }
     }
-    ${_fragments.PetitionBase}
   `,
 ];
 

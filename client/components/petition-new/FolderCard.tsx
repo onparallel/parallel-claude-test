@@ -13,55 +13,55 @@ export interface FolderCardProps {
   onPress: () => void;
 }
 
-export const FolderCard = Object.assign(
-  chakraForwardRef<"div", FolderCardProps>(function FolderCard({ folder, onPress, ...props }, ref) {
-    const buttonProps = useRoleButton(onPress);
+export const FolderCard = chakraForwardRef<"div", FolderCardProps>(function FolderCard(
+  { folder, onPress, ...props },
+  ref,
+) {
+  const buttonProps = useRoleButton(onPress);
 
-    return (
-      <Card
-        ref={ref}
-        as={Stack}
-        padding={4}
-        minHeight="160px"
-        outline="none"
-        isInteractive
-        minWidth={0}
-        {...buttonProps}
-        {...props}
-      >
-        <HStack as="header" alignItems="flex-start">
-          <Flex>
-            <VisuallyHidden>
-              <FormattedMessage id="generic.folder" defaultMessage="Folder" />
-            </VisuallyHidden>
-            <FolderIcon fontSize="lg" role="presentation" marginTop={1} />
-          </Flex>
-          <Text as="h2" fontSize="lg" noOfLines={2} fontWeight="bold">
-            {folder.folderName}
-          </Text>
-        </HStack>
-        <Spacer />
-        <Text>
-          <FormattedMessage
-            id="generic.number-of-templates"
-            defaultMessage="{count, plural, =1 {# template} other {# templates}}"
-            values={{ count: folder.petitionCount }}
-          />
+  return (
+    <Card
+      ref={ref}
+      as={Stack}
+      padding={4}
+      minHeight="160px"
+      outline="none"
+      isInteractive
+      minWidth={0}
+      {...buttonProps}
+      {...props}
+    >
+      <HStack as="header" alignItems="flex-start">
+        <Flex>
+          <VisuallyHidden>
+            <FormattedMessage id="generic.folder" defaultMessage="Folder" />
+          </VisuallyHidden>
+          <FolderIcon fontSize="lg" role="presentation" marginTop={1} />
+        </Flex>
+        <Text as="h2" fontSize="lg" noOfLines={2} fontWeight="bold">
+          {folder.folderName}
         </Text>
-      </Card>
-    );
-  }),
-  {
-    fragments: {
-      PetitionFolder: gql`
-        fragment FolderCard_PetitionFolder on PetitionFolder {
-          folderId: id
-          folderName: name
-          path
-          petitionCount
-          minimumPermissionType
-        }
-      `,
-    },
-  },
-);
+      </HStack>
+      <Spacer />
+      <Text>
+        <FormattedMessage
+          id="generic.number-of-templates"
+          defaultMessage="{count, plural, =1 {# template} other {# templates}}"
+          values={{ count: folder.petitionCount }}
+        />
+      </Text>
+    </Card>
+  );
+});
+
+const _fragments = {
+  PetitionFolder: gql`
+    fragment FolderCard_PetitionFolder on PetitionFolder {
+      folderId: id
+      folderName: name
+      path
+      petitionCount
+      minimumPermissionType
+    }
+  `,
+};

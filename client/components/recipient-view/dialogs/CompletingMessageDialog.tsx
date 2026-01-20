@@ -207,20 +207,18 @@ function CompletingMessageDialog({
   );
 }
 
-useCompletingMessageDialog.fragments = {
-  get PublicPetition() {
-    return gql`
-      fragment useCompletingMessageDialog_PublicPetition on PublicPetition {
-        id
-        completingMessageBody
-        completingMessageSubject
-        organization {
-          name
-          logoUrl80: logoUrl(options: { resize: { height: 80 } })
-        }
+const _fragments = {
+  PublicPetition: gql`
+    fragment useCompletingMessageDialog_PublicPetition on PublicPetition {
+      id
+      completingMessageBody
+      completingMessageSubject
+      organization {
+        name
+        logoUrl80: logoUrl(options: { resize: { height: 80 } })
       }
-    `;
-  },
+    }
+  `,
 };
 
 export function useCompletingMessageDialog() {

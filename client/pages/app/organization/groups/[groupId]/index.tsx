@@ -321,37 +321,31 @@ function useOrganizationGroupTableColumns(): TableColumn<OrganizationGroup_UserG
 }
 
 const _fragments = {
-  get UserGroup() {
-    return gql`
-      fragment OrganizationGroup_UserGroup on UserGroup {
-        id
-        name
-        createdAt
-        members {
-          ...OrganizationGroup_UserGroupMember
-        }
-        type
-        ...UserGroupLayout_UserGroup
+  UserGroup: gql`
+    fragment OrganizationGroup_UserGroup on UserGroup {
+      id
+      name
+      createdAt
+      members {
+        ...OrganizationGroup_UserGroupMember
       }
-      ${this.UserGroupMember}
-      ${UserGroupLayout.fragments.UserGroup}
-    `;
-  },
-  get UserGroupMember() {
-    return gql`
-      fragment OrganizationGroup_UserGroupMember on UserGroupMember {
+      type
+      ...UserGroupLayout_UserGroup
+    }
+  `,
+  UserGroupMember: gql`
+    fragment OrganizationGroup_UserGroupMember on UserGroupMember {
+      id
+      addedAt
+      user {
         id
-        addedAt
-        user {
-          id
-          fullName
-          email
-          isOrgOwner
-          lastActiveAt
-        }
+        fullName
+        email
+        isOrgOwner
+        lastActiveAt
       }
-    `;
-  },
+    }
+  `,
 };
 
 const _mutations = [
@@ -361,7 +355,6 @@ const _mutations = [
         ...OrganizationGroup_UserGroup
       }
     }
-    ${_fragments.UserGroup}
   `,
   gql`
     mutation OrganizationGroup_removeUsersFromGroup($userGroupId: GID!, $userIds: [GID!]!) {
@@ -369,7 +362,6 @@ const _mutations = [
         ...OrganizationGroup_UserGroup
       }
     }
-    ${_fragments.UserGroup}
   `,
 ];
 
@@ -380,13 +372,11 @@ const _queries = [
         ...OrganizationGroup_UserGroup
       }
     }
-    ${_fragments.UserGroup}
   `,
   gql`
     query OrganizationGroup_user {
       ...UserGroupLayout_Query
     }
-    ${UserGroupLayout.fragments.Query}
   `,
 ];
 

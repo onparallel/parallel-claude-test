@@ -68,7 +68,7 @@ function ProfileTypeFieldReferencedMonitoringDialog({
   );
 }
 
-useProfileTypeFieldReferencedMonitoringDialog.fragments = {
+const _fragments = {
   ProfileTypeField: gql`
     fragment useProfileTypeFieldReferencedMonitoringDialog_ProfileTypeField on ProfileTypeField {
       id

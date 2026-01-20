@@ -41,46 +41,16 @@ export interface ProfilePropertyContentProps {
   fromHistory?: boolean;
 }
 
-export const ProfilePropertyContent = Object.assign(
-  chakraForwardRef<"p" | "span" | "ul" | "div", ProfilePropertyContentProps>(
-    function ProfileFieldValueContent(props, ref) {
-      if (props.field.type === "FILE") {
-        return <ProfileFieldFiles ref={ref} {...(props as any)} />;
-      } else {
-        return <ProfileFieldValue ref={ref} {...(props as any)} />;
-      }
-    },
-  ),
-  {
-    fragments: {
-      ProfileTypeField: gql`
-        fragment ProfilePropertyContent_ProfileTypeField on ProfileTypeField {
-          id
-          type
-          options
-        }
-      `,
-      ProfileFieldValue: gql`
-        fragment ProfilePropertyContent_ProfileFieldValue on ProfileFieldValue {
-          id
-          content
-          anonymizedAt
-        }
-      `,
-      // make id optional so "fake" values can be passed
-      ProfileFieldFile: gql`
-        fragment ProfilePropertyContent_ProfileFieldFile on ProfileFieldFile {
-          id @include(if: true)
-          file {
-            filename
-            contentType
-          }
-          anonymizedAt
-        }
-      `,
-    },
-  },
-);
+export const ProfilePropertyContent = chakraForwardRef<
+  "p" | "span" | "ul" | "div",
+  ProfilePropertyContentProps
+>(function ProfileFieldValueContent(props, ref) {
+  if (props.field.type === "FILE") {
+    return <ProfileFieldFiles ref={ref} {...(props as any)} />;
+  } else {
+    return <ProfileFieldValue ref={ref} {...(props as any)} />;
+  }
+});
 
 interface ProfileFieldFileContentProps {
   file: ProfilePropertyContent_ProfileFieldFileFragment;
@@ -575,3 +545,31 @@ const ProfileFieldUserAssignmentValue = chakraForwardRef<
     />
   );
 });
+
+const _fragments = {
+  ProfileTypeField: gql`
+    fragment ProfilePropertyContent_ProfileTypeField on ProfileTypeField {
+      id
+      type
+      options
+    }
+  `,
+  ProfileFieldValue: gql`
+    fragment ProfilePropertyContent_ProfileFieldValue on ProfileFieldValue {
+      id
+      content
+      anonymizedAt
+    }
+  `,
+  // make id optional so "fake" values can be passed
+  ProfileFieldFile: gql`
+    fragment ProfilePropertyContent_ProfileFieldFile on ProfileFieldFile {
+      id @include(if: true)
+      file {
+        filename
+        contentType
+      }
+      anonymizedAt
+    }
+  `,
+};

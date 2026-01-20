@@ -102,39 +102,34 @@ export function countLinkedRows<T extends GroupableField = GroupableField>(
   return linkedCount;
 }
 
-groupFieldsWithProfileTypes.fragments = {
-  get PetitionField() {
-    return gql`
-      fragment groupFieldsWithProfileTypes_PetitionField on PetitionField {
+const _fragments = {
+  PetitionField: gql`
+    fragment groupFieldsWithProfileTypes_PetitionField on PetitionField {
+      id
+      type
+      options
+      multiple
+      profileType {
         id
-        type
-        options
-        multiple
-        profileType {
-          id
-        }
-        replies {
-          ...groupFieldsWithProfileTypes_PetitionFieldReply
-        }
       }
-      ${this.PetitionFieldReply}
-    `;
-  },
-  get PetitionFieldReply() {
-    return gql`
-      fragment groupFieldsWithProfileTypes_PetitionFieldReply on PetitionFieldReply {
-        id
-        children {
-          field {
-            profileTypeField {
-              id
-            }
+      replies {
+        ...groupFieldsWithProfileTypes_PetitionFieldReply
+      }
+    }
+  `,
+  PetitionFieldReply: gql`
+    fragment groupFieldsWithProfileTypes_PetitionFieldReply on PetitionFieldReply {
+      id
+      children {
+        field {
+          profileTypeField {
+            id
           }
         }
-        associatedProfile {
-          id
-        }
       }
-    `;
-  },
+      associatedProfile {
+        id
+      }
+    }
+  `,
 };

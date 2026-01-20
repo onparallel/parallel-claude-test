@@ -35,14 +35,8 @@ import { Spacer } from "@parallel/components/common/Spacer";
 import { Table, TableColumn } from "@parallel/components/common/Table";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import { useConfirmDeactivateEventSubscriptionDialog } from "@parallel/components/settings/dialogs/ConfirmDeactivateEventSubscriptionDialog";
-import {
-  CreateOrUpdatePetitionEventSubscriptionDialog,
-  useCreateOrUpdatePetitionEventSubscriptionDialog,
-} from "@parallel/components/settings/dialogs/CreateOrUpdatePetitionEventSubscriptionDialog";
-import {
-  CreateOrUpdateProfileEventSubscriptionDialog,
-  useCreateOrUpdateProfileEventSubscriptionDialog,
-} from "@parallel/components/settings/dialogs/CreateOrUpdateProfileEventSubscriptionDialog";
+import { useCreateOrUpdatePetitionEventSubscriptionDialog } from "@parallel/components/settings/dialogs/CreateOrUpdatePetitionEventSubscriptionDialog";
+import { useCreateOrUpdateProfileEventSubscriptionDialog } from "@parallel/components/settings/dialogs/CreateOrUpdateProfileEventSubscriptionDialog";
 import {
   PetitionEventType,
   Subscriptions_deleteEventSubscriptionSignatureKeysDocument,
@@ -930,57 +924,48 @@ function useConfirmDeleteSubscriptionDialog() {
 }
 
 const _fragments = {
-  get PetitionEventSubscription() {
-    return gql`
-      fragment Subscriptions_PetitionEventSubscription on PetitionEventSubscription {
+  PetitionEventSubscription: gql`
+    fragment Subscriptions_PetitionEventSubscription on PetitionEventSubscription {
+      id
+      isEnabled
+      eventTypes
+      fromTemplate {
         id
-        isEnabled
-        eventTypes
-        fromTemplate {
-          id
-          name
-        }
-        ...CreateOrUpdatePetitionEventSubscriptionDialog_PetitionEventSubscription
-      }
-      ${CreateOrUpdatePetitionEventSubscriptionDialog.fragments.PetitionEventSubscription}
-    `;
-  },
-  get ProfileEventSubscription() {
-    return gql`
-      fragment Subscriptions_ProfileEventSubscription on ProfileEventSubscription {
-        id
-        isEnabled
-        profileEventTypes: eventTypes
-        fromProfileType {
-          id
-          name
-        }
-        ...CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscription
-      }
-      ${CreateOrUpdateProfileEventSubscriptionDialog.fragments.ProfileEventSubscription}
-    `;
-  },
-  get EventSubscription() {
-    return gql`
-      fragment Subscriptions_EventSubscription on EventSubscription {
-        id
-        eventsUrl
-        isEnabled
-        isFailing
         name
-        signatureKeys {
-          id
-        }
-        ... on PetitionEventSubscription {
-          ...Subscriptions_PetitionEventSubscription
-        }
-        ... on ProfileEventSubscription {
-          ...Subscriptions_ProfileEventSubscription
-        }
       }
-      ${this.ProfileEventSubscription}
-    `;
-  },
+      ...CreateOrUpdatePetitionEventSubscriptionDialog_PetitionEventSubscription
+    }
+  `,
+  ProfileEventSubscription: gql`
+    fragment Subscriptions_ProfileEventSubscription on ProfileEventSubscription {
+      id
+      isEnabled
+      profileEventTypes: eventTypes
+      fromProfileType {
+        id
+        name
+      }
+      ...CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscription
+    }
+  `,
+  EventSubscription: gql`
+    fragment Subscriptions_EventSubscription on EventSubscription {
+      id
+      eventsUrl
+      isEnabled
+      isFailing
+      name
+      signatureKeys {
+        id
+      }
+      ... on PetitionEventSubscription {
+        ...Subscriptions_PetitionEventSubscription
+      }
+      ... on ProfileEventSubscription {
+        ...Subscriptions_ProfileEventSubscription
+      }
+    }
+  `,
 };
 
 const _mutations = [
@@ -1004,7 +989,6 @@ const _mutations = [
         ...Subscriptions_PetitionEventSubscription
       }
     }
-    ${_fragments.PetitionEventSubscription}
   `,
   gql`
     mutation Subscriptions_updatePetitionEventSubscription(
@@ -1031,8 +1015,6 @@ const _mutations = [
         ...CreateOrUpdatePetitionEventSubscriptionDialog_PetitionEventSubscription
       }
     }
-    ${_fragments.PetitionEventSubscription}
-    ${CreateOrUpdatePetitionEventSubscriptionDialog.fragments.PetitionEventSubscription}
   `,
   gql`
     mutation Subscriptions_createProfileEventSubscription(
@@ -1054,7 +1036,6 @@ const _mutations = [
         ...Subscriptions_ProfileEventSubscription
       }
     }
-    ${_fragments.ProfileEventSubscription}
   `,
   gql`
     mutation Subscriptions_updateProfileEventSubscription(
@@ -1081,8 +1062,6 @@ const _mutations = [
         ...CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscription
       }
     }
-    ${_fragments.ProfileEventSubscription}
-    ${CreateOrUpdateProfileEventSubscriptionDialog.fragments.ProfileEventSubscription}
   `,
   gql`
     mutation Subscriptions_deleteEventSubscriptions($ids: [GID!]!) {
@@ -1096,8 +1075,6 @@ const _mutations = [
         ...CreateOrUpdateProfileEventSubscriptionDialog_EventSubscriptionSignatureKey
       }
     }
-    ${CreateOrUpdatePetitionEventSubscriptionDialog.fragments.EventSubscriptionSignatureKey}
-    ${CreateOrUpdateProfileEventSubscriptionDialog.fragments.EventSubscriptionSignatureKey}
   `,
   gql`
     mutation Subscriptions_deleteEventSubscriptionSignatureKeys($ids: [GID!]!) {
@@ -1113,13 +1090,11 @@ const _queries = [
         ...Subscriptions_EventSubscription
       }
     }
-    ${_fragments.EventSubscription}
   `,
   gql`
     query Subscriptions_user {
       ...DevelopersLayout_Query
     }
-    ${DevelopersLayout.fragments.Query}
   `,
 ];
 

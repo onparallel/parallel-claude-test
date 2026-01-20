@@ -1,10 +1,7 @@
 import { gql } from "@apollo/client";
 import { useApolloClient } from "@apollo/client/react";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import {
-  TaskProgressDialog,
-  useTaskProgressDialog,
-} from "@parallel/components/common/dialogs/TaskProgressDialog";
+import { useTaskProgressDialog } from "@parallel/components/common/dialogs/TaskProgressDialog";
 import { useFileExportTask_createFileExportTaskDocument } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 import { isNullish } from "remeda";
@@ -98,6 +95,5 @@ useFileExportTask.mutations = [
         ...TaskProgressDialog_Task
       }
     }
-    ${TaskProgressDialog.fragments.Task}
   `,
 ];

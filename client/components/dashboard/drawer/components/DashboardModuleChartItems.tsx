@@ -240,7 +240,7 @@ export function DashboardModuleChartItems({
   );
 }
 
-DashboardModuleChartItems.fragments = {
+const _fragments = {
   ProfileType: gql`
     fragment DashboardModuleChartItems_ProfileType on ProfileType {
       id
@@ -252,6 +252,5 @@ DashboardModuleChartItems.fragments = {
         ...ProfilesModuleFilterEditor_ProfileTypeField
       }
     }
-    ${ProfilesModuleFilterEditor.fragments.ProfileTypeField}
   `,
 };

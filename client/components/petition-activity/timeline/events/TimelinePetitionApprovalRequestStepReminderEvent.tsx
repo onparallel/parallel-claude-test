@@ -31,7 +31,7 @@ export function TimelinePetitionApprovalRequestStepReminderEvent({
   );
 }
 
-TimelinePetitionApprovalRequestStepReminderEvent.fragments = {
+const _fragments = {
   PetitionApprovalRequestStepReminderEvent: gql`
     fragment TimelinePetitionApprovalRequestStepReminderEvent_PetitionApprovalRequestStepReminderEvent on PetitionApprovalRequestStepReminderEvent {
       user {
@@ -39,6 +39,5 @@ TimelinePetitionApprovalRequestStepReminderEvent.fragments = {
       }
       createdAt
     }
-    ${UserReference.fragments.User}
   `,
 };

@@ -625,19 +625,16 @@ export function ProfileValueFilterLine({
   );
 }
 
-ProfileValueFilterLine.fragments = {
-  get ProfileTypeField() {
-    return gql`
-      fragment ProfileValueFilterLine_ProfileTypeField on ProfileTypeField {
-        id
-        type
-        name
-        options
-        ...useProfileFieldValueFilterOperators_ProfileTypeField
-      }
-      ${useProfileFieldValueFilterOperators.fragments.ProfileTypeField}
-    `;
-  },
+const _fragmentsProfileValueFilterLine = {
+  ProfileTypeField: gql`
+    fragment ProfileValueFilterLine_ProfileTypeField on ProfileTypeField {
+      id
+      type
+      name
+      options
+      ...useProfileFieldValueFilterOperators_ProfileTypeField
+    }
+  `,
 };
 
 const SimpleDurationInput = chakraForwardRef<"input", ValueProps<string> & ThemingProps<"Input">>(
@@ -786,76 +783,57 @@ const _components = {
   },
 };
 
-useProfileTableColumns.fragments = {
-  get ProfileTypeField() {
-    return gql`
-      fragment useProfileTableColumns_ProfileTypeField on ProfileTypeField {
-        id
-        type
-        name
-        options
-        ...ProfileValueFilterLine_ProfileTypeField
+const _fragments = {
+  ProfileTypeField: gql`
+    fragment useProfileTableColumns_ProfileTypeField on ProfileTypeField {
+      id
+      type
+      name
+      options
+      ...ProfileValueFilterLine_ProfileTypeField
+    }
+  `,
+  ProfileType: gql`
+    fragment useProfileTableColumns_ProfileType on ProfileType {
+      id
+      fields {
+        ...useProfileTableColumns_ProfileTypeField
       }
-      ${ProfileValueFilterLine.fragments.ProfileTypeField}
-    `;
-  },
-  get ProfileType() {
-    return gql`
-      fragment useProfileTableColumns_ProfileType on ProfileType {
+    }
+  `,
+  Profile: gql`
+    fragment useProfileTableColumns_Profile on Profile {
+      id
+      createdAt
+      subscribers {
         id
-        fields {
-          ...useProfileTableColumns_ProfileTypeField
-        }
-      }
-      ${this.ProfileTypeField}
-    `;
-  },
-  get Profile() {
-    return gql`
-      fragment useProfileTableColumns_Profile on Profile {
-        id
-        createdAt
-        subscribers {
+        user {
           id
-          user {
-            id
-            ...UserAvatarList_User
-          }
-        }
-        ...ProfileReference_Profile
-      }
-      ${ProfileReference.fragments.Profile}
-      ${UserAvatarList.fragments.User}
-    `;
-  },
-  get ProfileFieldProperty() {
-    return gql`
-      fragment useProfileTableColumns_ProfileFieldProperty on ProfileFieldProperty {
-        field {
-          ...ProfilePropertyContent_ProfileTypeField
-        }
-        files {
-          ...ProfilePropertyContent_ProfileFieldFile
-        }
-        value {
-          ...ProfilePropertyContent_ProfileFieldValue
+          ...UserAvatarList_User
         }
       }
-      ${ProfilePropertyContent.fragments.ProfileTypeField}
-      ${ProfilePropertyContent.fragments.ProfileFieldFile}
-      ${ProfilePropertyContent.fragments.ProfileFieldValue}
-    `;
-  },
-  get _Profile() {
-    return gql`
-      fragment useProfileTableColumns_ProfileWithProperties on Profile {
-        ...useProfileTableColumns_Profile
-        properties {
-          ...useProfileTableColumns_ProfileFieldProperty
-        }
+      ...ProfileReference_Profile
+    }
+  `,
+  ProfileFieldProperty: gql`
+    fragment useProfileTableColumns_ProfileFieldProperty on ProfileFieldProperty {
+      field {
+        ...ProfilePropertyContent_ProfileTypeField
       }
-      ${this.Profile}
-      ${this.ProfileFieldProperty}
-    `;
-  },
+      files {
+        ...ProfilePropertyContent_ProfileFieldFile
+      }
+      value {
+        ...ProfilePropertyContent_ProfileFieldValue
+      }
+    }
+  `,
+  _Profile: gql`
+    fragment useProfileTableColumns_ProfileWithProperties on Profile {
+      ...useProfileTableColumns_Profile
+      properties {
+        ...useProfileTableColumns_ProfileFieldProperty
+      }
+    }
+  `,
 };

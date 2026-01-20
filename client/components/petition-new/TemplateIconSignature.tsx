@@ -33,7 +33,7 @@ export function TemplateIconSignature({ signatureConfig, ...props }: TemplateIco
   );
 }
 
-TemplateIconSignature.fragments = {
+const _fragments = {
   SignatureConfig: gql`
     fragment TemplateIconSignature_SignatureConfig on SignatureConfig {
       review

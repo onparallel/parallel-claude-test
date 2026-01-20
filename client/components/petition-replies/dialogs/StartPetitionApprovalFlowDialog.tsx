@@ -197,29 +197,24 @@ export function useStartPetitionApprovalFlowDialog() {
   return useDialog(StartPetitionApprovalFlowDialog);
 }
 
-useStartPetitionApprovalFlowDialog.fragments = {
-  get User() {
-    return gql`
-      fragment useStartPetitionApprovalFlowDialog_User on User {
+const _fragments = {
+  User: gql`
+    fragment useStartPetitionApprovalFlowDialog_User on User {
+      id
+      fullName
+      email
+    }
+  `,
+  PetitionApprovalRequestStep: gql`
+    fragment useStartPetitionApprovalFlowDialog_PetitionApprovalRequestStep on PetitionApprovalRequestStep {
+      id
+      approvers {
         id
-        fullName
-        email
-      }
-    `;
-  },
-  get PetitionApprovalRequestStep() {
-    return gql`
-      fragment useStartPetitionApprovalFlowDialog_PetitionApprovalRequestStep on PetitionApprovalRequestStep {
-        id
-        approvers {
+        user {
           id
-          user {
-            id
-            ...useStartPetitionApprovalFlowDialog_User
-          }
+          ...useStartPetitionApprovalFlowDialog_User
         }
       }
-      ${this.User}
-    `;
-  },
+    }
+  `,
 };

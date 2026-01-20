@@ -214,7 +214,7 @@ export function useConfigureAdverseMediaAutomateSearchDialog() {
   return useDialog(ConfigureAdverseMediaAutomateSearchDialog);
 }
 
-ConfigureAdverseMediaAutomateSearchDialog.fragments = {
+const _fragments = {
   PetitionBase: gql`
     fragment ConfigureAdverseMediaAutomateSearchDialog_PetitionBase on PetitionBase {
       fields {
@@ -227,7 +227,6 @@ ConfigureAdverseMediaAutomateSearchDialog.fragments = {
       }
       ...PetitionFieldSelect_PetitionBase
     }
-    ${PetitionFieldSelect.fragments.PetitionBase}
 
     fragment ConfigureAdverseMediaAutomateSearchDialog_InnerPetitionField on PetitionField {
       id
@@ -257,6 +256,5 @@ const _queries = [
         ...ConfigureAdverseMediaAutomateSearchDialog_PetitionBase
       }
     }
-    ${ConfigureAdverseMediaAutomateSearchDialog.fragments.PetitionBase}
   `,
 ];

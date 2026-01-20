@@ -31,7 +31,7 @@ export function TimelinePetitionReminderBouncedEvent({
   );
 }
 
-TimelinePetitionReminderBouncedEvent.fragments = {
+const _fragments = {
   PetitionReminderBouncedEvent: gql`
     fragment TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEvent on PetitionReminderBouncedEvent {
       reminder {
@@ -43,6 +43,5 @@ TimelinePetitionReminderBouncedEvent.fragments = {
       }
       createdAt
     }
-    ${ContactReference.fragments.Contact}
   `,
 };

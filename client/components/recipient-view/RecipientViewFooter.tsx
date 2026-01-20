@@ -10,8 +10,8 @@ export interface RecipientViewFooterProps {
   petition: RecipientViewFooter_PublicPetitionFragment;
 }
 
-export const RecipientViewFooter = Object.assign(
-  chakraForwardRef<"div", RecipientViewFooterProps>(function RecipientViewFooter(props, ref) {
+export const RecipientViewFooter = chakraForwardRef<"div", RecipientViewFooterProps>(
+  function RecipientViewFooter(props, ref) {
     const intl = useIntl();
     return (
       <Flex
@@ -71,18 +71,17 @@ export const RecipientViewFooter = Object.assign(
         </Stack>
       </Flex>
     );
-  }),
-  {
-    fragments: {
-      PublicPetition: gql`
-        fragment RecipientViewFooter_PublicPetition on PublicPetition {
-          id
-          organization {
-            id
-            hasRemoveParallelBranding
-          }
-        }
-      `,
-    },
   },
 );
+
+const _fragments = {
+  PublicPetition: gql`
+    fragment RecipientViewFooter_PublicPetition on PublicPetition {
+      id
+      organization {
+        id
+        hasRemoveParallelBranding
+      }
+    }
+  `,
+};

@@ -33,7 +33,7 @@ export function TimelinePetitionRecoveredFromDeletionEvent({
   );
 }
 
-TimelinePetitionRecoveredFromDeletionEvent.fragments = {
+const _fragments = {
   PetitionRecoveredFromDeletionEvent: gql`
     fragment TimelinePetitionRecoveredFromDeletionEvent_PetitionRecoveredFromDeletionEvent on PetitionRecoveredFromDeletionEvent {
       user {
@@ -41,6 +41,5 @@ TimelinePetitionRecoveredFromDeletionEvent.fragments = {
       }
       createdAt
     }
-    ${UserReference.fragments.User}
   `,
 };

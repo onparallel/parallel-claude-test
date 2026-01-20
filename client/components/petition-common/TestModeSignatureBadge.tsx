@@ -43,7 +43,7 @@ export function TestModeSignatureBadge({
   );
 }
 
-TestModeSignatureBadge.fragments = {
+const _fragments = {
   User: gql`
     fragment TestModeSignatureBadge_User on User {
       hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)

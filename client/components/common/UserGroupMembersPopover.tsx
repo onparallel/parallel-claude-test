@@ -126,8 +126,6 @@ const _fragments = {
       }
       ...UserGroupReference_UserGroup
     }
-    ${UserAvatar.fragments.User}
-    ${UserGroupReference.fragments.UserGroup}
   `,
 };
 
@@ -140,6 +138,5 @@ const _queries = [
         }
       }
     }
-    ${_fragments.UserGroup}
   `,
 ];

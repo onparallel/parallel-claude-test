@@ -15,11 +15,8 @@ interface RecipientPortalHeaderProps {
   keycode: string;
 }
 
-export const RecipientPortalHeader = Object.assign(
-  chakraForwardRef<"section", RecipientPortalHeaderProps>(function RecipientPortalHeader(
-    { organization, contact, keycode, ...props },
-    ref,
-  ) {
+export const RecipientPortalHeader = chakraForwardRef<"section", RecipientPortalHeaderProps>(
+  function RecipientPortalHeader({ organization, contact, keycode, ...props }, ref) {
     return (
       <HStack
         ref={ref as any}
@@ -63,24 +60,23 @@ export const RecipientPortalHeader = Object.assign(
         </HStack>
       </HStack>
     );
-  }),
-  {
-    fragments: {
-      PublicContact: gql`
-        fragment RecipientPortalHeader_PublicContact on PublicContact {
-          id
-          fullName
-          firstName
-          email
-          initials
-        }
-      `,
-      PublicOrganization: gql`
-        fragment RecipientPortalHeader_PublicOrganization on PublicOrganization {
-          name
-          logoUrl72: logoUrl(options: { resize: { height: 72 } })
-        }
-      `,
-    },
   },
 );
+
+const _fragments = {
+  PublicContact: gql`
+    fragment RecipientPortalHeader_PublicContact on PublicContact {
+      id
+      fullName
+      firstName
+      email
+      initials
+    }
+  `,
+  PublicOrganization: gql`
+    fragment RecipientPortalHeader_PublicOrganization on PublicOrganization {
+      name
+      logoUrl72: logoUrl(options: { resize: { height: 72 } })
+    }
+  `,
+};

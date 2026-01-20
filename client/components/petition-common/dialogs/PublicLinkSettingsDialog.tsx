@@ -508,7 +508,7 @@ PublicLinkSettingsDialog.queries = [
   `,
 ];
 
-PublicLinkSettingsDialog.fragments = {
+const _fragments = {
   User: gql`
     fragment PublicLinkSettingsDialog_User on User {
       hasPrefillSecret: hasFeatureFlag(featureFlag: PUBLIC_PETITION_LINK_PREFILL_SECRET_UI)

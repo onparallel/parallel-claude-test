@@ -40,25 +40,20 @@ export function usePinProfileType() {
 }
 
 const _fragments = {
-  get ProfileType() {
-    return gql`
-      fragment usePinProfileType_ProfileType on ProfileType {
-        id
-        isPinned
+  ProfileType: gql`
+    fragment usePinProfileType_ProfileType on ProfileType {
+      id
+      isPinned
+    }
+  `,
+  User: gql`
+    fragment usePinProfileType_User on User {
+      id
+      pinnedProfileTypes {
+        ...usePinProfileType_ProfileType
       }
-    `;
-  },
-  get User() {
-    return gql`
-      fragment usePinProfileType_User on User {
-        id
-        pinnedProfileTypes {
-          ...usePinProfileType_ProfileType
-        }
-      }
-      ${this.ProfileType}
-    `;
-  },
+    }
+  `,
 };
 
 const _mutations = [
@@ -68,6 +63,5 @@ const _mutations = [
         ...usePinProfileType_ProfileType
       }
     }
-    ${_fragments.ProfileType}
   `,
 ];

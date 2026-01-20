@@ -23,7 +23,7 @@ export function getFieldsReferencedInAutoSearchConfig({
     });
 }
 
-getFieldsReferencedInAutoSearchConfig.fragments = {
+const _fragments = {
   ProfileTypeField: gql`
     fragment getFieldsReferencedInAutoSearchConfig_ProfileTypeField on ProfileTypeField {
       id

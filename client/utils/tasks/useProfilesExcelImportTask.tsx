@@ -3,10 +3,7 @@ import { useApolloClient } from "@apollo/client/react";
 import { Text } from "@chakra-ui/react";
 import { BaseModalProps } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import {
-  TaskProgressDialog,
-  useTaskProgressDialog,
-} from "@parallel/components/common/dialogs/TaskProgressDialog";
+import { useTaskProgressDialog } from "@parallel/components/common/dialogs/TaskProgressDialog";
 import { useProfilesExcelImportTask_createProfilesExcelImportTaskDocument } from "@parallel/graphql/__types";
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -150,6 +147,5 @@ useProfilesExcelImportTask.mutations = [
         ...TaskProgressDialog_Task
       }
     }
-    ${TaskProgressDialog.fragments.Task}
   `,
 ];

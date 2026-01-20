@@ -150,75 +150,64 @@ export function ProfileKeyProcesses({ profile }: { profile: ProfileKeyProcesses_
   );
 }
 
-ProfileKeyProcesses.fragments = {
-  get PetitionBaseMini() {
-    return gql`
-      fragment ProfileKeyProcesses_PetitionBaseMini on PetitionBaseMini {
+const _fragments = {
+  PetitionBaseMini: gql`
+    fragment ProfileKeyProcesses_PetitionBaseMini on PetitionBaseMini {
+      id
+      name
+      status
+      currentSignatureRequest {
         id
-        name
         status
-        currentSignatureRequest {
-          id
-          status
-        }
-        myEffectivePermission {
-          permissionType
-        }
-        lastActivityAt
       }
-    `;
-  },
-  get ProfileTypeProcess() {
-    return gql`
-      fragment ProfileKeyProcesses_ProfileTypeProcess on ProfileTypeProcess {
+      myEffectivePermission {
+        permissionType
+      }
+      lastActivityAt
+    }
+  `,
+  ProfileTypeProcess: gql`
+    fragment ProfileKeyProcesses_ProfileTypeProcess on ProfileTypeProcess {
+      id
+      name
+      position
+      latestPetition(profileId: $profileId) {
+        ...ProfileKeyProcesses_PetitionBaseMini
+      }
+      templates {
         id
-        name
-        position
-        latestPetition(profileId: $profileId) {
-          ...ProfileKeyProcesses_PetitionBaseMini
-        }
-        templates {
+        fields {
           id
-          fields {
+          type
+          isLinkedToProfileType
+          profileType {
             id
-            type
-            isLinkedToProfileType
-            profileType {
-              id
-            }
           }
         }
-        ...useAssociateNewPetitionToProfileDialog_ProfileTypeProcess
       }
-      ${this.PetitionBaseMini}
-      ${useAssociateNewPetitionToProfileDialog.fragments.ProfileTypeProcess}
-    `;
-  },
-  get Profile() {
-    return gql`
-      fragment ProfileKeyProcesses_Profile on Profile {
+      ...useAssociateNewPetitionToProfileDialog_ProfileTypeProcess
+    }
+  `,
+  Profile: gql`
+    fragment ProfileKeyProcesses_Profile on Profile {
+      id
+      profileType {
         id
-        profileType {
-          id
-          keyProcesses {
-            ...ProfileKeyProcesses_ProfileTypeProcess
-          }
+        keyProcesses {
+          ...ProfileKeyProcesses_ProfileTypeProcess
         }
-        associatedPetitions(offset: 0, limit: 100) {
-          items {
-            id
-            fromTemplate {
-              id
-            }
-          }
-        }
-        ...useAssociateNewPetitionToProfileDialog_Profile
       }
-      ${this.PetitionBaseMini}
-      ${this.ProfileTypeProcess}
-      ${useAssociateNewPetitionToProfileDialog.fragments.Profile}
-    `;
-  },
+      associatedPetitions(offset: 0, limit: 100) {
+        items {
+          id
+          fromTemplate {
+            id
+          }
+        }
+      }
+      ...useAssociateNewPetitionToProfileDialog_Profile
+    }
+  `,
 };
 
 const _mutations = [
@@ -230,7 +219,6 @@ const _mutations = [
         }
       }
     }
-    ${ProfileKeyProcesses.fragments.Profile}
   `,
   gql`
     mutation ProfileKeyProcesses_createPetitionFromProfile(

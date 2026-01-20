@@ -46,14 +46,13 @@ export function ConfirmReactivateAccessDialog({
   );
 }
 
-ConfirmReactivateAccessDialog.fragments = {
+const _fragments = {
   PetitionAccess: gql`
     fragment ConfirmReactivateAccessDialog_PetitionAccess on PetitionAccess {
       contact {
         ...ContactReference_Contact
       }
     }
-    ${ContactReference.fragments.Contact}
   `,
 };
 

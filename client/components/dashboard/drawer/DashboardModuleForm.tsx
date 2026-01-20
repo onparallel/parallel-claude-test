@@ -53,8 +53,6 @@ import { DashboardModuleProfileForm } from "./modules/profiles/DashboardModulePr
 import {
   defaultDashboardModulePetitionFilter,
   defaultDashboardModuleProfileFilter,
-  fullDashboardModulePetitionFilter,
-  fullDashboardModuleProfileFilter,
 } from "./utils/moduleUtils";
 
 export interface DashboardModuleFormData {
@@ -603,96 +601,92 @@ function DashboardModuleRatioType({ value, onChange }: DashboardModuleRatioTypeP
   );
 }
 
-DashboardModuleForm.fragments = {
-  get DashboardModule() {
-    return gql`
-      fragment DashboardModuleForm_DashboardModule on DashboardModule {
-        id
-        size
-        title
-        ... on DashboardProfilesNumberModule {
-          profilesNumberSettings: settings {
-            type
-            profileTypeId
-            profileTypeFieldId
-            aggregate
-            filters {
-              ...fullDashboardModuleProfileFilter
-            }
-          }
-        }
-        ... on DashboardPetitionsRatioModule {
-          petitionsRatioSettings: settings {
-            graphicType
-            filters {
-              ...fullDashboardModulePetitionFilter
-            }
-          }
-        }
-        ... on DashboardProfilesRatioModule {
-          profilesRatioSettings: settings {
-            type
-            graphicType
-            profileTypeId
-            profileTypeFieldId
-            aggregate
-            filters {
-              ...fullDashboardModuleProfileFilter
-            }
-          }
-        }
-        ... on DashboardPetitionsPieChartModule {
-          petitionsPieChartSettings: settings {
-            graphicType
-            items {
-              filter {
-                ...fullDashboardModulePetitionFilter
-              }
-              color
-              label
-            }
-          }
-        }
-        ... on DashboardProfilesPieChartModule {
-          profilesPieChartSettings: settings {
-            type
-            graphicType
-            profileTypeId
-            profileTypeFieldId
-            groupByProfileTypeFieldId
-            aggregate
-            items {
-              filter {
-                ...fullDashboardModuleProfileFilter
-              }
-              color
-              label
-            }
-            groupByFilter {
-              ...fullDashboardModuleProfileFilter
-            }
-          }
-        }
-        ... on DashboardCreatePetitionButtonModule {
-          createPetitionButtonSettings: settings {
-            template {
-              id
-            }
-            label
-          }
-        }
-        ... on DashboardPetitionsNumberModule {
-          petitionsNumberSettings: settings {
-            filters {
-              ...fullDashboardModulePetitionFilter
-            }
+const _fragments = {
+  DashboardModule: gql`
+    fragment DashboardModuleForm_DashboardModule on DashboardModule {
+      id
+      size
+      title
+      ... on DashboardProfilesNumberModule {
+        profilesNumberSettings: settings {
+          type
+          profileTypeId
+          profileTypeFieldId
+          aggregate
+          filters {
+            ...fullDashboardModuleProfileFilter
           }
         }
       }
-      ${fullDashboardModulePetitionFilter}
-      ${fullDashboardModuleProfileFilter}
-    `;
-  },
+      ... on DashboardPetitionsRatioModule {
+        petitionsRatioSettings: settings {
+          graphicType
+          filters {
+            ...fullDashboardModulePetitionFilter
+          }
+        }
+      }
+      ... on DashboardProfilesRatioModule {
+        profilesRatioSettings: settings {
+          type
+          graphicType
+          profileTypeId
+          profileTypeFieldId
+          aggregate
+          filters {
+            ...fullDashboardModuleProfileFilter
+          }
+        }
+      }
+      ... on DashboardPetitionsPieChartModule {
+        petitionsPieChartSettings: settings {
+          graphicType
+          items {
+            filter {
+              ...fullDashboardModulePetitionFilter
+            }
+            color
+            label
+          }
+        }
+      }
+      ... on DashboardProfilesPieChartModule {
+        profilesPieChartSettings: settings {
+          type
+          graphicType
+          profileTypeId
+          profileTypeFieldId
+          groupByProfileTypeFieldId
+          aggregate
+          items {
+            filter {
+              ...fullDashboardModuleProfileFilter
+            }
+            color
+            label
+          }
+          groupByFilter {
+            ...fullDashboardModuleProfileFilter
+          }
+        }
+      }
+      ... on DashboardCreatePetitionButtonModule {
+        createPetitionButtonSettings: settings {
+          template {
+            id
+          }
+          label
+        }
+      }
+      ... on DashboardPetitionsNumberModule {
+        petitionsNumberSettings: settings {
+          filters {
+            ...fullDashboardModulePetitionFilter
+          }
+        }
+      }
+    }
+  `,
 };
 
 const _mutations = [
@@ -865,7 +859,6 @@ const _mutations = [
         ...DashboardModuleForm_DashboardModule
       }
     }
-    ${DashboardModuleForm.fragments.DashboardModule}
   `,
   gql`
     mutation DashboardModuleForm_updateProfilesPieChartDashboardModule(
@@ -882,7 +875,6 @@ const _mutations = [
         ...DashboardModuleForm_DashboardModule
       }
     }
-    ${DashboardModuleForm.fragments.DashboardModule}
   `,
   gql`
     mutation DashboardModuleForm_updateProfilesNumberDashboardModule(
@@ -899,7 +891,6 @@ const _mutations = [
         ...DashboardModuleForm_DashboardModule
       }
     }
-    ${DashboardModuleForm.fragments.DashboardModule}
   `,
   gql`
     mutation DashboardModuleForm_updatePetitionsPieChartDashboardModule(
@@ -916,7 +907,6 @@ const _mutations = [
         ...DashboardModuleForm_DashboardModule
       }
     }
-    ${DashboardModuleForm.fragments.DashboardModule}
   `,
   gql`
     mutation DashboardModuleForm_updatePetitionsRatioDashboardModule(
@@ -933,7 +923,6 @@ const _mutations = [
         ...DashboardModuleForm_DashboardModule
       }
     }
-    ${DashboardModuleForm.fragments.DashboardModule}
   `,
   gql`
     mutation DashboardModuleForm_updateCreatePetitionButtonDashboardModule(
@@ -950,7 +939,6 @@ const _mutations = [
         ...DashboardModuleForm_DashboardModule
       }
     }
-    ${DashboardModuleForm.fragments.DashboardModule}
   `,
   gql`
     mutation DashboardModuleForm_updatePetitionsNumberDashboardModule(
@@ -967,6 +955,5 @@ const _mutations = [
         ...DashboardModuleForm_DashboardModule
       }
     }
-    ${DashboardModuleForm.fragments.DashboardModule}
   `,
 ];

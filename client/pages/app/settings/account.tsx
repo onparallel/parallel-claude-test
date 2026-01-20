@@ -94,7 +94,7 @@ function Account() {
   );
 }
 
-Account.fragments = {
+const _fragments = {
   Query: gql`
     fragment Account_Query on Query {
       ...UserSettingsLayout_Query
@@ -105,10 +105,6 @@ Account.fragments = {
         ...AccountDelegates_User
       }
     }
-    ${UserSettingsLayout.fragments.Query}
-    ${AccountChangeName.fragments.User}
-    ${AccountLocaleChange.fragments.User}
-    ${AccountDelegates.fragments.User}
   `,
 };
 
@@ -131,7 +127,6 @@ Account.mutations = [
         ...AccountLocaleChange_User
       }
     }
-    ${AccountLocaleChange.fragments.User}
   `,
   gql`
     mutation Account_setUserDelegates($delegateIds: [GID!]!) {
@@ -140,7 +135,6 @@ Account.mutations = [
         ...AccountDelegates_User
       }
     }
-    ${AccountDelegates.fragments.User}
   `,
 ];
 
@@ -149,7 +143,6 @@ Account.queries = [
     query Account_user {
       ...Account_Query
     }
-    ${Account.fragments.Query}
   `,
 ];
 

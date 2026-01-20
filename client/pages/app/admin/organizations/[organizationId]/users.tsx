@@ -465,7 +465,7 @@ function useOrganizationMembersTableColumns() {
   );
 }
 
-AdminOrganizationsMembers.fragments = {
+const _fragments = {
   OrganizationUser: gql`
     fragment AdminOrganizationsMembers_OrganizationUser on User {
       id
@@ -483,7 +483,6 @@ AdminOrganizationsMembers.fragments = {
         type
       }
     }
-    ${UserReference.fragments.User}
   `,
   Organization: gql`
     fragment AdminOrganizationsMembers_Organization on Organization {
@@ -494,7 +493,6 @@ AdminOrganizationsMembers.fragments = {
       activeUserCount
       ...AdminOrganizationsLayout_Organization
     }
-    ${AdminOrganizationsLayout.fragments.Organization}
   `,
 };
 
@@ -506,8 +504,6 @@ const _queries = [
         ...AdminOrganizationsMembers_Organization
       }
     }
-    ${AdminOrganizationsLayout.fragments.Query}
-    ${AdminOrganizationsMembers.fragments.Organization}
   `,
   gql`
     query AdminOrganizationsMembers_organization(
@@ -527,7 +523,6 @@ const _queries = [
         }
       }
     }
-    ${AdminOrganizationsMembers.fragments.OrganizationUser}
   `,
 ];
 
@@ -550,7 +545,6 @@ const _mutations = [
         ...AdminOrganizationsMembers_OrganizationUser
       }
     }
-    ${AdminOrganizationsMembers.fragments.OrganizationUser}
   `,
   gql`
     mutation AdminOrganizationsMembers_updateOrganizationUserLimit($orgId: GID!, $limit: Int!) {
@@ -558,7 +552,6 @@ const _mutations = [
         ...AdminOrganizationsMembers_Organization
       }
     }
-    ${AdminOrganizationsMembers.fragments.Organization}
   `,
 ];
 

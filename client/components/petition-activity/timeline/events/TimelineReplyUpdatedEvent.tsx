@@ -105,7 +105,7 @@ export function TimelineReplyUpdatedEvent({
   );
 }
 
-TimelineReplyUpdatedEvent.fragments = {
+const _fragments = {
   ReplyUpdatedEvent: gql`
     fragment TimelineReplyUpdatedEvent_ReplyUpdatedEvent on ReplyUpdatedEvent {
       field {
@@ -126,9 +126,5 @@ TimelineReplyUpdatedEvent.fragments = {
       }
       createdAt
     }
-    ${UserOrContactReference.fragments.UserOrPetitionAccess}
-    ${TimelineSeeReplyButton.fragments.PetitionField}
-    ${TimelineSeeReplyButton.fragments.PetitionFieldReply}
-    ${PetitionFieldReference.fragments.PetitionField}
   `,
 };

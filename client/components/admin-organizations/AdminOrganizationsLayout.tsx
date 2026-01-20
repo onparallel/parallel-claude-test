@@ -131,31 +131,25 @@ export function AdminOrganizationsLayout({
   );
 }
 
-AdminOrganizationsLayout.fragments = {
-  get Organization() {
-    return gql`
-      fragment AdminOrganizationsLayout_Organization on Organization {
+const _fragments = {
+  Organization: gql`
+    fragment AdminOrganizationsLayout_Organization on Organization {
+      id
+      name
+      status
+    }
+  `,
+  Query: gql`
+    fragment AdminOrganizationsLayout_Query on Query {
+      ...AdminSettingsLayout_Query
+      me {
         id
-        name
-        status
-      }
-    `;
-  },
-  get Query() {
-    return gql`
-      fragment AdminOrganizationsLayout_Query on Query {
-        ...AdminSettingsLayout_Query
-        me {
-          id
-          organization {
-            ...AdminOrganizationsLayout_Organization
-          }
+        organization {
+          ...AdminOrganizationsLayout_Organization
         }
       }
-      ${AdminSettingsLayout.fragments.Query}
-      ${AdminOrganizationsLayout.fragments.Organization}
-    `;
-  },
+    }
+  `,
 };
 
 const _mutations = [
@@ -168,6 +162,5 @@ const _mutations = [
         ...AdminOrganizationsLayout_Organization
       }
     }
-    ${AdminOrganizationsLayout.fragments.Organization}
   `,
 ];

@@ -197,11 +197,10 @@ export function DashboardModuleDrawer({
   );
 }
 
-DashboardModuleDrawer.fragments = {
+const _fragments = {
   DashboardModule: gql`
     fragment DashboardModuleDrawer_DashboardModule on DashboardModule {
       ...DashboardModuleForm_DashboardModule
     }
-    ${DashboardModuleForm.fragments.DashboardModule}
   `,
 };

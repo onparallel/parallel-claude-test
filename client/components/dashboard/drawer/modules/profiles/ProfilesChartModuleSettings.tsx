@@ -139,7 +139,7 @@ export function ProfilesChartModuleSettings({
   );
 }
 
-ProfilesChartModuleSettings.fragments = {
+const _fragments = {
   ProfileType: gql`
     fragment ProfilesChartModuleSettings_ProfileType on ProfileType {
       id
@@ -150,8 +150,5 @@ ProfilesChartModuleSettings.fragments = {
       }
       ...DashboardModuleChartItems_ProfileType
     }
-    ${ProfileTypeFieldSelect.fragments.ProfileTypeField}
-    ${DashboardModuleChartItems.fragments.ProfileType}
-    ${ProfilesModuleFilterEditor.fragments.ProfileTypeField}
   `,
 };

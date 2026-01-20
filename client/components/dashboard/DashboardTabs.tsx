@@ -33,171 +33,166 @@ interface DashboardTabsProps {
   onRefetchDashboards: (resetState?: boolean) => void;
 }
 
-export const DashboardTabs = Object.assign(
-  chakraForwardRef<"div", DashboardTabsProps>(function DashboardTabs(
-    {
-      userId,
-      state,
-      onStateChange,
-      onCreateDashboard,
-      dashboards,
-      onRenameDashboard,
-      onCloneDashboard,
-      onDeleteDashboard,
-      onReorder,
-      isEditing,
-      canCreateDashboard,
-      onRefetchDashboards,
-    },
-    ref,
-  ) {
-    const intl = useIntl();
-    const showGenericErrorToast = useGenericErrorToast();
-
-    const [sortedDashboardIds, setSortedDashboardIds] = useState(dashboards.map((d) => d.id));
-
-    useEffect(() => {
-      setSortedDashboardIds(dashboards.map((d) => d.id));
-    }, [dashboards.map((d) => d.id).join(",")]);
-
-    const handleDragEnd = async () => {
-      try {
-        await onReorder(sortedDashboardIds);
-      } catch (error) {
-        showGenericErrorToast(error);
-      }
-    };
-
-    const newDashboardButtonRef = useRef<HTMLButtonElement>(null);
-    const currentDashboard =
-      dashboards.find((d) => d.id === state.dashboard) ??
-      (dashboards.length > 0 ? dashboards[0] : undefined);
-
-    const handleDashboardChange = (dashboardId: string) => {
-      const dashboard = dashboards.find((d) => d.id === dashboardId);
-      if (isNonNullish(dashboard)) {
-        onStateChange({
-          dashboard: dashboard.id,
-        });
-      }
-    };
-
-    const showAskNameDialog = useAskNameDialog();
-    const handleCreateNewDashboard = async () => {
-      try {
-        const name = await showAskNameDialog({
-          name: intl.formatMessage(
-            {
-              id: "component.dashboard-tabs.dashboard-x",
-              defaultMessage: "Dashboard {count}",
-            },
-            {
-              count: dashboards.length + 1,
-            },
-          ),
-          header: (
-            <FormattedMessage
-              id="component.dashboard-tabs.new-dashboard-header"
-              defaultMessage="New dashboard"
-            />
-          ),
-          label: <FormattedMessage id="generic.forms-name-label" defaultMessage="Name" />,
-          confirm: <FormattedMessage id="generic.create" defaultMessage="Create" />,
-          modalProps: { finalFocusRef: newDashboardButtonRef },
-        });
-        onCreateDashboard(name);
-      } catch {}
-    };
-
-    return (
-      <RadioTabList
-        ref={ref}
-        className="no-print"
-        variant="line"
-        name="dashboard"
-        value={currentDashboard?.id}
-        onChange={handleDashboardChange}
-        flex={1}
-        minWidth={0}
-        listStyleType="none"
-        position="relative"
-      >
-        {dashboards.length ? (
-          <Flex
-            minWidth={`${MIN_TAB_WIDTH}px`}
-            as={Reorder.Group<string>}
-            layoutScroll
-            axis="x"
-            values={sortedDashboardIds}
-            onReorder={setSortedDashboardIds}
-            marginTop="-1px"
-            overflowX="auto"
-            overflowY="hidden"
-          >
-            {sortedDashboardIds.map((id) => {
-              const dashboard = dashboards.find((d) => d.id === id);
-              if (!dashboard) {
-                return null;
-              }
-              return (
-                <DashboardTab
-                  key={dashboard.id}
-                  userId={userId}
-                  dashboard={dashboard}
-                  isActive={dashboard.id === currentDashboard?.id}
-                  onRenameDashboard={onRenameDashboard}
-                  onCloneDashboard={onCloneDashboard}
-                  onDeleteDashboard={onDeleteDashboard}
-                  onDragEnd={handleDragEnd}
-                  canCreateDashboard={canCreateDashboard}
-                  onRefetchDashboards={onRefetchDashboards}
-                />
-              );
-            })}
-          </Flex>
-        ) : null}
-        {canCreateDashboard && isEditing ? (
-          <IconButtonWithTooltip
-            ref={newDashboardButtonRef}
-            variant="ghost"
-            icon={<AddIcon boxSize={4} />}
-            label={intl.formatMessage({
-              id: "component.dashboard-tabs.new-dashboard",
-              defaultMessage: "New dashboard",
-            })}
-            marginX={2}
-            marginY={1}
-            size="sm"
-            onClick={handleCreateNewDashboard}
-            alignSelf="flex-end"
-          />
-        ) : null}
-      </RadioTabList>
-    );
-  }),
+export const DashboardTabs = chakraForwardRef<"div", DashboardTabsProps>(function DashboardTabs(
   {
-    fragments: {
-      get Dashboard() {
-        return gql`
-          fragment DashboardTabs_Dashboard on Dashboard {
-            id
-            isRefreshing
-            lastRefreshAt
-            name
-            myEffectivePermission
-            permissions {
-              id
-              userGroup {
-                id
-                imMember
-              }
-            }
-          }
-        `;
-      },
-    },
+    userId,
+    state,
+    onStateChange,
+    onCreateDashboard,
+    dashboards,
+    onRenameDashboard,
+    onCloneDashboard,
+    onDeleteDashboard,
+    onReorder,
+    isEditing,
+    canCreateDashboard,
+    onRefetchDashboards,
   },
-);
+  ref,
+) {
+  const intl = useIntl();
+  const showGenericErrorToast = useGenericErrorToast();
+
+  const [sortedDashboardIds, setSortedDashboardIds] = useState(dashboards.map((d) => d.id));
+
+  useEffect(() => {
+    setSortedDashboardIds(dashboards.map((d) => d.id));
+  }, [dashboards.map((d) => d.id).join(",")]);
+
+  const handleDragEnd = async () => {
+    try {
+      await onReorder(sortedDashboardIds);
+    } catch (error) {
+      showGenericErrorToast(error);
+    }
+  };
+
+  const newDashboardButtonRef = useRef<HTMLButtonElement>(null);
+  const currentDashboard =
+    dashboards.find((d) => d.id === state.dashboard) ??
+    (dashboards.length > 0 ? dashboards[0] : undefined);
+
+  const handleDashboardChange = (dashboardId: string) => {
+    const dashboard = dashboards.find((d) => d.id === dashboardId);
+    if (isNonNullish(dashboard)) {
+      onStateChange({
+        dashboard: dashboard.id,
+      });
+    }
+  };
+
+  const showAskNameDialog = useAskNameDialog();
+  const handleCreateNewDashboard = async () => {
+    try {
+      const name = await showAskNameDialog({
+        name: intl.formatMessage(
+          {
+            id: "component.dashboard-tabs.dashboard-x",
+            defaultMessage: "Dashboard {count}",
+          },
+          {
+            count: dashboards.length + 1,
+          },
+        ),
+        header: (
+          <FormattedMessage
+            id="component.dashboard-tabs.new-dashboard-header"
+            defaultMessage="New dashboard"
+          />
+        ),
+        label: <FormattedMessage id="generic.forms-name-label" defaultMessage="Name" />,
+        confirm: <FormattedMessage id="generic.create" defaultMessage="Create" />,
+        modalProps: { finalFocusRef: newDashboardButtonRef },
+      });
+      onCreateDashboard(name);
+    } catch {}
+  };
+
+  return (
+    <RadioTabList
+      ref={ref}
+      className="no-print"
+      variant="line"
+      name="dashboard"
+      value={currentDashboard?.id}
+      onChange={handleDashboardChange}
+      flex={1}
+      minWidth={0}
+      listStyleType="none"
+      position="relative"
+    >
+      {dashboards.length ? (
+        <Flex
+          minWidth={`${MIN_TAB_WIDTH}px`}
+          as={Reorder.Group<string>}
+          layoutScroll
+          axis="x"
+          values={sortedDashboardIds}
+          onReorder={setSortedDashboardIds}
+          marginTop="-1px"
+          overflowX="auto"
+          overflowY="hidden"
+        >
+          {sortedDashboardIds.map((id) => {
+            const dashboard = dashboards.find((d) => d.id === id);
+            if (!dashboard) {
+              return null;
+            }
+            return (
+              <DashboardTab
+                key={dashboard.id}
+                userId={userId}
+                dashboard={dashboard}
+                isActive={dashboard.id === currentDashboard?.id}
+                onRenameDashboard={onRenameDashboard}
+                onCloneDashboard={onCloneDashboard}
+                onDeleteDashboard={onDeleteDashboard}
+                onDragEnd={handleDragEnd}
+                canCreateDashboard={canCreateDashboard}
+                onRefetchDashboards={onRefetchDashboards}
+              />
+            );
+          })}
+        </Flex>
+      ) : null}
+      {canCreateDashboard && isEditing ? (
+        <IconButtonWithTooltip
+          ref={newDashboardButtonRef}
+          variant="ghost"
+          icon={<AddIcon boxSize={4} />}
+          label={intl.formatMessage({
+            id: "component.dashboard-tabs.new-dashboard",
+            defaultMessage: "New dashboard",
+          })}
+          marginX={2}
+          marginY={1}
+          size="sm"
+          onClick={handleCreateNewDashboard}
+          alignSelf="flex-end"
+        />
+      ) : null}
+    </RadioTabList>
+  );
+});
+
+const _fragments = {
+  Dashboard: gql`
+    fragment DashboardTabs_Dashboard on Dashboard {
+      id
+      isRefreshing
+      lastRefreshAt
+      name
+      myEffectivePermission
+      permissions {
+        id
+        userGroup {
+          id
+          imMember
+        }
+      }
+    }
+  `,
+};
 
 interface DashboardTabProps {
   userId: string;

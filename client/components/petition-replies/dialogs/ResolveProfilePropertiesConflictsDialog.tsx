@@ -569,113 +569,96 @@ export function useResolveProfilePropertiesConflictsDialog() {
   );
 }
 
-useResolveProfilePropertiesConflictsDialog.fragments = {
-  get ProfileFieldProperty() {
-    return gql`
-      fragment useResolveProfilePropertiesConflictsDialog_ProfileFieldProperty on ProfileFieldProperty {
-        field {
-          id
-          type
-          name
-          options
-          isUsedInProfileName
-        }
-        files {
-          id
-          file {
-            size
-            isComplete
-            filename
-            contentType
-          }
-        }
-        value {
-          id
-          content
-        }
-      }
-    `;
-  },
-  get Profile() {
-    return gql`
-      fragment useResolveProfilePropertiesConflictsDialog_Profile on Profile {
+const _fragments = {
+  ProfileFieldProperty: gql`
+    fragment useResolveProfilePropertiesConflictsDialog_ProfileFieldProperty on ProfileFieldProperty {
+      field {
         id
-        properties {
-          ...useResolveProfilePropertiesConflictsDialog_ProfileFieldProperty
-        }
-        ...ProfileReference_Profile
+        type
+        name
+        options
+        isUsedInProfileName
       }
-      ${this.ProfileFieldProperty}
-      ${ProfileReference.fragments.Profile}
-    `;
-  },
+      files {
+        id
+        file {
+          size
+          isComplete
+          filename
+          contentType
+        }
+      }
+      value {
+        id
+        content
+      }
+    }
+  `,
+  Profile: gql`
+    fragment useResolveProfilePropertiesConflictsDialog_Profile on Profile {
+      id
+      properties {
+        ...useResolveProfilePropertiesConflictsDialog_ProfileFieldProperty
+      }
+      ...ProfileReference_Profile
+    }
+  `,
 
-  get PetitionFieldReply() {
-    return gql`
-      fragment useResolveProfilePropertiesConflictsDialog_PetitionFieldReply on PetitionFieldReply {
+  PetitionFieldReply: gql`
+    fragment useResolveProfilePropertiesConflictsDialog_PetitionFieldReply on PetitionFieldReply {
+      id
+      parent {
         id
-        parent {
-          id
-        }
-        ...PetitionFieldRepliesContent_PetitionFieldReply
       }
-      ${PetitionFieldRepliesContent.fragments.PetitionFieldReply}
-    `;
-  },
-  get PetitionField() {
-    return gql`
-      fragment useResolveProfilePropertiesConflictsDialog_PetitionField on PetitionField {
+      ...PetitionFieldRepliesContent_PetitionFieldReply
+    }
+  `,
+  PetitionField: gql`
+    fragment useResolveProfilePropertiesConflictsDialog_PetitionField on PetitionField {
+      id
+      ...PetitionFieldRepliesContent_PetitionField
+      parent {
         id
-        ...PetitionFieldRepliesContent_PetitionField
-        parent {
-          id
-        }
-        profileTypeField {
-          id
-        }
-        replies {
-          ...useResolveProfilePropertiesConflictsDialog_PetitionFieldReply
-        }
       }
-      ${this.PetitionFieldReply}
-      ${PetitionFieldRepliesContent.fragments.PetitionField}
-    `;
-  },
-  get Petition() {
-    return gql`
-      fragment useResolveProfilePropertiesConflictsDialog_Petition on Petition {
+      profileTypeField {
         id
-        closedAt
-        fields {
+      }
+      replies {
+        ...useResolveProfilePropertiesConflictsDialog_PetitionFieldReply
+      }
+    }
+  `,
+  Petition: gql`
+    fragment useResolveProfilePropertiesConflictsDialog_Petition on Petition {
+      id
+      closedAt
+      fields {
+        id
+        ...useResolveProfilePropertiesConflictsDialog_PetitionField
+        children {
           id
           ...useResolveProfilePropertiesConflictsDialog_PetitionField
-          children {
-            id
-            ...useResolveProfilePropertiesConflictsDialog_PetitionField
-          }
         }
-        variables {
-          name
-          __typename
-          ... on PetitionVariableNumber {
-            valueLabels {
-              value
-              label
-            }
-          }
-          ... on PetitionVariableEnum {
-            enumValueLabels: valueLabels {
-              value
-              label
-            }
-          }
-        }
-        ...useFieldLogic_PetitionBase
       }
-      ${this.PetitionField}
-      ${useFieldLogic.fragments.PetitionBase}
-    `;
-  },
+      variables {
+        name
+        __typename
+        ... on PetitionVariableNumber {
+          valueLabels {
+            value
+            label
+          }
+        }
+        ... on PetitionVariableEnum {
+          enumValueLabels: valueLabels {
+            value
+            label
+          }
+        }
+      }
+      ...useFieldLogic_PetitionBase
+    }
+  `,
 };
 
 const _queries = {
@@ -685,7 +668,6 @@ const _queries = {
         ...useResolveProfilePropertiesConflictsDialog_Profile
       }
     }
-    ${useResolveProfilePropertiesConflictsDialog.fragments.Profile}
   `,
   petition: gql`
     query useResolveProfilePropertiesConflictsDialog_petition($petitionId: GID!) {
@@ -694,6 +676,5 @@ const _queries = {
         ...useResolveProfilePropertiesConflictsDialog_Petition
       }
     }
-    ${useResolveProfilePropertiesConflictsDialog.fragments.Petition}
   `,
 };

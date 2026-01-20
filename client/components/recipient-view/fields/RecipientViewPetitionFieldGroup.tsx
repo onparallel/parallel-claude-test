@@ -34,15 +34,11 @@ import {
 import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
 import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
 import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
-import { usePetitionCanFinalize } from "@parallel/utils/usePetitionCanFinalize";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish, zip } from "remeda";
 import { RecipientViewPetitionFieldIdVerification } from "./RecipientViewPetitionFieldIdVerification";
-import {
-  RecipientViewPetitionFieldLayout,
-  RecipientViewPetitionFieldLayoutProps,
-} from "./RecipientViewPetitionFieldLayout";
+import { RecipientViewPetitionFieldLayoutProps } from "./RecipientViewPetitionFieldLayout";
 
 export interface RecipientViewPetitionFieldGroupProps
   extends Omit<
@@ -530,7 +526,7 @@ export function RecipientViewPetitionFieldGroupCard({
   );
 }
 
-RecipientViewPetitionFieldGroupLayout.fragments = {
+const _fragmentsRecipientViewPetitionFieldGroupLayout = {
   PetitionField: gql`
     fragment RecipientViewPetitionFieldGroupLayout_PetitionField on PetitionField {
       id
@@ -553,7 +549,6 @@ RecipientViewPetitionFieldGroupLayout.fragments = {
         id
       }
     }
-    ${FileAttachmentButton.fragments.FileUpload}
   `,
   PublicPetitionField: gql`
     fragment RecipientViewPetitionFieldGroupLayout_PublicPetitionField on PublicPetitionField {
@@ -577,11 +572,10 @@ RecipientViewPetitionFieldGroupLayout.fragments = {
         id
       }
     }
-    ${FileAttachmentButton.fragments.FileUpload}
   `,
 };
 
-RecipientViewPetitionFieldGroupCard.fragments = {
+const _fragmentsRecipientViewPetitionFieldGroupCard = {
   PetitionField: gql`
     fragment RecipientViewPetitionFieldGroupCard_PetitionField on PetitionField {
       id
@@ -606,7 +600,7 @@ RecipientViewPetitionFieldGroupCard.fragments = {
   `,
 };
 
-RecipientViewPetitionFieldGroup.fragments = {
+const _fragments = {
   PublicPetitionField: gql`
     fragment RecipientViewPetitionFieldGroup_PublicPetitionField on PublicPetitionField {
       id
@@ -629,10 +623,6 @@ RecipientViewPetitionFieldGroup.fragments = {
       }
       ...RecipientViewPetitionFieldLayout_PublicPetitionField
     }
-    ${RecipientViewPetitionFieldLayout.fragments.PublicPetitionField}
-    ${RecipientViewPetitionFieldLayout.fragments.PublicPetitionFieldReply}
-    ${RecipientViewPetitionFieldGroupCard.fragments.PublicPetitionField}
-    ${RecipientViewPetitionFieldGroupLayout.fragments.PublicPetitionField}
   `,
   PublicPetition: gql`
     fragment RecipientViewPetitionFieldGroup_PublicPetition on PublicPetition {
@@ -642,7 +632,5 @@ RecipientViewPetitionFieldGroup.fragments = {
         ...LiquidPetitionVariableProvider_PetitionVariable
       }
     }
-    ${usePetitionCanFinalize.fragments.PublicPetition}
-    ${LiquidPetitionVariableProvider.fragments.PetitionVariable}
   `,
 };

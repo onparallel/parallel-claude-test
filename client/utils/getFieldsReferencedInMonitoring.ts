@@ -23,7 +23,7 @@ export function getFieldsReferencedInMonitoring({
     });
 }
 
-getFieldsReferencedInMonitoring.fragments = {
+const _fragments = {
   ProfileTypeField: gql`
     fragment getFieldsReferencedInMonitoring_ProfileTypeField on ProfileTypeField {
       id

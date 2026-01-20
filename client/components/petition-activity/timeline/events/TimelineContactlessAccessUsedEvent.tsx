@@ -33,7 +33,7 @@ export function TimelineContactlessAccessUsedEvent({
   );
 }
 
-TimelineContactlessAccessUsedEvent.fragments = {
+const _fragments = {
   ContactlessAccessUsedEvent: gql`
     fragment TimelineContactlessAccessUsedEvent_ContactlessAccessUsedEvent on ContactlessAccessUsedEvent {
       access {
@@ -43,6 +43,5 @@ TimelineContactlessAccessUsedEvent.fragments = {
       }
       createdAt
     }
-    ${ContactReference.fragments.Contact}
   `,
 };

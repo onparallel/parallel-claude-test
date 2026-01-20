@@ -81,7 +81,7 @@ export function PetitionSignatureRequestStatusText({
   }
 }
 
-PetitionSignatureRequestStatusText.fragments = {
+const _fragments = {
   PetitionSignatureRequest: gql`
     fragment PetitionSignatureRequestStatusText_PetitionSignatureRequest on PetitionSignatureRequest {
       id

@@ -344,7 +344,7 @@ export function KYCResearchFieldReplyProfile({
   );
 }
 
-PreviewPetitionFieldKyc.fragments = {
+const _fragments = {
   PetitionBase: gql`
     fragment PreviewPetitionFieldKyc_PetitionBase on PetitionBase {
       id

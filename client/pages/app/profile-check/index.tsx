@@ -395,7 +395,7 @@ function ProfileSearchTabs({
   );
 }
 
-ProfileSearch.fragments = {
+const _fragments = {
   ProfileType: gql`
     fragment ProfileSearch_ProfileType on ProfileType {
       id
@@ -425,10 +425,6 @@ ProfileSearch.fragments = {
       }
       ...ProfileReference_Profile
     }
-    ${ProfilePropertyContent.fragments.ProfileFieldFile}
-    ${ProfilePropertyContent.fragments.ProfileFieldValue}
-    ${ProfilePropertyContent.fragments.ProfileTypeField}
-    ${ProfileReference.fragments.Profile}
   `,
 };
 
@@ -633,7 +629,6 @@ const _queries = [
         totalCount
       }
     }
-    ${ProfileTypeReference.fragments.ProfileType}
   `,
   gql`
     query ProfileSearch_conflictCheckProfileSearch(
@@ -645,7 +640,6 @@ const _queries = [
         ...ProfileSearch_Profile
       }
     }
-    ${ProfileSearch.fragments.Profile}
   `,
 ];
 

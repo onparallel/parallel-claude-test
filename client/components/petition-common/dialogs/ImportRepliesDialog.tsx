@@ -579,40 +579,33 @@ function ImportRepliesMappingDialog({
 }
 
 const _fragments = {
-  get PetitionField() {
-    return gql`
-      fragment ImportRepliesDialog_PetitionField on PetitionField {
+  PetitionField: gql`
+    fragment ImportRepliesDialog_PetitionField on PetitionField {
+      id
+      replies {
         id
-        replies {
-          id
-          children {
-            field {
-              id
-            }
-            replies {
-              id
-            }
+        children {
+          field {
+            id
+          }
+          replies {
+            id
           }
         }
       }
-    `;
-  },
-  get Petition() {
-    return gql`
-      fragment ImportRepliesDialog_Petition on Petition {
+    }
+  `,
+  Petition: gql`
+    fragment ImportRepliesDialog_Petition on Petition {
+      id
+      ...MapFieldsTable_PetitionBase
+      fields {
         id
-        ...MapFieldsTable_PetitionBase
-        fields {
-          id
-          ...mapReplyContents_PetitionField
-          ...ImportRepliesDialog_PetitionField
-        }
+        ...mapReplyContents_PetitionField
+        ...ImportRepliesDialog_PetitionField
       }
-      ${mapReplyContents.fragments.PetitionField}
-      ${MapFieldsTable.fragments.PetitionBase}
-      ${this.PetitionField}
-    `;
-  },
+    }
+  `,
 };
 
 const _queries = [
@@ -623,7 +616,6 @@ const _queries = [
         ...ImportRepliesDialog_Petition
       }
     }
-    ${_fragments.Petition}
   `,
 ];
 
@@ -645,7 +637,6 @@ const _mutations = [
         }
       }
     }
-    ${_fragments.PetitionField}
   `,
 ];
 

@@ -78,7 +78,7 @@ export function NewSignatureRequestRow({
   );
 }
 
-NewSignatureRequestRow.fragments = {
+const _fragments = {
   Petition: gql`
     fragment NewSignatureRequestRow_Petition on Petition {
       ...useStartSignatureRequest_Petition
@@ -88,7 +88,5 @@ NewSignatureRequestRow.fragments = {
         }
       }
     }
-    ${useStartSignatureRequest.fragments.Petition}
-    ${SignerReference.fragments.PetitionSigner}
   `,
 };

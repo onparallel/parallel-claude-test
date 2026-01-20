@@ -443,11 +443,8 @@ export interface PetitionFieldTitleContentProps {
     | PetitionFieldTitleContent_LandingTemplateFieldFragment;
 }
 
-export const PetitionFieldTitleContent = Object.assign(
-  chakraForwardRef<"p", PetitionFieldTitleContentProps>(function PetitionFieldTitleContent(
-    { index, field, ...props },
-    ref,
-  ) {
+export const PetitionFieldTitleContent = chakraForwardRef<"p", PetitionFieldTitleContentProps>(
+  function PetitionFieldTitleContent({ index, field, ...props }, ref) {
     return (
       <Text {...props} ref={ref}>
         {index}.{" "}
@@ -462,26 +459,25 @@ export const PetitionFieldTitleContent = Object.assign(
         )}
       </Text>
     );
-  }),
-  {
-    fragments: {
-      PetitionField: gql`
-        fragment PetitionFieldTitleContent_PetitionField on PetitionField {
-          id
-          title
-        }
-      `,
-      LandingTemplateField: gql`
-        fragment PetitionFieldTitleContent_LandingTemplateField on LandingTemplateField {
-          id
-          title
-        }
-      `,
-    },
   },
 );
 
-TemplateDetailsModal.fragments = {
+const _fragments = {
+  PetitionField: gql`
+    fragment PetitionFieldTitleContent_PetitionField on PetitionField {
+      id
+      title
+    }
+  `,
+  LandingTemplateField: gql`
+    fragment PetitionFieldTitleContent_LandingTemplateField on LandingTemplateField {
+      id
+      title
+    }
+  `,
+};
+
+const _fragmentsTemplateDetailsModal = {
   PetitionTemplate: gql`
     fragment TemplateDetailsModal_PetitionTemplate on PetitionTemplate {
       id
@@ -534,8 +530,5 @@ TemplateDetailsModal.fragments = {
       ...TemplateActiveSettingsIcons_PetitionTemplate
       ...useFieldsWithIndices_PetitionBase
     }
-    ${PetitionFieldTitleContent.fragments.PetitionField}
-    ${TemplateActiveSettingsIcons.fragments.PetitionTemplate}
-    ${useFieldsWithIndices.fragments.PetitionBase}
   `,
 };

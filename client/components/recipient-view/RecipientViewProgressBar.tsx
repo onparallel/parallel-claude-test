@@ -50,8 +50,8 @@ export interface RecipientViewProgressBarProps {
   onFinalize?: () => void;
 }
 
-export const RecipientViewProgressBar = Object.assign(
-  chakraForwardRef<"div", RecipientViewProgressBarProps>(function RecipientViewProgressBar(
+export const RecipientViewProgressBar = chakraForwardRef<"div", RecipientViewProgressBarProps>(
+  function RecipientViewProgressBar(
     { petition, isDisabled, canFinalize, onFinalize, ...props },
     ref,
   ) {
@@ -186,97 +186,86 @@ export const RecipientViewProgressBar = Object.assign(
         ) : null}
       </HStack>
     );
-  }),
-  {
-    fragments: {
-      get Petition() {
-        return gql`
-          fragment RecipientViewProgressBar_Petition on Petition {
-            status
-            fields {
-              id
-              ...RecipientViewProgressBar_PetitionField
-            }
-            signatureConfig {
-              isEnabled
-              review
-            }
-            ...useFieldLogic_PetitionBase
-          }
-
-          fragment RecipientViewProgressBar_PetitionField on PetitionField {
-            id
-            type
-            optional
-            isInternal
-            isReadOnly
-            replies {
-              id
-              children {
-                field {
-                  id
-                  optional
-                  isInternal
-                  isReadOnly
-                  ...completedFieldReplies_PetitionField
-                }
-                replies {
-                  id
-                  ...completedFieldReplies_PetitionFieldReply
-                }
-              }
-            }
-            ...completedFieldReplies_PetitionField
-          }
-          ${useFieldLogic.fragments.PetitionBase}
-          ${completedFieldReplies.fragments.PetitionField}
-          ${completedFieldReplies.fragments.PetitionFieldReply}
-        `;
-      },
-      get PublicPetition() {
-        return gql`
-          fragment RecipientViewProgressBar_PublicPetition on PublicPetition {
-            status
-            fields {
-              id
-              ...RecipientViewProgressBar_PublicPetitionField
-            }
-            signatureConfig {
-              isEnabled
-              review
-            }
-            ...useFieldLogic_PublicPetition
-          }
-
-          fragment RecipientViewProgressBar_PublicPetitionField on PublicPetitionField {
-            id
-            type
-            optional
-            isInternal
-            isReadOnly
-            replies {
-              id
-              children {
-                field {
-                  id
-                  optional
-                  isInternal
-                  isReadOnly
-                  ...completedFieldReplies_PublicPetitionField
-                }
-                replies {
-                  id
-                  ...completedFieldReplies_PublicPetitionFieldReply
-                }
-              }
-            }
-            ...completedFieldReplies_PublicPetitionField
-          }
-          ${useFieldLogic.fragments.PublicPetition}
-          ${completedFieldReplies.fragments.PublicPetitionField}
-          ${completedFieldReplies.fragments.PublicPetitionFieldReply}
-        `;
-      },
-    },
   },
 );
+
+const _fragments = {
+  Petition: gql`
+    fragment RecipientViewProgressBar_Petition on Petition {
+      status
+      fields {
+        id
+        ...RecipientViewProgressBar_PetitionField
+      }
+      signatureConfig {
+        isEnabled
+        review
+      }
+      ...useFieldLogic_PetitionBase
+    }
+
+    fragment RecipientViewProgressBar_PetitionField on PetitionField {
+      id
+      type
+      optional
+      isInternal
+      isReadOnly
+      replies {
+        id
+        children {
+          field {
+            id
+            optional
+            isInternal
+            isReadOnly
+            ...completedFieldReplies_PetitionField
+          }
+          replies {
+            id
+            ...completedFieldReplies_PetitionFieldReply
+          }
+        }
+      }
+      ...completedFieldReplies_PetitionField
+    }
+  `,
+  PublicPetition: gql`
+    fragment RecipientViewProgressBar_PublicPetition on PublicPetition {
+      status
+      fields {
+        id
+        ...RecipientViewProgressBar_PublicPetitionField
+      }
+      signatureConfig {
+        isEnabled
+        review
+      }
+      ...useFieldLogic_PublicPetition
+    }
+
+    fragment RecipientViewProgressBar_PublicPetitionField on PublicPetitionField {
+      id
+      type
+      optional
+      isInternal
+      isReadOnly
+      replies {
+        id
+        children {
+          field {
+            id
+            optional
+            isInternal
+            isReadOnly
+            ...completedFieldReplies_PublicPetitionField
+          }
+          replies {
+            id
+            ...completedFieldReplies_PublicPetitionFieldReply
+          }
+        }
+      }
+      ...completedFieldReplies_PublicPetitionField
+    }
+  `,
+};

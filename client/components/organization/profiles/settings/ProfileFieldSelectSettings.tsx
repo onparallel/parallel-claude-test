@@ -452,7 +452,7 @@ export function ProfileFieldSelectSettings({
   );
 }
 
-ProfileFieldSelectSettings.fragments = {
+const _fragments = {
   ProfileType: gql`
     fragment ProfileFieldSelectSettings_ProfileType on ProfileType {
       id
@@ -461,8 +461,6 @@ ProfileFieldSelectSettings.fragments = {
         ...getFieldsReferencedInAutoSearchConfig_ProfileTypeField
       }
     }
-    ${getFieldsReferencedInMonitoring.fragments.ProfileTypeField}
-    ${getFieldsReferencedInAutoSearchConfig.fragments.ProfileTypeField}
   `,
   ProfileTypeField: gql`
     fragment ProfileFieldSelectSettings_ProfileTypeField on ProfileTypeField {

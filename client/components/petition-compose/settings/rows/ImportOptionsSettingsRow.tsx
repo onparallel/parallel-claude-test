@@ -101,7 +101,7 @@ export function ImportOptionsSettingsRow({
   );
 }
 
-ImportOptionsSettingsRow.fragments = {
+const _fragments = {
   PetitionField: gql`
     fragment ImportOptionsSettingsRow_PetitionField on PetitionField {
       id

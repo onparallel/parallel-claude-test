@@ -31,7 +31,7 @@ export function TimelinePetitionScheduledForDeletionEvent({
   );
 }
 
-TimelinePetitionScheduledForDeletionEvent.fragments = {
+const _fragments = {
   PetitionScheduledForDeletionEvent: gql`
     fragment TimelinePetitionScheduledForDeletionEvent_PetitionScheduledForDeletionEvent on PetitionScheduledForDeletionEvent {
       user {
@@ -39,6 +39,5 @@ TimelinePetitionScheduledForDeletionEvent.fragments = {
       }
       createdAt
     }
-    ${UserReference.fragments.User}
   `,
 };

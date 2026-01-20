@@ -44,7 +44,7 @@ export function getPetitionSignatureStatus({
   return "NO_SIGNATURE";
 }
 
-getPetitionSignatureStatus.fragments = {
+const _fragments = {
   Petition: gql`
     fragment getPetitionSignatureStatus_Petition on Petition {
       status

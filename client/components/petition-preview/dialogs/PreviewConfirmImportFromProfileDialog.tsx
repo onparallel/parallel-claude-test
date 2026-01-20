@@ -83,6 +83,5 @@ const _queries = [
         }
       }
     }
-    ${ProfileReference.fragments.Profile}
   `,
 ];

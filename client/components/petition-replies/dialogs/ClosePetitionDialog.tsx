@@ -215,7 +215,7 @@ export function useClosePetitionDialog() {
   return useDialog(ClosePetitionDialog);
 }
 
-useClosePetitionDialog.fragments = {
+const _fragments = {
   Petition: gql`
     fragment useClosePetitionDialog_Petition on Petition {
       id
@@ -230,6 +230,5 @@ useClosePetitionDialog.fragments = {
       }
       ...usePetitionMessagePlaceholderOptions_PetitionBase
     }
-    ${usePetitionMessagePlaceholderOptions.fragments.PetitionBase}
   `,
 };

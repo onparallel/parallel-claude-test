@@ -10,7 +10,6 @@ import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { UploadFileError, uploadFile } from "@parallel/utils/uploadFile";
 import pMap from "p-map";
 import { MutableRefObject, useCallback } from "react";
-import { RecipientViewPetitionFieldLayout } from "./RecipientViewPetitionFieldLayout";
 
 const _publicCreateFileUploadReply = gql`
   mutation RecipientViewPetitionFieldMutations_publicCreateFileUploadReply(
@@ -65,8 +64,6 @@ const _publicCreateFileUploadReply = gql`
       }
     }
   }
-  ${uploadFile.fragments.AWSPresignedPostData}
-  ${RecipientViewPetitionFieldLayout.fragments.PublicPetitionFieldReply}
 `;
 const _publicFileUploadReplyComplete = gql`
   mutation RecipientViewPetitionFieldMutations_publicFileUploadReplyComplete(
@@ -206,7 +203,7 @@ function updateReplyContent(
   });
 }
 
-updateReplyContent.fragments = {
+const _fragments = {
   PublicPetitionFieldReply: gql`
     fragment RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReply on PublicPetitionFieldReply {
       content

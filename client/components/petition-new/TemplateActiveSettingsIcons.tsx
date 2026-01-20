@@ -67,7 +67,7 @@ export function TemplateActiveSettingsIcons({
   );
 }
 
-TemplateActiveSettingsIcons.fragments = {
+const _fragments = {
   PetitionTemplate: gql`
     fragment TemplateActiveSettingsIcons_PetitionTemplate on PetitionTemplate {
       id
@@ -88,8 +88,5 @@ TemplateActiveSettingsIcons.fragments = {
       ...TemplateIconDefaultPermissions_PetitionTemplate
       anonymizeAfterMonths
     }
-    ${TemplateIconSignature.fragments.SignatureConfig}
-    ${TemplateIconReminders.fragments.RemindersConfig}
-    ${TemplateIconDefaultPermissions.fragments.PetitionTemplate}
   `,
 };

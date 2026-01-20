@@ -152,7 +152,7 @@ export function useCompliancePeriodDialog() {
   return useDialog(CompliancePeriodDialog);
 }
 
-CompliancePeriodDialog.fragments = {
+const _fragments = {
   PetitionBase: gql`
     fragment CompliancePeriodDialog_PetitionBase on PetitionBase {
       id

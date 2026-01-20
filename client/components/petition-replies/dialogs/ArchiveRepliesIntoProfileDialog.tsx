@@ -858,140 +858,109 @@ export function useArchiveRepliesIntoProfileDialog() {
   );
 }
 
-useArchiveRepliesIntoProfileDialog.fragments = {
-  get ProfileFieldProperty() {
-    return gql`
-      fragment useArchiveRepliesIntoProfileDialog_ProfileFieldProperty on ProfileFieldProperty {
+const _fragments = {
+  ProfileFieldProperty: gql`
+    fragment useArchiveRepliesIntoProfileDialog_ProfileFieldProperty on ProfileFieldProperty {
+      field {
+        id
+        name
+        type
+        myPermission
+        isUsedInProfileName
+      }
+    }
+  `,
+  Profile: gql`
+    fragment useArchiveRepliesIntoProfileDialog_Profile on Profile {
+      id
+      properties {
+        ...useArchiveRepliesIntoProfileDialog_ProfileFieldProperty
+      }
+      ...ProfileSelect_Profile
+      ...ProfileReference_Profile
+      ...useCheckUpdateProfile_Profile
+    }
+  `,
+  PetitionFieldReplyInner: gql`
+    fragment useArchiveRepliesIntoProfileDialog_PetitionFieldReplyInner on PetitionFieldReply {
+      id
+      content
+      associatedProfile {
+        id
+      }
+      ...useCheckUpdateProfile_PetitionFieldReply
+    }
+  `,
+  PetitionFieldReply: gql`
+    fragment useArchiveRepliesIntoProfileDialog_PetitionFieldReply on PetitionFieldReply {
+      id
+      children {
         field {
           id
-          name
-          type
-          myPermission
-          isUsedInProfileName
-        }
-      }
-    `;
-  },
-  get Profile() {
-    return gql`
-      fragment useArchiveRepliesIntoProfileDialog_Profile on Profile {
-        id
-        properties {
-          ...useArchiveRepliesIntoProfileDialog_ProfileFieldProperty
-        }
-        ...ProfileSelect_Profile
-        ...ProfileReference_Profile
-        ...useCheckUpdateProfile_Profile
-      }
-      ${ProfileSelect.fragments.Profile}
-      ${ProfileReference.fragments.Profile}
-      ${this.ProfileFieldProperty}
-      ${useCheckUpdateProfile.fragments.Profile}
-    `;
-  },
-  get PetitionFieldReplyInner() {
-    return gql`
-      fragment useArchiveRepliesIntoProfileDialog_PetitionFieldReplyInner on PetitionFieldReply {
-        id
-        content
-        associatedProfile {
-          id
-        }
-        ...useCheckUpdateProfile_PetitionFieldReply
-      }
-      ${useCheckUpdateProfile.fragments.PetitionFieldReply}
-      ${this.Profile}
-    `;
-  },
-  get PetitionFieldReply() {
-    return gql`
-      fragment useArchiveRepliesIntoProfileDialog_PetitionFieldReply on PetitionFieldReply {
-        id
-        children {
-          field {
+          profileTypeField {
             id
-            profileTypeField {
-              id
-            }
           }
-          replies {
-            id
-            ...useArchiveRepliesIntoProfileDialog_PetitionFieldReplyInner
-          }
-        }
-        ...useArchiveRepliesIntoProfileDialog_PetitionFieldReplyInner
-      }
-      ${this.PetitionFieldReplyInner}
-    `;
-  },
-  get ProfileType() {
-    return gql`
-      fragment useArchiveRepliesIntoProfileDialog_ProfileType on ProfileType {
-        id
-        ...useProfileNamePreview_ProfileType
-      }
-      ${useProfileNamePreview.fragments.ProfileType}
-    `;
-  },
-  get PetitionFieldInner() {
-    return gql`
-      fragment useArchiveRepliesIntoProfileDialog_PetitionFieldInner on PetitionField {
-        id
-        title
-        type
-        options
-        isLinkedToProfileType
-        profileType {
-          id
-        }
-        profileTypeField {
-          id
-          myPermission
-          isUsedInProfileName
         }
         replies {
           id
-          ...useArchiveRepliesIntoProfileDialog_PetitionFieldReply
-          associatedProfile {
-            id
-          }
+          ...useArchiveRepliesIntoProfileDialog_PetitionFieldReplyInner
         }
       }
-      ${this.PetitionFieldReply}
-    `;
-  },
-  get PetitionField() {
-    return gql`
-      fragment useArchiveRepliesIntoProfileDialog_PetitionField on PetitionField {
+      ...useArchiveRepliesIntoProfileDialog_PetitionFieldReplyInner
+    }
+  `,
+  ProfileType: gql`
+    fragment useArchiveRepliesIntoProfileDialog_ProfileType on ProfileType {
+      id
+      ...useProfileNamePreview_ProfileType
+    }
+  `,
+  PetitionFieldInner: gql`
+    fragment useArchiveRepliesIntoProfileDialog_PetitionFieldInner on PetitionField {
+      id
+      title
+      type
+      options
+      isLinkedToProfileType
+      profileType {
         id
-        ...groupFieldsWithProfileTypes_PetitionField
+      }
+      profileTypeField {
+        id
+        myPermission
+        isUsedInProfileName
+      }
+      replies {
+        id
+        ...useArchiveRepliesIntoProfileDialog_PetitionFieldReply
+        associatedProfile {
+          id
+        }
+      }
+    }
+  `,
+  PetitionField: gql`
+    fragment useArchiveRepliesIntoProfileDialog_PetitionField on PetitionField {
+      id
+      ...groupFieldsWithProfileTypes_PetitionField
+      ...useArchiveRepliesIntoProfileDialog_PetitionFieldInner
+      children {
         ...useArchiveRepliesIntoProfileDialog_PetitionFieldInner
-        children {
-          ...useArchiveRepliesIntoProfileDialog_PetitionFieldInner
-        }
       }
-      ${groupFieldsWithProfileTypes.fragments.PetitionField}
-      ${this.PetitionFieldInner}
-    `;
-  },
-  get Petition() {
-    return gql`
-      fragment useArchiveRepliesIntoProfileDialog_Petition on Petition {
-        id
-        closedAt
-        fields {
-          ...useArchiveRepliesIntoProfileDialog_PetitionField
-        }
-        ...useFieldLogic_PetitionBase
-        ...useProfileNamePreview_Petition
-        ...useCheckUpdateProfile_Petition
+    }
+  `,
+  Petition: gql`
+    fragment useArchiveRepliesIntoProfileDialog_Petition on Petition {
+      id
+      closedAt
+      fields {
+        ...useArchiveRepliesIntoProfileDialog_PetitionField
       }
-      ${this.PetitionField}
-      ${useFieldLogic.fragments.PetitionBase}
-      ${useProfileNamePreview.fragments.Petition}
-      ${useCheckUpdateProfile.fragments.Petition}
-    `;
-  },
+      ...useFieldLogic_PetitionBase
+      ...useProfileNamePreview_Petition
+      ...useCheckUpdateProfile_Petition
+    }
+  `,
 };
 
 const _queries = [
@@ -1001,7 +970,6 @@ const _queries = [
         ...useArchiveRepliesIntoProfileDialog_Petition
       }
     }
-    ${useArchiveRepliesIntoProfileDialog.fragments.Petition}
   `,
   gql`
     query useArchiveRepliesIntoProfileDialog_profile($profileId: GID!) {
@@ -1009,7 +977,6 @@ const _queries = [
         ...useArchiveRepliesIntoProfileDialog_Profile
       }
     }
-    ${useArchiveRepliesIntoProfileDialog.fragments.Profile}
   `,
   gql`
     query useArchiveRepliesIntoProfileDialog_profileType($profileTypeId: GID!) {
@@ -1017,7 +984,6 @@ const _queries = [
         ...useArchiveRepliesIntoProfileDialog_ProfileType
       }
     }
-    ${useArchiveRepliesIntoProfileDialog.fragments.ProfileType}
   `,
 ];
 
@@ -1045,6 +1011,5 @@ const _mutations = [
         }
       }
     }
-    ${useArchiveRepliesIntoProfileDialog.fragments.Profile}
   `,
 ];

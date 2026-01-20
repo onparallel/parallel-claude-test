@@ -56,65 +56,6 @@ export type ProfileSelectInstance<
   OptionType extends ProfileSelectSelection = ProfileSelectSelection,
 > = SelectInstance<OptionType, IsMulti, never>;
 
-const fragments = {
-  Profile: gql`
-    fragment ProfileSelect_Profile on Profile {
-      id
-      localizableName
-      status
-      profileType {
-        id
-        name
-        canCreate
-      }
-    }
-  `,
-};
-
-const _queries = [
-  gql`
-    query ProfileSelect_profilesSimple(
-      $offset: Int
-      $limit: Int
-      $search: String
-      $profileTypeId: [GID!]
-      $status: [ProfileStatus!]
-    ) {
-      profilesSimple(
-        offset: $offset
-        limit: $limit
-        search: $search
-        profileTypeId: $profileTypeId
-        status: $status
-      ) {
-        items {
-          ...ProfileSelect_Profile
-        }
-        totalCount
-      }
-    }
-    ${fragments.Profile}
-  `,
-  gql`
-    query ProfileSelect_profile($profileId: GID!) {
-      profile(profileId: $profileId) {
-        ...ProfileSelect_Profile
-      }
-    }
-    ${fragments.Profile}
-  `,
-  gql`
-    query ProfileSelect_ProfileTypes($offset: Int, $limit: Int, $filter: ProfileTypeFilter) {
-      profileTypes(offset: $offset, limit: $limit, filter: $filter) {
-        items {
-          id
-          canCreate
-        }
-      }
-    }
-  `,
-];
-
 export interface ProfileSelectProps<
   IsMulti extends boolean = false,
   IsSync extends boolean = false,
@@ -132,284 +73,281 @@ export interface ProfileSelectProps<
   onCreateProfile?: (profile: useCreateProfileDialog_ProfileFragment) => void;
 }
 
-export const ProfileSelect = Object.assign(
-  forwardRef(function ProfileSelect<
-    IsMulti extends boolean = false,
-    IsSync extends boolean = false,
-    OptionType extends ProfileSelectSelection = ProfileSelectSelection,
-  >(
-    {
-      value,
-      isSync,
-      onChange,
-      options,
-      isMulti,
-      placeholder,
-      profileTypeId,
-      defaultCreateProfileName,
-      defaultCreateProfileFieldValues,
-      excludeProfiles,
-      canCreateProfiles,
-      onCreateProfile,
-      ...props
-    }: ProfileSelectProps<IsMulti, IsSync, OptionType>,
-    ref: ForwardedRef<ProfileSelectInstance<IsMulti, OptionType>>,
-  ) {
-    const innerRef = useRef<ProfileSelectInstance<IsMulti, OptionType>>();
-    const _ref = useMergedRef(ref, innerRef);
-    const intl = useIntl();
-    const needsLoading =
-      typeof value === "string" || (Array.isArray(value) && typeof value[0] === "string");
+export const ProfileSelect = forwardRef(function ProfileSelect<
+  IsMulti extends boolean = false,
+  IsSync extends boolean = false,
+  OptionType extends ProfileSelectSelection = ProfileSelectSelection,
+>(
+  {
+    value,
+    isSync,
+    onChange,
+    options,
+    isMulti,
+    placeholder,
+    profileTypeId,
+    defaultCreateProfileName,
+    defaultCreateProfileFieldValues,
+    excludeProfiles,
+    canCreateProfiles,
+    onCreateProfile,
+    ...props
+  }: ProfileSelectProps<IsMulti, IsSync, OptionType>,
+  ref: ForwardedRef<ProfileSelectInstance<IsMulti, OptionType>>,
+) {
+  const innerRef = useRef<ProfileSelectInstance<IsMulti, OptionType>>();
+  const _ref = useMergedRef(ref, innerRef);
+  const intl = useIntl();
+  const needsLoading =
+    typeof value === "string" || (Array.isArray(value) && typeof value[0] === "string");
 
-    const apollo = useApolloClient();
+  const apollo = useApolloClient();
 
-    const { registerProfileSelect, triggerRerender } = useContext(ProfileSelectRerenderContext);
-    const [key, rerender] = useRerender();
+  const { registerProfileSelect, triggerRerender } = useContext(ProfileSelectRerenderContext);
+  const [key, rerender] = useRerender();
 
-    useEffect(() => {
-      if (isNonNullish(profileTypeId)) {
-        return registerProfileSelect(profileTypeId, rerender);
-      }
-    }, [unMaybeArray(profileTypeId ?? []).join(",")]);
-
-    const { data } = useQuery(ProfileSelect_ProfileTypesDocument, {
-      variables: {
-        limit: 100,
-        offset: 0,
-        filter: isNonNullish(profileTypeId)
-          ? {
-              profileTypeId: unMaybeArray(profileTypeId),
-            }
-          : undefined,
-      },
-      skip: !canCreateProfiles,
-    });
-
-    const hideCreate = isNonNullish(data)
-      ? data.profileTypes.items.every((profileType) => !profileType.canCreate)
-      : false;
-
-    const loadProfiles = useDebouncedAsync(
-      async (search: string | null | undefined) => {
-        const { data } = await apollo.query({
-          query: ProfileSelect_profilesSimpleDocument,
-          variables: {
-            offset: 0,
-            limit: 100,
-            profileTypeId: isNonNullish(profileTypeId) ? unMaybeArray(profileTypeId) : null,
-            status: ["OPEN", "CLOSED"],
-            search,
-          },
-          fetchPolicy: "no-cache",
-        });
-
-        const exclude = excludeProfiles ? [...excludeProfiles] : [];
-
-        assert(isNonNullish(data), "Result data in ProfileSelect_profilesDocument is missing");
-
-        return data.profilesSimple.items.filter((p) => !exclude.includes(p.id)) as any[];
-      },
-      300,
-      [unMaybeArray(profileTypeId ?? []).join(","), hideCreate],
-    );
-
-    const getProfiles = useGetProfiles();
-
-    const _value = useAsyncMemo(async () => {
-      if (value === null) {
-        return null;
-      }
-      if (needsLoading) {
-        return await getProfiles(value as any);
-      } else {
-        return value as MaybeArray<ProfileSelectSelection>;
-      }
-    }, [
-      needsLoading,
-      // Rerun when value changes
-      value === null
-        ? null
-        : needsLoading
-          ? // value is string | string[]
-            unMaybeArray(value as any).join(",")
-          : // value is ProfileSelection[]
-            unMaybeArray(value as any)
-              .map((x) => x.id)
-              .join(","),
-    ]);
-
-    const rsProps = useReactSelectProps<OptionType, IsMulti, never>({
-      ...props,
-      components: {
-        SingleValue,
-        MultiValueLabel,
-        Option,
-        ...props.components,
-      } as unknown as SelectComponentsConfig<OptionType, IsMulti, never>,
-    });
-
-    const formatCreateLabel = (label: string) => {
-      return (
-        <Text as="em">
-          {label || defaultCreateProfileName ? (
-            <FormattedMessage
-              id="component.profile-select.create-new-profile"
-              defaultMessage="Create new profile for: <b>{label}</b>"
-              values={{ label: label || defaultCreateProfileName }}
-            />
-          ) : (
-            <FormattedMessage
-              id="component.profile-select.create-new-profile-no-name"
-              defaultMessage="Create new profile"
-            />
-          )}
-        </Text>
-      );
-    };
-    const hasCreatePermission = useHasPermission("PROFILES:CREATE_PROFILES");
-
-    const userCanCreateProfiles = hideCreate !== true && hasCreatePermission && canCreateProfiles;
-
-    const showCreateProfileDialog = useCreateProfileDialog();
-    async function handleCreateOption(name: string) {
-      try {
-        const allowedProfileTypeIds = unMaybeArray(profileTypeId ?? []);
-        const { profile } = await showCreateProfileDialog({
-          profileTypeId: allowedProfileTypeIds.length === 1 ? allowedProfileTypeIds[0] : undefined,
-          ...(name
-            ? { suggestedName: name }
-            : defaultCreateProfileFieldValues
-              ? { profileFieldValues: defaultCreateProfileFieldValues }
-              : {}),
-          modalProps: innerRef.current?.inputRef
-            ? { finalFocusRef: innerRef.current!.inputRef as any }
-            : undefined,
-        });
-        if (profile) {
-          triggerRerender(profile.profileType.id);
-          if (isMulti) {
-            const selectedValues = unMaybeArray(_value);
-            onChange([...selectedValues, profile] as any, {
-              action: "create-option",
-              option: profile as any,
-            });
-          } else {
-            onChange(profile as any, { action: "create-option", option: profile as any });
-          }
-        }
-      } catch {}
-      setTimeout(() => {
-        // this line seems to be needed in some scenarios on FF
-        innerRef.current?.controlRef?.closest("form")?.focus();
-        innerRef.current?.focus();
-      }, 1);
+  useEffect(() => {
+    if (isNonNullish(profileTypeId)) {
+      return registerProfileSelect(profileTypeId, rerender);
     }
+  }, [unMaybeArray(profileTypeId ?? []).join(",")]);
 
-    useEffectSkipFirst(() => {
-      rerender();
-    }, [unMaybeArray(profileTypeId ?? [])?.join(",")]);
+  const { data } = useQuery(ProfileSelect_ProfileTypesDocument, {
+    variables: {
+      limit: 100,
+      offset: 0,
+      filter: isNonNullish(profileTypeId)
+        ? {
+            profileTypeId: unMaybeArray(profileTypeId),
+          }
+        : undefined,
+    },
+    skip: !canCreateProfiles,
+  });
 
-    const getOptionLabel = useCallback(
-      (option: ProfileSelectSelection) => {
-        if ((option as any).__isNew__) {
-          return (option as any).label;
+  const hideCreate = isNonNullish(data)
+    ? data.profileTypes.items.every((profileType) => !profileType.canCreate)
+    : false;
+
+  const loadProfiles = useDebouncedAsync(
+    async (search: string | null | undefined) => {
+      const { data } = await apollo.query({
+        query: ProfileSelect_profilesSimpleDocument,
+        variables: {
+          offset: 0,
+          limit: 100,
+          profileTypeId: isNonNullish(profileTypeId) ? unMaybeArray(profileTypeId) : null,
+          status: ["OPEN", "CLOSED"],
+          search,
+        },
+        fetchPolicy: "no-cache",
+      });
+
+      const exclude = excludeProfiles ? [...excludeProfiles] : [];
+
+      assert(isNonNullish(data), "Result data in ProfileSelect_profilesDocument is missing");
+
+      return data.profilesSimple.items.filter((p) => !exclude.includes(p.id)) as any[];
+    },
+    300,
+    [unMaybeArray(profileTypeId ?? []).join(","), hideCreate],
+  );
+
+  const getProfiles = useGetProfiles();
+
+  const _value = useAsyncMemo(async () => {
+    if (value === null) {
+      return null;
+    }
+    if (needsLoading) {
+      return await getProfiles(value as any);
+    } else {
+      return value as MaybeArray<ProfileSelectSelection>;
+    }
+  }, [
+    needsLoading,
+    // Rerun when value changes
+    value === null
+      ? null
+      : needsLoading
+        ? // value is string | string[]
+          unMaybeArray(value as any).join(",")
+        : // value is ProfileSelection[]
+          unMaybeArray(value as any)
+            .map((x) => x.id)
+            .join(","),
+  ]);
+
+  const rsProps = useReactSelectProps<OptionType, IsMulti, never>({
+    ...props,
+    components: {
+      SingleValue,
+      MultiValueLabel,
+      Option,
+      ...props.components,
+    } as unknown as SelectComponentsConfig<OptionType, IsMulti, never>,
+  });
+
+  const formatCreateLabel = (label: string) => {
+    return (
+      <Text as="em">
+        {label || defaultCreateProfileName ? (
+          <FormattedMessage
+            id="component.profile-select.create-new-profile"
+            defaultMessage="Create new profile for: <b>{label}</b>"
+            values={{ label: label || defaultCreateProfileName }}
+          />
+        ) : (
+          <FormattedMessage
+            id="component.profile-select.create-new-profile-no-name"
+            defaultMessage="Create new profile"
+          />
+        )}
+      </Text>
+    );
+  };
+  const hasCreatePermission = useHasPermission("PROFILES:CREATE_PROFILES");
+
+  const userCanCreateProfiles = hideCreate !== true && hasCreatePermission && canCreateProfiles;
+
+  const showCreateProfileDialog = useCreateProfileDialog();
+  async function handleCreateOption(name: string) {
+    try {
+      const allowedProfileTypeIds = unMaybeArray(profileTypeId ?? []);
+      const { profile } = await showCreateProfileDialog({
+        profileTypeId: allowedProfileTypeIds.length === 1 ? allowedProfileTypeIds[0] : undefined,
+        ...(name
+          ? { suggestedName: name }
+          : defaultCreateProfileFieldValues
+            ? { profileFieldValues: defaultCreateProfileFieldValues }
+            : {}),
+        modalProps: innerRef.current?.inputRef
+          ? { finalFocusRef: innerRef.current!.inputRef as any }
+          : undefined,
+      });
+      if (profile) {
+        triggerRerender(profile.profileType.id);
+        if (isMulti) {
+          const selectedValues = unMaybeArray(_value);
+          onChange([...selectedValues, profile] as any, {
+            action: "create-option",
+            option: profile as any,
+          });
         } else {
-          return localizableUserTextRender({ intl, value: option.localizableName, default: "" });
+          onChange(profile as any, { action: "create-option", option: profile as any });
         }
-      },
-      [intl.locale],
-    );
+      }
+    } catch {}
+    setTimeout(() => {
+      // this line seems to be needed in some scenarios on FF
+      innerRef.current?.controlRef?.closest("form")?.focus();
+      innerRef.current?.focus();
+    }, 1);
+  }
 
-    return isSync ? (
-      <Select<OptionType, IsMulti, never>
-        ref={_ref as any}
-        value={_value as any}
-        onChange={onChange as any}
-        isMulti={isMulti}
-        options={options}
-        getOptionLabel={getOptionLabel}
-        getOptionValue={getOptionValue}
-        onCreateOption={handleCreateOption}
-        placeholder={
-          placeholder ??
-          intl.formatMessage(
-            {
-              id: "component.profile-select.placeholder",
-              defaultMessage: "Select {isMulti, select, true{profiles} other {a profile}}",
-            },
-            { isMulti },
-          )
-        }
-        isClearable={props.isClearable}
-        {...props}
-        {...rsProps}
-      />
-    ) : userCanCreateProfiles ? (
-      <AsyncCreatableSelect<OptionType, IsMulti, never>
-        // a key is needed to force a rerender of the component and refetch of the default options
-        key={key}
-        cacheOptions={false}
-        ref={_ref as any}
-        value={_value as any}
-        onChange={onChange as any}
-        isMulti={isMulti}
-        loadOptions={loadProfiles}
-        getOptionLabel={getOptionLabel}
-        getOptionValue={getOptionValue}
-        onCreateOption={handleCreateOption}
-        isValidNewOption={isNonNullish(defaultCreateProfileName) ? () => true : undefined}
-        placeholder={
-          placeholder ??
-          intl.formatMessage(
-            {
-              id: "component.profile-select.placeholder",
-              defaultMessage: "Select {isMulti, select, true{profiles} other {a profile}}",
-            },
-            { isMulti },
-          )
-        }
-        isClearable={props.isClearable}
-        formatCreateLabel={formatCreateLabel}
-        {...props}
-        {...rsProps}
-      />
-    ) : (
-      <AsyncSelect<OptionType, IsMulti, never>
-        // a key is needed to force a rerender of the component and refetch of the default options
-        key={key}
-        cacheOptions={false}
-        ref={_ref as any}
-        value={_value as any}
-        onChange={onChange as any}
-        isMulti={isMulti}
-        loadOptions={loadProfiles}
-        getOptionLabel={getOptionLabel}
-        getOptionValue={getOptionValue}
-        placeholder={
-          placeholder ??
-          intl.formatMessage(
-            {
-              id: "component.profile-select.placeholder",
-              defaultMessage: "Select {isMulti, select, true{profiles} other {a profile}}",
-            },
-            { isMulti },
-          )
-        }
-        isClearable={props.isClearable}
-        {...props}
-        {...rsProps}
-      />
-    );
-  }) as <
-    IsMulti extends boolean = false,
-    IsSync extends boolean = false,
-    OptionType extends ProfileSelectSelection = ProfileSelectSelection,
-  >(
-    props: ProfileSelectProps<IsMulti, IsSync, OptionType> &
-      RefAttributes<ProfileSelectInstance<IsMulti, OptionType>>,
-  ) => ReactElement,
-  { fragments },
-);
+  useEffectSkipFirst(() => {
+    rerender();
+  }, [unMaybeArray(profileTypeId ?? [])?.join(",")]);
+
+  const getOptionLabel = useCallback(
+    (option: ProfileSelectSelection) => {
+      if ((option as any).__isNew__) {
+        return (option as any).label;
+      } else {
+        return localizableUserTextRender({ intl, value: option.localizableName, default: "" });
+      }
+    },
+    [intl.locale],
+  );
+
+  return isSync ? (
+    <Select<OptionType, IsMulti, never>
+      ref={_ref as any}
+      value={_value as any}
+      onChange={onChange as any}
+      isMulti={isMulti}
+      options={options}
+      getOptionLabel={getOptionLabel}
+      getOptionValue={getOptionValue}
+      onCreateOption={handleCreateOption}
+      placeholder={
+        placeholder ??
+        intl.formatMessage(
+          {
+            id: "component.profile-select.placeholder",
+            defaultMessage: "Select {isMulti, select, true{profiles} other {a profile}}",
+          },
+          { isMulti },
+        )
+      }
+      isClearable={props.isClearable}
+      {...props}
+      {...rsProps}
+    />
+  ) : userCanCreateProfiles ? (
+    <AsyncCreatableSelect<OptionType, IsMulti, never>
+      // a key is needed to force a rerender of the component and refetch of the default options
+      key={key}
+      cacheOptions={false}
+      ref={_ref as any}
+      value={_value as any}
+      onChange={onChange as any}
+      isMulti={isMulti}
+      loadOptions={loadProfiles}
+      getOptionLabel={getOptionLabel}
+      getOptionValue={getOptionValue}
+      onCreateOption={handleCreateOption}
+      isValidNewOption={isNonNullish(defaultCreateProfileName) ? () => true : undefined}
+      placeholder={
+        placeholder ??
+        intl.formatMessage(
+          {
+            id: "component.profile-select.placeholder",
+            defaultMessage: "Select {isMulti, select, true{profiles} other {a profile}}",
+          },
+          { isMulti },
+        )
+      }
+      isClearable={props.isClearable}
+      formatCreateLabel={formatCreateLabel}
+      {...props}
+      {...rsProps}
+    />
+  ) : (
+    <AsyncSelect<OptionType, IsMulti, never>
+      // a key is needed to force a rerender of the component and refetch of the default options
+      key={key}
+      cacheOptions={false}
+      ref={_ref as any}
+      value={_value as any}
+      onChange={onChange as any}
+      isMulti={isMulti}
+      loadOptions={loadProfiles}
+      getOptionLabel={getOptionLabel}
+      getOptionValue={getOptionValue}
+      placeholder={
+        placeholder ??
+        intl.formatMessage(
+          {
+            id: "component.profile-select.placeholder",
+            defaultMessage: "Select {isMulti, select, true{profiles} other {a profile}}",
+          },
+          { isMulti },
+        )
+      }
+      isClearable={props.isClearable}
+      {...props}
+      {...rsProps}
+    />
+  );
+}) as <
+  IsMulti extends boolean = false,
+  IsSync extends boolean = false,
+  OptionType extends ProfileSelectSelection = ProfileSelectSelection,
+>(
+  props: ProfileSelectProps<IsMulti, IsSync, OptionType> &
+    RefAttributes<ProfileSelectInstance<IsMulti, OptionType>>,
+) => ReactElement;
 
 function useGetProfiles() {
   const client = useApolloClient();
@@ -625,3 +563,60 @@ export function ProfileSelectRerenderProvider({ children }: { children: React.Re
     </ProfileSelectRerenderContext.Provider>
   );
 }
+
+const _fragments = {
+  Profile: gql`
+    fragment ProfileSelect_Profile on Profile {
+      id
+      localizableName
+      status
+      profileType {
+        id
+        name
+        canCreate
+      }
+    }
+  `,
+};
+
+const _queries = [
+  gql`
+    query ProfileSelect_profilesSimple(
+      $offset: Int
+      $limit: Int
+      $search: String
+      $profileTypeId: [GID!]
+      $status: [ProfileStatus!]
+    ) {
+      profilesSimple(
+        offset: $offset
+        limit: $limit
+        search: $search
+        profileTypeId: $profileTypeId
+        status: $status
+      ) {
+        items {
+          ...ProfileSelect_Profile
+        }
+        totalCount
+      }
+    }
+  `,
+  gql`
+    query ProfileSelect_profile($profileId: GID!) {
+      profile(profileId: $profileId) {
+        ...ProfileSelect_Profile
+      }
+    }
+  `,
+  gql`
+    query ProfileSelect_ProfileTypes($offset: Int, $limit: Int, $filter: ProfileTypeFilter) {
+      profileTypes(offset: $offset, limit: $limit, filter: $filter) {
+        items {
+          id
+          canCreate
+        }
+      }
+    }
+  `,
+];

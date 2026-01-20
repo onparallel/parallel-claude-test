@@ -330,7 +330,7 @@ export function PetitionListHeader({
   );
 }
 
-PetitionListHeader.fragments = {
+const _fragments = {
   PetitionListView: gql`
     fragment PetitionListHeader_PetitionListView on PetitionListView {
       id
@@ -392,7 +392,6 @@ const _mutations = [
         }
       }
     }
-    ${PetitionListHeader.fragments.PetitionListView}
   `,
   gql`
     mutation PetitionListHeader_updatePetitionListView(
@@ -410,7 +409,6 @@ const _mutations = [
         }
       }
     }
-    ${PetitionListHeader.fragments.PetitionListView}
   `,
 ];
 

@@ -31,7 +31,7 @@ export function TimelinePetitionClonedEvent({ event }: TimelinePetitionClonedEve
   );
 }
 
-TimelinePetitionClonedEvent.fragments = {
+const _fragments = {
   PetitionClonedEvent: gql`
     fragment TimelinePetitionClonedEvent_PetitionClonedEvent on PetitionClonedEvent {
       user {
@@ -39,6 +39,5 @@ TimelinePetitionClonedEvent.fragments = {
       }
       createdAt
     }
-    ${UserReference.fragments.User}
   `,
 };

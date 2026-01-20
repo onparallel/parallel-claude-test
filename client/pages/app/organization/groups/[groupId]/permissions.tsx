@@ -849,21 +849,17 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
 }
 
 const _fragments = {
-  get UserGroup() {
-    return gql`
-      fragment PermissionsGroup_UserGroup on UserGroup {
+  UserGroup: gql`
+    fragment PermissionsGroup_UserGroup on UserGroup {
+      id
+      ...UserGroupLayout_UserGroup
+      permissions {
         id
-        ...UserGroupLayout_UserGroup
-        permissions {
-          id
-          name
-          effect
-        }
+        name
+        effect
       }
-
-      ${UserGroupLayout.fragments.UserGroup}
-    `;
-  },
+    }
+  `,
 };
 
 const _queries = [
@@ -873,7 +869,6 @@ const _queries = [
         ...PermissionsGroup_UserGroup
       }
     }
-    ${_fragments.UserGroup}
   `,
   gql`
     query PermissionsGroup_user {
@@ -892,7 +887,6 @@ const _queries = [
         }
       }
     }
-    ${UserGroupLayout.fragments.Query}
   `,
 ];
 
@@ -906,7 +900,6 @@ const _mutations = [
         ...PermissionsGroup_UserGroup
       }
     }
-    ${_fragments.UserGroup}
   `,
 ];
 

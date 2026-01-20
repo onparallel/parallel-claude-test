@@ -278,7 +278,6 @@ OrganizationGeneral.queries = [
         }
       }
     }
-    ${OrganizationSettingsLayout.fragments.Query}
   `,
 ];
 

@@ -89,7 +89,7 @@ const MentionBadge = chakraForwardRef<"span", MentionBadgeProps>(function Mentio
   );
 });
 
-Mention.fragments = {
+const _fragments = {
   PetitionFieldCommentMention: gql`
     fragment Mention_PetitionFieldCommentMention on PetitionFieldCommentMention {
       ... on PetitionFieldCommentUserMention {
@@ -110,6 +110,5 @@ Mention.fragments = {
         }
       }
     }
-    ${UserGroupReference.fragments.UserGroup}
   `,
 };

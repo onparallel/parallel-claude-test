@@ -631,14 +631,13 @@ export function PetitionRepliesFieldReply({
   );
 }
 
-PetitionRepliesFieldReply.fragments = {
+const _fragments = {
   Petition: gql`
     fragment PetitionRepliesFieldReply_Petition on Petition {
       id
       isReviewFlowEnabled
       permanentDeletionAt
     }
-    ${getReplyContents.fragments.PetitionField}
   `,
   PetitionField: gql`
     fragment PetitionRepliesFieldReply_PetitionField on PetitionField {
@@ -647,7 +646,6 @@ PetitionRepliesFieldReply.fragments = {
       requireApproval
       ...getReplyContents_PetitionField
     }
-    ${getReplyContents.fragments.PetitionField}
   `,
   PetitionFieldReply: gql`
     fragment PetitionRepliesFieldReply_PetitionFieldReply on PetitionFieldReply {
@@ -672,10 +670,6 @@ PetitionRepliesFieldReply.fragments = {
       ...CopyOrDownloadReplyButton_PetitionFieldReply
       ...getReplyContents_PetitionFieldReply
     }
-    ${UserOrContactReference.fragments.UserOrPetitionAccess}
-    ${CopyOrDownloadReplyButton.fragments.PetitionFieldReply}
-    ${getReplyContents.fragments.PetitionFieldReply}
-    ${PetitionRepliesFieldUserAssignmentReply.fragments.PetitionFieldReply}
   `,
 };
 

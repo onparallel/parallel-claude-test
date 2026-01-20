@@ -86,7 +86,7 @@ export function useSignatureCancelledRequestErrorMessage() {
   );
 }
 
-useSignatureCancelledRequestErrorMessage.fragments = {
+const _fragments = {
   SignatureCancelledEvent: gql`
     fragment useSignatureCancelledRequestErrorMessage_SignatureCancelledEvent on SignatureCancelledEvent {
       errorCode

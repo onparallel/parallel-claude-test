@@ -95,11 +95,8 @@ export interface PetitionHeaderInstance {
   focusName(): void;
 }
 
-export const PetitionHeader = Object.assign(
-  chakraForwardRef<"div", PetitionHeaderProps, PetitionHeaderInstance>(function PetitionHeader(
-    { petition, me, section: current, actions, onRefetch, ...props },
-    ref,
-  ) {
+export const PetitionHeader = chakraForwardRef<"div", PetitionHeaderProps, PetitionHeaderInstance>(
+  function PetitionHeader({ petition, me, section: current, actions, onRefetch, ...props }, ref) {
     const intl = useIntl();
     const router = useRouter();
     const toast = useToast();
@@ -897,89 +894,71 @@ export const PetitionHeader = Object.assign(
         </GridItem>
       </Grid>
     );
-  }),
-  {
-    fragments: {
-      get Petition() {
-        return gql`
-          fragment PetitionHeader_Petition on Petition {
-            id
-            locale
-            deadline
-            status
-            isRestricted
-            isAnonymized
-            profiles {
-              id
-            }
-            myEffectivePermission {
-              isSubscribed
-              isBypassed
-              permissionType
-            }
-
-            ...HeaderNameEditable_PetitionBase
-            ...useDeletePetitions_PetitionBase
-            ...useRecoverPetition_PetitionBase
-          }
-          ${HeaderNameEditable.fragments.PetitionBase}
-          ${useDeletePetitions.fragments.PetitionBase}
-          ${useRecoverPetition.fragments.PetitionBase}
-        `;
-      },
-      get PetitionTemplate() {
-        return gql`
-          fragment PetitionHeader_PetitionTemplate on PetitionTemplate {
-            id
-            locale
-            isPublic
-            isRestricted
-            ...HeaderNameEditable_PetitionBase
-            ...useDeletePetitions_PetitionBase
-          }
-          ${HeaderNameEditable.fragments.PetitionBase}
-          ${useDeletePetitions.fragments.PetitionBase}
-        `;
-      },
-      get PetitionBase() {
-        return gql`
-          fragment PetitionHeader_PetitionBase on PetitionBase {
-            id
-            isDocumentGenerationEnabled
-            isInteractionWithRecipientsEnabled
-            permanentDeletionAt
-            path
-            ... on Petition {
-              ...PetitionHeader_Petition
-            }
-            ... on PetitionTemplate {
-              ...PetitionHeader_PetitionTemplate
-            }
-            tags {
-              id
-              ...Tag_Tag
-            }
-            ...useEditTagsDialog_PetitionBase
-          }
-          ${useEditTagsDialog.fragments.PetitionBase}
-          ${Tag.fragments.Tag}
-          ${this.Petition}
-          ${this.PetitionTemplate}
-        `;
-      },
-      get Query() {
-        return gql`
-          fragment PetitionHeader_Query on Query {
-            me {
-              id
-              hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
-            }
-          }
-        `;
-      },
-    },
   },
 );
+
+const _fragments = {
+  Petition: gql`
+    fragment PetitionHeader_Petition on Petition {
+      id
+      locale
+      deadline
+      status
+      isRestricted
+      isAnonymized
+      profiles {
+        id
+      }
+      myEffectivePermission {
+        isSubscribed
+        isBypassed
+        permissionType
+      }
+
+      ...HeaderNameEditable_PetitionBase
+      ...useDeletePetitions_PetitionBase
+      ...useRecoverPetition_PetitionBase
+    }
+  `,
+  PetitionTemplate: gql`
+    fragment PetitionHeader_PetitionTemplate on PetitionTemplate {
+      id
+      locale
+      isPublic
+      isRestricted
+      ...HeaderNameEditable_PetitionBase
+      ...useDeletePetitions_PetitionBase
+    }
+  `,
+  PetitionBase: gql`
+    fragment PetitionHeader_PetitionBase on PetitionBase {
+      id
+      isDocumentGenerationEnabled
+      isInteractionWithRecipientsEnabled
+      permanentDeletionAt
+      path
+      ... on Petition {
+        ...PetitionHeader_Petition
+      }
+      ... on PetitionTemplate {
+        ...PetitionHeader_PetitionTemplate
+      }
+      tags {
+        id
+        ...Tag_Tag
+      }
+      ...useEditTagsDialog_PetitionBase
+    }
+  `,
+  Query: gql`
+    fragment PetitionHeader_Query on Query {
+      me {
+        id
+        hasProfilesAccess: hasFeatureFlag(featureFlag: PROFILES)
+      }
+    }
+  `,
+};
 
 const _mutations = [
   gql`

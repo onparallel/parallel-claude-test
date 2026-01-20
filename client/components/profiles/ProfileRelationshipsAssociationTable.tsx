@@ -202,72 +202,53 @@ export function ProfileRelationshipsAssociationTable({
   );
 }
 
-ProfileRelationshipsAssociationTable.fragments = {
-  get PetitionBase() {
-    return gql`
-      fragment ProfileRelationshipsAssociationTable_PetitionBase on PetitionBase {
+const _fragments = {
+  PetitionBase: gql`
+    fragment ProfileRelationshipsAssociationTable_PetitionBase on PetitionBase {
+      id
+      fields {
         id
-        fields {
-          id
-          type
-          multiple
-          options
-          ...PetitionFieldReference_PetitionField
-        }
-        ...useFieldsWithIndices_PetitionBase
-        ...calculateCompatibleFieldGroups_PetitionBase
-        ...calculateRelatedFieldGroupsWithCompatibleProfiles_PetitionBase
+        type
+        multiple
+        options
+        ...PetitionFieldReference_PetitionField
       }
-      ${PetitionFieldReference.fragments.PetitionField}
-      ${useFieldsWithIndices.fragments.PetitionBase}
-      ${calculateCompatibleFieldGroups.fragments.PetitionBase}
-      ${calculateRelatedFieldGroupsWithCompatibleProfiles.fragments.PetitionBase}
-    `;
-  },
-  get ProfileInner() {
-    return gql`
-      fragment ProfileRelationshipsAssociationTable_ProfileInner on Profile {
-        id
-        localizableName
-        ...calculateCompatibleFieldGroups_Profile
-        ...calculateRelatedFieldGroupsWithCompatibleProfiles_Profile
+      ...useFieldsWithIndices_PetitionBase
+      ...calculateCompatibleFieldGroups_PetitionBase
+      ...calculateRelatedFieldGroupsWithCompatibleProfiles_PetitionBase
+    }
+  `,
+  ProfileInner: gql`
+    fragment ProfileRelationshipsAssociationTable_ProfileInner on Profile {
+      id
+      localizableName
+      ...calculateCompatibleFieldGroups_Profile
+      ...calculateRelatedFieldGroupsWithCompatibleProfiles_Profile
+    }
+  `,
+  Profile: gql`
+    fragment ProfileRelationshipsAssociationTable_Profile on Profile {
+      ...ProfileRelationshipsAssociationTable_ProfileInner
+      ...calculateRelatedFieldGroupsWithCompatibleProfiles_Profile
+      relationships {
+        ...ProfileRelationshipsAssociationTable_ProfileRelationship
+        ...calculateRelatedFieldGroupsWithCompatibleProfiles_ProfileRelationship
       }
-      ${calculateCompatibleFieldGroups.fragments.Profile}
-      ${calculateRelatedFieldGroupsWithCompatibleProfiles.fragments.Profile}
-    `;
-  },
-  get Profile() {
-    return gql`
-      fragment ProfileRelationshipsAssociationTable_Profile on Profile {
+    }
+  `,
+  ProfileRelationship: gql`
+    fragment ProfileRelationshipsAssociationTable_ProfileRelationship on ProfileRelationship {
+      id
+      leftSideProfile {
         ...ProfileRelationshipsAssociationTable_ProfileInner
-        ...calculateRelatedFieldGroupsWithCompatibleProfiles_Profile
-        relationships {
-          ...ProfileRelationshipsAssociationTable_ProfileRelationship
-          ...calculateRelatedFieldGroupsWithCompatibleProfiles_ProfileRelationship
-        }
       }
-      ${this.ProfileInner}
-      ${this.ProfileRelationship}
-      ${calculateRelatedFieldGroupsWithCompatibleProfiles.fragments.Profile}
-      ${calculateRelatedFieldGroupsWithCompatibleProfiles.fragments.ProfileRelationship}
-    `;
-  },
-  get ProfileRelationship() {
-    return gql`
-      fragment ProfileRelationshipsAssociationTable_ProfileRelationship on ProfileRelationship {
+      rightSideProfile {
+        ...ProfileRelationshipsAssociationTable_ProfileInner
+      }
+      relationshipType {
         id
-        leftSideProfile {
-          ...ProfileRelationshipsAssociationTable_ProfileInner
-        }
-        rightSideProfile {
-          ...ProfileRelationshipsAssociationTable_ProfileInner
-        }
-        relationshipType {
-          id
-          isReciprocal
-        }
+        isReciprocal
       }
-      ${this.ProfileInner}
-    `;
-  },
+    }
+  `,
 };

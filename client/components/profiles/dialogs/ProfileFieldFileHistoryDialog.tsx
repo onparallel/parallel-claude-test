@@ -222,47 +222,40 @@ function useProfileFieldFileHistoryDialogColumns({
   );
 }
 
-useProfileFieldFileHistoryDialog.fragments = {
-  get ProfileTypeField() {
-    return gql`
-      fragment useProfileFieldFileHistoryDialog_ProfileTypeField on ProfileTypeField {
+const _fragments = {
+  ProfileTypeField: gql`
+    fragment useProfileFieldFileHistoryDialog_ProfileTypeField on ProfileTypeField {
+      id
+      ...ProfilePropertyContent_ProfileTypeField
+    }
+  `,
+  ProfileTypeFieldFileHistory: gql`
+    fragment useProfileFieldFileHistoryDialog_ProfileTypeFieldFileHistory on ProfileTypeFieldFileHistory {
+      eventType
+      profileFieldFile {
         id
-        ...ProfilePropertyContent_ProfileTypeField
-      }
-      ${ProfilePropertyContent.fragments.ProfileTypeField}
-    `;
-  },
-  get ProfileTypeFieldFileHistory() {
-    return gql`
-      fragment useProfileFieldFileHistoryDialog_ProfileTypeFieldFileHistory on ProfileTypeFieldFileHistory {
-        eventType
-        profileFieldFile {
+        source
+        createdBy {
           id
-          source
-          createdBy {
+          ...UserReference_User
+        }
+        createdAt
+        ...ProfilePropertyContent_ProfileFieldFile
+        petitionFieldReply {
+          id
+          parent {
             id
-            ...UserReference_User
           }
-          createdAt
-          ...ProfilePropertyContent_ProfileFieldFile
-          petitionFieldReply {
+          field {
             id
-            parent {
+            petition {
               id
-            }
-            field {
-              id
-              petition {
-                id
-              }
             }
           }
         }
       }
-      ${UserReference.fragments.User}
-      ${ProfilePropertyContent.fragments.ProfileFieldFile}
-    `;
-  },
+    }
+  `,
 };
 
 const _query = gql`
@@ -284,7 +277,6 @@ const _query = gql`
       }
     }
   }
-  ${useProfileFieldFileHistoryDialog.fragments.ProfileTypeFieldFileHistory}
 `;
 
 export function useProfileFieldFileHistoryDialog() {

@@ -246,35 +246,28 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
   );
 }
 
-BrandingDocumentTheme.fragments = {
-  get User() {
-    return gql`
-      fragment BrandingDocumentTheme_User on User {
-        id
-        organization {
-          ...DocumentThemePreview_Organization
-          pdfDocumentThemes {
-            ...BrandingDocumentTheme_OrganizationTheme
-          }
+const _fragments = {
+  User: gql`
+    fragment BrandingDocumentTheme_User on User {
+      id
+      organization {
+        ...DocumentThemePreview_Organization
+        pdfDocumentThemes {
+          ...BrandingDocumentTheme_OrganizationTheme
         }
-        ...DocumentThemeEditor_User
       }
-      ${DocumentThemePreview.fragments.Organization}
-      ${DocumentThemeEditor.fragments.User}
-      ${this.OrganizationTheme}
-    `;
-  },
+      ...DocumentThemeEditor_User
+    }
+  `,
 
-  get OrganizationTheme() {
-    return gql`
-      fragment BrandingDocumentTheme_OrganizationTheme on OrganizationTheme {
-        id
-        name
-        data
-        isDefault
-      }
-    `;
-  },
+  OrganizationTheme: gql`
+    fragment BrandingDocumentTheme_OrganizationTheme on OrganizationTheme {
+      id
+      name
+      data
+      isDefault
+    }
+  `,
 };
 
 const _mutations = [
@@ -290,7 +283,6 @@ const _mutations = [
         }
       }
     }
-    ${BrandingDocumentTheme.fragments.OrganizationTheme}
   `,
   gql`
     mutation BrandingDocumentTheme_updateOrganizationPdfDocumentTheme(
@@ -311,7 +303,6 @@ const _mutations = [
         }
       }
     }
-    ${BrandingDocumentTheme.fragments.OrganizationTheme}
   `,
   gql`
     mutation BrandingDocumentTheme_deleteOrganizationPdfDocumentTheme($orgThemeId: GID!) {
@@ -322,6 +313,5 @@ const _mutations = [
         }
       }
     }
-    ${BrandingDocumentTheme.fragments.OrganizationTheme}
   `,
 ];

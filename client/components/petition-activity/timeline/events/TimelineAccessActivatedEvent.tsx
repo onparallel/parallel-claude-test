@@ -79,7 +79,7 @@ export function TimelineAccessActivatedEvent({ event }: TimelineAccessActivatedE
   );
 }
 
-TimelineAccessActivatedEvent.fragments = {
+const _fragments = {
   AccessActivatedEvent: gql`
     fragment TimelineAccessActivatedEvent_AccessActivatedEvent on AccessActivatedEvent {
       user {
@@ -97,7 +97,5 @@ TimelineAccessActivatedEvent.fragments = {
       }
       createdAt
     }
-    ${UserReference.fragments.User}
-    ${ContactReference.fragments.Contact}
   `,
 };

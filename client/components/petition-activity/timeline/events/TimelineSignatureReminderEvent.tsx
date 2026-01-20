@@ -36,7 +36,7 @@ export function TimelineSignatureReminderEvent({ event }: TimelineSignatureRemin
   );
 }
 
-TimelineSignatureReminderEvent.fragments = {
+const _fragments = {
   SignatureReminderEvent: gql`
     fragment TimelineSignatureReminderEvent_SignatureReminderEvent on SignatureReminderEvent {
       user {
@@ -44,6 +44,5 @@ TimelineSignatureReminderEvent.fragments = {
       }
       createdAt
     }
-    ${UserReference.fragments.User}
   `,
 };

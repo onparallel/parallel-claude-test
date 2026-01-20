@@ -7,10 +7,7 @@ import { TimelineReminderSentEvent_ReminderSentEventFragment } from "@parallel/g
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import { UserReference } from "../../../common/UserReference";
-import {
-  SentReminderMessageDialog,
-  useSentReminderMessageDialog,
-} from "../../dialogs/SentReminderMessageDialog";
+import { useSentReminderMessageDialog } from "../../dialogs/SentReminderMessageDialog";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
@@ -100,7 +97,7 @@ export function TimelineReminderSentEvent({
   );
 }
 
-TimelineReminderSentEvent.fragments = {
+const _fragments = {
   ReminderSentEvent: gql`
     fragment TimelineReminderSentEvent_ReminderSentEvent on ReminderSentEvent {
       reminder {
@@ -123,8 +120,5 @@ TimelineReminderSentEvent.fragments = {
       }
       createdAt
     }
-    ${UserReference.fragments.User}
-    ${ContactReference.fragments.Contact}
-    ${SentReminderMessageDialog.fragments.PetitionReminder}
   `,
 };

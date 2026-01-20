@@ -739,41 +739,33 @@ export function useCreateOrUpdateProfileTypeFieldDialog() {
   return useDialog(CreateOrUpdateProfileTypeFieldDialog);
 }
 
-useCreateOrUpdateProfileTypeFieldDialog.fragments = {
-  get ProfileTypeField() {
-    return gql`
-      fragment useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField on ProfileTypeField {
+const _fragments = {
+  ProfileTypeField: gql`
+    fragment useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField on ProfileTypeField {
+      id
+      name
+      type
+      alias
+      options
+      isExpirable
+      expiryAlertAheadTime
+      options
+      isStandard
+      isUnique
+      ...ProfileFieldSelectSettings_ProfileTypeField
+      ...ProfileFieldUserAssignmentSettings_ProfileTypeField
+    }
+  `,
+  ProfileType: gql`
+    fragment useCreateOrUpdateProfileTypeFieldDialog_ProfileType on ProfileType {
+      id
+      fields {
         id
-        name
-        type
-        alias
-        options
-        isExpirable
-        expiryAlertAheadTime
-        options
-        isStandard
-        isUnique
-        ...ProfileFieldSelectSettings_ProfileTypeField
-        ...ProfileFieldUserAssignmentSettings_ProfileTypeField
       }
-      ${ProfileFieldSelectSettings.fragments.ProfileTypeField}
-      ${ProfileFieldUserAssignmentSettings.fragments.ProfileTypeField}
-    `;
-  },
-  get ProfileType() {
-    return gql`
-      fragment useCreateOrUpdateProfileTypeFieldDialog_ProfileType on ProfileType {
-        id
-        fields {
-          id
-        }
-        ...ProfileFieldSelectSettings_ProfileType
-        ...ProfileFieldMonitoringSettings_ProfileType
-      }
-      ${ProfileFieldSelectSettings.fragments.ProfileType}
-      ${ProfileFieldMonitoringSettings.fragments.ProfileType}
-    `;
-  },
+      ...ProfileFieldSelectSettings_ProfileType
+      ...ProfileFieldMonitoringSettings_ProfileType
+    }
+  `,
 };
 
 const _mutations = [
@@ -786,7 +778,6 @@ const _mutations = [
         ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
       }
     }
-    ${useCreateOrUpdateProfileTypeFieldDialog.fragments.ProfileTypeField}
   `,
   gql`
     mutation useCreateOrUpdateProfileTypeFieldDialog_updateProfileTypeField(
@@ -804,7 +795,6 @@ const _mutations = [
         ...useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeField
       }
     }
-    ${useCreateOrUpdateProfileTypeFieldDialog.fragments.ProfileTypeField}
   `,
 ];
 
@@ -824,7 +814,6 @@ const _queries = [
         }
       }
     }
-    ${ProfileReference.fragments.Profile}
   `,
 ];
 

@@ -229,7 +229,7 @@ export function AdverseMediaArticleHeader({
   );
 }
 
-AdverseMediaArticleHeader.fragments = {
+const _fragments = {
   AdverseMediaArticle: gql`
     fragment AdverseMediaArticleHeader_AdverseMediaArticle on AdverseMediaArticle {
       id

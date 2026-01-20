@@ -34,7 +34,7 @@ export function TimelinePetitionTaggedEvent({ event }: TimelinePetitionTaggedEve
   );
 }
 
-TimelinePetitionTaggedEvent.fragments = {
+const _fragments = {
   PetitionTaggedEvent: gql`
     fragment TimelinePetitionTaggedEvent_PetitionTaggedEvent on PetitionTaggedEvent {
       user {
@@ -45,7 +45,5 @@ TimelinePetitionTaggedEvent.fragments = {
       }
       createdAt
     }
-    ${UserReference.fragments.User}
-    ${TagReference.fragments.Tag}
   `,
 };

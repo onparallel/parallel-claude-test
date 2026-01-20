@@ -63,7 +63,7 @@ export function defaultDashboardModuleProfileFilter(
   };
 }
 
-export const fullDashboardModulePetitionFilter = gql`
+const _fragmentsFullDashboardModulePetitionFilter = gql`
   fragment fullDashboardModulePetitionFilter on DashboardModulePetitionFilter {
     fromTemplateId
     status
@@ -92,7 +92,7 @@ export const fullDashboardModulePetitionFilter = gql`
   }
 `;
 
-export const fullDashboardModuleProfileFilter = gql`
+const _fragmentsFullDashboardModuleProfileFilter = gql`
   fragment fullDashboardModuleProfileFilter on DashboardModuleProfileFilter {
     status
     values {

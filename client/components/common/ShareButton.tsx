@@ -60,7 +60,7 @@ export function ShareButton({
   );
 }
 
-ShareButton.fragments = {
+const _fragments = {
   PetitionBase: gql`
     fragment ShareButton_PetitionBase on PetitionBase {
       permissions {
@@ -80,7 +80,5 @@ ShareButton.fragments = {
         }
       }
     }
-    ${UserReference.fragments.User}
-    ${UserGroupReference.fragments.UserGroup}
   `,
 };

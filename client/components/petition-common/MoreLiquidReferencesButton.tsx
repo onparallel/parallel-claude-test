@@ -30,106 +30,103 @@ export interface MoreLiquidReferencesButtonProps extends Omit<IconButtonWithTool
   onAddAliasToField?: () => Promise<string>;
 }
 
-export const MoreLiquidReferencesButton = Object.assign(
-  chakraForwardRef<"button", MoreLiquidReferencesButtonProps>(function MoreLiquidReferencesButton(
-    { field, onAddAliasToField, ...props },
-    ref,
-  ) {
-    const intl = useIntl();
-    const copyReference = useClipboardWithToast({
-      text: intl.formatMessage({
-        id: "component.more-liquid-references-button.formula-copied-alert",
-        defaultMessage: "Formula copied to clipboard",
-      }),
-    });
-    const references = useLiquidReferences({ field });
+export const MoreLiquidReferencesButton = chakraForwardRef<
+  "button",
+  MoreLiquidReferencesButtonProps
+>(function MoreLiquidReferencesButton({ field, onAddAliasToField, ...props }, ref) {
+  const intl = useIntl();
+  const copyReference = useClipboardWithToast({
+    text: intl.formatMessage({
+      id: "component.more-liquid-references-button.formula-copied-alert",
+      defaultMessage: "Formula copied to clipboard",
+    }),
+  });
+  const references = useLiquidReferences({ field });
 
-    return (
-      <Menu>
-        <MenuButton
-          onClick={(event) => {
-            event.stopPropagation();
-          }}
-          ref={ref}
-          as={IconButtonWithTooltip}
-          label={intl.formatMessage({
-            id: "component.more-liquid-references-button.formulas",
-            defaultMessage: "Formulas",
-          })}
-          icon={<MoreVerticalIcon />}
-          size="xs"
-          {...props}
-        />
-        <Portal>
-          <MenuList width="min-content" minWidth="20rem">
-            <Heading
-              paddingX={4}
-              paddingTop={1}
-              paddingBottom={1.5}
-              as="h4"
-              size="xs"
-              textTransform="uppercase"
-            >
-              <FormattedMessage
-                id="component.more-liquid-references-button.formulas"
-                defaultMessage="Formulas"
-              />
-            </Heading>
-            {references.map(({ title, description, builder }, index) => (
-              <MenuItem
-                onClick={async (event) => {
-                  event.stopPropagation();
-                  try {
-                    const alias = field.alias ?? (await onAddAliasToField!());
-                    copyReference({ value: builder(alias) });
-                  } catch {}
-                }}
-                key={index}
-              >
-                <Stack spacing={1}>
-                  <Text fontSize="md" fontWeight="bold">
-                    {title}
-                  </Text>
-                  <Text fontSize="sm">{description}</Text>
-                </Stack>
-              </MenuItem>
-            ))}
-            <MenuDivider />
+  return (
+    <Menu>
+      <MenuButton
+        onClick={(event) => {
+          event.stopPropagation();
+        }}
+        ref={ref}
+        as={IconButtonWithTooltip}
+        label={intl.formatMessage({
+          id: "component.more-liquid-references-button.formulas",
+          defaultMessage: "Formulas",
+        })}
+        icon={<MoreVerticalIcon />}
+        size="xs"
+        {...props}
+      />
+      <Portal>
+        <MenuList width="min-content" minWidth="20rem">
+          <Heading
+            paddingX={4}
+            paddingTop={1}
+            paddingBottom={1.5}
+            as="h4"
+            size="xs"
+            textTransform="uppercase"
+          >
+            <FormattedMessage
+              id="component.more-liquid-references-button.formulas"
+              defaultMessage="Formulas"
+            />
+          </Heading>
+          {references.map(({ title, description, builder }, index) => (
             <MenuItem
-              icon={<HelpOutlineIcon display="block" boxSize={4} />}
-              as={NakedHelpCenterLink}
-              articleId={6323096}
+              onClick={async (event) => {
+                event.stopPropagation();
+                try {
+                  const alias = field.alias ?? (await onAddAliasToField!());
+                  copyReference({ value: builder(alias) });
+                } catch {}
+              }}
+              key={index}
             >
-              <FormattedMessage id="generic.learn-more" defaultMessage="Learn more" />
+              <Stack spacing={1}>
+                <Text fontSize="md" fontWeight="bold">
+                  {title}
+                </Text>
+                <Text fontSize="sm">{description}</Text>
+              </Stack>
             </MenuItem>
-          </MenuList>
-        </Portal>
-      </Menu>
-    );
-  }),
-  {
-    fragments: {
-      PetitionField: gql`
-        fragment MoreLiquidReferencesButton_PetitionField on PetitionField {
-          id
-          alias
-          type
-          multiple
-          options
-          isChild
-          children {
-            id
-            type
-            title
-            multiple
-            alias
-            options
-          }
-        }
-      `,
-    },
-  },
-);
+          ))}
+          <MenuDivider />
+          <MenuItem
+            icon={<HelpOutlineIcon display="block" boxSize={4} />}
+            as={NakedHelpCenterLink}
+            articleId={6323096}
+          >
+            <FormattedMessage id="generic.learn-more" defaultMessage="Learn more" />
+          </MenuItem>
+        </MenuList>
+      </Portal>
+    </Menu>
+  );
+});
+
+const _fragments = {
+  PetitionField: gql`
+    fragment MoreLiquidReferencesButton_PetitionField on PetitionField {
+      id
+      alias
+      type
+      multiple
+      options
+      isChild
+      children {
+        id
+        type
+        title
+        multiple
+        alias
+        options
+      }
+    }
+  `,
+};
 
 interface LiquidReference {
   title: string;

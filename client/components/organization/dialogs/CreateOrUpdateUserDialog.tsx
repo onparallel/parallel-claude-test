@@ -3,7 +3,6 @@ import { Button, FormControl, FormErrorMessage, FormLabel, Input, Stack } from "
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { UserGroupSelect } from "@parallel/components/common/UserGroupSelect";
-import { UserSelect } from "@parallel/components/common/UserSelect";
 import {
   useCreateOrUpdateUserDialog_UserFragment,
   UserSelect_UserGroupFragment,
@@ -222,32 +221,26 @@ function CreateOrUpdateUserDialog({
   );
 }
 
-useCreateOrUpdateUserDialog.fragments = {
-  get User() {
-    return gql`
-      fragment useCreateOrUpdateUserDialog_User on User {
-        id
-        firstName
-        lastName
-        email
-        status
-        isMe
-        userGroups {
-          ...useCreateOrUpdateUserDialog_UserGroup
-        }
+const _fragments = {
+  User: gql`
+    fragment useCreateOrUpdateUserDialog_User on User {
+      id
+      firstName
+      lastName
+      email
+      status
+      isMe
+      userGroups {
+        ...useCreateOrUpdateUserDialog_UserGroup
       }
-      ${this.UserGroup}
-    `;
-  },
-  get UserGroup() {
-    return gql`
-      fragment useCreateOrUpdateUserDialog_UserGroup on UserGroup {
-        id
-        ...UserSelect_UserGroup
-      }
-      ${UserSelect.fragments.UserGroup}
-    `;
-  },
+    }
+  `,
+  UserGroup: gql`
+    fragment useCreateOrUpdateUserDialog_UserGroup on UserGroup {
+      id
+      ...UserSelect_UserGroup
+    }
+  `,
 };
 
 CreateOrUpdateUserDialog.queries = [

@@ -102,10 +102,6 @@ const _fragments = {
         ...PetitionTemplateClosingMessageCard_PetitionTemplate
       }
     }
-    ${PetitionLayout.fragments.PetitionBase}
-    ${PetitionTemplateRequestMessageCard.fragments.PetitionTemplate}
-    ${PetitionTemplateCompletingMessageCard.fragments.PetitionTemplate}
-    ${PetitionTemplateClosingMessageCard.fragments.PetitionTemplate}
   `,
   Query: gql`
     fragment PetitionMessages_Query on Query {
@@ -115,8 +111,6 @@ const _fragments = {
         ...PetitionTemplateRequestMessageCard_User
       }
     }
-    ${PetitionLayout.fragments.Query}
-    ${PetitionTemplateRequestMessageCard.fragments.User}
   `,
 };
 
@@ -125,7 +119,6 @@ const _queries = [
     query PetitionMessages_user {
       ...PetitionMessages_Query
     }
-    ${_fragments.Query}
   `,
   gql`
     query PetitionMessages_petition($id: GID!) {
@@ -133,7 +126,6 @@ const _queries = [
         ...PetitionMessages_PetitionBase
       }
     }
-    ${_fragments.PetitionBase}
   `,
 ];
 
@@ -144,7 +136,6 @@ const _mutations = [
         ...PetitionMessages_PetitionBase
       }
     }
-    ${_fragments.PetitionBase}
   `,
 ];
 

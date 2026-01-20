@@ -1,4 +1,3 @@
-import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import { Box, Center, Grid, HStack, Text, useToast } from "@chakra-ui/react";
 import { AddIcon, SignatureIcon } from "@parallel/chakra/icons";
@@ -37,119 +36,8 @@ export interface PetitionSignaturesCardProps {
   isDisabled: boolean;
 }
 
-const fragments = {
-  User: gql`
-    fragment PetitionSignaturesCard_User on User {
-      ...TestModeSignatureBadge_User
-    }
-    ${TestModeSignatureBadge.fragments.User}
-  `,
-  Petition: gql`
-    fragment PetitionSignaturesCard_Petition on Petition {
-      id
-      status
-      signatureConfig {
-        isEnabled
-      }
-      generalCommentCount
-      unreadGeneralCommentCount
-      signatureRequests {
-        id
-        ...CurrentSignatureRequestRow_PetitionSignatureRequest
-        ...OlderSignatureRequestRows_PetitionSignatureRequest
-      }
-      ...NewSignatureRequestRow_Petition
-      ...getPetitionSignatureEnvironment_Petition
-      ...useAddNewSignature_Petition
-    }
-    ${CurrentSignatureRequestRow.fragments.PetitionSignatureRequest}
-    ${OlderSignatureRequestRows.fragments.PetitionSignatureRequest}
-    ${NewSignatureRequestRow.fragments.Petition}
-    ${getPetitionSignatureEnvironment.fragments.Petition}
-    ${useAddNewSignature.fragments.Petition}
-  `,
-  PetitionPolling: gql`
-    fragment PetitionSignaturesCard_PetitionPolling on Petition {
-      id
-      status
-      signatureConfig {
-        isEnabled
-      }
-      generalCommentCount
-      unreadGeneralCommentCount
-      signatureRequests {
-        id
-        ...CurrentSignatureRequestRow_PetitionSignatureRequest
-      }
-      ...useAddNewSignature_Petition
-      ...getPetitionSignatureEnvironment_Petition
-    }
-    ${useAddNewSignature.fragments.Petition}
-    ${getPetitionSignatureEnvironment.fragments.Petition}
-    ${CurrentSignatureRequestRow.fragments.PetitionSignatureRequest}
-  `,
-};
-
-const _mutations = [
-  gql`
-    mutation PetitionSignaturesCard_cancelSignatureRequest($petitionSignatureRequestId: GID!) {
-      cancelSignatureRequest(petitionSignatureRequestId: $petitionSignatureRequestId) {
-        id
-        status
-        cancelReason
-        petition {
-          id
-          hasStartedProcess
-        }
-      }
-    }
-  `,
-  gql`
-    mutation PetitionSignaturesCard_signedPetitionDownloadLink(
-      $petitionSignatureRequestId: GID!
-      $preview: Boolean
-      $downloadAuditTrail: Boolean
-    ) {
-      signedPetitionDownloadLink(
-        petitionSignatureRequestId: $petitionSignatureRequestId
-        preview: $preview
-        downloadAuditTrail: $downloadAuditTrail
-      ) {
-        result
-        url
-      }
-    }
-  `,
-  gql`
-    mutation PetitionSignaturesCard_sendSignatureRequestReminders(
-      $petitionSignatureRequestId: GID!
-    ) {
-      sendSignatureRequestReminders(petitionSignatureRequestId: $petitionSignatureRequestId)
-    }
-  `,
-  gql`
-    mutation PetitionSignaturesCard_completePetition($petitionId: GID!, $message: String) {
-      completePetition(petitionId: $petitionId, message: $message) {
-        ...PetitionSignaturesCard_Petition
-      }
-    }
-    ${fragments.Petition}
-  `,
-];
-
-const _queries = [
-  gql`
-    query PetitionSignaturesCard_petition($petitionId: GID!) {
-      petition(id: $petitionId) {
-        ...PetitionSignaturesCard_PetitionPolling
-      }
-    }
-    ${fragments.PetitionPolling}
-  `,
-];
-
-export const PetitionSignaturesCard = Object.assign(
-  chakraForwardRef<"section", PetitionSignaturesCardProps>(function PetitionSignaturesCard(
+export const PetitionSignaturesCard = chakraForwardRef<"section", PetitionSignaturesCardProps>(
+  function PetitionSignaturesCard(
     {
       petition,
       user,
@@ -232,8 +120,7 @@ export const PetitionSignaturesCard = Object.assign(
         />
       </Card>
     );
-  }),
-  { fragments },
+  },
 );
 
 interface PetitionSignaturesCardBodyProps {

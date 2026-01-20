@@ -780,54 +780,43 @@ function CustomFooter({
   );
 }
 
-Petitions.fragments = {
-  get User() {
-    return gql`
-      fragment Petitions_User on User {
-        id
-        ...usePetitionsTableColumns_User
-        hasPetitionApprovalFlow: hasFeatureFlag(featureFlag: PETITION_APPROVAL_FLOW)
-        petitionListViews {
-          ...PetitionViewTabs_PetitionListView
-          ...PetitionListHeader_PetitionListView
+const _fragments = {
+  User: gql`
+    fragment Petitions_User on User {
+      id
+      ...usePetitionsTableColumns_User
+      hasPetitionApprovalFlow: hasFeatureFlag(featureFlag: PETITION_APPROVAL_FLOW)
+      petitionListViews {
+        ...PetitionViewTabs_PetitionListView
+        ...PetitionListHeader_PetitionListView
+      }
+    }
+  `,
+  PetitionBaseOrFolder: gql`
+    fragment Petitions_PetitionBaseOrFolder on PetitionBaseOrFolder {
+      ...useDeletePetitions_PetitionBaseOrFolder
+      ...useRecoverPetition_PetitionBaseOrFolder
+      ... on PetitionBase {
+        name
+        ...usePetitionsTableColumns_PetitionBase
+        myEffectivePermission {
+          permissionType
         }
       }
-      ${usePetitionsTableColumns.fragments.User}
-      ${PetitionListHeader.fragments.PetitionListView}
-      ${PetitionViewTabs.fragments.PetitionListView}
-    `;
-  },
-  get PetitionBaseOrFolder() {
-    return gql`
-      fragment Petitions_PetitionBaseOrFolder on PetitionBaseOrFolder {
-        ...useDeletePetitions_PetitionBaseOrFolder
-        ...useRecoverPetition_PetitionBaseOrFolder
-        ... on PetitionBase {
-          name
-          ...usePetitionsTableColumns_PetitionBase
-          myEffectivePermission {
-            permissionType
-          }
-        }
-        ... on Petition {
-          status
-          isAnonymized
-        }
-        ... on PetitionTemplate {
-          isPublic
-        }
-        ... on PetitionFolder {
-          ...usePetitionsTableColumns_PetitionFolder
-          path
-          minimumPermissionType
-        }
+      ... on Petition {
+        status
+        isAnonymized
       }
-      ${useDeletePetitions.fragments.PetitionBaseOrFolder}
-      ${useRecoverPetition.fragments.PetitionBaseOrFolder}
-      ${usePetitionsTableColumns.fragments.PetitionBase}
-      ${usePetitionsTableColumns.fragments.PetitionFolder}
-    `;
-  },
+      ... on PetitionTemplate {
+        isPublic
+      }
+      ... on PetitionFolder {
+        ...usePetitionsTableColumns_PetitionFolder
+        path
+        minimumPermissionType
+      }
+    }
+  `,
 };
 
 const _queries = [
@@ -838,8 +827,6 @@ const _queries = [
         ...Petitions_User
       }
     }
-    ${AppLayout.fragments.Query}
-    ${Petitions.fragments.User}
   `,
   gql`
     query Petitions_petitions(
@@ -876,7 +863,6 @@ const _queries = [
         totalCount
       }
     }
-    ${Petitions.fragments.PetitionBaseOrFolder}
   `,
 ];
 

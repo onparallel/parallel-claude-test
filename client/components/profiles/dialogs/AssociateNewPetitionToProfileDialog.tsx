@@ -647,67 +647,53 @@ export function useAssociateNewPetitionToProfileDialog() {
   );
 }
 
-useAssociateNewPetitionToProfileDialog.fragments = {
-  get PetitionBase() {
-    return gql`
-      fragment useAssociateNewPetitionToProfileDialog_PetitionBase on PetitionBase {
+const _fragments = {
+  PetitionBase: gql`
+    fragment useAssociateNewPetitionToProfileDialog_PetitionBase on PetitionBase {
+      id
+      name
+      fields {
+        id
+        type
+        options
+        ...PetitionFieldReference_PetitionField
+        ...groupFieldsWithProfileTypes_PetitionField
+      }
+      ...useFieldsWithIndices_PetitionBase
+      ...ProfileRelationshipsAssociationTable_PetitionBase
+    }
+  `,
+  ProfileInner: gql`
+    fragment useAssociateNewPetitionToProfileDialog_ProfileInner on Profile {
+      id
+      localizableName
+      profileType {
+        id
+      }
+    }
+  `,
+  ProfileTypeProcess: gql`
+    fragment useAssociateNewPetitionToProfileDialog_ProfileTypeProcess on ProfileTypeProcess {
+      id
+      templates {
         id
         name
-        fields {
-          id
-          type
-          options
-          ...PetitionFieldReference_PetitionField
-          ...groupFieldsWithProfileTypes_PetitionField
+        myEffectivePermission {
+          permissionType
         }
-        ...useFieldsWithIndices_PetitionBase
-        ...ProfileRelationshipsAssociationTable_PetitionBase
       }
-      ${PetitionFieldReference.fragments.PetitionField}
-      ${useFieldsWithIndices.fragments.PetitionBase}
-      ${ProfileRelationshipsAssociationTable.fragments.PetitionBase}
-      ${groupFieldsWithProfileTypes.fragments.PetitionField}
-    `;
-  },
-  get ProfileInner() {
-    return gql`
-      fragment useAssociateNewPetitionToProfileDialog_ProfileInner on Profile {
+    }
+  `,
+  Profile: gql`
+    fragment useAssociateNewPetitionToProfileDialog_Profile on Profile {
+      ...useAssociateNewPetitionToProfileDialog_ProfileInner
+      profileType {
         id
-        localizableName
-        profileType {
-          id
-        }
+        name
       }
-    `;
-  },
-  get ProfileTypeProcess() {
-    return gql`
-      fragment useAssociateNewPetitionToProfileDialog_ProfileTypeProcess on ProfileTypeProcess {
-        id
-        templates {
-          id
-          name
-          myEffectivePermission {
-            permissionType
-          }
-        }
-      }
-    `;
-  },
-  get Profile() {
-    return gql`
-      fragment useAssociateNewPetitionToProfileDialog_Profile on Profile {
-        ...useAssociateNewPetitionToProfileDialog_ProfileInner
-        profileType {
-          id
-          name
-        }
-        ...ProfileRelationshipsAssociationTable_Profile
-      }
-      ${this.ProfileInner}
-      ${ProfileRelationshipsAssociationTable.fragments.Profile}
-    `;
-  },
+      ...ProfileRelationshipsAssociationTable_Profile
+    }
+  `,
 };
 
 const _queries = [
@@ -717,7 +703,6 @@ const _queries = [
         ...useAssociateNewPetitionToProfileDialog_PetitionBase
       }
     }
-    ${useAssociateNewPetitionToProfileDialog.fragments.PetitionBase}
   `,
 ];
 

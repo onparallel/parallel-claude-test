@@ -34,7 +34,7 @@ export function OverrideWithOrganizationTheme({
   );
 }
 
-OverrideWithOrganizationTheme.fragments = {
+const _fragments = {
   OrganizationBrandThemeData: gql`
     fragment OverrideWithOrganizationTheme_OrganizationBrandThemeData on OrganizationBrandThemeData {
       color

@@ -443,7 +443,6 @@ const _fragments = {
         expiryDate
       }
     }
-    ${UserAvatarList.fragments.User}
   `,
 };
 
@@ -452,7 +451,6 @@ const _queries = [
     query Alerts_user {
       ...AppLayout_Query
     }
-    ${AppLayout.fragments.Query}
   `,
   gql`
     query Alerts_expiringProfileProperties(
@@ -468,7 +466,6 @@ const _queries = [
         totalCount
       }
     }
-    ${_fragments.ProfileFieldProperty}
   `,
 ];
 

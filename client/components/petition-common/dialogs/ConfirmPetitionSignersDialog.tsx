@@ -42,7 +42,6 @@ import {
   ConfirmPetitionSignersDialog_petitionDocument,
   SignatureConfigInputSigner,
 } from "@parallel/graphql/__types";
-import { Fragments } from "@parallel/utils/apollo/fragments";
 import { FORMATS } from "@parallel/utils/dates";
 import { downloadLocalFile } from "@parallel/utils/downloadLocalFile";
 import { fullName } from "@parallel/utils/fullName";
@@ -673,91 +672,76 @@ export function ConfirmPetitionSignersDialog(
   );
 }
 
-ConfirmPetitionSignersDialog.fragments = {
-  get User() {
-    return gql`
-      fragment ConfirmPetitionSignersDialog_User on User {
+const _fragments = {
+  User: gql`
+    fragment ConfirmPetitionSignersDialog_User on User {
+      id
+      email
+      firstName
+      lastName
+      ...SuggestedSigners_User
+      hasSignWithDigitalCertificate: hasFeatureFlag(featureFlag: SIGN_WITH_DIGITAL_CERTIFICATE)
+      hasSignWithEmbeddedImage: hasFeatureFlag(featureFlag: SIGN_WITH_EMBEDDED_IMAGE)
+    }
+  `,
+  PetitionSigner: gql`
+    fragment ConfirmPetitionSignersDialog_PetitionSigner on PetitionSigner {
+      ...Fragments_FullPetitionSigner
+      ...SelectedSignerRow_PetitionSigner
+      signWithDigitalCertificate
+      signWithEmbeddedImageFileUploadId
+      signWithEmbeddedImageUrl300: signWithEmbeddedImageUrl(
+        options: { resize: { height: 300, fit: inside }, toFormat: png }
+      )
+    }
+  `,
+  SignatureConfig: gql`
+    fragment ConfirmPetitionSignersDialog_SignatureConfig on SignatureConfig {
+      signingMode
+      minSigners
+      instructions
+      allowAdditionalSigners
+      useCustomDocument
+      signers {
+        ...ConfirmPetitionSignersDialog_PetitionSigner
+      }
+      integration {
         id
-        email
-        firstName
-        lastName
-        ...SuggestedSigners_User
-        hasSignWithDigitalCertificate: hasFeatureFlag(featureFlag: SIGN_WITH_DIGITAL_CERTIFICATE)
-        hasSignWithEmbeddedImage: hasFeatureFlag(featureFlag: SIGN_WITH_EMBEDDED_IMAGE)
+        provider
       }
-      ${SuggestedSigners.fragments.User}
-    `;
-  },
-  get PetitionSigner() {
-    return gql`
-      fragment ConfirmPetitionSignersDialog_PetitionSigner on PetitionSigner {
-        ...Fragments_FullPetitionSigner
-        ...SelectedSignerRow_PetitionSigner
-        signWithDigitalCertificate
-        signWithEmbeddedImageFileUploadId
-        signWithEmbeddedImageUrl300: signWithEmbeddedImageUrl(
-          options: { resize: { height: 300, fit: inside }, toFormat: png }
-        )
-      }
-      ${Fragments.FullPetitionSigner}
-      ${SelectedSignerRow.fragments.PetitionSigner}
-    `;
-  },
-  get SignatureConfig() {
-    return gql`
-      fragment ConfirmPetitionSignersDialog_SignatureConfig on SignatureConfig {
-        signingMode
-        minSigners
-        instructions
-        allowAdditionalSigners
-        useCustomDocument
-        signers {
-          ...ConfirmPetitionSignersDialog_PetitionSigner
-        }
-        integration {
-          id
-          provider
-        }
-      }
-      ${this.PetitionSigner}
-    `;
-  },
-  get PetitionField() {
-    return gql`
-      fragment ConfirmPetitionSignersDialog_PetitionField on PetitionField {
+    }
+  `,
+  PetitionField: gql`
+    fragment ConfirmPetitionSignersDialog_PetitionField on PetitionField {
+      id
+      type
+      title
+      options
+      alias
+      replies {
         id
-        type
-        title
-        options
-        alias
-        replies {
-          id
-          content
-          children {
-            field {
-              id
-              type
-              alias
-              options
-            }
-            replies {
-              id
-              content
-            }
+        content
+        children {
+          field {
+            id
+            type
+            alias
+            options
+          }
+          replies {
+            id
+            content
           }
         }
       }
-    `;
-  },
-  get PetitionBase() {
-    return gql`
-      fragment ConfirmPetitionSignersDialog_PetitionBase on PetitionBase {
-        id
-        ...SuggestedSigners_PetitionBase
-      }
-      ${SuggestedSigners.fragments.PetitionBase}
-    `;
-  },
+    }
+  `,
+  PetitionBase: gql`
+    fragment ConfirmPetitionSignersDialog_PetitionBase on PetitionBase {
+      id
+      ...SuggestedSigners_PetitionBase
+    }
+  `,
 };
 
 const _mutations = [
@@ -778,7 +762,6 @@ const _queries = [
         ...ConfirmPetitionSignersDialog_PetitionBase
       }
     }
-    ${ConfirmPetitionSignersDialog.fragments.PetitionBase}
   `,
   gql`
     query ConfirmPetitionSignersDialog_me {
@@ -787,7 +770,6 @@ const _queries = [
         ...ConfirmPetitionSignersDialog_User
       }
     }
-    ${ConfirmPetitionSignersDialog.fragments.User}
   `,
 ];
 

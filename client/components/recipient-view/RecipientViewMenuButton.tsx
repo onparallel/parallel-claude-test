@@ -215,7 +215,7 @@ export function RecipientViewMenuButton({
   );
 }
 
-RecipientViewMenuButton.fragments = {
+const _fragments = {
   PublicContact: gql`
     fragment RecipientViewMenuButton_PublicContact on PublicContact {
       id

@@ -214,15 +214,13 @@ OptOut.mutations = [
   `,
 ];
 
-OptOut.fragments = {
-  get PublicRemindersOptOut() {
-    return gql`
-      fragment OptOut_PublicRemindersOptOut on PublicRemindersOptOut {
-        orgLogoUrl
-        orgName
-      }
-    `;
-  },
+const _fragments = {
+  PublicRemindersOptOut: gql`
+    fragment OptOut_PublicRemindersOptOut on PublicRemindersOptOut {
+      orgLogoUrl
+      orgName
+    }
+  `,
 };
 
 OptOut.queries = [
@@ -232,7 +230,6 @@ OptOut.queries = [
         ...OptOut_PublicRemindersOptOut
       }
     }
-    ${OptOut.fragments.PublicRemindersOptOut}
   `,
 ];
 

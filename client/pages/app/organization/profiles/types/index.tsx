@@ -396,36 +396,28 @@ function useProfileTypesListActions({
       ];
 }
 
-OrganizationProfileTypes.fragments = {
-  get ProfileType() {
-    return gql`
-      fragment OrganizationProfileTypes_ProfileType on ProfileType {
-        id
-        name
-        pluralName
-        icon
-        createdAt
-        archivedAt
-        standardType
-        ...useDeleteProfileType_ProfileType
-        ...useArchiveProfileType_ProfileType
+const _fragments = {
+  ProfileType: gql`
+    fragment OrganizationProfileTypes_ProfileType on ProfileType {
+      id
+      name
+      pluralName
+      icon
+      createdAt
+      archivedAt
+      standardType
+      ...useDeleteProfileType_ProfileType
+      ...useArchiveProfileType_ProfileType
+    }
+  `,
+  ProfileTypePagination: gql`
+    fragment OrganizationProfileTypes_ProfileTypePagination on ProfileTypePagination {
+      items {
+        ...OrganizationProfileTypes_ProfileType
       }
-      ${useDeleteProfileType.fragments.ProfileType}
-      ${useArchiveProfileType.fragments.ProfileType}
-      ${useUnarchiveProfileType.fragments.ProfileType}
-    `;
-  },
-  get ProfileTypePagination() {
-    return gql`
-      fragment OrganizationProfileTypes_ProfileTypePagination on ProfileTypePagination {
-        items {
-          ...OrganizationProfileTypes_ProfileType
-        }
-        totalCount
-      }
-      ${this.ProfileType}
-    `;
-  },
+      totalCount
+    }
+  `,
 };
 
 OrganizationProfileTypes.queries = [
@@ -449,7 +441,6 @@ OrganizationProfileTypes.queries = [
         ...OrganizationProfileTypes_ProfileTypePagination
       }
     }
-    ${OrganizationProfileTypes.fragments.ProfileTypePagination}
   `,
   gql`
     query OrganizationProfileTypes_user {
@@ -459,7 +450,6 @@ OrganizationProfileTypes.queries = [
         hasCreateProfileType: hasFeatureFlag(featureFlag: CREATE_PROFILE_TYPE)
       }
     }
-    ${OrganizationProfilesLayout.fragments.Query}
   `,
 ];
 
@@ -474,7 +464,6 @@ OrganizationProfileTypes.mutations = [
         ...OrganizationProfileTypes_ProfileType
       }
     }
-    ${OrganizationProfileTypes.fragments.ProfileType}
   `,
   gql`
     mutation OrganizationProfileTypes_cloneProfileType(
@@ -486,7 +475,6 @@ OrganizationProfileTypes.mutations = [
         ...OrganizationProfileType_ProfileType
       }
     }
-    ${OrganizationProfileTypes.fragments.ProfileType}
   `,
 ];
 

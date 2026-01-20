@@ -59,28 +59,25 @@ function SignatureBoxesPage2({ petition }: SignatureBoxesPageProps, intl: IntlSh
   ].join("\n");
 }
 
-SignatureBoxesPage2.fragments = {
-  get PetitionBase() {
-    return gql`
-      fragment SignatureBoxesPage2_PetitionBase on PetitionBase {
-        selectedDocumentTheme {
-          data
-        }
-        ... on Petition {
-          fromTemplate {
-            id
-          }
-          currentSignatureRequest {
-            signatureConfig {
-              ...documentSignatures_SignatureConfig
-            }
-          }
-        }
-        __typename
+const _fragments = {
+  PetitionBase: gql`
+    fragment SignatureBoxesPage2_PetitionBase on PetitionBase {
+      selectedDocumentTheme {
+        data
       }
-      ${documentSignatures.fragments.SignatureConfig}
-    `;
-  },
+      ... on Petition {
+        fromTemplate {
+          id
+        }
+        currentSignatureRequest {
+          signatureConfig {
+            ...documentSignatures_SignatureConfig
+          }
+        }
+      }
+      __typename
+    }
+  `,
 };
 
 SignatureBoxesPage2.queries = [
@@ -90,7 +87,6 @@ SignatureBoxesPage2.queries = [
         ...SignatureBoxesPage2_PetitionBase
       }
     }
-    ${SignatureBoxesPage2.fragments.PetitionBase}
   `,
 ];
 

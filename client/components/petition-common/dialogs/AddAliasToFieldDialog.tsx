@@ -159,7 +159,7 @@ export function AddAliasToFieldDialog({
   );
 }
 
-AddAliasToFieldDialog.fragments = {
+const _fragments = {
   PetitionField: gql`
     fragment AddAliasToFieldDialog_PetitionField on PetitionField {
       id

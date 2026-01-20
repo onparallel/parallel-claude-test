@@ -334,41 +334,34 @@ export function TemplateDefaultPermissionsDialog({
   );
 }
 
-TemplateDefaultPermissionsDialog.fragments = {
-  get TemplateDefaultPermission() {
-    return gql`
-      fragment TemplateDefaultPermissionsDialog_TemplateDefaultPermission on TemplateDefaultPermission {
-        id
+const _fragments = {
+  TemplateDefaultPermission: gql`
+    fragment TemplateDefaultPermissionsDialog_TemplateDefaultPermission on TemplateDefaultPermission {
+      id
+      isSubscribed
+      permissionType
+      ... on TemplateDefaultUserPermission {
+        ...TemplateDefaultUserPermissionRow_TemplateDefaultUserPermission
+      }
+      ... on TemplateDefaultUserGroupPermission {
+        ...TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermission
+      }
+    }
+  `,
+  PetitionTemplate: gql`
+    fragment TemplateDefaultPermissionsDialog_PetitionTemplate on PetitionTemplate {
+      id
+      effectiveDefaultPermissions {
+        user {
+          id
+        }
         isSubscribed
-        permissionType
-        ... on TemplateDefaultUserPermission {
-          ...TemplateDefaultUserPermissionRow_TemplateDefaultUserPermission
-        }
-        ... on TemplateDefaultUserGroupPermission {
-          ...TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermission
-        }
       }
-      ${TemplateDefaultUserPermissionRow.fragments.TemplateDefaultUserPermission}
-      ${TemplateDefaultUserGroupPermissionRow.fragments.TemplateDefaultUserGroupPermission}
-    `;
-  },
-  get PetitionTemplate() {
-    return gql`
-      fragment TemplateDefaultPermissionsDialog_PetitionTemplate on PetitionTemplate {
-        id
-        effectiveDefaultPermissions {
-          user {
-            id
-          }
-          isSubscribed
-        }
-        defaultPermissions {
-          ...TemplateDefaultPermissionsDialog_TemplateDefaultPermission
-        }
+      defaultPermissions {
+        ...TemplateDefaultPermissionsDialog_TemplateDefaultPermission
       }
-      ${this.TemplateDefaultPermission}
-    `;
-  },
+    }
+  `,
 };
 
 TemplateDefaultPermissionsDialog.queries = [
@@ -381,7 +374,6 @@ TemplateDefaultPermissionsDialog.queries = [
         }
       }
     }
-    ${TemplateDefaultPermissionsDialog.fragments.PetitionTemplate}
   `,
 ];
 

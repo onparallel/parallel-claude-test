@@ -39,56 +39,6 @@ export type PetitionSelectInstance<
   OptionType extends PetitionSelectSelection = PetitionSelectSelection,
 > = SelectInstance<OptionType, IsMulti, never>;
 
-const fragments = {
-  PetitionBase: gql`
-    fragment PetitionSelect_PetitionBase on PetitionBase {
-      id
-      ...PetitionSelectOption_PetitionBase
-    }
-    ${PetitionSelectOption.fragments.PetitionBase}
-  `,
-};
-
-const _queries = [
-  gql`
-    query PetitionSelect_petitions(
-      $offset: Int
-      $limit: Int
-      $search: String
-      $filters: PetitionFilter
-      $sortBy: [QueryPetitions_OrderBy!]
-      $minEffectivePermission: PetitionPermissionType
-      $excludePublicTemplates: Boolean
-    ) {
-      petitions(
-        offset: $offset
-        limit: $limit
-        search: $search
-        filters: $filters
-        sortBy: $sortBy
-        searchByNameOnly: true
-        excludeAnonymized: true
-        minEffectivePermission: $minEffectivePermission
-        excludePublicTemplates: $excludePublicTemplates
-      ) {
-        items {
-          ...PetitionSelect_PetitionBase
-        }
-        totalCount
-      }
-    }
-    ${fragments.PetitionBase}
-  `,
-  gql`
-    query PetitionSelect_petition($id: GID!) {
-      petition(id: $id) {
-        ...PetitionSelect_PetitionBase
-      }
-    }
-    ${fragments.PetitionBase}
-  `,
-];
-
 export interface PetitionSelectProps<
   IsMulti extends boolean = false,
   IsSync extends boolean = false,
@@ -105,169 +55,164 @@ export interface PetitionSelectProps<
   noOfLines?: number;
 }
 
-export const PetitionSelect = Object.assign(
-  forwardRef(function PetitionSelect<
-    IsMulti extends boolean = false,
-    IsSync extends boolean = false,
-    OptionType extends PetitionSelectSelection = PetitionSelectSelection,
-  >(
-    {
-      value,
-      isSync,
-      onChange,
-      options,
-      isMulti,
-      placeholder: _placeholder,
-      excludePetitions,
-      excludePublicTemplates,
-      minEffectivePermission,
-      fromTemplateId,
-      ...props
-    }: PetitionSelectProps<IsMulti, IsSync, OptionType>,
-    ref: ForwardedRef<PetitionSelectInstance<IsMulti, OptionType>>,
-  ) {
-    const needsLoading =
-      typeof value === "string" || (Array.isArray(value) && typeof value[0] === "string");
+export const PetitionSelect = forwardRef(function PetitionSelect<
+  IsMulti extends boolean = false,
+  IsSync extends boolean = false,
+  OptionType extends PetitionSelectSelection = PetitionSelectSelection,
+>(
+  {
+    value,
+    isSync,
+    onChange,
+    options,
+    isMulti,
+    placeholder: _placeholder,
+    excludePetitions,
+    excludePublicTemplates,
+    minEffectivePermission,
+    fromTemplateId,
+    ...props
+  }: PetitionSelectProps<IsMulti, IsSync, OptionType>,
+  ref: ForwardedRef<PetitionSelectInstance<IsMulti, OptionType>>,
+) {
+  const needsLoading =
+    typeof value === "string" || (Array.isArray(value) && typeof value[0] === "string");
 
-    const apollo = useApolloClient();
-    const type = props.type ?? "PETITION";
+  const apollo = useApolloClient();
+  const type = props.type ?? "PETITION";
 
-    const loadPetitions = useDebouncedAsync(
-      async (search: string | null | undefined) => {
-        const { data } = await apollo.query({
-          query: PetitionSelect_petitionsDocument,
-          variables: {
-            offset: 0,
-            limit: 100,
-            filters: {
-              type,
-              fromTemplateId,
-            },
-            minEffectivePermission,
-            excludePublicTemplates,
-            search,
-            sortBy: "lastUsedAt_DESC",
+  const loadPetitions = useDebouncedAsync(
+    async (search: string | null | undefined) => {
+      const { data } = await apollo.query({
+        query: PetitionSelect_petitionsDocument,
+        variables: {
+          offset: 0,
+          limit: 100,
+          filters: {
+            type,
+            fromTemplateId,
           },
-          fetchPolicy: "no-cache",
-        });
+          minEffectivePermission,
+          excludePublicTemplates,
+          search,
+          sortBy: "lastUsedAt_DESC",
+        },
+        fetchPolicy: "no-cache",
+      });
 
-        assert(isNonNullish(data), "Result data in PetitionSelect_petitionsDocument is missing");
+      assert(isNonNullish(data), "Result data in PetitionSelect_petitionsDocument is missing");
 
-        assertTypenameArray(
-          data.petitions.items,
-          type === "PETITION" ? "Petition" : "PetitionTemplate",
-        );
-
-        return data.petitions.items.filter((p) =>
-          excludePetitions
-            ? p?.__typename === "Petition" && !excludePetitions?.includes(p.id)
-            : true,
-        ) as any[];
-      },
-      300,
-      [excludePetitions?.join(","), fromTemplateId?.join(",")],
-    );
-
-    const getPetitions = useGetPetitions();
-
-    const _value = useAsyncMemo(async () => {
-      if (value === null) {
-        return null;
-      }
-      if (needsLoading) {
-        return await getPetitions(value as any);
-      } else {
-        return value as MaybeArray<PetitionSelectSelection>;
-      }
-    }, [
-      needsLoading,
-      // Rerun when value changes
-      value === null
-        ? null
-        : needsLoading
-          ? // value is string | string[]
-            unMaybeArray(value as any).join(",")
-          : // value is PetitionSelection[]
-            unMaybeArray(value as any)
-              .map((x) => x.id)
-              .join(","),
-    ]);
-    const intl = useIntl();
-    const placeholder = useMemo(() => {
-      return (
-        _placeholder ??
-        (type === "PETITION"
-          ? intl.formatMessage(
-              {
-                id: "component.petition-select.placeholder-petition",
-                defaultMessage: "Select {isMulti, select, true{parallels} other {a parallel}}",
-              },
-              {
-                isMulti,
-              },
-            )
-          : intl.formatMessage(
-              {
-                id: "component.petition-select.placeholder-petition-template",
-                defaultMessage: "Select {isMulti, select, true{templates} other {a template}}",
-              },
-              {
-                isMulti,
-              },
-            ))
+      assertTypenameArray(
+        data.petitions.items,
+        type === "PETITION" ? "Petition" : "PetitionTemplate",
       );
-    }, [_placeholder, isMulti]);
 
-    const rsProps = useReactSelectProps<OptionType, IsMulti, never>({
-      ...props,
-      components: {
-        NoOptionsMessage,
-        SingleValue,
-        MultiValueLabel,
-        Option,
-        ...props.components,
-      } as unknown as SelectComponentsConfig<OptionType, IsMulti, never>,
-    });
+      return data.petitions.items.filter((p) =>
+        excludePetitions ? p?.__typename === "Petition" && !excludePetitions?.includes(p.id) : true,
+      ) as any[];
+    },
+    300,
+    [excludePetitions?.join(","), fromTemplateId?.join(",")],
+  );
 
-    return isSync ? (
-      <Select<OptionType, IsMulti, never>
-        ref={ref as any}
-        value={_value as any}
-        onChange={onChange as any}
-        isMulti={isMulti}
-        options={options}
-        getOptionLabel={getOptionLabel}
-        getOptionValue={getOptionValue}
-        placeholder={placeholder}
-        isClearable={props.isClearable}
-        {...props}
-        {...rsProps}
-      />
-    ) : (
-      <AsyncSelect<OptionType, IsMulti, never>
-        ref={ref as any}
-        value={_value as any}
-        onChange={onChange as any}
-        isMulti={isMulti}
-        loadOptions={loadPetitions}
-        getOptionLabel={getOptionLabel}
-        getOptionValue={getOptionValue}
-        placeholder={placeholder}
-        isClearable={props.isClearable}
-        {...props}
-        {...rsProps}
-      />
+  const getPetitions = useGetPetitions();
+
+  const _value = useAsyncMemo(async () => {
+    if (value === null) {
+      return null;
+    }
+    if (needsLoading) {
+      return await getPetitions(value as any);
+    } else {
+      return value as MaybeArray<PetitionSelectSelection>;
+    }
+  }, [
+    needsLoading,
+    // Rerun when value changes
+    value === null
+      ? null
+      : needsLoading
+        ? // value is string | string[]
+          unMaybeArray(value as any).join(",")
+        : // value is PetitionSelection[]
+          unMaybeArray(value as any)
+            .map((x) => x.id)
+            .join(","),
+  ]);
+  const intl = useIntl();
+  const placeholder = useMemo(() => {
+    return (
+      _placeholder ??
+      (type === "PETITION"
+        ? intl.formatMessage(
+            {
+              id: "component.petition-select.placeholder-petition",
+              defaultMessage: "Select {isMulti, select, true{parallels} other {a parallel}}",
+            },
+            {
+              isMulti,
+            },
+          )
+        : intl.formatMessage(
+            {
+              id: "component.petition-select.placeholder-petition-template",
+              defaultMessage: "Select {isMulti, select, true{templates} other {a template}}",
+            },
+            {
+              isMulti,
+            },
+          ))
     );
-  }) as <
-    IsMulti extends boolean = false,
-    IsSync extends boolean = false,
-    OptionType extends PetitionSelectSelection = PetitionSelectSelection,
-  >(
-    props: PetitionSelectProps<IsMulti, IsSync, OptionType> &
-      RefAttributes<PetitionSelectInstance<IsMulti, OptionType>>,
-  ) => ReactElement,
-  { fragments },
-);
+  }, [_placeholder, isMulti]);
+
+  const rsProps = useReactSelectProps<OptionType, IsMulti, never>({
+    ...props,
+    components: {
+      NoOptionsMessage,
+      SingleValue,
+      MultiValueLabel,
+      Option,
+      ...props.components,
+    } as unknown as SelectComponentsConfig<OptionType, IsMulti, never>,
+  });
+
+  return isSync ? (
+    <Select<OptionType, IsMulti, never>
+      ref={ref as any}
+      value={_value as any}
+      onChange={onChange as any}
+      isMulti={isMulti}
+      options={options}
+      getOptionLabel={getOptionLabel}
+      getOptionValue={getOptionValue}
+      placeholder={placeholder}
+      isClearable={props.isClearable}
+      {...props}
+      {...rsProps}
+    />
+  ) : (
+    <AsyncSelect<OptionType, IsMulti, never>
+      ref={ref as any}
+      value={_value as any}
+      onChange={onChange as any}
+      isMulti={isMulti}
+      loadOptions={loadPetitions}
+      getOptionLabel={getOptionLabel}
+      getOptionValue={getOptionValue}
+      placeholder={placeholder}
+      isClearable={props.isClearable}
+      {...props}
+      {...rsProps}
+    />
+  );
+}) as <
+  IsMulti extends boolean = false,
+  IsSync extends boolean = false,
+  OptionType extends PetitionSelectSelection = PetitionSelectSelection,
+>(
+  props: PetitionSelectProps<IsMulti, IsSync, OptionType> &
+    RefAttributes<PetitionSelectInstance<IsMulti, OptionType>>,
+) => ReactElement;
 
 function useGetPetitions() {
   const client = useApolloClient();
@@ -398,3 +343,50 @@ function Option({
     </components.Option>
   );
 }
+
+const _fragments = {
+  PetitionBase: gql`
+    fragment PetitionSelect_PetitionBase on PetitionBase {
+      id
+      ...PetitionSelectOption_PetitionBase
+    }
+  `,
+};
+
+const _queries = [
+  gql`
+    query PetitionSelect_petitions(
+      $offset: Int
+      $limit: Int
+      $search: String
+      $filters: PetitionFilter
+      $sortBy: [QueryPetitions_OrderBy!]
+      $minEffectivePermission: PetitionPermissionType
+      $excludePublicTemplates: Boolean
+    ) {
+      petitions(
+        offset: $offset
+        limit: $limit
+        search: $search
+        filters: $filters
+        sortBy: $sortBy
+        searchByNameOnly: true
+        excludeAnonymized: true
+        minEffectivePermission: $minEffectivePermission
+        excludePublicTemplates: $excludePublicTemplates
+      ) {
+        items {
+          ...PetitionSelect_PetitionBase
+        }
+        totalCount
+      }
+    }
+  `,
+  gql`
+    query PetitionSelect_petition($id: GID!) {
+      petition(id: $id) {
+        ...PetitionSelect_PetitionBase
+      }
+    }
+  `,
+];

@@ -73,12 +73,11 @@ export function ReferencedCalculationsDialog({
   );
 }
 
-ReferencedCalculationsDialog.fragments = {
+const _fragments = {
   PetitionField: gql`
     fragment ReferencedCalculationsDialog_PetitionField on PetitionField {
       ...FieldErrorDialog_PetitionField
     }
-    ${FieldErrorDialog.fragments.PetitionField}
   `,
 };
 

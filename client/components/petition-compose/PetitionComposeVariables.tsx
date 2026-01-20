@@ -54,10 +54,7 @@ import {
   useUpdateNumericPetitionVariableDialog,
 } from "./dialogs/CreateOrUpdatePetitionVariableDialog";
 import { usePetitionComposeCalculationRulesDialog } from "./dialogs/PetitionComposeCalculationRulesDialog";
-import {
-  ReferencedCalculationsDialog,
-  useReferencedCalculationsDialog,
-} from "./dialogs/ReferencedCalculationsDialog";
+import { useReferencedCalculationsDialog } from "./dialogs/ReferencedCalculationsDialog";
 
 export interface PetitionComposeVariablesProps {
   allFieldsWithIndices: [
@@ -444,43 +441,32 @@ export function PetitionComposeVariables({
   );
 }
 
-PetitionComposeVariables.fragments = {
-  get PetitionVariable() {
-    return gql`
-      fragment PetitionComposeVariables_PetitionVariable on PetitionVariable {
-        name
-        type
-        ...VariableReference_PetitionVariable
-        ...useCreatePetitionVariableDialog_PetitionVariable
+const _fragments = {
+  PetitionVariable: gql`
+    fragment PetitionComposeVariables_PetitionVariable on PetitionVariable {
+      name
+      type
+      ...VariableReference_PetitionVariable
+      ...useCreatePetitionVariableDialog_PetitionVariable
+    }
+  `,
+  PetitionField: gql`
+    fragment PetitionComposeVariables_PetitionField on PetitionField {
+      id
+      visibility
+      math
+      ...ReferencedCalculationsDialog_PetitionField
+    }
+  `,
+  PetitionBase: gql`
+    fragment PetitionComposeVariables_PetitionBase on PetitionBase {
+      id
+      variables {
+        ...PetitionComposeVariables_PetitionVariable
       }
-      ${VariableReference.fragments.PetitionVariable}
-      ${useCreatePetitionVariableDialog.fragments.PetitionVariable}
-    `;
-  },
-  get PetitionField() {
-    return gql`
-      fragment PetitionComposeVariables_PetitionField on PetitionField {
-        id
-        visibility
-        math
-        ...ReferencedCalculationsDialog_PetitionField
-      }
-      ${ReferencedCalculationsDialog.fragments.PetitionField}
-      ${PetitionFieldReference.fragments.PetitionField}
-    `;
-  },
-  get PetitionBase() {
-    return gql`
-      fragment PetitionComposeVariables_PetitionBase on PetitionBase {
-        id
-        variables {
-          ...PetitionComposeVariables_PetitionVariable
-        }
-        lastChangeAt
-      }
-      ${this.PetitionVariable}
-    `;
-  },
+      lastChangeAt
+    }
+  `,
 };
 
 const _mutations = [
@@ -490,7 +476,6 @@ const _mutations = [
         ...PetitionComposeVariables_PetitionBase
       }
     }
-    ${PetitionComposeVariables.fragments.PetitionBase}
   `,
   gql`
     mutation PetitionComposeVariables_updatePetitionField(
@@ -508,7 +493,6 @@ const _mutations = [
         }
       }
     }
-    ${PetitionComposeVariables.fragments.PetitionField}
   `,
 ];
 

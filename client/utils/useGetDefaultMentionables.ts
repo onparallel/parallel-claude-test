@@ -4,7 +4,6 @@ import { useGetDefaultMentionables_permissionsQueryDocument } from "@parallel/gr
 import { useMemo } from "react";
 import { uniqueBy } from "remeda";
 import { isTypename } from "./apollo/typename";
-import { createMentionPlugin } from "./slate/MentionPlugin";
 
 export function useGetDefaultMentionables(petitionId: string) {
   const { data } = useQuery(useGetDefaultMentionables_permissionsQueryDocument, {
@@ -65,6 +64,5 @@ const _queries = [
         }
       }
     }
-    ${createMentionPlugin.fragments.UserOrUserGroup}
   `,
 ];

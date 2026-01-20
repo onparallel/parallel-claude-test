@@ -27,7 +27,6 @@ import {
   Tone,
   useRecipientViewConfirmPetitionSignersDialog_PublicPetitionAccessFragment,
 } from "@parallel/graphql/__types";
-import { Fragments } from "@parallel/utils/apollo/fragments";
 import { fullName } from "@parallel/utils/fullName";
 import { Maybe } from "@parallel/utils/types";
 import { useState } from "react";
@@ -372,72 +371,53 @@ function RecipientViewConfirmPetitionSignersDialog({
   );
 }
 
-useRecipientViewConfirmPetitionSignersDialog.fragments = {
-  get PetitionSigner() {
-    return gql`
-      fragment useRecipientViewConfirmPetitionSignersDialog_PetitionSigner on PetitionSigner {
-        ...Fragments_FullPetitionSigner
-        ...SelectedSignerRow_PetitionSigner
+const _fragments = {
+  PetitionSigner: gql`
+    fragment useRecipientViewConfirmPetitionSignersDialog_PetitionSigner on PetitionSigner {
+      ...Fragments_FullPetitionSigner
+      ...SelectedSignerRow_PetitionSigner
+    }
+  `,
+  PublicContact: gql`
+    fragment useRecipientViewConfirmPetitionSignersDialog_PublicContact on PublicContact {
+      firstName
+      lastName
+      email
+      ...SuggestedSigners_PublicContact
+    }
+  `,
+  PublicSignatureConfig: gql`
+    fragment useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfig on PublicSignatureConfig {
+      signingMode
+      minSigners
+      instructions
+      allowAdditionalSigners
+      signers {
+        ...useRecipientViewConfirmPetitionSignersDialog_PetitionSigner
       }
-      ${Fragments.FullPetitionSigner}
-      ${SelectedSignerRow.fragments.PetitionSigner}
-    `;
-  },
-  get PublicContact() {
-    return gql`
-      fragment useRecipientViewConfirmPetitionSignersDialog_PublicContact on PublicContact {
-        firstName
-        lastName
-        email
-        ...SuggestedSigners_PublicContact
+    }
+  `,
+  PublicPetition: gql`
+    fragment useRecipientViewConfirmPetitionSignersDialog_PublicPetition on PublicPetition {
+      signatureConfig {
+        ...useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfig
       }
-      ${SuggestedSigners.fragments.PublicContact}
-    `;
-  },
-  get PublicSignatureConfig() {
-    return gql`
-      fragment useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfig on PublicSignatureConfig {
-        signingMode
-        minSigners
-        instructions
-        allowAdditionalSigners
-        signers {
-          ...useRecipientViewConfirmPetitionSignersDialog_PetitionSigner
-        }
+      recipients {
+        ...useRecipientViewConfirmPetitionSignersDialog_PublicContact
       }
-      ${this.PetitionSigner}
-    `;
-  },
-  get PublicPetition() {
-    return gql`
-      fragment useRecipientViewConfirmPetitionSignersDialog_PublicPetition on PublicPetition {
-        signatureConfig {
-          ...useRecipientViewConfirmPetitionSignersDialog_PublicSignatureConfig
-        }
-        recipients {
-          ...useRecipientViewConfirmPetitionSignersDialog_PublicContact
-        }
-        ...SuggestedSigners_PublicPetition
+      ...SuggestedSigners_PublicPetition
+    }
+  `,
+  PublicPetitionAccess: gql`
+    fragment useRecipientViewConfirmPetitionSignersDialog_PublicPetitionAccess on PublicPetitionAccess {
+      petition {
+        ...useRecipientViewConfirmPetitionSignersDialog_PublicPetition
       }
-      ${SuggestedSigners.fragments.PublicPetition}
-      ${this.PublicContact}
-      ${this.PublicSignatureConfig}
-    `;
-  },
-  get PublicPetitionAccess() {
-    return gql`
-      fragment useRecipientViewConfirmPetitionSignersDialog_PublicPetitionAccess on PublicPetitionAccess {
-        petition {
-          ...useRecipientViewConfirmPetitionSignersDialog_PublicPetition
-        }
-        contact {
-          ...useRecipientViewConfirmPetitionSignersDialog_PublicContact
-        }
+      contact {
+        ...useRecipientViewConfirmPetitionSignersDialog_PublicContact
       }
-      ${this.PublicContact}
-      ${this.PublicPetition}
-    `;
-  },
+    }
+  `,
 };
 
 export function useRecipientViewConfirmPetitionSignersDialog() {

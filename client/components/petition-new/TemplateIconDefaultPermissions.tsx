@@ -116,7 +116,7 @@ export function TemplateIconDefaultPermissions({
   );
 }
 
-TemplateIconDefaultPermissions.fragments = {
+const _fragments = {
   PetitionTemplate: gql`
     fragment TemplateIconDefaultPermissions_PetitionTemplate on PetitionTemplate {
       id
@@ -147,7 +147,5 @@ TemplateIconDefaultPermissions.fragments = {
         isSubscribed
       }
     }
-    ${UserAvatar.fragments.User}
-    ${UserGroupReference.fragments.UserGroup}
   `,
 };

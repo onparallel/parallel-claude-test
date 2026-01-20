@@ -308,7 +308,7 @@ export function ExportRepliesProgressDialog({
   }
 }
 
-ExportRepliesProgressDialog.fragments = {
+const _fragments = {
   Petition: gql`
     fragment ExportRepliesProgressDialog_Petition on Petition {
       id
@@ -339,10 +339,6 @@ ExportRepliesProgressDialog.fragments = {
         }
       }
     }
-    ${useCuatrecasasExport.fragments.Petition}
-    ${useFilenamePlaceholdersRename.fragments.PetitionField}
-    ${useFilenamePlaceholdersRename.fragments.PetitionFieldReply}
-    ${useCuatrecasasExport.fragments.PetitionFieldReply}
   `,
 };
 
@@ -354,8 +350,6 @@ ExportRepliesProgressDialog.queries = [
         ...ExportRepliesProgressDialog_Petition
       }
     }
-    ${useFilenamePlaceholdersRename.fragments.PetitionBase}
-    ${ExportRepliesProgressDialog.fragments.Petition}
   `,
 ];
 

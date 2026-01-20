@@ -81,11 +81,8 @@ export interface PetitionComposeAttachmentsProps {
   isReadOnly?: boolean;
 }
 
-export const PetitionComposeAttachments = Object.assign(
-  chakraForwardRef<"div", PetitionComposeAttachmentsProps>(function PetitionComposeAttachments(
-    { petition, isReadOnly, ...props },
-    ref,
-  ) {
+export const PetitionComposeAttachments = chakraForwardRef<"div", PetitionComposeAttachmentsProps>(
+  function PetitionComposeAttachments({ petition, isReadOnly, ...props }, ref) {
     const intl = useIntl();
 
     const petitionId = petition.id;
@@ -501,72 +498,61 @@ export const PetitionComposeAttachments = Object.assign(
         </Stack>
       </Card>
     );
-  }),
-  {
-    fragments: {
-      get PetitionAttachment() {
-        return gql`
-          fragment PetitionComposeAttachments_PetitionAttachment on PetitionAttachment {
-            id
-            type
-            file {
-              filename
-              size
-              isComplete
-            }
-            isUploading @client
-            visibility
-          }
-        `;
-      },
-      get PetitionAttachmentsList() {
-        return gql`
-          fragment PetitionComposeAttachments_PetitionAttachmentsList on PetitionAttachmentsList {
-            FRONT {
-              ...PetitionComposeAttachments_PetitionAttachment
-            }
-            ANNEX {
-              ...PetitionComposeAttachments_PetitionAttachment
-            }
-            BACK {
-              ...PetitionComposeAttachments_PetitionAttachment
-            }
-          }
-          ${this.PetitionAttachment}
-        `;
-      },
-      get PetitionBase() {
-        return gql`
-          fragment PetitionComposeAttachments_PetitionBase on PetitionBase {
-            id
-            fields {
-              id
-              type
-              isReadOnly
-              options
-              visibility
-              ...PetitionVisibilityEditor_PetitionField
-              children {
-                id
-                type
-                visibility
-                ...PetitionVisibilityEditor_PetitionField
-              }
-            }
-            attachmentsList {
-              ...PetitionComposeAttachments_PetitionAttachmentsList
-            }
-            lastChangeAt
-            ...PetitionVisibilityEditor_PetitionBase
-          }
-          ${this.PetitionAttachmentsList}
-          ${PetitionVisibilityEditor.fragments.PetitionBase}
-          ${PetitionVisibilityEditor.fragments.PetitionField}
-        `;
-      },
-    },
   },
 );
+
+const _fragments = {
+  PetitionAttachment: gql`
+    fragment PetitionComposeAttachments_PetitionAttachment on PetitionAttachment {
+      id
+      type
+      file {
+        filename
+        size
+        isComplete
+      }
+      isUploading @client
+      visibility
+    }
+  `,
+  PetitionAttachmentsList: gql`
+    fragment PetitionComposeAttachments_PetitionAttachmentsList on PetitionAttachmentsList {
+      FRONT {
+        ...PetitionComposeAttachments_PetitionAttachment
+      }
+      ANNEX {
+        ...PetitionComposeAttachments_PetitionAttachment
+      }
+      BACK {
+        ...PetitionComposeAttachments_PetitionAttachment
+      }
+    }
+  `,
+  PetitionBase: gql`
+    fragment PetitionComposeAttachments_PetitionBase on PetitionBase {
+      id
+      fields {
+        id
+        type
+        isReadOnly
+        options
+        visibility
+        ...PetitionVisibilityEditor_PetitionField
+        children {
+          id
+          type
+          visibility
+          ...PetitionVisibilityEditor_PetitionField
+        }
+      }
+      attachmentsList {
+        ...PetitionComposeAttachments_PetitionAttachmentsList
+      }
+      lastChangeAt
+      ...PetitionVisibilityEditor_PetitionBase
+    }
+  `,
+};
 
 const _mutations = [
   gql`
@@ -583,7 +569,6 @@ const _mutations = [
         ...PetitionComposeAttachments_PetitionBase
       }
     }
-    ${PetitionComposeAttachments.fragments.PetitionBase}
   `,
   gql`
     mutation PetitionComposeAttachments_createPetitionAttachmentUploadLink(
@@ -604,8 +589,6 @@ const _mutations = [
         }
       }
     }
-    ${uploadFile.fragments.AWSPresignedPostData}
-    ${PetitionComposeAttachments.fragments.PetitionAttachment}
   `,
   gql`
     mutation PetitionComposeAttachments_updatePetitionAttachmentType(
@@ -624,8 +607,6 @@ const _mutations = [
         }
       }
     }
-    ${PetitionComposeAttachments.fragments.PetitionAttachment}
-    ${PetitionComposeAttachments.fragments.PetitionBase}
   `,
   gql`
     mutation PetitionComposeAttachments_petitionAttachmentUploadComplete(
@@ -639,8 +620,6 @@ const _mutations = [
         }
       }
     }
-    ${PetitionComposeAttachments.fragments.PetitionAttachment}
-    ${PetitionComposeAttachments.fragments.PetitionBase}
   `,
   gql`
     mutation PetitionComposeAttachments_deletePetitionAttachment(
@@ -651,7 +630,6 @@ const _mutations = [
         ...PetitionComposeAttachments_PetitionBase
       }
     }
-    ${PetitionComposeAttachments.fragments.PetitionBase}
   `,
   gql`
     mutation PetitionComposeAttachments_petitionAttachmentDownloadLink(

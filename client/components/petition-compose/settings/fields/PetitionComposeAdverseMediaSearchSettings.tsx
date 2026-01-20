@@ -82,7 +82,7 @@ export function PetitionComposeAdverseMediaSearchSettings({
   );
 }
 
-PetitionComposeAdverseMediaSearchSettings.fragments = {
+const _fragments = {
   PetitionField: gql`
     fragment PetitionComposeAdverseMediaSearchSettings_PetitionField on PetitionField {
       id

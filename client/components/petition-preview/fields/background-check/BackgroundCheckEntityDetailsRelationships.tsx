@@ -115,30 +115,28 @@ export function BackgroundCheckEntityDetailsRelationships({
   );
 }
 
-BackgroundCheckEntityDetailsRelationships.fragments = {
-  get BackgroundCheckEntityDetailsRelationship() {
-    return gql`
-      fragment BackgroundCheckEntityDetailsRelationships_BackgroundCheckEntityDetailsRelationship on BackgroundCheckEntityDetailsRelationship {
-        id
-        type
-        properties {
-          entityA {
-            id
-            name
-            type
-          }
-          entityB {
-            id
-            name
-            type
-          }
-          startDate
-          endDate
-          relationship
+const _fragments = {
+  BackgroundCheckEntityDetailsRelationship: gql`
+    fragment BackgroundCheckEntityDetailsRelationships_BackgroundCheckEntityDetailsRelationship on BackgroundCheckEntityDetailsRelationship {
+      id
+      type
+      properties {
+        entityA {
+          id
+          name
+          type
         }
+        entityB {
+          id
+          name
+          type
+        }
+        startDate
+        endDate
+        relationship
       }
-    `;
-  },
+    }
+  `,
 };
 
 function useBackgroundCheckRelationshipsColumns(entityId: string) {

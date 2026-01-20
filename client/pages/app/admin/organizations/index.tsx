@@ -283,24 +283,22 @@ function useOrganizationColumns() {
   );
 }
 
-AdminOrganizations.fragments = {
-  get Organization() {
-    return gql`
-      fragment AdminOrganizations_Organization on Organization {
+const _fragments = {
+  Organization: gql`
+    fragment AdminOrganizations_Organization on Organization {
+      id
+      name
+      status
+      activeUserCount
+      createdAt
+      petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
         id
-        name
-        status
-        activeUserCount
-        createdAt
-        petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
-          id
-          limit
-          used
-        }
-        usageDetails
+        limit
+        used
       }
-    `;
-  },
+      usageDetails
+    }
+  `,
 };
 
 AdminOrganizations.queries = [
@@ -325,13 +323,11 @@ AdminOrganizations.queries = [
         }
       }
     }
-    ${AdminOrganizations.fragments.Organization}
   `,
   gql`
     query AdminOrganizations_user {
       ...AdminSettingsLayout_Query
     }
-    ${AdminSettingsLayout.fragments.Query}
   `,
 ];
 
@@ -356,7 +352,6 @@ AdminOrganizations.mutations = [
         ...AdminOrganizations_Organization
       }
     }
-    ${AdminOrganizations.fragments.Organization}
   `,
 ];
 

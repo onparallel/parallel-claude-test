@@ -563,7 +563,7 @@ export function AdverseMediaSearchArticle({
   );
 }
 
-PreviewPetitionFieldAdverseMediaSearch.fragments = {
+const _fragments = {
   PetitionField: gql`
     fragment PreviewPetitionFieldAdverseMediaSearch_PetitionField on PetitionField {
       id
@@ -600,6 +600,5 @@ PreviewPetitionFieldAdverseMediaSearch.fragments = {
       permanentDeletionAt
       ...useFieldLogic_PetitionBase
     }
-    ${useFieldLogic.fragments.PetitionBase}
   `,
 };

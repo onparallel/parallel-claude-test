@@ -30,7 +30,7 @@ export function TimelineSignatureCompletedEvent({ event }: TimelineSignatureComp
   );
 }
 
-TimelineSignatureCompletedEvent.fragments = {
+const _fragments = {
   SignatureCompletedEvent: gql`
     fragment TimelineSignatureCompletedEvent_SignatureCompletedEvent on SignatureCompletedEvent {
       createdAt

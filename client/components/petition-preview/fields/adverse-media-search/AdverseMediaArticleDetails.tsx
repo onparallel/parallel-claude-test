@@ -158,7 +158,7 @@ export function AdverseMediaArticleDetails({
   );
 }
 
-AdverseMediaArticleDetails.fragments = {
+const _fragments = {
   AdverseMediaArticle: gql`
     fragment AdverseMediaArticleDetails_AdverseMediaArticle on AdverseMediaArticle {
       id

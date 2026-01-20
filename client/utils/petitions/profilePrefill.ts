@@ -36,33 +36,29 @@ export const calculateCompatibleFieldGroups = <
   );
 };
 
-calculateCompatibleFieldGroups.fragments = {
-  get PetitionBase() {
-    return gql`
-      fragment calculateCompatibleFieldGroups_PetitionBase on PetitionBase {
+const _fragmentsCalculateCompatibleFieldGroups = {
+  PetitionBase: gql`
+    fragment calculateCompatibleFieldGroups_PetitionBase on PetitionBase {
+      id
+      fields {
         id
-        fields {
-          id
-          type
-          isLinkedToProfileType
-          profileType {
-            id
-          }
-          multiple
-        }
-      }
-    `;
-  },
-  get Profile() {
-    return gql`
-      fragment calculateCompatibleFieldGroups_Profile on Profile {
-        id
+        type
+        isLinkedToProfileType
         profileType {
           id
         }
+        multiple
       }
-    `;
-  },
+    }
+  `,
+  Profile: gql`
+    fragment calculateCompatibleFieldGroups_Profile on Profile {
+      id
+      profileType {
+        id
+      }
+    }
+  `,
 };
 
 export const calculateRelatedFieldGroupsWithCompatibleProfiles = ({
@@ -159,96 +155,81 @@ export const calculateRelatedFieldGroupsWithCompatibleProfiles = ({
   return relatedFieldGroupsWithCompatibleProfiles;
 };
 
-calculateRelatedFieldGroupsWithCompatibleProfiles.fragments = {
-  get PetitionField() {
-    return gql`
-      fragment calculateRelatedFieldGroupsWithCompatibleProfiles_PetitionField on PetitionField {
+const _fragments = {
+  PetitionField: gql`
+    fragment calculateRelatedFieldGroupsWithCompatibleProfiles_PetitionField on PetitionField {
+      id
+      type
+      isLinkedToProfileType
+      profileType {
         id
-        type
-        isLinkedToProfileType
-        profileType {
-          id
-        }
-        multiple
-        ...groupFieldsWithProfileTypes_PetitionField
       }
-      ${groupFieldsWithProfileTypes.fragments.PetitionField}
-    `;
-  },
-  get PetitionBase() {
-    return gql`
-      fragment calculateRelatedFieldGroupsWithCompatibleProfiles_PetitionBase on PetitionBase {
+      multiple
+      ...groupFieldsWithProfileTypes_PetitionField
+    }
+  `,
+  PetitionBase: gql`
+    fragment calculateRelatedFieldGroupsWithCompatibleProfiles_PetitionBase on PetitionBase {
+      id
+      fieldRelationships {
         id
-        fieldRelationships {
-          id
-          relationshipTypeWithDirection {
-            direction
-            profileRelationshipType {
-              id
-              isReciprocal
-            }
-          }
-          leftSidePetitionField {
+        relationshipTypeWithDirection {
+          direction
+          profileRelationshipType {
             id
-          }
-          rightSidePetitionField {
-            id
+            isReciprocal
           }
         }
-        fields {
+        leftSidePetitionField {
           id
-          ...calculateRelatedFieldGroupsWithCompatibleProfiles_PetitionField
+        }
+        rightSidePetitionField {
+          id
         }
       }
-      ${this.PetitionField}
-    `;
-  },
-  get ProfileInner() {
-    return gql`
-      fragment calculateRelatedFieldGroupsWithCompatibleProfiles_ProfileInner on Profile {
+      fields {
         id
-        status
-        localizableName
-        profileType {
-          id
-        }
+        ...calculateRelatedFieldGroupsWithCompatibleProfiles_PetitionField
       }
-    `;
-  },
-  get ProfileRelationship() {
-    return gql`
-      fragment calculateRelatedFieldGroupsWithCompatibleProfiles_ProfileRelationship on ProfileRelationship {
+    }
+  `,
+  ProfileInner: gql`
+    fragment calculateRelatedFieldGroupsWithCompatibleProfiles_ProfileInner on Profile {
+      id
+      status
+      localizableName
+      profileType {
         id
-        leftSideProfile {
-          ...calculateRelatedFieldGroupsWithCompatibleProfiles_ProfileInner
-        }
-        rightSideProfile {
-          ...calculateRelatedFieldGroupsWithCompatibleProfiles_ProfileInner
-        }
-        relationshipType {
-          id
-          isReciprocal
-        }
       }
-      ${this.ProfileInner}
-    `;
-  },
-  get Profile() {
-    return gql`
-      fragment calculateRelatedFieldGroupsWithCompatibleProfiles_Profile on Profile {
+    }
+  `,
+  ProfileRelationship: gql`
+    fragment calculateRelatedFieldGroupsWithCompatibleProfiles_ProfileRelationship on ProfileRelationship {
+      id
+      leftSideProfile {
         ...calculateRelatedFieldGroupsWithCompatibleProfiles_ProfileInner
-        profileType {
-          id
-          name
-        }
-        relationships {
-          ...calculateRelatedFieldGroupsWithCompatibleProfiles_ProfileRelationship
-        }
       }
-      ${this.ProfileInner}
-      ${this.ProfileRelationship}
-    `;
-  },
+      rightSideProfile {
+        ...calculateRelatedFieldGroupsWithCompatibleProfiles_ProfileInner
+      }
+      relationshipType {
+        id
+        isReciprocal
+      }
+    }
+  `,
+  Profile: gql`
+    fragment calculateRelatedFieldGroupsWithCompatibleProfiles_Profile on Profile {
+      ...calculateRelatedFieldGroupsWithCompatibleProfiles_ProfileInner
+      profileType {
+        id
+        name
+      }
+      relationships {
+        ...calculateRelatedFieldGroupsWithCompatibleProfiles_ProfileRelationship
+      }
+    }
+  `,
 };
 
 export const generatePrefillData = (

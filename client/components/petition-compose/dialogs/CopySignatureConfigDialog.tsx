@@ -6,7 +6,6 @@ import {
   BulkSendSigningMode,
   CopySignatureConfigDialog_PetitionSignerFragment,
 } from "@parallel/graphql/__types";
-import { Fragments } from "@parallel/utils/apollo/fragments";
 import { useState } from "react";
 import { FormattedList, FormattedMessage } from "react-intl";
 
@@ -96,12 +95,11 @@ export function CopySignatureConfigDialog({
   );
 }
 
-CopySignatureConfigDialog.fragments = {
+const _fragments = {
   PetitionSigner: gql`
     fragment CopySignatureConfigDialog_PetitionSigner on PetitionSigner {
       ...Fragments_FullPetitionSigner
     }
-    ${Fragments.FullPetitionSigner}
   `,
 };
 

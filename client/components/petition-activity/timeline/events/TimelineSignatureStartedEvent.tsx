@@ -58,7 +58,7 @@ export function TimelineSignatureStartedEvent({ event }: TimelineSignatureStarte
   );
 }
 
-TimelineSignatureStartedEvent.fragments = {
+const _fragments = {
   SignatureStartedEvent: gql`
     fragment TimelineSignatureStartedEvent_SignatureStartedEvent on SignatureStartedEvent {
       createdAt

@@ -10,34 +10,31 @@ interface PublicPetitionFieldCommentExcerptProps {
   comment: PublicPetitionFieldCommentExcerpt_PetitionFieldCommentFragment;
 }
 
-export const PublicPetitionFieldCommentExcerpt = Object.assign(
-  chakraForwardRef<"div", PublicPetitionFieldCommentExcerptProps>(function CommentContent(
-    { comment, ...props },
-    ref,
-  ) {
-    const memoizedHtml = useMemo(() => {
-      return comment.excerptHtml
-        ? parse(
-            sanitizeHtml(comment.excerptHtml, {
-              FORBID_TAGS: ["p", "a"],
-            }),
-          )
-        : null;
-    }, [comment.excerptHtml]);
+export const PublicPetitionFieldCommentExcerpt = chakraForwardRef<
+  "div",
+  PublicPetitionFieldCommentExcerptProps
+>(function CommentContent({ comment, ...props }, ref) {
+  const memoizedHtml = useMemo(() => {
+    return comment.excerptHtml
+      ? parse(
+          sanitizeHtml(comment.excerptHtml, {
+            FORBID_TAGS: ["p", "a"],
+          }),
+        )
+      : null;
+  }, [comment.excerptHtml]);
 
-    return (
-      <Box ref={ref} {...props}>
-        {memoizedHtml}
-      </Box>
-    );
-  }),
-  {
-    fragments: {
-      PetitionFieldComment: gql`
-        fragment PublicPetitionFieldCommentExcerpt_PetitionFieldComment on PublicPetitionFieldComment {
-          excerptHtml
-        }
-      `,
-    },
-  },
-);
+  return (
+    <Box ref={ref} {...props}>
+      {memoizedHtml}
+    </Box>
+  );
+});
+
+const _fragments = {
+  PetitionFieldComment: gql`
+    fragment PublicPetitionFieldCommentExcerpt_PetitionFieldComment on PublicPetitionFieldComment {
+      excerptHtml
+    }
+  `,
+};

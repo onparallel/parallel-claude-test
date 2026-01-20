@@ -7,7 +7,7 @@ import { useMemo } from "react";
 import { useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { useAllFieldsWithIndices } from "./fieldIndices";
-import { PlaceholderOption, createPlaceholderPlugin } from "./slate/PlaceholderPlugin";
+import { PlaceholderOption } from "./slate/PlaceholderPlugin";
 
 const ACCEPTED_FIELD_TYPES = [
   "NUMBER",
@@ -123,7 +123,7 @@ export function usePetitionMessagePlaceholderOptions({
   }, [intl.locale]);
 }
 
-usePetitionMessagePlaceholderOptions.fragments = {
+const _fragments = {
   PetitionBase: gql`
     fragment usePetitionMessagePlaceholderOptions_PetitionField on PetitionField {
       id
@@ -146,7 +146,5 @@ usePetitionMessagePlaceholderOptions.fragments = {
         }
       }
     }
-    ${createPlaceholderPlugin.fragments.PetitionBase}
-    ${useAllFieldsWithIndices.fragments.PetitionBase}
   `,
 };

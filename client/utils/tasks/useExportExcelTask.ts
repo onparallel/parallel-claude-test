@@ -61,7 +61,7 @@ export function useExportExcelBackgroundTask() {
   );
 }
 
-const fragments = {
+const _fragments = {
   Task: gql`
     fragment useExportExcelTask_Task on Task {
       id
@@ -78,7 +78,6 @@ const _mutations = [
         ...useExportExcelTask_Task
       }
     }
-    ${fragments.Task}
   `,
   gql`
     mutation useExportExcelTask_getTaskResultFile($taskId: GID!) {
@@ -97,6 +96,5 @@ const _queries = [
         ...useExportExcelTask_Task
       }
     }
-    ${fragments.Task}
   `,
 ];

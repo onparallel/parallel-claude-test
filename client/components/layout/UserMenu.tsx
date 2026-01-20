@@ -257,7 +257,7 @@ export function UserMenu({ extended, placement, me, realMe, onToggle }: UserMenu
   );
 }
 
-UserMenu.fragments = {
+const _fragments = {
   Query: gql`
     fragment UserMenu_Query on Query {
       me {
@@ -271,6 +271,5 @@ UserMenu.fragments = {
         ...UserAvatar_User
       }
     }
-    ${UserAvatar.fragments.User}
   `,
 };

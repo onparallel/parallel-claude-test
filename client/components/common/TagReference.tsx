@@ -24,11 +24,10 @@ export function TagReference({ tag }: { tag?: Maybe<TagReference_TagFragment> })
   );
 }
 
-TagReference.fragments = {
+const _fragments = {
   Tag: gql`
     fragment TagReference_Tag on Tag {
       ...Tag_Tag
     }
-    ${Tag.fragments.Tag}
   `,
 };

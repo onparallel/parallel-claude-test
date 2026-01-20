@@ -64,7 +64,7 @@ export function useUpdateIsReadNotification() {
   );
 }
 
-useUpdateIsReadNotification.fragments = {
+const _fragments = {
   User: gql`
     fragment useUpdateIsReadNotification_User on User {
       id

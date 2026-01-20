@@ -57,184 +57,181 @@ export type ContactSelectInstance<IsMulti extends boolean = false> = SelectInsta
   never
 >;
 
-export const ContactSelect = Object.assign(
-  forwardRef(function ContactSelect<IsMulti extends boolean = false>(
-    {
-      value,
-      isMulti,
-      onSearchContacts,
-      onCreateContact,
-      onPasteEmails,
-      onChange,
-      onFocus,
-      ...props
-    }: ContactSelectProps<IsMulti>,
-    ref: ForwardedRef<ContactSelectInstance<IsMulti>>,
-  ) {
-    const [isCreating, _setIsCreating] = useState(false);
-    // we need this because the create handler is called twice when clicking on the create menu option,
-    // one because of the click and another one from the input blur
-    const isCreatingRef = useRef(false);
-    function setIsCreating(value: boolean) {
-      _setIsCreating(value);
-      isCreatingRef.current = value;
+export const ContactSelect = forwardRef(function ContactSelect<IsMulti extends boolean = false>(
+  {
+    value,
+    isMulti,
+    onSearchContacts,
+    onCreateContact,
+    onPasteEmails,
+    onChange,
+    onFocus,
+    ...props
+  }: ContactSelectProps<IsMulti>,
+  ref: ForwardedRef<ContactSelectInstance<IsMulti>>,
+) {
+  const [isCreating, _setIsCreating] = useState(false);
+  // we need this because the create handler is called twice when clicking on the create menu option,
+  // one because of the click and another one from the input blur
+  const isCreatingRef = useRef(false);
+  function setIsCreating(value: boolean) {
+    _setIsCreating(value);
+    isCreatingRef.current = value;
+  }
+
+  const [options, setOptions] = useState<ContactSelectSelection[]>();
+
+  const rsProps = useContactSelectReactSelectProps<IsMulti>({
+    ...props,
+    isDisabled: props.isDisabled || isCreating,
+  });
+  const innerRef = useRef<any>();
+  const _ref = useMergedRef(ref, innerRef);
+
+  const [inputValue, setInputValue] = useState("");
+
+  async function loadOptions(search: string) {
+    if (!search) {
+      setOptions(undefined);
+      return [];
     }
 
-    const [options, setOptions] = useState<ContactSelectSelection[]>();
-
-    const rsProps = useContactSelectReactSelectProps<IsMulti>({
-      ...props,
-      isDisabled: props.isDisabled || isCreating,
-    });
-    const innerRef = useRef<any>();
-    const _ref = useMergedRef(ref, innerRef);
-
-    const [inputValue, setInputValue] = useState("");
-
-    async function loadOptions(search: string) {
-      if (!search) {
-        setOptions(undefined);
-        return [];
-      }
-
-      const exclude: string[] = [];
-      if (isNonNullish(value)) {
-        for (const recipient of unMaybeArray(value)) {
-          if (!recipient.isInvalid) {
-            exclude.push(recipient.id);
-          }
+    const exclude: string[] = [];
+    if (isNonNullish(value)) {
+      for (const recipient of unMaybeArray(value)) {
+        if (!recipient.isInvalid) {
+          exclude.push(recipient.id);
         }
       }
-      const options = await onSearchContacts(search.trim(), exclude);
-      setOptions(options);
-      return options;
     }
+    const options = await onSearchContacts(search.trim(), exclude);
+    setOptions(options);
+    return options;
+  }
 
-    async function handleCreate(email: string) {
-      if (isCreatingRef.current) {
+  async function handleCreate(email: string) {
+    if (isCreatingRef.current) {
+      return;
+    }
+    setIsCreating(true);
+    try {
+      const contact = await onCreateContact({ email });
+      if (isNullish(contact)) {
+        setIsCreating(false);
         return;
       }
-      setIsCreating(true);
-      try {
-        const contact = await onCreateContact({ email });
-        if (isNullish(contact)) {
-          setIsCreating(false);
-          return;
-        }
-        const option = pick(contact, [
-          "id",
-          "email",
-          "firstName",
-          "lastName",
-          "fullName",
-          "hasBouncedEmail",
-        ]) as ContactSelectSelection;
-        if (isMulti) {
-          onChange(
-            [
-              ...((value ?? []) as ContactSelectSelection[]).filter((v) => v.email !== email),
-              option,
-            ] as any,
-            { action: "select-option", option },
-          );
-        } else {
-          onChange(option as any, { action: "select-option", option });
-        }
-        setIsCreating(false);
-        setTimeout(() => innerRef.current?.focus(), 1);
-        return true;
-      } catch {}
+      const option = pick(contact, [
+        "id",
+        "email",
+        "firstName",
+        "lastName",
+        "fullName",
+        "hasBouncedEmail",
+      ]) as ContactSelectSelection;
+      if (isMulti) {
+        onChange(
+          [
+            ...((value ?? []) as ContactSelectSelection[]).filter((v) => v.email !== email),
+            option,
+          ] as any,
+          { action: "select-option", option },
+        );
+      } else {
+        onChange(option as any, { action: "select-option", option });
+      }
       setIsCreating(false);
       setTimeout(() => innerRef.current?.focus(), 1);
-      return false;
-    }
-    async function handleInputChange(_value: string, meta: InputActionMeta) {
-      switch (meta.action) {
-        case "input-change":
-          if (_value === "") {
+      return true;
+    } catch {}
+    setIsCreating(false);
+    setTimeout(() => innerRef.current?.focus(), 1);
+    return false;
+  }
+  async function handleInputChange(_value: string, meta: InputActionMeta) {
+    switch (meta.action) {
+      case "input-change":
+        if (_value === "") {
+          setInputValue("");
+          setOptions(undefined);
+        } else {
+          setInputValue(_value);
+        }
+        break;
+      case "set-value":
+        setInputValue("");
+        setOptions(undefined);
+        break;
+      case "input-blur":
+        const cleaned = inputValue.trim();
+        if (isValidEmail(cleaned)) {
+          const option = options?.find((o) => o.email === cleaned);
+          if (option) {
+            onChange([...((value ?? []) as ContactSelectSelection[]), option] as any, {
+              action: "select-option",
+              option,
+            });
             setInputValue("");
             setOptions(undefined);
           } else {
-            setInputValue(_value);
-          }
-          break;
-        case "set-value":
-          setInputValue("");
-          setOptions(undefined);
-          break;
-        case "input-blur":
-          const cleaned = inputValue.trim();
-          if (isValidEmail(cleaned)) {
-            const option = options?.find((o) => o.email === cleaned);
-            if (option) {
-              onChange([...((value ?? []) as ContactSelectSelection[]), option] as any, {
-                action: "select-option",
-                option,
-              });
+            if (await handleCreate(cleaned)) {
               setInputValue("");
               setOptions(undefined);
-            } else {
-              if (await handleCreate(cleaned)) {
-                setInputValue("");
-                setOptions(undefined);
-              }
             }
           }
-          break;
-      }
-    }
-
-    function handleKeyDown(event: KeyboardEvent) {
-      const select = innerRef.current!;
-      switch (event.key) {
-        case ",":
-        case ";":
-        case " ":
-          const { focusedOption } = select.state;
-          if (focusedOption && inputValue === focusedOption.email) {
-            event.preventDefault();
-            select.selectOption(focusedOption);
-          }
-      }
-    }
-
-    return (
-      <AsyncCreatableSelect<ContactSelectSelection, IsMulti, never>
-        ref={_ref}
-        isMulti={isMulti}
-        onChange={onChange as any}
-        onFocus={onFocus}
-        value={value}
-        inputValue={inputValue}
-        onKeyDown={handleKeyDown}
-        onInputChange={handleInputChange}
-        onCreateOption={handleCreate}
-        loadOptions={loadOptions}
-        defaultOptions={options}
-        {...{ onPasteEmails }}
-        {...props}
-        {...rsProps}
-      />
-    );
-  }) as <IsMulti extends boolean = false>(
-    props: ContactSelectProps<IsMulti> & RefAttributes<ContactSelectInstance<IsMulti>>,
-  ) => ReactElement,
-  {
-    fragments: {
-      // firstName and lastName are needed for converting from Contact to PetitionSigner in some dialogs
-      Contact: gql`
-        fragment ContactSelect_Contact on Contact {
-          id
-          firstName
-          lastName
-          fullName
-          email
-          hasBouncedEmail
         }
-      `,
-    },
-  },
-);
+        break;
+    }
+  }
+
+  function handleKeyDown(event: KeyboardEvent) {
+    const select = innerRef.current!;
+    switch (event.key) {
+      case ",":
+      case ";":
+      case " ":
+        const { focusedOption } = select.state;
+        if (focusedOption && inputValue === focusedOption.email) {
+          event.preventDefault();
+          select.selectOption(focusedOption);
+        }
+    }
+  }
+
+  return (
+    <AsyncCreatableSelect<ContactSelectSelection, IsMulti, never>
+      ref={_ref}
+      isMulti={isMulti}
+      onChange={onChange as any}
+      onFocus={onFocus}
+      value={value}
+      inputValue={inputValue}
+      onKeyDown={handleKeyDown}
+      onInputChange={handleInputChange}
+      onCreateOption={handleCreate}
+      loadOptions={loadOptions}
+      defaultOptions={options}
+      {...{ onPasteEmails }}
+      {...props}
+      {...rsProps}
+    />
+  );
+}) as <IsMulti extends boolean = false>(
+  props: ContactSelectProps<IsMulti> & RefAttributes<ContactSelectInstance<IsMulti>>,
+) => ReactElement;
+
+const _fragments = {
+  // firstName and lastName are needed for converting from Contact to PetitionSigner in some dialogs
+  Contact: gql`
+    fragment ContactSelect_Contact on Contact {
+      id
+      firstName
+      lastName
+      fullName
+      email
+      hasBouncedEmail
+    }
+  `,
+};
 
 function useContactSelectReactSelectProps<IsMulti extends boolean>(
   props: UseReactSelectProps<ContactSelectSelection, IsMulti, never>,

@@ -49,7 +49,7 @@ export function TimelineReplyStatusChangedEvent({
   );
 }
 
-TimelineReplyStatusChangedEvent.fragments = {
+const _fragments = {
   ReplyStatusChangedEvent: gql`
     fragment TimelineReplyStatusChangedEvent_ReplyStatusChangedEvent on ReplyStatusChangedEvent {
       field {
@@ -67,9 +67,5 @@ TimelineReplyStatusChangedEvent.fragments = {
       status
       createdAt
     }
-    ${UserOrContactReference.fragments.UserOrPetitionAccess}
-    ${TimelineSeeReplyButton.fragments.PetitionField}
-    ${TimelineSeeReplyButton.fragments.PetitionFieldReply}
-    ${PetitionFieldReference.fragments.PetitionField}
   `,
 };

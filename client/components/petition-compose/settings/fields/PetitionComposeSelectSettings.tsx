@@ -77,7 +77,7 @@ export function PetitionComposeSelectSettings({
   );
 }
 
-PetitionComposeSelectSettings.fragments = {
+const _fragments = {
   PetitionField: gql`
     fragment PetitionComposeSelectSettings_PetitionField on PetitionField {
       id

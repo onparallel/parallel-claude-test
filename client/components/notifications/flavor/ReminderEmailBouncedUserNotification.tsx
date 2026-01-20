@@ -12,53 +12,49 @@ export interface ReminderEmailBouncedUserNotificationProps {
   notification: ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotificationFragment;
 }
 
-export const ReminderEmailBouncedUserNotification = Object.assign(
-  forwardRef<HTMLElement, ReminderEmailBouncedUserNotificationProps>(
-    function ReminderEmailBouncedUserNotification({ isFirst, notification }, ref) {
-      return (
-        <PetitionUserNotification
-          ref={ref}
-          isFirst={isFirst}
-          notification={notification}
-          icon={
-            <Circle size="36px" background="red.500">
-              <EmailXIcon color="white" fontSize="1rem" />
-            </Circle>
-          }
-          path={`/activity`}
-        >
-          <FormattedMessage
-            id="component.notification-reminder-bounced.body"
-            defaultMessage="Error sending reminder to recipient {name}."
-            values={{
-              name: (
-                <ContactReference
-                  draggable="false"
-                  tabIndex={-1}
-                  contact={notification.access.contact}
-                  withEmail
-                />
-              ),
-            }}
-          />
-        </PetitionUserNotification>
-      );
-    },
-  ),
-  {
-    fragments: {
-      ReminderEmailBouncedUserNotification: gql`
-        fragment ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotification on ReminderEmailBouncedUserNotification {
-          ...PetitionUserNotification_PetitionUserNotification
-          access {
-            contact {
-              ...ContactReference_Contact
-            }
-          }
+export const ReminderEmailBouncedUserNotification = forwardRef<
+  HTMLElement,
+  ReminderEmailBouncedUserNotificationProps
+>(function ReminderEmailBouncedUserNotification({ isFirst, notification }, ref) {
+  return (
+    <PetitionUserNotification
+      ref={ref}
+      isFirst={isFirst}
+      notification={notification}
+      icon={
+        <Circle size="36px" background="red.500">
+          <EmailXIcon color="white" fontSize="1rem" />
+        </Circle>
+      }
+      path={`/activity`}
+    >
+      <FormattedMessage
+        id="component.notification-reminder-bounced.body"
+        defaultMessage="Error sending reminder to recipient {name}."
+        values={{
+          name: (
+            <ContactReference
+              draggable="false"
+              tabIndex={-1}
+              contact={notification.access.contact}
+              withEmail
+            />
+          ),
+        }}
+      />
+    </PetitionUserNotification>
+  );
+});
+
+const _fragments = {
+  ReminderEmailBouncedUserNotification: gql`
+    fragment ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotification on ReminderEmailBouncedUserNotification {
+      ...PetitionUserNotification_PetitionUserNotification
+      access {
+        contact {
+          ...ContactReference_Contact
         }
-        ${PetitionUserNotification.fragments.PetitionUserNotification}
-        ${ContactReference.fragments.Contact}
-      `,
-    },
-  },
-);
+      }
+    }
+  `,
+};

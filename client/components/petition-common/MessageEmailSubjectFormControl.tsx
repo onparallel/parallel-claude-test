@@ -12,48 +12,45 @@ interface MessageEmailSubjectFormControlProps extends Omit<FormControlProps, "va
   petition: MessageEmailSubjectFormControl_PetitionBaseFragment;
 }
 
-export const MessageEmailSubjectFormControl = Object.assign(
-  chakraForwardRef<"div", MessageEmailSubjectFormControlProps>(
-    function MessageEmailSubjectFormControl({ value, onChange, petition, ...props }, ref) {
-      const intl = useIntl();
-      const placeholderOptions = usePetitionMessagePlaceholderOptions({ petition });
-      return (
-        <FormControl ref={ref} {...props}>
-          <FormLabel fontWeight="normal">
-            <FormattedMessage
-              id="component.message-email-subject-form-control.label"
-              defaultMessage="Subject"
-            />
-          </FormLabel>
-          <PlaceholderInput
-            data-testid="petition-email-subject-input"
-            value={value}
-            onChange={(value) => onChange(value)}
-            onBlur={() => onChange(value.trim())}
-            placeholder={intl.formatMessage({
-              id: "component.message-email-subject-form-control.placeholder",
-              defaultMessage: "Enter the subject of the email",
-            })}
-            placeholders={placeholderOptions}
-          />
-          <FormErrorMessage>
-            <FormattedMessage
-              id="component.message-email-subject-form-control.required-error"
-              defaultMessage="A subject helps the recipient understand the context of your parallel"
-            />
-          </FormErrorMessage>
-        </FormControl>
-      );
-    },
-  ),
-  {
-    fragments: {
-      PetitionBase: gql`
-        fragment MessageEmailSubjectFormControl_PetitionBase on PetitionBase {
-          ...usePetitionMessagePlaceholderOptions_PetitionBase
-        }
-        ${usePetitionMessagePlaceholderOptions.fragments.PetitionBase}
-      `,
-    },
-  },
-);
+export const MessageEmailSubjectFormControl = chakraForwardRef<
+  "div",
+  MessageEmailSubjectFormControlProps
+>(function MessageEmailSubjectFormControl({ value, onChange, petition, ...props }, ref) {
+  const intl = useIntl();
+  const placeholderOptions = usePetitionMessagePlaceholderOptions({ petition });
+  return (
+    <FormControl ref={ref} {...props}>
+      <FormLabel fontWeight="normal">
+        <FormattedMessage
+          id="component.message-email-subject-form-control.label"
+          defaultMessage="Subject"
+        />
+      </FormLabel>
+      <PlaceholderInput
+        data-testid="petition-email-subject-input"
+        value={value}
+        onChange={(value) => onChange(value)}
+        onBlur={() => onChange(value.trim())}
+        placeholder={intl.formatMessage({
+          id: "component.message-email-subject-form-control.placeholder",
+          defaultMessage: "Enter the subject of the email",
+        })}
+        placeholders={placeholderOptions}
+      />
+      <FormErrorMessage>
+        <FormattedMessage
+          id="component.message-email-subject-form-control.required-error"
+          defaultMessage="A subject helps the recipient understand the context of your parallel"
+        />
+      </FormErrorMessage>
+    </FormControl>
+  );
+});
+
+const _fragments = {
+  PetitionBase: gql`
+    fragment MessageEmailSubjectFormControl_PetitionBase on PetitionBase {
+      ...usePetitionMessagePlaceholderOptions_PetitionBase
+    }
+  `,
+};

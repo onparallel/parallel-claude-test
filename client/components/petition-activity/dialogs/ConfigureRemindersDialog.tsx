@@ -98,13 +98,11 @@ export function ConfigureRemindersDialog({
   );
 }
 
-useConfigureRemindersDialog.fragments = {
+const _fragments = {
   RemindersConfig: gql`
     fragment useConfigureRemindersDialog_RemindersConfig on RemindersConfig {
       ...PetitionRemindersConfig_RemindersConfig
     }
-
-    ${PetitionRemindersConfig.fragments.RemindersConfig}
   `,
 
   PetitionAccess: gql`
@@ -118,8 +116,6 @@ useConfigureRemindersDialog.fragments = {
         ...PetitionRemindersConfig_RemindersConfig
       }
     }
-    ${ContactReference.fragments.Contact}
-    ${PetitionRemindersConfig.fragments.RemindersConfig}
   `,
 };
 

@@ -641,30 +641,24 @@ function SearchFrequencyOptions({
   );
 }
 
-ProfileFieldMonitoringSettings.fragments = {
-  get ProfileTypeField() {
-    return gql`
-      fragment ProfileFieldMonitoringSettings_ProfileTypeField on ProfileTypeField {
+const _fragments = {
+  ProfileTypeField: gql`
+    fragment ProfileFieldMonitoringSettings_ProfileTypeField on ProfileTypeField {
+      id
+      name
+      type
+      options
+      alias
+      ...ProfileTypeFieldSelect_ProfileTypeField
+    }
+  `,
+  ProfileType: gql`
+    fragment ProfileFieldMonitoringSettings_ProfileType on ProfileType {
+      id
+      fields {
         id
-        name
-        type
-        options
-        alias
-        ...ProfileTypeFieldSelect_ProfileTypeField
+        ...ProfileFieldMonitoringSettings_ProfileTypeField
       }
-      ${ProfileTypeFieldSelect.fragments.ProfileTypeField}
-    `;
-  },
-  get ProfileType() {
-    return gql`
-      fragment ProfileFieldMonitoringSettings_ProfileType on ProfileType {
-        id
-        fields {
-          id
-          ...ProfileFieldMonitoringSettings_ProfileTypeField
-        }
-      }
-      ${this.ProfileTypeField}
-    `;
-  },
+    }
+  `,
 };

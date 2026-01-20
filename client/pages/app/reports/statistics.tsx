@@ -259,7 +259,7 @@ export function ReportsTemplates() {
   );
 }
 
-ReportsTemplates.fragments = {
+const _fragments = {
   PetitionTemplate: gql`
     fragment ReportsTemplates_PetitionTemplate on PetitionTemplate {
       id
@@ -273,7 +273,6 @@ ReportsTemplates.queries = [
     query ReportsTemplates_user {
       ...ReportsSidebarLayout_Query
     }
-    ${ReportsSidebarLayout.fragments.Query}
   `,
 ];
 

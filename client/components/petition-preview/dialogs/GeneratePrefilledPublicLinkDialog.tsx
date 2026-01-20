@@ -248,7 +248,7 @@ const _mutations = [
   `,
 ];
 
-GeneratePrefilledPublicLinkDialog.fragments = {
+const _fragments = {
   PetitionTemplate: gql`
     fragment GeneratePrefilledPublicLinkDialog_PetitionTemplate on PetitionTemplate {
       id
@@ -269,8 +269,6 @@ GeneratePrefilledPublicLinkDialog.fragments = {
       }
       ...useFieldsWithIndices_PetitionBase
     }
-    ${PetitionFieldReference.fragments.PetitionField}
-    ${useFieldsWithIndices.fragments.PetitionBase}
   `,
 };
 

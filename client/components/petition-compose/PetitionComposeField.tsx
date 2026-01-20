@@ -33,7 +33,9 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   PetitionComposeFieldAttachment_PetitionFieldAttachmentFragmentDoc,
   PetitionComposeField_PetitionBaseFragment,
+  PetitionComposeField_PetitionBaseFragmentDoc,
   PetitionComposeField_PetitionFieldFragment,
+  PetitionComposeField_PetitionFieldFragmentDoc,
   PetitionComposeField_createPetitionFieldAttachmentUploadLinkDocument,
   PetitionComposeField_deletePetitionFieldAttachmentDocument,
   PetitionComposeField_petitionFieldAttachmentDownloadLinkDocument,
@@ -1440,88 +1442,73 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
   },
 );
 
-const fragments = {
-  get PetitionBase() {
-    return gql`
-      fragment PetitionComposeField_PetitionBase on PetitionBase {
+const _fragments = {
+  PetitionBase: gql`
+    fragment PetitionComposeField_PetitionBase on PetitionBase {
+      id
+      fields {
         id
-        fields {
-          id
-          isReadOnly
-        }
-        ...PetitionFieldMathEditor_PetitionBase
-        ...PetitionVisibilityEditor_PetitionBase
-      }
-      ${PetitionFieldMathEditor.fragments.PetitionBase}
-      ${PetitionVisibilityEditor.fragments.PetitionBase}
-    `;
-  },
-  get BasePetitionField() {
-    return gql`
-      fragment PetitionComposeField_BasePetitionField on PetitionField {
-        id
-        type
-        title
-        description
-        optional
-        multiple
-        isFixed
-        isInternal
         isReadOnly
-        visibility
-        math
-        isChild
-        attachments {
-          ...PetitionComposeField_PetitionFieldAttachment
-        }
-        ...PetitionFieldOptionsListEditor_PetitionField
-        ...PetitionVisibilityEditor_PetitionField
       }
-      ${this.PetitionFieldAttachment}
-      ${PetitionFieldOptionsListEditor.fragments.PetitionField}
-      ${PetitionVisibilityEditor.fragments.PetitionField}
-    `;
-  },
-  get PetitionField() {
-    return gql`
-      fragment PetitionComposeField_PetitionField on PetitionField {
-        ...PetitionComposeField_BasePetitionField
-        isLinkedToProfileType
+      ...PetitionFieldMathEditor_PetitionBase
+      ...PetitionVisibilityEditor_PetitionBase
+    }
+  `,
+  BasePetitionField: gql`
+    fragment PetitionComposeField_BasePetitionField on PetitionField {
+      id
+      type
+      title
+      description
+      optional
+      multiple
+      isFixed
+      isInternal
+      isReadOnly
+      visibility
+      math
+      isChild
+      attachments {
+        ...PetitionComposeField_PetitionFieldAttachment
+      }
+      ...PetitionFieldOptionsListEditor_PetitionField
+      ...PetitionVisibilityEditor_PetitionField
+    }
+  `,
+  PetitionField: gql`
+    fragment PetitionComposeField_PetitionField on PetitionField {
+      ...PetitionComposeField_BasePetitionField
+      isLinkedToProfileType
+      profileType {
+        id
+        name
+      }
+      children {
+        ...PetitionComposeField_ChildPetitionField
+      }
+    }
+    fragment PetitionComposeField_ChildPetitionField on PetitionField {
+      ...PetitionComposeField_BasePetitionField
+      isLinkedToProfileTypeField
+      profileTypeField {
+        id
+        name
         profileType {
           id
           name
         }
-        children {
-          ...PetitionComposeField_ChildPetitionField
-        }
       }
-      fragment PetitionComposeField_ChildPetitionField on PetitionField {
-        ...PetitionComposeField_BasePetitionField
-        isLinkedToProfileTypeField
-        profileTypeField {
-          id
-          name
-          profileType {
-            id
-            name
-          }
-        }
-        parent {
-          id
-          isInternal
-        }
+      parent {
+        id
+        isInternal
       }
-      ${this.BasePetitionField}
-    `;
-  },
-  get PetitionFieldAttachment() {
-    return gql`
-      fragment PetitionComposeField_PetitionFieldAttachment on PetitionFieldAttachment {
-        ...PetitionComposeFieldAttachment_PetitionFieldAttachment
-      }
-      ${PetitionComposeFieldAttachment.fragments.PetitionFieldAttachment}
-    `;
-  },
+    }
+  `,
+  PetitionFieldAttachment: gql`
+    fragment PetitionComposeField_PetitionFieldAttachment on PetitionFieldAttachment {
+      ...PetitionComposeFieldAttachment_PetitionFieldAttachment
+    }
+  `,
 };
 
 const _mutations = [
@@ -1554,8 +1541,6 @@ const _mutations = [
         }
       }
     }
-    ${uploadFile.fragments.AWSPresignedPostData}
-    ${fragments.PetitionFieldAttachment}
   `,
   gql`
     mutation PetitionComposeField_petitionFieldAttachmentUploadComplete(
@@ -1571,7 +1556,6 @@ const _mutations = [
         ...PetitionComposeField_PetitionFieldAttachment
       }
     }
-    ${fragments.PetitionFieldAttachment}
   `,
   gql`
     mutation PetitionComposeField_deletePetitionFieldAttachment(
@@ -1613,21 +1597,18 @@ const _mutations = [
 ];
 
 const PetitionComposeFieldActions = memoWithFragments(_PetitionComposeFieldActions, {
-  field: fragments.PetitionField,
+  field: PetitionComposeField_PetitionFieldFragmentDoc,
 });
 
 const PetitionComposeFieldInner = memoWithFragments(_PetitionComposeFieldInner, {
-  field: fragments.PetitionField,
-  petition: fragments.PetitionBase,
+  field: PetitionComposeField_PetitionFieldFragmentDoc,
+  petition: PetitionComposeField_PetitionBaseFragmentDoc,
 });
 
-export const PetitionComposeField = Object.assign(
-  memoWithFragments(_PetitionComposeField, {
-    field: fragments.PetitionField,
-    petition: fragments.PetitionBase,
-  }),
-  { fragments },
-);
+export const PetitionComposeField = memoWithFragments(_PetitionComposeField, {
+  field: PetitionComposeField_PetitionFieldFragmentDoc,
+  petition: PetitionComposeField_PetitionBaseFragmentDoc,
+});
 
 interface DragItem {
   index: number;

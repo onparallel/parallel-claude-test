@@ -67,18 +67,16 @@ export function useHiddenFieldDialog() {
   return useDialog(HiddenFieldDialog);
 }
 
-HiddenFieldDialog.fragments = {
+const _fragments = {
   PetitionBase: gql`
     fragment HiddenFieldDialog_PetitionBase on PetitionBase {
       ...PetitionVisibilityEditor_PetitionBase
     }
-    ${PetitionVisibilityEditor.fragments.PetitionBase}
   `,
   PetitionField: gql`
     fragment HiddenFieldDialog_PetitionField on PetitionField {
       id
       ...PetitionVisibilityEditor_PetitionField
     }
-    ${PetitionVisibilityEditor.fragments.PetitionField}
   `,
 };

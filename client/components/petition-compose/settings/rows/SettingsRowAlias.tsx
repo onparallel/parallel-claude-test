@@ -182,7 +182,7 @@ export function SettingsRowAlias({ field, onFieldEdit, isReadOnly }: SettingsRow
   );
 }
 
-SettingsRowAlias.fragments = {
+const _fragments = {
   PetitionField: gql`
     fragment SettingsRowAlias_PetitionField on PetitionField {
       id
@@ -191,7 +191,5 @@ SettingsRowAlias.fragments = {
       ...CopyLiquidReferenceButton_PetitionField
       ...MoreLiquidReferencesButton_PetitionField
     }
-    ${CopyLiquidReferenceButton.fragments.PetitionField}
-    ${MoreLiquidReferencesButton.fragments.PetitionField}
   `,
 };

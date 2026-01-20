@@ -27,8 +27,8 @@ export interface DashboardModuleCardProps extends CardProps {
   listeners?: SyntheticListenerMap;
 }
 
-export const DashboardModuleCard = Object.assign(
-  chakraForwardRef<"section", DashboardModuleCardProps>(function DashboardModuleCard(
+export const DashboardModuleCard = chakraForwardRef<"section", DashboardModuleCardProps>(
+  function DashboardModuleCard(
     {
       module,
       children,
@@ -174,16 +174,15 @@ export const DashboardModuleCard = Object.assign(
         </Flex>
       </Card>
     );
-  }),
-  {
-    fragments: {
-      DashboardModule: gql`
-        fragment DashboardModuleCard_DashboardModule on DashboardModule {
-          id
-          title
-          size
-        }
-      `,
-    },
   },
 );
+
+const _fragments = {
+  DashboardModule: gql`
+    fragment DashboardModuleCard_DashboardModule on DashboardModule {
+      id
+      title
+      size
+    }
+  `,
+};

@@ -20,7 +20,7 @@ export function UserAvatar({ user, showImage, ...props }: UserAvatarProps) {
   );
 }
 
-UserAvatar.fragments = {
+const _fragments = {
   User: gql`
     fragment UserAvatar_User on User {
       fullName

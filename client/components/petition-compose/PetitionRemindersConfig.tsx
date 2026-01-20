@@ -230,7 +230,7 @@ export function PetitionRemindersConfig({
   );
 }
 
-PetitionRemindersConfig.fragments = {
+const _fragments = {
   RemindersConfig: gql`
     fragment PetitionRemindersConfig_RemindersConfig on RemindersConfig {
       offset

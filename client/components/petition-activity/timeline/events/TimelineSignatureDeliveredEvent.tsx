@@ -45,7 +45,7 @@ export function TimelineSignatureDeliveredEvent({ event }: TimelineSignatureDeli
   );
 }
 
-TimelineSignatureDeliveredEvent.fragments = {
+const _fragments = {
   SignatureDeliveredEvent: gql`
     fragment TimelineSignatureDeliveredEvent_SignatureDeliveredEvent on SignatureDeliveredEvent {
       createdAt
@@ -64,6 +64,5 @@ TimelineSignatureDeliveredEvent.fragments = {
       deliveredAt
       bouncedAt
     }
-    ${SignerReference.fragments.PetitionSigner}
   `,
 };

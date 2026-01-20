@@ -796,7 +796,7 @@ export function usePetitionsTableColumns(
   }, [type]) as any;
 }
 
-usePetitionsTableColumns.fragments = {
+const _fragments = {
   PetitionFolder: gql`
     fragment usePetitionsTableColumns_PetitionFolder on PetitionFolder {
       folderId: id
@@ -865,13 +865,6 @@ usePetitionsTableColumns.fragments = {
         ...TemplateActiveSettingsIcons_PetitionTemplate
       }
     }
-    ${UserAvatarList.fragments.User}
-    ${UserAvatarList.fragments.UserGroup}
-    ${PetitionTagListCellContent.fragments.PetitionBase}
-    ${ContactReference.fragments.Contact}
-    ${PetitionStatusCellContent.fragments.Petition}
-    ${PetitionSignatureCellContent.fragments.Petition}
-    ${TemplateActiveSettingsIcons.fragments.PetitionTemplate}
   `,
   User: gql`
     fragment usePetitionsTableColumns_User on User {

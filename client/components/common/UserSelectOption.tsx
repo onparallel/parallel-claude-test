@@ -8,7 +8,7 @@ import {
 } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { HighlightText } from "./HighlightText";
-import { UserGroupReference, userGroupReferenceText } from "./UserGroupReference";
+import { userGroupReferenceText } from "./UserGroupReference";
 
 interface UserSelectOptionProps {
   data: UserSelectOption_UserFragment | UserSelectOption_UserGroupFragment;
@@ -61,7 +61,7 @@ export function UserSelectOption({ data, highlight, isDisabled }: UserSelectOpti
   ) : null;
 }
 
-UserSelectOption.fragments = {
+const _fragments = {
   User: gql`
     fragment UserSelectOption_User on User {
       id
@@ -76,6 +76,5 @@ UserSelectOption.fragments = {
       memberCount
       ...UserGroupReference_UserGroup
     }
-    ${UserGroupReference.fragments.UserGroup}
   `,
 };

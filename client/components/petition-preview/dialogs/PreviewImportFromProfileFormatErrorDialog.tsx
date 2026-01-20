@@ -100,7 +100,7 @@ export function usePreviewImportFromProfileFormatErrorDialog() {
   return useDialog(PreviewImportFromProfileFormatErrorDialog);
 }
 
-PreviewImportFromProfileFormatErrorDialog.fragments = {
+const _fragments = {
   ProfileType: gql`
     fragment PreviewImportFromProfileFormatErrorDialog_ProfileType on ProfileType {
       id
@@ -129,6 +129,5 @@ const _queries = [
         totalCount
       }
     }
-    ${PreviewImportFromProfileFormatErrorDialog.fragments.ProfileType}
   `,
 ];

@@ -73,7 +73,7 @@ export function useFieldLogic(
   );
 }
 
-useFieldLogic.fragments = {
+const _fragments = {
   PublicPetition: gql`
     fragment useFieldLogic_PublicPetition on PublicPetition {
       automaticNumberingConfig {

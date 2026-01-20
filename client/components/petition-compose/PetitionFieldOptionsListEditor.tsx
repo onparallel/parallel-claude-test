@@ -60,212 +60,208 @@ function valuesToSlateNodes(values: string[]): PetitionFieldOptionsListEditorVal
   }));
 }
 
-export const PetitionFieldOptionsListEditor = Object.assign(
-  forwardRef<PetitionFieldOptionsListEditorRef, PetitionFieldOptionsListEditorProps>(
-    function PetitionFieldOptionsListEditor(
-      { field, showError, onFieldEdit, onFocusNextField, onFocusDescription, isReadOnly, ...props },
-      ref,
-    ) {
-      const intl = useIntl();
-      const editor = useMemo(() => pipe(createEditor(), withHistory, withReact), []);
-      const editorRef = useUpdatingRef(editor);
-      const [value, onChange] = useState(valuesToSlateNodes(field.options.values ?? []));
-      const currentValues = useRef(field.options.values);
+export const PetitionFieldOptionsListEditor = forwardRef<
+  PetitionFieldOptionsListEditorRef,
+  PetitionFieldOptionsListEditorProps
+>(function PetitionFieldOptionsListEditor(
+  { field, showError, onFieldEdit, onFocusNextField, onFocusDescription, isReadOnly, ...props },
+  ref,
+) {
+  const intl = useIntl();
+  const editor = useMemo(() => pipe(createEditor(), withHistory, withReact), []);
+  const editorRef = useUpdatingRef(editor);
+  const [value, onChange] = useState(valuesToSlateNodes(field.options.values ?? []));
+  const currentValues = useRef(field.options.values);
 
-      const hasLabels =
-        ["SELECT", "CHECKBOX"].includes(field.type) &&
-        isNonNullish(field.options.labels) &&
-        field.options.values.length === field.options.labels.length;
+  const hasLabels =
+    ["SELECT", "CHECKBOX"].includes(field.type) &&
+    isNonNullish(field.options.labels) &&
+    field.options.values.length === field.options.labels.length;
 
-      const validOptions = value.filter((v) => !isEmptyParagraph(v));
-      const isInvalid =
-        field.type === "SELECT" ? validOptions.length < 2 : validOptions.length === 0;
+  const validOptions = value.filter((v) => !isEmptyParagraph(v));
+  const isInvalid = field.type === "SELECT" ? validOptions.length < 2 : validOptions.length === 0;
 
-      const standardList =
-        (field.type === "SELECT" || field.type === "CHECKBOX") && field.options.standardList
-          ? field.options.standardList
-          : null;
+  const standardList =
+    (field.type === "SELECT" || field.type === "CHECKBOX") && field.options.standardList
+      ? field.options.standardList
+      : null;
 
-      const isNotEditable =
-        field.isLinkedToProfileTypeField || isReadOnly || hasLabels || isNonNullish(standardList);
+  const isNotEditable =
+    field.isLinkedToProfileTypeField || isReadOnly || hasLabels || isNonNullish(standardList);
 
-      useEffect(() => {
-        if (isNotEditable) {
-          return;
-        }
-        if (!hasLabels && !shallowEqualArrays(field.options.values, currentValues.current)) {
-          const newSlateValue = valuesToSlateNodes(field.options.values);
-          onChange(newSlateValue);
+  useEffect(() => {
+    if (isNotEditable) {
+      return;
+    }
+    if (!hasLabels && !shallowEqualArrays(field.options.values, currentValues.current)) {
+      const newSlateValue = valuesToSlateNodes(field.options.values);
+      onChange(newSlateValue);
 
-          const currentEditor = editorRef.current;
+      const currentEditor = editorRef.current;
 
-          Editor.withoutNormalizing(currentEditor, () => {
-            // Select all the nodes
-            Transforms.select(currentEditor, {
-              anchor: Editor.start(currentEditor, []),
-              focus: Editor.end(currentEditor, []),
-            });
-            // Deletes all the selection and the empty node that creates by default
-            Transforms.delete(currentEditor);
-            Transforms.removeNodes(currentEditor, { at: [0] });
+      Editor.withoutNormalizing(currentEditor, () => {
+        // Select all the nodes
+        Transforms.select(currentEditor, {
+          anchor: Editor.start(currentEditor, []),
+          focus: Editor.end(currentEditor, []),
+        });
+        // Deletes all the selection and the empty node that creates by default
+        Transforms.delete(currentEditor);
+        Transforms.removeNodes(currentEditor, { at: [0] });
 
-            // Insert new values as nodes
-            Transforms.insertNodes(currentEditor, newSlateValue, { at: [0] });
-          });
+        // Insert new values as nodes
+        Transforms.insertNodes(currentEditor, newSlateValue, { at: [0] });
+      });
 
-          currentValues.current = field.options.values;
-        }
-      }, [isNotEditable, field.options.values.join(","), hasLabels]);
+      currentValues.current = field.options.values;
+    }
+  }, [isNotEditable, field.options.values.join(","), hasLabels]);
 
-      const handleKeyDown = useCallback(
-        (event: KeyboardEvent) => {
-          if (editor.selection && isSelectionExpanded(editor as any)) {
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (editor.selection && isSelectionExpanded(editor as any)) {
+        return;
+      }
+      const anchor = editor.selection?.anchor;
+      if (!anchor) {
+        return;
+      }
+
+      switch (event.key) {
+        case "ArrowDown":
+          const atEnd = Point.equals(anchor, Editor.end(editor, []));
+          if (atEnd) {
+            onFocusNextField();
+          }
+          break;
+        case "ArrowUp":
+          const atStart = Point.equals(anchor, Editor.start(editor, []));
+          if (atStart) {
+            onFocusDescription();
+          }
+          break;
+      }
+    },
+    [editor, onFocusNextField, onFocusDescription],
+  );
+
+  const handleBlur = useCallback(() => {
+    const values = value
+      .map((n) => (n.children as any)[0].text.trim())
+      .filter((option) => option !== "");
+    if (!shallowEqualArrays(field.options.values, values)) {
+      if (field.type === "CHECKBOX") {
+        const [min, max] = getMinMaxCheckboxLimit({
+          min: field.options.limit.min || 0,
+          max: field.options.limit.max || 1,
+          valuesLength: values.length || 1,
+          optional: field.optional,
+        });
+        onFieldEdit({
+          options: {
+            ...field.options,
+            limit: {
+              ...field.options.limit,
+              min,
+              max,
+            },
+            values,
+          },
+        });
+      } else {
+        onFieldEdit({ options: { values } });
+      }
+      currentValues.current = values;
+    }
+  }, [field.options.values, value, onFieldEdit, onChange]);
+
+  useImperativeHandle(
+    ref,
+    () =>
+      ({
+        focus: (position) => {
+          if (isNotEditable) {
             return;
           }
-          const anchor = editor.selection?.anchor;
-          if (!anchor) {
-            return;
-          }
-
-          switch (event.key) {
-            case "ArrowDown":
-              const atEnd = Point.equals(anchor, Editor.end(editor, []));
-              if (atEnd) {
-                onFocusNextField();
-              }
-              break;
-            case "ArrowUp":
-              const atStart = Point.equals(anchor, Editor.start(editor, []));
-              if (atStart) {
-                onFocusDescription();
-              }
-              break;
+          const editor = editorRef.current;
+          ReactEditor.focus(editor);
+          if (position) {
+            Transforms.select(
+              editor,
+              position === "START" ? Editor.start(editor, []) : Editor.end(editor, []),
+            );
           }
         },
-        [editor, onFocusNextField, onFocusDescription],
-      );
+      }) as PetitionFieldOptionsListEditorRef,
+    [isNotEditable],
+  );
 
-      const handleBlur = useCallback(() => {
-        const values = value
-          .map((n) => (n.children as any)[0].text.trim())
-          .filter((option) => option !== "");
-        if (!shallowEqualArrays(field.options.values, values)) {
-          if (field.type === "CHECKBOX") {
-            const [min, max] = getMinMaxCheckboxLimit({
-              min: field.options.limit.min || 0,
-              max: field.options.limit.max || 1,
-              valuesLength: values.length || 1,
-              optional: field.optional,
-            });
-            onFieldEdit({
-              options: {
-                ...field.options,
-                limit: {
-                  ...field.options.limit,
-                  min,
-                  max,
-                },
-                values,
-              },
-            });
-          } else {
-            onFieldEdit({ options: { values } });
-          }
-          currentValues.current = values;
-        }
-      }, [field.options.values, value, onFieldEdit, onChange]);
+  return isNotEditable ? (
+    <>
+      {standardList && !field.isLinkedToProfileTypeField ? (
+        <Text fontSize="sm">
+          <FormattedMessage
+            id="component.petition-field-options-list-editor.settings-standard-options-description"
+            defaultMessage='Standard options from <b>"{standardList}"</b>. Edit from the field settings.'
+            values={{ standardList: getStandardListLabel(standardList, intl) }}
+          />
+          <Text as="span" marginStart={1} position="relative" top="-1px">
+            (<SettingsIcon />)
+          </Text>
+        </Text>
+      ) : hasLabels && !field.isLinkedToProfileTypeField ? (
+        <Text fontSize="sm">
+          <FormattedMessage
+            id="component.petition-field-options-list-editor.settings-imported-options-description"
+            defaultMessage="Options imported with internal values. To edit, import an Excel file from field settings."
+          />
+          <Text as="span" marginStart={1} position="relative" top="-1px">
+            (<SettingsIcon />)
+          </Text>
+        </Text>
+      ) : null}
 
-      useImperativeHandle(
-        ref,
-        () =>
-          ({
-            focus: (position) => {
-              if (isNotEditable) {
-                return;
-              }
-              const editor = editorRef.current;
-              ReactEditor.focus(editor);
-              if (position) {
-                Transforms.select(
-                  editor,
-                  position === "START" ? Editor.start(editor, []) : Editor.end(editor, []),
-                );
-              }
-            },
-          }) as PetitionFieldOptionsListEditorRef,
-        [isNotEditable],
-      );
+      <List textStyle="muted" maxHeight="200px" overflow="auto" fontSize="sm">
+        {field.options.values.map((value: string, index: number) => {
+          const label = field.options.labels?.[index];
+          return (
+            <ListItem key={index} _before={{ content: "'-'", marginEnd: 1 }}>
+              {value}
+              {isNonNullish(label) ? `: ${label}` : null}
+            </ListItem>
+          );
+        })}
+      </List>
+    </>
+  ) : (
+    <Slate editor={editor} initialValue={value} onChange={onChange as any}>
+      <Box maxHeight="200px" overflow="auto" fontSize="sm">
+        <Editable
+          style={{ outline: "none" }}
+          renderElement={renderElement}
+          renderLeaf={renderLeaf}
+          {...props}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
+          as="ul"
+          aria-invalid={(showError && isInvalid) || undefined}
+        />
+      </Box>
+    </Slate>
+  );
+});
 
-      return isNotEditable ? (
-        <>
-          {standardList && !field.isLinkedToProfileTypeField ? (
-            <Text fontSize="sm">
-              <FormattedMessage
-                id="component.petition-field-options-list-editor.settings-standard-options-description"
-                defaultMessage='Standard options from <b>"{standardList}"</b>. Edit from the field settings.'
-                values={{ standardList: getStandardListLabel(standardList, intl) }}
-              />
-              <Text as="span" marginStart={1} position="relative" top="-1px">
-                (<SettingsIcon />)
-              </Text>
-            </Text>
-          ) : hasLabels && !field.isLinkedToProfileTypeField ? (
-            <Text fontSize="sm">
-              <FormattedMessage
-                id="component.petition-field-options-list-editor.settings-imported-options-description"
-                defaultMessage="Options imported with internal values. To edit, import an Excel file from field settings."
-              />
-              <Text as="span" marginStart={1} position="relative" top="-1px">
-                (<SettingsIcon />)
-              </Text>
-            </Text>
-          ) : null}
-
-          <List textStyle="muted" maxHeight="200px" overflow="auto" fontSize="sm">
-            {field.options.values.map((value: string, index: number) => {
-              const label = field.options.labels?.[index];
-              return (
-                <ListItem key={index} _before={{ content: "'-'", marginEnd: 1 }}>
-                  {value}
-                  {isNonNullish(label) ? `: ${label}` : null}
-                </ListItem>
-              );
-            })}
-          </List>
-        </>
-      ) : (
-        <Slate editor={editor} initialValue={value} onChange={onChange as any}>
-          <Box maxHeight="200px" overflow="auto" fontSize="sm">
-            <Editable
-              style={{ outline: "none" }}
-              renderElement={renderElement}
-              renderLeaf={renderLeaf}
-              {...props}
-              onBlur={handleBlur}
-              onKeyDown={handleKeyDown}
-              as="ul"
-              aria-invalid={(showError && isInvalid) || undefined}
-            />
-          </Box>
-        </Slate>
-      );
-    },
-  ),
-
-  {
-    fragments: {
-      PetitionField: gql`
-        fragment PetitionFieldOptionsListEditor_PetitionField on PetitionField {
-          id
-          type
-          optional
-          options
-          isLinkedToProfileTypeField
-        }
-      `,
-    },
-  },
-);
+const _fragments = {
+  PetitionField: gql`
+    fragment PetitionFieldOptionsListEditor_PetitionField on PetitionField {
+      id
+      type
+      optional
+      options
+      isLinkedToProfileTypeField
+    }
+  `,
+};
 
 function renderElement({ attributes, children, element }: RenderElementProps) {
   return (

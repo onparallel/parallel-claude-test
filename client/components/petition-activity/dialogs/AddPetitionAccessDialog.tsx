@@ -25,15 +25,9 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { MessageEmailBodyFormControl } from "@parallel/components/petition-common/MessageEmailBodyFormControl";
 import { MessageEmailSubjectFormControl } from "@parallel/components/petition-common/MessageEmailSubjectFormControl";
-import {
-  ConfirmPetitionSignersDialog,
-  useConfirmPetitionSignersDialog,
-} from "@parallel/components/petition-common/dialogs/ConfirmPetitionSignersDialog";
+import { useConfirmPetitionSignersDialog } from "@parallel/components/petition-common/dialogs/ConfirmPetitionSignersDialog";
 import { PetitionRemindersConfig } from "@parallel/components/petition-compose/PetitionRemindersConfig";
-import {
-  CopySignatureConfigDialog,
-  useCopySignatureConfigDialog,
-} from "@parallel/components/petition-compose/dialogs/CopySignatureConfigDialog";
+import { useCopySignatureConfigDialog } from "@parallel/components/petition-compose/dialogs/CopySignatureConfigDialog";
 import { useScheduleMessageDialog } from "@parallel/components/petition-compose/dialogs/ScheduleMessageDialog";
 import {
   AddPetitionAccessDialog_DelegateUserFragment,
@@ -590,14 +584,13 @@ export function AddPetitionAccessDialog({
   );
 }
 
-AddPetitionAccessDialog.fragments = {
+const _fragments = {
   DelegateUser: gql`
     fragment AddPetitionAccessDialog_DelegateUser on User {
       id
       fullName
       ...UserSelect_User
     }
-    ${UserSelect.fragments.User}
   `,
   User: gql`
     fragment AddPetitionAccessDialog_User on User {
@@ -626,8 +619,6 @@ AddPetitionAccessDialog.fragments = {
       }
       ...ConfirmPetitionSignersDialog_SignatureConfig
     }
-    ${CopySignatureConfigDialog.fragments.PetitionSigner}
-    ${ConfirmPetitionSignersDialog.fragments.SignatureConfig}
   `,
   PetitionAccess: gql`
     fragment AddPetitionAccessDialog_PetitionAccess on PetitionAccess {
@@ -677,10 +668,6 @@ AddPetitionAccessDialog.fragments = {
       ...MessageEmailSubjectFormControl_PetitionBase
       ...RecipientSelectGroups_Petition
     }
-    ${ConfirmPetitionSignersDialog.fragments.SignatureConfig}
-    ${PetitionRemindersConfig.fragments.RemindersConfig}
-    ${MessageEmailSubjectFormControl.fragments.PetitionBase}
-    ${RecipientSelectGroups.fragments.Petition}
   `,
 };
 
@@ -691,7 +678,6 @@ const _queries = [
         ...AddPetitionAccessDialog_Petition
       }
     }
-    ${AddPetitionAccessDialog.fragments.Petition}
   `,
 ];
 
@@ -709,7 +695,6 @@ AddPetitionAccessDialog.mutations = [
         }
       }
     }
-    ${AddPetitionAccessDialog.fragments.Petition}
   `,
 ];
 

@@ -31,7 +31,7 @@ export function TimelinePetitionClosedEvent({ event }: TimelinePetitionClosedEve
   );
 }
 
-TimelinePetitionClosedEvent.fragments = {
+const _fragments = {
   PetitionClosedEvent: gql`
     fragment TimelinePetitionClosedEvent_PetitionClosedEvent on PetitionClosedEvent {
       user {
@@ -39,6 +39,5 @@ TimelinePetitionClosedEvent.fragments = {
       }
       createdAt
     }
-    ${UserReference.fragments.User}
   `,
 };

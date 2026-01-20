@@ -146,7 +146,7 @@ export function PetitionFieldSelect<
   );
 }
 
-PetitionFieldSelect.fragments = {
+const _fragments = {
   PetitionBase: gql`
     fragment PetitionFieldSelect_PetitionBase on PetitionBase {
       fields {

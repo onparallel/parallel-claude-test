@@ -177,7 +177,7 @@ export function PetitionActivityTimeline({ events }: PetitionActivityTimelinePro
   );
 }
 
-PetitionActivityTimeline.fragments = {
+const _fragments = {
   PetitionEvent: gql`
     fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
       id
@@ -341,65 +341,5 @@ PetitionActivityTimeline.fragments = {
         ...TimelinePetitionRecoveredFromDeletionEvent_PetitionRecoveredFromDeletionEvent
       }
     }
-    ${TimelinePetitionCreatedEvent.fragments.PetitionCreatedEvent}
-    ${TimelinePetitionCompletedEvent.fragments.PetitionCompletedEvent}
-    ${TimelineAccessActivatedEvent.fragments.AccessActivatedEvent}
-    ${TimelineAccessDeactivatedEvent.fragments.AccessDeactivatedEvent}
-    ${TimelineAccessOpenedEvent.fragments.AccessOpenedEvent}
-    ${TimelineMessageSentEvent.fragments.MessageSentEvent}
-    ${TimelineMessageScheduledEvent.fragments.MessageScheduledEvent}
-    ${TimelineMessageCancelledEvent.fragments.MessageCancelledEvent}
-    ${TimelineReminderSentEvent.fragments.ReminderSentEvent}
-    ${TimelineReplyCreatedEvent.fragments.ReplyCreatedEvent}
-    ${TimelineReplyUpdatedEvent.fragments.ReplyUpdatedEvent}
-    ${TimelineReplyDeletedEvent.fragments.ReplyDeletedEvent}
-    ${TimelineCommentPublishedEvent.fragments.CommentPublishedEvent}
-    ${TimelineCommentDeletedEvent.fragments.CommentDeletedEvent}
-    ${TimelineUserPermissionAddedEvent.fragments.UserPermissionAddedEvent}
-    ${TimelineUserPermissionRemovedEvent.fragments.UserPermissionRemovedEvent}
-    ${TimelineUserPermissionEditedEvent.fragments.UserPermissionEditedEvent}
-    ${TimelineOwnershipTransferredEvent.fragments.OwnershipTransferredEvent}
-    ${TimelinePetitionClosedEvent.fragments.PetitionClosedEvent}
-    ${TimelinePetitionClosedNotifiedEvent.fragments.PetitionClosedNotifiedEvent}
-    ${TimelinePetitionReopenedEvent.fragments.PetitionReopenedEvent}
-    ${TimelineSignatureDeliveredEvent.fragments.SignatureDeliveredEvent}
-    ${TimelineSignatureOpenedEvent.fragments.SignatureOpenedEvent}
-    ${TimelineSignatureStartedEvent.fragments.SignatureStartedEvent}
-    ${TimelineSignatureCompletedEvent.fragments.SignatureCompletedEvent}
-    ${TimelineSignatureCancelledEvent.fragments.SignatureCancelledEvent}
-    ${TimelineSignatureReminderEvent.fragments.SignatureReminderEvent}
-    ${TimelineAccessDelegatedEvent.fragments.AccessDelegatedEvent}
-    ${TimelineGroupPermissionAddedEvent.fragments.GroupPermissionAddedEvent}
-    ${TimelineGroupPermissionEditedEvent.fragments.GroupPermissionEditedEvent}
-    ${TimelineGroupPermissionRemovedEvent.fragments.GroupPermissionRemovedEvent}
-    ${TimelinePetitionClonedEvent.fragments.PetitionClonedEvent}
-    ${TimelineRemindersOptOutEvent.fragments.RemindersOptOutEvent}
-    ${TimelineAccessActivatedFromLinkEvent.fragments.AccessActivatedFromPublicPetitionLinkEvent}
-    ${TimelineRecipientSignedEvent.fragments.RecipientSignedEvent}
-    ${TimelinePetitionMessageBouncedEvent.fragments.PetitionMessageBouncedEvent}
-    ${TimelinePetitionReminderBouncedEvent.fragments.PetitionReminderBouncedEvent}
-    ${TimelinePetitionAnonymizedEvent.fragments.PetitionAnonymizedEvent}
-    ${TimelineReplyStatusChangedEvent.fragments.ReplyStatusChangedEvent}
-    ${TimelineProfileAssociatedEvent.fragments.ProfileAssociatedEvent}
-    ${TimelineProfileDisassociatedEvent.fragments.ProfileDisassociatedEvent}
-    ${TimelinePetitionTaggedEvent.fragments.PetitionTaggedEvent}
-    ${TimelinePetitionUntaggedEvent.fragments.PetitionUntaggedEvent}
-    ${TimelineContactlessAccessUsedEvent.fragments.ContactlessAccessUsedEvent}
-    ${TimelinePetitionApprovalRequestStepStartedEvent.fragments
-      .PetitionApprovalRequestStepStartedEvent}
-    ${TimelinePetitionApprovalRequestStepApprovedEvent.fragments
-      .PetitionApprovalRequestStepApprovedEvent}
-    ${TimelinePetitionApprovalRequestStepRejectedEvent.fragments
-      .PetitionApprovalRequestStepRejectedEvent}
-    ${TimelinePetitionApprovalRequestStepSkippedEvent.fragments
-      .PetitionApprovalRequestStepSkippedEvent}
-    ${TimelinePetitionApprovalRequestStepReminderEvent.fragments
-      .PetitionApprovalRequestStepReminderEvent}
-    ${TimelinePetitionApprovalRequestStepFinishedEvent.fragments
-      .PetitionApprovalRequestStepFinishedEvent}
-    ${TimelinePetitionApprovalRequestStepCanceledEvent.fragments
-      .PetitionApprovalRequestStepCanceledEvent}
-    ${TimelinePetitionScheduledForDeletionEvent.fragments.PetitionScheduledForDeletionEvent}
-    ${TimelinePetitionRecoveredFromDeletionEvent.fragments.PetitionRecoveredFromDeletionEvent}
   `,
 };

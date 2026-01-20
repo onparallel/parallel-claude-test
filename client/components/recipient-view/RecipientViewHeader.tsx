@@ -39,8 +39,8 @@ interface RecipientViewHeaderProps {
   canFinalize: boolean;
 }
 
-export const RecipientViewHeader = Object.assign(
-  chakraForwardRef<"section", RecipientViewHeaderProps>(function RecipientViewHeader(
+export const RecipientViewHeader = chakraForwardRef<"section", RecipientViewHeaderProps>(
+  function RecipientViewHeader(
     {
       access,
       hasSignature,
@@ -245,48 +245,38 @@ export const RecipientViewHeader = Object.assign(
         </HStack>
       </HStack>
     );
-  }),
-  {
-    fragments: {
-      get PublicContact() {
-        return gql`
-          fragment RecipientViewHeader_PublicContact on PublicContact {
-            id
-            fullName
-            firstName
-            email
-            initials
-            ...RecipientViewMenuButton_PublicContact
-          }
-          ${RecipientViewMenuButton.fragments.PublicContact}
-        `;
-      },
-      get PublicPetition() {
-        return gql`
-          fragment RecipientViewHeader_PublicPetition on PublicPetition {
-            id
-            organization {
-              name
-              logoUrl72: logoUrl(options: { resize: { height: 72 } })
-            }
-          }
-        `;
-      },
-      get PublicPetitionAccess() {
-        return gql`
-          fragment RecipientViewHeader_PublicPetitionAccess on PublicPetitionAccess {
-            hasClientPortalAccess
-            petition {
-              ...RecipientViewHeader_PublicPetition
-            }
-            contact {
-              ...RecipientViewHeader_PublicContact
-            }
-          }
-          ${this.PublicPetition}
-          ${this.PublicContact}
-        `;
-      },
-    },
   },
 );
+
+const _fragments = {
+  PublicContact: gql`
+    fragment RecipientViewHeader_PublicContact on PublicContact {
+      id
+      fullName
+      firstName
+      email
+      initials
+      ...RecipientViewMenuButton_PublicContact
+    }
+  `,
+  PublicPetition: gql`
+    fragment RecipientViewHeader_PublicPetition on PublicPetition {
+      id
+      organization {
+        name
+        logoUrl72: logoUrl(options: { resize: { height: 72 } })
+      }
+    }
+  `,
+  PublicPetitionAccess: gql`
+    fragment RecipientViewHeader_PublicPetitionAccess on PublicPetitionAccess {
+      hasClientPortalAccess
+      petition {
+        ...RecipientViewHeader_PublicPetition
+      }
+      contact {
+        ...RecipientViewHeader_PublicContact
+      }
+    }
+  `,
+};

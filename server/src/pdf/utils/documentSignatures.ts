@@ -121,7 +121,7 @@ export function documentSignatures(
   ];
 }
 
-documentSignatures.fragments = {
+const _fragments = {
   SignatureConfig: gql`
     fragment documentSignatures_SignatureConfig on SignatureConfig {
       signers {

@@ -637,43 +637,34 @@ function useConfirmDeletePermanentlyPetitionsDialog() {
   );
 }
 
-useDeletePetitions.fragments = {
-  get PetitionBaseOrFolder() {
-    return gql`
-      fragment useDeletePetitions_PetitionBaseOrFolder on PetitionBaseOrFolder {
-        ... on PetitionBase {
-          ...useDeletePetitions_PetitionBase
-        }
-        ... on PetitionFolder {
-          ...useDeletePetitions_PetitionFolder
-        }
+const _fragments = {
+  PetitionBaseOrFolder: gql`
+    fragment useDeletePetitions_PetitionBaseOrFolder on PetitionBaseOrFolder {
+      ... on PetitionBase {
+        ...useDeletePetitions_PetitionBase
       }
-      ${this.PetitionBase}
-      ${this.PetitionFolder}
-    `;
-  },
-  get PetitionBase() {
-    return gql`
-      fragment useDeletePetitions_PetitionBase on PetitionBase {
-        id
-        path
-        ...PetitionName_PetitionBase
-        myEffectivePermission {
-          permissionType
-        }
+      ... on PetitionFolder {
+        ...useDeletePetitions_PetitionFolder
       }
-      ${PetitionNameWithPath.fragments.PetitionBase}
-    `;
-  },
-  get PetitionFolder() {
-    return gql`
-      fragment useDeletePetitions_PetitionFolder on PetitionFolder {
-        folderId: id
-        path
-        petitionCount
+    }
+  `,
+  PetitionBase: gql`
+    fragment useDeletePetitions_PetitionBase on PetitionBase {
+      id
+      path
+      ...PetitionName_PetitionBase
+      myEffectivePermission {
+        permissionType
       }
-    `;
-  },
+    }
+  `,
+  PetitionFolder: gql`
+    fragment useDeletePetitions_PetitionFolder on PetitionFolder {
+      folderId: id
+      path
+      petitionCount
+    }
+  `,
 };
 
 const _queries = [
@@ -684,7 +675,6 @@ const _queries = [
         ...useDeletePetitions_PetitionBase
       }
     }
-    ${useDeletePetitions.fragments.PetitionBase}
   `,
 ];
 

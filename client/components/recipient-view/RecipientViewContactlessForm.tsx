@@ -516,7 +516,7 @@ export function RecipientViewContactlessForm({
   );
 }
 
-RecipientViewContactlessForm.fragments = {
+const _fragments = {
   PublicOrganization: gql`
     fragment RecipientViewContactlessForm_PublicOrganization on PublicOrganization {
       name

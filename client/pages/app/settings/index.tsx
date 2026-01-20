@@ -15,7 +15,6 @@ Settings.queries = [
     query Settings_user {
       ...UserSettingsLayout_Query
     }
-    ${UserSettingsLayout.fragments.Query}
   `,
 ];
 

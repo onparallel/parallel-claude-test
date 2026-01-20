@@ -64,7 +64,7 @@ export function useSentPetitionMessageDialog() {
   return useDialog(SentPetitionMessageDialog);
 }
 
-SentPetitionMessageDialog.fragments = {
+const _fragments = {
   PetitionMessage: gql`
     fragment SentPetitionMessageDialog_PetitionMessage on PetitionMessage {
       emailBody
@@ -77,6 +77,5 @@ SentPetitionMessageDialog.fragments = {
         }
       }
     }
-    ${ContactReference.fragments.Contact}
   `,
 };

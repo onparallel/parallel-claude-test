@@ -31,15 +31,13 @@ export function useUnarchiveProfileType() {
   };
 }
 
-useUnarchiveProfileType.fragments = {
-  get ProfileType() {
-    return gql`
-      fragment useUnarchiveProfileType_ProfileType on ProfileType {
-        id
-        name
-      }
-    `;
-  },
+const _fragments = {
+  ProfileType: gql`
+    fragment useUnarchiveProfileType_ProfileType on ProfileType {
+      id
+      name
+    }
+  `,
 };
 
 useUnarchiveProfileType.mutations = [

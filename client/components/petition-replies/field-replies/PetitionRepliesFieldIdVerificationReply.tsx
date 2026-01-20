@@ -77,7 +77,7 @@ export function PetitionRepliesFieldIdVerificationReply({
   return null;
 }
 
-PetitionRepliesFieldIdVerificationReply.fragments = {
+const _fragments = {
   PetitionFieldReply: gql`
     fragment PetitionRepliesFieldIdVerificationReply_PetitionFieldReply on PetitionFieldReply {
       id

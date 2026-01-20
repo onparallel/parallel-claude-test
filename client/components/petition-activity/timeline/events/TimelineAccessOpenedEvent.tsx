@@ -29,7 +29,7 @@ export function TimelineAccessOpenedEvent({ event }: TimelineAccessOpenedEventPr
   );
 }
 
-TimelineAccessOpenedEvent.fragments = {
+const _fragments = {
   AccessOpenedEvent: gql`
     fragment TimelineAccessOpenedEvent_AccessOpenedEvent on AccessOpenedEvent {
       access {
@@ -39,6 +39,5 @@ TimelineAccessOpenedEvent.fragments = {
       }
       createdAt
     }
-    ${ContactReference.fragments.Contact}
   `,
 };

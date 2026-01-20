@@ -130,7 +130,7 @@ export function CreateOrUpdateDocumentThemeDialog({
   );
 }
 
-CreateOrUpdateDocumentThemeDialog.fragments = {
+const _fragments = {
   OrganizationTheme: gql`
     fragment CreateOrUpdateDocumentThemeDialog_OrganizationTheme on OrganizationTheme {
       name

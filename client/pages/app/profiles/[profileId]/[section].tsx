@@ -59,7 +59,6 @@ const _queries = [
         hasKeyProcessesFeature: hasFeatureFlag(featureFlag: KEY_PROCESSES)
       }
     }
-    ${ProfileLayout.fragments.Query}
   `,
   gql`
     query ProfileDetail_profile($profileId: GID!) {
@@ -69,8 +68,6 @@ const _queries = [
         ...ProfileKeyProcesses_Profile
       }
     }
-    ${ProfileLayout.fragments.Profile}
-    ${ProfileKeyProcesses.fragments.Profile}
   `,
 ];
 

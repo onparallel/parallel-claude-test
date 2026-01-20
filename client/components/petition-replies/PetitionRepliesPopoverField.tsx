@@ -182,8 +182,5 @@ const _queries = [
         ...PreviewPetitionField_PetitionBase
       }
     }
-    ${PreviewPetitionField.fragments.PetitionBase}
-    ${PreviewPetitionField.fragments.PetitionField}
-    ${PreviewPetitionField.fragments.User}
   `,
 ];

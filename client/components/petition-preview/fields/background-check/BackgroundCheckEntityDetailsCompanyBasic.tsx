@@ -193,18 +193,16 @@ export function BackgroundCheckEntityDetailsCompanyBasic({
   );
 }
 
-BackgroundCheckEntityDetailsCompanyBasic.fragments = {
-  get BackgroundCheckEntityDetailsCompanyBasic() {
-    return gql`
-      fragment BackgroundCheckEntityDetailsCompanyBasic_BackgroundCheckEntityDetailsCompany on BackgroundCheckEntityDetailsCompany {
-        id
-        name
-        properties {
-          dateOfRegistration
-          topics
-          jurisdiction
-        }
+const _fragments = {
+  BackgroundCheckEntityDetailsCompanyBasic: gql`
+    fragment BackgroundCheckEntityDetailsCompanyBasic_BackgroundCheckEntityDetailsCompany on BackgroundCheckEntityDetailsCompany {
+      id
+      name
+      properties {
+        dateOfRegistration
+        topics
+        jurisdiction
       }
-    `;
-  },
+    }
+  `,
 };

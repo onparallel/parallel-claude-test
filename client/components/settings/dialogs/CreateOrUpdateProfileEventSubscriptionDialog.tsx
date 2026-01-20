@@ -539,61 +539,50 @@ export function CreateOrUpdateProfileEventSubscriptionDialog({
   );
 }
 
-CreateOrUpdateProfileEventSubscriptionDialog.fragments = {
-  get ProfileEventSubscription() {
-    return gql`
-      fragment CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscription on ProfileEventSubscription {
+const _fragments = {
+  ProfileEventSubscription: gql`
+    fragment CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscription on ProfileEventSubscription {
+      id
+      name
+      eventsUrl
+      isEnabled
+      isFailing
+      ignoreOwnerEvents
+      signatureKeys {
+        ...CreateOrUpdateProfileEventSubscriptionDialog_EventSubscriptionSignatureKey
+      }
+      profileEventTypes: eventTypes
+      fromProfileType {
         id
         name
-        eventsUrl
-        isEnabled
-        isFailing
-        ignoreOwnerEvents
-        signatureKeys {
-          ...CreateOrUpdateProfileEventSubscriptionDialog_EventSubscriptionSignatureKey
-        }
-        profileEventTypes: eventTypes
-        fromProfileType {
-          id
-          name
-        }
-        fromProfileTypeFields {
-          id
-        }
       }
-      ${this.EventSubscriptionSignatureKey}
-    `;
-  },
-  get EventSubscriptionSignatureKey() {
-    return gql`
-      fragment CreateOrUpdateProfileEventSubscriptionDialog_EventSubscriptionSignatureKey on EventSubscriptionSignatureKey {
+      fromProfileTypeFields {
         id
-        publicKey
       }
-    `;
-  },
-  get ProfileTypeField() {
-    return gql`
-      fragment CreateOrUpdateProfileEventSubscriptionDialog_ProfileTypeField on ProfileTypeField {
+    }
+  `,
+  EventSubscriptionSignatureKey: gql`
+    fragment CreateOrUpdateProfileEventSubscriptionDialog_EventSubscriptionSignatureKey on EventSubscriptionSignatureKey {
+      id
+      publicKey
+    }
+  `,
+  ProfileTypeField: gql`
+    fragment CreateOrUpdateProfileEventSubscriptionDialog_ProfileTypeField on ProfileTypeField {
+      id
+      ...ProfileTypeFieldSelect_ProfileTypeField
+    }
+  `,
+  ProfileType: gql`
+    fragment CreateOrUpdateProfileEventSubscriptionDialog_ProfileType on ProfileType {
+      id
+      name
+      fields {
         id
-        ...ProfileTypeFieldSelect_ProfileTypeField
+        ...CreateOrUpdateProfileEventSubscriptionDialog_ProfileTypeField
       }
-      ${ProfileTypeFieldSelect.fragments.ProfileTypeField}
-    `;
-  },
-  get ProfileType() {
-    return gql`
-      fragment CreateOrUpdateProfileEventSubscriptionDialog_ProfileType on ProfileType {
-        id
-        name
-        fields {
-          id
-          ...CreateOrUpdateProfileEventSubscriptionDialog_ProfileTypeField
-        }
-      }
-      ${this.ProfileTypeField}
-    `;
-  },
+    }
+  `,
 };
 
 const _queries = [
@@ -603,7 +592,6 @@ const _queries = [
         ...CreateOrUpdateProfileEventSubscriptionDialog_ProfileType
       }
     }
-    ${CreateOrUpdateProfileEventSubscriptionDialog.fragments.ProfileType}
   `,
 ];
 

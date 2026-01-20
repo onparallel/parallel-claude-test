@@ -191,7 +191,7 @@ export function PetitionRepliesSummary({ petition, user, onRefetch }: PetitionRe
   );
 }
 
-PetitionRepliesSummary.fragments = {
+const _fragments = {
   Petition: gql`
     fragment PetitionRepliesSummary_Petition on Petition {
       id

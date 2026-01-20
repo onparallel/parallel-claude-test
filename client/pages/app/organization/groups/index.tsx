@@ -459,37 +459,30 @@ function ConfirmDeleteGroupsDialog({
   );
 }
 
-OrganizationGroups.fragments = {
-  get UserGroupPagination() {
-    return gql`
-      fragment OrganizationGroups_UserGroupPagination on UserGroupPagination {
-        items {
-          ...OrganizationGroups_UserGroup
-        }
-        totalCount
+const _fragments = {
+  UserGroupPagination: gql`
+    fragment OrganizationGroups_UserGroupPagination on UserGroupPagination {
+      items {
+        ...OrganizationGroups_UserGroup
       }
-      ${this.UserGroup}
-    `;
-  },
-  get UserGroup() {
-    return gql`
-      fragment OrganizationGroups_UserGroup on UserGroup {
-        id
-        name
-        createdAt
-        members {
-          user {
-            ...UserAvatarList_User
-          }
+      totalCount
+    }
+  `,
+  UserGroup: gql`
+    fragment OrganizationGroups_UserGroup on UserGroup {
+      id
+      name
+      createdAt
+      members {
+        user {
+          ...UserAvatarList_User
         }
-        hasPermissions
-        type
-        ...UserGroupReference_UserGroup
       }
-      ${UserAvatarList.fragments.User}
-      ${UserGroupReference.fragments.UserGroup}
-    `;
-  },
+      hasPermissions
+      type
+      ...UserGroupReference_UserGroup
+    }
+  `,
 };
 
 OrganizationGroups.mutations = [
@@ -499,7 +492,6 @@ OrganizationGroups.mutations = [
         ...OrganizationGroups_UserGroup
       }
     }
-    ${OrganizationGroups.fragments.UserGroup}
   `,
   gql`
     mutation OrganizationGroups_deleteUserGroup($ids: [GID!]!) {
@@ -512,7 +504,6 @@ OrganizationGroups.mutations = [
         ...OrganizationGroups_UserGroup
       }
     }
-    ${OrganizationGroups.fragments.UserGroup}
   `,
 ];
 
@@ -528,7 +519,6 @@ OrganizationGroups.queries = [
         ...OrganizationGroups_UserGroupPagination
       }
     }
-    ${OrganizationGroups.fragments.UserGroupPagination}
   `,
   gql`
     query OrganizationGroups_user {
@@ -538,7 +528,6 @@ OrganizationGroups.queries = [
         hasPermissionManagement: hasFeatureFlag(featureFlag: PERMISSION_MANAGEMENT)
       }
     }
-    ${OrganizationSettingsLayout.fragments.Query}
   `,
 ];
 

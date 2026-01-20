@@ -729,34 +729,26 @@ export function PetitionSharingDialog({
 }
 
 const _fragments = {
-  get User() {
-    return gql`
-      fragment PetitionSharingModal_User on User {
-        id
-        email
-        fullName
-        ...UserAvatar_User
-        ...UserSelect_User
-        ...UserReference_User
-      }
-      ${UserReference.fragments.User}
-      ${UserSelect.fragments.User}
-      ${UserAvatar.fragments.User}
-    `;
-  },
-  get UserGroup() {
-    return gql`
-      fragment PetitionSharingModal_UserGroup on UserGroup {
-        id
-        name
-        initials
-        memberCount
-        imMember
-        ...UserGroupReference_UserGroup
-      }
-      ${UserGroupReference.fragments.UserGroup}
-    `;
-  },
+  User: gql`
+    fragment PetitionSharingModal_User on User {
+      id
+      email
+      fullName
+      ...UserAvatar_User
+      ...UserSelect_User
+      ...UserReference_User
+    }
+  `,
+  UserGroup: gql`
+    fragment PetitionSharingModal_UserGroup on UserGroup {
+      id
+      name
+      initials
+      memberCount
+      imMember
+      ...UserGroupReference_UserGroup
+    }
+  `,
 };
 
 const _mutations = [
@@ -808,9 +800,6 @@ const _queries = [
         }
       }
     }
-    ${PetitionNameWithPath.fragments.PetitionBase}
-    ${_fragments.User}
-    ${_fragments.UserGroup}
   `,
 ];
 

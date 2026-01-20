@@ -24,7 +24,7 @@ export function VariableReference({
   );
 }
 
-VariableReference.fragments = {
+const _fragments = {
   PetitionVariable: gql`
     fragment VariableReference_PetitionVariable on PetitionVariable {
       name

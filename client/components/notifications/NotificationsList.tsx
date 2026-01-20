@@ -216,7 +216,7 @@ export function NotificationsList({
   );
 }
 
-NotificationsList.fragments = {
+const _fragments = {
   PetitionUserNotification: gql`
     fragment NotificationsList_PetitionUserNotification on PetitionUserNotification {
       ... on CommentCreatedUserNotification {
@@ -247,15 +247,5 @@ NotificationsList.fragments = {
         ...AccessActivatedFromLinkNotification_AccessActivatedFromPublicPetitionLinkUserNotification
       }
     }
-    ${CommentCreatedUserNotification.fragments.CommentCreatedUserNotification}
-    ${MessageEmailBouncedUserNotification.fragments.MessageEmailBouncedUserNotification}
-    ${ReminderEmailBouncedUserNotification.fragments.ReminderEmailBouncedUserNotification}
-    ${PetitionCompletedUserNotification.fragments.PetitionCompletedUserNotification}
-    ${PetitionSharedUserNotification.fragments.PetitionSharedUserNotification}
-    ${SignatureCancelledUserNotification.fragments.SignatureCancelledUserNotification}
-    ${SignatureCompletedUserNotification.fragments.SignatureCompletedUserNotification}
-    ${RemindersOptOutNotification.fragments.RemindersOptOutNotification}
-    ${AccessActivatedFromLinkNotification.fragments
-      .AccessActivatedFromPublicPetitionLinkUserNotification}
   `,
 };

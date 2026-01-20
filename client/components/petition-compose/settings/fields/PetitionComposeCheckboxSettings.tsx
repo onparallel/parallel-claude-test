@@ -296,7 +296,7 @@ export function PetitionComposeCheckboxSettings({
   );
 }
 
-PetitionComposeCheckboxSettings.fragments = {
+const _fragments = {
   PetitionField: gql`
     fragment PetitionComposeCheckboxSettings_PetitionField on PetitionField {
       id

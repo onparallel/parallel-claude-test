@@ -216,7 +216,7 @@ function Option(props: OptionProps<TypesOfVerificationSelectOption>) {
   );
 }
 
-PetitionComposeIdVerificationSettings.fragments = {
+const _fragments = {
   PetitionField: gql`
     fragment PetitionComposeIdVerificationSettings_PetitionField on PetitionField {
       id

@@ -101,7 +101,7 @@ export async function getServerSideProps({
   }
 }
 
-RecipientViewVerify.fragments = {
+const _fragments = {
   PublicAccessVerification: gql`
     fragment RecipientViewVerify_PublicAccessVerification on PublicAccessVerification {
       isAllowed
@@ -121,9 +121,6 @@ RecipientViewVerify.fragments = {
         }
       }
     }
-    ${RecipientViewContactlessForm.fragments.PublicOrganization}
-    ${RecipientViewNewDevice.fragments.PublicOrganization}
-    ${OverrideWithOrganizationTheme.fragments.OrganizationBrandThemeData}
   `,
 };
 
@@ -139,7 +136,6 @@ RecipientViewVerify.mutations = [
         ...RecipientViewVerify_PublicAccessVerification
       }
     }
-    ${RecipientViewVerify.fragments.PublicAccessVerification}
   `,
 ];
 

@@ -114,7 +114,7 @@ export function filterPetitionFields<T extends filterPetitionFields_PetitionFiel
   return filtered;
 }
 
-filterPetitionFields.fragments = {
+const _fragments = {
   PetitionField: gql`
     fragment filterPetitionFields_PetitionField on PetitionField {
       id

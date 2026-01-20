@@ -195,81 +195,62 @@ export function ProfileFormInner({
   );
 }
 
-ProfileFormInner.fragments = {
-  get ProfileTypeField() {
-    return gql`
-      fragment ProfileFormInner_ProfileTypeField on ProfileTypeField {
+const _fragmentsProfileFormInner = {
+  ProfileTypeField: gql`
+    fragment ProfileFormInner_ProfileTypeField on ProfileTypeField {
+      id
+      name
+      position
+      type
+      myPermission
+      alias
+      ...ProfileFormField_ProfileTypeField
+    }
+  `,
+  ProfileFieldFile: gql`
+    fragment ProfileFormInner_ProfileFieldFile on ProfileFieldFile {
+      id
+      ...ProfileFormField_ProfileFieldFile
+    }
+  `,
+  ProfileFieldValue: gql`
+    fragment ProfileFormInner_ProfileFieldValue on ProfileFieldValue {
+      id
+      content
+      createdAt
+      expiryDate
+      ...ProfileFormField_ProfileFieldValue
+    }
+  `,
+  ProfileFieldProperty: gql`
+    fragment ProfileFormInner_ProfileFieldProperty on ProfileFieldProperty {
+      field {
+        ...ProfileFormInner_ProfileTypeField
+      }
+      files {
+        ...ProfileFormInner_ProfileFieldFile
+      }
+      value {
+        ...ProfileFormInner_ProfileFieldValue
+      }
+      ...ProfileFormField_ProfileFieldProperty
+    }
+  `,
+  PetitionBase: gql`
+    fragment ProfileFormInner_PetitionBase on PetitionBase {
+      fields {
         id
-        name
-        position
-        type
-        myPermission
         alias
-        ...ProfileFormField_ProfileTypeField
-      }
-      ${ProfileFormField.fragments.ProfileTypeField}
-    `;
-  },
-  get ProfileFieldFile() {
-    return gql`
-      fragment ProfileFormInner_ProfileFieldFile on ProfileFieldFile {
-        id
-        ...ProfileFormField_ProfileFieldFile
-      }
-      ${ProfileFormField.fragments.ProfileFieldFile}
-    `;
-  },
-  get ProfileFieldValue() {
-    return gql`
-      fragment ProfileFormInner_ProfileFieldValue on ProfileFieldValue {
-        id
-        content
-        createdAt
-        expiryDate
-        ...ProfileFormField_ProfileFieldValue
-      }
-      ${ProfileFormField.fragments.ProfileFieldValue}
-    `;
-  },
-  get ProfileFieldProperty() {
-    return gql`
-      fragment ProfileFormInner_ProfileFieldProperty on ProfileFieldProperty {
-        field {
-          ...ProfileFormInner_ProfileTypeField
-        }
-        files {
-          ...ProfileFormInner_ProfileFieldFile
-        }
-        value {
-          ...ProfileFormInner_ProfileFieldValue
-        }
-        ...ProfileFormField_ProfileFieldProperty
-      }
-      ${this.ProfileTypeField}
-      ${this.ProfileFieldFile}
-      ${this.ProfileFieldValue}
-      ${ProfileFormField.fragments.ProfileFieldProperty}
-    `;
-  },
-  get PetitionBase() {
-    return gql`
-      fragment ProfileFormInner_PetitionBase on PetitionBase {
-        fields {
+        ...ProfileFormField_PetitionField
+        children {
           id
           alias
           ...ProfileFormField_PetitionField
-          children {
-            id
-            alias
-            ...ProfileFormField_PetitionField
-          }
         }
-        ...useAllFieldsWithIndices_PetitionBase
       }
-      ${useAllFieldsWithIndices.fragments.PetitionBase}
-      ${ProfileFormField.fragments.PetitionField}
-    `;
-  },
+      ...useAllFieldsWithIndices_PetitionBase
+    }
+  `,
 };
 
 export function useProfileFormInnerSubmitHandler({
@@ -528,7 +509,6 @@ const _mutations = [
         ...ProfileFormInner_ProfileFieldFile
       }
     }
-    ${ProfileFormInner.fragments.ProfileFieldFile}
   `,
   gql`
     mutation ProfileFormInner_updateProfileFieldValue(
@@ -566,9 +546,6 @@ const _mutations = [
         }
       }
     }
-    ${uploadFile.fragments.AWSPresignedPostData}
-    ${ProfileFormInner.fragments.ProfileFieldProperty}
-    ${ProfileFormInner.fragments.ProfileFieldFile}
   `,
   gql`
     mutation ProfileFormInner_profileFieldFileUploadComplete(
@@ -585,7 +562,6 @@ const _mutations = [
         ...ProfileFormInner_ProfileFieldFile
       }
     }
-    ${ProfileFormInner.fragments.ProfileFieldFile}
   `,
   gql`
     mutation ProfileFormInner_deleteProfileFieldFile(
@@ -627,7 +603,7 @@ export function buildFormDefaultValue(
   };
 }
 
-buildFormDefaultValue.fragments = {
+const _fragments = {
   ProfileFieldProperty: gql`
     fragment buildFormDefaultValue_ProfileFieldProperty on ProfileFieldProperty {
       field {

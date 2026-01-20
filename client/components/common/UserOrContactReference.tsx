@@ -12,8 +12,8 @@ interface UserOrContactReferenceProps {
   userOrAccess?: Maybe<UserOrContactReference_UserOrPetitionAccessFragment>;
   _activeContact?: SystemStyleObject;
 }
-export const UserOrContactReference = Object.assign(
-  chakraForwardRef<"span", UserOrContactReferenceProps>(function UserOrContactReference(
+export const UserOrContactReference = chakraForwardRef<"span", UserOrContactReferenceProps>(
+  function UserOrContactReference(
     { userOrAccess, contactAsLink, userUseYou, _activeContact, ...props },
     ref,
   ) {
@@ -33,23 +33,20 @@ export const UserOrContactReference = Object.assign(
         {...props}
       />
     );
-  }),
-  {
-    fragments: {
-      UserOrPetitionAccess: gql`
-        fragment UserOrContactReference_UserOrPetitionAccess on UserOrPetitionAccess {
-          ... on User {
-            ...UserReference_User
-          }
-          ... on PetitionAccess {
-            contact {
-              ...ContactReference_Contact
-            }
-          }
-        }
-        ${UserReference.fragments.User}
-        ${ContactReference.fragments.Contact}
-      `,
-    },
   },
 );
+
+const _fragments = {
+  UserOrPetitionAccess: gql`
+    fragment UserOrContactReference_UserOrPetitionAccess on UserOrPetitionAccess {
+      ... on User {
+        ...UserReference_User
+      }
+      ... on PetitionAccess {
+        contact {
+          ...ContactReference_Contact
+        }
+      }
+    }
+  `,
+};

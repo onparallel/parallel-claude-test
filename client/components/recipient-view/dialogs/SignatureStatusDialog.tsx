@@ -65,7 +65,7 @@ export function useSignatureStatusDialog() {
   return useDialog(SignatureStatusDialog);
 }
 
-useSignatureStatusDialog.fragments = {
+const _fragments = {
   PublicPetition: gql`
     fragment RecipientViewSignatureStatusDialog_PublicPetition on PublicPetition {
       id

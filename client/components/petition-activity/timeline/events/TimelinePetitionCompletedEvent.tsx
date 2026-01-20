@@ -31,7 +31,7 @@ export function TimelinePetitionCompletedEvent({ event }: TimelinePetitionComple
   );
 }
 
-TimelinePetitionCompletedEvent.fragments = {
+const _fragments = {
   PetitionCompletedEvent: gql`
     fragment TimelinePetitionCompletedEvent_PetitionCompletedEvent on PetitionCompletedEvent {
       completedBy {
@@ -39,6 +39,5 @@ TimelinePetitionCompletedEvent.fragments = {
       }
       createdAt
     }
-    ${UserOrContactReference.fragments.UserOrPetitionAccess}
   `,
 };

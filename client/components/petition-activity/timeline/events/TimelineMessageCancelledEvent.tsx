@@ -46,7 +46,7 @@ export function TimelineMessageCancelledEvent({
   );
 }
 
-TimelineMessageCancelledEvent.fragments = {
+const _fragments = {
   MessageCancelledEvent: gql`
     fragment TimelineMessageCancelledEvent_MessageCancelledEvent on MessageCancelledEvent {
       reason
@@ -65,7 +65,5 @@ TimelineMessageCancelledEvent.fragments = {
       }
       createdAt
     }
-    ${ContactReference.fragments.Contact}
-    ${UserReference.fragments.User}
   `,
 };

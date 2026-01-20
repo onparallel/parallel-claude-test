@@ -28,7 +28,6 @@ Admin.queries = [
     query Admin_user {
       ...AdminSettingsLayout_Query
     }
-    ${AdminSettingsLayout.fragments.Query}
   `,
 ];
 

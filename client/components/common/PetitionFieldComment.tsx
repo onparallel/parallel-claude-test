@@ -284,7 +284,7 @@ export function PetitionFieldComment({
   );
 }
 
-PetitionFieldComment.fragments = {
+const _fragments = {
   PetitionFieldComment: gql`
     fragment PetitionFieldComment_PetitionFieldComment on PetitionFieldComment {
       id
@@ -307,8 +307,5 @@ PetitionFieldComment.fragments = {
       }
       isAnonymized
     }
-    ${UserOrContactReference.fragments.UserOrPetitionAccess}
-    ${PetitionFieldCommentContent.fragments.PetitionFieldComment}
-    ${FileAttachmentButton.fragments.FileUpload}
   `,
 };

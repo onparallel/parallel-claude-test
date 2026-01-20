@@ -488,7 +488,6 @@ const _queries = [
         ...DowJonesFieldSearchResults_PetitionField
       }
     }
-    ${_fragments.PetitionField}
   `,
   gql`
     query DowJonesFieldSearchResults_search(
@@ -509,7 +508,6 @@ const _queries = [
         totalCount
       }
     }
-    ${_fragments.DowJonesKycEntitySearchResult}
   `,
 ];
 

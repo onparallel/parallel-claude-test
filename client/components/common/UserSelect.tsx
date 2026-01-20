@@ -32,7 +32,7 @@ import { assert } from "ts-essentials";
 import { OverflownText } from "./OverflownText";
 import { UserDropdownEmpty } from "./UserDropdownEmpty";
 import { UserGroupMembersPopover } from "./UserGroupMembersPopover";
-import { UserGroupReference, userGroupReferenceText } from "./UserGroupReference";
+import { userGroupReferenceText } from "./UserGroupReference";
 import { UserSelectOption } from "./UserSelectOption";
 
 export type UserSelectSelection<IncludeGroups extends boolean = false> =
@@ -44,54 +44,6 @@ export type UserSelectInstance<
   IncludeGroups extends boolean = false,
   OptionType extends UserSelectSelection<IncludeGroups> = UserSelectSelection<IncludeGroups>,
 > = SelectInstance<OptionType, IsMulti, never>;
-
-const fragments = {
-  User: gql`
-    fragment UserSelect_User on User {
-      id
-      fullName
-      email
-      ...UserSelectOption_User
-    }
-    ${UserSelectOption.fragments.User}
-  `,
-  UserGroup: gql`
-    fragment UserSelect_UserGroup on UserGroup {
-      id
-      name
-      memberCount
-      ...UserSelectOption_UserGroup
-      ...UserGroupReference_UserGroup
-    }
-    ${UserSelectOption.fragments.UserGroup}
-    ${UserGroupReference.fragments.UserGroup}
-  `,
-};
-
-const _queries = [
-  gql`
-    query UserSelect_canCreateUsers {
-      me {
-        id
-        canCreateUsers
-      }
-    }
-  `,
-  gql`
-    query UserSelect_useGetUsersOrGroups($ids: [ID!]!) {
-      getUsersOrGroups(ids: $ids) {
-        ... on User {
-          ...UserSelect_User
-        }
-        ... on UserGroup {
-          ...UserSelect_UserGroup
-        }
-      }
-    }
-    ${fragments.User}
-    ${fragments.UserGroup}
-  `,
-];
 
 export interface UserSelectProps<
   IsMulti extends boolean = false,
@@ -111,153 +63,150 @@ export interface UserSelectProps<
       ) => Promise<OptionType[]>;
 }
 
-export const UserSelect = Object.assign(
-  forwardRef(function UserSelect<
-    IsMulti extends boolean = false,
-    IncludeGroups extends boolean = false,
-    IsSync extends boolean = false,
-    OptionType extends UserSelectSelection<IncludeGroups> = UserSelectSelection<IncludeGroups>,
-  >(
-    {
-      value,
-      onSearch,
-      isSync,
-      onChange,
-      options,
-      isMulti,
-      includeGroups,
-      placeholder: _placeholder,
-      ...props
-    }: UserSelectProps<IsMulti, IncludeGroups, IsSync, OptionType>,
-    ref: ForwardedRef<UserSelectInstance<IsMulti, IncludeGroups, OptionType>>,
-  ) {
-    const needsLoading =
-      typeof value === "string" || (Array.isArray(value) && typeof value[0] === "string");
-    const getUsersOrGroups = useGetUsersOrGroups();
-    const _value = useAsyncMemo(async () => {
-      if (value === null) {
-        return null;
-      }
-      if (needsLoading) {
-        return await getUsersOrGroups(value as any);
-      } else {
-        return value as MaybeArray<UserSelectSelection<boolean>>;
-      }
-    }, [
-      needsLoading,
-      // Rerun when value changes
-      value === null
-        ? null
-        : needsLoading
-          ? // value is string | string[]
-            unMaybeArray(value as any).join(",")
-          : // value is UserSelection | UserSelection[]
-            unMaybeArray(value as any)
-              .map((x) => x.id)
-              .join(","),
-    ]);
-    const intl = useIntl();
-    const placeholder = useMemo(() => {
-      return (
-        _placeholder ??
-        (isMulti && includeGroups
+export const UserSelect = forwardRef(function UserSelect<
+  IsMulti extends boolean = false,
+  IncludeGroups extends boolean = false,
+  IsSync extends boolean = false,
+  OptionType extends UserSelectSelection<IncludeGroups> = UserSelectSelection<IncludeGroups>,
+>(
+  {
+    value,
+    onSearch,
+    isSync,
+    onChange,
+    options,
+    isMulti,
+    includeGroups,
+    placeholder: _placeholder,
+    ...props
+  }: UserSelectProps<IsMulti, IncludeGroups, IsSync, OptionType>,
+  ref: ForwardedRef<UserSelectInstance<IsMulti, IncludeGroups, OptionType>>,
+) {
+  const needsLoading =
+    typeof value === "string" || (Array.isArray(value) && typeof value[0] === "string");
+  const getUsersOrGroups = useGetUsersOrGroups();
+  const _value = useAsyncMemo(async () => {
+    if (value === null) {
+      return null;
+    }
+    if (needsLoading) {
+      return await getUsersOrGroups(value as any);
+    } else {
+      return value as MaybeArray<UserSelectSelection<boolean>>;
+    }
+  }, [
+    needsLoading,
+    // Rerun when value changes
+    value === null
+      ? null
+      : needsLoading
+        ? // value is string | string[]
+          unMaybeArray(value as any).join(",")
+        : // value is UserSelection | UserSelection[]
+          unMaybeArray(value as any)
+            .map((x) => x.id)
+            .join(","),
+  ]);
+  const intl = useIntl();
+  const placeholder = useMemo(() => {
+    return (
+      _placeholder ??
+      (isMulti && includeGroups
+        ? intl.formatMessage({
+            id: "component.user-select.placeholder-multi-with-groups",
+            defaultMessage: "Select users or teams from your organization",
+          })
+        : isMulti && !includeGroups
           ? intl.formatMessage({
-              id: "component.user-select.placeholder-multi-with-groups",
-              defaultMessage: "Select users or teams from your organization",
+              id: "component.user-select.placeholder-multi-without-groups",
+              defaultMessage: "Select users from your organization",
             })
-          : isMulti && !includeGroups
+          : !isMulti && includeGroups
             ? intl.formatMessage({
-                id: "component.user-select.placeholder-multi-without-groups",
-                defaultMessage: "Select users from your organization",
+                id: "component.user-select.placeholder-single-with-groups",
+                defaultMessage: "Select a user or team from your organization",
               })
-            : !isMulti && includeGroups
+            : !isMulti && !includeGroups
               ? intl.formatMessage({
-                  id: "component.user-select.placeholder-single-with-groups",
-                  defaultMessage: "Select a user or team from your organization",
+                  id: "component.user-select.placeholder-single-without-groups",
+                  defaultMessage: "Select a user from your organization",
                 })
-              : !isMulti && !includeGroups
-                ? intl.formatMessage({
-                    id: "component.user-select.placeholder-single-without-groups",
-                    defaultMessage: "Select a user from your organization",
-                  })
-                : (null as never))
-      );
-    }, [_placeholder, isMulti, includeGroups]);
-
-    const loadOptions = useMemo(
-      () =>
-        onSearch &&
-        (async (search: string) => {
-          const items = unMaybeArray(_value ?? []) as UserSelectSelection<boolean>[];
-          return await onSearch(
-            search,
-            items.filter(isTypename("User")).map((item) => item.id),
-            items.filter(isTypename("UserGroup")).map((item) => item.id),
-          );
-        }),
-      [onSearch, _value],
+              : (null as never))
     );
+  }, [_placeholder, isMulti, includeGroups]);
 
-    const { data } = useQuery(UserSelect_canCreateUsersDocument);
+  const loadOptions = useMemo(
+    () =>
+      onSearch &&
+      (async (search: string) => {
+        const items = unMaybeArray(_value ?? []) as UserSelectSelection<boolean>[];
+        return await onSearch(
+          search,
+          items.filter(isTypename("User")).map((item) => item.id),
+          items.filter(isTypename("UserGroup")).map((item) => item.id),
+        );
+      }),
+    [onSearch, _value],
+  );
 
-    const rsProps = useReactSelectProps<OptionType, IsMulti, never>({
-      ...props,
-      components: {
-        NoOptionsMessage,
-        SingleValue,
-        MultiValueLabel,
-        Option,
-        ...props.components,
-      } as unknown as SelectComponentsConfig<OptionType, IsMulti, never>,
-    });
+  const { data } = useQuery(UserSelect_canCreateUsersDocument);
 
-    const extensions = {
-      canCreateUsers: data?.me.canCreateUsers ?? false,
-      includeGroups,
-    };
+  const rsProps = useReactSelectProps<OptionType, IsMulti, never>({
+    ...props,
+    components: {
+      NoOptionsMessage,
+      SingleValue,
+      MultiValueLabel,
+      Option,
+      ...props.components,
+    } as unknown as SelectComponentsConfig<OptionType, IsMulti, never>,
+  });
 
-    return isSync ? (
-      <Select<OptionType, IsMulti, never>
-        ref={ref as any}
-        value={_value as any}
-        onChange={onChange as any}
-        isMulti={isMulti}
-        options={options}
-        getOptionLabel={getOptionLabel(intl.locale as UserLocale)}
-        getOptionValue={getOptionValue}
-        placeholder={placeholder}
-        isClearable={props.isClearable}
-        {...props}
-        {...rsProps}
-        {...(extensions as any)}
-      />
-    ) : (
-      <AsyncSelect<OptionType, IsMulti, never>
-        ref={ref as any}
-        value={_value as any}
-        onChange={onChange as any}
-        isMulti={isMulti}
-        loadOptions={loadOptions}
-        getOptionLabel={getOptionLabel}
-        getOptionValue={getOptionValue}
-        placeholder={placeholder}
-        isClearable={props.isClearable}
-        {...props}
-        {...rsProps}
-        {...(extensions as any)}
-      />
-    );
-  }) as <
-    IsMulti extends boolean = false,
-    IncludeGroups extends boolean = false,
-    IsSync extends boolean = false,
-    OptionType extends UserSelectSelection<IncludeGroups> = UserSelectSelection<IncludeGroups>,
-  >(
-    props: UserSelectProps<IsMulti, IncludeGroups, IsSync, OptionType> &
-      RefAttributes<UserSelectInstance<IsMulti, IncludeGroups, OptionType>>,
-  ) => ReactElement,
-  { fragments },
-);
+  const extensions = {
+    canCreateUsers: data?.me.canCreateUsers ?? false,
+    includeGroups,
+  };
+
+  return isSync ? (
+    <Select<OptionType, IsMulti, never>
+      ref={ref as any}
+      value={_value as any}
+      onChange={onChange as any}
+      isMulti={isMulti}
+      options={options}
+      getOptionLabel={getOptionLabel(intl.locale as UserLocale)}
+      getOptionValue={getOptionValue}
+      placeholder={placeholder}
+      isClearable={props.isClearable}
+      {...props}
+      {...rsProps}
+      {...(extensions as any)}
+    />
+  ) : (
+    <AsyncSelect<OptionType, IsMulti, never>
+      ref={ref as any}
+      value={_value as any}
+      onChange={onChange as any}
+      isMulti={isMulti}
+      loadOptions={loadOptions}
+      getOptionLabel={getOptionLabel}
+      getOptionValue={getOptionValue}
+      placeholder={placeholder}
+      isClearable={props.isClearable}
+      {...props}
+      {...rsProps}
+      {...(extensions as any)}
+    />
+  );
+}) as <
+  IsMulti extends boolean = false,
+  IncludeGroups extends boolean = false,
+  IsSync extends boolean = false,
+  OptionType extends UserSelectSelection<IncludeGroups> = UserSelectSelection<IncludeGroups>,
+>(
+  props: UserSelectProps<IsMulti, IncludeGroups, IsSync, OptionType> &
+    RefAttributes<UserSelectInstance<IsMulti, IncludeGroups, OptionType>>,
+) => ReactElement;
 
 function useGetUsersOrGroups() {
   const client = useApolloClient();
@@ -415,3 +364,46 @@ function Option({ children, ...props }: OptionProps<UserSelectSelection<boolean>
     </components.Option>
   );
 }
+
+const _fragments = {
+  User: gql`
+    fragment UserSelect_User on User {
+      id
+      fullName
+      email
+      ...UserSelectOption_User
+    }
+  `,
+  UserGroup: gql`
+    fragment UserSelect_UserGroup on UserGroup {
+      id
+      name
+      memberCount
+      ...UserSelectOption_UserGroup
+      ...UserGroupReference_UserGroup
+    }
+  `,
+};
+
+const _queries = [
+  gql`
+    query UserSelect_canCreateUsers {
+      me {
+        id
+        canCreateUsers
+      }
+    }
+  `,
+  gql`
+    query UserSelect_useGetUsersOrGroups($ids: [ID!]!) {
+      getUsersOrGroups(ids: $ids) {
+        ... on User {
+          ...UserSelect_User
+        }
+        ... on UserGroup {
+          ...UserSelect_UserGroup
+        }
+      }
+    }
+  `,
+];

@@ -105,18 +105,16 @@ export function BackgroundCheckEntityDetailsCompanyOverview({
   );
 }
 
-BackgroundCheckEntityDetailsCompanyOverview.fragments = {
-  get BackgroundCheckEntityDetailsCompanyOverview() {
-    return gql`
-      fragment BackgroundCheckEntityDetailsCompanyOverview_BackgroundCheckEntityDetailsCompany on BackgroundCheckEntityDetailsCompany {
-        id
-        properties {
-          name
-          alias
-          address
-          sourceUrl
-        }
+const _fragments = {
+  BackgroundCheckEntityDetailsCompanyOverview: gql`
+    fragment BackgroundCheckEntityDetailsCompanyOverview_BackgroundCheckEntityDetailsCompany on BackgroundCheckEntityDetailsCompany {
+      id
+      properties {
+        name
+        alias
+        address
+        sourceUrl
       }
-    `;
-  },
+    }
+  `,
 };

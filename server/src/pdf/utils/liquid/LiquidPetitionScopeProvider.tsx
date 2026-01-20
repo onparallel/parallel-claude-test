@@ -179,7 +179,7 @@ function getReplyValue(
   }
 }
 
-LiquidPetitionScopeProvider.fragments = {
+const _fragments = {
   PetitionBase: gql`
     fragment LiquidPetitionScopeProvider_PetitionBase on PetitionBase {
       id

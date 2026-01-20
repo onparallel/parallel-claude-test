@@ -27,136 +27,133 @@ interface ViewTabsProps {
   onReorder: (viewIds: string[]) => Promise<void>;
 }
 
-export const ViewTabs = Object.assign(
-  chakraForwardRef<"div", ViewTabsProps>(function ViewTabs(
-    {
-      currentViewId,
-      onChange,
-      views,
-      onRenameView,
-      onCloneView,
-      onMarkViewAsDefault,
-      onDeleteView,
-      onReorder,
-    },
-    ref,
-  ) {
-    const showGenericErrorToast = useGenericErrorToast();
-
-    const allView = views.find((v) => v.type === "ALL");
-
-    const [viewIds, setViewIds] = useState(() => views.map((v) => v.id));
-    useEffect(() => {
-      setViewIds(views.map((v) => v.id));
-    }, [views.map((v) => v.id).join(",")]);
-
-    const [draggedViewId, setDraggedViewId] = useState<string | null>(null);
-
-    const createDragStartHandler = useCallback((view: ViewTabs_ListViewFragment) => {
-      setDraggedViewId(view.id);
-    }, []);
-
-    const createDragEndHandler = useCallback(async () => {
-      setDraggedViewId(null);
-      try {
-        await onReorder(viewIds);
-      } catch (error) {
-        showGenericErrorToast(error);
-      }
-    }, []);
-
-    const handleReorderViews = useCallback((newOrder: string[]) => {
-      // as "ALL" view is fixed in first position and cannot be moved, we need to manually add it to the new order
-      setViewIds([allView?.id, ...newOrder].filter(isNonNullish));
-    }, []);
-
-    const filteredViews = viewIds.map((id) => views.find((v) => v.id === id)!).filter(isNonNullish);
-
-    // Set views as fallback to avoid flickering when changing between profile types
-    const currentViews = filteredViews.length ? filteredViews : views;
-
-    return (
-      <Flex
-        data-section="list-views"
-        overflowX="auto"
-        paddingBottom="1px"
-        paddingTop="1px"
-        borderTop="1px solid"
-        borderX="1px solid"
-        borderTopColor="inherit"
-        borderStartColor="inherit"
-        borderEndColor="inherit"
-        borderTopRadius="md"
-        marginTop="-1px"
-        marginX="-1px"
-        minHeight="42px"
-      >
-        <RadioTabList
-          ref={ref}
-          variant="enclosed"
-          name="view"
-          value={currentViewId}
-          onChange={onChange}
-          flex={1}
-          minWidth={0}
-          marginTop="-1px"
-          listStyleType="none"
-          position="relative"
-        >
-          <Flex
-            as={Reorder.Group<string>}
-            layoutScroll
-            axis="x"
-            values={views.map((v) => v.id)}
-            onReorder={handleReorderViews}
-            marginTop="-1px"
-            flex={1}
-            minWidth={MIN_TAB_WIDTH * (views.length + 1)}
-            sx={{
-              "> *": { position: "relative" },
-              "label:not([data-checked]):after": {
-                content: "''",
-                borderStart: "1px solid",
-                borderStartColor: "gray.200",
-                height: "24px",
-                position: "absolute",
-                insetEnd: "0",
-              },
-            }}
-            backgroundColor="gray.50"
-          >
-            {currentViews.map((view) => (
-              <ViewTab
-                key={view.id}
-                view={view}
-                isActive={view.id === currentViewId}
-                draggedViewId={draggedViewId}
-                onRenameView={onRenameView}
-                onCloneView={onCloneView}
-                onMarkViewAsDefault={onMarkViewAsDefault}
-                onDeleteView={onDeleteView}
-                onDragStart={createDragStartHandler}
-                onDragEnd={createDragEndHandler}
-              />
-            ))}
-          </Flex>
-        </RadioTabList>
-      </Flex>
-    );
-  }),
+export const ViewTabs = chakraForwardRef<"div", ViewTabsProps>(function ViewTabs(
   {
-    fragments: {
-      ListView: gql`
-        fragment ViewTabs_ListView on ListView {
-          id
-          name
-          type
-          isDefault
-        }
-      `,
-    },
+    currentViewId,
+    onChange,
+    views,
+    onRenameView,
+    onCloneView,
+    onMarkViewAsDefault,
+    onDeleteView,
+    onReorder,
   },
-);
+  ref,
+) {
+  const showGenericErrorToast = useGenericErrorToast();
+
+  const allView = views.find((v) => v.type === "ALL");
+
+  const [viewIds, setViewIds] = useState(() => views.map((v) => v.id));
+  useEffect(() => {
+    setViewIds(views.map((v) => v.id));
+  }, [views.map((v) => v.id).join(",")]);
+
+  const [draggedViewId, setDraggedViewId] = useState<string | null>(null);
+
+  const createDragStartHandler = useCallback((view: ViewTabs_ListViewFragment) => {
+    setDraggedViewId(view.id);
+  }, []);
+
+  const createDragEndHandler = useCallback(async () => {
+    setDraggedViewId(null);
+    try {
+      await onReorder(viewIds);
+    } catch (error) {
+      showGenericErrorToast(error);
+    }
+  }, []);
+
+  const handleReorderViews = useCallback((newOrder: string[]) => {
+    // as "ALL" view is fixed in first position and cannot be moved, we need to manually add it to the new order
+    setViewIds([allView?.id, ...newOrder].filter(isNonNullish));
+  }, []);
+
+  const filteredViews = viewIds.map((id) => views.find((v) => v.id === id)!).filter(isNonNullish);
+
+  // Set views as fallback to avoid flickering when changing between profile types
+  const currentViews = filteredViews.length ? filteredViews : views;
+
+  return (
+    <Flex
+      data-section="list-views"
+      overflowX="auto"
+      paddingBottom="1px"
+      paddingTop="1px"
+      borderTop="1px solid"
+      borderX="1px solid"
+      borderTopColor="inherit"
+      borderStartColor="inherit"
+      borderEndColor="inherit"
+      borderTopRadius="md"
+      marginTop="-1px"
+      marginX="-1px"
+      minHeight="42px"
+    >
+      <RadioTabList
+        ref={ref}
+        variant="enclosed"
+        name="view"
+        value={currentViewId}
+        onChange={onChange}
+        flex={1}
+        minWidth={0}
+        marginTop="-1px"
+        listStyleType="none"
+        position="relative"
+      >
+        <Flex
+          as={Reorder.Group<string>}
+          layoutScroll
+          axis="x"
+          values={views.map((v) => v.id)}
+          onReorder={handleReorderViews}
+          marginTop="-1px"
+          flex={1}
+          minWidth={MIN_TAB_WIDTH * (views.length + 1)}
+          sx={{
+            "> *": { position: "relative" },
+            "label:not([data-checked]):after": {
+              content: "''",
+              borderStart: "1px solid",
+              borderStartColor: "gray.200",
+              height: "24px",
+              position: "absolute",
+              insetEnd: "0",
+            },
+          }}
+          backgroundColor="gray.50"
+        >
+          {currentViews.map((view) => (
+            <ViewTab
+              key={view.id}
+              view={view}
+              isActive={view.id === currentViewId}
+              draggedViewId={draggedViewId}
+              onRenameView={onRenameView}
+              onCloneView={onCloneView}
+              onMarkViewAsDefault={onMarkViewAsDefault}
+              onDeleteView={onDeleteView}
+              onDragStart={createDragStartHandler}
+              onDragEnd={createDragEndHandler}
+            />
+          ))}
+        </Flex>
+      </RadioTabList>
+    </Flex>
+  );
+});
+
+const _fragments = {
+  ListView: gql`
+    fragment ViewTabs_ListView on ListView {
+      id
+      name
+      type
+      isDefault
+    }
+  `,
+};
 
 interface ViewTabProps {
   view: ViewTabs_ListViewFragment;

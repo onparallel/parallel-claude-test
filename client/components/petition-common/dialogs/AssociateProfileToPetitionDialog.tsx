@@ -98,15 +98,12 @@ function AssociateProfileToPetitionDialog({
 }
 
 const _fragments = {
-  get Profile() {
-    return gql`
-      fragment AssociateProfileToPetitionDialog_Profile on Profile {
-        id
-        ...ProfileSelect_Profile
-      }
-      ${ProfileSelect.fragments.Profile}
-    `;
-  },
+  Profile: gql`
+    fragment AssociateProfileToPetitionDialog_Profile on Profile {
+      id
+      ...ProfileSelect_Profile
+    }
+  `,
 };
 
 export function useAssociateProfileToPetitionDialog() {

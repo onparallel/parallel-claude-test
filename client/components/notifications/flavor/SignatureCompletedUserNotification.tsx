@@ -10,37 +10,34 @@ export interface SignatureCompletedUserNotificationProps {
   notification: any;
 }
 
-export const SignatureCompletedUserNotification = Object.assign(
-  forwardRef<HTMLElement, SignatureCompletedUserNotificationProps>(
-    function SignatureCompletedUserNotification({ isFirst, notification }, ref) {
-      return (
-        <PetitionUserNotification
-          ref={ref}
-          isFirst={isFirst}
-          notification={notification}
-          icon={
-            <Circle size="36px" background="green.500">
-              <SignatureIcon color="white" fontSize="1rem" />
-            </Circle>
-          }
-          path={`/replies#signatures`}
-        >
-          <FormattedMessage
-            id="component.notification-signature-completed.body"
-            defaultMessage="The eSignature has been completed."
-          />
-        </PetitionUserNotification>
-      );
-    },
-  ),
-  {
-    fragments: {
-      SignatureCompletedUserNotification: gql`
-        fragment SignatureCompletedUserNotification_SignatureCompletedUserNotification on SignatureCompletedUserNotification {
-          ...PetitionUserNotification_PetitionUserNotification
-        }
-        ${PetitionUserNotification.fragments.PetitionUserNotification}
-      `,
-    },
-  },
-);
+export const SignatureCompletedUserNotification = forwardRef<
+  HTMLElement,
+  SignatureCompletedUserNotificationProps
+>(function SignatureCompletedUserNotification({ isFirst, notification }, ref) {
+  return (
+    <PetitionUserNotification
+      ref={ref}
+      isFirst={isFirst}
+      notification={notification}
+      icon={
+        <Circle size="36px" background="green.500">
+          <SignatureIcon color="white" fontSize="1rem" />
+        </Circle>
+      }
+      path={`/replies#signatures`}
+    >
+      <FormattedMessage
+        id="component.notification-signature-completed.body"
+        defaultMessage="The eSignature has been completed."
+      />
+    </PetitionUserNotification>
+  );
+});
+
+const _fragments = {
+  SignatureCompletedUserNotification: gql`
+    fragment SignatureCompletedUserNotification_SignatureCompletedUserNotification on SignatureCompletedUserNotification {
+      ...PetitionUserNotification_PetitionUserNotification
+    }
+  `,
+};

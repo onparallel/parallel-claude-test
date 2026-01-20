@@ -8,10 +8,7 @@ import { TimelineMessageSentEvent_MessageSentEventFragment } from "@parallel/gra
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import { UserReference } from "../../../common/UserReference";
-import {
-  SentPetitionMessageDialog,
-  useSentPetitionMessageDialog,
-} from "../../dialogs/SentPetitionMessageDialog";
+import { useSentPetitionMessageDialog } from "../../dialogs/SentPetitionMessageDialog";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 
@@ -132,7 +129,7 @@ export function TimelineMessageSentEvent({
   );
 }
 
-TimelineMessageSentEvent.fragments = {
+const _fragments = {
   MessageSentEvent: gql`
     fragment TimelineMessageSentEvent_MessageSentEvent on MessageSentEvent {
       message {
@@ -157,8 +154,5 @@ TimelineMessageSentEvent.fragments = {
       }
       createdAt
     }
-    ${UserReference.fragments.User}
-    ${ContactReference.fragments.Contact}
-    ${SentPetitionMessageDialog.fragments.PetitionMessage}
   `,
 };

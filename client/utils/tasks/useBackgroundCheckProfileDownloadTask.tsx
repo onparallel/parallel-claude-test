@@ -1,10 +1,7 @@
 import { gql } from "@apollo/client";
 import { useApolloClient, useMutation } from "@apollo/client/react";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import {
-  TaskProgressDialog,
-  useTaskProgressDialog,
-} from "@parallel/components/common/dialogs/TaskProgressDialog";
+import { useTaskProgressDialog } from "@parallel/components/common/dialogs/TaskProgressDialog";
 import {
   useBackgroundCheckProfileDownloadTask_createBackgroundCheckProfilePdfTaskDocument,
   useBackgroundCheckProfileDownloadTask_getTaskResultFileDocument,
@@ -94,7 +91,6 @@ useBackgroundCheckProfileDownloadTask.mutations = [
         ...TaskProgressDialog_Task
       }
     }
-    ${TaskProgressDialog.fragments.Task}
   `,
   gql`
     mutation useBackgroundCheckProfileDownloadTask_getTaskResultFile($taskId: GID!) {

@@ -83,7 +83,7 @@ function LandingTemplatesCategory({
   );
 }
 
-LandingTemplatesCategory.fragments = {
+const _fragments = {
   LandingTemplateCategorySample: gql`
     fragment LandintTemplatesCategory_LandingTemplateCategorySample on LandingTemplateCategorySample {
       category
@@ -109,7 +109,6 @@ LandingTemplatesCategory.queries = [
         }
       }
     }
-    ${LandingTemplateCard.fragments.LandingTemplate}
   `,
   gql`
     query LandingTemplatesCategory_categorySamples($locale: PetitionLocale!) {
@@ -117,7 +116,6 @@ LandingTemplatesCategory.queries = [
         ...LandintTemplatesCategory_LandingTemplateCategorySample
       }
     }
-    ${LandingTemplatesCategory.fragments.LandingTemplateCategorySample}
   `,
 ];
 

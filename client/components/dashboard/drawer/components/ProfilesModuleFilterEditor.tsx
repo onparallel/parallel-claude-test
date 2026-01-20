@@ -352,7 +352,7 @@ function ConditionComponent({ path, onRemove, profileTypeFields }: ConditionComp
   );
 }
 
-ProfilesModuleFilterEditor.fragments = {
+const _fragments = {
   ProfileTypeField: gql`
     fragment ProfilesModuleFilterEditor_ProfileTypeField on ProfileTypeField {
       id
@@ -361,7 +361,5 @@ ProfilesModuleFilterEditor.fragments = {
       ...ProfileTypeFieldSelect_ProfileTypeField
       ...ProfileValueFilterLine_ProfileTypeField
     }
-    ${ProfileTypeFieldSelect.fragments.ProfileTypeField}
-    ${ProfileValueFilterLine.fragments.ProfileTypeField}
   `,
 };

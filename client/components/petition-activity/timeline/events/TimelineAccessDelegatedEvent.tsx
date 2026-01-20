@@ -32,7 +32,7 @@ export function TimelineAccessDelegatedEvent({ event }: TimelineAccessDelegatedE
   );
 }
 
-TimelineAccessDelegatedEvent.fragments = {
+const _fragments = {
   AccessDelegatedEvent: gql`
     fragment TimelineAccessDelegatedEvent_AccessDelegatedEvent on AccessDelegatedEvent {
       originalAccess {
@@ -47,6 +47,5 @@ TimelineAccessDelegatedEvent.fragments = {
       }
       createdAt
     }
-    ${ContactReference.fragments.Contact}
   `,
 };

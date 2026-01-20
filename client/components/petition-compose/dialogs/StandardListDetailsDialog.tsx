@@ -173,7 +173,7 @@ export function StandardListDetailsDialog({
   );
 }
 
-StandardListDetailsDialog.fragments = {
+const _fragments = {
   StandardListDefinition: gql`
     fragment StandardListDetailsDialog_StandardListDefinition on StandardListDefinition {
       id
@@ -200,6 +200,5 @@ const _queries = [
         ...StandardListDetailsDialog_StandardListDefinition
       }
     }
-    ${StandardListDetailsDialog.fragments.StandardListDefinition}
   `,
 ];

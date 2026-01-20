@@ -367,7 +367,7 @@ function AddSignatureCredentialsStep2({ hasDocusignSandbox }: { hasDocusignSandb
   );
 }
 
-useAddSignatureCredentialsDialog.fragments = {
+const _fragments = {
   User: gql`
     fragment useAddSignatureCredentialsDialog_User on User {
       id

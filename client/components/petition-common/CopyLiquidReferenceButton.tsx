@@ -12,11 +12,8 @@ export interface CopyLiquidReferenceButtonProps extends Omit<IconButtonWithToolt
   onAddAliasToField?: () => Promise<string>;
 }
 
-export const CopyLiquidReferenceButton = Object.assign(
-  chakraForwardRef<"button", CopyLiquidReferenceButtonProps>(function CopyReferenceIconButton(
-    { field, onClick, onAddAliasToField, ...props },
-    ref,
-  ) {
+export const CopyLiquidReferenceButton = chakraForwardRef<"button", CopyLiquidReferenceButtonProps>(
+  function CopyReferenceIconButton({ field, onClick, onAddAliasToField, ...props }, ref) {
     const intl = useIntl();
     const copyFormula = useClipboardWithToast({
       text: intl.formatMessage({
@@ -68,23 +65,22 @@ export const CopyLiquidReferenceButton = Object.assign(
         {...props}
       />
     );
-  }),
-  {
-    fragments: {
-      PetitionField: gql`
-        fragment CopyLiquidReferenceButton_PetitionField on PetitionField {
-          id
-          alias
-          type
-          multiple
-          options
-          isChild
-          parent {
-            id
-            multiple
-          }
-        }
-      `,
-    },
   },
 );
+
+const _fragments = {
+  PetitionField: gql`
+    fragment CopyLiquidReferenceButton_PetitionField on PetitionField {
+      id
+      alias
+      type
+      multiple
+      options
+      isChild
+      parent {
+        id
+        multiple
+      }
+    }
+  `,
+};

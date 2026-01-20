@@ -181,19 +181,17 @@ export function ProfileFormFieldFileUpload({
   );
 }
 
-ProfileFormFieldFileUpload.fragments = {
-  get ProfileFieldFile() {
-    return gql`
-      fragment ProfileFieldFileUpload_ProfileFieldFile on ProfileFieldFile {
-        id
-        expiryDate
-        file {
-          contentType
-          filename
-          isComplete
-          size
-        }
+const _fragments = {
+  ProfileFieldFile: gql`
+    fragment ProfileFieldFileUpload_ProfileFieldFile on ProfileFieldFile {
+      id
+      expiryDate
+      file {
+        contentType
+        filename
+        isComplete
+        size
       }
-    `;
-  },
+    }
+  `,
 };

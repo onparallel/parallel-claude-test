@@ -15,11 +15,8 @@ export interface PublicTemplateCardProps {
   onPress: () => void;
 }
 
-export const PublicTemplateCard = Object.assign(
-  chakraForwardRef<"div", PublicTemplateCardProps>(function TemplateCard(
-    { template, onPress, ...props },
-    ref,
-  ) {
+export const PublicTemplateCard = chakraForwardRef<"div", PublicTemplateCardProps>(
+  function TemplateCard({ template, onPress, ...props }, ref) {
     const intl = useIntl();
     const buttonProps = useRoleButton(onPress);
 
@@ -100,20 +97,18 @@ export const PublicTemplateCard = Object.assign(
         </Stack>
       </Card>
     );
-  }),
-  {
-    fragments: {
-      PetitionTemplate: gql`
-        fragment PublicTemplateCard_PetitionTemplate on PetitionTemplate {
-          id
-          name
-          backgroundColor
-          categories
-          imageUrl212: imageUrl(options: { resize: { height: 212 } })
-          ...TemplateActiveSettingsIcons_PetitionTemplate
-        }
-        ${TemplateActiveSettingsIcons.fragments.PetitionTemplate}
-      `,
-    },
   },
 );
+
+const _fragments = {
+  PetitionTemplate: gql`
+    fragment PublicTemplateCard_PetitionTemplate on PetitionTemplate {
+      id
+      name
+      backgroundColor
+      categories
+      imageUrl212: imageUrl(options: { resize: { height: 212 } })
+      ...TemplateActiveSettingsIcons_PetitionTemplate
+    }
+  `,
+};

@@ -234,32 +234,26 @@ export function useProfileSubscribersDialog() {
   return useDialog(ProfileSubscribersDialog);
 }
 
-useProfileSubscribersDialog.fragments = {
-  get User() {
-    return gql`
-      fragment useProfileSubscribersDialog_User on User {
+const _fragments = {
+  User: gql`
+    fragment useProfileSubscribersDialog_User on User {
+      id
+      email
+      ...UserAvatar_User
+    }
+  `,
+  Profile: gql`
+    fragment useProfileSubscribersDialog_Profile on Profile {
+      id
+      subscribers {
         id
-        email
-        ...UserAvatar_User
-      }
-      ${UserAvatar.fragments.User}
-    `;
-  },
-  get Profile() {
-    return gql`
-      fragment useProfileSubscribersDialog_Profile on Profile {
-        id
-        subscribers {
+        user {
           id
-          user {
-            id
-            ...useProfileSubscribersDialog_User
-          }
+          ...useProfileSubscribersDialog_User
         }
       }
-      ${this.User}
-    `;
-  },
+    }
+  `,
 };
 useProfileSubscribersDialog.mutations = [
   gql`
@@ -271,7 +265,6 @@ useProfileSubscribersDialog.mutations = [
         ...useProfileSubscribersDialog_Profile
       }
     }
-    ${useProfileSubscribersDialog.fragments.Profile}
   `,
   gql`
     mutation useProfileSubscribersDialog_unsubscribeFromProfile(
@@ -282,6 +275,5 @@ useProfileSubscribersDialog.mutations = [
         ...useProfileSubscribersDialog_Profile
       }
     }
-    ${useProfileSubscribersDialog.fragments.Profile}
   `,
 ];

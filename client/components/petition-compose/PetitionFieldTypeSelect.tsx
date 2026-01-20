@@ -16,11 +16,8 @@ interface PetitionFieldTypeSelectProps extends ThemingProps<"Select"> {
   isFieldGroupChild?: boolean;
 }
 
-export const PetitionFieldTypeSelect = Object.assign(
-  chakraForwardRef<"button", PetitionFieldTypeSelectProps>(function PetitionFieldTypeSelect(
-    { user, type, onChange, isFieldGroupChild, ...props },
-    ref,
-  ) {
+export const PetitionFieldTypeSelect = chakraForwardRef<"button", PetitionFieldTypeSelectProps>(
+  function PetitionFieldTypeSelect({ user, type, onChange, isFieldGroupChild, ...props }, ref) {
     return (
       <Menu placement="bottom" gutter={2}>
         <MenuButton as={SelectLikeButton} ref={ref} {...(props as any)}>
@@ -36,15 +33,13 @@ export const PetitionFieldTypeSelect = Object.assign(
         </Portal>
       </Menu>
     );
-  }),
-  {
-    fragments: {
-      User: gql`
-        fragment PetitionFieldTypeSelect_User on User {
-          ...PetitionFieldTypeSelectDropdown_User
-        }
-        ${PetitionFieldTypeSelectDropdown.fragments.User}
-      `,
-    },
   },
 );
+
+const _fragments = {
+  User: gql`
+    fragment PetitionFieldTypeSelect_User on User {
+      ...PetitionFieldTypeSelectDropdown_User
+    }
+  `,
+};

@@ -23,11 +23,10 @@ export function AdminSettingsLayout({ children, basePath, ...props }: AdminSetti
   );
 }
 
-AdminSettingsLayout.fragments = {
+const _fragments = {
   Query: gql`
     fragment AdminSettingsLayout_Query on Query {
       ...SidebarLayout_Query
     }
-    ${SidebarLayout.fragments.Query}
   `,
 };

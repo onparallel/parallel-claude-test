@@ -43,17 +43,15 @@ export function PetitionFieldMathEnumSelect({
   );
 }
 
-PetitionFieldMathEnumSelect.fragments = {
-  get PetitionVariableEnum() {
-    return gql`
-      fragment PetitionFieldMathEnumSelect_PetitionVariableEnum on PetitionVariableEnum {
-        name
-        defaultEnum: defaultValue
-        enumLabels: valueLabels {
-          value
-          label
-        }
+const _fragments = {
+  PetitionVariableEnum: gql`
+    fragment PetitionFieldMathEnumSelect_PetitionVariableEnum on PetitionVariableEnum {
+      name
+      defaultEnum: defaultValue
+      enumLabels: valueLabels {
+        value
+        label
       }
-    `;
-  },
+    }
+  `,
 };

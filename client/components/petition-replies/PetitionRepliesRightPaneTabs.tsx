@@ -194,13 +194,12 @@ export function PetitionRepliesRightPaneTabs({
   );
 }
 
-PetitionRepliesRightPaneTabs.fragments = {
+const _fragments = {
   User: gql`
     fragment PetitionRepliesRightPaneTabs_User on User {
       id
       ...PetitionRepliesSummary_User
     }
-    ${PetitionRepliesSummary.fragments.User}
   `,
   Petition: gql`
     fragment PetitionRepliesRightPaneTabs_Petition on Petition {
@@ -227,12 +226,5 @@ PetitionRepliesRightPaneTabs.fragments = {
         ...getPetitionSignatureEnvironment_Petition
       }
     }
-    ${PetitionComments.fragments.PetitionBase}
-    ${PetitionRepliesSummary.fragments.Petition}
-    ${PetitionRepliesFieldComments.fragments.PetitionBase}
-    ${PetitionRepliesFieldComments.fragments.PetitionField}
-    ${PetitionRepliesContents.fragments.PetitionField}
-    ${getPetitionSignatureStatus.fragments.Petition}
-    ${getPetitionSignatureEnvironment.fragments.Petition}
   `,
 };

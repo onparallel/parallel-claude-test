@@ -710,93 +710,83 @@ function useDowJonesKycRelationshipsColumns() {
 }
 
 const _fragments = {
-  get PetitionField() {
-    return gql`
-      fragment DowJonesFieldProfileDetails_PetitionField on PetitionField {
+  PetitionField: gql`
+    fragment DowJonesFieldProfileDetails_PetitionField on PetitionField {
+      id
+      type
+      replies {
         id
-        type
-        replies {
-          id
-          content
-        }
+        content
       }
-    `;
-  },
-  get DowJonesKycEntitySanction() {
-    return gql`
-      fragment DowJonesFieldProfileDetails_DowJonesKycEntitySanction on DowJonesKycEntitySanction {
-        id
-        name
-        sources
-        fromDate {
+    }
+  `,
+  DowJonesKycEntitySanction: gql`
+    fragment DowJonesFieldProfileDetails_DowJonesKycEntitySanction on DowJonesKycEntitySanction {
+      id
+      name
+      sources
+      fromDate {
+        year
+        month
+        day
+      }
+    }
+  `,
+  DowJonesKycEntityRelationship: gql`
+    fragment DowJonesFieldProfileDetails_DowJonesKycEntityRelationship on DowJonesKycEntityRelationship {
+      profileId
+      connectionType
+      iconHints
+      name
+      type
+    }
+  `,
+  DowJonesKycEntityProfileResult: gql`
+    fragment DowJonesFieldProfileDetails_DowJonesKycEntityProfileResult on DowJonesKycEntityProfileResult {
+      id
+      type
+      name
+      iconHints
+      sanctions {
+        ...DowJonesFieldProfileDetails_DowJonesKycEntitySanction
+      }
+      relationships {
+        ...DowJonesFieldProfileDetails_DowJonesKycEntityRelationship
+      }
+      updatedAt
+      ... on DowJonesKycEntityProfileResultEntity {
+        dateOfRegistration {
           year
           month
           day
         }
       }
-    `;
-  },
-  get DowJonesKycEntityRelationship() {
-    return gql`
-      fragment DowJonesFieldProfileDetails_DowJonesKycEntityRelationship on DowJonesKycEntityRelationship {
-        profileId
-        connectionType
-        iconHints
-        name
-        type
+      ... on DowJonesKycEntityProfileResultPerson {
+        placeOfBirth {
+          descriptor
+          countryCode
+        }
+        dateOfBirth {
+          year
+          month
+          day
+        }
+        citizenship {
+          descriptor
+          countryCode
+        }
+        residence {
+          descriptor
+          countryCode
+        }
+        jurisdiction {
+          descriptor
+          countryCode
+        }
+        isDeceased
       }
-    `;
-  },
-  get DowJonesKycEntityProfileResult() {
-    return gql`
-      fragment DowJonesFieldProfileDetails_DowJonesKycEntityProfileResult on DowJonesKycEntityProfileResult {
-        id
-        type
-        name
-        iconHints
-        sanctions {
-          ...DowJonesFieldProfileDetails_DowJonesKycEntitySanction
-        }
-        relationships {
-          ...DowJonesFieldProfileDetails_DowJonesKycEntityRelationship
-        }
-        updatedAt
-        ... on DowJonesKycEntityProfileResultEntity {
-          dateOfRegistration {
-            year
-            month
-            day
-          }
-        }
-        ... on DowJonesKycEntityProfileResultPerson {
-          placeOfBirth {
-            descriptor
-            countryCode
-          }
-          dateOfBirth {
-            year
-            month
-            day
-          }
-          citizenship {
-            descriptor
-            countryCode
-          }
-          residence {
-            descriptor
-            countryCode
-          }
-          jurisdiction {
-            descriptor
-            countryCode
-          }
-          isDeceased
-        }
-      }
-      ${_fragments.DowJonesKycEntitySanction}
-      ${_fragments.DowJonesKycEntityRelationship}
-    `;
-  },
+    }
+  `,
 };
 
 const _mutations = [
@@ -841,7 +831,6 @@ const _queries = [
         ...DowJonesFieldProfileDetails_DowJonesKycEntityProfileResult
       }
     }
-    ${_fragments.DowJonesKycEntityProfileResult}
   `,
   gql`
     query DowJonesFieldProfileDetails_petitionField($petitionId: GID!, $petitionFieldId: GID!) {
@@ -849,7 +838,6 @@ const _queries = [
         ...DowJonesFieldProfileDetails_PetitionField
       }
     }
-    ${_fragments.PetitionField}
   `,
 ];
 

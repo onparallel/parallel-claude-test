@@ -401,51 +401,38 @@ export function ProfileLayout({
   );
 }
 
-ProfileLayout.fragments = {
-  get Query() {
-    return gql`
-      fragment ProfileLayout_Query on Query {
-        ...AppLayout_Query
-        me {
-          ...ProfileSubscribers_User
-        }
+const _fragments = {
+  Query: gql`
+    fragment ProfileLayout_Query on Query {
+      ...AppLayout_Query
+      me {
+        ...ProfileSubscribers_User
       }
-      ${AppLayout.fragments.Query}
-      ${ProfileSubscribers.fragments.User}
-    `;
-  },
-  get ProfileSubscription() {
-    return gql`
-      fragment ProfileLayout_ProfileSubscription on ProfileSubscription {
+    }
+  `,
+  ProfileSubscription: gql`
+    fragment ProfileLayout_ProfileSubscription on ProfileSubscription {
+      id
+      user {
         id
-        user {
-          id
-          isMe
-          ...ProfileSubscribers_User
-          ...useProfileSubscribersDialog_User
-        }
+        isMe
+        ...ProfileSubscribers_User
+        ...useProfileSubscribersDialog_User
       }
-      ${ProfileSubscribers.fragments.User}
-      ${useProfileSubscribersDialog.fragments.User}
-    `;
-  },
-  get Profile() {
-    return gql`
-      fragment ProfileLayout_Profile on Profile {
-        id
-        localizableName
-        status
-        ...ProfileForm_Profile
-        ...ProfileReference_Profile
-        subscribers {
-          ...ProfileLayout_ProfileSubscription
-        }
+    }
+  `,
+  Profile: gql`
+    fragment ProfileLayout_Profile on Profile {
+      id
+      localizableName
+      status
+      ...ProfileForm_Profile
+      ...ProfileReference_Profile
+      subscribers {
+        ...ProfileLayout_ProfileSubscription
       }
-      ${ProfileForm.fragments.Profile}
-      ${ProfileReference.fragments.Profile}
-      ${this.ProfileSubscription}
-    `;
-  },
+    }
+  `,
 };
 
 const _mutations = [
@@ -455,7 +442,6 @@ const _mutations = [
         ...ProfileLayout_Profile
       }
     }
-    ${ProfileLayout.fragments.Profile}
   `,
   gql`
     mutation ProfileLayout_unsubscribeFromProfile($profileIds: [GID!]!, $userIds: [GID!]!) {
@@ -463,6 +449,5 @@ const _mutations = [
         ...ProfileLayout_Profile
       }
     }
-    ${ProfileLayout.fragments.Profile}
   `,
 ];

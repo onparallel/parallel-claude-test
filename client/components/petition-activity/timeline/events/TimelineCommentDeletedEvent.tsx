@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import { CommentXIcon } from "@parallel/chakra/icons";
-import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineCommentDeletedEvent_CommentDeletedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -67,7 +66,7 @@ export function TimelineCommentDeletedEvent({
   );
 }
 
-TimelineCommentDeletedEvent.fragments = {
+const _fragments = {
   CommentDeletedEvent: gql`
     fragment TimelineCommentDeletedEvent_CommentDeletedEvent on CommentDeletedEvent {
       field {
@@ -80,8 +79,5 @@ TimelineCommentDeletedEvent.fragments = {
       isGeneral
       createdAt
     }
-    ${PetitionFieldReference.fragments.PetitionField}
-    ${UserOrContactReference.fragments.UserOrPetitionAccess}
-    ${ContactReference.fragments.Contact}
   `,
 };

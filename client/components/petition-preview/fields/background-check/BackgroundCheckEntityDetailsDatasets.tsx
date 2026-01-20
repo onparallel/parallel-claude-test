@@ -44,17 +44,15 @@ export function BackgroundCheckEntityDetailsDatasets({
   );
 }
 
-BackgroundCheckEntityDetailsDatasets.fragments = {
-  get BackgroundCheckEntityDetailsDataset() {
-    return gql`
-      fragment BackgroundCheckEntityDetailsDatasets_BackgroundCheckEntityDetailsDataset on BackgroundCheckEntityDetailsDataset {
-        name
-        title
-        summary
-        url
-      }
-    `;
-  },
+const _fragments = {
+  BackgroundCheckEntityDetailsDataset: gql`
+    fragment BackgroundCheckEntityDetailsDatasets_BackgroundCheckEntityDetailsDataset on BackgroundCheckEntityDetailsDataset {
+      name
+      title
+      summary
+      url
+    }
+  `,
 };
 
 function useBackgroundCheckDatasetsColumns() {

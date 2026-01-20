@@ -9,29 +9,26 @@ interface PetitionPreviewStartSignatureButtonProps extends ButtonOptions, Themin
   isDisabled?: boolean;
 }
 
-export const PetitionPreviewStartSignatureButton = Object.assign(
-  chakraForwardRef<"button", PetitionPreviewStartSignatureButtonProps>(
-    function PetitionPreviewStartSignatureButton({ petition, isDisabled, ...props }, ref) {
-      const { handleStartSignature, buttonLabel } = useStartSignatureRequest({
-        petition,
-      });
+export const PetitionPreviewStartSignatureButton = chakraForwardRef<
+  "button",
+  PetitionPreviewStartSignatureButtonProps
+>(function PetitionPreviewStartSignatureButton({ petition, isDisabled, ...props }, ref) {
+  const { handleStartSignature, buttonLabel } = useStartSignatureRequest({
+    petition,
+  });
 
-      return (
-        <Button ref={ref} isDisabled={isDisabled} onClick={handleStartSignature} {...props}>
-          {buttonLabel}
-        </Button>
-      );
-    },
-  ),
-  {
-    fragments: {
-      Petition: gql`
-        fragment PetitionPreviewStartSignatureButton_Petition on Petition {
-          id
-          ...useStartSignatureRequest_Petition
-        }
-        ${useStartSignatureRequest.fragments.Petition}
-      `,
-    },
-  },
-);
+  return (
+    <Button ref={ref} isDisabled={isDisabled} onClick={handleStartSignature} {...props}>
+      {buttonLabel}
+    </Button>
+  );
+});
+
+const _fragments = {
+  Petition: gql`
+    fragment PetitionPreviewStartSignatureButton_Petition on Petition {
+      id
+      ...useStartSignatureRequest_Petition
+    }
+  `,
+};

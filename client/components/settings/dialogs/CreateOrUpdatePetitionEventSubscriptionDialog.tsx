@@ -682,68 +682,55 @@ function SingleValue(
   );
 }
 
-CreateOrUpdatePetitionEventSubscriptionDialog.fragments = {
-  get PetitionEventSubscription() {
-    return gql`
-      fragment CreateOrUpdatePetitionEventSubscriptionDialog_PetitionEventSubscription on PetitionEventSubscription {
-        id
-        name
-        eventsUrl
-        isEnabled
-        isFailing
-        eventTypes
-        ignoreOwnerEvents
-        fromTemplate {
-          id
-          name
-        }
-        fromTemplateFields {
-          id
-        }
-        signatureKeys {
-          ...CreateOrUpdatePetitionEventSubscriptionDialog_EventSubscriptionSignatureKey
-        }
-      }
-      ${this.EventSubscriptionSignatureKey}
-    `;
-  },
-  get PetitionBase() {
-    return gql`
-      fragment CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBase on PetitionBase {
+const _fragments = {
+  PetitionEventSubscription: gql`
+    fragment CreateOrUpdatePetitionEventSubscriptionDialog_PetitionEventSubscription on PetitionEventSubscription {
+      id
+      name
+      eventsUrl
+      isEnabled
+      isFailing
+      eventTypes
+      ignoreOwnerEvents
+      fromTemplate {
         id
         name
       }
-    `;
-  },
-  get EventSubscriptionSignatureKey() {
-    return gql`
-      fragment CreateOrUpdatePetitionEventSubscriptionDialog_EventSubscriptionSignatureKey on EventSubscriptionSignatureKey {
+      fromTemplateFields {
         id
-        publicKey
       }
-    `;
-  },
-  get PetitionField() {
-    return gql`
-      fragment CreateOrUpdatePetitionEventSubscriptionDialog_PetitionField on PetitionField {
-        isReadOnly
+      signatureKeys {
+        ...CreateOrUpdatePetitionEventSubscriptionDialog_EventSubscriptionSignatureKey
       }
-    `;
-  },
-  get PetitionBaseWithFields() {
-    return gql`
-      fragment CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseWithFields on PetitionBase {
+    }
+  `,
+  PetitionBase: gql`
+    fragment CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBase on PetitionBase {
+      id
+      name
+    }
+  `,
+  EventSubscriptionSignatureKey: gql`
+    fragment CreateOrUpdatePetitionEventSubscriptionDialog_EventSubscriptionSignatureKey on EventSubscriptionSignatureKey {
+      id
+      publicKey
+    }
+  `,
+  PetitionField: gql`
+    fragment CreateOrUpdatePetitionEventSubscriptionDialog_PetitionField on PetitionField {
+      isReadOnly
+    }
+  `,
+  PetitionBaseWithFields: gql`
+    fragment CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseWithFields on PetitionBase {
+      id
+      fields {
         id
-        fields {
-          id
-          ...CreateOrUpdatePetitionEventSubscriptionDialog_PetitionField
-        }
-        ...PetitionFieldSelect_PetitionBase
+        ...CreateOrUpdatePetitionEventSubscriptionDialog_PetitionField
       }
-      ${this.PetitionField}
-      ${PetitionFieldSelect.fragments.PetitionBase}
-    `;
-  },
+      ...PetitionFieldSelect_PetitionBase
+    }
+  `,
 };
 
 const _queries = [
@@ -767,7 +754,6 @@ const _queries = [
         }
       }
     }
-    ${CreateOrUpdatePetitionEventSubscriptionDialog.fragments.PetitionBase}
   `,
   gql`
     query CreateOrUpdatePetitionEventSubscriptionDialog_petitionWithFields($petitionId: GID!) {
@@ -775,7 +761,6 @@ const _queries = [
         ...CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseWithFields
       }
     }
-    ${CreateOrUpdatePetitionEventSubscriptionDialog.fragments.PetitionBaseWithFields}
   `,
 ];
 

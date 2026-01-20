@@ -25,168 +25,167 @@ export interface HeaderNameEditableInstance {
   focus(): void;
 }
 
-export const HeaderNameEditable = Object.assign(
-  chakraForwardRef<"div", HeaderNameEditableProps, HeaderNameEditableInstance>(
-    function HeaderNameEditable({ petition, state, onNameChange, ...props }, ref) {
-      const intl = useIntl();
-      const petitionName = petition.name ?? "";
-      const [name, setName] = useState(petitionName);
+export const HeaderNameEditable = chakraForwardRef<
+  "div",
+  HeaderNameEditableProps,
+  HeaderNameEditableInstance
+>(function HeaderNameEditable({ petition, state, onNameChange, ...props }, ref) {
+  const intl = useIntl();
+  const petitionName = petition.name ?? "";
+  const [name, setName] = useState(petitionName);
 
-      const isPublic = petition.__typename === "PetitionTemplate" && petition.isPublic;
+  const isPublic = petition.__typename === "PetitionTemplate" && petition.isPublic;
 
-      const myEffectivePermission = petition.myEffectivePermission!.permissionType;
+  const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
-      const previewRef = useRef<HTMLElement>(null);
-      useImperativeHandle(ref, () => ({ focus: () => previewRef.current?.focus() }), []);
+  const previewRef = useRef<HTMLElement>(null);
+  useImperativeHandle(ref, () => ({ focus: () => previewRef.current?.focus() }), []);
 
-      const isReadOnly =
-        props.isDisabled ||
-        isPublic ||
-        myEffectivePermission === "READ" ||
-        (petition.isRestricted && petition.__typename === "PetitionTemplate");
+  const isReadOnly =
+    props.isDisabled ||
+    isPublic ||
+    myEffectivePermission === "READ" ||
+    (petition.isRestricted && petition.__typename === "PetitionTemplate");
 
-      const placeholder =
+  const placeholder =
+    petition.__typename === "Petition"
+      ? intl.formatMessage({
+          id: "generic.unnamed-parallel",
+          defaultMessage: "Unnamed parallel",
+        })
+      : intl.formatMessage({
+          id: "generic.unnamed-template",
+          defaultMessage: "Unnamed template",
+        });
+
+  return (
+    <Editable
+      display="flex"
+      fontSize="lg"
+      value={name}
+      onChange={setName}
+      onSubmit={() => {
+        const trimmed = name.trim();
+        setName(trimmed);
+        if (trimmed !== petitionName) {
+          onNameChange(trimmed);
+        }
+      }}
+      onBlur={() => {
+        setName(name.trim());
+      }}
+      placeholder={placeholder}
+      aria-label={
         petition.__typename === "Petition"
           ? intl.formatMessage({
-              id: "generic.unnamed-parallel",
-              defaultMessage: "Unnamed parallel",
+              id: "generic.parallel-name",
+              defaultMessage: "Parallel name",
             })
           : intl.formatMessage({
-              id: "generic.unnamed-template",
-              defaultMessage: "Unnamed template",
-            });
-
-      return (
-        <Editable
-          display="flex"
-          fontSize="lg"
-          value={name}
-          onChange={setName}
-          onSubmit={() => {
-            const trimmed = name.trim();
-            setName(trimmed);
-            if (trimmed !== petitionName) {
-              onNameChange(trimmed);
-            }
-          }}
-          onBlur={() => {
-            setName(name.trim());
-          }}
-          placeholder={placeholder}
-          aria-label={
-            petition.__typename === "Petition"
-              ? intl.formatMessage({
-                  id: "generic.parallel-name",
-                  defaultMessage: "Parallel name",
-                })
-              : intl.formatMessage({
-                  id: "generic.template-name",
-                  defaultMessage: "Template name",
-                })
-          }
-          {...props}
-        >
-          {({ isEditing }: { isEditing: boolean }) => (
-            <>
-              <Flex flex="1 1 auto" minWidth={0}>
-                {isReadOnly ? (
-                  <Text
-                    color={name ? "default" : "gray.400"}
+              id: "generic.template-name",
+              defaultMessage: "Template name",
+            })
+      }
+      {...props}
+    >
+      {({ isEditing }: { isEditing: boolean }) => (
+        <>
+          <Flex flex="1 1 auto" minWidth={0}>
+            {isReadOnly ? (
+              <Text
+                color={name ? "default" : "gray.400"}
+                paddingX={1}
+                noOfLines={1}
+                wordBreak="break-all"
+              >
+                {name || placeholder}
+              </Text>
+            ) : (
+              <Flex minWidth="0" flex="1">
+                <Tooltip
+                  placement="bottom"
+                  label={intl.formatMessage({
+                    id: "component.header-name-editable.change-name",
+                    defaultMessage: "Change name",
+                  })}
+                  offset={[0, 4]}
+                >
+                  <EditablePreview
+                    ref={previewRef}
+                    color={name ? undefined : "gray.400"}
+                    paddingY={0}
                     paddingX={1}
+                    display="block"
                     noOfLines={1}
                     wordBreak="break-all"
-                  >
-                    {name || placeholder}
-                  </Text>
-                ) : (
-                  <Flex minWidth="0" flex="1">
-                    <Tooltip
-                      placement="bottom"
-                      label={intl.formatMessage({
-                        id: "component.header-name-editable.change-name",
-                        defaultMessage: "Change name",
-                      })}
-                      offset={[0, 4]}
-                    >
-                      <EditablePreview
-                        ref={previewRef}
-                        color={name ? undefined : "gray.400"}
-                        paddingY={0}
-                        paddingX={1}
-                        display="block"
-                        noOfLines={1}
-                        wordBreak="break-all"
-                        data-testid="petition-name-preview"
-                      />
-                    </Tooltip>
-                    {!isEditing && (
-                      <Tooltip
-                        label={intl.formatMessage(
-                          {
-                            id: "component.header-name-editable.last-saved-on",
-                            defaultMessage: "Last saved on: {date}",
-                          },
-                          { date: intl.formatDate(petition.lastChangeAt, FORMATS.FULL) },
-                        )}
-                        isDisabled={state !== "SAVED"}
-                        offset={[0, 4]}
-                      >
-                        <Flex
-                          alignItems="center"
-                          color={
-                            state === "SAVING"
-                              ? "gray.500"
-                              : state === "SAVED"
-                                ? "green.500"
-                                : state === "ERROR"
-                                  ? "red.500"
-                                  : undefined
-                          }
-                          fontSize="xs"
-                          cursor="default"
-                          marginStart={2}
-                        >
-                          {state === "SAVING" ? (
-                            <CloudUploadIcon fontSize="sm" role="presentation" />
-                          ) : state === "SAVED" ? (
-                            <CloudOkIcon fontSize="sm" role="presentation" />
-                          ) : state === "ERROR" ? (
-                            <CloudErrorIcon fontSize="sm" role="presentation" />
-                          ) : null}
-                        </Flex>
-                      </Tooltip>
+                    data-testid="petition-name-preview"
+                  />
+                </Tooltip>
+                {!isEditing && (
+                  <Tooltip
+                    label={intl.formatMessage(
+                      {
+                        id: "component.header-name-editable.last-saved-on",
+                        defaultMessage: "Last saved on: {date}",
+                      },
+                      { date: intl.formatDate(petition.lastChangeAt, FORMATS.FULL) },
                     )}
-                    <EditableInput
-                      paddingY={0}
-                      paddingX={1}
-                      maxLength={255}
-                      data-testid="petition-name-input"
-                    />
-                  </Flex>
+                    isDisabled={state !== "SAVED"}
+                    offset={[0, 4]}
+                  >
+                    <Flex
+                      alignItems="center"
+                      color={
+                        state === "SAVING"
+                          ? "gray.500"
+                          : state === "SAVED"
+                            ? "green.500"
+                            : state === "ERROR"
+                              ? "red.500"
+                              : undefined
+                      }
+                      fontSize="xs"
+                      cursor="default"
+                      marginStart={2}
+                    >
+                      {state === "SAVING" ? (
+                        <CloudUploadIcon fontSize="sm" role="presentation" />
+                      ) : state === "SAVED" ? (
+                        <CloudOkIcon fontSize="sm" role="presentation" />
+                      ) : state === "ERROR" ? (
+                        <CloudErrorIcon fontSize="sm" role="presentation" />
+                      ) : null}
+                    </Flex>
+                  </Tooltip>
                 )}
+                <EditableInput
+                  paddingY={0}
+                  paddingX={1}
+                  maxLength={255}
+                  data-testid="petition-name-input"
+                />
               </Flex>
-            </>
-          )}
-        </Editable>
-      );
-    },
-  ),
-  {
-    fragments: {
-      PetitionBase: gql`
-        fragment HeaderNameEditable_PetitionBase on PetitionBase {
-          id
-          name
-          lastChangeAt
-          isRestricted
-          myEffectivePermission {
-            permissionType
-          }
-          ... on PetitionTemplate {
-            isPublic
-          }
-        }
-      `,
-    },
-  },
-);
+            )}
+          </Flex>
+        </>
+      )}
+    </Editable>
+  );
+});
+
+const _fragments = {
+  PetitionBase: gql`
+    fragment HeaderNameEditable_PetitionBase on PetitionBase {
+      id
+      name
+      lastChangeAt
+      isRestricted
+      myEffectivePermission {
+        permissionType
+      }
+      ... on PetitionTemplate {
+        isPublic
+      }
+    }
+  `,
+};

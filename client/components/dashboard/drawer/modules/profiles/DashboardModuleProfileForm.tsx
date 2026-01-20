@@ -233,9 +233,5 @@ const _queries = [
         ...ProfilesNumberModuleSettings_ProfileType
       }
     }
-    ${ProfileTypeFieldSelect.fragments.ProfileTypeField}
-    ${ProfilesChartModuleSettings.fragments.ProfileType}
-    ${ProfilesRatioModuleSettings.fragments.ProfileType}
-    ${ProfilesNumberModuleSettings.fragments.ProfileType}
   `,
 ];

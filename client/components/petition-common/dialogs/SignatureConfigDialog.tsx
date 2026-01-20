@@ -45,7 +45,6 @@ import {
   SignatureConfigInputSigner,
   SignatureConfigSigningMode,
 } from "@parallel/graphql/__types";
-import { Fragments } from "@parallel/utils/apollo/fragments";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
@@ -976,92 +975,78 @@ function buildSignatureConfigInput(data: SignatureConfigFormData): SignatureConf
 
 // Fragment definitions - following the original pattern
 const _fragments = {
-  get SignatureConfig() {
-    return gql`
-      fragment SignatureConfigDialog_SignatureConfig on SignatureConfig {
-        isEnabled
-        integration {
-          ...SignatureConfigDialog_SignatureOrgIntegration
-        }
-        signers {
-          ...Fragments_FullPetitionSigner
-          signWithEmbeddedImageFileUploadId
-          signWithEmbeddedImageUrl300: signWithEmbeddedImageUrl(
-            options: { resize: { height: 300, fit: inside }, toFormat: png }
-          )
-        }
-        title
-        review
-        allowAdditionalSigners
-        signingMode
-        minSigners
-        instructions
-        useCustomDocument
-        reviewAfterApproval
+  SignatureConfig: gql`
+    fragment SignatureConfigDialog_SignatureConfig on SignatureConfig {
+      isEnabled
+      integration {
+        ...SignatureConfigDialog_SignatureOrgIntegration
       }
-      ${Fragments.FullPetitionSigner}
-      ${this.SignatureOrgIntegration}
-    `;
-  },
-  get PetitionBase() {
-    return gql`
-      fragment SignatureConfigDialog_PetitionBase on PetitionBase {
-        name
-        isReviewFlowEnabled
-        isInteractionWithRecipientsEnabled
-        signatureConfig {
-          ...SignatureConfigDialog_SignatureConfig
-        }
-        ... on Petition {
-          hasStartedProcess
+      signers {
+        ...Fragments_FullPetitionSigner
+        signWithEmbeddedImageFileUploadId
+        signWithEmbeddedImageUrl300: signWithEmbeddedImageUrl(
+          options: { resize: { height: 300, fit: inside }, toFormat: png }
+        )
+      }
+      title
+      review
+      allowAdditionalSigners
+      signingMode
+      minSigners
+      instructions
+      useCustomDocument
+      reviewAfterApproval
+    }
+  `,
+  PetitionBase: gql`
+    fragment SignatureConfigDialog_PetitionBase on PetitionBase {
+      name
+      isReviewFlowEnabled
+      isInteractionWithRecipientsEnabled
+      signatureConfig {
+        ...SignatureConfigDialog_SignatureConfig
+      }
+      ... on Petition {
+        hasStartedProcess
+        status
+        accesses {
+          id
           status
-          accesses {
+          contact {
             id
-            status
-            contact {
-              id
-              firstName
-              lastName
-              email
-            }
+            firstName
+            lastName
+            email
           }
         }
-        approvalFlowConfig {
-          ...Fragments_FullApprovalFlowConfig
-        }
-        ...SuggestedSigners_PetitionBase
       }
-      ${Fragments.FullApprovalFlowConfig}
-      ${SuggestedSigners.fragments.PetitionBase}
-      ${this.SignatureConfig}
-    `;
-  },
-  get SignatureOrgIntegration() {
-    return gql`
-      fragment SignatureConfigDialog_SignatureOrgIntegration on SignatureOrgIntegration {
-        id
-        name
-        isDefault
-        environment
-        provider
+      approvalFlowConfig {
+        ...Fragments_FullApprovalFlowConfig
       }
-    `;
-  },
-  get User() {
-    return gql`
-      fragment SignatureConfigDialog_User on User {
-        id
-        hasPetitionApprovalFlow: hasFeatureFlag(featureFlag: PETITION_APPROVAL_FLOW)
-        hasSignWithDigitalCertificate: hasFeatureFlag(featureFlag: SIGN_WITH_DIGITAL_CERTIFICATE)
-        hasSignWithEmbeddedImage: hasFeatureFlag(featureFlag: SIGN_WITH_EMBEDDED_IMAGE)
-        firstName
-        lastName
-        email
-        ...SuggestedSigners_User
-      }
-      ${SuggestedSigners.fragments.User}
-    `;
-  },
+      ...SuggestedSigners_PetitionBase
+    }
+  `,
+  SignatureOrgIntegration: gql`
+    fragment SignatureConfigDialog_SignatureOrgIntegration on SignatureOrgIntegration {
+      id
+      name
+      isDefault
+      environment
+      provider
+    }
+  `,
+  User: gql`
+    fragment SignatureConfigDialog_User on User {
+      id
+      hasPetitionApprovalFlow: hasFeatureFlag(featureFlag: PETITION_APPROVAL_FLOW)
+      hasSignWithDigitalCertificate: hasFeatureFlag(featureFlag: SIGN_WITH_DIGITAL_CERTIFICATE)
+      hasSignWithEmbeddedImage: hasFeatureFlag(featureFlag: SIGN_WITH_EMBEDDED_IMAGE)
+      firstName
+      lastName
+      email
+      ...SuggestedSigners_User
+    }
+  `,
 };
 
 const _query = [
@@ -1071,7 +1056,6 @@ const _query = [
         ...SignatureConfigDialog_PetitionBase
       }
     }
-    ${_fragments.PetitionBase}
   `,
   gql`
     query SignatureConfigDialog_me {
@@ -1091,8 +1075,6 @@ const _query = [
         }
       }
     }
-    ${_fragments.User}
-    ${_fragments.SignatureOrgIntegration}
   `,
 ];
 

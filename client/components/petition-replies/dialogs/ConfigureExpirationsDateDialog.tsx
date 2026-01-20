@@ -369,41 +369,35 @@ export function useConfigureExpirationsDateDialog() {
   );
 }
 
-useConfigureExpirationsDateDialog.fragments = {
-  get ProfileFieldProperty() {
-    return gql`
-      fragment useConfigureExpirationsDateDialog_ProfileFieldProperty on ProfileFieldProperty {
-        field {
-          id
-          type
-          name
-          expiryAlertAheadTime
-        }
-        files {
-          id
-          expiryDate
-          file {
-            contentType
-            filename
-            isComplete
-          }
-        }
-      }
-    `;
-  },
-  get Profile() {
-    return gql`
-      fragment useConfigureExpirationsDateDialog_Profile on Profile {
+const _fragments = {
+  ProfileFieldProperty: gql`
+    fragment useConfigureExpirationsDateDialog_ProfileFieldProperty on ProfileFieldProperty {
+      field {
         id
-        properties {
-          ...useConfigureExpirationsDateDialog_ProfileFieldProperty
-        }
-        ...ProfileReference_Profile
+        type
+        name
+        expiryAlertAheadTime
       }
-      ${ProfileReference.fragments.Profile}
-      ${this.ProfileFieldProperty}
-    `;
-  },
+      files {
+        id
+        expiryDate
+        file {
+          contentType
+          filename
+          isComplete
+        }
+      }
+    }
+  `,
+  Profile: gql`
+    fragment useConfigureExpirationsDateDialog_Profile on Profile {
+      id
+      properties {
+        ...useConfigureExpirationsDateDialog_ProfileFieldProperty
+      }
+      ...ProfileReference_Profile
+    }
+  `,
 };
 
 const _queries = [
@@ -414,6 +408,5 @@ const _queries = [
         ...useConfigureExpirationsDateDialog_Profile
       }
     }
-    ${useConfigureExpirationsDateDialog.fragments.Profile}
   `,
 ];

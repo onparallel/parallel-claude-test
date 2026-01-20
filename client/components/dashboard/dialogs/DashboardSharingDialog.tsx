@@ -534,63 +534,48 @@ export function DashboardSharingDialog({
   );
 }
 
-DashboardSharingDialog.fragments = {
-  get User() {
-    return gql`
-      fragment DashboardSharingDialog_User on User {
-        id
-        email
-        fullName
-        ...UserAvatar_User
-        ...UserSelect_User
-        ...UserReference_User
+const _fragments = {
+  User: gql`
+    fragment DashboardSharingDialog_User on User {
+      id
+      email
+      fullName
+      ...UserAvatar_User
+      ...UserSelect_User
+      ...UserReference_User
+    }
+  `,
+  UserGroup: gql`
+    fragment DashboardSharingDialog_UserGroup on UserGroup {
+      id
+      name
+      initials
+      memberCount
+      imMember
+      ...UserGroupReference_UserGroup
+    }
+  `,
+  DashboardPermission: gql`
+    fragment DashboardSharingDialog_DashboardPermission on DashboardPermission {
+      id
+      type
+      user {
+        ...DashboardSharingDialog_User
       }
-      ${UserReference.fragments.User}
-      ${UserSelect.fragments.User}
-      ${UserAvatar.fragments.User}
-    `;
-  },
-  get UserGroup() {
-    return gql`
-      fragment DashboardSharingDialog_UserGroup on UserGroup {
-        id
-        name
-        initials
-        memberCount
-        imMember
-        ...UserGroupReference_UserGroup
+      userGroup {
+        ...DashboardSharingDialog_UserGroup
       }
-      ${UserGroupReference.fragments.UserGroup}
-    `;
-  },
-  get DashboardPermission() {
-    return gql`
-      fragment DashboardSharingDialog_DashboardPermission on DashboardPermission {
-        id
-        type
-        user {
-          ...DashboardSharingDialog_User
-        }
-        userGroup {
-          ...DashboardSharingDialog_UserGroup
-        }
+    }
+  `,
+  Dashboard: gql`
+    fragment DashboardSharingDialog_Dashboard on Dashboard {
+      id
+      myEffectivePermission
+      permissions {
+        ...DashboardSharingDialog_DashboardPermission
       }
-      ${this.User}
-      ${this.UserGroup}
-    `;
-  },
-  get Dashboard() {
-    return gql`
-      fragment DashboardSharingDialog_Dashboard on Dashboard {
-        id
-        myEffectivePermission
-        permissions {
-          ...DashboardSharingDialog_DashboardPermission
-        }
-      }
-      ${this.DashboardPermission}
-    `;
-  },
+    }
+  `,
 };
 
 const _queries = {
@@ -600,7 +585,6 @@ const _queries = {
         ...DashboardSharingDialog_Dashboard
       }
     }
-    ${DashboardSharingDialog.fragments.Dashboard}
   `,
 };
 
@@ -621,7 +605,6 @@ const _mutations = [
         ...DashboardSharingDialog_Dashboard
       }
     }
-    ${DashboardSharingDialog.fragments.Dashboard}
   `,
   gql`
     mutation DashboardSharingDialog_updateDashboardPermission(
@@ -637,7 +620,6 @@ const _mutations = [
         ...DashboardSharingDialog_DashboardPermission
       }
     }
-    ${DashboardSharingDialog.fragments.DashboardPermission}
   `,
   gql`
     mutation DashboardSharingDialog_deleteDashboardPermission(
@@ -648,7 +630,6 @@ const _mutations = [
         ...DashboardSharingDialog_Dashboard
       }
     }
-    ${DashboardSharingDialog.fragments.Dashboard}
   `,
 ];
 

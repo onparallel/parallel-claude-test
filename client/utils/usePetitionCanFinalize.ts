@@ -158,7 +158,7 @@ export function usePetitionCanFinalize(petition: PetitionSelection, publicContex
   }, [logic]);
 }
 
-usePetitionCanFinalize.fragments = {
+const _fragments = {
   PetitionBase: gql`
     fragment usePetitionCanFinalize_PetitionBase on PetitionBase {
       fields {
@@ -191,8 +191,6 @@ usePetitionCanFinalize.fragments = {
       }
       ...useFieldLogic_PetitionBase
     }
-    ${useFieldLogic.fragments.PetitionBase}
-    ${completedFieldReplies.fragments.PetitionField}
   `,
   PublicPetition: gql`
     fragment usePetitionCanFinalize_PublicPetition on PublicPetition {
@@ -228,7 +226,5 @@ usePetitionCanFinalize.fragments = {
       }
       ...useFieldLogic_PublicPetition
     }
-    ${useFieldLogic.fragments.PublicPetition}
-    ${completedFieldReplies.fragments.PublicPetitionField}
   `,
 };

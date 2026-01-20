@@ -290,7 +290,7 @@ function NewFieldProfileTypeFieldItem({
   );
 }
 
-PetitionComposeNewFieldDrawerProfileTypeFields.fragments = {
+const _fragments = {
   ProfileTypeField: gql`
     fragment PetitionComposeNewFieldDrawerProfileTypeFields_ProfileTypeField on ProfileTypeField {
       id
@@ -299,59 +299,47 @@ PetitionComposeNewFieldDrawerProfileTypeFields.fragments = {
       type
     }
   `,
-  get ProfileType() {
-    return gql`
-      fragment PetitionComposeNewFieldDrawerProfileTypeFields_ProfileType on ProfileType {
+  ProfileType: gql`
+    fragment PetitionComposeNewFieldDrawerProfileTypeFields_ProfileType on ProfileType {
+      id
+      name
+      fields {
         id
-        name
-        fields {
-          id
-          ...PetitionComposeNewFieldDrawerProfileTypeFields_ProfileTypeField
-        }
+        ...PetitionComposeNewFieldDrawerProfileTypeFields_ProfileTypeField
       }
-      ${this.ProfileTypeField}
-    `;
-  },
-  get PetitionFieldInner() {
-    return gql`
-      fragment PetitionComposeNewFieldDrawerProfileTypeFields_PetitionFieldInner on PetitionField {
+    }
+  `,
+  PetitionFieldInner: gql`
+    fragment PetitionComposeNewFieldDrawerProfileTypeFields_PetitionFieldInner on PetitionField {
+      id
+      options
+      isLinkedToProfileType
+      isLinkedToProfileTypeField
+      profileType {
+        ...PetitionComposeNewFieldDrawerProfileTypeFields_ProfileType
+      }
+      profileTypeField {
         id
-        options
-        isLinkedToProfileType
-        isLinkedToProfileTypeField
-        profileType {
-          ...PetitionComposeNewFieldDrawerProfileTypeFields_ProfileType
-        }
-        profileTypeField {
-          id
-        }
       }
-      ${this.ProfileType}
-    `;
-  },
-  get PetitionField() {
-    return gql`
-      fragment PetitionComposeNewFieldDrawerProfileTypeFields_PetitionField on PetitionField {
+    }
+  `,
+  PetitionField: gql`
+    fragment PetitionComposeNewFieldDrawerProfileTypeFields_PetitionField on PetitionField {
+      ...PetitionComposeNewFieldDrawerProfileTypeFields_PetitionFieldInner
+      children {
         ...PetitionComposeNewFieldDrawerProfileTypeFields_PetitionFieldInner
-        children {
-          ...PetitionComposeNewFieldDrawerProfileTypeFields_PetitionFieldInner
-        }
       }
-      ${this.PetitionFieldInner}
-    `;
-  },
-  get PetitionBase() {
-    return gql`
-      fragment PetitionComposeNewFieldDrawerProfileTypeFields_PetitionBase on PetitionBase {
+    }
+  `,
+  PetitionBase: gql`
+    fragment PetitionComposeNewFieldDrawerProfileTypeFields_PetitionBase on PetitionBase {
+      id
+      fields {
         id
-        fields {
-          id
-          ...PetitionComposeNewFieldDrawerProfileTypeFields_PetitionField
-        }
+        ...PetitionComposeNewFieldDrawerProfileTypeFields_PetitionField
       }
-      ${this.PetitionField}
-    `;
-  },
+    }
+  `,
 };
 
 const _mutations = [
@@ -369,7 +357,6 @@ const _mutations = [
         ...PetitionComposeNewFieldDrawerProfileTypeFields_PetitionField
       }
     }
-    ${PetitionComposeNewFieldDrawerProfileTypeFields.fragments.PetitionField}
   `,
 ];
 

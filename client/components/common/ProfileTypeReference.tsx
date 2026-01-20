@@ -38,7 +38,7 @@ export function ProfileTypeReference({
   );
 }
 
-ProfileTypeReference.fragments = {
+const _fragments = {
   ProfileType: gql`
     fragment ProfileTypeReference_ProfileType on ProfileType {
       id

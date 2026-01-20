@@ -31,7 +31,7 @@ export function TimelinePetitionMessageBouncedEvent({
   );
 }
 
-TimelinePetitionMessageBouncedEvent.fragments = {
+const _fragments = {
   PetitionMessageBouncedEvent: gql`
     fragment TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEvent on PetitionMessageBouncedEvent {
       message {
@@ -43,6 +43,5 @@ TimelinePetitionMessageBouncedEvent.fragments = {
       }
       createdAt
     }
-    ${ContactReference.fragments.Contact}
   `,
 };

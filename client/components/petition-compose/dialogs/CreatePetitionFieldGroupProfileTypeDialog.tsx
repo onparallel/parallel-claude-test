@@ -6,7 +6,6 @@ import {
   useWizardDialog,
   WizardStepDialogProps,
 } from "@parallel/components/common/dialogs/WizardDialog";
-import { ProfileRelationshipTypeWithDirectionSelect } from "@parallel/components/common/ProfileRelationshipTypeWithDirectionSelect";
 import {
   CreatePetitionFieldInput,
   PetitionFieldType,
@@ -277,73 +276,61 @@ export function useCreatePetitionFieldGroupProfileTypeDialog() {
   );
 }
 
-useCreatePetitionFieldGroupProfileTypeDialog.fragments = {
-  get PetitionBase() {
-    return gql`
-      fragment useCreatePetitionFieldGroupProfileTypeDialog_PetitionBase on PetitionBase {
+const _fragments = {
+  PetitionBase: gql`
+    fragment useCreatePetitionFieldGroupProfileTypeDialog_PetitionBase on PetitionBase {
+      id
+      fieldRelationships {
         id
-        fieldRelationships {
-          id
-          leftSidePetitionField {
-            ...useCreatePetitionFieldGroupProfileTypeDialog_PetitionFieldInner
-          }
-          rightSidePetitionField {
-            ...useCreatePetitionFieldGroupProfileTypeDialog_PetitionFieldInner
-          }
-          relationshipTypeWithDirection {
-            ...useCreatePetitionFieldGroupProfileTypeDialog_ProfileRelationshipTypeWithDirection
-          }
-        }
-        fields {
+        leftSidePetitionField {
           ...useCreatePetitionFieldGroupProfileTypeDialog_PetitionFieldInner
         }
+        rightSidePetitionField {
+          ...useCreatePetitionFieldGroupProfileTypeDialog_PetitionFieldInner
+        }
+        relationshipTypeWithDirection {
+          ...useCreatePetitionFieldGroupProfileTypeDialog_ProfileRelationshipTypeWithDirection
+        }
       }
-      ${this.PetitionFieldInner}
-      ${this.ProfileRelationshipTypeWithDirection}
-    `;
-  },
-  get ProfileType() {
-    return gql`
-      fragment useCreatePetitionFieldGroupProfileTypeDialog_ProfileType on ProfileType {
+      fields {
+        ...useCreatePetitionFieldGroupProfileTypeDialog_PetitionFieldInner
+      }
+    }
+  `,
+  ProfileType: gql`
+    fragment useCreatePetitionFieldGroupProfileTypeDialog_ProfileType on ProfileType {
+      id
+      name
+      fields {
         id
+        alias
         name
-        fields {
-          id
-          alias
-          name
-          type
-        }
-      }
-    `;
-  },
-  get PetitionFieldInner() {
-    return gql`
-      fragment useCreatePetitionFieldGroupProfileTypeDialog_PetitionFieldInner on PetitionField {
-        id
         type
-        options
-        isLinkedToProfileType
-        isLinkedToProfileTypeField
-        profileType {
-          id
-          standardType
-          ...useCreatePetitionFieldGroupProfileTypeDialog_ProfileType
-        }
-        profileTypeField {
-          id
-        }
       }
-      ${this.ProfileType}
-    `;
-  },
-  get ProfileRelationshipTypeWithDirection() {
-    return gql`
-      fragment useCreatePetitionFieldGroupProfileTypeDialog_ProfileRelationshipTypeWithDirection on ProfileRelationshipTypeWithDirection {
-        ...ProfileRelationshipTypeWithDirectionSelect_ProfileRelationshipTypeWithDirection
+    }
+  `,
+  PetitionFieldInner: gql`
+    fragment useCreatePetitionFieldGroupProfileTypeDialog_PetitionFieldInner on PetitionField {
+      id
+      type
+      options
+      isLinkedToProfileType
+      isLinkedToProfileTypeField
+      profileType {
+        id
+        standardType
+        ...useCreatePetitionFieldGroupProfileTypeDialog_ProfileType
       }
-      ${ProfileRelationshipTypeWithDirectionSelect.fragments.ProfileRelationshipTypeWithDirection}
-    `;
-  },
+      profileTypeField {
+        id
+      }
+    }
+  `,
+  ProfileRelationshipTypeWithDirection: gql`
+    fragment useCreatePetitionFieldGroupProfileTypeDialog_ProfileRelationshipTypeWithDirection on ProfileRelationshipTypeWithDirection {
+      ...ProfileRelationshipTypeWithDirectionSelect_ProfileRelationshipTypeWithDirection
+    }
+  `,
 };
 
 const _queries = [
@@ -353,7 +340,6 @@ const _queries = [
         ...useCreatePetitionFieldGroupProfileTypeDialog_PetitionBase
       }
     }
-    ${useCreatePetitionFieldGroupProfileTypeDialog.fragments.PetitionBase}
   `,
   gql`
     query useCreatePetitionFieldGroupProfileTypeDialog_profileRelationshipTypesWithDirection {
@@ -361,6 +347,5 @@ const _queries = [
         ...useCreatePetitionFieldGroupProfileTypeDialog_ProfileRelationshipTypeWithDirection
       }
     }
-    ${useCreatePetitionFieldGroupProfileTypeDialog.fragments.ProfileRelationshipTypeWithDirection}
   `,
 ];

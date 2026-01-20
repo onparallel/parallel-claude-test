@@ -828,82 +828,65 @@ export function useConfigureUpdateProfileOnCloseDialog() {
   );
 }
 
-useConfigureUpdateProfileOnCloseDialog.fragments = {
-  get PetitionField() {
-    return gql`
-      fragment useConfigureUpdateProfileOnCloseDialog_PetitionField on PetitionField {
+const _fragments = {
+  PetitionField: gql`
+    fragment useConfigureUpdateProfileOnCloseDialog_PetitionField on PetitionField {
+      id
+      type
+      options
+      profileTypeField {
         id
         type
-        options
-        profileTypeField {
-          id
-          type
-        }
-        ...PetitionUpdateProfileOnCloseSourceSelect_PetitionField
       }
-      ${PetitionUpdateProfileOnCloseSourceSelect.fragments.PetitionField}
-    `;
-  },
-  get PetitionVariable() {
-    return gql`
-      fragment useConfigureUpdateProfileOnCloseDialog_PetitionVariable on PetitionVariable {
-        name
-        type
-        ... on PetitionVariableEnum {
-          valueLabels {
-            value
-            label
-          }
+      ...PetitionUpdateProfileOnCloseSourceSelect_PetitionField
+    }
+  `,
+  PetitionVariable: gql`
+    fragment useConfigureUpdateProfileOnCloseDialog_PetitionVariable on PetitionVariable {
+      name
+      type
+      ... on PetitionVariableEnum {
+        valueLabels {
+          value
+          label
         }
       }
-    `;
-  },
-  get PetitionBase() {
-    return gql`
-      fragment useConfigureUpdateProfileOnCloseDialog_PetitionBase on PetitionBase {
+    }
+  `,
+  PetitionBase: gql`
+    fragment useConfigureUpdateProfileOnCloseDialog_PetitionBase on PetitionBase {
+      id
+      fields {
         id
-        fields {
+        ...useConfigureUpdateProfileOnCloseDialog_PetitionField
+        children {
           id
           ...useConfigureUpdateProfileOnCloseDialog_PetitionField
-          children {
-            id
-            ...useConfigureUpdateProfileOnCloseDialog_PetitionField
-          }
         }
-        variables {
-          ...useConfigureUpdateProfileOnCloseDialog_PetitionVariable
-        }
-        ...PetitionUpdateProfileOnCloseSourceSelect_PetitionBase
       }
-      ${this.PetitionField}
-      ${this.PetitionVariable}
-      ${PetitionUpdateProfileOnCloseSourceSelect.fragments.PetitionBase}
-    `;
-  },
-  get ProfileTypeField() {
-    return gql`
-      fragment useConfigureUpdateProfileOnCloseDialog_ProfileTypeField on ProfileTypeField {
+      variables {
+        ...useConfigureUpdateProfileOnCloseDialog_PetitionVariable
+      }
+      ...PetitionUpdateProfileOnCloseSourceSelect_PetitionBase
+    }
+  `,
+  ProfileTypeField: gql`
+    fragment useConfigureUpdateProfileOnCloseDialog_ProfileTypeField on ProfileTypeField {
+      id
+      options
+      ...ProfileTypeFieldSelect_ProfileTypeField
+      ...PetitionUpdateProfileOnCloseSourceSelect_ProfileTypeField
+    }
+  `,
+  ProfileType: gql`
+    fragment useConfigureUpdateProfileOnCloseDialog_ProfileType on ProfileType {
+      id
+      fields {
         id
-        options
-        ...ProfileTypeFieldSelect_ProfileTypeField
-        ...PetitionUpdateProfileOnCloseSourceSelect_ProfileTypeField
+        ...useConfigureUpdateProfileOnCloseDialog_ProfileTypeField
       }
-      ${ProfileTypeFieldSelect.fragments.ProfileTypeField}
-      ${PetitionUpdateProfileOnCloseSourceSelect.fragments.ProfileTypeField}
-    `;
-  },
-  get ProfileType() {
-    return gql`
-      fragment useConfigureUpdateProfileOnCloseDialog_ProfileType on ProfileType {
-        id
-        fields {
-          id
-          ...useConfigureUpdateProfileOnCloseDialog_ProfileTypeField
-        }
-      }
-      ${this.ProfileTypeField}
-    `;
-  },
+    }
+  `,
 };
 
 const _queries = [
@@ -914,7 +897,6 @@ const _queries = [
         ...useConfigureUpdateProfileOnCloseDialog_PetitionBase
       }
     }
-    ${useConfigureUpdateProfileOnCloseDialog.fragments.PetitionBase}
   `,
   gql`
     query ConfigureUpdateProfileOnCloseDialog_profileType($profileTypeId: GID!) {
@@ -923,6 +905,5 @@ const _queries = [
         ...useConfigureUpdateProfileOnCloseDialog_ProfileType
       }
     }
-    ${useConfigureUpdateProfileOnCloseDialog.fragments.ProfileType}
   `,
 ];

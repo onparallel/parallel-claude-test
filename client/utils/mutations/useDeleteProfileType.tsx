@@ -88,15 +88,13 @@ export function useDeleteProfileType() {
   };
 }
 
-useDeleteProfileType.fragments = {
-  get ProfileType() {
-    return gql`
-      fragment useDeleteProfileType_ProfileType on ProfileType {
-        id
-        name
-      }
-    `;
-  },
+const _fragments = {
+  ProfileType: gql`
+    fragment useDeleteProfileType_ProfileType on ProfileType {
+      id
+      name
+    }
+  `,
 };
 
 useDeleteProfileType.queries = [

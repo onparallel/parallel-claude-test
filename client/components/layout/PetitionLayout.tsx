@@ -264,7 +264,7 @@ export function PetitionLayout({
   );
 }
 
-PetitionLayout.fragments = {
+const _fragments = {
   PetitionBase: gql`
     fragment PetitionLayout_PetitionBase on PetitionBase {
       id
@@ -272,16 +272,12 @@ PetitionLayout.fragments = {
       ...useConfirmDiscardDraftDialog_PetitionBase
       ...PetitionHeader_PetitionBase
     }
-    ${useConfirmDiscardDraftDialog.fragments.PetitionBase}
-    ${PetitionHeader.fragments.PetitionBase}
   `,
   Query: gql`
     fragment PetitionLayout_Query on Query {
       ...AppLayout_Query
       ...PetitionHeader_Query
     }
-    ${AppLayout.fragments.Query}
-    ${PetitionHeader.fragments.Query}
   `,
 };
 

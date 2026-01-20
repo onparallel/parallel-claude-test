@@ -429,49 +429,41 @@ function ProfileTypeProccess({ process, onDragEnd, onEdit, onRemove }: ProfileTy
   );
 }
 
-ProfileTypeSettings.fragments = {
-  get ProfileTypeField() {
-    return gql`
-      fragment ProfileTypeSettings_ProfileTypeField on ProfileTypeField {
+const _fragments = {
+  ProfileTypeField: gql`
+    fragment ProfileTypeSettings_ProfileTypeField on ProfileTypeField {
+      id
+      name
+      type
+      defaultPermission
+    }
+  `,
+  ProfileTypeProcess: gql`
+    fragment ProfileTypeSettings_ProfileTypeProcess on ProfileTypeProcess {
+      id
+      name
+      position
+      templates {
         id
-        name
-        type
-        defaultPermission
       }
-    `;
-  },
-  get ProfileTypeProcess() {
-    return gql`
-      fragment ProfileTypeSettings_ProfileTypeProcess on ProfileTypeProcess {
+    }
+  `,
+  ProfileType: gql`
+    fragment ProfileTypeSettings_ProfileType on ProfileType {
+      id
+      name
+      fields {
         id
-        name
-        position
-        templates {
-          id
-        }
+        ...ProfileTypeSettings_ProfileTypeField
       }
-    `;
-  },
-  get ProfileType() {
-    return gql`
-      fragment ProfileTypeSettings_ProfileType on ProfileType {
+      isStandard
+      profileNamePattern
+      keyProcesses {
         id
-        name
-        fields {
-          id
-          ...ProfileTypeSettings_ProfileTypeField
-        }
-        isStandard
-        profileNamePattern
-        keyProcesses {
-          id
-          ...ProfileTypeSettings_ProfileTypeProcess
-        }
+        ...ProfileTypeSettings_ProfileTypeProcess
       }
-      ${this.ProfileTypeProcess}
-      ${this.ProfileTypeField}
-    `;
-  },
+    }
+  `,
 };
 
 const _mutations = [
@@ -489,7 +481,6 @@ const _mutations = [
         ...ProfileTypeSettings_ProfileTypeProcess
       }
     }
-    ${ProfileTypeSettings.fragments.ProfileTypeProcess}
   `,
   gql`
     mutation ProfileTypeSettings_editProfileTypeProcess(
@@ -500,7 +491,6 @@ const _mutations = [
         ...ProfileTypeSettings_ProfileTypeProcess
       }
     }
-    ${ProfileTypeSettings.fragments.ProfileTypeProcess}
   `,
   gql`
     mutation ProfileTypeSettings_removeProfileTypeProcess($profileTypeProcessId: GID!) {

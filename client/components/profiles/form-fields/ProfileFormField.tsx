@@ -44,7 +44,6 @@ import {
   ProfileFormFieldFileAction,
   ProfileFormFieldFileUpload,
 } from "./ProfileFormFieldFileUpload";
-import { ProfileFormFieldInputGroup } from "./ProfileFormFieldInputGroup";
 import { ProfileFormFieldNumber } from "./ProfileFormFieldNumber";
 import { ProfileFormFieldPhone } from "./ProfileFormFieldPhone";
 import { ProfileFormFieldSelect } from "./ProfileFormFieldSelect";
@@ -504,77 +503,60 @@ export function ProfileFormField(props: ProfileFormFieldProps) {
   );
 }
 
-ProfileFormField.fragments = {
-  get ProfileFieldProperty() {
-    return gql`
-      fragment ProfileFormField_ProfileFieldProperty on ProfileFieldProperty {
-        field {
-          ...ProfileFormField_ProfileTypeField
-        }
-        files {
-          ...ProfileFormField_ProfileFieldFile
-        }
-        value {
-          ...ProfileFormField_ProfileFieldValue
-        }
+const _fragments = {
+  ProfileFieldProperty: gql`
+    fragment ProfileFormField_ProfileFieldProperty on ProfileFieldProperty {
+      field {
+        ...ProfileFormField_ProfileTypeField
       }
-      ${this.ProfileTypeField}
-      ${this.ProfileFieldFile}
-      ${this.ProfileFieldValue}
-    `;
-  },
-  get ProfileTypeField() {
-    return gql`
-      fragment ProfileFormField_ProfileTypeField on ProfileTypeField {
-        id
-        name
-        type
-        isExpirable
-        expiryAlertAheadTime
-        options
-        ...ProfileFormFieldInputGroup_ProfileTypeField
-        ...useProfileFieldValueHistoryDialog_ProfileTypeField
+      files {
+        ...ProfileFormField_ProfileFieldFile
       }
-      ${ProfileFormFieldInputGroup.fragments.ProfileTypeField}
-      ${useProfileFieldValueHistoryDialog.fragments.ProfileTypeField}
-    `;
-  },
-  get ProfileFieldValue() {
-    return gql`
-      fragment ProfileFormField_ProfileFieldValue on ProfileFieldValue {
+      value {
+        ...ProfileFormField_ProfileFieldValue
+      }
+    }
+  `,
+  ProfileTypeField: gql`
+    fragment ProfileFormField_ProfileTypeField on ProfileTypeField {
+      id
+      name
+      type
+      isExpirable
+      expiryAlertAheadTime
+      options
+      ...ProfileFormFieldInputGroup_ProfileTypeField
+      ...useProfileFieldValueHistoryDialog_ProfileTypeField
+    }
+  `,
+  ProfileFieldValue: gql`
+    fragment ProfileFormField_ProfileFieldValue on ProfileFieldValue {
+      id
+      content
+      isDraft
+      expiryDate
+      hasPendingReview
+      hasActiveMonitoring
+      hasStoredValue
+    }
+  `,
+  ProfileFieldFile: gql`
+    fragment ProfileFormField_ProfileFieldFile on ProfileFieldFile {
+      ...ProfileFieldFileUpload_ProfileFieldFile
+    }
+  `,
+  PetitionField: gql`
+    fragment ProfileFormField_PetitionField on PetitionField {
+      id
+      options
+      replies {
         id
+        isAnonymized
         content
-        isDraft
-        expiryDate
-        hasPendingReview
-        hasActiveMonitoring
-        hasStoredValue
       }
-    `;
-  },
-  get ProfileFieldFile() {
-    return gql`
-      fragment ProfileFormField_ProfileFieldFile on ProfileFieldFile {
-        ...ProfileFieldFileUpload_ProfileFieldFile
-      }
-      ${ProfileFormFieldFileUpload.fragments.ProfileFieldFile}
-    `;
-  },
-  get PetitionField() {
-    return gql`
-      fragment ProfileFormField_PetitionField on PetitionField {
-        id
-        options
-        replies {
-          id
-          isAnonymized
-          content
-        }
-        ...ProfileFieldSuggestion_PetitionField
-      }
-      ${ProfileFieldSuggestion.fragments.PetitionField}
-    `;
-  },
+      ...ProfileFieldSuggestion_PetitionField
+    }
+  `,
 };
 
 export function useModifyExpirationDialog({

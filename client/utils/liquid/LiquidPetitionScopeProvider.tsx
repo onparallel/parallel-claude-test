@@ -120,7 +120,7 @@ export function LiquidPetitionScopeProvider({
   return <LiquidScopeProvider scope={scope}>{children}</LiquidScopeProvider>;
 }
 
-LiquidPetitionScopeProvider.fragments = {
+const _fragments = {
   PetitionBase: gql`
     fragment LiquidPetitionScopeProvider_PetitionBase on PetitionBase {
       id
@@ -167,9 +167,6 @@ LiquidPetitionScopeProvider.fragments = {
       alias
       options
     }
-
-    ${useFieldsWithIndices.fragments.PetitionBase}
-    ${useFieldLogic.fragments.PetitionBase}
   `,
   PublicPetition: gql`
     fragment LiquidPetitionScopeProvider_PublicPetition on PublicPetition {
@@ -205,8 +202,5 @@ LiquidPetitionScopeProvider.fragments = {
       alias
       options
     }
-
-    ${useFieldsWithIndices.fragments.PublicPetition}
-    ${useFieldLogic.fragments.PublicPetition}
   `,
 };

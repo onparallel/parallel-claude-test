@@ -17,75 +17,73 @@ export interface RecipientSuggestionProps {
   petitionFieldIndex: PetitionFieldIndex;
 }
 
-export const RecipientSuggestion = Object.assign(
-  chakraForwardRef<"button", PropsWithChildren<RecipientSuggestionProps>>(
-    function RecipientSuggestion(
-      { petitionField, petitionFieldIndex, groupName, firstName, lastName, email, ...props },
-      ref,
-    ) {
-      const name = `${firstName ?? ""} ${lastName ?? ""}`.trim();
-      return (
-        <SmallPopover
-          width="auto"
-          maxWidth="container.xs"
-          content={
-            <Stack spacing={0.5}>
-              <Text fontSize="sm">
-                <Text as="span" textStyle={name ? undefined : "hint"}>
-                  {name || (
-                    <FormattedMessage
-                      id="component.recipient-suggestion.unnamed"
-                      defaultMessage="Unnamed"
-                    />
-                  )}
-                </Text>
-
-                <Text as="span">{` <${email}>`}</Text>
-              </Text>
-              <HStack align="start">
-                <PetitionFieldTypeIndicator
-                  as="span"
-                  type={petitionField.type}
-                  fieldIndex={petitionFieldIndex}
-                  hideIcon
+export const RecipientSuggestion = chakraForwardRef<
+  "button",
+  PropsWithChildren<RecipientSuggestionProps>
+>(function RecipientSuggestion(
+  { petitionField, petitionFieldIndex, groupName, firstName, lastName, email, ...props },
+  ref,
+) {
+  const name = `${firstName ?? ""} ${lastName ?? ""}`.trim();
+  return (
+    <SmallPopover
+      width="auto"
+      maxWidth="container.xs"
+      content={
+        <Stack spacing={0.5}>
+          <Text fontSize="sm">
+            <Text as="span" textStyle={name ? undefined : "hint"}>
+              {name || (
+                <FormattedMessage
+                  id="component.recipient-suggestion.unnamed"
+                  defaultMessage="Unnamed"
                 />
-                <Text fontSize="sm" noOfLines={2}>
-                  {petitionField.title || (
-                    <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
-                  )}
-                </Text>
-              </HStack>
-            </Stack>
-          }
-          placement="bottom"
-        >
-          <Button
-            ref={ref}
-            variant="outline"
-            size="xs"
-            colorScheme="purple"
-            fontWeight={400}
-            fontSize="sm"
-            maxWidth="218px"
-            {...props}
-          >
-            <Text as="span" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
-              {`${name ? name : email} ${groupName ? `(${groupName})` : ""}`.trim()}
+              )}
             </Text>
-          </Button>
-        </SmallPopover>
-      );
-    },
-  ),
-  {
-    fragments: {
-      PetitionField: gql`
-        fragment RecipientSuggestion_PetitionField on PetitionField {
-          id
-          title
-          type
-        }
-      `,
-    },
-  },
-);
+
+            <Text as="span">{` <${email}>`}</Text>
+          </Text>
+          <HStack align="start">
+            <PetitionFieldTypeIndicator
+              as="span"
+              type={petitionField.type}
+              fieldIndex={petitionFieldIndex}
+              hideIcon
+            />
+            <Text fontSize="sm" noOfLines={2}>
+              {petitionField.title || (
+                <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
+              )}
+            </Text>
+          </HStack>
+        </Stack>
+      }
+      placement="bottom"
+    >
+      <Button
+        ref={ref}
+        variant="outline"
+        size="xs"
+        colorScheme="purple"
+        fontWeight={400}
+        fontSize="sm"
+        maxWidth="218px"
+        {...props}
+      >
+        <Text as="span" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
+          {`${name ? name : email} ${groupName ? `(${groupName})` : ""}`.trim()}
+        </Text>
+      </Button>
+    </SmallPopover>
+  );
+});
+
+const _fragments = {
+  PetitionField: gql`
+    fragment RecipientSuggestion_PetitionField on PetitionField {
+      id
+      title
+      type
+    }
+  `,
+};

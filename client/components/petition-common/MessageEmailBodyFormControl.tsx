@@ -13,42 +13,38 @@ interface MessageEmailBodyFormControlProps extends Omit<FormControlProps, "value
   petition: MessageEmailBodyFormControl_PetitionBaseFragment;
 }
 
-export const MessageEmailBodyFormControl = Object.assign(
-  chakraForwardRef<"div", MessageEmailBodyFormControlProps>(function MessageEmailBodyFormControl(
-    { value, onChange, petition, ...props },
-    ref,
-  ) {
-    const intl = useIntl();
-    const placeholderOptions = usePetitionMessagePlaceholderOptions({ petition });
-    return (
-      <FormControl ref={ref} {...props}>
-        <RichTextEditor
-          data-testid="petition-email-body-rte"
-          value={value}
-          onChange={onChange}
-          placeholder={intl.formatMessage({
-            id: "generic.email-message-placeholder",
-            defaultMessage: "Write a message to include in the email",
-          })}
-          placeholderOptions={placeholderOptions}
+export const MessageEmailBodyFormControl = chakraForwardRef<
+  "div",
+  MessageEmailBodyFormControlProps
+>(function MessageEmailBodyFormControl({ value, onChange, petition, ...props }, ref) {
+  const intl = useIntl();
+  const placeholderOptions = usePetitionMessagePlaceholderOptions({ petition });
+  return (
+    <FormControl ref={ref} {...props}>
+      <RichTextEditor
+        data-testid="petition-email-body-rte"
+        value={value}
+        onChange={onChange}
+        placeholder={intl.formatMessage({
+          id: "generic.email-message-placeholder",
+          defaultMessage: "Write a message to include in the email",
+        })}
+        placeholderOptions={placeholderOptions}
+      />
+      <FormErrorMessage>
+        <FormattedMessage
+          id="component.message-email-body-form-control.required-error"
+          defaultMessage="Customizing the initial message improves the response time of the recipients"
         />
-        <FormErrorMessage>
-          <FormattedMessage
-            id="component.message-email-body-form-control.required-error"
-            defaultMessage="Customizing the initial message improves the response time of the recipients"
-          />
-        </FormErrorMessage>
-      </FormControl>
-    );
-  }),
-  {
-    fragments: {
-      PetitionBase: gql`
-        fragment MessageEmailBodyFormControl_PetitionBase on PetitionBase {
-          ...usePetitionMessagePlaceholderOptions_PetitionBase
-        }
-        ${usePetitionMessagePlaceholderOptions.fragments.PetitionBase}
-      `,
-    },
-  },
-);
+      </FormErrorMessage>
+    </FormControl>
+  );
+});
+
+const _fragments = {
+  PetitionBase: gql`
+    fragment MessageEmailBodyFormControl_PetitionBase on PetitionBase {
+      ...usePetitionMessagePlaceholderOptions_PetitionBase
+    }
+  `,
+};

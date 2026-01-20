@@ -14,7 +14,6 @@ import {
   RecipientViewPetitionField_publicUpdatePetitionFieldRepliesDocument,
   RecipientViewPetitionField_queryDocument,
 } from "@parallel/graphql/__types";
-import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
 import { isWindowBlockedError, openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
@@ -33,10 +32,7 @@ import { RecipientViewPetitionFieldFileUpload } from "./RecipientViewPetitionFie
 import { RecipientViewPetitionFieldGroup } from "./RecipientViewPetitionFieldGroup";
 import { RecipientViewPetitionFieldHeading } from "./RecipientViewPetitionFieldHeading";
 import { RecipientViewPetitionFieldIdVerification } from "./RecipientViewPetitionFieldIdVerification";
-import {
-  RecipientViewPetitionFieldLayout,
-  RecipientViewPetitionFieldLayoutProps,
-} from "./RecipientViewPetitionFieldLayout";
+import { RecipientViewPetitionFieldLayoutProps } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldNumber } from "./RecipientViewPetitionFieldNumber";
 import { RecipientViewPetitionFieldPhone } from "./RecipientViewPetitionFieldPhone";
 import { RecipientViewPetitionFieldSelect } from "./RecipientViewPetitionFieldSelect";
@@ -343,14 +339,13 @@ export function RecipientViewPetitionField({
   );
 }
 
-RecipientViewPetitionField.fragments = {
+const _fragments = {
   PublicPetitionAccess: gql`
     fragment RecipientViewPetitionField_PublicPetitionAccess on PublicPetitionAccess {
       petition {
         ...RecipientViewPetitionFieldGroup_PublicPetition
       }
     }
-    ${RecipientViewPetitionFieldGroup.fragments.PublicPetition}
   `,
   PublicPetitionField: gql`
     fragment RecipientViewPetitionField_PublicPetitionField on PublicPetitionField {
@@ -359,10 +354,6 @@ RecipientViewPetitionField.fragments = {
       ...RecipientViewPetitionFieldGroup_PublicPetitionField
       ...completedFieldReplies_PublicPetitionField
     }
-    ${RecipientViewPetitionFieldCard.fragments.PublicPetitionField}
-    ${RecipientViewPetitionFieldLayout.fragments.PublicPetitionField}
-    ${RecipientViewPetitionFieldGroup.fragments.PublicPetitionField}
-    ${completedFieldReplies.fragments.PublicPetitionField}
   `,
   PublicPetitionFieldReply: gql`
     fragment RecipientViewPetitionField_PublicPetitionFieldReply on PublicPetitionFieldReply {
@@ -378,7 +369,6 @@ const _queries = [
         ...RecipientViewPetitionFieldLayout_PublicPetitionField
       }
     }
-    ${RecipientViewPetitionFieldLayout.fragments.PublicPetitionField}
   `,
 ];
 
@@ -473,7 +463,6 @@ RecipientViewPetitionField.mutations = [
         }
       }
     }
-    ${RecipientViewPetitionFieldLayout.fragments.PublicPetitionFieldReply}
   `,
   gql`
     mutation RecipientViewPetitionField_publicUpdatePetitionFieldReplies(
@@ -491,7 +480,6 @@ RecipientViewPetitionField.mutations = [
         }
       }
     }
-    ${RecipientViewPetitionFieldLayout.fragments.PublicPetitionFieldReply}
   `,
   gql`
     mutation RecipientViewPetitionField_publicStartAsyncFieldCompletion(

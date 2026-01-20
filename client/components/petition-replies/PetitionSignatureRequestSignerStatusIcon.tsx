@@ -70,7 +70,7 @@ function DatesList({
   );
 }
 
-DatesList.fragments = {
+const _fragments = {
   SignerStatus: gql`
     fragment DatesList_SignerStatus on PetitionSignatureRequestSignerStatus {
       sentAt
@@ -82,93 +82,89 @@ DatesList.fragments = {
   `,
 };
 
-export const PetitionSignatureRequestSignerStatusIcon = Object.assign(
-  chakraForwardRef<
-    "svg",
-    {
-      signerStatus: PetitionSignatureRequestSignerStatusIcon_SignerStatusFragment;
-      signingMode: SignatureConfigSigningMode;
-    }
-  >(function PetitionSignatureRequestSignerStatusIcon(
-    {
-      signerStatus: { status, sentAt, openedAt, signedAt, declinedAt, bouncedAt },
-      signingMode,
-      ...props
-    },
-    ref,
-  ) {
-    switch (status) {
-      case "SIGNED":
+export const PetitionSignatureRequestSignerStatusIcon = chakraForwardRef<
+  "svg",
+  {
+    signerStatus: PetitionSignatureRequestSignerStatusIcon_SignerStatusFragment;
+    signingMode: SignatureConfigSigningMode;
+  }
+>(function PetitionSignatureRequestSignerStatusIcon(
+  {
+    signerStatus: { status, sentAt, openedAt, signedAt, declinedAt, bouncedAt },
+    signingMode,
+    ...props
+  },
+  ref,
+) {
+  switch (status) {
+    case "SIGNED":
+      return (
+        <SmallPopover
+          isDisabled={!sentAt && !openedAt && !signedAt}
+          content={<DatesList sentAt={sentAt} openedAt={openedAt} signedAt={signedAt} />}
+          width="auto"
+        >
+          <CheckIcon ref={ref} color="green.500" {...(props as any)} />
+        </SmallPopover>
+      );
+    case "BOUNCED":
+    case "DECLINED":
+      return (
+        <SmallPopover
+          isDisabled={!sentAt && !openedAt && !declinedAt && !bouncedAt}
+          content={
+            <DatesList
+              sentAt={sentAt}
+              openedAt={openedAt}
+              declinedAt={declinedAt}
+              bouncedAt={bouncedAt}
+            />
+          }
+          width="auto"
+        >
+          <CloseIcon ref={ref} color="red.500" fontSize="12px" {...(props as any)} />
+        </SmallPopover>
+      );
+    case "PENDING":
+      return (
+        <SmallPopover
+          isDisabled={!sentAt && !openedAt}
+          content={<DatesList sentAt={sentAt} openedAt={openedAt} />}
+          width="auto"
+        >
+          <TimeIcon ref={ref} color="yellow.500" {...(props as any)} />
+        </SmallPopover>
+      );
+    case "NOT_STARTED":
+      if (signingMode === "SEQUENTIAL") {
         return (
           <SmallPopover
-            isDisabled={!sentAt && !openedAt && !signedAt}
-            content={<DatesList sentAt={sentAt} openedAt={openedAt} signedAt={signedAt} />}
-            width="auto"
-          >
-            <CheckIcon ref={ref} color="green.500" {...(props as any)} />
-          </SmallPopover>
-        );
-      case "BOUNCED":
-      case "DECLINED":
-        return (
-          <SmallPopover
-            isDisabled={!sentAt && !openedAt && !declinedAt && !bouncedAt}
             content={
-              <DatesList
-                sentAt={sentAt}
-                openedAt={openedAt}
-                declinedAt={declinedAt}
-                bouncedAt={bouncedAt}
-              />
+              <Text fontSize="sm">
+                <FormattedMessage
+                  id="component.petition-signature-request-signer-status-icon.not-started"
+                  defaultMessage="The signature will start once the previous signer has signed."
+                />
+              </Text>
             }
             width="auto"
           >
-            <CloseIcon ref={ref} color="red.500" fontSize="12px" {...(props as any)} />
+            <TimeIcon ref={ref} color="gray.500" {...(props as any)} />
           </SmallPopover>
         );
-      case "PENDING":
-        return (
-          <SmallPopover
-            isDisabled={!sentAt && !openedAt}
-            content={<DatesList sentAt={sentAt} openedAt={openedAt} />}
-            width="auto"
-          >
-            <TimeIcon ref={ref} color="yellow.500" {...(props as any)} />
-          </SmallPopover>
-        );
-      case "NOT_STARTED":
-        if (signingMode === "SEQUENTIAL") {
-          return (
-            <SmallPopover
-              content={
-                <Text fontSize="sm">
-                  <FormattedMessage
-                    id="component.petition-signature-request-signer-status-icon.not-started"
-                    defaultMessage="The signature will start once the previous signer has signed."
-                  />
-                </Text>
-              }
-              width="auto"
-            >
-              <TimeIcon ref={ref} color="gray.500" {...(props as any)} />
-            </SmallPopover>
-          );
-        } else {
-          return null;
-        }
-      default:
+      } else {
         return null;
+      }
+    default:
+      return null;
+  }
+});
+
+const _fragmentsPetitionSignatureRequestSignerStatusIcon = {
+  SignerStatus: gql`
+    fragment PetitionSignatureRequestSignerStatusIcon_SignerStatus on PetitionSignatureRequestSignerStatus {
+      status
+      ...DatesList_SignerStatus
     }
-  }),
-  {
-    fragments: {
-      SignerStatus: gql`
-        fragment PetitionSignatureRequestSignerStatusIcon_SignerStatus on PetitionSignatureRequestSignerStatus {
-          status
-          ...DatesList_SignerStatus
-        }
-        ${DatesList.fragments.SignerStatus}
-      `,
-    },
-  },
-);
+  `,
+};

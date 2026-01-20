@@ -46,7 +46,6 @@ import {
   PetitionApprovalsCard_UserFragment,
   PetitionStatus,
 } from "@parallel/graphql/__types";
-import { Fragments } from "@parallel/utils/apollo/fragments";
 import { FORMATS } from "@parallel/utils/dates";
 import { getPetitionSignatureEnvironment } from "@parallel/utils/getPetitionSignatureEnvironment";
 import { getPetitionSignatureStatus } from "@parallel/utils/getPetitionSignatureStatus";
@@ -70,7 +69,7 @@ import { UserReference } from "../common/UserReference";
 import { isDialogError } from "../common/dialogs/DialogProvider";
 import { PetitionApprovalsAboutToStartAlert } from "./PetitionApprovalsAboutToStartAlert";
 import { CommentsButton } from "./PetitionRepliesField";
-import { PetitionSignaturesCard, PetitionSignaturesCardBody } from "./PetitionSignaturesCard";
+import { PetitionSignaturesCardBody } from "./PetitionSignaturesCard";
 import {
   ApproveOrRejectAction,
   useApproveOrRejectPetitionApprovalFlowDialog,
@@ -78,7 +77,6 @@ import {
 import { useConfirmCancelPetitionApprovalFlowDialog } from "./dialogs/ConfirmCancelPetitionApprovalFlowDialog";
 import { useConfirmSendReminderPetitionApprovalFlowDialog } from "./dialogs/ConfirmSendReminderPetitionApprovalFlowDialog";
 import { useConfirmSkipPetitionApprovalFlowDialog } from "./dialogs/ConfirmSkipPetitionApprovalFlowDialog";
-import { useStartPetitionApprovalFlowDialog } from "./dialogs/StartPetitionApprovalFlowDialog";
 
 interface PetitionApprovalsCardProps {
   petition: PetitionApprovalsCard_PetitionFragment;
@@ -89,8 +87,8 @@ interface PetitionApprovalsCardProps {
   isDisabled: boolean;
 }
 
-export const PetitionApprovalsCard = Object.assign(
-  chakraForwardRef<"section", PetitionApprovalsCardProps>(function PetitionApprovalsCard(
+export const PetitionApprovalsCard = chakraForwardRef<"section", PetitionApprovalsCardProps>(
+  function PetitionApprovalsCard(
     {
       petition,
       user,
@@ -601,170 +599,136 @@ export const PetitionApprovalsCard = Object.assign(
         </Card>
       </>
     );
-  }),
-  {
-    fragments: {
-      get PetitionApprovalRequestStepApprover() {
-        return gql`
-          fragment PetitionApprovalsCard_PetitionApprovalRequestStepApprover on PetitionApprovalRequestStepApprover {
-            id
-            approvedAt
-            canceledAt
-            rejectedAt
-            sentAt
-            skippedAt
-            user {
-              id
-              isMe
-              ...UserReference_User
-            }
-          }
-          ${UserReference.fragments.User}
-        `;
-      },
-      get PetitionApprovalRequestStep() {
-        return gql`
-          fragment PetitionApprovalsCard_PetitionApprovalRequestStep on PetitionApprovalRequestStep {
-            id
-            status
-            stepName
-            approvalType
-            manualStart
-            approvers {
-              ...PetitionApprovalsCard_PetitionApprovalRequestStepApprover
-            }
-            ...useStartPetitionApprovalFlowDialog_PetitionApprovalRequestStep
-          }
-          ${this.PetitionApprovalRequestStepApprover}
-          ${useStartPetitionApprovalFlowDialog.fragments.PetitionApprovalRequestStep}
-        `;
-      },
-      get Petition() {
-        return gql`
-          fragment PetitionApprovalsCard_Petition on Petition {
-            id
-            status
-            currentApprovalRequestStatus
-            generalCommentCount
-            unreadGeneralCommentCount
-            currentSignatureRequest {
-              id
-              status
-              signatureConfig {
-                review
-                reviewAfterApproval
-              }
-            }
-            signatureConfig {
-              isEnabled
-              review
-              reviewAfterApproval
-            }
-            signatureRequests {
-              id
-              status
-            }
-            currentApprovalRequestSteps {
-              id
-              ...PetitionApprovalsCard_PetitionApprovalRequestStep
-            }
-            oldApprovalRequestSteps {
-              id
-              ...PetitionApprovalsCard_PetitionApprovalRequestStep
-            }
-            approvalFlowConfig {
-              ...Fragments_FullApprovalFlowConfig
-              approvers {
-                id
-                isMe
-                ...useStartPetitionApprovalFlowDialog_User
-                ...UserReference_User
-              }
-            }
-            ...PetitionSignaturesCard_Petition
-            ...getPetitionSignatureStatus_Petition
-            ...getPetitionSignatureEnvironment_Petition
-            ...useStartApprovalRequestStep_PetitionBase
-          }
-          ${UserReference.fragments.User}
-          ${Fragments.FullApprovalFlowConfig}
-          ${PetitionSignaturesCard.fragments.Petition}
-          ${useAddNewSignature.fragments.Petition}
-          ${useStartPetitionApprovalFlowDialog.fragments.User}
-          ${this.PetitionApprovalRequestStep}
-          ${getPetitionSignatureStatus.fragments.Petition}
-          ${getPetitionSignatureEnvironment.fragments.Petition}
-          ${useStartApprovalRequestStep.fragments.PetitionBase}
-        `;
-      },
-      get PetitionPolling() {
-        return gql`
-          fragment PetitionApprovalsCard_PetitionPolling on Petition {
-            id
-            status
-            currentApprovalRequestStatus
-            generalCommentCount
-            unreadGeneralCommentCount
-            currentSignatureRequest {
-              id
-              status
-              signatureConfig {
-                review
-                reviewAfterApproval
-              }
-            }
-            signatureConfig {
-              isEnabled
-              review
-              reviewAfterApproval
-            }
-            signatureRequests {
-              id
-              status
-            }
-            approvalFlowConfig {
-              ...Fragments_FullApprovalFlowConfig
-              approvers {
-                id
-                isMe
-                ...useStartPetitionApprovalFlowDialog_User
-                ...UserReference_User
-              }
-            }
-            currentApprovalRequestSteps {
-              id
-              ...PetitionApprovalsCard_PetitionApprovalRequestStep
-            }
-            ...PetitionSignaturesCard_PetitionPolling
-            ...getPetitionSignatureStatus_Petition
-            ...getPetitionSignatureEnvironment_Petition
-            ...useStartApprovalRequestStep_PetitionBase
-          }
-          ${UserReference.fragments.User}
-          ${Fragments.FullApprovalFlowConfig}
-          ${PetitionSignaturesCard.fragments.PetitionPolling}
-          ${useAddNewSignature.fragments.Petition}
-          ${useStartPetitionApprovalFlowDialog.fragments.User}
-          ${this.PetitionApprovalRequestStep}
-          ${getPetitionSignatureStatus.fragments.Petition}
-          ${getPetitionSignatureEnvironment.fragments.Petition}
-          ${useStartApprovalRequestStep.fragments.PetitionBase}
-        `;
-      },
-      get User() {
-        return gql`
-          fragment PetitionApprovalsCard_User on User {
-            id
-            ...PetitionSignaturesCard_User
-            ...UserReference_User
-          }
-          ${PetitionSignaturesCard.fragments.User}
-          ${UserReference.fragments.User}
-        `;
-      },
-    },
   },
 );
+
+const _fragments = {
+  PetitionApprovalRequestStepApprover: gql`
+    fragment PetitionApprovalsCard_PetitionApprovalRequestStepApprover on PetitionApprovalRequestStepApprover {
+      id
+      approvedAt
+      canceledAt
+      rejectedAt
+      sentAt
+      skippedAt
+      user {
+        id
+        isMe
+        ...UserReference_User
+      }
+    }
+  `,
+  PetitionApprovalRequestStep: gql`
+    fragment PetitionApprovalsCard_PetitionApprovalRequestStep on PetitionApprovalRequestStep {
+      id
+      status
+      stepName
+      approvalType
+      manualStart
+      approvers {
+        ...PetitionApprovalsCard_PetitionApprovalRequestStepApprover
+      }
+      ...useStartPetitionApprovalFlowDialog_PetitionApprovalRequestStep
+    }
+  `,
+  Petition: gql`
+    fragment PetitionApprovalsCard_Petition on Petition {
+      id
+      status
+      currentApprovalRequestStatus
+      generalCommentCount
+      unreadGeneralCommentCount
+      currentSignatureRequest {
+        id
+        status
+        signatureConfig {
+          review
+          reviewAfterApproval
+        }
+      }
+      signatureConfig {
+        isEnabled
+        review
+        reviewAfterApproval
+      }
+      signatureRequests {
+        id
+        status
+      }
+      currentApprovalRequestSteps {
+        id
+        ...PetitionApprovalsCard_PetitionApprovalRequestStep
+      }
+      oldApprovalRequestSteps {
+        id
+        ...PetitionApprovalsCard_PetitionApprovalRequestStep
+      }
+      approvalFlowConfig {
+        ...Fragments_FullApprovalFlowConfig
+        approvers {
+          id
+          isMe
+          ...useStartPetitionApprovalFlowDialog_User
+          ...UserReference_User
+        }
+      }
+      ...PetitionSignaturesCard_Petition
+      ...getPetitionSignatureStatus_Petition
+      ...getPetitionSignatureEnvironment_Petition
+      ...useStartApprovalRequestStep_PetitionBase
+    }
+  `,
+  PetitionPolling: gql`
+    fragment PetitionApprovalsCard_PetitionPolling on Petition {
+      id
+      status
+      currentApprovalRequestStatus
+      generalCommentCount
+      unreadGeneralCommentCount
+      currentSignatureRequest {
+        id
+        status
+        signatureConfig {
+          review
+          reviewAfterApproval
+        }
+      }
+      signatureConfig {
+        isEnabled
+        review
+        reviewAfterApproval
+      }
+      signatureRequests {
+        id
+        status
+      }
+      approvalFlowConfig {
+        ...Fragments_FullApprovalFlowConfig
+        approvers {
+          id
+          isMe
+          ...useStartPetitionApprovalFlowDialog_User
+          ...UserReference_User
+        }
+      }
+      currentApprovalRequestSteps {
+        id
+        ...PetitionApprovalsCard_PetitionApprovalRequestStep
+      }
+      ...PetitionSignaturesCard_PetitionPolling
+      ...getPetitionSignatureStatus_Petition
+      ...getPetitionSignatureEnvironment_Petition
+      ...useStartApprovalRequestStep_PetitionBase
+    }
+  `,
+  User: gql`
+    fragment PetitionApprovalsCard_User on User {
+      id
+      ...PetitionSignaturesCard_User
+      ...UserReference_User
+    }
+  `,
+};
 
 const _mutations = [
   gql`
@@ -784,8 +748,6 @@ const _mutations = [
         }
       }
     }
-    ${PetitionApprovalsCard.fragments.PetitionApprovalRequestStep}
-    ${PetitionApprovalsCard.fragments.Petition}
   `,
   gql`
     mutation PetitionApprovalsCard_skipPetitionApprovalRequestStep(
@@ -806,8 +768,6 @@ const _mutations = [
         }
       }
     }
-    ${PetitionApprovalsCard.fragments.PetitionApprovalRequestStep}
-    ${PetitionApprovalsCard.fragments.Petition}
   `,
   gql`
     mutation PetitionApprovalsCard_rejectPetitionApprovalRequestStep(
@@ -832,8 +792,6 @@ const _mutations = [
         }
       }
     }
-    ${PetitionApprovalsCard.fragments.PetitionApprovalRequestStep}
-    ${PetitionApprovalsCard.fragments.Petition}
   `,
   gql`
     mutation PetitionApprovalsCard_approvePetitionApprovalRequestStep(
@@ -856,8 +814,6 @@ const _mutations = [
         }
       }
     }
-    ${PetitionApprovalsCard.fragments.PetitionApprovalRequestStep}
-    ${PetitionApprovalsCard.fragments.Petition}
   `,
   gql`
     mutation PetitionApprovalsCard_sendPetitionApprovalRequestStepReminder(
@@ -872,7 +828,6 @@ const _mutations = [
         ...PetitionApprovalsCard_PetitionApprovalRequestStep
       }
     }
-    ${PetitionApprovalsCard.fragments.PetitionApprovalRequestStep}
   `,
 ];
 
@@ -883,7 +838,6 @@ const _queries = [
         ...PetitionApprovalsCard_PetitionPolling
       }
     }
-    ${PetitionApprovalsCard.fragments.PetitionPolling}
   `,
 ];
 

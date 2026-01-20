@@ -1090,57 +1090,46 @@ function ProfilesListHeader({
 }
 
 const _fragments = {
-  get ProfileType() {
-    return gql`
-      fragment Profiles_ProfileType on ProfileType {
+  ProfileType: gql`
+    fragment Profiles_ProfileType on ProfileType {
+      id
+      name
+      icon
+      isPinned
+      canCreate
+      archivedAt
+      ...ProfileTypeReference_ProfileType
+      ...useProfileTableColumns_ProfileType
+    }
+  `,
+  Profile: gql`
+    fragment Profiles_Profile on Profile {
+      id
+      status
+      ...ProfileReference_Profile
+      profileType {
         id
         name
-        icon
-        isPinned
-        canCreate
-        archivedAt
-        ...ProfileTypeReference_ProfileType
-        ...useProfileTableColumns_ProfileType
       }
-      ${ProfileTypeReference.fragments.ProfileType}
-      ${useProfileTableColumns.fragments.ProfileType}
-    `;
-  },
-  get Profile() {
-    return gql`
-      fragment Profiles_Profile on Profile {
-        id
+      ...useProfileTableColumns_Profile
+    }
+  `,
+  ProfileListView: gql`
+    fragment Profiles_ProfileListView on ProfileListView {
+      id
+      ...ProfileViewTabs_ProfileListView
+      data {
+        columns
+        search
+        sort {
+          field
+          direction
+        }
         status
-        ...ProfileReference_Profile
-        profileType {
-          id
-          name
-        }
-        ...useProfileTableColumns_Profile
+        values
       }
-      ${ProfileReference.fragments.Profile}
-      ${useProfileTableColumns.fragments.Profile}
-    `;
-  },
-  get ProfileListView() {
-    return gql`
-      fragment Profiles_ProfileListView on ProfileListView {
-        id
-        ...ProfileViewTabs_ProfileListView
-        data {
-          columns
-          search
-          sort {
-            field
-            direction
-          }
-          status
-          values
-        }
-      }
-      ${ProfileViewTabs.fragments.ProfileListView}
-    `;
-  },
+    }
+  `,
 };
 
 const _queries = [
@@ -1155,9 +1144,6 @@ const _queries = [
         }
       }
     }
-    ${AppLayout.fragments.Query}
-    ${useProfileSubscribersDialog.fragments.User}
-    ${_fragments.ProfileListView}
   `,
   gql`
     query Profiles_profileType($profileTypeId: GID!) {
@@ -1165,7 +1151,6 @@ const _queries = [
         ...Profiles_ProfileType
       }
     }
-    ${_fragments.ProfileType}
   `,
   gql`
     query Profiles_profiles(
@@ -1194,8 +1179,6 @@ const _queries = [
         totalCount
       }
     }
-    ${_fragments.Profile}
-    ${useProfileTableColumns.fragments.ProfileFieldProperty}
   `,
 ];
 
@@ -1217,7 +1200,6 @@ const _mutations = [
         }
       }
     }
-    ${_fragments.ProfileListView}
   `,
   gql`
     mutation Profiles_updateProfileListView(
@@ -1236,7 +1218,6 @@ const _mutations = [
         ...Profiles_ProfileListView
       }
     }
-    ${_fragments.ProfileListView}
   `,
 ];
 

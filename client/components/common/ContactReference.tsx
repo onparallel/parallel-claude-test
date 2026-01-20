@@ -8,44 +8,38 @@ import { isNonNullish } from "remeda";
 import { DeletedContact } from "./DeletedContact";
 import { Link } from "./Link";
 
-export const ContactReference = Object.assign(
-  chakraForwardRef<
-    "a" | "span",
-    {
-      contact?: Maybe<ContactReference_ContactFragment>;
-      withEmail?: boolean;
-      asLink?: boolean;
-      _activeContact?: SystemStyleObject;
-    }
-  >(function ContactReference(
-    { contact, withEmail, asLink = true, _activeContact, ...props },
-    ref,
-  ) {
-    return isNonNullish(contact) ? (
-      <Tooltip isDisabled={withEmail} label={contact.email}>
-        <Text
-          ref={ref}
-          sx={{ ...props.sx, ..._activeContact }}
-          {...(asLink ? { as: Link, href: `/app/contacts/${contact.id}` } : { as: "span" })}
-          {...(props as any)}
-        >
-          {contact.fullName}
-          {withEmail ? ` <${contact.email}>` : null}
-        </Text>
-      </Tooltip>
-    ) : (
-      <DeletedContact />
-    );
-  }),
+export const ContactReference = chakraForwardRef<
+  "a" | "span",
   {
-    fragments: {
-      Contact: gql`
-        fragment ContactReference_Contact on Contact {
-          id
-          fullName
-          email
-        }
-      `,
-    },
-  },
-);
+    contact?: Maybe<ContactReference_ContactFragment>;
+    withEmail?: boolean;
+    asLink?: boolean;
+    _activeContact?: SystemStyleObject;
+  }
+>(function ContactReference({ contact, withEmail, asLink = true, _activeContact, ...props }, ref) {
+  return isNonNullish(contact) ? (
+    <Tooltip isDisabled={withEmail} label={contact.email}>
+      <Text
+        ref={ref}
+        sx={{ ...props.sx, ..._activeContact }}
+        {...(asLink ? { as: Link, href: `/app/contacts/${contact.id}` } : { as: "span" })}
+        {...(props as any)}
+      >
+        {contact.fullName}
+        {withEmail ? ` <${contact.email}>` : null}
+      </Text>
+    </Tooltip>
+  ) : (
+    <DeletedContact />
+  );
+});
+
+const _fragments = {
+  Contact: gql`
+    fragment ContactReference_Contact on Contact {
+      id
+      fullName
+      email
+    }
+  `,
+};

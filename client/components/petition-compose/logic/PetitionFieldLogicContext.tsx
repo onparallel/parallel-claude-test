@@ -7,7 +7,6 @@ import { PetitionFieldIndex, useAllFieldsWithIndices } from "@parallel/utils/fie
 import { UnwrapArray } from "@parallel/utils/types";
 import { PropsWithChildren, createContext, useContext, useMemo } from "react";
 import { pick } from "remeda";
-import { PetitionFieldMathEnumSelect } from "./PetitionFieldMathEnumSelect";
 
 interface PetitionFieldLogicContextProps {
   field?: PetitionFieldLogicContext_PetitionFieldFragment;
@@ -66,75 +65,67 @@ export function PetitionFieldLogicContext({
   );
 }
 
-PetitionFieldLogicContext.fragments = {
-  get PetitionVariable() {
-    return gql`
-      fragment PetitionFieldLogicContext_PetitionVariable on PetitionVariable {
-        name
-        type
-        ... on PetitionVariableNumber {
-          defaultValue
-        }
-        ... on PetitionVariableEnum {
-          defaultEnum: defaultValue
-          enumLabels: valueLabels {
-            value
-            label
-          }
+const _fragments = {
+  PetitionVariable: gql`
+    fragment PetitionFieldLogicContext_PetitionVariable on PetitionVariable {
+      name
+      type
+      ... on PetitionVariableNumber {
+        defaultValue
+      }
+      ... on PetitionVariableEnum {
+        defaultEnum: defaultValue
+        enumLabels: valueLabels {
+          value
+          label
         }
       }
-      ${PetitionFieldMathEnumSelect.fragments.PetitionVariableEnum}
-    `;
-  },
-  get PetitionBase() {
-    return gql`
-      fragment PetitionFieldLogicContext_PetitionBase on PetitionBase {
+    }
+  `,
+  PetitionBase: gql`
+    fragment PetitionFieldLogicContext_PetitionBase on PetitionBase {
+      id
+      fields {
         id
-        fields {
+        ...PetitionFieldLogicContext_PetitionField
+        parent {
+          id
+        }
+        children {
           id
           ...PetitionFieldLogicContext_PetitionField
           parent {
             id
           }
-          children {
-            id
-            ...PetitionFieldLogicContext_PetitionField
-            parent {
-              id
-            }
-          }
         }
-        variables {
-          ...PetitionFieldLogicContext_PetitionVariable
-        }
-        customLists {
-          name
-          values
-        }
-        standardListDefinitions {
-          id
-          listName
-          listType
-          title
-          listVersion
-          versionFormat
-        }
-        ...useAllFieldsWithIndices_PetitionBase
       }
-      fragment PetitionFieldLogicContext_PetitionField on PetitionField {
+      variables {
+        ...PetitionFieldLogicContext_PetitionVariable
+      }
+      customLists {
+        name
+        values
+      }
+      standardListDefinitions {
         id
+        listName
+        listType
         title
-        type
-        multiple
-        options
-        isReadOnly
-        isChild
+        listVersion
+        versionFormat
       }
-      ${useAllFieldsWithIndices.fragments.PetitionBase}
-      ${PetitionFieldMathEnumSelect.fragments.PetitionVariableEnum}
-      ${this.PetitionVariable}
-    `;
-  },
+      ...useAllFieldsWithIndices_PetitionBase
+    }
+    fragment PetitionFieldLogicContext_PetitionField on PetitionField {
+      id
+      title
+      type
+      multiple
+      options
+      isReadOnly
+      isChild
+    }
+  `,
 };
 
 export function usePetitionFieldLogicContext() {

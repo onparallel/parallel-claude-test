@@ -91,11 +91,10 @@ export function UserSettingsLayout({
   );
 }
 
-UserSettingsLayout.fragments = {
+const _fragments = {
   Query: gql`
     fragment UserSettingsLayout_Query on Query {
       ...SidebarLayout_Query
     }
-    ${SidebarLayout.fragments.Query}
   `,
 };

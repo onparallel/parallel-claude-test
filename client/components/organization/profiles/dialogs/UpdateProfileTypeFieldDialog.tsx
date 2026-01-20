@@ -177,7 +177,7 @@ function UpdateProfileTypeFieldDialog({
   );
 }
 
-useUpdateProfileTypeFieldDialog.fragments = {
+const _fragments = {
   ProfileTypeField: gql`
     fragment useUpdateProfileTypeFieldDialog_ProfileTypeField on ProfileTypeField {
       id

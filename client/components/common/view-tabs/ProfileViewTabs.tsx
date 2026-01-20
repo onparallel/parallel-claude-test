@@ -23,8 +23,8 @@ interface ProfileViewTabsProps {
   views: ProfileViewTabs_ProfileListViewFragment[];
 }
 
-export const ProfileViewTabs = Object.assign(
-  chakraForwardRef<"div", ProfileViewTabsProps>(function ProfileViewTabs({ views }, ref) {
+export const ProfileViewTabs = chakraForwardRef<"div", ProfileViewTabsProps>(
+  function ProfileViewTabs({ views }, ref) {
     const intl = useIntl();
     const toast = useToast();
     const showGenericErrorToast = useGenericErrorToast();
@@ -169,42 +169,35 @@ export const ProfileViewTabs = Object.assign(
         onReorder={handleReorderViews}
       />
     );
-  }),
-  {
-    fragments: {
-      get ProfileListViewData() {
-        return gql`
-          fragment ProfileViewTabs_ProfileListViewData on ProfileListViewData {
-            sort {
-              field
-              direction
-            }
-            columns
-            search
-            status
-            values
-          }
-        `;
-      },
-      get ProfileListView() {
-        return gql`
-          fragment ProfileViewTabs_ProfileListView on ProfileListView {
-            id
-            name
-            isDefault
-            type
-            data {
-              ...ProfileViewTabs_ProfileListViewData
-            }
-            ...ViewTabs_ListView
-          }
-          ${this.ProfileListViewData}
-          ${ViewTabs.fragments.ListView}
-        `;
-      },
-    },
   },
 );
+
+const _fragments = {
+  ProfileListViewData: gql`
+    fragment ProfileViewTabs_ProfileListViewData on ProfileListViewData {
+      sort {
+        field
+        direction
+      }
+      columns
+      search
+      status
+      values
+    }
+  `,
+  ProfileListView: gql`
+    fragment ProfileViewTabs_ProfileListView on ProfileListView {
+      id
+      name
+      isDefault
+      type
+      data {
+        ...ProfileViewTabs_ProfileListViewData
+      }
+      ...ViewTabs_ListView
+    }
+  `,
+};
 
 const _mutations = [
   gql`
@@ -244,7 +237,6 @@ const _mutations = [
         }
       }
     }
-    ${ProfileViewTabs.fragments.ProfileListView}
   `,
   gql`
     mutation ProfileViewTabs_updateProfileListView(
@@ -269,7 +261,6 @@ const _mutations = [
         }
       }
     }
-    ${ProfileViewTabs.fragments.ProfileListView}
   `,
   gql`
     mutation ProfileViewTabs_markProfileListViewAsDefault(

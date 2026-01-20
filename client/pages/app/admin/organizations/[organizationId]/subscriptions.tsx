@@ -3,14 +3,8 @@ import { useMutation } from "@apollo/client/react";
 import { Badge, Button, Center, Flex, Grid, HStack, Stack, Text } from "@chakra-ui/react";
 import { AdminOrganizationsLayout } from "@parallel/components/admin-organizations/AdminOrganizationsLayout";
 import { AdminOrganizationsSubscriptionCard } from "@parallel/components/admin-organizations/AdminOrganizationsSubscriptionCard";
-import {
-  UpdateOrganizationCurrentUsagePeriodDialog,
-  useUpdateOrganizationCurrentUsagePeriodDialog,
-} from "@parallel/components/admin-organizations/dialogs/UpdateOrganizationCurrentUsagePeriodDialog";
-import {
-  UpdateOrganizationUsageDetailsDialog,
-  useUpdateOrganizationUsageDetailsDialog,
-} from "@parallel/components/admin-organizations/dialogs/UpdateOrganizationUsageDetailsDialog";
+import { useUpdateOrganizationCurrentUsagePeriodDialog } from "@parallel/components/admin-organizations/dialogs/UpdateOrganizationCurrentUsagePeriodDialog";
+import { useUpdateOrganizationUsageDetailsDialog } from "@parallel/components/admin-organizations/dialogs/UpdateOrganizationUsageDetailsDialog";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { TableColumn } from "@parallel/components/common/Table";
@@ -579,53 +573,44 @@ export function OrganizationUsagePeriodsTable({
   );
 }
 
-OrganizationUsagePeriodsTable.fragments = {
-  get OrganizationUsageLimit() {
-    return gql`
-      fragment OrganizationUsagePeriodsTable_OrganizationUsageLimit on OrganizationUsageLimit {
-        id
-        used
-        limit
-        period
-        periodStartDate
-        periodEndDate
+const _fragmentsOrganizationUsagePeriodsTable = {
+  OrganizationUsageLimit: gql`
+    fragment OrganizationUsagePeriodsTable_OrganizationUsageLimit on OrganizationUsageLimit {
+      id
+      used
+      limit
+      period
+      periodStartDate
+      periodEndDate
+    }
+  `,
+  OrganizationUsageLimitPagination: gql`
+    fragment OrganizationUsagePeriodsTable_OrganizationUsageLimitPagination on OrganizationUsageLimitPagination {
+      totalCount
+      items {
+        ...OrganizationUsagePeriodsTable_OrganizationUsageLimit
       }
-    `;
-  },
-  get OrganizationUsageLimitPagination() {
-    return gql`
-      fragment OrganizationUsagePeriodsTable_OrganizationUsageLimitPagination on OrganizationUsageLimitPagination {
-        totalCount
-        items {
-          ...OrganizationUsagePeriodsTable_OrganizationUsageLimit
-        }
-      }
-      ${this.OrganizationUsageLimit}
-    `;
-  },
+    }
+  `,
 };
 
-AdminOrganizationsSubscriptions.fragments = {
-  get Organization() {
-    return gql`
-      fragment AdminOrganizationsSubscriptions_Organization on Organization {
-        id
-        ...AdminOrganizationsLayout_Organization
-        activeUserCount
-        usageDetails
-        petitionsSubscriptionEndDate: subscriptionEndDate(limitName: PETITION_SEND)
-        signaturitSubscriptionEndDate: subscriptionEndDate(limitName: SIGNATURIT_SHARED_APIKEY)
-        petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
-          ...UpdateOrganizationUsageDetailsDialog_OrganizationUsageLimit
-        }
-        signaturesPeriod: currentUsagePeriod(limitName: SIGNATURIT_SHARED_APIKEY) {
-          ...UpdateOrganizationUsageDetailsDialog_OrganizationUsageLimit
-        }
+const _fragments = {
+  Organization: gql`
+    fragment AdminOrganizationsSubscriptions_Organization on Organization {
+      id
+      ...AdminOrganizationsLayout_Organization
+      activeUserCount
+      usageDetails
+      petitionsSubscriptionEndDate: subscriptionEndDate(limitName: PETITION_SEND)
+      signaturitSubscriptionEndDate: subscriptionEndDate(limitName: SIGNATURIT_SHARED_APIKEY)
+      petitionsPeriod: currentUsagePeriod(limitName: PETITION_SEND) {
+        ...UpdateOrganizationUsageDetailsDialog_OrganizationUsageLimit
       }
-      ${AdminOrganizationsLayout.fragments.Organization}
-      ${UpdateOrganizationUsageDetailsDialog.fragments.OrganizationUsageLimit}
-    `;
-  },
+      signaturesPeriod: currentUsagePeriod(limitName: SIGNATURIT_SHARED_APIKEY) {
+        ...UpdateOrganizationUsageDetailsDialog_OrganizationUsageLimit
+      }
+    }
+  `,
 };
 
 const _queries = [
@@ -636,8 +621,6 @@ const _queries = [
         ...AdminOrganizationsSubscriptions_Organization
       }
     }
-    ${AdminOrganizationsLayout.fragments.Query}
-    ${AdminOrganizationsSubscriptions.fragments.Organization}
   `,
   gql`
     query AdminOrganizationsSubscriptions_organizationUsagePeriodsQuery(
@@ -664,8 +647,6 @@ const _queries = [
         }
       }
     }
-    ${OrganizationUsagePeriodsTable.fragments.OrganizationUsageLimitPagination}
-    ${UpdateOrganizationCurrentUsagePeriodDialog.fragments.OrganizationUsageLimit}
   `,
 ];
 
@@ -679,7 +660,6 @@ const _mutations = [
         ...AdminOrganizationsSubscriptions_Organization
       }
     }
-    ${AdminOrganizationsSubscriptions.fragments.Organization}
   `,
   gql`
     mutation AdminOrganizationsSubscriptions_updateOrganizationUsageDetails(
@@ -701,7 +681,6 @@ const _mutations = [
         ...AdminOrganizationsSubscriptions_Organization
       }
     }
-    ${AdminOrganizationsSubscriptions.fragments.Organization}
   `,
   gql`
     mutation AdminOrganizationsSubscriptions_shareSignaturitApiKey(
@@ -713,7 +692,6 @@ const _mutations = [
         ...AdminOrganizationsSubscriptions_Organization
       }
     }
-    ${AdminOrganizationsSubscriptions.fragments.Organization}
   `,
   gql`
     mutation AdminOrganizationsSubscriptions_modifyCurrentUsagePeriod(
@@ -725,7 +703,6 @@ const _mutations = [
         ...AdminOrganizationsSubscriptions_Organization
       }
     }
-    ${AdminOrganizationsSubscriptions.fragments.Organization}
   `,
 ];
 

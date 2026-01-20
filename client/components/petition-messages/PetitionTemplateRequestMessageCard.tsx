@@ -27,136 +27,131 @@ interface PetitionTemplateRequestMessageCardProps {
   isDisabled: boolean;
 }
 
-export const PetitionTemplateRequestMessageCard = Object.assign(
-  chakraForwardRef<"section", PetitionTemplateRequestMessageCardProps>(
-    function PetitionTemplateRequestMessageCard(
-      { petition, user, onUpdatePetition, isDisabled, ...props },
-      ref,
-    ) {
-      const [messages, setMessages] = useState({
-        emailSubject: petition.emailSubject ?? "",
-        emailBody: petition.emailBody ?? emptyRTEValue(),
+export const PetitionTemplateRequestMessageCard = chakraForwardRef<
+  "section",
+  PetitionTemplateRequestMessageCardProps
+>(function PetitionTemplateRequestMessageCard(
+  { petition, user, onUpdatePetition, isDisabled, ...props },
+  ref,
+) {
+  const [messages, setMessages] = useState({
+    emailSubject: petition.emailSubject ?? "",
+    emailBody: petition.emailBody ?? emptyRTEValue(),
+  });
+
+  const [onBehalf, setOnBehalf] = useState<UserSelect_UserFragment | null>(
+    petition.defaultOnBehalf ?? null,
+  );
+
+  const handleMessagesEmailSubjectChange = (emailSubject: string) => {
+    if (emailSubject === messages.emailSubject) return;
+    setMessages({ ...messages, emailSubject });
+    onUpdatePetition({ emailSubject });
+  };
+
+  const handleMessagesEmailBodyChange = (emailBody: RichTextEditorValue) => {
+    setMessages({ ...messages, emailBody });
+    onUpdatePetition({ emailBody: isEmptyRTEValue(emailBody) ? null : emailBody });
+  };
+
+  const _handleSearchUsers = useSearchUsers();
+
+  const handleSearchUsers = useCallback(
+    async (search: string, excludeUsers: string[]) => {
+      return await _handleSearchUsers(search, {
+        excludeIds: [...excludeUsers],
       });
+    },
+    [_handleSearchUsers],
+  );
 
-      const [onBehalf, setOnBehalf] = useState<UserSelect_UserFragment | null>(
-        petition.defaultOnBehalf ?? null,
-      );
+  const handleDefaultOnBehalf = (user: UserSelect_UserFragment | null) => {
+    setOnBehalf(user);
+    onUpdatePetition({ defaultOnBehalfId: user?.id ?? null });
+  };
 
-      const handleMessagesEmailSubjectChange = (emailSubject: string) => {
-        if (emailSubject === messages.emailSubject) return;
-        setMessages({ ...messages, emailSubject });
-        onUpdatePetition({ emailSubject });
-      };
+  return (
+    <Card ref={ref} {...props}>
+      <CardHeader leftIcon={<EmailIcon marginEnd={2} role="presentation" />}>
+        <FormattedMessage
+          id="component.petition-template-request-message.card-header"
+          defaultMessage="Parallel message"
+        />
+      </CardHeader>
 
-      const handleMessagesEmailBodyChange = (emailBody: RichTextEditorValue) => {
-        setMessages({ ...messages, emailBody });
-        onUpdatePetition({ emailBody: isEmptyRTEValue(emailBody) ? null : emailBody });
-      };
-
-      const _handleSearchUsers = useSearchUsers();
-
-      const handleSearchUsers = useCallback(
-        async (search: string, excludeUsers: string[]) => {
-          return await _handleSearchUsers(search, {
-            excludeIds: [...excludeUsers],
-          });
-        },
-        [_handleSearchUsers],
-      );
-
-      const handleDefaultOnBehalf = (user: UserSelect_UserFragment | null) => {
-        setOnBehalf(user);
-        onUpdatePetition({ defaultOnBehalfId: user?.id ?? null });
-      };
-
-      return (
-        <Card ref={ref} {...props}>
-          <CardHeader leftIcon={<EmailIcon marginEnd={2} role="presentation" />}>
-            <FormattedMessage
-              id="component.petition-template-request-message.card-header"
-              defaultMessage="Parallel message"
-            />
-          </CardHeader>
-
-          <Stack padding={4} spacing={3}>
-            <Text>
-              <FormattedMessage
-                id="component.petition-template-request-message.card-explainer"
-                defaultMessage="This message will be used <b>when sending</b> the parallel to the recipients."
-              />
-            </Text>
-            {user.hasOnBehalfOf ? (
-              <FormControl isDisabled={isDisabled}>
-                <HStack marginBottom={2}>
-                  <FormLabel fontWeight="normal" margin={0}>
-                    <FormattedMessage
-                      id="component.petition-template-request-message.send-as"
-                      defaultMessage="Send as..."
-                    />
-                  </FormLabel>
-                  <HelpPopover>
-                    <Text>
-                      <FormattedMessage
-                        id="component.petition-template-request-message.send-as-help"
-                        defaultMessage="Default option. If the user cannot send on behalf of the chosen user, the user's own email would be used by default."
-                      />
-                    </Text>
-                  </HelpPopover>
-                </HStack>
-                <UserSelect
-                  onSearch={handleSearchUsers}
-                  value={onBehalf}
-                  onChange={handleDefaultOnBehalf}
-                  isClearable
+      <Stack padding={4} spacing={3}>
+        <Text>
+          <FormattedMessage
+            id="component.petition-template-request-message.card-explainer"
+            defaultMessage="This message will be used <b>when sending</b> the parallel to the recipients."
+          />
+        </Text>
+        {user.hasOnBehalfOf ? (
+          <FormControl isDisabled={isDisabled}>
+            <HStack marginBottom={2}>
+              <FormLabel fontWeight="normal" margin={0}>
+                <FormattedMessage
+                  id="component.petition-template-request-message.send-as"
+                  defaultMessage="Send as..."
                 />
-              </FormControl>
-            ) : null}
-            <Box>
-              <MessageEmailSubjectFormControl
-                id={`request-message-${petition.id}-subject`}
-                value={messages.emailSubject}
-                onChange={handleMessagesEmailSubjectChange}
-                petition={petition}
-                isDisabled={isDisabled}
-              />
-              <MessageEmailBodyFormControl
-                id={`request-message-${petition.id}-body`}
-                marginTop={4}
-                value={messages.emailBody}
-                onChange={handleMessagesEmailBodyChange}
-                petition={petition}
-                isDisabled={isDisabled}
-              />
-            </Box>
-          </Stack>
-        </Card>
-      );
-    },
-  ),
-  {
-    fragments: {
-      PetitionTemplate: gql`
-        fragment PetitionTemplateRequestMessageCard_PetitionTemplate on PetitionTemplate {
-          id
-          emailSubject
-          emailBody
-          defaultOnBehalf {
-            ...UserSelect_User
-          }
+              </FormLabel>
+              <HelpPopover>
+                <Text>
+                  <FormattedMessage
+                    id="component.petition-template-request-message.send-as-help"
+                    defaultMessage="Default option. If the user cannot send on behalf of the chosen user, the user's own email would be used by default."
+                  />
+                </Text>
+              </HelpPopover>
+            </HStack>
+            <UserSelect
+              onSearch={handleSearchUsers}
+              value={onBehalf}
+              onChange={handleDefaultOnBehalf}
+              isClearable
+            />
+          </FormControl>
+        ) : null}
+        <Box>
+          <MessageEmailSubjectFormControl
+            id={`request-message-${petition.id}-subject`}
+            value={messages.emailSubject}
+            onChange={handleMessagesEmailSubjectChange}
+            petition={petition}
+            isDisabled={isDisabled}
+          />
+          <MessageEmailBodyFormControl
+            id={`request-message-${petition.id}-body`}
+            marginTop={4}
+            value={messages.emailBody}
+            onChange={handleMessagesEmailBodyChange}
+            petition={petition}
+            isDisabled={isDisabled}
+          />
+        </Box>
+      </Stack>
+    </Card>
+  );
+});
 
-          ...MessageEmailSubjectFormControl_PetitionBase
-          ...MessageEmailBodyFormControl_PetitionBase
-        }
-        ${UserSelect.fragments.User}
-        ${MessageEmailSubjectFormControl.fragments.PetitionBase}
-        ${MessageEmailBodyFormControl.fragments.PetitionBase}
-      `,
-      User: gql`
-        fragment PetitionTemplateRequestMessageCard_User on User {
-          id
-          hasOnBehalfOf: hasFeatureFlag(featureFlag: ON_BEHALF_OF)
-        }
-      `,
-    },
-  },
-);
+const _fragments = {
+  PetitionTemplate: gql`
+    fragment PetitionTemplateRequestMessageCard_PetitionTemplate on PetitionTemplate {
+      id
+      emailSubject
+      emailBody
+      defaultOnBehalf {
+        ...UserSelect_User
+      }
+
+      ...MessageEmailSubjectFormControl_PetitionBase
+      ...MessageEmailBodyFormControl_PetitionBase
+    }
+  `,
+  User: gql`
+    fragment PetitionTemplateRequestMessageCard_User on User {
+      id
+      hasOnBehalfOf: hasFeatureFlag(featureFlag: ON_BEHALF_OF)
+    }
+  `,
+};

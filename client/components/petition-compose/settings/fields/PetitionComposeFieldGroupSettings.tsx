@@ -234,7 +234,7 @@ export function PetitionComposeFieldGroupSettings({
   );
 }
 
-PetitionComposeFieldGroupSettings.fragments = {
+const _fragments = {
   PetitionField: gql`
     fragment PetitionComposeFieldGroupSettings_PetitionField on PetitionField {
       id

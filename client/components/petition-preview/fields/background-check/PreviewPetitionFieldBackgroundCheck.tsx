@@ -517,7 +517,7 @@ export function KYCResearchFieldReplyProfile({
   );
 }
 
-PreviewPetitionFieldBackgroundCheck.fragments = {
+const _fragments = {
   User: gql`
     fragment PreviewPetitionFieldBackgroundCheck_User on User {
       id
@@ -560,6 +560,5 @@ PreviewPetitionFieldBackgroundCheck.fragments = {
       permanentDeletionAt
       ...useFieldLogic_PetitionBase
     }
-    ${useFieldLogic.fragments.PetitionBase}
   `,
 };

@@ -130,7 +130,7 @@ export function AccountDelegates({ user, onSubmit, ...props }: AccountDelegatesP
   );
 }
 
-AccountDelegates.fragments = {
+const _fragments = {
   User: gql`
     fragment AccountDelegates_User on User {
       id
@@ -139,6 +139,5 @@ AccountDelegates.fragments = {
       }
       hasOnBehalfOf: hasFeatureFlag(featureFlag: ON_BEHALF_OF)
     }
-    ${UserSelect.fragments.User}
   `,
 };

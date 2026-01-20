@@ -46,8 +46,8 @@ interface RecipientViewContentsProps {
   closeOnNavigate?: boolean;
 }
 
-export const RecipientViewContents = Object.assign(
-  chakraForwardRef<"section", RecipientViewContentsProps>(function RecipientViewContents(
+export const RecipientViewContents = chakraForwardRef<"section", RecipientViewContentsProps>(
+  function RecipientViewContents(
     { currentPage, petition, usePreviewReplies, isPreview, closeOnNavigate, onClose, ...props },
     ref,
   ) {
@@ -291,89 +291,74 @@ export const RecipientViewContents = Object.assign(
         </Stack>
       </Flex>
     );
-  }),
-  {
-    fragments: {
-      get PublicUser() {
-        return gql`
-          fragment RecipientViewContents_PublicUser on PublicUser {
-            firstName
-          }
-        `;
-      },
-      get PublicPetition() {
-        return gql`
-          fragment RecipientViewContents_PublicPetition on PublicPetition {
-            fields {
-              id
-              type
-              title
-              options
-              optional
-              isInternal
-              isReadOnly
-              replies {
-                id
-                status
-                parent {
-                  id
-                }
-              }
-
-              unreadCommentCount
-              hasCommentsEnabled
-              ...completedFieldReplies_PublicPetitionField
-              ...focusPetitionField_PublicPetitionField
-            }
-            ...useFieldLogic_PublicPetition
-          }
-
-          ${useFieldLogic.fragments.PublicPetition}
-          ${completedFieldReplies.fragments.PublicPetitionField}
-          ${focusPetitionField.fragments.PublicPetitionField}
-        `;
-      },
-      get PetitionBase() {
-        return gql`
-          fragment RecipientViewContents_PetitionBase on PetitionBase {
-            fields {
-              id
-              type
-              title
-              options
-              optional
-              isInternal
-              isReadOnly
-              previewReplies @client {
-                id
-                status
-                parent {
-                  id
-                }
-              }
-              replies {
-                id
-                status
-                parent {
-                  id
-                }
-              }
-              unreadCommentCount
-              hasCommentsEnabled
-              ...completedFieldReplies_PetitionField
-              ...focusPetitionField_PetitionField
-            }
-            ...useFieldLogic_PetitionBase
-          }
-
-          ${useFieldLogic.fragments.PetitionBase}
-          ${completedFieldReplies.fragments.PetitionField}
-          ${focusPetitionField.fragments.PetitionField}
-        `;
-      },
-    },
   },
 );
+
+const _fragments = {
+  PublicUser: gql`
+    fragment RecipientViewContents_PublicUser on PublicUser {
+      firstName
+    }
+  `,
+  PublicPetition: gql`
+    fragment RecipientViewContents_PublicPetition on PublicPetition {
+      fields {
+        id
+        type
+        title
+        options
+        optional
+        isInternal
+        isReadOnly
+        replies {
+          id
+          status
+          parent {
+            id
+          }
+        }
+
+        unreadCommentCount
+        hasCommentsEnabled
+        ...completedFieldReplies_PublicPetitionField
+        ...focusPetitionField_PublicPetitionField
+      }
+      ...useFieldLogic_PublicPetition
+    }
+  `,
+  PetitionBase: gql`
+    fragment RecipientViewContents_PetitionBase on PetitionBase {
+      fields {
+        id
+        type
+        title
+        options
+        optional
+        isInternal
+        isReadOnly
+        previewReplies @client {
+          id
+          status
+          parent {
+            id
+          }
+        }
+        replies {
+          id
+          status
+          parent {
+            id
+          }
+        }
+        unreadCommentCount
+        hasCommentsEnabled
+        ...completedFieldReplies_PetitionField
+        ...focusPetitionField_PetitionField
+      }
+      ...useFieldLogic_PetitionBase
+    }
+  `,
+};
 
 function useGetPagesAndFields<T extends PetitionSelection>(
   petition: T,

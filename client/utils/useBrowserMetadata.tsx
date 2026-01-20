@@ -30,7 +30,7 @@ export function useBrowserMetadata() {
   return data.metadata!;
 }
 
-useBrowserMetadata.fragments = {
+const _fragments = {
   ConnectionMetadata: gql`
     fragment useBrowserMetadata_ConnectionMetadata on ConnectionMetadata {
       browserName
@@ -40,24 +40,18 @@ useBrowserMetadata.fragments = {
       ip
     }
   `,
-  get PublicQuery() {
-    return gql`
-      fragment useBrowserMetadata_PublicQuery on Query {
-        metadata(keycode: $keycode) {
-          ...useBrowserMetadata_ConnectionMetadata
-        }
+  PublicQuery: gql`
+    fragment useBrowserMetadata_PublicQuery on Query {
+      metadata(keycode: $keycode) {
+        ...useBrowserMetadata_ConnectionMetadata
       }
-      ${this.ConnectionMetadata}
-    `;
-  },
-  get Query() {
-    return gql`
-      fragment useBrowserMetadata_Query on Query {
-        metadata {
-          ...useBrowserMetadata_ConnectionMetadata
-        }
+    }
+  `,
+  Query: gql`
+    fragment useBrowserMetadata_Query on Query {
+      metadata {
+        ...useBrowserMetadata_ConnectionMetadata
       }
-      ${this.ConnectionMetadata}
-    `;
-  },
+    }
+  `,
 };

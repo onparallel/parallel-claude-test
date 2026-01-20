@@ -60,7 +60,7 @@ export function useTemplatesOverviewReportBackgroundTask() {
   );
 }
 
-const fragments = {
+const _fragments = {
   Task: gql`
     fragment useTemplatesOverviewReportTask_Task on Task {
       id
@@ -80,7 +80,6 @@ const _mutations = [
         ...useTemplatesOverviewReportTask_Task
       }
     }
-    ${fragments.Task}
   `,
 ];
 
@@ -91,6 +90,5 @@ const _queries = [
         ...useTemplatesOverviewReportTask_Task
       }
     }
-    ${fragments.Task}
   `,
 ];

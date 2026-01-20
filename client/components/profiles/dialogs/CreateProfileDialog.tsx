@@ -308,35 +308,30 @@ const _fragments = {
       }
     }
   `,
-  get ProfileType() {
-    return gql`
-      fragment useCreateProfileDialog_ProfileType on ProfileType {
+  ProfileType: gql`
+    fragment useCreateProfileDialog_ProfileType on ProfileType {
+      id
+      name
+      createdAt
+      fields {
         id
+        type
         name
-        createdAt
-        fields {
-          id
-          type
-          name
-          isUsedInProfileName
-          myPermission
-          options
-          isExpirable
-        }
+        isUsedInProfileName
+        myPermission
+        options
+        isExpirable
       }
-    `;
-  },
-  get ProfileTypePagination() {
-    return gql`
-      fragment useCreateProfileDialog_ProfileTypePagination on ProfileTypePagination {
-        items {
-          ...useCreateProfileDialog_ProfileType
-        }
-        totalCount
+    }
+  `,
+  ProfileTypePagination: gql`
+    fragment useCreateProfileDialog_ProfileTypePagination on ProfileTypePagination {
+      items {
+        ...useCreateProfileDialog_ProfileType
       }
-      ${this.ProfileType}
-    `;
-  },
+      totalCount
+    }
+  `,
 };
 
 const _queries = [
@@ -346,7 +341,6 @@ const _queries = [
         ...useCreateProfileDialog_ProfileType
       }
     }
-    ${_fragments.ProfileType}
   `,
 ];
 
@@ -360,6 +354,5 @@ const _mutations = [
         ...useCreateProfileDialog_Profile
       }
     }
-    ${_fragments.Profile}
   `,
 ];

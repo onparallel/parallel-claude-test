@@ -11,7 +11,6 @@ import {
   PreviewPetitionField_retryAsyncFieldCompletionDocument,
   RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkDocument,
 } from "@parallel/graphql/__types";
-import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
@@ -28,10 +27,7 @@ import { RecipientViewPetitionFieldDynamicSelect } from "../recipient-view/field
 import { RecipientViewPetitionFieldFileUpload } from "../recipient-view/fields/RecipientViewPetitionFieldFileUpload";
 import { RecipientViewPetitionFieldHeading } from "../recipient-view/fields/RecipientViewPetitionFieldHeading";
 import { RecipientViewPetitionFieldIdVerification } from "../recipient-view/fields/RecipientViewPetitionFieldIdVerification";
-import {
-  RecipientViewPetitionFieldLayout,
-  RecipientViewPetitionFieldLayoutProps,
-} from "../recipient-view/fields/RecipientViewPetitionFieldLayout";
+import { RecipientViewPetitionFieldLayoutProps } from "../recipient-view/fields/RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldNumber } from "../recipient-view/fields/RecipientViewPetitionFieldNumber";
 import { RecipientViewPetitionFieldPhone } from "../recipient-view/fields/RecipientViewPetitionFieldPhone";
 import { RecipientViewPetitionFieldSelect } from "../recipient-view/fields/RecipientViewPetitionFieldSelect";
@@ -392,7 +388,7 @@ export function PreviewPetitionField({
   );
 }
 
-PreviewPetitionField.fragments = {
+const _fragments = {
   User: gql`
     fragment PreviewPetitionField_User on User {
       id
@@ -400,9 +396,6 @@ PreviewPetitionField.fragments = {
       ...PreviewPetitionFieldGroup_User
       ...PreviewPetitionFieldProfileSearch_User
     }
-    ${PreviewPetitionFieldBackgroundCheck.fragments.User}
-    ${PreviewPetitionFieldGroup.fragments.User}
-    ${PreviewPetitionFieldProfileSearch.fragments.User}
   `,
   PetitionBase: gql`
     fragment PreviewPetitionField_PetitionBase on PetitionBase {
@@ -410,9 +403,6 @@ PreviewPetitionField.fragments = {
       ...PreviewPetitionFieldKyc_PetitionBase
       ...PreviewPetitionFieldGroup_PetitionBase
     }
-    ${PreviewPetitionFieldBackgroundCheck.fragments.PetitionBase}
-    ${PreviewPetitionFieldKyc.fragments.PetitionBase}
-    ${PreviewPetitionFieldGroup.fragments.PetitionBase}
   `,
   PetitionField: gql`
     fragment PreviewPetitionField_PetitionField on PetitionField {
@@ -430,11 +420,6 @@ PreviewPetitionField.fragments = {
       }
       ...completedFieldReplies_PetitionField
     }
-    ${RecipientViewPetitionFieldCard.fragments.PetitionField}
-    ${RecipientViewPetitionFieldLayout.fragments.PetitionField}
-    ${RecipientViewPetitionFieldLayout.fragments.PetitionFieldReply}
-    ${PreviewPetitionFieldGroup.fragments.PetitionField}
-    ${completedFieldReplies.fragments.PetitionField}
   `,
   PetitionFieldReply: gql`
     fragment PreviewPetitionField_PetitionFieldReply on PetitionFieldReply {
@@ -450,7 +435,6 @@ const _queries = [
         ...PreviewPetitionField_PetitionField
       }
     }
-    ${PreviewPetitionField.fragments.PetitionField}
   `,
 ];
 

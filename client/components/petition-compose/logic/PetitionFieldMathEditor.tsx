@@ -598,33 +598,27 @@ export function PetitionFieldMathRowReadOnly({
   );
 }
 
-PetitionFieldMathEditor.fragments = {
-  get PetitionBase() {
-    return gql`
-      fragment PetitionFieldMathEditor_PetitionBase on PetitionBase {
-        fields {
+const _fragments = {
+  PetitionBase: gql`
+    fragment PetitionFieldMathEditor_PetitionBase on PetitionBase {
+      fields {
+        id
+        ...PetitionFieldMathEditor_PetitionField
+        children {
           id
           ...PetitionFieldMathEditor_PetitionField
-          children {
-            id
-            ...PetitionFieldMathEditor_PetitionField
-          }
         }
-        variables {
-          name
-        }
-        ...PetitionFieldLogicContext_PetitionBase
       }
-      ${PetitionFieldLogicContext.fragments.PetitionBase}
-      ${this.PetitionField}
-    `;
-  },
-  get PetitionField() {
-    return gql`
-      fragment PetitionFieldMathEditor_PetitionField on PetitionField {
-        id
-        math
+      variables {
+        name
       }
-    `;
-  },
+      ...PetitionFieldLogicContext_PetitionBase
+    }
+  `,
+  PetitionField: gql`
+    fragment PetitionFieldMathEditor_PetitionField on PetitionField {
+      id
+      math
+    }
+  `,
 };

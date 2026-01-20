@@ -173,69 +173,60 @@ export function useProfileNamePreview({
   }, [profileType, updateProfileOnClose, petition, replies, fieldLogic]);
 }
 
-useProfileNamePreview.fragments = {
-  get ProfileType() {
-    return gql`
-      fragment useProfileNamePreview_ProfileType on ProfileType {
+const _fragments = {
+  ProfileType: gql`
+    fragment useProfileNamePreview_ProfileType on ProfileType {
+      id
+      profileNamePattern
+      fields {
         id
-        profileNamePattern
-        fields {
-          id
-          isUsedInProfileName
-          type
-          options
-        }
-      }
-    `;
-  },
-  get PetitionFieldReply() {
-    return gql`
-      fragment useProfileNamePreview_PetitionFieldReply on PetitionFieldReply {
-        id
-        content
-        children {
-          field {
-            id
-          }
-          replies {
-            id
-            content
-          }
-        }
-      }
-    `;
-  },
-  get PetitionField() {
-    return gql`
-      fragment useProfileNamePreview_PetitionField on PetitionField {
-        id
+        isUsedInProfileName
         type
         options
-        parent {
+      }
+    }
+  `,
+  PetitionFieldReply: gql`
+    fragment useProfileNamePreview_PetitionFieldReply on PetitionFieldReply {
+      id
+      content
+      children {
+        field {
           id
         }
         replies {
-          ...useProfileNamePreview_PetitionFieldReply
-        }
-        profileTypeField {
           id
+          content
         }
       }
-      ${this.PetitionFieldReply}
-    `;
-  },
-  get Petition() {
-    return gql`
-      fragment useProfileNamePreview_Petition on Petition {
+    }
+  `,
+  PetitionField: gql`
+    fragment useProfileNamePreview_PetitionField on PetitionField {
+      id
+      type
+      options
+      parent {
         id
-        closedAt
-        fields {
+      }
+      replies {
+        ...useProfileNamePreview_PetitionFieldReply
+      }
+      profileTypeField {
+        id
+      }
+    }
+  `,
+  Petition: gql`
+    fragment useProfileNamePreview_Petition on Petition {
+      id
+      closedAt
+      fields {
+        ...useProfileNamePreview_PetitionField
+        children {
           ...useProfileNamePreview_PetitionField
-          children {
-            ...useProfileNamePreview_PetitionField
-          }
         }
       }
-    `;
-  },
+    }
+  `,
 };

@@ -63,7 +63,7 @@ export function PetitionComposeShortTextSettings({
   );
 }
 
-PetitionComposeShortTextSettings.fragments = {
+const _fragments = {
   PetitionField: gql`
     fragment PetitionComposeShortTextSettings_PetitionField on PetitionField {
       id

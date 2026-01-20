@@ -276,122 +276,100 @@ export function useCheckUpdateProfile({
   }, [profile, updateProfileOnClose, replies, petition, fieldLogic, parentReplyId]);
 }
 
-useCheckUpdateProfile.fragments = {
-  get ProfileType() {
-    return gql`
-      fragment useCheckUpdateProfile_ProfileType on ProfileType {
-        id
-        fields {
-          id
-          type
-        }
-      }
-    `;
-  },
-  get ProfileFieldFile() {
-    return gql`
-      fragment useCheckUpdateProfile_ProfileFieldFile on ProfileFieldFile {
-        file {
-          filename
-          size
-          contentType
-        }
-      }
-    `;
-  },
-  get ProfileFieldValue() {
-    return gql`
-      fragment useCheckUpdateProfile_ProfileFieldValue on ProfileFieldValue {
-        content
-      }
-    `;
-  },
-  get ProfileFieldProperty() {
-    return gql`
-      fragment useCheckUpdateProfile_ProfileFieldProperty on ProfileFieldProperty {
-        field {
-          id
-          myPermission
-          type
-        }
-        value {
-          ...useCheckUpdateProfile_ProfileFieldValue
-        }
-        files {
-          ...useCheckUpdateProfile_ProfileFieldFile
-        }
-      }
-      ${this.ProfileFieldValue}
-      ${this.ProfileFieldFile}
-    `;
-  },
-  get Profile() {
-    return gql`
-      fragment useCheckUpdateProfile_Profile on Profile {
-        id
-        properties {
-          ...useCheckUpdateProfile_ProfileFieldProperty
-        }
-        profileType {
-          ...useCheckUpdateProfile_ProfileType
-        }
-      }
-      ${this.ProfileFieldProperty}
-      ${this.ProfileType}
-    `;
-  },
-
-  get PetitionFieldReply() {
-    return gql`
-      fragment useCheckUpdateProfile_PetitionFieldReply on PetitionFieldReply {
-        id
-        content
-        parent {
-          id
-        }
-        children {
-          field {
-            id
-          }
-          replies {
-            id
-            content
-            parent {
-              id
-            }
-          }
-        }
-      }
-    `;
-  },
-  get PetitionField() {
-    return gql`
-      fragment useCheckUpdateProfile_PetitionField on PetitionField {
+const _fragments = {
+  ProfileType: gql`
+    fragment useCheckUpdateProfile_ProfileType on ProfileType {
+      id
+      fields {
         id
         type
-        replies {
-          ...useCheckUpdateProfile_PetitionFieldReply
-        }
-        profileTypeField {
+      }
+    }
+  `,
+  ProfileFieldFile: gql`
+    fragment useCheckUpdateProfile_ProfileFieldFile on ProfileFieldFile {
+      file {
+        filename
+        size
+        contentType
+      }
+    }
+  `,
+  ProfileFieldValue: gql`
+    fragment useCheckUpdateProfile_ProfileFieldValue on ProfileFieldValue {
+      content
+    }
+  `,
+  ProfileFieldProperty: gql`
+    fragment useCheckUpdateProfile_ProfileFieldProperty on ProfileFieldProperty {
+      field {
+        id
+        myPermission
+        type
+      }
+      value {
+        ...useCheckUpdateProfile_ProfileFieldValue
+      }
+      files {
+        ...useCheckUpdateProfile_ProfileFieldFile
+      }
+    }
+  `,
+  Profile: gql`
+    fragment useCheckUpdateProfile_Profile on Profile {
+      id
+      properties {
+        ...useCheckUpdateProfile_ProfileFieldProperty
+      }
+      profileType {
+        ...useCheckUpdateProfile_ProfileType
+      }
+    }
+  `,
+
+  PetitionFieldReply: gql`
+    fragment useCheckUpdateProfile_PetitionFieldReply on PetitionFieldReply {
+      id
+      content
+      parent {
+        id
+      }
+      children {
+        field {
           id
         }
-      }
-      ${this.PetitionFieldReply}
-    `;
-  },
-  get Petition() {
-    return gql`
-      fragment useCheckUpdateProfile_Petition on Petition {
-        id
-        closedAt
-        fields {
-          ...useCheckUpdateProfile_PetitionField
-          children {
-            ...useCheckUpdateProfile_PetitionField
+        replies {
+          id
+          content
+          parent {
+            id
           }
         }
       }
-      ${this.PetitionField}
-    `;
-  },
+    }
+  `,
+  PetitionField: gql`
+    fragment useCheckUpdateProfile_PetitionField on PetitionField {
+      id
+      type
+      replies {
+        ...useCheckUpdateProfile_PetitionFieldReply
+      }
+      profileTypeField {
+        id
+      }
+    }
+  `,
+  Petition: gql`
+    fragment useCheckUpdateProfile_Petition on Petition {
+      id
+      closedAt
+      fields {
+        ...useCheckUpdateProfile_PetitionField
+        children {
+          ...useCheckUpdateProfile_PetitionField
+        }
+      }
+    }
+  `,
 };

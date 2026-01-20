@@ -43,7 +43,7 @@ import { HighlightText } from "./HighlightText";
 import { OverflownText } from "./OverflownText";
 import { UserDropdownEmpty } from "./UserDropdownEmpty";
 import { UserGroupMembersPopover } from "./UserGroupMembersPopover";
-import { UserGroupReference, userGroupReferenceText } from "./UserGroupReference";
+import { userGroupReferenceText } from "./UserGroupReference";
 import { UserSelectOption } from "./UserSelectOption";
 
 type FieldOf<T extends ApprovalFlowConfigApproverSelect_PetitionBaseFragment> = UnwrapArray<
@@ -76,78 +76,6 @@ export type ApprovalFlowConfigApproverSelectInstance<
     ApprovalFlowConfigApproverSelection<T> = ApprovalFlowConfigApproverSelection<T>,
 > = SelectInstance<OptionType, true, GroupBase<OptionType>>;
 
-const fragments = {
-  User: gql`
-    fragment ApprovalFlowConfigApproverSelect_User on User {
-      id
-      fullName
-      email
-      ...UserSelectOption_User
-    }
-    ${UserSelectOption.fragments.User}
-  `,
-  UserGroup: gql`
-    fragment ApprovalFlowConfigApproverSelect_UserGroup on UserGroup {
-      id
-      name
-      memberCount
-      ...UserSelectOption_UserGroup
-      ...UserGroupReference_UserGroup
-    }
-    ${UserSelectOption.fragments.UserGroup}
-    ${UserGroupReference.fragments.UserGroup}
-  `,
-  PetitionBase: gql`
-    fragment ApprovalFlowConfigApproverSelect_PetitionBase on PetitionBase {
-      id
-      fields {
-        id
-        ...ApprovalFlowConfigApproverSelect_PetitionFieldInner
-        children {
-          id
-          ...ApprovalFlowConfigApproverSelect_PetitionFieldInner
-        }
-      }
-      ...useAllFieldsWithIndices_PetitionBase
-    }
-    fragment ApprovalFlowConfigApproverSelect_PetitionFieldInner on PetitionField {
-      id
-      type
-      title
-      options
-      parent {
-        id
-      }
-    }
-    ${useAllFieldsWithIndices.fragments.PetitionBase}
-  `,
-};
-
-const _queries = [
-  gql`
-    query ApprovalFlowConfigApproverSelect_canCreateUsers {
-      me {
-        id
-        canCreateUsers
-      }
-    }
-  `,
-  gql`
-    query ApprovalFlowConfigApproverSelect_useGetUsersOrGroups($ids: [ID!]!) {
-      getUsersOrGroups(ids: $ids) {
-        ... on User {
-          ...ApprovalFlowConfigApproverSelect_User
-        }
-        ... on UserGroup {
-          ...ApprovalFlowConfigApproverSelect_UserGroup
-        }
-      }
-    }
-    ${fragments.User}
-    ${fragments.UserGroup}
-  `,
-];
-
 export interface ApprovalFlowConfigApproverSelectProps<
   T extends
     ApprovalFlowConfigApproverSelect_PetitionBaseFragment = ApprovalFlowConfigApproverSelect_PetitionBaseFragment,
@@ -158,8 +86,8 @@ export interface ApprovalFlowConfigApproverSelectProps<
   petition: T;
 }
 
-export const ApprovalFlowConfigApproverSelect = Object.assign(
-  forwardRef(function ApprovalFlowConfigApproverSelect<
+export const ApprovalFlowConfigApproverSelect = forwardRef(
+  function ApprovalFlowConfigApproverSelect<
     T extends
       ApprovalFlowConfigApproverSelect_PetitionBaseFragment = ApprovalFlowConfigApproverSelect_PetitionBaseFragment,
     OptionType extends
@@ -445,17 +373,16 @@ export const ApprovalFlowConfigApproverSelect = Object.assign(
         {...extensions}
       />
     );
-  }) as <
-    T extends
-      ApprovalFlowConfigApproverSelect_PetitionBaseFragment = ApprovalFlowConfigApproverSelect_PetitionBaseFragment,
-    OptionType extends
-      ApprovalFlowConfigApproverSelection<T> = ApprovalFlowConfigApproverSelection<T>,
-  >(
-    props: ApprovalFlowConfigApproverSelectProps<T, OptionType> &
-      RefAttributes<ApprovalFlowConfigApproverSelectInstance<T, OptionType>>,
-  ) => ReactElement,
-  { fragments },
-);
+  },
+) as <
+  T extends
+    ApprovalFlowConfigApproverSelect_PetitionBaseFragment = ApprovalFlowConfigApproverSelect_PetitionBaseFragment,
+  OptionType extends
+    ApprovalFlowConfigApproverSelection<T> = ApprovalFlowConfigApproverSelection<T>,
+>(
+  props: ApprovalFlowConfigApproverSelectProps<T, OptionType> &
+    RefAttributes<ApprovalFlowConfigApproverSelectInstance<T, OptionType>>,
+) => ReactElement;
 
 function useGetUsersOrGroups() {
   const client = useApolloClient();
@@ -762,3 +689,69 @@ function ApprovalFlowConfigApproverSelectOption<
   }
   return null;
 }
+
+const _fragments = {
+  User: gql`
+    fragment ApprovalFlowConfigApproverSelect_User on User {
+      id
+      fullName
+      email
+      ...UserSelectOption_User
+    }
+  `,
+  UserGroup: gql`
+    fragment ApprovalFlowConfigApproverSelect_UserGroup on UserGroup {
+      id
+      name
+      memberCount
+      ...UserSelectOption_UserGroup
+      ...UserGroupReference_UserGroup
+    }
+  `,
+  PetitionBase: gql`
+    fragment ApprovalFlowConfigApproverSelect_PetitionBase on PetitionBase {
+      id
+      fields {
+        id
+        ...ApprovalFlowConfigApproverSelect_PetitionFieldInner
+        children {
+          id
+          ...ApprovalFlowConfigApproverSelect_PetitionFieldInner
+        }
+      }
+      ...useAllFieldsWithIndices_PetitionBase
+    }
+    fragment ApprovalFlowConfigApproverSelect_PetitionFieldInner on PetitionField {
+      id
+      type
+      title
+      options
+      parent {
+        id
+      }
+    }
+  `,
+};
+
+const _queries = [
+  gql`
+    query ApprovalFlowConfigApproverSelect_canCreateUsers {
+      me {
+        id
+        canCreateUsers
+      }
+    }
+  `,
+  gql`
+    query ApprovalFlowConfigApproverSelect_useGetUsersOrGroups($ids: [ID!]!) {
+      getUsersOrGroups(ids: $ids) {
+        ... on User {
+          ...ApprovalFlowConfigApproverSelect_User
+        }
+        ... on UserGroup {
+          ...ApprovalFlowConfigApproverSelect_UserGroup
+        }
+      }
+    }
+  `,
+];

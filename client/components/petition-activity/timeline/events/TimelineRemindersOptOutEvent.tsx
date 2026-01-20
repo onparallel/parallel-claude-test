@@ -43,7 +43,7 @@ export function TimelineRemindersOptOutEvent({ event }: TimelineRemindersOptOutE
   );
 }
 
-TimelineRemindersOptOutEvent.fragments = {
+const _fragments = {
   RemindersOptOutEvent: gql`
     fragment TimelineRemindersOptOutEvent_RemindersOptOutEvent on RemindersOptOutEvent {
       access {
@@ -55,6 +55,5 @@ TimelineRemindersOptOutEvent.fragments = {
       reason
       other
     }
-    ${ContactReference.fragments.Contact}
   `,
 };

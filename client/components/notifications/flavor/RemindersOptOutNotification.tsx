@@ -16,64 +16,59 @@ export interface RemindersOptOutNotificationProps {
   notification: RemindersOptOutNotification_RemindersOptOutNotificationFragment;
 }
 
-export const RemindersOptOutNotification = Object.assign(
-  forwardRef<HTMLElement, RemindersOptOutNotificationProps>(function RemindersOptOutNotification(
-    { isFirst, notification },
-    ref,
-  ) {
-    const answers = useReminderOptOutReasons();
-    const { other, access } = notification;
-    const reason = notification.reason as ReminderOptOutReason;
+export const RemindersOptOutNotification = forwardRef<
+  HTMLElement,
+  RemindersOptOutNotificationProps
+>(function RemindersOptOutNotification({ isFirst, notification }, ref) {
+  const answers = useReminderOptOutReasons();
+  const { other, access } = notification;
+  const reason = notification.reason as ReminderOptOutReason;
 
-    return (
-      <PetitionUserNotification
-        ref={ref}
-        isFirst={isFirst}
-        notification={notification}
-        icon={
-          <Circle size="36px" background="red.600">
-            <BellOffIcon color="white" fontSize="1rem" />
-          </Circle>
+  return (
+    <PetitionUserNotification
+      ref={ref}
+      isFirst={isFirst}
+      notification={notification}
+      icon={
+        <Circle size="36px" background="red.600">
+          <BellOffIcon color="white" fontSize="1rem" />
+        </Circle>
+      }
+      path={`/activity`}
+    >
+      <FormattedMessage
+        id="component.notification-reminders-opt-out.body"
+        defaultMessage="{name} has opted out from receiving reminders: {reason}"
+        values={{
+          name: <ContactReference draggable="false" tabIndex={-1} contact={access.contact} />,
+          reason: (
+            <Text as="cite">
+              {reason === "OTHER" ? (
+                <>
+                  {answers[reason]}: ({other})
+                </>
+              ) : (
+                answers[reason]
+              )}
+            </Text>
+          ),
+        }}
+      />
+    </PetitionUserNotification>
+  );
+});
+
+const _fragments = {
+  RemindersOptOutNotification: gql`
+    fragment RemindersOptOutNotification_RemindersOptOutNotification on RemindersOptOutNotification {
+      ...PetitionUserNotification_PetitionUserNotification
+      access {
+        contact {
+          ...ContactReference_Contact
         }
-        path={`/activity`}
-      >
-        <FormattedMessage
-          id="component.notification-reminders-opt-out.body"
-          defaultMessage="{name} has opted out from receiving reminders: {reason}"
-          values={{
-            name: <ContactReference draggable="false" tabIndex={-1} contact={access.contact} />,
-            reason: (
-              <Text as="cite">
-                {reason === "OTHER" ? (
-                  <>
-                    {answers[reason]}: ({other})
-                  </>
-                ) : (
-                  answers[reason]
-                )}
-              </Text>
-            ),
-          }}
-        />
-      </PetitionUserNotification>
-    );
-  }),
-  {
-    fragments: {
-      RemindersOptOutNotification: gql`
-        fragment RemindersOptOutNotification_RemindersOptOutNotification on RemindersOptOutNotification {
-          ...PetitionUserNotification_PetitionUserNotification
-          access {
-            contact {
-              ...ContactReference_Contact
-            }
-          }
-          reason
-          other
-        }
-        ${PetitionUserNotification.fragments.PetitionUserNotification}
-        ${ContactReference.fragments.Contact}
-      `,
-    },
-  },
-);
+      }
+      reason
+      other
+    }
+  `,
+};

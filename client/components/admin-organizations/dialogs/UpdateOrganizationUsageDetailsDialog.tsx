@@ -398,7 +398,7 @@ export function UpdateOrganizationUsageDetailsDialog({
   );
 }
 
-UpdateOrganizationUsageDetailsDialog.fragments = {
+const _fragments = {
   OrganizationUsageLimit: gql`
     fragment UpdateOrganizationUsageDetailsDialog_OrganizationUsageLimit on OrganizationUsageLimit {
       id

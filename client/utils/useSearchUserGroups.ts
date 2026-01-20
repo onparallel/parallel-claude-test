@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import { useApolloClient } from "@apollo/client/react";
-import { UserSelect } from "@parallel/components/common/UserSelect";
 import {
   UserGroupType,
   UserSelect_UserGroupFragment,
@@ -56,6 +55,5 @@ const _queries = [
         }
       }
     }
-    ${UserSelect.fragments.UserGroup}
   `,
 ];

@@ -45,7 +45,7 @@ export function ProfilesRatioModuleSettings({
   );
 }
 
-ProfilesRatioModuleSettings.fragments = {
+const _fragments = {
   ProfileType: gql`
     fragment ProfilesRatioModuleSettings_ProfileType on ProfileType {
       id
@@ -54,6 +54,5 @@ ProfilesRatioModuleSettings.fragments = {
         ...ProfilesModuleFilterEditor_ProfileTypeField
       }
     }
-    ${ProfilesModuleFilterEditor.fragments.ProfileTypeField}
   `,
 };

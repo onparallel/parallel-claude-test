@@ -11,10 +11,7 @@ import {
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
-import {
-  SentPetitionMessageDialog,
-  useSentPetitionMessageDialog,
-} from "../../dialogs/SentPetitionMessageDialog";
+import { useSentPetitionMessageDialog } from "../../dialogs/SentPetitionMessageDialog";
 
 import { getOperationName } from "@apollo/client/utilities/internal";
 import { useCallback } from "react";
@@ -117,7 +114,7 @@ export function TimelineMessageScheduledEvent({
   );
 }
 
-TimelineMessageScheduledEvent.fragments = {
+const _fragments = {
   MessageScheduledEvent: gql`
     fragment TimelineMessageScheduledEvent_MessageScheduledEvent on MessageScheduledEvent {
       petition {
@@ -143,9 +140,6 @@ TimelineMessageScheduledEvent.fragments = {
       }
       createdAt
     }
-    ${UserReference.fragments.User}
-    ${ContactReference.fragments.Contact}
-    ${SentPetitionMessageDialog.fragments.PetitionMessage}
   `,
 };
 

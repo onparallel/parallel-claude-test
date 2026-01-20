@@ -37,50 +37,6 @@ export type ProfileTypeSelectInstance<
   OptionType extends ProfileTypeSelectSelection = ProfileTypeSelectSelection,
 > = SelectInstance<OptionType, IsMulti, never>;
 
-const fragments = {
-  ProfileType: gql`
-    fragment ProfileTypeSelect_ProfileType on ProfileType {
-      id
-      name
-      canCreate
-    }
-  `,
-};
-
-const _queries = [
-  gql`
-    query ProfileTypeSelect_profileTypes(
-      $offset: Int
-      $limit: Int
-      $search: String
-      $locale: UserLocale
-      $sortBy: [QueryProfileTypes_OrderBy!]
-    ) {
-      profileTypes(
-        offset: $offset
-        limit: $limit
-        search: $search
-        locale: $locale
-        sortBy: $sortBy
-      ) {
-        items {
-          ...ProfileTypeSelect_ProfileType
-        }
-        totalCount
-      }
-    }
-    ${fragments.ProfileType}
-  `,
-  gql`
-    query ProfileTypeSelect_profileType($profileTypeId: GID!) {
-      profileType(profileTypeId: $profileTypeId) {
-        ...ProfileTypeSelect_ProfileType
-      }
-    }
-    ${fragments.ProfileType}
-  `,
-];
-
 export interface ProfileTypeSelectProps<
   IsMulti extends boolean = false,
   IsSync extends boolean = false,
@@ -92,159 +48,156 @@ export interface ProfileTypeSelectProps<
   showOnlyCreatable?: boolean;
 }
 
-export const ProfileTypeSelect = Object.assign(
-  forwardRef(function ProfileTypeSelect<
-    IsMulti extends boolean = false,
-    IsSync extends boolean = false,
-    OptionType extends ProfileTypeSelectSelection = ProfileTypeSelectSelection,
-  >(
-    {
-      value,
-      isSync,
-      onChange,
-      options,
-      isMulti,
-      placeholder: _placeholder,
-      showOnlyCreatable,
-      ...props
-    }: ProfileTypeSelectProps<IsMulti, IsSync, OptionType>,
-    ref: ForwardedRef<ProfileTypeSelectInstance<IsMulti, OptionType>>,
-  ) {
-    const intl = useIntl();
-    const needsLoading =
-      typeof value === "string" || (Array.isArray(value) && typeof value[0] === "string");
+export const ProfileTypeSelect = forwardRef(function ProfileTypeSelect<
+  IsMulti extends boolean = false,
+  IsSync extends boolean = false,
+  OptionType extends ProfileTypeSelectSelection = ProfileTypeSelectSelection,
+>(
+  {
+    value,
+    isSync,
+    onChange,
+    options,
+    isMulti,
+    placeholder: _placeholder,
+    showOnlyCreatable,
+    ...props
+  }: ProfileTypeSelectProps<IsMulti, IsSync, OptionType>,
+  ref: ForwardedRef<ProfileTypeSelectInstance<IsMulti, OptionType>>,
+) {
+  const intl = useIntl();
+  const needsLoading =
+    typeof value === "string" || (Array.isArray(value) && typeof value[0] === "string");
 
-    const apollo = useApolloClient();
+  const apollo = useApolloClient();
 
-    const loadProfileTypes = useDebouncedAsync(
-      async (search: string | null | undefined) => {
-        const { data } = await apollo.query({
-          query: ProfileTypeSelect_profileTypesDocument,
-          variables: {
-            offset: 0,
-            limit: 100,
-            locale: intl.locale as UserLocale,
-            search,
-            sortBy: "name_ASC",
-          },
-          fetchPolicy: "no-cache",
-        });
-
-        assert(
-          isNonNullish(data),
-          "Result data in ProfileTypeSelect_profileTypesDocument is missing",
-        );
-
-        return (
-          showOnlyCreatable
-            ? data.profileTypes.items.filter((pt) => pt.canCreate)
-            : data.profileTypes.items
-        ) as any[];
-      },
-      300,
-      [intl.locale, showOnlyCreatable],
-    );
-
-    const getProfileTypes = useGetProfileTypes();
-
-    const _value = useAsyncMemo(async () => {
-      if (value === null) {
-        return null;
-      }
-      if (needsLoading) {
-        return await getProfileTypes(value as any);
-      } else {
-        return value as MaybeArray<ProfileTypeSelectSelection>;
-      }
-    }, [
-      needsLoading,
-      // Rerun when value changes
-      isNonNullish(value)
-        ? needsLoading
-          ? // value is string | string[]
-            unMaybeArray(value as any).join(",")
-          : // value is ProfileSelection[]
-            unMaybeArray(value as any)
-              .map((x) => x.id)
-              .join(",")
-        : null,
-    ]);
-
-    const placeholder = useMemo(() => {
-      return (
-        _placeholder ??
-        intl.formatMessage(
-          {
-            id: "component.profile-type-select.placeholder",
-            defaultMessage: "Select {isMulti, select, true{profiles types} other {a profile type}}",
-          },
-          {
-            isMulti,
-          },
-        )
-      );
-    }, [_placeholder, isMulti]);
-
-    const rsProps = useReactSelectProps<OptionType, IsMulti, never>({
-      ...props,
-      components: {
-        SingleValue,
-        MultiValueLabel,
-        Option,
-        ...props.components,
-      } as unknown as SelectComponentsConfig<OptionType, IsMulti, never>,
-    });
-
-    const getOptionLabel = (option: ProfileTypeSelectSelection) => {
-      return localizableUserTextRender({
-        value: option.name,
-        intl,
-        default: intl.formatMessage({
-          id: "generic.unnamed-profile-type",
-          defaultMessage: "Unnamed profile type",
-        }),
+  const loadProfileTypes = useDebouncedAsync(
+    async (search: string | null | undefined) => {
+      const { data } = await apollo.query({
+        query: ProfileTypeSelect_profileTypesDocument,
+        variables: {
+          offset: 0,
+          limit: 100,
+          locale: intl.locale as UserLocale,
+          search,
+          sortBy: "name_ASC",
+        },
+        fetchPolicy: "no-cache",
       });
-    };
 
-    return isSync ? (
-      <Select<OptionType, IsMulti, never>
-        ref={ref as any}
-        value={_value as any}
-        onChange={onChange as any}
-        isMulti={isMulti}
-        options={options}
-        getOptionLabel={getOptionLabel}
-        getOptionValue={getOptionValue}
-        placeholder={placeholder}
-        isClearable={props.isClearable}
-        {...props}
-        {...rsProps}
-      />
-    ) : (
-      <AsyncSelect<OptionType, IsMulti, never>
-        ref={ref as any}
-        value={_value as any}
-        onChange={onChange as any}
-        isMulti={isMulti}
-        loadOptions={loadProfileTypes}
-        getOptionLabel={getOptionLabel}
-        getOptionValue={getOptionValue}
-        placeholder={placeholder}
-        isClearable={props.isClearable}
-        {...props}
-        {...rsProps}
-      />
+      assert(
+        isNonNullish(data),
+        "Result data in ProfileTypeSelect_profileTypesDocument is missing",
+      );
+
+      return (
+        showOnlyCreatable
+          ? data.profileTypes.items.filter((pt) => pt.canCreate)
+          : data.profileTypes.items
+      ) as any[];
+    },
+    300,
+    [intl.locale, showOnlyCreatable],
+  );
+
+  const getProfileTypes = useGetProfileTypes();
+
+  const _value = useAsyncMemo(async () => {
+    if (value === null) {
+      return null;
+    }
+    if (needsLoading) {
+      return await getProfileTypes(value as any);
+    } else {
+      return value as MaybeArray<ProfileTypeSelectSelection>;
+    }
+  }, [
+    needsLoading,
+    // Rerun when value changes
+    isNonNullish(value)
+      ? needsLoading
+        ? // value is string | string[]
+          unMaybeArray(value as any).join(",")
+        : // value is ProfileSelection[]
+          unMaybeArray(value as any)
+            .map((x) => x.id)
+            .join(",")
+      : null,
+  ]);
+
+  const placeholder = useMemo(() => {
+    return (
+      _placeholder ??
+      intl.formatMessage(
+        {
+          id: "component.profile-type-select.placeholder",
+          defaultMessage: "Select {isMulti, select, true{profiles types} other {a profile type}}",
+        },
+        {
+          isMulti,
+        },
+      )
     );
-  }) as <
-    IsMulti extends boolean = false,
-    IsSync extends boolean = false,
-    OptionType extends ProfileTypeSelectSelection = ProfileTypeSelectSelection,
-  >(
-    props: ProfileTypeSelectProps<IsMulti, IsSync, OptionType> &
-      RefAttributes<ProfileTypeSelectInstance<IsMulti, OptionType>>,
-  ) => ReactElement,
-  { fragments },
-);
+  }, [_placeholder, isMulti]);
+
+  const rsProps = useReactSelectProps<OptionType, IsMulti, never>({
+    ...props,
+    components: {
+      SingleValue,
+      MultiValueLabel,
+      Option,
+      ...props.components,
+    } as unknown as SelectComponentsConfig<OptionType, IsMulti, never>,
+  });
+
+  const getOptionLabel = (option: ProfileTypeSelectSelection) => {
+    return localizableUserTextRender({
+      value: option.name,
+      intl,
+      default: intl.formatMessage({
+        id: "generic.unnamed-profile-type",
+        defaultMessage: "Unnamed profile type",
+      }),
+    });
+  };
+
+  return isSync ? (
+    <Select<OptionType, IsMulti, never>
+      ref={ref as any}
+      value={_value as any}
+      onChange={onChange as any}
+      isMulti={isMulti}
+      options={options}
+      getOptionLabel={getOptionLabel}
+      getOptionValue={getOptionValue}
+      placeholder={placeholder}
+      isClearable={props.isClearable}
+      {...props}
+      {...rsProps}
+    />
+  ) : (
+    <AsyncSelect<OptionType, IsMulti, never>
+      ref={ref as any}
+      value={_value as any}
+      onChange={onChange as any}
+      isMulti={isMulti}
+      loadOptions={loadProfileTypes}
+      getOptionLabel={getOptionLabel}
+      getOptionValue={getOptionValue}
+      placeholder={placeholder}
+      isClearable={props.isClearable}
+      {...props}
+      {...rsProps}
+    />
+  );
+}) as <
+  IsMulti extends boolean = false,
+  IsSync extends boolean = false,
+  OptionType extends ProfileTypeSelectSelection = ProfileTypeSelectSelection,
+>(
+  props: ProfileTypeSelectProps<IsMulti, IsSync, OptionType> &
+    RefAttributes<ProfileTypeSelectInstance<IsMulti, OptionType>>,
+) => ReactElement;
 
 function useGetProfileTypes() {
   const client = useApolloClient();
@@ -357,3 +310,45 @@ function ProfileTypeSelectOption({ data, highlight, isDisabled }: ProfileTypeSel
     </Box>
   );
 }
+
+const _fragments = {
+  ProfileType: gql`
+    fragment ProfileTypeSelect_ProfileType on ProfileType {
+      id
+      name
+      canCreate
+    }
+  `,
+};
+
+const _queries = [
+  gql`
+    query ProfileTypeSelect_profileTypes(
+      $offset: Int
+      $limit: Int
+      $search: String
+      $locale: UserLocale
+      $sortBy: [QueryProfileTypes_OrderBy!]
+    ) {
+      profileTypes(
+        offset: $offset
+        limit: $limit
+        search: $search
+        locale: $locale
+        sortBy: $sortBy
+      ) {
+        items {
+          ...ProfileTypeSelect_ProfileType
+        }
+        totalCount
+      }
+    }
+  `,
+  gql`
+    query ProfileTypeSelect_profileType($profileTypeId: GID!) {
+      profileType(profileTypeId: $profileTypeId) {
+        ...ProfileTypeSelect_ProfileType
+      }
+    }
+  `,
+];
