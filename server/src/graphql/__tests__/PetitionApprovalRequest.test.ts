@@ -12,6 +12,10 @@ import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { EMAILS, IEmailsService } from "../../services/EmailsService";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
+import {
+  PETITION_APPROVAL_PROCESS_LISTENER,
+  PetitionApprovalProcessListener,
+} from "../../workers/queues/event-listeners/PetitionApprovalProcessListener";
 import { initServer, TestClient } from "./server";
 
 describe("GraphQL/Petition Approval Request", () => {
@@ -4035,6 +4039,168 @@ describe("GraphQL/Petition Approval Request", () => {
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
+    });
+  });
+
+  describe("Bug: Multiple PENDING steps when manually approving in quick succession", () => {
+    let petition: Petition;
+
+    /**
+     * This test reproduces a bug where multiple approval steps become PENDING simultaneously
+     * after going through multiple steps in a quick succession
+     *
+     * Configuration:
+     * - 3 approval steps
+     * - Step 1: Manual start
+     * - Step 2: Manual start
+     * - Step 3: Auto-start
+     *
+     * Bug scenario:
+     * 1. Start and approve step 1, then start step 2 quickly (before first event is processed)
+     * 2. 3rd step should remain NOT_STARTED
+     */
+
+    beforeEach(async () => {
+      [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+        status: "COMPLETED",
+        approval_flow_config: JSON.stringify([
+          {
+            manual_start: false,
+            name: "Approval 1",
+            type: "ANY",
+            values: [{ type: "User", id: user.id }],
+          },
+          {
+            manual_start: true,
+            name: "Approval 2",
+            type: "ANY",
+            values: [{ type: "User", id: user.id }],
+          },
+          {
+            manual_start: false,
+            name: "Approval 3",
+            type: "ANY",
+            values: [{ type: "User", id: user.id }],
+          },
+        ]),
+      }));
+    });
+
+    it("should not have multiple PENDING steps after starting step 2 quickly", async () => {
+      await testClient.container
+        .get<PetitionApprovalProcessListener>(PETITION_APPROVAL_PROCESS_LISTENER)
+        .handle({
+          id: 1,
+          type: "PETITION_COMPLETED",
+          data: { user_id: user.id },
+          petition_id: petition.id,
+          created_at: new Date(),
+          processed_at: null,
+          processed_by: null,
+        });
+
+      let steps = await mocks.knex
+        .from("petition_approval_request_step")
+        .where("petition_id", petition.id)
+        .whereNull("deprecated_at")
+        .orderBy("step_number")
+        .select("*");
+
+      // Initial state: Step 1 should be PENDING
+      expect(steps[0].status).toBe("PENDING");
+      expect(steps[1].status).toBe("NOT_STARTED");
+      expect(steps[2].status).toBe("NOT_STARTED");
+      expect(steps).toHaveLength(3);
+
+      // Approve Step 1
+      const approveResult = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $approvalRequestStepId: GID!, $message: String!) {
+            approvePetitionApprovalRequestStep(
+              petitionId: $petitionId
+              approvalRequestStepId: $approvalRequestStepId
+              message: $message
+            ) {
+              id
+              status
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          approvalRequestStepId: toGlobalId("PetitionApprovalRequestStep", steps[0].id),
+          message: "Approved",
+        },
+      );
+
+      expect(approveResult.errors).toBeUndefined();
+      expect(approveResult.data?.approvePetitionApprovalRequestStep.status).toBe("APPROVED");
+
+      steps = await mocks.knex
+        .from("petition_approval_request_step")
+        .where("petition_id", petition.id)
+        .whereNull("deprecated_at")
+        .orderBy("step_number")
+        .select("*");
+
+      expect(steps[0].status).toBe("APPROVED");
+      expect(steps[1].status).toBe("NOT_STARTED");
+      expect(steps[2].status).toBe("NOT_STARTED");
+      expect(steps).toHaveLength(3);
+
+      // Start Step 2 manually. Here we will simulate a quick start before first event is processed
+      const startResult = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $approvalRequestStepId: GID!, $message: String) {
+            startPetitionApprovalRequestStep(
+              petitionId: $petitionId
+              approvalRequestStepId: $approvalRequestStepId
+              message: $message
+            ) {
+              id
+              status
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          approvalRequestStepId: toGlobalId("PetitionApprovalRequestStep", steps[1].id),
+          message: "Starting step 2",
+        },
+      );
+
+      expect(startResult.errors).toBeUndefined();
+      expect(startResult.data?.startPetitionApprovalRequestStep.status).toBe("PENDING");
+
+      // Simulate the event listener processing the first event after a while (after starting step 2)
+      await testClient.container
+        .get<PetitionApprovalProcessListener>(PETITION_APPROVAL_PROCESS_LISTENER)
+        .handle({
+          id: 2,
+          type: "PETITION_APPROVAL_REQUEST_STEP_FINISHED",
+          data: {
+            is_approved: true,
+            petition_approval_request_step_id: steps[0].id,
+            user_id: user.id,
+          },
+          petition_id: petition.id,
+          created_at: new Date(),
+          processed_at: null,
+          processed_by: null,
+        });
+
+      steps = await mocks.knex
+        .from("petition_approval_request_step")
+        .where("petition_id", petition.id)
+        .whereNull("deprecated_at")
+        .orderBy("step_number")
+        .select("*");
+
+      expect(steps[0].status).toBe("APPROVED");
+      expect(steps[1].status).toBe("PENDING");
+      // 3rd step should remain NOT_STARTED
+      expect(steps[2].status).toBe("NOT_STARTED");
+      expect(steps).toHaveLength(3);
     });
   });
 });

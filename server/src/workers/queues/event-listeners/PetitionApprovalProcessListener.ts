@@ -97,9 +97,12 @@ export class PetitionApprovalProcessListener
       (event.type === "PETITION_APPROVAL_REQUEST_STEP_FINISHED" && event.data.is_approved) ||
       event.type === "PETITION_APPROVAL_REQUEST_STEP_SKIPPED"
     ) {
-      const nextStep = currentSteps.find((s) => s.status === "NOT_STARTED");
-      if (nextStep?.manual_start === false) {
-        await this.approvals.startApprovalRequestStep(nextStep.id);
+      const pendingStep = currentSteps.find((s) => s.status === "PENDING");
+      if (!pendingStep) {
+        const nextStep = currentSteps.find((s) => s.status === "NOT_STARTED");
+        if (nextStep?.manual_start === false) {
+          await this.approvals.startApprovalRequestStep(nextStep.id);
+        }
       }
 
       return;
