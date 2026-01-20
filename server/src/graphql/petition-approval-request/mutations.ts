@@ -1,6 +1,6 @@
 import { enumType, list, mutationField, nonNull, stringArg } from "nexus";
 import pMap from "p-map";
-import { isNonNullish, unique, zip } from "remeda";
+import { isNonNullish, zip } from "remeda";
 import { assert } from "ts-essentials";
 import { PetitionFieldComment } from "../../db/__types";
 import { toBytes } from "../../util/fileSize";
@@ -643,14 +643,7 @@ export const rejectPetitionApprovalRequestStep = mutationField(
         const petition = await ctx.petitions.loadPetition(args.petitionId);
         assert(petition?.approval_flow_config);
         for (const [step, config] of zip(newSteps, petition.approval_flow_config)) {
-          const userGroupsIds = config.values
-            .filter((v) => v.type === "UserGroup")
-            .map((v) => v.id);
-          const groupMembers = (await ctx.userGroups.loadUserGroupMembers(userGroupsIds)).flat();
-          const userIds = unique([
-            ...config.values.filter((v) => v.type === "User").map((v) => v.id),
-            ...groupMembers.map((m) => m.user_id),
-          ]);
+          const userIds = await ctx.approvals.extractUserIdsFromApprovalFlowConfig(config);
 
           await ctx.approvalRequests.createPetitionApprovalRequestStepApprovers(
             step.id,
