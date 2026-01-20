@@ -156,9 +156,10 @@ export const PetitionApprovalsCard = Object.assign(
     );
 
     const signatureIndex = approvalStepsWithSignature.findIndex((s) => s.id === "signature");
+    const lastStepIndex = approvalStepsWithSignature.length - 1;
 
     const [tabIndex, setTabIndex] = useState(
-      pendingOrNotStartedStepIndex === -1 ? signatureIndex : pendingOrNotStartedStepIndex,
+      pendingOrNotStartedStepIndex === -1 ? lastStepIndex : pendingOrNotStartedStepIndex,
     );
     const autoChangeTabIndex = useRef(true);
 
