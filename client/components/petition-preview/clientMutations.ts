@@ -201,40 +201,18 @@ export function useUpdatePetitionFieldReply() {
   );
 }
 
+// spread all field fragments from Preview and Replies to avoid circular dependencies and missing cache
 const _createPetitionFieldReplies = gql`
   mutation PreviewPetitionFieldMutations_createPetitionFieldReplies(
     $petitionId: GID!
     $fields: [CreatePetitionFieldReplyInput!]!
   ) {
     createPetitionFieldReplies(petitionId: $petitionId, fields: $fields) {
-      ...RecipientViewPetitionFieldLayout_PetitionFieldReply
-      children {
-        field {
-          id
-        }
-      }
+      id
       field {
         id
-        petition {
-          id
-          ... on Petition {
-            status
-          }
-        }
-        replies {
-          id
-          parent {
-            id
-            children {
-              field {
-                id
-              }
-              replies {
-                id
-              }
-            }
-          }
-        }
+        ...PetitionReplies_PetitionField
+        ...PetitionPreview_PetitionField
       }
     }
   }

@@ -920,6 +920,37 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
 }
 
 const _fragments = {
+  PetitionField: gql`
+    fragment PetitionPreview_PetitionField on PetitionField {
+      id
+      unreadCommentCount
+      children {
+        id
+        alias
+        ...validatePetitionFields_PetitionField
+        ...FieldErrorDialog_PetitionField
+        replies {
+          id
+          parent {
+            id
+          }
+        }
+      }
+      replies {
+        id
+        parent {
+          id
+        }
+      }
+      ...PreviewPetitionField_PetitionField
+      ...validatePetitionFields_PetitionField
+      ...FieldErrorDialog_PetitionField
+      ...HiddenFieldDialog_PetitionField
+      ...focusPetitionField_PetitionField
+      ...PetitionPreviewRightPaneTabs_PetitionField
+      ...PetitionRepliesFieldComments_PetitionField
+    }
+  `,
   PetitionBase: gql`
     fragment PetitionPreview_PetitionBase on PetitionBase {
       id
@@ -968,32 +999,7 @@ const _fragments = {
       }
       fields {
         id
-        unreadCommentCount
-        children {
-          id
-          alias
-          ...validatePetitionFields_PetitionField
-          ...FieldErrorDialog_PetitionField
-          replies {
-            id
-            parent {
-              id
-            }
-          }
-        }
-        replies {
-          id
-          parent {
-            id
-          }
-        }
-        ...PreviewPetitionField_PetitionField
-        ...validatePetitionFields_PetitionField
-        ...FieldErrorDialog_PetitionField
-        ...HiddenFieldDialog_PetitionField
-        ...focusPetitionField_PetitionField
-        ...PetitionPreviewRightPaneTabs_PetitionField
-        ...PetitionRepliesFieldComments_PetitionField
+        ...PetitionPreview_PetitionField
       }
       signatureConfig {
         isEnabled

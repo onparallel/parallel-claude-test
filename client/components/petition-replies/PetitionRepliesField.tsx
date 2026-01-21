@@ -354,14 +354,14 @@ export const PetitionRepliesField = forwardRef<HTMLElement, PetitionRepliesField
                     </Text>
                   ) : null}
                   <Stack spacing={3}>
-                    {filteredFields.map((x) => {
+                    {filteredFields.map((x, filteredFieldIndex) => {
                       return x.type === "FIELD" ? (
                         <LiquidPetitionVariableProvider
                           key={x.field.id}
                           logic={x.fieldLogic}
                           variables={petition.variables}
                         >
-                          <Stack key={x.field.id}>
+                          <Stack>
                             <Box>
                               <Box position="relative">
                                 {x.field.optional ? null : (
@@ -472,7 +472,10 @@ export const PetitionRepliesField = forwardRef<HTMLElement, PetitionRepliesField
                           </Stack>
                         </LiquidPetitionVariableProvider>
                       ) : (
-                        <PetitionRepliesFilteredFields key={index} count={x.count} />
+                        <PetitionRepliesFilteredFields
+                          key={`filtered-${filteredFieldIndex}`}
+                          count={x.count}
+                        />
                       );
                     })}
                   </Stack>
