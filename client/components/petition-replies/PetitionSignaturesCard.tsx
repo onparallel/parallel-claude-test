@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import { Box, Center, Grid, HStack, Text, useToast } from "@chakra-ui/react";
 import { AddIcon, SignatureIcon } from "@parallel/chakra/icons";
@@ -260,3 +261,93 @@ export function PetitionSignaturesCardBody({
     </Center>
   );
 }
+
+const _fragments = {
+  User: gql`
+    fragment PetitionSignaturesCard_User on User {
+      ...TestModeSignatureBadge_User
+    }
+  `,
+  Petition: gql`
+    fragment PetitionSignaturesCard_Petition on Petition {
+      id
+      status
+      signatureConfig {
+        isEnabled
+      }
+      generalCommentCount
+      unreadGeneralCommentCount
+      signatureRequests {
+        id
+        ...CurrentSignatureRequestRow_PetitionSignatureRequest
+        ...OlderSignatureRequestRows_PetitionSignatureRequest
+      }
+      ...NewSignatureRequestRow_Petition
+      ...getPetitionSignatureEnvironment_Petition
+      ...useAddNewSignature_Petition
+    }
+  `,
+  PetitionPolling: gql`
+    fragment PetitionSignaturesCard_PetitionPolling on Petition {
+      id
+      status
+      signatureConfig {
+        isEnabled
+      }
+      generalCommentCount
+      unreadGeneralCommentCount
+      signatureRequests {
+        id
+        ...CurrentSignatureRequestRow_PetitionSignatureRequest
+      }
+      ...useAddNewSignature_Petition
+      ...getPetitionSignatureEnvironment_Petition
+    }
+  `,
+};
+
+const _mutations = [
+  gql`
+    mutation PetitionSignaturesCard_cancelSignatureRequest($petitionSignatureRequestId: GID!) {
+      cancelSignatureRequest(petitionSignatureRequestId: $petitionSignatureRequestId) {
+        id
+        status
+        cancelReason
+        petition {
+          id
+          hasStartedProcess
+        }
+      }
+    }
+  `,
+  gql`
+    mutation PetitionSignaturesCard_signedPetitionDownloadLink(
+      $petitionSignatureRequestId: GID!
+      $preview: Boolean
+      $downloadAuditTrail: Boolean
+    ) {
+      signedPetitionDownloadLink(
+        petitionSignatureRequestId: $petitionSignatureRequestId
+        preview: $preview
+        downloadAuditTrail: $downloadAuditTrail
+      ) {
+        result
+        url
+      }
+    }
+  `,
+  gql`
+    mutation PetitionSignaturesCard_sendSignatureRequestReminders(
+      $petitionSignatureRequestId: GID!
+    ) {
+      sendSignatureRequestReminders(petitionSignatureRequestId: $petitionSignatureRequestId)
+    }
+  `,
+  gql`
+    mutation PetitionSignaturesCard_completePetition($petitionId: GID!, $message: String) {
+      completePetition(petitionId: $petitionId, message: $message) {
+        ...PetitionSignaturesCard_Petition
+      }
+    }
+  `,
+];

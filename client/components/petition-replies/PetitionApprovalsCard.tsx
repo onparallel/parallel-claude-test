@@ -715,7 +715,6 @@ const _fragments = {
         id
         ...PetitionApprovalsCard_PetitionApprovalRequestStep
       }
-      ...PetitionSignaturesCard_PetitionPolling
       ...getPetitionSignatureStatus_Petition
       ...getPetitionSignatureEnvironment_Petition
       ...useStartApprovalRequestStep_PetitionBase

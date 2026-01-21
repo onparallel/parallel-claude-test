@@ -35871,69 +35871,16 @@ export type PetitionApprovalsCard_PetitionPollingFragment = {
     isEnabled: boolean;
     review: boolean;
     reviewAfterApproval?: boolean | null;
-    allowAdditionalSigners: boolean;
-    minSigners: number;
-    signingMode: SignatureConfigSigningMode;
-    instructions?: string | null;
-    title?: string | null;
-    useCustomDocument: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
       environment: SignatureOrgIntegrationEnvironment;
     } | null;
-    signers: Array<{
-      __typename?: "PetitionSigner";
-      contactId?: string | null;
-      email?: string | null;
-      firstName: string;
-      lastName?: string | null;
-      isPreset: boolean;
-      signWithEmbeddedImageFileUploadId?: string | null;
-    } | null>;
   } | null;
   signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
     id: string;
     status: PetitionSignatureRequestStatus;
-    isAnonymized: boolean;
-    metadata: { [key: string]: any };
-    auditTrailFilename?: string | null;
-    errorCode?: string | null;
-    createdAt: string;
-    errorMessage?: string | null;
-    extraErrorData?: any | null;
-    latestSignatureReminderAt?: string | null;
-    cancelReason?: string | null;
-    signerStatus: Array<{
-      __typename?: "PetitionSignatureRequestSignerStatus";
-      status: string;
-      sentAt?: string | null;
-      openedAt?: string | null;
-      signedAt?: string | null;
-      declinedAt?: string | null;
-      bouncedAt?: string | null;
-      signer: {
-        __typename?: "PetitionSigner";
-        signWithEmbeddedImageFileUploadId?: string | null;
-        contactId?: string | null;
-        firstName: string;
-        lastName?: string | null;
-        fullName: string;
-        email?: string | null;
-        isPreset: boolean;
-        signWithDigitalCertificate?: boolean | null;
-      };
-    }>;
-    signatureConfig: {
-      __typename?: "SignatureConfig";
-      signingMode: SignatureConfigSigningMode;
-      integration?: {
-        __typename?: "SignatureOrgIntegration";
-        id: string;
-        provider: SignatureOrgIntegrationProvider;
-      } | null;
-    };
   }>;
   approvalFlowConfig?: Array<{
     __typename?: "ApprovalFlowConfig";
@@ -37477,69 +37424,16 @@ export type PetitionApprovalsCard_petitionQuery = {
           isEnabled: boolean;
           review: boolean;
           reviewAfterApproval?: boolean | null;
-          allowAdditionalSigners: boolean;
-          minSigners: number;
-          signingMode: SignatureConfigSigningMode;
-          instructions?: string | null;
-          title?: string | null;
-          useCustomDocument: boolean;
           integration?: {
             __typename?: "SignatureOrgIntegration";
             id: string;
             environment: SignatureOrgIntegrationEnvironment;
           } | null;
-          signers: Array<{
-            __typename?: "PetitionSigner";
-            contactId?: string | null;
-            email?: string | null;
-            firstName: string;
-            lastName?: string | null;
-            isPreset: boolean;
-            signWithEmbeddedImageFileUploadId?: string | null;
-          } | null>;
         } | null;
         signatureRequests: Array<{
           __typename?: "PetitionSignatureRequest";
           id: string;
           status: PetitionSignatureRequestStatus;
-          isAnonymized: boolean;
-          metadata: { [key: string]: any };
-          auditTrailFilename?: string | null;
-          errorCode?: string | null;
-          createdAt: string;
-          errorMessage?: string | null;
-          extraErrorData?: any | null;
-          latestSignatureReminderAt?: string | null;
-          cancelReason?: string | null;
-          signerStatus: Array<{
-            __typename?: "PetitionSignatureRequestSignerStatus";
-            status: string;
-            sentAt?: string | null;
-            openedAt?: string | null;
-            signedAt?: string | null;
-            declinedAt?: string | null;
-            bouncedAt?: string | null;
-            signer: {
-              __typename?: "PetitionSigner";
-              signWithEmbeddedImageFileUploadId?: string | null;
-              contactId?: string | null;
-              firstName: string;
-              lastName?: string | null;
-              fullName: string;
-              email?: string | null;
-              isPreset: boolean;
-              signWithDigitalCertificate?: boolean | null;
-            };
-          }>;
-          signatureConfig: {
-            __typename?: "SignatureConfig";
-            signingMode: SignatureConfigSigningMode;
-            integration?: {
-              __typename?: "SignatureOrgIntegration";
-              id: string;
-              provider: SignatureOrgIntegrationProvider;
-            } | null;
-          };
         }>;
         approvalFlowConfig?: Array<{
           __typename?: "ApprovalFlowConfig";
@@ -39617,14 +39511,14 @@ export type PetitionSignaturesCard_PetitionPollingFragment = {
   signatureConfig?: {
     __typename?: "SignatureConfig";
     isEnabled: boolean;
-    review: boolean;
-    reviewAfterApproval?: boolean | null;
     allowAdditionalSigners: boolean;
     minSigners: number;
+    review: boolean;
     signingMode: SignatureConfigSigningMode;
     instructions?: string | null;
     title?: string | null;
     useCustomDocument: boolean;
+    reviewAfterApproval?: boolean | null;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
@@ -39975,97 +39869,6 @@ export type PetitionSignaturesCard_completePetitionMutation = {
       values: Array<{ __typename?: "StandardListDefinitionValue"; key: string }>;
     }>;
   };
-};
-
-export type PetitionSignaturesCard_petitionQueryVariables = Exact<{
-  petitionId: Scalars["GID"]["input"];
-}>;
-
-export type PetitionSignaturesCard_petitionQuery = {
-  petition?:
-    | {
-        __typename?: "Petition";
-        id: string;
-        status: PetitionStatus;
-        generalCommentCount: number;
-        unreadGeneralCommentCount: number;
-        signatureConfig?: {
-          __typename?: "SignatureConfig";
-          isEnabled: boolean;
-          review: boolean;
-          reviewAfterApproval?: boolean | null;
-          allowAdditionalSigners: boolean;
-          minSigners: number;
-          signingMode: SignatureConfigSigningMode;
-          instructions?: string | null;
-          title?: string | null;
-          useCustomDocument: boolean;
-          integration?: {
-            __typename?: "SignatureOrgIntegration";
-            id: string;
-            environment: SignatureOrgIntegrationEnvironment;
-          } | null;
-          signers: Array<{
-            __typename?: "PetitionSigner";
-            contactId?: string | null;
-            email?: string | null;
-            firstName: string;
-            lastName?: string | null;
-            isPreset: boolean;
-            signWithEmbeddedImageFileUploadId?: string | null;
-          } | null>;
-        } | null;
-        signatureRequests: Array<{
-          __typename?: "PetitionSignatureRequest";
-          id: string;
-          status: PetitionSignatureRequestStatus;
-          isAnonymized: boolean;
-          metadata: { [key: string]: any };
-          auditTrailFilename?: string | null;
-          errorCode?: string | null;
-          createdAt: string;
-          errorMessage?: string | null;
-          extraErrorData?: any | null;
-          latestSignatureReminderAt?: string | null;
-          cancelReason?: string | null;
-          signerStatus: Array<{
-            __typename?: "PetitionSignatureRequestSignerStatus";
-            status: string;
-            sentAt?: string | null;
-            openedAt?: string | null;
-            signedAt?: string | null;
-            declinedAt?: string | null;
-            bouncedAt?: string | null;
-            signer: {
-              __typename?: "PetitionSigner";
-              signWithEmbeddedImageFileUploadId?: string | null;
-              contactId?: string | null;
-              firstName: string;
-              lastName?: string | null;
-              fullName: string;
-              email?: string | null;
-              isPreset: boolean;
-              signWithDigitalCertificate?: boolean | null;
-            };
-          }>;
-          signatureConfig: {
-            __typename?: "SignatureConfig";
-            signingMode: SignatureConfigSigningMode;
-            integration?: {
-              __typename?: "SignatureOrgIntegration";
-              id: string;
-              provider: SignatureOrgIntegrationProvider;
-            } | null;
-          };
-        }>;
-        currentSignatureRequest?: {
-          __typename?: "PetitionSignatureRequest";
-          id: string;
-          environment: SignatureOrgIntegrationEnvironment;
-        } | null;
-      }
-    | { __typename?: "PetitionTemplate" }
-    | null;
 };
 
 export type PetitionVariablesCard_PetitionBase_Petition_Fragment = {
@@ -80797,6 +80600,102 @@ export const PetitionApprovalsCard_PetitionApprovalRequestStepFragmentDoc = gql`
   ${PetitionApprovalsCard_PetitionApprovalRequestStepApproverFragmentDoc}
   ${useStartPetitionApprovalFlowDialog_PetitionApprovalRequestStepFragmentDoc}
 ` as unknown as DocumentNode<PetitionApprovalsCard_PetitionApprovalRequestStepFragment, unknown>;
+export const getPetitionSignatureEnvironment_PetitionFragmentDoc = gql`
+  fragment getPetitionSignatureEnvironment_Petition on Petition {
+    currentSignatureRequest {
+      id
+      environment
+    }
+    signatureConfig {
+      integration {
+        id
+        environment
+      }
+    }
+  }
+` as unknown as DocumentNode<getPetitionSignatureEnvironment_PetitionFragment, unknown>;
+export const PetitionApprovalsCard_PetitionPollingFragmentDoc = gql`
+  fragment PetitionApprovalsCard_PetitionPolling on Petition {
+    id
+    status
+    currentApprovalRequestStatus
+    generalCommentCount
+    unreadGeneralCommentCount
+    currentSignatureRequest {
+      id
+      status
+      signatureConfig {
+        review
+        reviewAfterApproval
+      }
+    }
+    signatureConfig {
+      isEnabled
+      review
+      reviewAfterApproval
+    }
+    signatureRequests {
+      id
+      status
+    }
+    approvalFlowConfig {
+      ...Fragments_FullApprovalFlowConfig
+      approvers {
+        id
+        isMe
+        ...useStartPetitionApprovalFlowDialog_User
+        ...UserReference_User
+      }
+    }
+    currentApprovalRequestSteps {
+      id
+      ...PetitionApprovalsCard_PetitionApprovalRequestStep
+    }
+    ...getPetitionSignatureStatus_Petition
+    ...getPetitionSignatureEnvironment_Petition
+    ...useStartApprovalRequestStep_PetitionBase
+  }
+  ${Fragments_FullApprovalFlowConfigFragmentDoc}
+  ${useStartPetitionApprovalFlowDialog_UserFragmentDoc}
+  ${UserReference_UserFragmentDoc}
+  ${PetitionApprovalsCard_PetitionApprovalRequestStepFragmentDoc}
+  ${getPetitionSignatureStatus_PetitionFragmentDoc}
+  ${getPetitionSignatureEnvironment_PetitionFragmentDoc}
+  ${useStartApprovalRequestStep_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<PetitionApprovalsCard_PetitionPollingFragment, unknown>;
+export const TestModeSignatureBadge_UserFragmentDoc = gql`
+  fragment TestModeSignatureBadge_User on User {
+    hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
+  }
+` as unknown as DocumentNode<TestModeSignatureBadge_UserFragment, unknown>;
+export const PetitionSignaturesCard_UserFragmentDoc = gql`
+  fragment PetitionSignaturesCard_User on User {
+    ...TestModeSignatureBadge_User
+  }
+  ${TestModeSignatureBadge_UserFragmentDoc}
+` as unknown as DocumentNode<PetitionSignaturesCard_UserFragment, unknown>;
+export const PetitionApprovalsCard_UserFragmentDoc = gql`
+  fragment PetitionApprovalsCard_User on User {
+    id
+    ...PetitionSignaturesCard_User
+    ...UserReference_User
+  }
+  ${PetitionSignaturesCard_UserFragmentDoc}
+  ${UserReference_UserFragmentDoc}
+` as unknown as DocumentNode<PetitionApprovalsCard_UserFragment, unknown>;
+export const PetitionRepliesSummary_UserFragmentDoc = gql`
+  fragment PetitionRepliesSummary_User on User {
+    id
+    hasSummaryAccess: hasFeatureFlag(featureFlag: PETITION_SUMMARY)
+  }
+` as unknown as DocumentNode<PetitionRepliesSummary_UserFragment, unknown>;
+export const PetitionRepliesRightPaneTabs_UserFragmentDoc = gql`
+  fragment PetitionRepliesRightPaneTabs_User on User {
+    id
+    ...PetitionRepliesSummary_User
+  }
+  ${PetitionRepliesSummary_UserFragmentDoc}
+` as unknown as DocumentNode<PetitionRepliesRightPaneTabs_UserFragment, unknown>;
 export const PetitionSignatureRequestStatusText_PetitionSignatureRequestFragmentDoc = gql`
   fragment PetitionSignatureRequestStatusText_PetitionSignatureRequest on PetitionSignatureRequest {
     id
@@ -80889,20 +80788,6 @@ export const useAddNewSignature_PetitionFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<useAddNewSignature_PetitionFragment, unknown>;
-export const getPetitionSignatureEnvironment_PetitionFragmentDoc = gql`
-  fragment getPetitionSignatureEnvironment_Petition on Petition {
-    currentSignatureRequest {
-      id
-      environment
-    }
-    signatureConfig {
-      integration {
-        id
-        environment
-      }
-    }
-  }
-` as unknown as DocumentNode<getPetitionSignatureEnvironment_PetitionFragment, unknown>;
 export const PetitionSignaturesCard_PetitionPollingFragmentDoc = gql`
   fragment PetitionSignaturesCard_PetitionPolling on Petition {
     id
@@ -80923,90 +80808,6 @@ export const PetitionSignaturesCard_PetitionPollingFragmentDoc = gql`
   ${useAddNewSignature_PetitionFragmentDoc}
   ${getPetitionSignatureEnvironment_PetitionFragmentDoc}
 ` as unknown as DocumentNode<PetitionSignaturesCard_PetitionPollingFragment, unknown>;
-export const PetitionApprovalsCard_PetitionPollingFragmentDoc = gql`
-  fragment PetitionApprovalsCard_PetitionPolling on Petition {
-    id
-    status
-    currentApprovalRequestStatus
-    generalCommentCount
-    unreadGeneralCommentCount
-    currentSignatureRequest {
-      id
-      status
-      signatureConfig {
-        review
-        reviewAfterApproval
-      }
-    }
-    signatureConfig {
-      isEnabled
-      review
-      reviewAfterApproval
-    }
-    signatureRequests {
-      id
-      status
-    }
-    approvalFlowConfig {
-      ...Fragments_FullApprovalFlowConfig
-      approvers {
-        id
-        isMe
-        ...useStartPetitionApprovalFlowDialog_User
-        ...UserReference_User
-      }
-    }
-    currentApprovalRequestSteps {
-      id
-      ...PetitionApprovalsCard_PetitionApprovalRequestStep
-    }
-    ...PetitionSignaturesCard_PetitionPolling
-    ...getPetitionSignatureStatus_Petition
-    ...getPetitionSignatureEnvironment_Petition
-    ...useStartApprovalRequestStep_PetitionBase
-  }
-  ${Fragments_FullApprovalFlowConfigFragmentDoc}
-  ${useStartPetitionApprovalFlowDialog_UserFragmentDoc}
-  ${UserReference_UserFragmentDoc}
-  ${PetitionApprovalsCard_PetitionApprovalRequestStepFragmentDoc}
-  ${PetitionSignaturesCard_PetitionPollingFragmentDoc}
-  ${getPetitionSignatureStatus_PetitionFragmentDoc}
-  ${getPetitionSignatureEnvironment_PetitionFragmentDoc}
-  ${useStartApprovalRequestStep_PetitionBaseFragmentDoc}
-` as unknown as DocumentNode<PetitionApprovalsCard_PetitionPollingFragment, unknown>;
-export const TestModeSignatureBadge_UserFragmentDoc = gql`
-  fragment TestModeSignatureBadge_User on User {
-    hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
-  }
-` as unknown as DocumentNode<TestModeSignatureBadge_UserFragment, unknown>;
-export const PetitionSignaturesCard_UserFragmentDoc = gql`
-  fragment PetitionSignaturesCard_User on User {
-    ...TestModeSignatureBadge_User
-  }
-  ${TestModeSignatureBadge_UserFragmentDoc}
-` as unknown as DocumentNode<PetitionSignaturesCard_UserFragment, unknown>;
-export const PetitionApprovalsCard_UserFragmentDoc = gql`
-  fragment PetitionApprovalsCard_User on User {
-    id
-    ...PetitionSignaturesCard_User
-    ...UserReference_User
-  }
-  ${PetitionSignaturesCard_UserFragmentDoc}
-  ${UserReference_UserFragmentDoc}
-` as unknown as DocumentNode<PetitionApprovalsCard_UserFragment, unknown>;
-export const PetitionRepliesSummary_UserFragmentDoc = gql`
-  fragment PetitionRepliesSummary_User on User {
-    id
-    hasSummaryAccess: hasFeatureFlag(featureFlag: PETITION_SUMMARY)
-  }
-` as unknown as DocumentNode<PetitionRepliesSummary_UserFragment, unknown>;
-export const PetitionRepliesRightPaneTabs_UserFragmentDoc = gql`
-  fragment PetitionRepliesRightPaneTabs_User on User {
-    id
-    ...PetitionRepliesSummary_User
-  }
-  ${PetitionRepliesSummary_UserFragmentDoc}
-` as unknown as DocumentNode<PetitionRepliesRightPaneTabs_UserFragment, unknown>;
 export const useArchiveRepliesIntoProfileDialog_ProfileFieldPropertyFragmentDoc = gql`
   fragment useArchiveRepliesIntoProfileDialog_ProfileFieldProperty on ProfileFieldProperty {
     field {
@@ -91634,17 +91435,6 @@ export const PetitionSignaturesCard_completePetitionDocument = gql`
 ` as unknown as DocumentNode<
   PetitionSignaturesCard_completePetitionMutation,
   PetitionSignaturesCard_completePetitionMutationVariables
->;
-export const PetitionSignaturesCard_petitionDocument = gql`
-  query PetitionSignaturesCard_petition($petitionId: GID!) {
-    petition(id: $petitionId) {
-      ...PetitionSignaturesCard_PetitionPolling
-    }
-  }
-  ${PetitionSignaturesCard_PetitionPollingFragmentDoc}
-` as unknown as DocumentNode<
-  PetitionSignaturesCard_petitionQuery,
-  PetitionSignaturesCard_petitionQueryVariables
 >;
 export const ProfileDrawer_profileDocument = gql`
   query ProfileDrawer_profile($profileId: GID!) {
