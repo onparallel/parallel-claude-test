@@ -12,7 +12,6 @@ import {
   ProfileViewTabs_updateProfileListViewDocument,
 } from "@parallel/graphql/__types";
 import { ProfilesQueryState, useProfilesQueryState } from "@parallel/utils/profilesQueryState";
-import { unMaybeArray } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useIntl } from "react-intl";
 import { isNonNullish, omit } from "remeda";
@@ -47,8 +46,7 @@ export const ProfileViewTabs = chakraForwardRef<"div", ProfileViewTabsProps>(
           sort: isNonNullish(view.data.sort)
             ? (omit(view.data.sort, ["__typename"]) as ProfilesQueryState["sort"])
             : undefined,
-          // TODO: remove unMaybeArray after profile views are updated
-          status: isNonNullish(view.data.status) ? unMaybeArray(view.data.status) : undefined,
+          status: view.data.status,
           values: view.data.values as any,
         });
       }

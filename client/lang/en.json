@@ -10270,6 +10270,36 @@
     "context": "Subscribed"
   },
   {
+    "term": "component.profile-type-field-and-metadata-select.metadata-close-date",
+    "definition": "Close date",
+    "context": "Close date"
+  },
+  {
+    "term": "component.profile-type-field-and-metadata-select.metadata-creation-date",
+    "definition": "Creation date",
+    "context": "Creation date"
+  },
+  {
+    "term": "component.profile-type-field-and-metadata-select.metadata-group-label",
+    "definition": "Metadata",
+    "context": "Metadata"
+  },
+  {
+    "term": "component.profile-type-field-and-metadata-select.metadata-status",
+    "definition": "Status",
+    "context": "Status"
+  },
+  {
+    "term": "component.profile-type-field-and-metadata-select.metadata-update-date",
+    "definition": "Update date",
+    "context": "Update date"
+  },
+  {
+    "term": "component.profile-type-field-and-metadata-select.properties-group-label",
+    "definition": "Properties",
+    "context": "Properties"
+  },
+  {
     "term": "component.profile-type-field-icon.briefcase-icon",
     "definition": "Briefcase icon",
     "context": "Briefcase icon"
@@ -10660,9 +10690,14 @@
     "context": "At least one condition is required."
   },
   {
-    "term": "component.profiles-module-filter-editor.properties",
+    "term": "component.profiles-module-filter-editor.properties-label",
     "definition": "Properties",
     "context": "Properties"
+  },
+  {
+    "term": "component.profiles-module-filter-editor.status-label",
+    "definition": "Status",
+    "context": "Status"
   },
   {
     "term": "component.property-referenced-alert.referenced-by-auto-search-config-1",

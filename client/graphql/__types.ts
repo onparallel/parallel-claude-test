@@ -724,51 +724,10 @@ export interface DashboardModulePetitionFilterTagsFilters {
   value: Array<Scalars["GID"]["output"]>;
 }
 
-export interface DashboardModuleProfileFieldValuesFilter {
-  __typename?: "DashboardModuleProfileFieldValuesFilter";
-  conditions?: Maybe<Array<DashboardModuleProfileFieldValuesFilter>>;
-  logicalOperator?: Maybe<DashboardModuleProfileFieldValuesFilterGroupLogicalOperator>;
-  operator?: Maybe<DashboardModuleProfileFieldValuesFilterOperator>;
-  profileTypeFieldId?: Maybe<Scalars["GID"]["output"]>;
-  value?: Maybe<Scalars["JSON"]["output"]>;
-}
-
-export type DashboardModuleProfileFieldValuesFilterGroupLogicalOperator = "AND" | "OR";
-
-export type DashboardModuleProfileFieldValuesFilterOperator =
-  | "CONTAIN"
-  | "END_WITH"
-  | "EQUAL"
-  | "EXPIRES_IN"
-  | "GREATER_THAN"
-  | "GREATER_THAN_OR_EQUAL"
-  | "HAS_ANY_BG_CHECK_TOPICS"
-  | "HAS_BG_CHECK_MATCH"
-  | "HAS_BG_CHECK_RESULTS"
-  | "HAS_BG_CHECK_TOPICS"
-  | "HAS_EXPIRY"
-  | "HAS_PENDING_REVIEW"
-  | "HAS_VALUE"
-  | "IS_EXPIRED"
-  | "IS_ONE_OF"
-  | "LESS_THAN"
-  | "LESS_THAN_OR_EQUAL"
-  | "NOT_CONTAIN"
-  | "NOT_EQUAL"
-  | "NOT_HAS_ANY_BG_CHECK_TOPICS"
-  | "NOT_HAS_BG_CHECK_MATCH"
-  | "NOT_HAS_BG_CHECK_RESULTS"
-  | "NOT_HAS_BG_CHECK_TOPICS"
-  | "NOT_HAS_EXPIRY"
-  | "NOT_HAS_PENDING_REVIEW"
-  | "NOT_HAS_VALUE"
-  | "NOT_IS_ONE_OF"
-  | "START_WITH";
-
 export interface DashboardModuleProfileFilter {
   __typename?: "DashboardModuleProfileFilter";
   status?: Maybe<Array<ProfileStatus>>;
-  values?: Maybe<DashboardModuleProfileFieldValuesFilter>;
+  values?: Maybe<ProfileQueryFilter>;
 }
 
 export interface DashboardModuleResultItem {
@@ -5996,51 +5955,9 @@ export interface ProfileFieldValueUpdatedEvent extends ProfileEvent {
   user?: Maybe<User>;
 }
 
-export interface ProfileFieldValuesFilter {
-  conditions?: InputMaybe<Array<ProfileFieldValuesFilter>>;
-  logicalOperator?: InputMaybe<ProfileFieldValuesFilterGroupLogicalOperator>;
-  operator?: InputMaybe<ProfileFieldValuesFilterOperator>;
-  profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
-  value?: InputMaybe<Scalars["JSON"]["input"]>;
-}
-
-export type ProfileFieldValuesFilterGroupLogicalOperator = "AND" | "OR";
-
-export type ProfileFieldValuesFilterOperator =
-  | "CONTAIN"
-  | "END_WITH"
-  | "EQUAL"
-  | "EXPIRES_IN"
-  | "GREATER_THAN"
-  | "GREATER_THAN_OR_EQUAL"
-  | "HAS_ANY_BG_CHECK_TOPICS"
-  | "HAS_BG_CHECK_MATCH"
-  | "HAS_BG_CHECK_RESULTS"
-  | "HAS_BG_CHECK_TOPICS"
-  | "HAS_EXPIRY"
-  | "HAS_PENDING_REVIEW"
-  | "HAS_VALUE"
-  | "IS_EXPIRED"
-  | "IS_ONE_OF"
-  | "LESS_THAN"
-  | "LESS_THAN_OR_EQUAL"
-  | "NOT_CONTAIN"
-  | "NOT_EQUAL"
-  | "NOT_HAS_ANY_BG_CHECK_TOPICS"
-  | "NOT_HAS_BG_CHECK_MATCH"
-  | "NOT_HAS_BG_CHECK_RESULTS"
-  | "NOT_HAS_BG_CHECK_TOPICS"
-  | "NOT_HAS_EXPIRY"
-  | "NOT_HAS_PENDING_REVIEW"
-  | "NOT_HAS_VALUE"
-  | "NOT_IS_ONE_OF"
-  | "START_WITH";
-
-export interface ProfileFilter {
-  profileId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-  profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+export interface ProfileFilterInput {
   status?: InputMaybe<Array<ProfileStatus>>;
-  values?: InputMaybe<ProfileFieldValuesFilter>;
+  values?: InputMaybe<ProfileQueryFilterInput>;
 }
 
 export interface ProfileListView extends ListView {
@@ -6069,7 +5986,7 @@ export interface ProfileListViewDataInput {
   search?: InputMaybe<Scalars["String"]["input"]>;
   sort?: InputMaybe<ProfileListViewSortInput>;
   status?: InputMaybe<Array<ProfileStatus>>;
-  values?: InputMaybe<ProfileFieldValuesFilter>;
+  values?: InputMaybe<ProfileQueryFilterInput>;
 }
 
 export interface ProfileListViewSort {
@@ -6094,6 +6011,16 @@ export interface ProfilePagination {
 export interface ProfilePropertyFilter {
   profileTypeFieldId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+}
+
+export interface ProfileQueryFilter {
+  __typename?: "ProfileQueryFilter";
+  conditions?: Maybe<Array<ProfileQueryFilter>>;
+  logicalOperator?: Maybe<ProfileQueryFilterGroupLogicalOperator>;
+  operator?: Maybe<ProfileQueryFilterOperator>;
+  profileTypeFieldId?: Maybe<Scalars["GID"]["output"]>;
+  property?: Maybe<ProfileQueryFilterProperty>;
+  value?: Maybe<Scalars["JSON"]["output"]>;
 }
 
 export type ProfileQueryFilterGroupLogicalOperator = "AND" | "OR";
@@ -6361,7 +6288,7 @@ export interface ProfileUpdatedEvent extends ProfileEvent {
 export interface ProfilesNumberDashboardModuleSettingsInput {
   /** Aggregate function. Only for type AGGREGATE */
   aggregate?: InputMaybe<ModuleResultAggregateType>;
-  filter: ProfileFilter;
+  filter: ProfileFilterInput;
   /** Field to aggregate on. Only for type AGGREGATE */
   profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
   profileTypeId: Scalars["GID"]["input"];
@@ -6373,7 +6300,7 @@ export interface ProfilesPieChartDashboardModuleSettingsInput {
   aggregate?: InputMaybe<ModuleResultAggregateType>;
   graphicType: DashboardPieChartModuleSettingsType;
   /** Optional filter to apply to all items when grouping by a field */
-  groupByFilter?: InputMaybe<ProfileFilter>;
+  groupByFilter?: InputMaybe<ProfileFilterInput>;
   /** Optional SELECT field to group by its values instead of items array */
   groupByProfileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
   items: Array<ProfilesPieChartDashboardModuleSettingsItemInput>;
@@ -6385,14 +6312,14 @@ export interface ProfilesPieChartDashboardModuleSettingsInput {
 
 export interface ProfilesPieChartDashboardModuleSettingsItemInput {
   color: Scalars["String"]["input"];
-  filter: ProfileFilter;
+  filter: ProfileFilterInput;
   label: Scalars["String"]["input"];
 }
 
 export interface ProfilesRatioDashboardModuleSettingsInput {
   /** Aggregate function. Only for type AGGREGATE */
   aggregate?: InputMaybe<ModuleResultAggregateType>;
-  filters: Array<ProfileFilter>;
+  filters: Array<ProfileFilterInput>;
   graphicType: DashboardRatioModuleSettingsType;
   /** Field to aggregate on. Only for type AGGREGATE */
   profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
@@ -9101,6 +9028,13 @@ export type ProfilePropertyContent_ProfileFieldFileFragment = {
   file?: { __typename?: "FileUpload"; filename: string; contentType: string } | null;
 };
 
+export type ProfileQueryFilterSubjectSelect_ProfileTypeFieldFragment = {
+  __typename?: "ProfileTypeField";
+  id: string;
+  name: { [locale in UserLocale]?: string };
+  type: ProfileTypeFieldType;
+};
+
 export type ProfileReference_ProfileFragment = {
   __typename?: "Profile";
   id: string;
@@ -10393,28 +10327,32 @@ export type DashboardModule_DashboardModule_DashboardProfilesNumberModule_Fragme
       __typename?: "DashboardModuleProfileFilter";
       status?: Array<ProfileStatus> | null;
       values?: {
-        __typename?: "DashboardModuleProfileFieldValuesFilter";
-        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        __typename?: "ProfileQueryFilter";
+        logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+        operator?: ProfileQueryFilterOperator | null;
         profileTypeFieldId?: string | null;
+        property?: ProfileQueryFilterProperty | null;
         value?: any | null;
         conditions?: Array<{
-          __typename?: "DashboardModuleProfileFieldValuesFilter";
-          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          __typename?: "ProfileQueryFilter";
+          logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+          operator?: ProfileQueryFilterOperator | null;
           profileTypeFieldId?: string | null;
+          property?: ProfileQueryFilterProperty | null;
           value?: any | null;
           conditions?: Array<{
-            __typename?: "DashboardModuleProfileFieldValuesFilter";
-            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            __typename?: "ProfileQueryFilter";
+            logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+            operator?: ProfileQueryFilterOperator | null;
             profileTypeFieldId?: string | null;
+            property?: ProfileQueryFilterProperty | null;
             value?: any | null;
             conditions?: Array<{
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
             }> | null;
           }> | null;
@@ -10454,28 +10392,32 @@ export type DashboardModule_DashboardModule_DashboardProfilesPieChartModule_Frag
         __typename?: "DashboardModuleProfileFilter";
         status?: Array<ProfileStatus> | null;
         values?: {
-          __typename?: "DashboardModuleProfileFieldValuesFilter";
-          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          __typename?: "ProfileQueryFilter";
+          logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+          operator?: ProfileQueryFilterOperator | null;
           profileTypeFieldId?: string | null;
+          property?: ProfileQueryFilterProperty | null;
           value?: any | null;
           conditions?: Array<{
-            __typename?: "DashboardModuleProfileFieldValuesFilter";
-            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            __typename?: "ProfileQueryFilter";
+            logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+            operator?: ProfileQueryFilterOperator | null;
             profileTypeFieldId?: string | null;
+            property?: ProfileQueryFilterProperty | null;
             value?: any | null;
             conditions?: Array<{
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
               }> | null;
             }> | null;
@@ -10487,28 +10429,32 @@ export type DashboardModule_DashboardModule_DashboardProfilesPieChartModule_Frag
       __typename?: "DashboardModuleProfileFilter";
       status?: Array<ProfileStatus> | null;
       values?: {
-        __typename?: "DashboardModuleProfileFieldValuesFilter";
-        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        __typename?: "ProfileQueryFilter";
+        logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+        operator?: ProfileQueryFilterOperator | null;
         profileTypeFieldId?: string | null;
+        property?: ProfileQueryFilterProperty | null;
         value?: any | null;
         conditions?: Array<{
-          __typename?: "DashboardModuleProfileFieldValuesFilter";
-          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          __typename?: "ProfileQueryFilter";
+          logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+          operator?: ProfileQueryFilterOperator | null;
           profileTypeFieldId?: string | null;
+          property?: ProfileQueryFilterProperty | null;
           value?: any | null;
           conditions?: Array<{
-            __typename?: "DashboardModuleProfileFieldValuesFilter";
-            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            __typename?: "ProfileQueryFilter";
+            logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+            operator?: ProfileQueryFilterOperator | null;
             profileTypeFieldId?: string | null;
+            property?: ProfileQueryFilterProperty | null;
             value?: any | null;
             conditions?: Array<{
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
             }> | null;
           }> | null;
@@ -10538,28 +10484,32 @@ export type DashboardModule_DashboardModule_DashboardProfilesRatioModule_Fragmen
       __typename?: "DashboardModuleProfileFilter";
       status?: Array<ProfileStatus> | null;
       values?: {
-        __typename?: "DashboardModuleProfileFieldValuesFilter";
-        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        __typename?: "ProfileQueryFilter";
+        logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+        operator?: ProfileQueryFilterOperator | null;
         profileTypeFieldId?: string | null;
+        property?: ProfileQueryFilterProperty | null;
         value?: any | null;
         conditions?: Array<{
-          __typename?: "DashboardModuleProfileFieldValuesFilter";
-          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          __typename?: "ProfileQueryFilter";
+          logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+          operator?: ProfileQueryFilterOperator | null;
           profileTypeFieldId?: string | null;
+          property?: ProfileQueryFilterProperty | null;
           value?: any | null;
           conditions?: Array<{
-            __typename?: "DashboardModuleProfileFieldValuesFilter";
-            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            __typename?: "ProfileQueryFilter";
+            logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+            operator?: ProfileQueryFilterOperator | null;
             profileTypeFieldId?: string | null;
+            property?: ProfileQueryFilterProperty | null;
             value?: any | null;
             conditions?: Array<{
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
             }> | null;
           }> | null;
@@ -10983,28 +10933,32 @@ export type DashboardModuleDrawer_DashboardModule_DashboardProfilesNumberModule_
       __typename?: "DashboardModuleProfileFilter";
       status?: Array<ProfileStatus> | null;
       values?: {
-        __typename?: "DashboardModuleProfileFieldValuesFilter";
-        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        __typename?: "ProfileQueryFilter";
+        logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+        operator?: ProfileQueryFilterOperator | null;
         profileTypeFieldId?: string | null;
+        property?: ProfileQueryFilterProperty | null;
         value?: any | null;
         conditions?: Array<{
-          __typename?: "DashboardModuleProfileFieldValuesFilter";
-          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          __typename?: "ProfileQueryFilter";
+          logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+          operator?: ProfileQueryFilterOperator | null;
           profileTypeFieldId?: string | null;
+          property?: ProfileQueryFilterProperty | null;
           value?: any | null;
           conditions?: Array<{
-            __typename?: "DashboardModuleProfileFieldValuesFilter";
-            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            __typename?: "ProfileQueryFilter";
+            logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+            operator?: ProfileQueryFilterOperator | null;
             profileTypeFieldId?: string | null;
+            property?: ProfileQueryFilterProperty | null;
             value?: any | null;
             conditions?: Array<{
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
             }> | null;
           }> | null;
@@ -11035,28 +10989,32 @@ export type DashboardModuleDrawer_DashboardModule_DashboardProfilesPieChartModul
         __typename?: "DashboardModuleProfileFilter";
         status?: Array<ProfileStatus> | null;
         values?: {
-          __typename?: "DashboardModuleProfileFieldValuesFilter";
-          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          __typename?: "ProfileQueryFilter";
+          logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+          operator?: ProfileQueryFilterOperator | null;
           profileTypeFieldId?: string | null;
+          property?: ProfileQueryFilterProperty | null;
           value?: any | null;
           conditions?: Array<{
-            __typename?: "DashboardModuleProfileFieldValuesFilter";
-            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            __typename?: "ProfileQueryFilter";
+            logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+            operator?: ProfileQueryFilterOperator | null;
             profileTypeFieldId?: string | null;
+            property?: ProfileQueryFilterProperty | null;
             value?: any | null;
             conditions?: Array<{
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
               }> | null;
             }> | null;
@@ -11068,28 +11026,32 @@ export type DashboardModuleDrawer_DashboardModule_DashboardProfilesPieChartModul
       __typename?: "DashboardModuleProfileFilter";
       status?: Array<ProfileStatus> | null;
       values?: {
-        __typename?: "DashboardModuleProfileFieldValuesFilter";
-        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        __typename?: "ProfileQueryFilter";
+        logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+        operator?: ProfileQueryFilterOperator | null;
         profileTypeFieldId?: string | null;
+        property?: ProfileQueryFilterProperty | null;
         value?: any | null;
         conditions?: Array<{
-          __typename?: "DashboardModuleProfileFieldValuesFilter";
-          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          __typename?: "ProfileQueryFilter";
+          logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+          operator?: ProfileQueryFilterOperator | null;
           profileTypeFieldId?: string | null;
+          property?: ProfileQueryFilterProperty | null;
           value?: any | null;
           conditions?: Array<{
-            __typename?: "DashboardModuleProfileFieldValuesFilter";
-            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            __typename?: "ProfileQueryFilter";
+            logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+            operator?: ProfileQueryFilterOperator | null;
             profileTypeFieldId?: string | null;
+            property?: ProfileQueryFilterProperty | null;
             value?: any | null;
             conditions?: Array<{
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
             }> | null;
           }> | null;
@@ -11115,28 +11077,32 @@ export type DashboardModuleDrawer_DashboardModule_DashboardProfilesRatioModule_F
       __typename?: "DashboardModuleProfileFilter";
       status?: Array<ProfileStatus> | null;
       values?: {
-        __typename?: "DashboardModuleProfileFieldValuesFilter";
-        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        __typename?: "ProfileQueryFilter";
+        logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+        operator?: ProfileQueryFilterOperator | null;
         profileTypeFieldId?: string | null;
+        property?: ProfileQueryFilterProperty | null;
         value?: any | null;
         conditions?: Array<{
-          __typename?: "DashboardModuleProfileFieldValuesFilter";
-          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          __typename?: "ProfileQueryFilter";
+          logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+          operator?: ProfileQueryFilterOperator | null;
           profileTypeFieldId?: string | null;
+          property?: ProfileQueryFilterProperty | null;
           value?: any | null;
           conditions?: Array<{
-            __typename?: "DashboardModuleProfileFieldValuesFilter";
-            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            __typename?: "ProfileQueryFilter";
+            logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+            operator?: ProfileQueryFilterOperator | null;
             profileTypeFieldId?: string | null;
+            property?: ProfileQueryFilterProperty | null;
             value?: any | null;
             conditions?: Array<{
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
             }> | null;
           }> | null;
@@ -11318,28 +11284,32 @@ export type DashboardModuleForm_DashboardModule_DashboardProfilesNumberModule_Fr
       __typename?: "DashboardModuleProfileFilter";
       status?: Array<ProfileStatus> | null;
       values?: {
-        __typename?: "DashboardModuleProfileFieldValuesFilter";
-        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        __typename?: "ProfileQueryFilter";
+        logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+        operator?: ProfileQueryFilterOperator | null;
         profileTypeFieldId?: string | null;
+        property?: ProfileQueryFilterProperty | null;
         value?: any | null;
         conditions?: Array<{
-          __typename?: "DashboardModuleProfileFieldValuesFilter";
-          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          __typename?: "ProfileQueryFilter";
+          logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+          operator?: ProfileQueryFilterOperator | null;
           profileTypeFieldId?: string | null;
+          property?: ProfileQueryFilterProperty | null;
           value?: any | null;
           conditions?: Array<{
-            __typename?: "DashboardModuleProfileFieldValuesFilter";
-            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            __typename?: "ProfileQueryFilter";
+            logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+            operator?: ProfileQueryFilterOperator | null;
             profileTypeFieldId?: string | null;
+            property?: ProfileQueryFilterProperty | null;
             value?: any | null;
             conditions?: Array<{
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
             }> | null;
           }> | null;
@@ -11370,28 +11340,32 @@ export type DashboardModuleForm_DashboardModule_DashboardProfilesPieChartModule_
         __typename?: "DashboardModuleProfileFilter";
         status?: Array<ProfileStatus> | null;
         values?: {
-          __typename?: "DashboardModuleProfileFieldValuesFilter";
-          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          __typename?: "ProfileQueryFilter";
+          logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+          operator?: ProfileQueryFilterOperator | null;
           profileTypeFieldId?: string | null;
+          property?: ProfileQueryFilterProperty | null;
           value?: any | null;
           conditions?: Array<{
-            __typename?: "DashboardModuleProfileFieldValuesFilter";
-            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            __typename?: "ProfileQueryFilter";
+            logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+            operator?: ProfileQueryFilterOperator | null;
             profileTypeFieldId?: string | null;
+            property?: ProfileQueryFilterProperty | null;
             value?: any | null;
             conditions?: Array<{
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
               }> | null;
             }> | null;
@@ -11403,28 +11377,32 @@ export type DashboardModuleForm_DashboardModule_DashboardProfilesPieChartModule_
       __typename?: "DashboardModuleProfileFilter";
       status?: Array<ProfileStatus> | null;
       values?: {
-        __typename?: "DashboardModuleProfileFieldValuesFilter";
-        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        __typename?: "ProfileQueryFilter";
+        logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+        operator?: ProfileQueryFilterOperator | null;
         profileTypeFieldId?: string | null;
+        property?: ProfileQueryFilterProperty | null;
         value?: any | null;
         conditions?: Array<{
-          __typename?: "DashboardModuleProfileFieldValuesFilter";
-          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          __typename?: "ProfileQueryFilter";
+          logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+          operator?: ProfileQueryFilterOperator | null;
           profileTypeFieldId?: string | null;
+          property?: ProfileQueryFilterProperty | null;
           value?: any | null;
           conditions?: Array<{
-            __typename?: "DashboardModuleProfileFieldValuesFilter";
-            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            __typename?: "ProfileQueryFilter";
+            logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+            operator?: ProfileQueryFilterOperator | null;
             profileTypeFieldId?: string | null;
+            property?: ProfileQueryFilterProperty | null;
             value?: any | null;
             conditions?: Array<{
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
             }> | null;
           }> | null;
@@ -11450,28 +11428,32 @@ export type DashboardModuleForm_DashboardModule_DashboardProfilesRatioModule_Fra
       __typename?: "DashboardModuleProfileFilter";
       status?: Array<ProfileStatus> | null;
       values?: {
-        __typename?: "DashboardModuleProfileFieldValuesFilter";
-        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        __typename?: "ProfileQueryFilter";
+        logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+        operator?: ProfileQueryFilterOperator | null;
         profileTypeFieldId?: string | null;
+        property?: ProfileQueryFilterProperty | null;
         value?: any | null;
         conditions?: Array<{
-          __typename?: "DashboardModuleProfileFieldValuesFilter";
-          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          __typename?: "ProfileQueryFilter";
+          logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+          operator?: ProfileQueryFilterOperator | null;
           profileTypeFieldId?: string | null;
+          property?: ProfileQueryFilterProperty | null;
           value?: any | null;
           conditions?: Array<{
-            __typename?: "DashboardModuleProfileFieldValuesFilter";
-            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            __typename?: "ProfileQueryFilter";
+            logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+            operator?: ProfileQueryFilterOperator | null;
             profileTypeFieldId?: string | null;
+            property?: ProfileQueryFilterProperty | null;
             value?: any | null;
             conditions?: Array<{
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
             }> | null;
           }> | null;
@@ -12063,28 +12045,32 @@ export type DashboardModuleForm_updateProfilesRatioDashboardModuleMutation = {
             __typename?: "DashboardModuleProfileFilter";
             status?: Array<ProfileStatus> | null;
             values?: {
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                   }> | null;
                 }> | null;
@@ -12114,28 +12100,32 @@ export type DashboardModuleForm_updateProfilesRatioDashboardModuleMutation = {
               __typename?: "DashboardModuleProfileFilter";
               status?: Array<ProfileStatus> | null;
               values?: {
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                     conditions?: Array<{
-                      __typename?: "DashboardModuleProfileFieldValuesFilter";
-                      logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                      operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                      __typename?: "ProfileQueryFilter";
+                      logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                      operator?: ProfileQueryFilterOperator | null;
                       profileTypeFieldId?: string | null;
+                      property?: ProfileQueryFilterProperty | null;
                       value?: any | null;
                     }> | null;
                   }> | null;
@@ -12147,28 +12137,32 @@ export type DashboardModuleForm_updateProfilesRatioDashboardModuleMutation = {
             __typename?: "DashboardModuleProfileFilter";
             status?: Array<ProfileStatus> | null;
             values?: {
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                   }> | null;
                 }> | null;
@@ -12193,28 +12187,32 @@ export type DashboardModuleForm_updateProfilesRatioDashboardModuleMutation = {
             __typename?: "DashboardModuleProfileFilter";
             status?: Array<ProfileStatus> | null;
             values?: {
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                   }> | null;
                 }> | null;
@@ -12392,28 +12390,32 @@ export type DashboardModuleForm_updateProfilesPieChartDashboardModuleMutation = 
             __typename?: "DashboardModuleProfileFilter";
             status?: Array<ProfileStatus> | null;
             values?: {
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                   }> | null;
                 }> | null;
@@ -12443,28 +12445,32 @@ export type DashboardModuleForm_updateProfilesPieChartDashboardModuleMutation = 
               __typename?: "DashboardModuleProfileFilter";
               status?: Array<ProfileStatus> | null;
               values?: {
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                     conditions?: Array<{
-                      __typename?: "DashboardModuleProfileFieldValuesFilter";
-                      logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                      operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                      __typename?: "ProfileQueryFilter";
+                      logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                      operator?: ProfileQueryFilterOperator | null;
                       profileTypeFieldId?: string | null;
+                      property?: ProfileQueryFilterProperty | null;
                       value?: any | null;
                     }> | null;
                   }> | null;
@@ -12476,28 +12482,32 @@ export type DashboardModuleForm_updateProfilesPieChartDashboardModuleMutation = 
             __typename?: "DashboardModuleProfileFilter";
             status?: Array<ProfileStatus> | null;
             values?: {
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                   }> | null;
                 }> | null;
@@ -12522,28 +12532,32 @@ export type DashboardModuleForm_updateProfilesPieChartDashboardModuleMutation = 
             __typename?: "DashboardModuleProfileFilter";
             status?: Array<ProfileStatus> | null;
             values?: {
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                   }> | null;
                 }> | null;
@@ -12721,28 +12735,32 @@ export type DashboardModuleForm_updateProfilesNumberDashboardModuleMutation = {
             __typename?: "DashboardModuleProfileFilter";
             status?: Array<ProfileStatus> | null;
             values?: {
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                   }> | null;
                 }> | null;
@@ -12772,28 +12790,32 @@ export type DashboardModuleForm_updateProfilesNumberDashboardModuleMutation = {
               __typename?: "DashboardModuleProfileFilter";
               status?: Array<ProfileStatus> | null;
               values?: {
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                     conditions?: Array<{
-                      __typename?: "DashboardModuleProfileFieldValuesFilter";
-                      logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                      operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                      __typename?: "ProfileQueryFilter";
+                      logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                      operator?: ProfileQueryFilterOperator | null;
                       profileTypeFieldId?: string | null;
+                      property?: ProfileQueryFilterProperty | null;
                       value?: any | null;
                     }> | null;
                   }> | null;
@@ -12805,28 +12827,32 @@ export type DashboardModuleForm_updateProfilesNumberDashboardModuleMutation = {
             __typename?: "DashboardModuleProfileFilter";
             status?: Array<ProfileStatus> | null;
             values?: {
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                   }> | null;
                 }> | null;
@@ -12851,28 +12877,32 @@ export type DashboardModuleForm_updateProfilesNumberDashboardModuleMutation = {
             __typename?: "DashboardModuleProfileFilter";
             status?: Array<ProfileStatus> | null;
             values?: {
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                   }> | null;
                 }> | null;
@@ -13050,28 +13080,32 @@ export type DashboardModuleForm_updatePetitionsPieChartDashboardModuleMutation =
             __typename?: "DashboardModuleProfileFilter";
             status?: Array<ProfileStatus> | null;
             values?: {
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                   }> | null;
                 }> | null;
@@ -13101,28 +13135,32 @@ export type DashboardModuleForm_updatePetitionsPieChartDashboardModuleMutation =
               __typename?: "DashboardModuleProfileFilter";
               status?: Array<ProfileStatus> | null;
               values?: {
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                     conditions?: Array<{
-                      __typename?: "DashboardModuleProfileFieldValuesFilter";
-                      logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                      operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                      __typename?: "ProfileQueryFilter";
+                      logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                      operator?: ProfileQueryFilterOperator | null;
                       profileTypeFieldId?: string | null;
+                      property?: ProfileQueryFilterProperty | null;
                       value?: any | null;
                     }> | null;
                   }> | null;
@@ -13134,28 +13172,32 @@ export type DashboardModuleForm_updatePetitionsPieChartDashboardModuleMutation =
             __typename?: "DashboardModuleProfileFilter";
             status?: Array<ProfileStatus> | null;
             values?: {
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                   }> | null;
                 }> | null;
@@ -13180,28 +13222,32 @@ export type DashboardModuleForm_updatePetitionsPieChartDashboardModuleMutation =
             __typename?: "DashboardModuleProfileFilter";
             status?: Array<ProfileStatus> | null;
             values?: {
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                   }> | null;
                 }> | null;
@@ -13379,28 +13425,32 @@ export type DashboardModuleForm_updatePetitionsRatioDashboardModuleMutation = {
             __typename?: "DashboardModuleProfileFilter";
             status?: Array<ProfileStatus> | null;
             values?: {
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                   }> | null;
                 }> | null;
@@ -13430,28 +13480,32 @@ export type DashboardModuleForm_updatePetitionsRatioDashboardModuleMutation = {
               __typename?: "DashboardModuleProfileFilter";
               status?: Array<ProfileStatus> | null;
               values?: {
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                     conditions?: Array<{
-                      __typename?: "DashboardModuleProfileFieldValuesFilter";
-                      logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                      operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                      __typename?: "ProfileQueryFilter";
+                      logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                      operator?: ProfileQueryFilterOperator | null;
                       profileTypeFieldId?: string | null;
+                      property?: ProfileQueryFilterProperty | null;
                       value?: any | null;
                     }> | null;
                   }> | null;
@@ -13463,28 +13517,32 @@ export type DashboardModuleForm_updatePetitionsRatioDashboardModuleMutation = {
             __typename?: "DashboardModuleProfileFilter";
             status?: Array<ProfileStatus> | null;
             values?: {
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                   }> | null;
                 }> | null;
@@ -13509,28 +13567,32 @@ export type DashboardModuleForm_updatePetitionsRatioDashboardModuleMutation = {
             __typename?: "DashboardModuleProfileFilter";
             status?: Array<ProfileStatus> | null;
             values?: {
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                   }> | null;
                 }> | null;
@@ -13708,28 +13770,32 @@ export type DashboardModuleForm_updateCreatePetitionButtonDashboardModuleMutatio
             __typename?: "DashboardModuleProfileFilter";
             status?: Array<ProfileStatus> | null;
             values?: {
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                   }> | null;
                 }> | null;
@@ -13759,28 +13825,32 @@ export type DashboardModuleForm_updateCreatePetitionButtonDashboardModuleMutatio
               __typename?: "DashboardModuleProfileFilter";
               status?: Array<ProfileStatus> | null;
               values?: {
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                     conditions?: Array<{
-                      __typename?: "DashboardModuleProfileFieldValuesFilter";
-                      logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                      operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                      __typename?: "ProfileQueryFilter";
+                      logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                      operator?: ProfileQueryFilterOperator | null;
                       profileTypeFieldId?: string | null;
+                      property?: ProfileQueryFilterProperty | null;
                       value?: any | null;
                     }> | null;
                   }> | null;
@@ -13792,28 +13862,32 @@ export type DashboardModuleForm_updateCreatePetitionButtonDashboardModuleMutatio
             __typename?: "DashboardModuleProfileFilter";
             status?: Array<ProfileStatus> | null;
             values?: {
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                   }> | null;
                 }> | null;
@@ -13838,28 +13912,32 @@ export type DashboardModuleForm_updateCreatePetitionButtonDashboardModuleMutatio
             __typename?: "DashboardModuleProfileFilter";
             status?: Array<ProfileStatus> | null;
             values?: {
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                   }> | null;
                 }> | null;
@@ -14037,28 +14115,32 @@ export type DashboardModuleForm_updatePetitionsNumberDashboardModuleMutation = {
             __typename?: "DashboardModuleProfileFilter";
             status?: Array<ProfileStatus> | null;
             values?: {
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                   }> | null;
                 }> | null;
@@ -14088,28 +14170,32 @@ export type DashboardModuleForm_updatePetitionsNumberDashboardModuleMutation = {
               __typename?: "DashboardModuleProfileFilter";
               status?: Array<ProfileStatus> | null;
               values?: {
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                     conditions?: Array<{
-                      __typename?: "DashboardModuleProfileFieldValuesFilter";
-                      logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                      operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                      __typename?: "ProfileQueryFilter";
+                      logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                      operator?: ProfileQueryFilterOperator | null;
                       profileTypeFieldId?: string | null;
+                      property?: ProfileQueryFilterProperty | null;
                       value?: any | null;
                     }> | null;
                   }> | null;
@@ -14121,28 +14207,32 @@ export type DashboardModuleForm_updatePetitionsNumberDashboardModuleMutation = {
             __typename?: "DashboardModuleProfileFilter";
             status?: Array<ProfileStatus> | null;
             values?: {
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                   }> | null;
                 }> | null;
@@ -14167,28 +14257,32 @@ export type DashboardModuleForm_updatePetitionsNumberDashboardModuleMutation = {
             __typename?: "DashboardModuleProfileFilter";
             status?: Array<ProfileStatus> | null;
             values?: {
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                   }> | null;
                 }> | null;
@@ -14318,28 +14412,32 @@ export type fullDashboardModuleProfileFilterFragment = {
   __typename?: "DashboardModuleProfileFilter";
   status?: Array<ProfileStatus> | null;
   values?: {
-    __typename?: "DashboardModuleProfileFieldValuesFilter";
-    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+    __typename?: "ProfileQueryFilter";
+    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+    operator?: ProfileQueryFilterOperator | null;
     profileTypeFieldId?: string | null;
+    property?: ProfileQueryFilterProperty | null;
     value?: any | null;
     conditions?: Array<{
-      __typename?: "DashboardModuleProfileFieldValuesFilter";
-      logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-      operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+      __typename?: "ProfileQueryFilter";
+      logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+      operator?: ProfileQueryFilterOperator | null;
       profileTypeFieldId?: string | null;
+      property?: ProfileQueryFilterProperty | null;
       value?: any | null;
       conditions?: Array<{
-        __typename?: "DashboardModuleProfileFieldValuesFilter";
-        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        __typename?: "ProfileQueryFilter";
+        logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+        operator?: ProfileQueryFilterOperator | null;
         profileTypeFieldId?: string | null;
+        property?: ProfileQueryFilterProperty | null;
         value?: any | null;
         conditions?: Array<{
-          __typename?: "DashboardModuleProfileFieldValuesFilter";
-          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          __typename?: "ProfileQueryFilter";
+          logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+          operator?: ProfileQueryFilterOperator | null;
           profileTypeFieldId?: string | null;
+          property?: ProfileQueryFilterProperty | null;
           value?: any | null;
         }> | null;
       }> | null;
@@ -14535,28 +14633,32 @@ export type DashboardProfilesNumberModule_DashboardProfilesNumberModuleFragment 
       __typename?: "DashboardModuleProfileFilter";
       status?: Array<ProfileStatus> | null;
       values?: {
-        __typename?: "DashboardModuleProfileFieldValuesFilter";
-        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        __typename?: "ProfileQueryFilter";
+        logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+        operator?: ProfileQueryFilterOperator | null;
         profileTypeFieldId?: string | null;
+        property?: ProfileQueryFilterProperty | null;
         value?: any | null;
         conditions?: Array<{
-          __typename?: "DashboardModuleProfileFieldValuesFilter";
-          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          __typename?: "ProfileQueryFilter";
+          logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+          operator?: ProfileQueryFilterOperator | null;
           profileTypeFieldId?: string | null;
+          property?: ProfileQueryFilterProperty | null;
           value?: any | null;
           conditions?: Array<{
-            __typename?: "DashboardModuleProfileFieldValuesFilter";
-            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            __typename?: "ProfileQueryFilter";
+            logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+            operator?: ProfileQueryFilterOperator | null;
             profileTypeFieldId?: string | null;
+            property?: ProfileQueryFilterProperty | null;
             value?: any | null;
             conditions?: Array<{
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
             }> | null;
           }> | null;
@@ -14596,28 +14698,32 @@ export type DashboardProfilesPieChartModule_DashboardProfilesPieChartModuleFragm
         __typename?: "DashboardModuleProfileFilter";
         status?: Array<ProfileStatus> | null;
         values?: {
-          __typename?: "DashboardModuleProfileFieldValuesFilter";
-          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          __typename?: "ProfileQueryFilter";
+          logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+          operator?: ProfileQueryFilterOperator | null;
           profileTypeFieldId?: string | null;
+          property?: ProfileQueryFilterProperty | null;
           value?: any | null;
           conditions?: Array<{
-            __typename?: "DashboardModuleProfileFieldValuesFilter";
-            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            __typename?: "ProfileQueryFilter";
+            logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+            operator?: ProfileQueryFilterOperator | null;
             profileTypeFieldId?: string | null;
+            property?: ProfileQueryFilterProperty | null;
             value?: any | null;
             conditions?: Array<{
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
               }> | null;
             }> | null;
@@ -14629,28 +14735,32 @@ export type DashboardProfilesPieChartModule_DashboardProfilesPieChartModuleFragm
       __typename?: "DashboardModuleProfileFilter";
       status?: Array<ProfileStatus> | null;
       values?: {
-        __typename?: "DashboardModuleProfileFieldValuesFilter";
-        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        __typename?: "ProfileQueryFilter";
+        logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+        operator?: ProfileQueryFilterOperator | null;
         profileTypeFieldId?: string | null;
+        property?: ProfileQueryFilterProperty | null;
         value?: any | null;
         conditions?: Array<{
-          __typename?: "DashboardModuleProfileFieldValuesFilter";
-          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          __typename?: "ProfileQueryFilter";
+          logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+          operator?: ProfileQueryFilterOperator | null;
           profileTypeFieldId?: string | null;
+          property?: ProfileQueryFilterProperty | null;
           value?: any | null;
           conditions?: Array<{
-            __typename?: "DashboardModuleProfileFieldValuesFilter";
-            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            __typename?: "ProfileQueryFilter";
+            logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+            operator?: ProfileQueryFilterOperator | null;
             profileTypeFieldId?: string | null;
+            property?: ProfileQueryFilterProperty | null;
             value?: any | null;
             conditions?: Array<{
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
             }> | null;
           }> | null;
@@ -14680,28 +14790,32 @@ export type DashboardProfilesRatioModule_DashboardProfilesRatioModuleFragment = 
       __typename?: "DashboardModuleProfileFilter";
       status?: Array<ProfileStatus> | null;
       values?: {
-        __typename?: "DashboardModuleProfileFieldValuesFilter";
-        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        __typename?: "ProfileQueryFilter";
+        logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+        operator?: ProfileQueryFilterOperator | null;
         profileTypeFieldId?: string | null;
+        property?: ProfileQueryFilterProperty | null;
         value?: any | null;
         conditions?: Array<{
-          __typename?: "DashboardModuleProfileFieldValuesFilter";
-          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          __typename?: "ProfileQueryFilter";
+          logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+          operator?: ProfileQueryFilterOperator | null;
           profileTypeFieldId?: string | null;
+          property?: ProfileQueryFilterProperty | null;
           value?: any | null;
           conditions?: Array<{
-            __typename?: "DashboardModuleProfileFieldValuesFilter";
-            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            __typename?: "ProfileQueryFilter";
+            logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+            operator?: ProfileQueryFilterOperator | null;
             profileTypeFieldId?: string | null;
+            property?: ProfileQueryFilterProperty | null;
             value?: any | null;
             conditions?: Array<{
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
             }> | null;
           }> | null;
@@ -50770,28 +50884,32 @@ export type Home_DashboardModule_DashboardProfilesNumberModule_Fragment = {
       __typename?: "DashboardModuleProfileFilter";
       status?: Array<ProfileStatus> | null;
       values?: {
-        __typename?: "DashboardModuleProfileFieldValuesFilter";
-        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        __typename?: "ProfileQueryFilter";
+        logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+        operator?: ProfileQueryFilterOperator | null;
         profileTypeFieldId?: string | null;
+        property?: ProfileQueryFilterProperty | null;
         value?: any | null;
         conditions?: Array<{
-          __typename?: "DashboardModuleProfileFieldValuesFilter";
-          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          __typename?: "ProfileQueryFilter";
+          logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+          operator?: ProfileQueryFilterOperator | null;
           profileTypeFieldId?: string | null;
+          property?: ProfileQueryFilterProperty | null;
           value?: any | null;
           conditions?: Array<{
-            __typename?: "DashboardModuleProfileFieldValuesFilter";
-            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            __typename?: "ProfileQueryFilter";
+            logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+            operator?: ProfileQueryFilterOperator | null;
             profileTypeFieldId?: string | null;
+            property?: ProfileQueryFilterProperty | null;
             value?: any | null;
             conditions?: Array<{
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
             }> | null;
           }> | null;
@@ -50834,28 +50952,32 @@ export type Home_DashboardModule_DashboardProfilesPieChartModule_Fragment = {
         __typename?: "DashboardModuleProfileFilter";
         status?: Array<ProfileStatus> | null;
         values?: {
-          __typename?: "DashboardModuleProfileFieldValuesFilter";
-          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          __typename?: "ProfileQueryFilter";
+          logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+          operator?: ProfileQueryFilterOperator | null;
           profileTypeFieldId?: string | null;
+          property?: ProfileQueryFilterProperty | null;
           value?: any | null;
           conditions?: Array<{
-            __typename?: "DashboardModuleProfileFieldValuesFilter";
-            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            __typename?: "ProfileQueryFilter";
+            logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+            operator?: ProfileQueryFilterOperator | null;
             profileTypeFieldId?: string | null;
+            property?: ProfileQueryFilterProperty | null;
             value?: any | null;
             conditions?: Array<{
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
               conditions?: Array<{
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
               }> | null;
             }> | null;
@@ -50867,28 +50989,32 @@ export type Home_DashboardModule_DashboardProfilesPieChartModule_Fragment = {
       __typename?: "DashboardModuleProfileFilter";
       status?: Array<ProfileStatus> | null;
       values?: {
-        __typename?: "DashboardModuleProfileFieldValuesFilter";
-        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        __typename?: "ProfileQueryFilter";
+        logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+        operator?: ProfileQueryFilterOperator | null;
         profileTypeFieldId?: string | null;
+        property?: ProfileQueryFilterProperty | null;
         value?: any | null;
         conditions?: Array<{
-          __typename?: "DashboardModuleProfileFieldValuesFilter";
-          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          __typename?: "ProfileQueryFilter";
+          logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+          operator?: ProfileQueryFilterOperator | null;
           profileTypeFieldId?: string | null;
+          property?: ProfileQueryFilterProperty | null;
           value?: any | null;
           conditions?: Array<{
-            __typename?: "DashboardModuleProfileFieldValuesFilter";
-            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            __typename?: "ProfileQueryFilter";
+            logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+            operator?: ProfileQueryFilterOperator | null;
             profileTypeFieldId?: string | null;
+            property?: ProfileQueryFilterProperty | null;
             value?: any | null;
             conditions?: Array<{
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
             }> | null;
           }> | null;
@@ -50919,28 +51045,32 @@ export type Home_DashboardModule_DashboardProfilesRatioModule_Fragment = {
       __typename?: "DashboardModuleProfileFilter";
       status?: Array<ProfileStatus> | null;
       values?: {
-        __typename?: "DashboardModuleProfileFieldValuesFilter";
-        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+        __typename?: "ProfileQueryFilter";
+        logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+        operator?: ProfileQueryFilterOperator | null;
         profileTypeFieldId?: string | null;
+        property?: ProfileQueryFilterProperty | null;
         value?: any | null;
         conditions?: Array<{
-          __typename?: "DashboardModuleProfileFieldValuesFilter";
-          logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-          operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+          __typename?: "ProfileQueryFilter";
+          logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+          operator?: ProfileQueryFilterOperator | null;
           profileTypeFieldId?: string | null;
+          property?: ProfileQueryFilterProperty | null;
           value?: any | null;
           conditions?: Array<{
-            __typename?: "DashboardModuleProfileFieldValuesFilter";
-            logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-            operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+            __typename?: "ProfileQueryFilter";
+            logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+            operator?: ProfileQueryFilterOperator | null;
             profileTypeFieldId?: string | null;
+            property?: ProfileQueryFilterProperty | null;
             value?: any | null;
             conditions?: Array<{
-              __typename?: "DashboardModuleProfileFieldValuesFilter";
-              logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-              operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+              __typename?: "ProfileQueryFilter";
+              logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+              operator?: ProfileQueryFilterOperator | null;
               profileTypeFieldId?: string | null;
+              property?: ProfileQueryFilterProperty | null;
               value?: any | null;
             }> | null;
           }> | null;
@@ -51294,28 +51424,32 @@ export type Home_dashboardQuery = {
               __typename?: "DashboardModuleProfileFilter";
               status?: Array<ProfileStatus> | null;
               values?: {
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                     conditions?: Array<{
-                      __typename?: "DashboardModuleProfileFieldValuesFilter";
-                      logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                      operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                      __typename?: "ProfileQueryFilter";
+                      logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                      operator?: ProfileQueryFilterOperator | null;
                       profileTypeFieldId?: string | null;
+                      property?: ProfileQueryFilterProperty | null;
                       value?: any | null;
                     }> | null;
                   }> | null;
@@ -51357,28 +51491,32 @@ export type Home_dashboardQuery = {
                 __typename?: "DashboardModuleProfileFilter";
                 status?: Array<ProfileStatus> | null;
                 values?: {
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                     conditions?: Array<{
-                      __typename?: "DashboardModuleProfileFieldValuesFilter";
-                      logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                      operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                      __typename?: "ProfileQueryFilter";
+                      logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                      operator?: ProfileQueryFilterOperator | null;
                       profileTypeFieldId?: string | null;
+                      property?: ProfileQueryFilterProperty | null;
                       value?: any | null;
                       conditions?: Array<{
-                        __typename?: "DashboardModuleProfileFieldValuesFilter";
-                        logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                        operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                        __typename?: "ProfileQueryFilter";
+                        logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                        operator?: ProfileQueryFilterOperator | null;
                         profileTypeFieldId?: string | null;
+                        property?: ProfileQueryFilterProperty | null;
                         value?: any | null;
                       }> | null;
                     }> | null;
@@ -51390,28 +51528,32 @@ export type Home_dashboardQuery = {
               __typename?: "DashboardModuleProfileFilter";
               status?: Array<ProfileStatus> | null;
               values?: {
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                     conditions?: Array<{
-                      __typename?: "DashboardModuleProfileFieldValuesFilter";
-                      logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                      operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                      __typename?: "ProfileQueryFilter";
+                      logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                      operator?: ProfileQueryFilterOperator | null;
                       profileTypeFieldId?: string | null;
+                      property?: ProfileQueryFilterProperty | null;
                       value?: any | null;
                     }> | null;
                   }> | null;
@@ -51445,28 +51587,32 @@ export type Home_dashboardQuery = {
               __typename?: "DashboardModuleProfileFilter";
               status?: Array<ProfileStatus> | null;
               values?: {
-                __typename?: "DashboardModuleProfileFieldValuesFilter";
-                logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                __typename?: "ProfileQueryFilter";
+                logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                operator?: ProfileQueryFilterOperator | null;
                 profileTypeFieldId?: string | null;
+                property?: ProfileQueryFilterProperty | null;
                 value?: any | null;
                 conditions?: Array<{
-                  __typename?: "DashboardModuleProfileFieldValuesFilter";
-                  logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                  operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                  __typename?: "ProfileQueryFilter";
+                  logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                  operator?: ProfileQueryFilterOperator | null;
                   profileTypeFieldId?: string | null;
+                  property?: ProfileQueryFilterProperty | null;
                   value?: any | null;
                   conditions?: Array<{
-                    __typename?: "DashboardModuleProfileFieldValuesFilter";
-                    logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                    operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                    __typename?: "ProfileQueryFilter";
+                    logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                    operator?: ProfileQueryFilterOperator | null;
                     profileTypeFieldId?: string | null;
+                    property?: ProfileQueryFilterProperty | null;
                     value?: any | null;
                     conditions?: Array<{
-                      __typename?: "DashboardModuleProfileFieldValuesFilter";
-                      logicalOperator?: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator | null;
-                      operator?: DashboardModuleProfileFieldValuesFilterOperator | null;
+                      __typename?: "ProfileQueryFilter";
+                      logicalOperator?: ProfileQueryFilterGroupLogicalOperator | null;
+                      operator?: ProfileQueryFilterOperator | null;
                       profileTypeFieldId?: string | null;
+                      property?: ProfileQueryFilterProperty | null;
                       value?: any | null;
                     }> | null;
                   }> | null;
@@ -76602,6 +76748,13 @@ export const ProfileTypeFieldSelect_ProfileTypeFieldFragmentDoc = gql`
     type
   }
 ` as unknown as DocumentNode<ProfileTypeFieldSelect_ProfileTypeFieldFragment, unknown>;
+export const ProfileQueryFilterSubjectSelect_ProfileTypeFieldFragmentDoc = gql`
+  fragment ProfileQueryFilterSubjectSelect_ProfileTypeField on ProfileTypeField {
+    id
+    name
+    type
+  }
+` as unknown as DocumentNode<ProfileQueryFilterSubjectSelect_ProfileTypeFieldFragment, unknown>;
 export const useProfileFieldValueFilterOperators_ProfileTypeFieldFragmentDoc = gql`
   fragment useProfileFieldValueFilterOperators_ProfileTypeField on ProfileTypeField {
     id
@@ -76625,10 +76778,10 @@ export const ProfilesModuleFilterEditor_ProfileTypeFieldFragmentDoc = gql`
     id
     type
     options
-    ...ProfileTypeFieldSelect_ProfileTypeField
+    ...ProfileQueryFilterSubjectSelect_ProfileTypeField
     ...ProfileValueFilterLine_ProfileTypeField
   }
-  ${ProfileTypeFieldSelect_ProfileTypeFieldFragmentDoc}
+  ${ProfileQueryFilterSubjectSelect_ProfileTypeFieldFragmentDoc}
   ${ProfileValueFilterLine_ProfileTypeFieldFragmentDoc}
 ` as unknown as DocumentNode<ProfilesModuleFilterEditor_ProfileTypeFieldFragment, unknown>;
 export const DashboardModuleChartItems_ProfileTypeFragmentDoc = gql`
@@ -83089,21 +83242,25 @@ export const fullDashboardModuleProfileFilterFragmentDoc = gql`
       logicalOperator
       operator
       profileTypeFieldId
+      property
       value
       conditions {
         logicalOperator
         operator
         profileTypeFieldId
+        property
         value
         conditions {
           logicalOperator
           operator
           profileTypeFieldId
+          property
           value
           conditions {
             logicalOperator
             operator
             profileTypeFieldId
+            property
             value
           }
         }

@@ -12,12 +12,16 @@ import {
 import { AddIcon, CloseIcon, PlusCircleFilledIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { MultiCheckboxSimpleSelect } from "@parallel/components/common/MultiCheckboxSimpleSelect";
-import { ProfileTypeFieldSelect } from "@parallel/components/common/ProfileTypeFieldSelect";
+import { ProfileQueryFilterSubjectSelect } from "@parallel/components/common/ProfileQueryFilterSubjectSelect";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { ProfilesModuleFilterEditor_ProfileTypeFieldFragment } from "@parallel/graphql/__types";
+import {
+  ProfileQueryFilterInput,
+  ProfileQueryFilterProperty,
+  ProfilesModuleFilterEditor_ProfileTypeFieldFragment,
+  ProfileStatus,
+} from "@parallel/graphql/__types";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
-import { ProfileFieldValuesFilterCondition } from "@parallel/utils/ProfileFieldValuesFilter";
 import { useLogicalOperators } from "@parallel/utils/useLogicalOperators";
 import { useProfileStatusOptions } from "@parallel/utils/useProfileStatusOptions";
 import { ProfileValueFilterLine } from "@parallel/utils/useProfileTableColumns";
@@ -44,32 +48,33 @@ export function ProfilesModuleFilterEditor({
   isUpdating,
 }: ProfilesModuleFilterEditorProps) {
   const { control } = useFormContext();
+
   return (
     <Stack spacing={4}>
       <Controller
         control={control}
-        name={`${field}.status` as any}
+        name={`${field}.status`}
         rules={{ required: true }}
         render={({ field: { value, onChange }, fieldState: { error } }) => (
           <DashboardModuleFilterContainer
             label={
               <FormattedMessage
-                id="component.petition-filters-module-settings.petition-status-label"
+                id="component.profiles-module-filter-editor.status-label"
                 defaultMessage="Status"
               />
             }
-            isInvalid={isNonNullish(error)}
             field={`${field}.status`}
+            isInvalid={isNonNullish(error)}
             isUpdating={isUpdating}
           >
-            <ProfileStatusFilter value={value} onChange={onChange} isDisabled={isDisabled} />
+            <ProfileStatusFilter value={value} onChange={onChange} />
           </DashboardModuleFilterContainer>
         )}
       />
       <DashboardModuleFilterContainer
         label={
           <FormattedMessage
-            id="component.profiles-module-filter-editor.properties"
+            id="component.profiles-module-filter-editor.properties-label"
             defaultMessage="Properties"
           />
         }
@@ -90,10 +95,12 @@ function ProfileStatusFilter({
   value,
   onChange,
   isDisabled,
+  size,
 }: {
   value?: string[];
   onChange: (v: string[]) => void;
   isDisabled?: boolean;
+  size?: "sm" | "md" | "lg";
 }) {
   const intl = useIntl();
   const profileStatusesOptions = useProfileStatusOptions();
@@ -117,6 +124,7 @@ function ProfileStatusFilter({
       })}
       onChange={handleChange}
       isDisabled={isDisabled}
+      size={size}
     />
   );
 }
@@ -220,7 +228,7 @@ function FilterGroupComponent({
             </Stack>
           ))
         ) : (
-          <Box>
+          <Box paddingY={1}>
             <Text textStyle="hint" textAlign="center">
               <FormattedMessage
                 id="generic.no-filter-applied"
@@ -268,9 +276,42 @@ function FilterGroupComponent({
   );
 }
 
+const defaultConditionForProperty = (
+  property: ProfileQueryFilterProperty,
+): ProfileQueryFilterInput => {
+  switch (property) {
+    case "status":
+      return {
+        property,
+        operator: "IS_ONE_OF",
+        value: ["OPEN"] as ProfileStatus[],
+      };
+    case "createdAt":
+      return {
+        property,
+        operator: "GREATER_THAN_OR_EQUAL",
+        value: format(startOfMonth(new Date()), "yyyy-MM-dd"),
+      };
+    case "closedAt":
+      return {
+        property,
+        operator: "GREATER_THAN_OR_EQUAL",
+        value: format(startOfMonth(new Date()), "yyyy-MM-dd"),
+      };
+    case "updatedAt":
+      return {
+        property,
+        operator: "GREATER_THAN_OR_EQUAL",
+        value: format(startOfMonth(new Date()), "yyyy-MM-dd"),
+      };
+  }
+
+  return { property, operator: "EQUAL", value: null };
+};
+
 const defaultConditionForField = (
   field: ProfilesModuleFilterEditor_ProfileTypeFieldFragment,
-): ProfileFieldValuesFilterCondition => {
+): ProfileQueryFilterInput => {
   if (field.type === "TEXT" || field.type === "SHORT_TEXT") {
     return { profileTypeFieldId: field.id, operator: "CONTAIN", value: "" };
   } else if (field.type === "NUMBER") {
@@ -308,6 +349,7 @@ function ConditionComponent({ path, onRemove, profileTypeFields }: ConditionComp
   const intl = useIntl();
   const { control, setValue, watch, clearErrors } = useFormContext();
   const profileTypeFieldId = watch(`${path}.profileTypeFieldId`);
+  const property = watch(`${path}.property`);
   const profileTypeField = profileTypeFields.find((f) => f.id === profileTypeFieldId);
 
   return (
@@ -323,30 +365,70 @@ function ConditionComponent({ path, onRemove, profileTypeFields }: ConditionComp
           size="sm"
           onClick={onRemove}
         />
+
         <Controller
           control={control}
           name={`${path}.profileTypeFieldId`}
-          rules={{ required: true }}
-          render={({ field: { value, onChange, ref, ...rest }, fieldState: { error } }) => (
-            <FormControl isInvalid={isNonNullish(error)}>
-              <ProfileTypeFieldSelect
-                size="sm"
-                value={profileTypeFields.find((f) => f.id === value) ?? null}
-                fields={profileTypeFields}
-                {...rest}
-                onChange={(v) => {
-                  setValue(path, defaultConditionForField(v!));
-                  clearErrors(`${path}.profileTypeFieldId`);
-                }}
-              />
-            </FormControl>
-          )}
+          rules={{ required: isNonNullish(property) ? false : true }}
+          render={({ field: { value, onChange, ref, ...rest }, fieldState: { error } }) => {
+            const _value = isNonNullish(property)
+              ? property
+              : (profileTypeFields.find((f) => f.id === value) ?? null);
+            return (
+              <FormControl isInvalid={isNonNullish(error)}>
+                <ProfileQueryFilterSubjectSelect
+                  size="sm"
+                  value={_value}
+                  fields={profileTypeFields}
+                  {...rest}
+                  onChange={(v) => {
+                    if (typeof v === "object" && v !== null && "id" in v) {
+                      setValue(path, defaultConditionForField(v!));
+                    } else {
+                      setValue(path, defaultConditionForProperty(v!));
+                    }
+
+                    clearErrors(`${path}.profileTypeFieldId`);
+                  }}
+                />
+              </FormControl>
+            );
+          }}
         />
       </HStack>
       {profileTypeField ? (
         <Grid templateColumns="0px auto" alignItems="center" columnGap={2} rowGap={2}>
           <ProfileValueFilterLine profileTypeField={profileTypeField} path={path} />
         </Grid>
+      ) : null}
+      {isNonNullish(property) ? (
+        property === "status" ? (
+          <Controller
+            control={control}
+            name={`${path}.value`}
+            rules={{ required: true }}
+            render={({ field: { value, onChange, ref, ...rest }, fieldState: { error } }) => {
+              return (
+                <FormControl isInvalid={isNonNullish(error)}>
+                  <ProfileStatusFilter value={value} onChange={onChange} size="sm" {...rest} />
+                </FormControl>
+              );
+            }}
+          />
+        ) : ["createdAt", "updatedAt", "closedAt"].includes(property) ? (
+          <Grid templateColumns="0px auto" alignItems="center" columnGap={2} rowGap={2}>
+            <ProfileValueFilterLine
+              profileTypeField={{
+                id: "property",
+                type: "DATE",
+                name: { en: "Date", es: "Fecha" },
+                options: [],
+                isExpirable: false,
+              }}
+              path={path}
+            />
+          </Grid>
+        ) : null
       ) : null}
     </Stack>
   );
@@ -358,7 +440,7 @@ const _fragments = {
       id
       type
       options
-      ...ProfileTypeFieldSelect_ProfileTypeField
+      ...ProfileQueryFilterSubjectSelect_ProfileTypeField
       ...ProfileValueFilterLine_ProfileTypeField
     }
   `,

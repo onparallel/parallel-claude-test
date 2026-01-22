@@ -20,7 +20,11 @@ import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { TestClient, initServer } from "./server";
 
-function modulesBuilder(dashboards: Dashboard[], templateId: number): CreateDashboardModule[] {
+function modulesBuilder(
+  dashboards: Dashboard[],
+  templateId: number,
+  profileTypeId: number,
+): CreateDashboardModule[] {
   return [
     {
       dashboard_id: dashboards[0].id,
@@ -47,7 +51,7 @@ function modulesBuilder(dashboards: Dashboard[], templateId: number): CreateDash
       type: "PROFILES_RATIO",
       size: "MEDIUM",
       title: "Open profiles percentage",
-      settings: JSON.stringify({}),
+      settings: JSON.stringify({ profileTypeId }),
     },
     {
       dashboard_id: dashboards[1].id,
@@ -55,7 +59,7 @@ function modulesBuilder(dashboards: Dashboard[], templateId: number): CreateDash
       type: "PROFILES_PIE_CHART",
       size: "LARGE",
       title: "Profiles by status",
-      settings: JSON.stringify({}),
+      settings: JSON.stringify({ profileTypeId }),
     },
     {
       dashboard_id: dashboards[1].id,
@@ -71,7 +75,7 @@ function modulesBuilder(dashboards: Dashboard[], templateId: number): CreateDash
       type: "PROFILES_PIE_CHART",
       size: "LARGE",
       title: "Profiles by status",
-      settings: JSON.stringify({}),
+      settings: JSON.stringify({ profileTypeId }),
     },
     {
       dashboard_id: dashboards[1].id,
@@ -95,7 +99,7 @@ function modulesBuilder(dashboards: Dashboard[], templateId: number): CreateDash
       type: "PROFILES_NUMBER",
       size: "SMALL",
       title: "Profiles number",
-      settings: JSON.stringify({}),
+      settings: JSON.stringify({ profileTypeId }),
     },
     {
       dashboard_id: dashboards[2].id,
@@ -119,7 +123,7 @@ function modulesBuilder(dashboards: Dashboard[], templateId: number): CreateDash
       type: "PROFILES_NUMBER",
       size: "SMALL",
       title: "Profiles number",
-      settings: JSON.stringify({}),
+      settings: JSON.stringify({ profileTypeId }),
     },
   ];
 }
@@ -231,12 +235,13 @@ describe("GraphQL / Dashboards", () => {
       },
     ]);
 
+    [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
+
     modules = await mocks.knex
       .from("dashboard_module")
-      .insert(modulesBuilder(dashboards, userTemplate.id))
+      .insert(modulesBuilder(dashboards, userTemplate.id, profileType.id))
       .returning("*");
 
-    [profileType] = await mocks.createRandomProfileTypes(organization.id, 1);
     [
       numberProfileTypeField,
       shortTextProfileTypeField,
@@ -281,7 +286,7 @@ describe("GraphQL / Dashboards", () => {
     await mocks.knex.from("dashboard_module").delete();
     modules = await mocks.knex
       .from("dashboard_module")
-      .insert(modulesBuilder(dashboards, userTemplate.id))
+      .insert(modulesBuilder(dashboards, userTemplate.id, profileType.id))
       .returning("*");
 
     await mocks.knex
@@ -2487,50 +2492,6 @@ describe("GraphQL / Dashboards", () => {
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
-
-    it("sends error if passing profileId or profileTypeId in filters", async () => {
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation (
-            $dashboardId: GID!
-            $title: String!
-            $size: DashboardModuleSize!
-            $settings: ProfilesNumberDashboardModuleSettingsInput!
-          ) {
-            createProfilesNumberDashboardModule(
-              dashboardId: $dashboardId
-              title: $title
-              size: $size
-              settings: $settings
-            ) {
-              id
-              modules {
-                id
-              }
-            }
-          }
-        `,
-        {
-          dashboardId: toGlobalId("Dashboard", dashboards[0].id),
-          title: "Total sum of numeric values",
-          size: "SMALL",
-          settings: {
-            type: "COUNT",
-            profileTypeId: toGlobalId("ProfileType", profileType.id),
-            filter: {
-              profileTypeId: toGlobalId("ProfileType", profileType.id),
-              status: ["OPEN"],
-            },
-          },
-        },
-      );
-
-      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
-        argName: "settings.filter.profileTypeId",
-        message: "Cannot be set",
-      });
-      expect(data).toBeNull();
-    });
   });
 
   describe("createProfilesRatioDashboardModule", () => {
@@ -2919,49 +2880,6 @@ describe("GraphQL / Dashboards", () => {
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
-
-    it("sends error if passing profileId or profileTypeId in filters", async () => {
-      const [profile] = await mocks.createRandomProfiles(organization.id, profileType.id, 1);
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation (
-            $dashboardId: GID!
-            $title: String!
-            $size: DashboardModuleSize!
-            $settings: ProfilesRatioDashboardModuleSettingsInput!
-          ) {
-            createProfilesRatioDashboardModule(
-              dashboardId: $dashboardId
-              title: $title
-              size: $size
-              settings: $settings
-            ) {
-              id
-            }
-          }
-        `,
-        {
-          dashboardId: toGlobalId("Dashboard", dashboards[0].id),
-          title: "Ratio of profiles",
-          size: "SMALL",
-          settings: {
-            graphicType: "RATIO",
-            type: "COUNT",
-            profileTypeId: toGlobalId("ProfileType", profileType.id),
-            filters: [
-              { status: ["OPEN"] },
-              { profileId: toGlobalId("Profile", profile.id), status: ["OPEN", "CLOSED"] },
-            ],
-          },
-        },
-      );
-
-      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
-        argName: "settings.filters[1].profileId",
-        message: "Cannot be set",
-      });
-      expect(data).toBeNull();
-    });
   });
 
   describe("createProfilesPieChartDashboardModule", () => {
@@ -3292,56 +3210,6 @@ describe("GraphQL / Dashboards", () => {
       expect(data).toBeNull();
     });
 
-    it("sends error if passing profileId or profileTypeId in filters", async () => {
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation (
-            $dashboardId: GID!
-            $title: String!
-            $size: DashboardModuleSize!
-            $settings: ProfilesPieChartDashboardModuleSettingsInput!
-          ) {
-            createProfilesPieChartDashboardModule(
-              dashboardId: $dashboardId
-              title: $title
-              size: $size
-              settings: $settings
-            ) {
-              id
-            }
-          }
-        `,
-        {
-          dashboardId: toGlobalId("Dashboard", dashboards[0].id),
-          title: "Profiles pie chart",
-          size: "SMALL",
-          settings: {
-            graphicType: "PIE",
-            type: "COUNT",
-            profileTypeId: toGlobalId("ProfileType", profileType.id),
-            items: [
-              {
-                label: "Open",
-                color: "#00ff00",
-                filter: {
-                  profileTypeId: toGlobalId("ProfileType", profileType.id),
-                  status: ["OPEN"],
-                },
-              },
-              { label: "Closed", color: "#ff0000", filter: { status: ["CLOSED"] } },
-              { label: "Open", color: "#0000ff", filter: { status: ["OPEN"] } },
-            ],
-          },
-        },
-      );
-
-      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR", {
-        argName: "settings.items[0].filter.profileTypeId",
-        message: "Cannot be set",
-      });
-      expect(data).toBeNull();
-    });
-
     it("creates a pie chart based on the values of a SELECT property with custom options", async () => {
       const { errors, data } = await testClient.execute(
         gql`
@@ -3532,14 +3400,7 @@ describe("GraphQL / Dashboards", () => {
               status: ["OPEN", "CLOSED"],
             },
             items: [
-              {
-                label: "Open",
-                color: "#00ff00",
-                filter: {
-                  profileTypeId: toGlobalId("ProfileType", profileType.id),
-                  status: ["OPEN"],
-                },
-              },
+              { label: "Open", color: "#00ff00", filter: { status: ["OPEN"] } },
               { label: "Closed", color: "#ff0000", filter: { status: ["CLOSED"] } },
               { label: "Open", color: "#0000ff", filter: { status: ["OPEN"] } },
             ],

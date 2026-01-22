@@ -1,8 +1,7 @@
-import { enumType, interfaceType, objectType } from "nexus";
+import { enumType, inputObjectType, interfaceType, objectType } from "nexus";
 import { assert } from "ts-essentials";
 import { DashboardModuleSizeValues, DashboardPermissionTypeValues } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
-import { ProfileQueryFilterOperatorValues } from "../../util/ProfileQueryFilter";
 
 export const DashboardPermission = objectType({
   name: "DashboardPermission",
@@ -122,34 +121,19 @@ export const DashboardModule = interfaceType({
   },
 });
 
-export const DashboardModuleProfileFieldValuesFilter = objectType({
-  name: "DashboardModuleProfileFieldValuesFilter",
-  definition(t) {
-    t.nullable.globalId("profileTypeFieldId", { prefixName: "ProfileTypeField" });
-    t.nullable.field("operator", {
-      type: enumType({
-        name: "DashboardModuleProfileFieldValuesFilterOperator",
-        members: ProfileQueryFilterOperatorValues,
-      }),
-    });
-    t.nullable.json("value");
-    t.nullable.field("logicalOperator", {
-      type: enumType({
-        name: "DashboardModuleProfileFieldValuesFilterGroupLogicalOperator",
-        members: ["AND", "OR"],
-      }),
-    });
-    t.nullable.list.nonNull.field("conditions", {
-      type: "DashboardModuleProfileFieldValuesFilter",
-    });
-  },
-});
-
 export const DashboardModuleProfileFilter = objectType({
   name: "DashboardModuleProfileFilter",
   definition(t) {
     t.nullable.list.nonNull.field("status", { type: "ProfileStatus" });
-    t.nullable.field("values", { type: "DashboardModuleProfileFieldValuesFilter" });
+    t.nullable.field("values", { type: "ProfileQueryFilter" });
+  },
+});
+
+export const DashboardModuleProfileFilterInput = inputObjectType({
+  name: "DashboardModuleProfileFilterInput",
+  definition(t) {
+    t.nullable.list.nonNull.field("status", { type: "ProfileStatus" });
+    t.nullable.field("values", { type: "ProfileQueryFilterInput" });
   },
 });
 

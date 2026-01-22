@@ -1,10 +1,8 @@
-import { profileFieldValuesFilter } from "./ProfileFieldValuesFilter";
+import { profileQueryFilter } from "./ProfileQueryFilter";
 import {
   buildBuildStateUrl,
   buildParseQuery,
-  buildUseGoTo,
   buildUseQueryState,
-  buildUseQueryStateSlice,
   integer,
   QueryStateFrom,
   sorting,
@@ -24,17 +22,13 @@ const QUERY_STATE = {
   type: string(),
   status: values(["OPEN", "CLOSED", "DELETION_SCHEDULED"]).list(),
   columns: string().list({ allowEmpty: true }),
-  values: profileFieldValuesFilter(),
+  values: profileQueryFilter(),
 };
 
 export type ProfilesQueryState = QueryStateFrom<typeof QUERY_STATE>;
 
 export const useProfilesQueryState = buildUseQueryState(QUERY_STATE);
 
-export const useProfilesQueryStateSlice = buildUseQueryStateSlice(QUERY_STATE);
-
 export const parseProfilesQuery = buildParseQuery(QUERY_STATE);
 
 export const buildProfilesQueryStateUrl = buildBuildStateUrl("/app/profiles", QUERY_STATE);
-
-export const useGoToProfiles = buildUseGoTo("app/profiles", QUERY_STATE);

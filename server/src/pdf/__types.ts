@@ -668,49 +668,14 @@ export type DashboardModulePetitionFilterTagsFilters = {
   value: Array<Scalars["GID"]["output"]>;
 };
 
-export type DashboardModuleProfileFieldValuesFilter = {
-  conditions: Maybe<Array<DashboardModuleProfileFieldValuesFilter>>;
-  logicalOperator: Maybe<DashboardModuleProfileFieldValuesFilterGroupLogicalOperator>;
-  operator: Maybe<DashboardModuleProfileFieldValuesFilterOperator>;
-  profileTypeFieldId: Maybe<Scalars["GID"]["output"]>;
-  value: Maybe<Scalars["JSON"]["output"]>;
-};
-
-export type DashboardModuleProfileFieldValuesFilterGroupLogicalOperator = "AND" | "OR";
-
-export type DashboardModuleProfileFieldValuesFilterOperator =
-  | "CONTAIN"
-  | "END_WITH"
-  | "EQUAL"
-  | "EXPIRES_IN"
-  | "GREATER_THAN"
-  | "GREATER_THAN_OR_EQUAL"
-  | "HAS_ANY_BG_CHECK_TOPICS"
-  | "HAS_BG_CHECK_MATCH"
-  | "HAS_BG_CHECK_RESULTS"
-  | "HAS_BG_CHECK_TOPICS"
-  | "HAS_EXPIRY"
-  | "HAS_PENDING_REVIEW"
-  | "HAS_VALUE"
-  | "IS_EXPIRED"
-  | "IS_ONE_OF"
-  | "LESS_THAN"
-  | "LESS_THAN_OR_EQUAL"
-  | "NOT_CONTAIN"
-  | "NOT_EQUAL"
-  | "NOT_HAS_ANY_BG_CHECK_TOPICS"
-  | "NOT_HAS_BG_CHECK_MATCH"
-  | "NOT_HAS_BG_CHECK_RESULTS"
-  | "NOT_HAS_BG_CHECK_TOPICS"
-  | "NOT_HAS_EXPIRY"
-  | "NOT_HAS_PENDING_REVIEW"
-  | "NOT_HAS_VALUE"
-  | "NOT_IS_ONE_OF"
-  | "START_WITH";
-
 export type DashboardModuleProfileFilter = {
   status: Maybe<Array<ProfileStatus>>;
-  values: Maybe<DashboardModuleProfileFieldValuesFilter>;
+  values: Maybe<ProfileQueryFilter>;
+};
+
+export type DashboardModuleProfileFilterInput = {
+  status?: InputMaybe<Array<ProfileStatus>>;
+  values?: InputMaybe<ProfileQueryFilterInput>;
 };
 
 export type DashboardModuleResultItem = {
@@ -5775,53 +5740,6 @@ export type ProfileFieldValueUpdatedEvent = ProfileEvent & {
   user: Maybe<User>;
 };
 
-export type ProfileFieldValuesFilter = {
-  conditions?: InputMaybe<Array<ProfileFieldValuesFilter>>;
-  logicalOperator?: InputMaybe<ProfileFieldValuesFilterGroupLogicalOperator>;
-  operator?: InputMaybe<ProfileFieldValuesFilterOperator>;
-  profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
-  value?: InputMaybe<Scalars["JSON"]["input"]>;
-};
-
-export type ProfileFieldValuesFilterGroupLogicalOperator = "AND" | "OR";
-
-export type ProfileFieldValuesFilterOperator =
-  | "CONTAIN"
-  | "END_WITH"
-  | "EQUAL"
-  | "EXPIRES_IN"
-  | "GREATER_THAN"
-  | "GREATER_THAN_OR_EQUAL"
-  | "HAS_ANY_BG_CHECK_TOPICS"
-  | "HAS_BG_CHECK_MATCH"
-  | "HAS_BG_CHECK_RESULTS"
-  | "HAS_BG_CHECK_TOPICS"
-  | "HAS_EXPIRY"
-  | "HAS_PENDING_REVIEW"
-  | "HAS_VALUE"
-  | "IS_EXPIRED"
-  | "IS_ONE_OF"
-  | "LESS_THAN"
-  | "LESS_THAN_OR_EQUAL"
-  | "NOT_CONTAIN"
-  | "NOT_EQUAL"
-  | "NOT_HAS_ANY_BG_CHECK_TOPICS"
-  | "NOT_HAS_BG_CHECK_MATCH"
-  | "NOT_HAS_BG_CHECK_RESULTS"
-  | "NOT_HAS_BG_CHECK_TOPICS"
-  | "NOT_HAS_EXPIRY"
-  | "NOT_HAS_PENDING_REVIEW"
-  | "NOT_HAS_VALUE"
-  | "NOT_IS_ONE_OF"
-  | "START_WITH";
-
-export type ProfileFilter = {
-  profileId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-  profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
-  status?: InputMaybe<Array<ProfileStatus>>;
-  values?: InputMaybe<ProfileFieldValuesFilter>;
-};
-
 export type ProfileListView = ListView & {
   data: ProfileListViewData;
   id: Scalars["GID"]["output"];
@@ -5846,7 +5764,7 @@ export type ProfileListViewDataInput = {
   search?: InputMaybe<Scalars["String"]["input"]>;
   sort?: InputMaybe<ProfileListViewSortInput>;
   status?: InputMaybe<Array<ProfileStatus>>;
-  values?: InputMaybe<ProfileFieldValuesFilter>;
+  values?: InputMaybe<ProfileQueryFilterInput>;
 };
 
 export type ProfileListViewSort = {
@@ -5869,6 +5787,15 @@ export type ProfilePagination = {
 export type ProfilePropertyFilter = {
   profileTypeFieldId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   profileTypeId?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+};
+
+export type ProfileQueryFilter = {
+  conditions: Maybe<Array<ProfileQueryFilter>>;
+  logicalOperator: Maybe<ProfileQueryFilterGroupLogicalOperator>;
+  operator: Maybe<ProfileQueryFilterOperator>;
+  profileTypeFieldId: Maybe<Scalars["GID"]["output"]>;
+  property: Maybe<ProfileQueryFilterProperty>;
+  value: Maybe<Scalars["JSON"]["output"]>;
 };
 
 export type ProfileQueryFilterGroupLogicalOperator = "AND" | "OR";
@@ -6120,7 +6047,7 @@ export type ProfileUpdatedEvent = ProfileEvent & {
 export type ProfilesNumberDashboardModuleSettingsInput = {
   /** Aggregate function. Only for type AGGREGATE */
   aggregate?: InputMaybe<ModuleResultAggregateType>;
-  filter: ProfileFilter;
+  filter: DashboardModuleProfileFilterInput;
   /** Field to aggregate on. Only for type AGGREGATE */
   profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
   profileTypeId: Scalars["GID"]["input"];
@@ -6132,7 +6059,7 @@ export type ProfilesPieChartDashboardModuleSettingsInput = {
   aggregate?: InputMaybe<ModuleResultAggregateType>;
   graphicType: DashboardPieChartModuleSettingsType;
   /** Optional filter to apply to all items when grouping by a field */
-  groupByFilter?: InputMaybe<ProfileFilter>;
+  groupByFilter?: InputMaybe<DashboardModuleProfileFilterInput>;
   /** Optional SELECT field to group by its values instead of items array */
   groupByProfileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
   items: Array<ProfilesPieChartDashboardModuleSettingsItemInput>;
@@ -6144,14 +6071,14 @@ export type ProfilesPieChartDashboardModuleSettingsInput = {
 
 export type ProfilesPieChartDashboardModuleSettingsItemInput = {
   color: Scalars["String"]["input"];
-  filter: ProfileFilter;
+  filter: DashboardModuleProfileFilterInput;
   label: Scalars["String"]["input"];
 };
 
 export type ProfilesRatioDashboardModuleSettingsInput = {
   /** Aggregate function. Only for type AGGREGATE */
   aggregate?: InputMaybe<ModuleResultAggregateType>;
-  filters: Array<ProfileFilter>;
+  filters: Array<DashboardModuleProfileFilterInput>;
   graphicType: DashboardRatioModuleSettingsType;
   /** Field to aggregate on. Only for type AGGREGATE */
   profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;

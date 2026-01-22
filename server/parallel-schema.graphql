@@ -781,53 +781,14 @@ type DashboardModulePetitionFilterTagsFilters {
   value: [GID!]!
 }
 
-type DashboardModuleProfileFieldValuesFilter {
-  conditions: [DashboardModuleProfileFieldValuesFilter!]
-  logicalOperator: DashboardModuleProfileFieldValuesFilterGroupLogicalOperator
-  operator: DashboardModuleProfileFieldValuesFilterOperator
-  profileTypeFieldId: GID
-  value: JSON
-}
-
-enum DashboardModuleProfileFieldValuesFilterGroupLogicalOperator {
-  AND
-  OR
-}
-
-enum DashboardModuleProfileFieldValuesFilterOperator {
-  CONTAIN
-  END_WITH
-  EQUAL
-  EXPIRES_IN
-  GREATER_THAN
-  GREATER_THAN_OR_EQUAL
-  HAS_ANY_BG_CHECK_TOPICS
-  HAS_BG_CHECK_MATCH
-  HAS_BG_CHECK_RESULTS
-  HAS_BG_CHECK_TOPICS
-  HAS_EXPIRY
-  HAS_PENDING_REVIEW
-  HAS_VALUE
-  IS_EXPIRED
-  IS_ONE_OF
-  LESS_THAN
-  LESS_THAN_OR_EQUAL
-  NOT_CONTAIN
-  NOT_EQUAL
-  NOT_HAS_ANY_BG_CHECK_TOPICS
-  NOT_HAS_BG_CHECK_MATCH
-  NOT_HAS_BG_CHECK_RESULTS
-  NOT_HAS_BG_CHECK_TOPICS
-  NOT_HAS_EXPIRY
-  NOT_HAS_PENDING_REVIEW
-  NOT_HAS_VALUE
-  NOT_IS_ONE_OF
-  START_WITH
-}
-
 type DashboardModuleProfileFilter {
   status: [ProfileStatus!]
-  values: DashboardModuleProfileFieldValuesFilter
+  values: ProfileQueryFilter
+}
+
+input DashboardModuleProfileFilterInput {
+  status: [ProfileStatus!]
+  values: ProfileQueryFilterInput
 }
 
 type DashboardModuleResultItem {
@@ -7314,57 +7275,6 @@ type ProfileFieldValueUpdatedEvent implements ProfileEvent {
   user: User
 }
 
-input ProfileFieldValuesFilter {
-  conditions: [ProfileFieldValuesFilter!]
-  logicalOperator: ProfileFieldValuesFilterGroupLogicalOperator
-  operator: ProfileFieldValuesFilterOperator
-  profileTypeFieldId: GID
-  value: JSON
-}
-
-enum ProfileFieldValuesFilterGroupLogicalOperator {
-  AND
-  OR
-}
-
-enum ProfileFieldValuesFilterOperator {
-  CONTAIN
-  END_WITH
-  EQUAL
-  EXPIRES_IN
-  GREATER_THAN
-  GREATER_THAN_OR_EQUAL
-  HAS_ANY_BG_CHECK_TOPICS
-  HAS_BG_CHECK_MATCH
-  HAS_BG_CHECK_RESULTS
-  HAS_BG_CHECK_TOPICS
-  HAS_EXPIRY
-  HAS_PENDING_REVIEW
-  HAS_VALUE
-  IS_EXPIRED
-  IS_ONE_OF
-  LESS_THAN
-  LESS_THAN_OR_EQUAL
-  NOT_CONTAIN
-  NOT_EQUAL
-  NOT_HAS_ANY_BG_CHECK_TOPICS
-  NOT_HAS_BG_CHECK_MATCH
-  NOT_HAS_BG_CHECK_RESULTS
-  NOT_HAS_BG_CHECK_TOPICS
-  NOT_HAS_EXPIRY
-  NOT_HAS_PENDING_REVIEW
-  NOT_HAS_VALUE
-  NOT_IS_ONE_OF
-  START_WITH
-}
-
-input ProfileFilter {
-  profileId: [GID!]
-  profileTypeId: [GID!]
-  status: [ProfileStatus!]
-  values: ProfileFieldValuesFilter
-}
-
 type ProfileListView implements ListView {
   data: ProfileListViewData!
   id: GID!
@@ -7391,7 +7301,7 @@ input ProfileListViewDataInput {
   search: String
   sort: ProfileListViewSortInput
   status: [ProfileStatus!]
-  values: ProfileFieldValuesFilter
+  values: ProfileQueryFilterInput
 }
 
 type ProfileListViewSort {
@@ -7419,6 +7329,15 @@ type ProfilePagination {
 input ProfilePropertyFilter {
   profileTypeFieldId: [GID!]
   profileTypeId: [GID!]
+}
+
+type ProfileQueryFilter {
+  conditions: [ProfileQueryFilter!]
+  logicalOperator: ProfileQueryFilterGroupLogicalOperator
+  operator: ProfileQueryFilterOperator
+  profileTypeFieldId: GID
+  property: ProfileQueryFilterProperty
+  value: JSON
 }
 
 enum ProfileQueryFilterGroupLogicalOperator {
@@ -7716,7 +7635,7 @@ input ProfilesNumberDashboardModuleSettingsInput {
   Aggregate function. Only for type AGGREGATE
   """
   aggregate: ModuleResultAggregateType
-  filter: ProfileFilter!
+  filter: DashboardModuleProfileFilterInput!
 
   """
   Field to aggregate on. Only for type AGGREGATE
@@ -7736,7 +7655,7 @@ input ProfilesPieChartDashboardModuleSettingsInput {
   """
   Optional filter to apply to all items when grouping by a field
   """
-  groupByFilter: ProfileFilter
+  groupByFilter: DashboardModuleProfileFilterInput
 
   """
   Optional SELECT field to group by its values instead of items array
@@ -7754,7 +7673,7 @@ input ProfilesPieChartDashboardModuleSettingsInput {
 
 input ProfilesPieChartDashboardModuleSettingsItemInput {
   color: String!
-  filter: ProfileFilter!
+  filter: DashboardModuleProfileFilterInput!
   label: String!
 }
 
@@ -7763,7 +7682,7 @@ input ProfilesRatioDashboardModuleSettingsInput {
   Aggregate function. Only for type AGGREGATE
   """
   aggregate: ModuleResultAggregateType
-  filters: [ProfileFilter!]!
+  filters: [DashboardModuleProfileFilterInput!]!
   graphicType: DashboardRatioModuleSettingsType!
 
   """

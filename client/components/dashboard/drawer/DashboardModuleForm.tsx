@@ -40,7 +40,7 @@ import {
 } from "@parallel/graphql/__types";
 import { removeTypenames, WithoutTypenames } from "@parallel/utils/apollo/removeTypenames";
 import { never } from "@parallel/utils/never";
-import { ProfileFieldValuesFilterGroup } from "@parallel/utils/ProfileFieldValuesFilter";
+import { ProfileQueryFilterGroup } from "@parallel/utils/ProfileQueryFilter";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
@@ -363,14 +363,13 @@ function prepareDashboardModulePetitionFilter(
 
 function prepareDashboardModuleProfileFilter(filter: {
   status: string[];
-  values: ProfileFieldValuesFilterGroup;
+  values: ProfileQueryFilterGroup;
 }) {
   return {
     status: filter.status.length > 0 ? filter.status : null,
     values: filter.values.conditions.length > 0 ? filter.values : null,
   };
 }
-
 function getDefaultDashboardModuleFormDataSettings(
   moduleType: DashboardModuleType,
   module: DashboardModuleForm_DashboardModuleFragment | null,

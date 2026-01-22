@@ -5,9 +5,9 @@ import { OverflownText } from "@parallel/components/common/OverflownText";
 import { ScrollShadows } from "@parallel/components/common/ScrollShadows";
 import { DashboardProfilesPieChartModule_DashboardProfilesPieChartModuleFragment } from "@parallel/graphql/__types";
 import {
-  ProfileFieldValuesFilterGroup,
-  simplifyProfileFieldValuesFilter,
-} from "@parallel/utils/ProfileFieldValuesFilter";
+  ProfileQueryFilterGroup,
+  simplifyProfileQueryFilter,
+} from "@parallel/utils/ProfileQueryFilter";
 import { buildProfilesQueryStateUrl } from "@parallel/utils/profilesQueryState";
 import { forwardRef, Fragment, useMemo } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
@@ -89,7 +89,7 @@ export const DashboardProfilesPieChartModule = forwardRef<
                     value: null,
                   },
             ],
-          } as ProfileFieldValuesFilterGroup;
+          } as ProfileQueryFilterGroup;
           if (isNonNullish(groupBy.values)) {
             // add global filter
             valueFilter.conditions.push(groupBy.values);
@@ -106,7 +106,7 @@ export const DashboardProfilesPieChartModule = forwardRef<
             view: "-ALL", // this forces ALL instead of the default view
             type: module.profilesPieChartSettings.profileTypeId,
             status: groupBy.status,
-            values: simplifyProfileFieldValuesFilter(valueFilter),
+            values: simplifyProfileQueryFilter(valueFilter),
           });
         }) ?? []
       );
@@ -116,7 +116,7 @@ export const DashboardProfilesPieChartModule = forwardRef<
         const valueFilter = {
           logicalOperator: "AND",
           conditions: [],
-        } as ProfileFieldValuesFilterGroup;
+        } as ProfileQueryFilterGroup;
         if (isNonNullish(values)) {
           valueFilter.conditions.push(values);
         }
@@ -133,9 +133,7 @@ export const DashboardProfilesPieChartModule = forwardRef<
           type: module.profilesPieChartSettings.profileTypeId,
           status,
           values:
-            valueFilter.conditions.length > 0
-              ? simplifyProfileFieldValuesFilter(valueFilter)
-              : null,
+            valueFilter.conditions.length > 0 ? simplifyProfileQueryFilter(valueFilter) : null,
         });
       });
     }

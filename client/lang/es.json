@@ -10270,6 +10270,36 @@
     "context": "Subscribed"
   },
   {
+    "term": "component.profile-type-field-and-metadata-select.metadata-close-date",
+    "definition": "Fecha de cierre",
+    "context": "Close date"
+  },
+  {
+    "term": "component.profile-type-field-and-metadata-select.metadata-creation-date",
+    "definition": "Fecha de creación",
+    "context": "Creation date"
+  },
+  {
+    "term": "component.profile-type-field-and-metadata-select.metadata-group-label",
+    "definition": "Metadatos",
+    "context": "Metadata"
+  },
+  {
+    "term": "component.profile-type-field-and-metadata-select.metadata-status",
+    "definition": "Estado",
+    "context": "Status"
+  },
+  {
+    "term": "component.profile-type-field-and-metadata-select.metadata-update-date",
+    "definition": "Fecha de actualización",
+    "context": "Update date"
+  },
+  {
+    "term": "component.profile-type-field-and-metadata-select.properties-group-label",
+    "definition": "Propiedades",
+    "context": "Properties"
+  },
+  {
     "term": "component.profile-type-field-icon.briefcase-icon",
     "definition": "Icono de maletín",
     "context": "Briefcase icon"
@@ -10660,9 +10690,14 @@
     "context": "At least one condition is required."
   },
   {
-    "term": "component.profiles-module-filter-editor.properties",
+    "term": "component.profiles-module-filter-editor.properties-label",
     "definition": "Propiedades",
     "context": "Properties"
+  },
+  {
+    "term": "component.profiles-module-filter-editor.status-label",
+    "definition": "Estado",
+    "context": "Status"
   },
   {
     "term": "component.property-referenced-alert.referenced-by-auto-search-config-1",

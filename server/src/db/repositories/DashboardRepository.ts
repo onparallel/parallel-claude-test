@@ -8,6 +8,7 @@ import {
 } from "../../services/ProfileTypeFieldService";
 import { fullName } from "../../util/fullName";
 import { never } from "../../util/never";
+import { ProfileQueryFilter } from "../../util/ProfileQueryFilter";
 import { hashString } from "../../util/token";
 import { Replace } from "../../util/types";
 import {
@@ -19,6 +20,7 @@ import {
   DashboardModuleType,
   DashboardPermission,
   DashboardPermissionType,
+  ProfileStatus,
   ProfileTypeField,
   User,
 } from "../__types";
@@ -27,8 +29,12 @@ import { PETITION_QUERY_HELPER, PetitionQueryHelper } from "../helpers/PetitionQ
 import { PROFILE_QUERY_HELPER, ProfileQueryHelper } from "../helpers/ProfileQueryHelper";
 import { KNEX } from "../knex";
 import { PetitionFilter } from "./PetitionRepository";
-import { ProfileFilter } from "./ProfileRepository";
 import { UserRepository } from "./UserRepository";
+
+export interface DashboardModuleProfileFilter {
+  status?: ProfileStatus[] | null;
+  values?: ProfileQueryFilter | null;
+}
 
 type UserDashboardPreferences = {
   tab_order: number[];
@@ -70,13 +76,13 @@ export type ModuleSettings<TType extends DashboardModuleType> = {
 
   PROFILES_NUMBER: {
     profileTypeId: number;
-    filters: ProfileFilter;
+    filters: DashboardModuleProfileFilter;
   } & ModuleResultType;
 
   PROFILES_RATIO: {
     graphicType: "RATIO" | "PERCENTAGE";
     profileTypeId: number;
-    filters: [ProfileFilter, ProfileFilter];
+    filters: DashboardModuleProfileFilter[];
   } & ModuleResultType;
 
   PROFILES_PIE_CHART: {
@@ -85,12 +91,12 @@ export type ModuleSettings<TType extends DashboardModuleType> = {
     items: {
       label: string;
       color: string;
-      filter: ProfileFilter;
+      filter: DashboardModuleProfileFilter;
     }[];
   } & ModuleResultType & {
       // optionally pass a SELECT profileTypeFieldId to build items array from field values
       groupByProfileTypeFieldId?: number;
-      groupByFilter?: ProfileFilter; // extra filters to apply to all grouped items
+      groupByFilter?: DashboardModuleProfileFilter; // extra filters to apply to all grouped items
     };
 }[TType];
 
@@ -464,11 +470,11 @@ export class DashboardRepository extends BaseRepository {
   private profilesCountQuery(
     orgId: number,
     profileTypeId: number,
-    filters: ProfileFilter,
+    filters: DashboardModuleProfileFilter,
     profileTypeFieldsById: Record<number, ProfileTypeField>,
     settings: ModuleResultType & {
       groupByProfileTypeFieldId?: number;
-      groupByFilter?: ProfileFilter;
+      groupByFilter?: DashboardModuleProfileFilter;
     },
   ) {
     assert(
@@ -528,10 +534,6 @@ export class DashboardRepository extends BaseRepository {
           q.whereIn("p.status", filters.status);
         }
         if (isNonNullish(filters?.values)) {
-          assert(
-            isNonNullish(profileTypeFieldsById),
-            "if filter.values is defined, profileTypeFieldsById is required",
-          );
           this.profileQueryHelper.applyProfileQueryFilterJoins(
             q,
             filters.values,

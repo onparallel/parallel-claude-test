@@ -1,27 +1,35 @@
 import { gql } from "@apollo/client";
 import {
-  DashboardModuleProfileFieldValuesFilter,
   fullDashboardModulePetitionFilterFragment,
   fullDashboardModuleProfileFilterFragment,
 } from "@parallel/graphql/__types";
 import { removeTypenames, WithoutTypenames } from "@parallel/utils/apollo/removeTypenames";
-import { ProfileFieldValuesFilter } from "@parallel/utils/ProfileFieldValuesFilter";
+import { never } from "@parallel/utils/never";
+import { ProfileQueryFilter } from "@parallel/utils/ProfileQueryFilter";
 import { isNonNullish } from "remeda";
 
-function cleanDashboardModuleProfileFieldValuesFilter(
-  values: WithoutTypenames<DashboardModuleProfileFieldValuesFilter>,
-): ProfileFieldValuesFilter {
+function cleanDashboardModuleProfileQueryFilter(
+  values: NonNullable<WithoutTypenames<fullDashboardModuleProfileFilterFragment["values"]>>,
+): ProfileQueryFilter {
   if (isNonNullish(values.logicalOperator)) {
     return {
       logicalOperator: values.logicalOperator!,
-      conditions: values.conditions!.map((c) => cleanDashboardModuleProfileFieldValuesFilter(c)),
+      conditions: values.conditions!.map((c) => cleanDashboardModuleProfileQueryFilter(c)),
     };
-  } else {
+  } else if (isNonNullish(values.profileTypeFieldId)) {
     return {
       profileTypeFieldId: values.profileTypeFieldId!,
       operator: values.operator!,
       value: values.value!,
     };
+  } else if (isNonNullish(values.property)) {
+    return {
+      property: values.property!,
+      operator: values.operator!,
+      value: values.value!,
+    };
+  } else {
+    never("Unknown filter type");
   }
 }
 
@@ -30,7 +38,7 @@ export function cleanDashboardModuleProfileFilter(
 ) {
   return {
     values: isNonNullish(filter.values)
-      ? cleanDashboardModuleProfileFieldValuesFilter(filter.values)
+      ? cleanDashboardModuleProfileQueryFilter(filter.values)
       : undefined,
     status: filter.status ?? undefined,
   };
@@ -54,7 +62,7 @@ export function defaultDashboardModulePetitionFilter(
 }
 
 export function defaultDashboardModuleProfileFilter(
-  filter?: WithoutTypenames<fullDashboardModuleProfileFilterFragment>,
+  filter?: WithoutTypenames<fullDashboardModuleProfileFilterFragment> | null,
 ) {
   const cleaned = isNonNullish(filter) ? cleanDashboardModuleProfileFilter(filter) : undefined;
   return {
@@ -99,21 +107,25 @@ const _fragmentsFullDashboardModuleProfileFilter = gql`
       logicalOperator
       operator
       profileTypeFieldId
+      property
       value
       conditions {
         logicalOperator
         operator
         profileTypeFieldId
+        property
         value
         conditions {
           logicalOperator
           operator
           profileTypeFieldId
+          property
           value
           conditions {
             logicalOperator
             operator
             profileTypeFieldId
+            property
             value
           }
         }

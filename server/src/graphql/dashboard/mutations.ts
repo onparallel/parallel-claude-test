@@ -1,10 +1,11 @@
 import { inputObjectType, list, mutationField, nonNull, nullable, stringArg } from "nexus";
-import { isNonNullish, unique } from "remeda";
+import { indexBy, isNonNullish, unique } from "remeda";
 import { assert } from "ts-essentials";
-import { DashboardModule } from "../../db/__types";
+import { DashboardModule, ProfileTypeField } from "../../db/__types";
 import { ModuleSettings } from "../../db/repositories/DashboardRepository";
 import { PetitionFilter } from "../../db/repositories/PetitionRepository";
-import { ProfileFilter } from "../../db/repositories/ProfileRepository";
+import { mapAndValidateProfileQueryFilter } from "../../util/ProfileQueryFilter";
+import { NexusGenInputs } from "../__types";
 import { and, authenticateAnd, ifArgDefined, or } from "../helpers/authorize";
 import { ArgValidationError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -25,7 +26,6 @@ import {
 } from "../profile/authorizers";
 import { userHasAccessToUserGroups } from "../user-group/authorizers";
 import { contextUserHasPermission } from "../users/authorizers";
-import { mapProfileFieldValuesFilterToDatabase } from "../views/helpers";
 import {
   dashboardCanCreateModule,
   dashboardIsNotGroupSharedToContextUser,
@@ -41,6 +41,16 @@ import {
   validateProfilesPieChartDashboardModuleSettingsInput,
   validateProfilesRatioDashboardModuleSettingsInput,
 } from "./validations";
+
+function mapAndValidateProfileFilter(
+  filter: NexusGenInputs["DashboardModuleProfileFilterInput"],
+  profileTypeFieldsById: Record<number, ProfileTypeField>,
+) {
+  return {
+    status: filter.status,
+    values: mapAndValidateProfileQueryFilter(filter.values, profileTypeFieldsById),
+  };
+}
 
 export const createDashboard = mutationField("createDashboard", {
   type: "Dashboard",
@@ -374,7 +384,7 @@ export const createProfilesNumberDashboardModule = mutationField(
           name: "ProfilesNumberDashboardModuleSettingsInput",
           definition(t) {
             t.nonNull.globalId("profileTypeId", { prefixName: "ProfileType" });
-            t.nonNull.field("filter", { type: "ProfileFilter" });
+            t.nonNull.field("filter", { type: "DashboardModuleProfileFilterInput" });
             t.nonNull.field("type", { type: "ModuleResultType" });
             t.nullable.globalId("profileTypeFieldId", {
               prefixName: "ProfileTypeField",
@@ -393,6 +403,9 @@ export const createProfilesNumberDashboardModule = mutationField(
       validateProfilesNumberDashboardModuleSettingsInput("settings"),
     ),
     resolve: async (_, { dashboardId, title, size, settings }, ctx) => {
+      const profileTypeFields = await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(
+        settings.profileTypeId,
+      );
       await ctx.dashboards.createDashboardModule(
         {
           type: "PROFILES_NUMBER",
@@ -408,10 +421,10 @@ export const createProfilesNumberDashboardModule = mutationField(
                   profileTypeFieldId: settings.profileTypeFieldId!,
                 }),
             profileTypeId: settings.profileTypeId,
-            filters: {
-              status: settings.filter.status ?? ["OPEN"],
-              values: mapProfileFieldValuesFilterToDatabase(settings.filter.values),
-            },
+            filters: mapAndValidateProfileFilter(
+              settings.filter,
+              indexBy(profileTypeFields, (ptf) => ptf.id),
+            ),
           },
         },
         `User:${ctx.user!.id}`,
@@ -451,7 +464,7 @@ export const createProfilesRatioDashboardModule = mutationField(
           definition(t) {
             t.nonNull.field("graphicType", { type: "DashboardRatioModuleSettingsType" });
             t.nonNull.globalId("profileTypeId", { prefixName: "ProfileType" });
-            t.nonNull.list.nonNull.field("filters", { type: "ProfileFilter" });
+            t.nonNull.list.nonNull.field("filters", { type: "DashboardModuleProfileFilterInput" });
             t.nonNull.field("type", { type: "ModuleResultType" });
             t.nullable.globalId("profileTypeFieldId", {
               prefixName: "ProfileTypeField",
@@ -470,6 +483,11 @@ export const createProfilesRatioDashboardModule = mutationField(
       validateProfilesRatioDashboardModuleSettingsInput("settings"),
     ),
     resolve: async (_, { dashboardId, title, size, settings }, ctx) => {
+      const profileTypeFields = await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(
+        settings.profileTypeId,
+      );
+      const profileTypeFieldsById = indexBy(profileTypeFields, (ptf) => ptf.id);
+
       await ctx.dashboards.createDashboardModule(
         {
           type: "PROFILES_RATIO",
@@ -486,11 +504,9 @@ export const createProfilesRatioDashboardModule = mutationField(
                 }),
             profileTypeId: settings.profileTypeId,
             graphicType: settings.graphicType,
-            filters: settings.filters.map((f) => ({
-              ...f,
-              values: mapProfileFieldValuesFilterToDatabase(f.values),
-              status: f.status ?? ["OPEN"],
-            })) as [ProfileFilter, ProfileFilter],
+            filters: settings.filters.map((filter) =>
+              mapAndValidateProfileFilter(filter, profileTypeFieldsById),
+            ),
           },
         },
         `User:${ctx.user!.id}`,
@@ -536,7 +552,7 @@ export const createProfilesPieChartDashboardModule = mutationField(
                 definition(t) {
                   t.nonNull.string("label");
                   t.nonNull.string("color");
-                  t.nonNull.field("filter", { type: "ProfileFilter" });
+                  t.nonNull.field("filter", { type: "DashboardModuleProfileFilterInput" });
                 },
               }),
             });
@@ -554,7 +570,7 @@ export const createProfilesPieChartDashboardModule = mutationField(
               description: "Optional SELECT field to group by its values instead of items array",
             });
             t.nullable.field("groupByFilter", {
-              type: "ProfileFilter",
+              type: "DashboardModuleProfileFilterInput",
               description: "Optional filter to apply to all items when grouping by a field",
             });
           },
@@ -566,6 +582,10 @@ export const createProfilesPieChartDashboardModule = mutationField(
       validateProfilesPieChartDashboardModuleSettingsInput("settings"),
     ),
     resolve: async (_, { dashboardId, title, size, settings }, ctx) => {
+      const profileTypeFields = await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(
+        settings.profileTypeId,
+      );
+      const profileTypeFieldsById = indexBy(profileTypeFields, (ptf) => ptf.id);
       await ctx.dashboards.createDashboardModule(
         {
           type: "PROFILES_PIE_CHART",
@@ -583,19 +603,12 @@ export const createProfilesPieChartDashboardModule = mutationField(
             profileTypeId: settings.profileTypeId,
             groupByProfileTypeFieldId: settings.groupByProfileTypeFieldId ?? undefined,
             groupByFilter: settings.groupByFilter
-              ? {
-                  status: settings.groupByFilter.status ?? ["OPEN"],
-                  values: mapProfileFieldValuesFilterToDatabase(settings.groupByFilter.values),
-                }
+              ? mapAndValidateProfileFilter(settings.groupByFilter, profileTypeFieldsById)
               : undefined,
             graphicType: settings.graphicType,
             items: settings.items.map((item) => ({
-              color: item.color,
-              label: item.label,
-              filter: {
-                status: item.filter.status ?? ["OPEN"],
-                values: mapProfileFieldValuesFilterToDatabase(item.filter.values),
-              },
+              ...item,
+              filter: mapAndValidateProfileFilter(item.filter, profileTypeFieldsById),
             })),
           },
         },
@@ -880,6 +893,14 @@ export const updateProfilesNumberDashboardModule = mutationField(
       validateProfilesNumberDashboardModuleSettingsInput("data.settings"),
     ),
     resolve: async (_, { moduleId, data }, ctx) => {
+      const module = await ctx.dashboards.loadDashboardModule(moduleId);
+      assert(isNonNullish(module) && isNonNullish(module.settings.profileTypeId));
+
+      const profileTypeFields = await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(
+        data.settings?.profileTypeId ?? module.settings.profileTypeId,
+      );
+      const profileTypeFieldsById = indexBy(profileTypeFields, (ptf) => ptf.id);
+
       const updateData: Partial<DashboardModule> = {};
       if (data.title !== undefined) {
         updateData.title = data.title;
@@ -897,10 +918,7 @@ export const updateProfilesNumberDashboardModule = mutationField(
                 profileTypeFieldId: data.settings.profileTypeFieldId!,
               }),
           profileTypeId: data.settings.profileTypeId,
-          filters: {
-            status: data.settings.filter.status,
-            values: mapProfileFieldValuesFilterToDatabase(data.settings.filter.values),
-          },
+          filters: mapAndValidateProfileFilter(data.settings.filter, profileTypeFieldsById),
         } as ModuleSettings<"PROFILES_NUMBER">;
         updateData.result = null;
       }
@@ -953,6 +971,14 @@ export const updateProfilesRatioDashboardModule = mutationField(
       validateProfilesRatioDashboardModuleSettingsInput("data.settings"),
     ),
     resolve: async (_, { moduleId, data }, ctx) => {
+      const module = await ctx.dashboards.loadDashboardModule(moduleId);
+      assert(isNonNullish(module) && isNonNullish(module.settings.profileTypeId));
+
+      const profileTypeFields = await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(
+        data.settings?.profileTypeId ?? module.settings.profileTypeId,
+      );
+      const profileTypeFieldsById = indexBy(profileTypeFields, (ptf) => ptf.id);
+
       const updateData: Partial<DashboardModule> = {};
       if (data.title !== undefined) {
         updateData.title = data.title;
@@ -971,10 +997,9 @@ export const updateProfilesRatioDashboardModule = mutationField(
               }),
           profileTypeId: data.settings.profileTypeId,
           graphicType: data.settings.graphicType,
-          filters: data.settings.filters.map((f) => ({
-            ...f,
-            values: mapProfileFieldValuesFilterToDatabase(f.values),
-          })) as [ProfileFilter, ProfileFilter],
+          filters: data.settings.filters.map((filter) =>
+            mapAndValidateProfileFilter(filter, profileTypeFieldsById),
+          ),
         } as ModuleSettings<"PROFILES_RATIO">;
         updateData.result = null;
       }
@@ -1027,6 +1052,14 @@ export const updateProfilesPieChartDashboardModule = mutationField(
       validateProfilesPieChartDashboardModuleSettingsInput("data.settings"),
     ),
     resolve: async (_, { moduleId, data }, ctx) => {
+      const module = await ctx.dashboards.loadDashboardModule(moduleId);
+      assert(isNonNullish(module) && isNonNullish(module.settings.profileTypeId));
+
+      const profileTypeFields = await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(
+        data.settings?.profileTypeId ?? module.settings.profileTypeId,
+      );
+      const profileTypeFieldsById = indexBy(profileTypeFields, (ptf) => ptf.id);
+
       const updateData: Partial<DashboardModule> = {};
       if (data.title !== undefined) {
         updateData.title = data.title;
@@ -1046,19 +1079,13 @@ export const updateProfilesPieChartDashboardModule = mutationField(
           profileTypeId: data.settings.profileTypeId,
           groupByProfileTypeFieldId: data.settings.groupByProfileTypeFieldId ?? undefined,
           groupByFilter: data.settings.groupByFilter
-            ? {
-                status: data.settings.groupByFilter.status,
-                values: mapProfileFieldValuesFilterToDatabase(data.settings.groupByFilter.values),
-              }
+            ? mapAndValidateProfileFilter(data.settings.groupByFilter, profileTypeFieldsById)
             : undefined,
           graphicType: data.settings.graphicType,
           items: data.settings.items.map((item) => ({
             color: item.color,
             label: item.label,
-            filter: {
-              status: item.filter.status,
-              values: mapProfileFieldValuesFilterToDatabase(item.filter.values),
-            },
+            filter: mapAndValidateProfileFilter(item.filter, profileTypeFieldsById),
           })),
         } as ModuleSettings<"PROFILES_PIE_CHART">;
         updateData.result = null;

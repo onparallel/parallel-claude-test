@@ -2,7 +2,7 @@ import fastSafeStringify from "fast-safe-stringify";
 import { GraphQLResolveInfo } from "graphql";
 import { indexBy, isNonNullish, isNullish, partition } from "remeda";
 import { ApiContext } from "../../context";
-import { ProfileStatusValues } from "../../db/__types";
+import { ProfileTypeField } from "../../db/__types";
 import { getAssertionErrorMessage, isAssertionError } from "../../util/assert";
 import { fromGlobalId, isGlobalId } from "../../util/globalId";
 import { mapAndValidateProfileQueryFilter } from "../../util/ProfileQueryFilter";
@@ -168,48 +168,29 @@ async function validatePetitionFilter(
   }
 }
 
-async function validateProfileFilter(
-  filter: NexusGenInputs["ProfileFilter"],
-  profileTypeId: number,
-  info: GraphQLResolveInfo,
+function validateDashboardModuleProfileFilterInput(
+  filter: NexusGenInputs["DashboardModuleProfileFilterInput"],
+  profileTypeFieldsById: Record<number, ProfileTypeField>,
   argName: string,
-  ctx: ApiContext,
+  info: GraphQLResolveInfo,
 ) {
-  // profileId and profileTypeId cannot be set on settings.filter
-  for (const invalidKey of ["profileId", "profileTypeId"]) {
-    if (isNonNullish(filter[invalidKey as keyof typeof filter])) {
-      throw new ArgValidationError(info, `${argName}.${invalidKey}`, "Cannot be set");
-    }
+  if (filter?.status?.includes("DELETION_SCHEDULED")) {
+    throw new ArgValidationError(info, `${argName}.status`, "Invalid status");
   }
 
-  if (filter.status) {
-    if (filter.status.length < 1 || filter.status.length > ProfileStatusValues.length) {
-      throw new ArgValidationError(
-        info,
-        `${argName}.status`,
-        `Must have between 1 and ${ProfileStatusValues.length} values`,
-      );
-    }
-
-    if (filter.status.includes("DELETION_SCHEDULED")) {
-      throw new ArgValidationError(info, `${argName}.status`, "Invalid status");
-    }
-  }
-
-  if (isNonNullish(filter.values)) {
-    const profileTypeFields =
-      await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(profileTypeId);
-    try {
+  try {
+    if (isNonNullish(filter.values)) {
       mapAndValidateProfileQueryFilter(
         filter.values,
-        indexBy(profileTypeFields, (f) => f.id),
+        profileTypeFieldsById,
+        ["OPEN", "CLOSED"], // cannot filter by DELETION_SCHEDULED in dashboards
       );
-    } catch (error) {
-      if (isAssertionError(error)) {
-        throw new ArgValidationError(info, `${argName}.values`, getAssertionErrorMessage(error));
-      } else {
-        throw error;
-      }
+    }
+  } catch (error) {
+    if (isAssertionError(error)) {
+      throw new ArgValidationError(info, `${argName}.values`, getAssertionErrorMessage(error));
+    } else {
+      throw error;
     }
   }
 }
@@ -331,12 +312,15 @@ export function validateProfilesNumberDashboardModuleSettingsInput<
       return;
     }
 
-    await validateProfileFilter(
-      settings.filter,
+    const profileTypeFields = await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(
       settings.profileTypeId,
+    );
+
+    validateDashboardModuleProfileFilterInput(
+      settings.filter,
+      indexBy(profileTypeFields, (ptf) => ptf.id),
+      `${argName}.filter`,
       info,
-      "settings.filter",
-      ctx,
     );
 
     try {
@@ -371,14 +355,18 @@ export function validateProfilesRatioDashboardModuleSettingsInput<
       throw new ArgValidationError(info, `${argName}.filters`, "Exactly 2 filters are required");
     }
 
+    const profileTypeFields = await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(
+      settings.profileTypeId,
+    );
+    const profileTypeFieldsById = indexBy(profileTypeFields, (ptf) => ptf.id);
+
     for (const filter of settings.filters) {
       const index = settings.filters.indexOf(filter);
-      await validateProfileFilter(
+      validateDashboardModuleProfileFilterInput(
         filter,
-        settings.profileTypeId,
-        info,
+        profileTypeFieldsById,
         `${argName}.filters[${index}]`,
-        ctx,
+        info,
       );
     }
 
@@ -441,6 +429,11 @@ export function validateProfilesPieChartDashboardModuleSettingsInput<
       }
     }
 
+    const profileTypeFields = await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(
+      settings.profileTypeId,
+    );
+    const profileTypeFieldsById = indexBy(profileTypeFields, (ptf) => ptf.id);
+
     if (isNonNullish(settings.groupByFilter)) {
       if (isNullish(settings.groupByProfileTypeFieldId)) {
         throw new ArgValidationError(
@@ -450,12 +443,11 @@ export function validateProfilesPieChartDashboardModuleSettingsInput<
         );
       }
 
-      await validateProfileFilter(
+      validateDashboardModuleProfileFilterInput(
         settings.groupByFilter,
-        settings.profileTypeId,
-        info,
+        profileTypeFieldsById,
         `${argName}.groupByFilter`,
-        ctx,
+        info,
       );
     }
 
@@ -469,12 +461,12 @@ export function validateProfilesPieChartDashboardModuleSettingsInput<
           `Argument must represent a HEX color value.`,
         );
       }
-      await validateProfileFilter(
+
+      validateDashboardModuleProfileFilterInput(
         item.filter,
-        settings.profileTypeId,
-        info,
+        profileTypeFieldsById,
         `${argName}.items[${index}].filter`,
-        ctx,
+        info,
       );
     }
 

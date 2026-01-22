@@ -1,5 +1,5 @@
 import { list, mutationField, nonNull, nullable, stringArg } from "nexus";
-import { firstBy, isNonNullish } from "remeda";
+import { firstBy, indexBy, isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
 import { PetitionListView, ProfileListView } from "../../db/__types";
 import { fromGlobalId } from "../../util/globalId";
@@ -27,7 +27,7 @@ import {
   validPetitionListViewReorder,
   validProfileListViewReorder,
 } from "./authorizers";
-import { mapProfileListViewDataToDatabase } from "./helpers";
+import { mapAndValidateProfileListView } from "./helpers";
 import { validProfileListViewDataInput } from "./validations";
 
 function mapPetitionListViewData(input: NexusGenInputs["PetitionListViewDataInput"] | null) {
@@ -240,11 +240,17 @@ export const createProfileListView = mutationField("createProfileListView", {
       profileTypeId: args.profileTypeId,
     });
     const maxPosition = firstBy(userViews, [(v) => v.position, "desc"])?.position ?? -1;
+
+    const profileTypeFields = await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(
+      args.profileTypeId,
+    );
+    const profileTypeFieldsById = indexBy(profileTypeFields, (ptf) => ptf.id);
+
     const [view] = await ctx.views.createProfileListView(
       {
         profile_type_id: args.profileTypeId,
         name: args.name,
-        data: mapProfileListViewDataToDatabase(args.data),
+        data: mapAndValidateProfileListView(args.data, profileTypeFieldsById),
         user_id: ctx.user!.id,
         position: maxPosition + 1,
       },
@@ -282,7 +288,12 @@ export const updateProfileListView = mutationField("updateProfileListView", {
       data.name = args.name;
     }
     if (args.data !== undefined) {
-      data.data = args.data !== null ? mapProfileListViewDataToDatabase(args.data) : null;
+      const profileTypeFields = await ctx.profiles.loadProfileTypeFieldsByProfileTypeId(
+        args.profileTypeId,
+      );
+      const profileTypeFieldsById = indexBy(profileTypeFields, (ptf) => ptf.id);
+      data.data =
+        args.data !== null ? mapAndValidateProfileListView(args.data, profileTypeFieldsById) : null;
     }
     return await ctx.views.updateProfileListView(args.profileListViewId, data, ctx.user!);
   },

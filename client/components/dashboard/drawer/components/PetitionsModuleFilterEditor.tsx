@@ -266,7 +266,7 @@ function LogicalOperatorFilterContainer({
           {children}
         </Grid>
       ) : (
-        <Text textStyle="hint" textAlign="center">
+        <Text textStyle="hint" textAlign="center" paddingY={2}>
           <FormattedMessage
             id="generic.no-filter-applied"
             defaultMessage="No filter is being applied."

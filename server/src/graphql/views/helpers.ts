@@ -1,8 +1,11 @@
-import { isNullish, pick, pickBy } from "remeda";
+import { isNullish, pick } from "remeda";
 import { assert } from "ts-essentials";
 import { ProfileTypeField } from "../../db/__types";
-import { fromGlobalId, isGlobalId, toGlobalId } from "../../util/globalId";
-import { ProfileQueryFilterOperatorValues } from "../../util/ProfileQueryFilter";
+import { fromGlobalId, toGlobalId } from "../../util/globalId";
+import {
+  mapAndValidateProfileQueryFilter,
+  ProfileQueryFilterOperatorValues,
+} from "../../util/ProfileQueryFilter";
 import { NexusGenInputs, NexusGenObjects } from "../__types";
 
 function mapProfileListViewDataInputSortToDatabase(sort: {
@@ -17,8 +20,9 @@ function mapProfileListViewDataInputSortToDatabase(sort: {
   return { field: sort.field, direction: sort.direction };
 }
 
-export function mapProfileListViewDataToDatabase(
+export function mapAndValidateProfileListView(
   input: NexusGenInputs["ProfileListViewDataInput"],
+  profileTypeFieldsById: Record<number, ProfileTypeField>,
 ) {
   return {
     columns:
@@ -34,7 +38,9 @@ export function mapProfileListViewDataToDatabase(
     search: input.search ?? null,
     status: input.status ?? null,
     sort: input.sort ? mapProfileListViewDataInputSortToDatabase(input.sort) : null,
-    values: input.values ? mapProfileFieldValuesFilterToDatabase(input.values) : null,
+    values: input.values
+      ? mapAndValidateProfileQueryFilter(input.values, profileTypeFieldsById)
+      : null,
   };
 }
 
@@ -80,37 +86,19 @@ function mapValuesFilterFromDatabase(profileTypeFieldsById: Record<number, Profi
       : null;
 
     return {
-      ...pick(v, ["logicalOperator", "operator"]),
-      value: v.value
-        ? profileTypeField?.type === "USER_ASSIGNMENT"
-          ? toGlobalId("User", v.value)
-          : v.value
-        : null,
+      ...pick(v, ["logicalOperator", "operator", "property"]),
+      value:
+        v.value !== null
+          ? profileTypeField?.type === "USER_ASSIGNMENT"
+            ? toGlobalId("User", v.value)
+            : v.property === "id"
+              ? toGlobalId("Profile", v.value)
+              : v.value
+          : null,
       profileTypeFieldId: v.profileTypeFieldId
         ? toGlobalId("ProfileTypeField", v.profileTypeFieldId)
         : v.profileTypeFieldId,
       conditions: v.conditions?.map(mapValuesFilterFromDatabase(profileTypeFieldsById)),
     };
   };
-}
-
-export function mapProfileFieldValuesFilterToDatabase(
-  v: NexusGenInputs["ProfileFieldValuesFilter"] | null | undefined,
-): any {
-  if (isNullish(v)) {
-    return v;
-  }
-
-  return pickBy(
-    {
-      ...pick(v, ["logicalOperator", "operator", "profileTypeFieldId"]),
-      conditions: v.conditions?.map(mapProfileFieldValuesFilterToDatabase),
-      value: v.value
-        ? isGlobalId(v.value, "User")
-          ? fromGlobalId(v.value, "User").id
-          : v.value
-        : v.value,
-    },
-    (value) => value !== undefined,
-  );
 }

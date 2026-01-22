@@ -68,10 +68,10 @@ import {
   UserLocale,
 } from "@parallel/graphql/__types";
 import {
-  ProfileFieldValuesFilter,
-  ProfileFieldValuesFilterCondition,
-  simplifyProfileFieldValuesFilter,
-} from "@parallel/utils/ProfileFieldValuesFilter";
+  ProfileQueryFilter,
+  ProfileQueryFilterCondition,
+  simplifyProfileQueryFilter,
+} from "@parallel/utils/ProfileQueryFilter";
 import { removeTypenames } from "@parallel/utils/apollo/removeTypenames";
 import {
   useAssertQuery,
@@ -85,6 +85,7 @@ import { usePermanentlyDeleteProfile } from "@parallel/utils/mutations/usePerman
 import { useRecoverProfile } from "@parallel/utils/mutations/useRecoverProfile";
 import { useReopenProfile } from "@parallel/utils/mutations/useReopenProfile";
 import { useHandleNavigation } from "@parallel/utils/navigation";
+import { never } from "@parallel/utils/never";
 import {
   ProfilesQueryState,
   buildProfilesQueryStateUrl,
@@ -115,7 +116,7 @@ import {
   useState,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDeepEqual, isNonNullish, isNullish, omit, pick, unique } from "remeda";
+import { isDeepEqual, isNonNullish, isNullish, omit, pick, pickBy, unique } from "remeda";
 
 interface ProfilesTableContext {
   status: ProfileStatus[];
@@ -161,28 +162,37 @@ function Profiles() {
     if (isNullish(values)) {
       return [{}, false];
     }
-    const simplifiedFilter = simplifyProfileFieldValuesFilter(values);
+    const filter = simplifyProfileQueryFilter(values);
     // we try to group conditions by profile type field id and see if we can create a single group per column
     try {
-      const conditionsByFieldId: Record<string, ProfileFieldValuesFilter[]> = {};
-      const getProfileTypeFieldIds = (item: ProfileFieldValuesFilter): string[] => {
+      const conditionsByKey: Record<string, ProfileQueryFilter[]> = {};
+      const getConditionKeys = (item: ProfileQueryFilter): string[] => {
         if ("logicalOperator" in item) {
-          return item.conditions.flatMap(getProfileTypeFieldIds);
+          return item.conditions.flatMap(getConditionKeys);
+        } else if ("profileTypeFieldId" in item) {
+          return [`field_${item.profileTypeFieldId}`];
+        } else if ("property" in item) {
+          return [item.property];
         } else {
-          return [item.profileTypeFieldId];
+          never("Unknown filter type");
         }
       };
-      for (const condition of simplifiedFilter.conditions) {
-        const profileTypeFieldIds = unique(getProfileTypeFieldIds(condition));
-        if (profileTypeFieldIds.length > 1) {
+      for (const condition of filter.conditions) {
+        const conditionKeys = unique(getConditionKeys(condition));
+        // all of the conditions should be on the same field or property
+        if (conditionKeys.length > 1) {
           throw new Error();
-        } else {
-          conditionsByFieldId[profileTypeFieldIds[0]] ??= [];
-          conditionsByFieldId[profileTypeFieldIds[0]].push(condition);
         }
+
+        // conditions over properties are not supported in the UI
+        if (conditionKeys.some((k) => !k.startsWith("field_"))) {
+          throw new Error();
+        }
+        conditionsByKey[conditionKeys[0]] ??= [];
+        conditionsByKey[conditionKeys[0]].push(condition);
       }
       const filtersByColumn: Record<string, ProfileValueColumnFilter> = {};
-      for (const [profileTypeFieldId, conditions] of Object.entries(conditionsByFieldId)) {
+      for (const [key, conditions] of Object.entries(conditionsByKey)) {
         if (conditions.length > 1 && conditions.some((c) => "logicalOperator" in c)) {
           // if there are multiple conditions and some of them are grouped, can't be columnable
           throw new Error();
@@ -191,12 +201,12 @@ function Profiles() {
           if (group.conditions.some((c) => "logicalOperator" in c)) {
             throw new Error();
           } else {
-            filtersByColumn[`field_${profileTypeFieldId}`] = group as ProfileValueColumnFilter;
+            filtersByColumn[key] = group as ProfileValueColumnFilter;
           }
         } else {
-          filtersByColumn[`field_${profileTypeFieldId}`] = {
+          filtersByColumn[key] = {
             logicalOperator: "AND",
-            conditions: conditions as ProfileFieldValuesFilterCondition[],
+            conditions: conditions as ProfileQueryFilterCondition[],
           };
         }
       }
@@ -217,10 +227,10 @@ function Profiles() {
           ...current,
           values:
             conditions.length > 0
-              ? {
+              ? simplifyProfileQueryFilter({
                   logicalOperator: "AND",
                   conditions,
-                }
+                })
               : null,
         }));
       }
@@ -904,12 +914,11 @@ function ProfilesListHeader({
     if (currentView.type !== "ALL") {
       // "ALL" view can only update columns and sort
       toCompare.push(
+        [currentView.data.status, state.status],
         [
-          // TODO remove unMaybeArray after profile views are updated
-          isNonNullish(currentView.data.status) ? unMaybeArray(currentView.data.status) : ["OPEN"],
-          state.status ?? ["OPEN"],
+          pickBy(currentView.data.values ?? null, isNonNullish),
+          pickBy(state.values ?? null, isNonNullish),
         ],
-        [currentView.data.values ?? null, state.values ?? null],
         [currentView.data.search ?? null, state.search ?? null],
       );
     }
@@ -983,9 +992,13 @@ function ProfilesListHeader({
         variables: {
           profileTypeId,
           name,
-          data: {
-            ...pick(state, ["sort", "columns", "search", "status", "values"]),
-          } as ProfileListViewDataInput,
+          data: pick(state, [
+            "sort",
+            "columns",
+            "search",
+            "status",
+            "values",
+          ]) as ProfileListViewDataInput,
         },
       });
       if (isNonNullish(data)) {
@@ -1255,7 +1268,7 @@ Profiles.getInitialProps = async ({ query, pathname, fetchQuery }: WithApolloDat
             (removeTypenames(view.data.sort) as ProfilesQueryState["sort"]) ??
             undefined,
           status: state.status ?? view.data.status ?? undefined,
-          values: state.values ?? (view.data.values as ProfileFieldValuesFilter) ?? undefined,
+          values: state.values ?? (view.data.values as ProfileQueryFilter) ?? undefined,
         },
         query,
       ),

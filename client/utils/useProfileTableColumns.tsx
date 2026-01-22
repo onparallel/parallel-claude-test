@@ -58,10 +58,7 @@ import { isNonNullish, isNullish, omit, pick, unique } from "remeda";
 import { assert, Merge } from "ts-essentials";
 import { never } from "./never";
 import { ProfileTypeFieldOptions } from "./profileFields";
-import {
-  ProfileFieldValuesFilterCondition,
-  ProfileFieldValuesFilterGroup,
-} from "./ProfileFieldValuesFilter";
+import { ProfileQueryFilterCondition, ProfileQueryFilterGroup } from "./ProfileQueryFilter";
 import { UseReactSelectProps, useReactSelectProps } from "./react-select/hooks";
 import { useProfileFieldValueFilterOperators } from "./useProfileFieldValueFilterOperators";
 import { useSearchUsers } from "./useSearchUsers";
@@ -183,8 +180,8 @@ export function useProfileTableColumns(
 }
 
 export type ProfileValueColumnFilter = Merge<
-  ProfileFieldValuesFilterGroup,
-  { conditions: ProfileFieldValuesFilterCondition[] }
+  ProfileQueryFilterGroup,
+  { conditions: ProfileQueryFilterCondition[] }
 >;
 
 interface ProfileValueFilterFormData {
@@ -195,7 +192,7 @@ function ProfileValueFilter({
   context,
   column,
 }: TableColumnFilterProps<
-  ProfileFieldValuesFilterGroup,
+  ProfileQueryFilterGroup,
   { profileType: useProfileTableColumns_ProfileTypeFragment }
 >) {
   const intl = useIntl();
@@ -493,8 +490,12 @@ export function ProfileValueFilterLine({
                 ? { validInterval: (value) => /^P\d+[YMWD]$/.test(value as string) }
                 : ["TEXT", "SHORT_TEXT"].includes(profileTypeField.type)
                   ? ["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(operator)
-                    ? { minLength: (value) => (value as string[]).length > 0 }
-                    : { minLength: (value) => (value as string).trim().length > 0 }
+                    ? { minLength: (value) => Array.isArray(value) && value.length > 0 }
+                    : {
+                        minLength: (value) =>
+                          (typeof value === "string" && value.trim().length > 0) ||
+                          (Array.isArray(value) && value.length > 0),
+                      }
                   : profileTypeField.type === "DATE"
                     ? { validDate: isValidDateString as any }
                     : profileTypeField.type === "PHONE"

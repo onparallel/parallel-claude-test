@@ -204,6 +204,11 @@ export interface NexusGenInputs {
     options?: NexusGenScalars["JSONObject"] | null; // JSONObject
     type: NexusGenEnums["ProfileTypeFieldType"]; // ProfileTypeFieldType!
   };
+  DashboardModuleProfileFilterInput: {
+    // input type
+    status?: NexusGenEnums["ProfileStatus"][] | null; // [ProfileStatus!]
+    values?: NexusGenInputs["ProfileQueryFilterInput"] | null; // ProfileQueryFilterInput
+  };
   EditProfileTypeProcessInput: {
     // input type
     processName?: NexusGenScalars["LocalizableUserText"] | null; // LocalizableUserText
@@ -354,28 +359,13 @@ export interface NexusGenInputs {
     alias?: string | null; // String
     profileTypeFieldId?: NexusGenScalars["GID"] | null; // GID
   };
-  ProfileFieldValuesFilter: {
-    // input type
-    conditions?: NexusGenInputs["ProfileFieldValuesFilter"][] | null; // [ProfileFieldValuesFilter!]
-    logicalOperator?: NexusGenEnums["ProfileFieldValuesFilterGroupLogicalOperator"] | null; // ProfileFieldValuesFilterGroupLogicalOperator
-    operator?: NexusGenEnums["ProfileFieldValuesFilterOperator"] | null; // ProfileFieldValuesFilterOperator
-    profileTypeFieldId?: NexusGenScalars["GID"] | null; // GID
-    value?: NexusGenScalars["JSON"] | null; // JSON
-  };
-  ProfileFilter: {
-    // input type
-    profileId?: NexusGenScalars["GID"][] | null; // [GID!]
-    profileTypeId?: NexusGenScalars["GID"][] | null; // [GID!]
-    status?: NexusGenEnums["ProfileStatus"][] | null; // [ProfileStatus!]
-    values?: NexusGenInputs["ProfileFieldValuesFilter"] | null; // ProfileFieldValuesFilter
-  };
   ProfileListViewDataInput: {
     // input type
     columns?: string[] | null; // [String!]
     search?: string | null; // String
     sort?: NexusGenInputs["ProfileListViewSortInput"] | null; // ProfileListViewSortInput
     status?: NexusGenEnums["ProfileStatus"][] | null; // [ProfileStatus!]
-    values?: NexusGenInputs["ProfileFieldValuesFilter"] | null; // ProfileFieldValuesFilter
+    values?: NexusGenInputs["ProfileQueryFilterInput"] | null; // ProfileQueryFilterInput
   };
   ProfileListViewSortInput: {
     // input type
@@ -410,7 +400,7 @@ export interface NexusGenInputs {
   ProfilesNumberDashboardModuleSettingsInput: {
     // input type
     aggregate?: NexusGenEnums["ModuleResultAggregateType"] | null; // ModuleResultAggregateType
-    filter: NexusGenInputs["ProfileFilter"]; // ProfileFilter!
+    filter: NexusGenInputs["DashboardModuleProfileFilterInput"]; // DashboardModuleProfileFilterInput!
     profileTypeFieldId?: NexusGenScalars["GID"] | null; // GID
     profileTypeId: NexusGenScalars["GID"]; // GID!
     type: NexusGenEnums["ModuleResultType"]; // ModuleResultType!
@@ -419,7 +409,7 @@ export interface NexusGenInputs {
     // input type
     aggregate?: NexusGenEnums["ModuleResultAggregateType"] | null; // ModuleResultAggregateType
     graphicType: NexusGenEnums["DashboardPieChartModuleSettingsType"]; // DashboardPieChartModuleSettingsType!
-    groupByFilter?: NexusGenInputs["ProfileFilter"] | null; // ProfileFilter
+    groupByFilter?: NexusGenInputs["DashboardModuleProfileFilterInput"] | null; // DashboardModuleProfileFilterInput
     groupByProfileTypeFieldId?: NexusGenScalars["GID"] | null; // GID
     items: NexusGenInputs["ProfilesPieChartDashboardModuleSettingsItemInput"][]; // [ProfilesPieChartDashboardModuleSettingsItemInput!]!
     profileTypeFieldId?: NexusGenScalars["GID"] | null; // GID
@@ -429,13 +419,13 @@ export interface NexusGenInputs {
   ProfilesPieChartDashboardModuleSettingsItemInput: {
     // input type
     color: string; // String!
-    filter: NexusGenInputs["ProfileFilter"]; // ProfileFilter!
+    filter: NexusGenInputs["DashboardModuleProfileFilterInput"]; // DashboardModuleProfileFilterInput!
     label: string; // String!
   };
   ProfilesRatioDashboardModuleSettingsInput: {
     // input type
     aggregate?: NexusGenEnums["ModuleResultAggregateType"] | null; // ModuleResultAggregateType
-    filters: NexusGenInputs["ProfileFilter"][]; // [ProfileFilter!]!
+    filters: NexusGenInputs["DashboardModuleProfileFilterInput"][]; // [DashboardModuleProfileFilterInput!]!
     graphicType: NexusGenEnums["DashboardRatioModuleSettingsType"]; // DashboardRatioModuleSettingsType!
     profileTypeFieldId?: NexusGenScalars["GID"] | null; // GID
     profileTypeId: NexusGenScalars["GID"]; // GID!
@@ -663,36 +653,6 @@ export interface NexusGenEnums {
     | "INVALID_NEW_PASSWORD"
     | "LIMIT_EXCEEDED"
     | "SUCCESS";
-  DashboardModuleProfileFieldValuesFilterGroupLogicalOperator: "AND" | "OR";
-  DashboardModuleProfileFieldValuesFilterOperator:
-    | "CONTAIN"
-    | "END_WITH"
-    | "EQUAL"
-    | "EXPIRES_IN"
-    | "GREATER_THAN"
-    | "GREATER_THAN_OR_EQUAL"
-    | "HAS_ANY_BG_CHECK_TOPICS"
-    | "HAS_BG_CHECK_MATCH"
-    | "HAS_BG_CHECK_RESULTS"
-    | "HAS_BG_CHECK_TOPICS"
-    | "HAS_EXPIRY"
-    | "HAS_PENDING_REVIEW"
-    | "HAS_VALUE"
-    | "IS_EXPIRED"
-    | "IS_ONE_OF"
-    | "LESS_THAN"
-    | "LESS_THAN_OR_EQUAL"
-    | "NOT_CONTAIN"
-    | "NOT_EQUAL"
-    | "NOT_HAS_ANY_BG_CHECK_TOPICS"
-    | "NOT_HAS_BG_CHECK_MATCH"
-    | "NOT_HAS_BG_CHECK_RESULTS"
-    | "NOT_HAS_BG_CHECK_TOPICS"
-    | "NOT_HAS_EXPIRY"
-    | "NOT_HAS_PENDING_REVIEW"
-    | "NOT_HAS_VALUE"
-    | "NOT_IS_ONE_OF"
-    | "START_WITH";
   DashboardModuleSize: db.DashboardModuleSize;
   DashboardPermissionType: db.DashboardPermissionType;
   DashboardPieChartModuleSettingsType: "DOUGHNUT" | "PIE";
@@ -800,36 +760,6 @@ export interface NexusGenEnums {
     | "PARALLEL_API"
     | "PARALLEL_MONITORING"
     | "PETITION_FIELD_REPLY";
-  ProfileFieldValuesFilterGroupLogicalOperator: "AND" | "OR";
-  ProfileFieldValuesFilterOperator:
-    | "CONTAIN"
-    | "END_WITH"
-    | "EQUAL"
-    | "EXPIRES_IN"
-    | "GREATER_THAN"
-    | "GREATER_THAN_OR_EQUAL"
-    | "HAS_ANY_BG_CHECK_TOPICS"
-    | "HAS_BG_CHECK_MATCH"
-    | "HAS_BG_CHECK_RESULTS"
-    | "HAS_BG_CHECK_TOPICS"
-    | "HAS_EXPIRY"
-    | "HAS_PENDING_REVIEW"
-    | "HAS_VALUE"
-    | "IS_EXPIRED"
-    | "IS_ONE_OF"
-    | "LESS_THAN"
-    | "LESS_THAN_OR_EQUAL"
-    | "NOT_CONTAIN"
-    | "NOT_EQUAL"
-    | "NOT_HAS_ANY_BG_CHECK_TOPICS"
-    | "NOT_HAS_BG_CHECK_MATCH"
-    | "NOT_HAS_BG_CHECK_RESULTS"
-    | "NOT_HAS_BG_CHECK_TOPICS"
-    | "NOT_HAS_EXPIRY"
-    | "NOT_HAS_PENDING_REVIEW"
-    | "NOT_HAS_VALUE"
-    | "NOT_IS_ONE_OF"
-    | "START_WITH";
   ProfileQueryFilterGroupLogicalOperator: "AND" | "OR";
   ProfileQueryFilterOperator:
     | "CONTAIN"
@@ -1253,20 +1183,10 @@ export interface NexusGenObjects {
     operator: NexusGenEnums["PetitionTagFilterLineOperator"]; // PetitionTagFilterLineOperator!
     value: NexusGenScalars["GID"][]; // [GID!]!
   };
-  DashboardModuleProfileFieldValuesFilter: {
-    // root type
-    conditions?: NexusGenRootTypes["DashboardModuleProfileFieldValuesFilter"][] | null; // [DashboardModuleProfileFieldValuesFilter!]
-    logicalOperator?:
-      | NexusGenEnums["DashboardModuleProfileFieldValuesFilterGroupLogicalOperator"]
-      | null; // DashboardModuleProfileFieldValuesFilterGroupLogicalOperator
-    operator?: NexusGenEnums["DashboardModuleProfileFieldValuesFilterOperator"] | null; // DashboardModuleProfileFieldValuesFilterOperator
-    profileTypeFieldId?: NexusGenScalars["GID"] | null; // GID
-    value?: NexusGenScalars["JSON"] | null; // JSON
-  };
   DashboardModuleProfileFilter: {
     // root type
     status?: NexusGenEnums["ProfileStatus"][] | null; // [ProfileStatus!]
-    values?: NexusGenRootTypes["DashboardModuleProfileFieldValuesFilter"] | null; // DashboardModuleProfileFieldValuesFilter
+    values?: NexusGenRootTypes["ProfileQueryFilter"] | null; // ProfileQueryFilter
   };
   DashboardModuleResultItem: {
     // root type
@@ -1855,6 +1775,15 @@ export interface NexusGenObjects {
     // root type
     items: NexusGenRootTypes["Profile"][]; // [Profile!]!
     totalCount: number; // Int!
+  };
+  ProfileQueryFilter: {
+    // root type
+    conditions?: NexusGenRootTypes["ProfileQueryFilter"][] | null; // [ProfileQueryFilter!]
+    logicalOperator?: NexusGenEnums["ProfileQueryFilterGroupLogicalOperator"] | null; // ProfileQueryFilterGroupLogicalOperator
+    operator?: NexusGenEnums["ProfileQueryFilterOperator"] | null; // ProfileQueryFilterOperator
+    profileTypeFieldId?: NexusGenScalars["GID"] | null; // GID
+    property?: NexusGenEnums["ProfileQueryFilterProperty"] | null; // ProfileQueryFilterProperty
+    value?: NexusGenScalars["JSON"] | null; // JSON
   };
   ProfileRelationship: db.ProfileRelationship;
   ProfileRelationshipCreatedEvent: profileEvents.ProfileRelationshipCreatedEvent;
@@ -2585,20 +2514,10 @@ export interface NexusGenFieldTypes {
     operator: NexusGenEnums["PetitionTagFilterLineOperator"]; // PetitionTagFilterLineOperator!
     value: NexusGenScalars["GID"][]; // [GID!]!
   };
-  DashboardModuleProfileFieldValuesFilter: {
-    // field return type
-    conditions: NexusGenRootTypes["DashboardModuleProfileFieldValuesFilter"][] | null; // [DashboardModuleProfileFieldValuesFilter!]
-    logicalOperator:
-      | NexusGenEnums["DashboardModuleProfileFieldValuesFilterGroupLogicalOperator"]
-      | null; // DashboardModuleProfileFieldValuesFilterGroupLogicalOperator
-    operator: NexusGenEnums["DashboardModuleProfileFieldValuesFilterOperator"] | null; // DashboardModuleProfileFieldValuesFilterOperator
-    profileTypeFieldId: NexusGenScalars["GID"] | null; // GID
-    value: NexusGenScalars["JSON"] | null; // JSON
-  };
   DashboardModuleProfileFilter: {
     // field return type
     status: NexusGenEnums["ProfileStatus"][] | null; // [ProfileStatus!]
-    values: NexusGenRootTypes["DashboardModuleProfileFieldValuesFilter"] | null; // DashboardModuleProfileFieldValuesFilter
+    values: NexusGenRootTypes["ProfileQueryFilter"] | null; // ProfileQueryFilter
   };
   DashboardModuleResultItem: {
     // field return type
@@ -4455,6 +4374,15 @@ export interface NexusGenFieldTypes {
     items: NexusGenRootTypes["Profile"][]; // [Profile!]!
     totalCount: number; // Int!
   };
+  ProfileQueryFilter: {
+    // field return type
+    conditions: NexusGenRootTypes["ProfileQueryFilter"][] | null; // [ProfileQueryFilter!]
+    logicalOperator: NexusGenEnums["ProfileQueryFilterGroupLogicalOperator"] | null; // ProfileQueryFilterGroupLogicalOperator
+    operator: NexusGenEnums["ProfileQueryFilterOperator"] | null; // ProfileQueryFilterOperator
+    profileTypeFieldId: NexusGenScalars["GID"] | null; // GID
+    property: NexusGenEnums["ProfileQueryFilterProperty"] | null; // ProfileQueryFilterProperty
+    value: NexusGenScalars["JSON"] | null; // JSON
+  };
   ProfileRelationship: {
     // field return type
     id: NexusGenScalars["GID"]; // GID!
@@ -5945,18 +5873,10 @@ export interface NexusGenFieldTypeNames {
     operator: "PetitionTagFilterLineOperator";
     value: "GID";
   };
-  DashboardModuleProfileFieldValuesFilter: {
-    // field return type name
-    conditions: "DashboardModuleProfileFieldValuesFilter";
-    logicalOperator: "DashboardModuleProfileFieldValuesFilterGroupLogicalOperator";
-    operator: "DashboardModuleProfileFieldValuesFilterOperator";
-    profileTypeFieldId: "GID";
-    value: "JSON";
-  };
   DashboardModuleProfileFilter: {
     // field return type name
     status: "ProfileStatus";
-    values: "DashboardModuleProfileFieldValuesFilter";
+    values: "ProfileQueryFilter";
   };
   DashboardModuleResultItem: {
     // field return type name
@@ -7812,6 +7732,15 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     items: "Profile";
     totalCount: "Int";
+  };
+  ProfileQueryFilter: {
+    // field return type name
+    conditions: "ProfileQueryFilter";
+    logicalOperator: "ProfileQueryFilterGroupLogicalOperator";
+    operator: "ProfileQueryFilterOperator";
+    profileTypeFieldId: "GID";
+    property: "ProfileQueryFilterProperty";
+    value: "JSON";
   };
   ProfileRelationship: {
     // field return type name

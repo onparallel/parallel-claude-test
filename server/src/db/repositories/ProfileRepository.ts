@@ -86,13 +86,6 @@ import { KNEX } from "../knex";
 
 type ProfileUpdateSource = (typeof ProfileUpdateSource)[number];
 
-export interface ProfileFilter {
-  profileId?: number[] | null;
-  profileTypeId?: number[] | null;
-  status?: ProfileStatus[] | null;
-  values?: ProfileQueryFilter | null;
-}
-
 @injectable()
 export class ProfileRepository extends BaseRepository {
   constructor(

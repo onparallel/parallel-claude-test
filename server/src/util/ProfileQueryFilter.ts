@@ -1,6 +1,6 @@
 import { isNonNullish, isNullish } from "remeda";
 import { assert } from "ts-essentials";
-import { ProfileTypeField } from "../db/__types";
+import { ProfileStatus, ProfileStatusValues, ProfileTypeField } from "../db/__types";
 import { NexusGenInputs } from "../graphql/__types";
 import { fromGlobalId, isGlobalId } from "./globalId";
 import { never } from "./never";
@@ -79,6 +79,7 @@ const MAX_GROUP_DEPTH = 4;
 export function mapAndValidateProfileQueryFilter(
   value: NexusGenInputs["ProfileQueryFilterInput"] | null | undefined,
   profileTypeFields: Record<number, ProfileTypeField> | undefined,
+  profileStatus: ProfileStatus[] = ProfileStatusValues,
   depth = 0,
 ): ProfileQueryFilter | null | undefined {
   if (isNullish(value)) {
@@ -100,7 +101,8 @@ export function mapAndValidateProfileQueryFilter(
     return {
       logicalOperator: value.logicalOperator,
       conditions: value.conditions.map(
-        (condition) => mapAndValidateProfileQueryFilter(condition, profileTypeFields, depth + 1)!,
+        (condition) =>
+          mapAndValidateProfileQueryFilter(condition, profileTypeFields, profileStatus, depth + 1)!,
       ),
     };
   } else if ("profileTypeFieldId" in value) {
@@ -280,8 +282,13 @@ export function mapAndValidateProfileQueryFilter(
           validateOperator(value.operator, ["EQUAL", "NOT_EQUAL", "IS_ONE_OF", "NOT_IS_ONE_OF"]);
           if (["EQUAL", "NOT_EQUAL"].includes(value.operator)) {
             validateValue(value.value, "string");
+            assert(profileStatus.includes(value.value), "value is not a valid status");
           } else if (["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(value.operator)) {
             validateValue(value.value, "string", true);
+            assert(
+              value.value.every((v: string) => profileStatus.includes(v)),
+              "value is not a valid status",
+            );
           }
           break;
         case "createdAt":

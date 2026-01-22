@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { SimpleOption } from "@parallel/components/common/SimpleSelect";
 import {
-  ProfileFieldValuesFilterOperator,
+  ProfileQueryFilterOperator,
   useProfileFieldValueFilterOperators_ProfileTypeFieldFragment,
 } from "@parallel/graphql/__types";
 import { useMemo } from "react";
@@ -11,8 +11,8 @@ export function useProfileFieldValueFilterOperators(
   field: useProfileFieldValueFilterOperators_ProfileTypeFieldFragment,
 ) {
   const intl = useIntl();
-  return useMemo<SimpleOption<ProfileFieldValuesFilterOperator>[]>(() => {
-    const operators: SimpleOption<ProfileFieldValuesFilterOperator>[] = [];
+  return useMemo<SimpleOption<ProfileQueryFilterOperator>[]>(() => {
+    const operators: SimpleOption<ProfileQueryFilterOperator>[] = [];
     operators.push(
       {
         label:

@@ -268,6 +268,6 @@ export const ProfileListViewDataInput = inputObjectType({
       }),
     });
     t.nullable.list.nonNull.field("status", { type: "ProfileStatus" });
-    t.nullable.field("values", { type: "ProfileFieldValuesFilter" });
+    t.nullable.field("values", { type: "ProfileQueryFilterInput" });
   },
 });

@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
 import { DashboardProfilesNumberModule_DashboardProfilesNumberModuleFragment } from "@parallel/graphql/__types";
 import {
-  ProfileFieldValuesFilterGroup,
-  simplifyProfileFieldValuesFilter,
-} from "@parallel/utils/ProfileFieldValuesFilter";
+  ProfileQueryFilterGroup,
+  simplifyProfileQueryFilter,
+} from "@parallel/utils/ProfileQueryFilter";
 import { buildProfilesQueryStateUrl } from "@parallel/utils/profilesQueryState";
 import { forwardRef, useMemo } from "react";
 import { useIntl } from "react-intl";
@@ -33,7 +33,7 @@ export const DashboardProfilesNumberModule = forwardRef<
     const valueFilter = {
       logicalOperator: "AND",
       conditions: [],
-    } as ProfileFieldValuesFilterGroup;
+    } as ProfileQueryFilterGroup;
     if (isNonNullish(values)) {
       valueFilter.conditions.push(values);
     }
@@ -49,8 +49,7 @@ export const DashboardProfilesNumberModule = forwardRef<
       view: "-ALL", // this forces ALL instead of the default view
       type: module.profilesNumberSettings.profileTypeId,
       status,
-      values:
-        valueFilter.conditions.length > 0 ? simplifyProfileFieldValuesFilter(valueFilter) : null,
+      values: valueFilter.conditions.length > 0 ? simplifyProfileQueryFilter(valueFilter) : null,
     });
   }, [module]);
 
