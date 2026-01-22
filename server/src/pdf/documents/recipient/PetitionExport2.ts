@@ -776,7 +776,7 @@ function mdList({ token }: { token: Tokens.List }) {
                     () => "  ".repeat(level + 1) + "#linebreak()",
                   ),
                 ]
-              : [JSON.stringify(t)];
+              : [`#text(${JSON.stringify(JSON.stringify(t))})`];
         }
       }),
     );
