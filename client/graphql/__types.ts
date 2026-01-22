@@ -33067,82 +33067,6 @@ export type PreviewPetitionFieldMutations_createPetitionFieldRepliesMutation = {
       hasCommentsEnabled: boolean;
       requireApproval: boolean;
       visibility?: { [key: string]: any } | null;
-      children?: Array<{
-        __typename?: "PetitionField";
-        id: string;
-        isLinkedToProfileTypeField: boolean;
-        alias?: string | null;
-        type: PetitionFieldType;
-        isReadOnly: boolean;
-        title?: string | null;
-        options: { [key: string]: any };
-        description?: string | null;
-        optional: boolean;
-        multiple: boolean;
-        isInternal: boolean;
-        commentCount: number;
-        unreadCommentCount: number;
-        hasCommentsEnabled: boolean;
-        replies: Array<{
-          __typename?: "PetitionFieldReply";
-          id: string;
-          status: PetitionFieldReplyStatus;
-          content: { [key: string]: any };
-          createdAt: string;
-          updatedAt: string;
-          isAnonymized: boolean;
-          children?: Array<{
-            __typename?: "PetitionFieldGroupChildReply";
-            field: {
-              __typename?: "PetitionField";
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              optional: boolean;
-            };
-            replies: Array<{
-              __typename?: "PetitionFieldReply";
-              id: string;
-              content: { [key: string]: any };
-              isAnonymized: boolean;
-            }>;
-          }> | null;
-          parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-        }>;
-        profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
-        children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
-        attachments: Array<{
-          __typename?: "PetitionFieldAttachment";
-          id: string;
-          file: {
-            __typename?: "FileUpload";
-            filename: string;
-            contentType: string;
-            size: number;
-            isComplete: boolean;
-          };
-        }>;
-        previewReplies: Array<{
-          __typename?: "PetitionFieldReply";
-          id: string;
-          content: { [key: string]: any };
-          isAnonymized: boolean;
-          children?: Array<{
-            __typename?: "PetitionFieldGroupChildReply";
-            field: {
-              __typename?: "PetitionField";
-              type: PetitionFieldType;
-              options: { [key: string]: any };
-              optional: boolean;
-            };
-            replies: Array<{
-              __typename?: "PetitionFieldReply";
-              id: string;
-              content: { [key: string]: any };
-              isAnonymized: boolean;
-            }>;
-          }> | null;
-        }>;
-      }> | null;
       replies: Array<{
         __typename?: "PetitionFieldReply";
         id: string;
@@ -33154,8 +33078,16 @@ export type PreviewPetitionFieldMutations_createPetitionFieldRepliesMutation = {
         repliedAt?: string | null;
         lastReviewedAt?: string | null;
         metadata: { [key: string]: any };
+        parent?: {
+          __typename?: "PetitionFieldReply";
+          id: string;
+          children?: Array<{
+            __typename?: "PetitionFieldGroupChildReply";
+            field: { __typename?: "PetitionField"; id: string };
+            replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+          }> | null;
+        } | null;
         associatedProfile?: { __typename?: "Profile"; id: string } | null;
-        parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
         children?: Array<{
           __typename?: "PetitionFieldGroupChildReply";
           field: {
@@ -33233,6 +33165,82 @@ export type PreviewPetitionFieldMutations_createPetitionFieldRepliesMutation = {
           isMe: boolean;
         } | null;
       }>;
+      children?: Array<{
+        __typename?: "PetitionField";
+        id: string;
+        isLinkedToProfileTypeField: boolean;
+        alias?: string | null;
+        type: PetitionFieldType;
+        isReadOnly: boolean;
+        title?: string | null;
+        options: { [key: string]: any };
+        description?: string | null;
+        optional: boolean;
+        multiple: boolean;
+        isInternal: boolean;
+        commentCount: number;
+        unreadCommentCount: number;
+        hasCommentsEnabled: boolean;
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          status: PetitionFieldReplyStatus;
+          content: { [key: string]: any };
+          createdAt: string;
+          updatedAt: string;
+          isAnonymized: boolean;
+          children?: Array<{
+            __typename?: "PetitionFieldGroupChildReply";
+            field: {
+              __typename?: "PetitionField";
+              type: PetitionFieldType;
+              options: { [key: string]: any };
+              optional: boolean;
+            };
+            replies: Array<{
+              __typename?: "PetitionFieldReply";
+              id: string;
+              content: { [key: string]: any };
+              isAnonymized: boolean;
+            }>;
+          }> | null;
+          parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+        }>;
+        profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+        children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
+        attachments: Array<{
+          __typename?: "PetitionFieldAttachment";
+          id: string;
+          file: {
+            __typename?: "FileUpload";
+            filename: string;
+            contentType: string;
+            size: number;
+            isComplete: boolean;
+          };
+        }>;
+        previewReplies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          content: { [key: string]: any };
+          isAnonymized: boolean;
+          children?: Array<{
+            __typename?: "PetitionFieldGroupChildReply";
+            field: {
+              __typename?: "PetitionField";
+              type: PetitionFieldType;
+              options: { [key: string]: any };
+              optional: boolean;
+            };
+            replies: Array<{
+              __typename?: "PetitionFieldReply";
+              id: string;
+              content: { [key: string]: any };
+              isAnonymized: boolean;
+            }>;
+          }> | null;
+        }>;
+      }> | null;
       attachments: Array<{
         __typename?: "PetitionFieldAttachment";
         id: string;
@@ -91214,6 +91222,20 @@ export const PreviewPetitionFieldMutations_createPetitionFieldRepliesDocument = 
         id
         ...PetitionReplies_PetitionField
         ...PetitionPreview_PetitionField
+        replies {
+          id
+          parent {
+            id
+            children {
+              field {
+                id
+              }
+              replies {
+                id
+              }
+            }
+          }
+        }
       }
     }
   }

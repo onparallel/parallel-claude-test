@@ -213,6 +213,20 @@ const _createPetitionFieldReplies = gql`
         id
         ...PetitionReplies_PetitionField
         ...PetitionPreview_PetitionField
+        replies {
+          id
+          parent {
+            id
+            children {
+              field {
+                id
+              }
+              replies {
+                id
+              }
+            }
+          }
+        }
       }
     }
   }
