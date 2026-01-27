@@ -80,7 +80,6 @@ const CONFIG: Config[] =
                   MEDIUM_LOW: { years: 4 },
                   LOW: { years: 5 },
                 },
-
                 clientStatusValuesForKycRefresh: ["APPROVED", "ACTIVE"],
               },
             ],
@@ -119,7 +118,6 @@ const CONFIG: Config[] =
                   MEDIUM_LOW: { years: 4 },
                   LOW: { years: 5 },
                 },
-
                 clientStatusValuesForKycRefresh: ["APPROVED", "ACTIVE"],
               },
             ],
@@ -142,7 +140,6 @@ const CONFIG: Config[] =
                   // MEDIUM_LOW: null, they also have MEDIUM_LOW risk, but it's not used for kyc refresh
                   LOW: { years: 3 },
                 },
-
                 clientStatusValuesForKycRefresh: ["ACTIVE"],
               },
             ],
@@ -163,7 +160,40 @@ const CONFIG: Config[] =
                   MEDIUM: { years: 3 },
                   LOW: { years: 5 },
                 },
-
+                clientStatusValuesForKycRefresh: ["ACTIVE"],
+              },
+            ],
+          },
+          // Aldea Ventures
+          {
+            orgId: 44807,
+            profileTypes: [
+              // Individuals
+              {
+                profileTypeId: 9780,
+                statusProfileTypeFieldId: 185731,
+                riskProfileTypeFieldId: 133695,
+                lastKycDateProfileTypeFieldId: 201490,
+                nextKycDateProfileTypeFieldId: 201491,
+                dateIntervalsByRisk: {
+                  HIGH: { years: 1 },
+                  MEDIUM: { years: 2 },
+                  LOW: { years: 3 },
+                },
+                clientStatusValuesForKycRefresh: ["ACTIVE"],
+              },
+              // Companies
+              {
+                profileTypeId: 9781,
+                statusProfileTypeFieldId: 185740,
+                riskProfileTypeFieldId: 133714,
+                lastKycDateProfileTypeFieldId: 201492,
+                nextKycDateProfileTypeFieldId: 201493,
+                dateIntervalsByRisk: {
+                  HIGH: { years: 1 },
+                  MEDIUM: { years: 2 },
+                  LOW: { years: 3 },
+                },
                 clientStatusValuesForKycRefresh: ["ACTIVE"],
               },
             ],
