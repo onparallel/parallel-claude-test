@@ -482,6 +482,13 @@ function evaluateValuePredicate(
         case "NOT_CONTAIN":
           assert(typeof value === "string");
           return !reply.includes(value);
+        case "IS_ONE_OF":
+        case "NOT_IS_ONE_OF": {
+          assert(Array.isArray(value));
+          const selectedValues = reply.filter((r) => typeof r === "string");
+          const result = selectedValues.some((r) => value.includes(r));
+          return operator.startsWith("NOT_") ? !result : result;
+        }
         case "NUMBER_OF_SUBREPLIES":
           assert(typeof value === "number");
           return reply.length === value;

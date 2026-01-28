@@ -7890,6 +7890,11 @@
     "context": "{modifier, select, ALL {are in list} other {is in list}}"
   },
   {
+    "term": "component.petition-field-visibility-editor.is-one-of-checkox",
+    "definition": "has one of",
+    "context": "has one of"
+  },
+  {
     "term": "component.petition-field-visibility-editor.is-one-of-select",
     "definition": "{modifier, select, ALL {are one of} other {is one of}}",
     "context": "{modifier, select, ALL {are one of} other {is one of}}"
@@ -7973,6 +7978,11 @@
     "term": "component.petition-field-visibility-editor.not-is-in-list-select",
     "definition": "{modifier, select, ALL {are not in list} other {is not in list}}",
     "context": "{modifier, select, ALL {are not in list} other {is not in list}}"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.not-is-one-of-checkox",
+    "definition": "doesn't have one of",
+    "context": "doesn't have one of"
   },
   {
     "term": "component.petition-field-visibility-editor.not-is-one-of-select",

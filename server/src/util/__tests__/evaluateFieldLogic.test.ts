@@ -750,6 +750,91 @@ describe("evaluateFieldLogic", () => {
       expect(fields).toMatchObject([true, true, false, false].map((isVisible) => ({ isVisible })));
     });
 
+    it("SHOW WHEN IS_ONE_OF and NOT_IS_ONE_OF CHECKBOX", () => {
+      const fields = evaluateFieldLogic({
+        fields: [
+          {
+            id: 1,
+            type: "CHECKBOX",
+            options: {
+              values: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
+              limit: {
+                type: "UNLIMITED",
+                min: 1,
+                max: 4,
+              },
+            },
+            visibility: null,
+            math: null,
+            replies: [{ content: { value: ["Choice 1", "Choice 2"] }, anonymized_at: null }],
+          },
+          {
+            id: 2,
+            type: "TEXT",
+            options: {},
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                {
+                  fieldId: 1,
+                  modifier: "ANY",
+                  operator: "IS_ONE_OF",
+                  value: ["Choice 3", "Choice 2"],
+                },
+              ],
+            },
+            math: null,
+            replies: [{ content: { value: "." }, anonymized_at: null }],
+          },
+          {
+            id: 3,
+            type: "TEXT",
+            options: {},
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                {
+                  fieldId: 1,
+                  modifier: "ANY",
+                  operator: "NOT_IS_ONE_OF",
+                  value: ["Choice 3", "Choice 4"],
+                },
+              ],
+            },
+            math: null,
+            replies: [{ content: { value: "." }, anonymized_at: null }],
+          },
+          {
+            id: 4,
+            type: "TEXT",
+            options: {},
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                {
+                  fieldId: 1,
+                  modifier: "ANY",
+                  operator: "NOT_IS_ONE_OF",
+                  value: ["Choice 2"],
+                },
+              ],
+            },
+            math: null,
+            replies: [{ content: { value: "." }, anonymized_at: null }],
+          },
+        ],
+        variables: [],
+        customLists: [],
+        automaticNumberingConfig: null,
+        standardListDefinitions: [],
+      });
+
+      expect(fields).toMatchObject([true, true, true, false].map((isVisible) => ({ isVisible })));
+    });
+
     it("SHOW WHEN HAS REPLIES AND DOES NOT HAVE REPLIES CHECKBOX INCOMPLETED REPLY", () => {
       const fields = evaluateFieldLogic({
         fields: [

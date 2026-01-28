@@ -403,6 +403,20 @@ function ConditionPredicate({
           options.push(
             {
               label: intl.formatMessage({
+                id: "component.petition-field-visibility-editor.is-one-of-checkox",
+                defaultMessage: "has one of",
+              }),
+              value: "IS_ONE_OF",
+            },
+            {
+              label: intl.formatMessage({
+                id: "component.petition-field-visibility-editor.not-is-one-of-checkox",
+                defaultMessage: "doesn't have one of",
+              }),
+              value: "NOT_IS_ONE_OF",
+            },
+            {
+              label: intl.formatMessage({
                 id: "component.petition-field-visibility-editor.contain-choice",
                 defaultMessage: "is selected",
               }),
@@ -748,7 +762,9 @@ function ConditionPredicate({
       ];
       const equalityOperators = ["EQUAL", "NOT_EQUAL"];
       const multiSelectOperators = ["IS_ONE_OF", "NOT_IS_ONE_OF"];
+      const containOperators = ["CONTAIN", "NOT_CONTAIN"];
 
+      // try to build a compatible value from the previous value depending on the new operator
       const value =
         listOperators.includes(condition.operator) && !listOperators.includes(operator)
           ? null
@@ -759,17 +775,25 @@ function ConditionPredicate({
           ? value
           : (customLists?.[0]?.name ?? standardListDefinitions?.[0]?.listName ?? null);
 
+      let nextValue = value;
+      if (equalityOperators.includes(operator) && Array.isArray(value)) {
+        nextValue = value?.[0] ?? defaultFieldConditionValue(referencedField, condition.column);
+      } else if (
+        referencedField.type === "CHECKBOX" &&
+        containOperators.includes(operator) &&
+        Array.isArray(value)
+      ) {
+        nextValue = value?.[0] ?? defaultFieldConditionValue(referencedField, condition.column);
+      } else if (multiSelectOperators.includes(operator) && typeof value === "string") {
+        nextValue = [value];
+      } else if (listOperators.includes(operator)) {
+        nextValue = listName;
+      }
+
       onChange({
         ...condition,
         operator,
-        value:
-          equalityOperators.includes(operator) && Array.isArray(value)
-            ? (value?.[0] ?? defaultFieldConditionValue(referencedField, condition.column))
-            : multiSelectOperators.includes(operator) && typeof value === "string"
-              ? [value]
-              : listOperators.includes(operator)
-                ? listName
-                : value,
+        value: nextValue,
       });
     } else if (
       isFieldCondition &&
