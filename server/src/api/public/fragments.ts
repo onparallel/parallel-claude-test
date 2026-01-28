@@ -358,6 +358,7 @@ export const ProfileFieldValueFragment = gql`
   fragment ProfileFieldValue on ProfileFieldValue {
     id
     content
+    hasPendingReview
     expiresAt
     createdAt
   }

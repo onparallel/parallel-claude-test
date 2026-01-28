@@ -41,6 +41,7 @@ import {
   PetitionFragment,
   PetitionSignatureRequestFragment,
   PetitionTagFilter,
+  ProfileFieldValueFragment,
   ProfileFragment,
   ProfileTypeFieldFragment,
   TagFragmentDoc,
@@ -592,10 +593,24 @@ function mapProfileFields<T extends ProfileFragment>(profile: T) {
           ...prop.field,
           options: prop.field.options ? mapProfilePropertyOptions(prop.field) : undefined,
         },
-        ...(prop.field.type === "FILE" ? { files: prop.files } : { value: prop.value }),
+        ...(prop.field.type === "FILE"
+          ? { files: prop.files }
+          : { value: mapProfileFieldValue(prop.field.type, prop.value) }),
       };
     }),
   };
+}
+
+function mapProfileFieldValue(type: ProfileTypeFieldType, value: ProfileFieldValueFragment | null) {
+  if (isNullish(value)) {
+    return null;
+  }
+
+  if (type === "BACKGROUND_CHECK" || type === "ADVERSE_MEDIA_SEARCH") {
+    return value;
+  }
+
+  return omit(value, ["hasPendingReview"]);
 }
 
 function mapProfileValues<T extends ProfileFragment>(profile: T) {

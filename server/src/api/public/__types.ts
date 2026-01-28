@@ -8300,6 +8300,7 @@ export type ProfileTypeFieldFragment = {
 export type ProfileFieldValueFragment = {
   id: string;
   content: { [key: string]: any } | null;
+  hasPendingReview: boolean;
   expiresAt: string | null;
   createdAt: string;
 };
@@ -8336,6 +8337,7 @@ export type ProfileFieldPropertyFragment = {
   value: {
     id: string;
     content: { [key: string]: any } | null;
+    hasPendingReview: boolean;
     expiresAt: string | null;
     createdAt: string;
   } | null;
@@ -8396,6 +8398,7 @@ export type ProfileFragment = {
     value: {
       id: string;
       content: { [key: string]: any } | null;
+      hasPendingReview: boolean;
       expiresAt: string | null;
       createdAt: string;
     } | null;
@@ -11015,6 +11018,7 @@ export type GetPetitionProfiles_petitionQuery = {
             value: {
               id: string;
               content: { [key: string]: any } | null;
+              hasPendingReview: boolean;
               expiresAt: string | null;
               createdAt: string;
             } | null;
@@ -11091,6 +11095,7 @@ export type AssociatePetitionToProfile_associateProfileToPetitionMutation = {
         value: {
           id: string;
           content: { [key: string]: any } | null;
+          hasPendingReview: boolean;
           expiresAt: string | null;
           createdAt: string;
         } | null;
@@ -19598,6 +19603,7 @@ export type GetProfiles_profilesQuery = {
         value: {
           id: string;
           content: { [key: string]: any } | null;
+          hasPendingReview: boolean;
           expiresAt: string | null;
           createdAt: string;
         } | null;
@@ -19695,6 +19701,7 @@ export type CreateProfile_createProfileMutation = {
       value: {
         id: string;
         content: { [key: string]: any } | null;
+        hasPendingReview: boolean;
         expiresAt: string | null;
         createdAt: string;
       } | null;
@@ -19785,6 +19792,7 @@ export type CreateProfile_profileFieldFileUploadCompleteMutation = {
         value: {
           id: string;
           content: { [key: string]: any } | null;
+          hasPendingReview: boolean;
           expiresAt: string | null;
           createdAt: string;
         } | null;
@@ -19857,6 +19865,7 @@ export type GetProfile_profileQuery = {
       value: {
         id: string;
         content: { [key: string]: any } | null;
+        hasPendingReview: boolean;
         expiresAt: string | null;
         createdAt: string;
       } | null;
@@ -19928,6 +19937,7 @@ export type UpdateProfileFieldValue_profileQuery = {
       value: {
         id: string;
         content: { [key: string]: any } | null;
+        hasPendingReview: boolean;
         expiresAt: string | null;
         createdAt: string;
       } | null;
@@ -20049,6 +20059,7 @@ export type CloseProfile_closeProfileMutation = {
       value: {
         id: string;
         content: { [key: string]: any } | null;
+        hasPendingReview: boolean;
         expiresAt: string | null;
         createdAt: string;
       } | null;
@@ -20246,6 +20257,7 @@ export type SubscribeToProfile_subscribeToProfileMutation = {
       value: {
         id: string;
         content: { [key: string]: any } | null;
+        hasPendingReview: boolean;
         expiresAt: string | null;
         createdAt: string;
       } | null;
@@ -20318,6 +20330,7 @@ export type UnsubscribeFromProfile_unsubscribeFromProfileMutation = {
       value: {
         id: string;
         content: { [key: string]: any } | null;
+        hasPendingReview: boolean;
         expiresAt: string | null;
         createdAt: string;
       } | null;
@@ -21498,6 +21511,7 @@ export const ProfileFieldValueFragmentDoc = gql`
   fragment ProfileFieldValue on ProfileFieldValue {
     id
     content
+    hasPendingReview
     expiresAt
     createdAt
   }

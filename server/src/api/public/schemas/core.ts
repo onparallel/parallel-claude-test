@@ -2203,6 +2203,12 @@ const _ProfileFieldValue = {
       description: "Content of the profile field value",
       example: { value: "Parallel Solutions" },
     },
+    hasPendingReview: {
+      type: "boolean",
+      description:
+        "Whether the profile field value is waiting for review. This flag is intended only for `BACKGROUND_CHECK` and `ADVERSE_MEDIA_SEARCH` fields.",
+      example: false,
+    },
     expiresAt: {
       type: ["string", "null"],
       description: "Expiration date of the profile field value",
