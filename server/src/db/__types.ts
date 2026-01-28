@@ -576,12 +576,13 @@ export const ProfileTypeFieldTypeValues = [
   "USER_ASSIGNMENT",
 ] as ProfileTypeFieldType[];
 
-export type ProfileTypeStandardType = "INDIVIDUAL" | "LEGAL_ENTITY" | "CONTRACT";
+export type ProfileTypeStandardType = "INDIVIDUAL" | "LEGAL_ENTITY" | "CONTRACT" | "MATTER";
 
 export const ProfileTypeStandardTypeValues = [
   "INDIVIDUAL",
   "LEGAL_ENTITY",
   "CONTRACT",
+  "MATTER",
 ] as ProfileTypeStandardType[];
 
 export type StandardListDefinitionListType = "COUNTRIES";

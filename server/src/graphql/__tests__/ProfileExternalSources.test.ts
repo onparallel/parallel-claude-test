@@ -40,7 +40,31 @@ describe("Profile External Sources", () => {
 
     const profilesSetup = testClient.container.get<ProfilesSetupService>(PROFILES_SETUP_SERVICE);
 
-    await profilesSetup.createDefaultProfileTypes(organization.id, `User:${user.id}`);
+    await profilesSetup.createIndividualProfileType(
+      {
+        org_id: organization.id,
+        name: { en: "Individual", es: "Persona" },
+        name_plural: { en: "Individuals", es: "Personas" },
+      },
+      `User:${user.id}`,
+    );
+    await profilesSetup.createLegalEntityProfileType(
+      {
+        org_id: organization.id,
+        name: { en: "Company", es: "Compañía" },
+        name_plural: { en: "Companies", es: "Compañías" },
+      },
+      `User:${user.id}`,
+    );
+    await profilesSetup.createContractProfileType(
+      {
+        org_id: organization.id,
+        name: { en: "Contract", es: "Contrato" },
+        name_plural: { en: "Contracts", es: "Contratos" },
+      },
+      `User:${user.id}`,
+    );
+
     await mocks.createFeatureFlags([{ name: "PROFILES", default_value: true }]);
   });
 

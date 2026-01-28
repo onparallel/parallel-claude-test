@@ -157,6 +157,15 @@ export const createProfileType = mutationField("createProfileType", {
           },
           `User:${ctx.user!.id}`,
         );
+      case "MATTER":
+        return await ctx.profilesSetup.createMatterProfileType(
+          {
+            org_id: ctx.user!.org_id,
+            name: args.name,
+            name_plural: args.pluralName,
+          },
+          `User:${ctx.user!.id}`,
+        );
       default:
         return await ctx.profilesSetup.createDefaultProfileType(
           {

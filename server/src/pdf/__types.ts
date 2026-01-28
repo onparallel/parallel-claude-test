@@ -6033,7 +6033,7 @@ export type ProfileTypeProcesslatestPetitionArgs = {
   profileId: Scalars["GID"]["input"];
 };
 
-export type ProfileTypeStandardType = "CONTRACT" | "INDIVIDUAL" | "LEGAL_ENTITY";
+export type ProfileTypeStandardType = "CONTRACT" | "INDIVIDUAL" | "LEGAL_ENTITY" | "MATTER";
 
 export type ProfileUpdatedEvent = ProfileEvent & {
   createdAt: Scalars["DateTime"]["output"];

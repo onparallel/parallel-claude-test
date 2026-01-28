@@ -313,6 +313,15 @@ export class ViewRepository extends BaseRepository {
           t,
         );
         break;
+      case "MATTER":
+        await this._createProfileListViewsByOrgId(
+          orgId,
+          profileType.id,
+          ["p_matter_id", "p_matter_status", "p_matter_risk", "p_kyc_date"],
+          createdBy,
+          t,
+        );
+        break;
       default:
         await this.createDefaultProfileListViewsByOrgId(orgId, profileType.id, createdBy, t);
         break;

@@ -7619,6 +7619,7 @@ enum ProfileTypeStandardType {
   CONTRACT
   INDIVIDUAL
   LEGAL_ENTITY
+  MATTER
 }
 
 type ProfileUpdatedEvent implements ProfileEvent {

@@ -142,6 +142,14 @@ export const profiles = queryField((t) => {
       status: nullable(list(nonNull("ProfileStatus"))),
     },
     resolve: async (_, { limit, offset, search, profileTypeId, status }, ctx) => {
+      // passing an empty array means the user filtered out every profile type from the query, so we return an empty list
+      if (isNonNullish(profileTypeId) && profileTypeId.length === 0) {
+        return {
+          items: [],
+          totalCount: 0,
+        };
+      }
+
       return ctx.profiles.getPaginatedProfileForOrg(ctx.user!.org_id, {
         limit,
         offset,

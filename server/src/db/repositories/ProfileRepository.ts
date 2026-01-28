@@ -3185,7 +3185,7 @@ export class ProfileRepository extends BaseRepository {
       string
     >(
       async (keys, t) => {
-        const rows = await this.from("profile_relationship_type_allowed_profile_type")
+        const rows = await this.from("profile_relationship_type_allowed_profile_type", t)
           .whereIn(
             "org_id",
             keys.map((k) => k.orgId),
@@ -3254,11 +3254,15 @@ export class ProfileRepository extends BaseRepository {
   async createProfileRelationshipType(
     data: MaybeArray<CreateProfileRelationshipType>,
     createdBy: string,
+    t?: Knex.Transaction,
   ) {
-    return await this.from("profile_relationship_type").insert(
-      unMaybeArray(data).map((d) => ({ ...d, created_by: createdBy })),
-      "*",
-    );
+    return await this.from("profile_relationship_type", t)
+      .insert(
+        unMaybeArray(data).map((d) => ({ ...d, created_by: createdBy })),
+        "*",
+      )
+      .onConflict()
+      .ignore();
   }
 
   async getOrganizationStandardProfileTypes(orgId: number) {
@@ -3277,10 +3281,13 @@ export class ProfileRepository extends BaseRepository {
     if (dataArr.length === 0) {
       return [];
     }
-    return await this.from("profile_relationship_type_allowed_profile_type", t).insert(
-      dataArr.map((d) => ({ ...d, created_by: createdBy })),
-      "*",
-    );
+    return await this.from("profile_relationship_type_allowed_profile_type", t)
+      .insert(
+        dataArr.map((d) => ({ ...d, created_by: createdBy })),
+        "*",
+      )
+      .onConflict()
+      .ignore();
   }
 
   readonly loadProfileRelationship = this.buildLoadBy("profile_relationship", "id", (q) =>

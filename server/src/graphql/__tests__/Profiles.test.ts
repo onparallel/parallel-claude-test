@@ -3426,7 +3426,18 @@ describe("GraphQL/Profiles", () => {
   describe("createProfileType", () => {
     beforeAll(async () => {
       const profilesSetup = testClient.container.get<ProfilesSetupService>(PROFILES_SETUP_SERVICE);
-      await profilesSetup.createDefaultProfileTypes(organization.id, "TEST");
+      await profilesSetup.createIndividualProfileType(
+        { org_id: organization.id, name: { en: "Individual" }, name_plural: { en: "Individuals" } },
+        "TEST",
+      );
+      await profilesSetup.createLegalEntityProfileType(
+        { org_id: organization.id, name: { en: "Company" }, name_plural: { en: "Companies" } },
+        "TEST",
+      );
+      await profilesSetup.createContractProfileType(
+        { org_id: organization.id, name: { en: "Contract" }, name_plural: { en: "Contracts" } },
+        "TEST",
+      );
     });
 
     it("creates a new profile type on organization", async () => {

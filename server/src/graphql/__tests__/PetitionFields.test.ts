@@ -5204,9 +5204,17 @@ describe("GraphQL/Petition Fields", () => {
       let fieldGroup: PetitionField;
 
       beforeAll(async () => {
-        await testClient.container
-          .get<IProfilesSetupService>(PROFILES_SETUP_SERVICE)
-          .createDefaultProfileTypes(organization.id, `User:${user.id}`);
+        const profilesSetup =
+          testClient.container.get<IProfilesSetupService>(PROFILES_SETUP_SERVICE);
+
+        await profilesSetup.createIndividualProfileType(
+          {
+            org_id: organization.id,
+            name: { en: "Individual" },
+            name_plural: { en: "Individuals" },
+          },
+          `User:${user.id}`,
+        );
 
         [individual] = await mocks.knex
           .from("profile_type")

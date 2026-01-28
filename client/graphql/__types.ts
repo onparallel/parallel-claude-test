@@ -730,6 +730,11 @@ export interface DashboardModuleProfileFilter {
   values?: Maybe<ProfileQueryFilter>;
 }
 
+export interface DashboardModuleProfileFilterInput {
+  status?: InputMaybe<Array<ProfileStatus>>;
+  values?: InputMaybe<ProfileQueryFilterInput>;
+}
+
 export interface DashboardModuleResultItem {
   __typename?: "DashboardModuleResultItem";
   aggr?: Maybe<Scalars["Float"]["output"]>;
@@ -5955,11 +5960,6 @@ export interface ProfileFieldValueUpdatedEvent extends ProfileEvent {
   user?: Maybe<User>;
 }
 
-export interface ProfileFilterInput {
-  status?: InputMaybe<Array<ProfileStatus>>;
-  values?: InputMaybe<ProfileQueryFilterInput>;
-}
-
 export interface ProfileListView extends ListView {
   __typename?: "ProfileListView";
   data: ProfileListViewData;
@@ -6273,7 +6273,7 @@ export interface ProfileTypeProcesslatestPetitionArgs {
   profileId: Scalars["GID"]["input"];
 }
 
-export type ProfileTypeStandardType = "CONTRACT" | "INDIVIDUAL" | "LEGAL_ENTITY";
+export type ProfileTypeStandardType = "CONTRACT" | "INDIVIDUAL" | "LEGAL_ENTITY" | "MATTER";
 
 export interface ProfileUpdatedEvent extends ProfileEvent {
   __typename?: "ProfileUpdatedEvent";
@@ -6288,7 +6288,7 @@ export interface ProfileUpdatedEvent extends ProfileEvent {
 export interface ProfilesNumberDashboardModuleSettingsInput {
   /** Aggregate function. Only for type AGGREGATE */
   aggregate?: InputMaybe<ModuleResultAggregateType>;
-  filter: ProfileFilterInput;
+  filter: DashboardModuleProfileFilterInput;
   /** Field to aggregate on. Only for type AGGREGATE */
   profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
   profileTypeId: Scalars["GID"]["input"];
@@ -6300,7 +6300,7 @@ export interface ProfilesPieChartDashboardModuleSettingsInput {
   aggregate?: InputMaybe<ModuleResultAggregateType>;
   graphicType: DashboardPieChartModuleSettingsType;
   /** Optional filter to apply to all items when grouping by a field */
-  groupByFilter?: InputMaybe<ProfileFilterInput>;
+  groupByFilter?: InputMaybe<DashboardModuleProfileFilterInput>;
   /** Optional SELECT field to group by its values instead of items array */
   groupByProfileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;
   items: Array<ProfilesPieChartDashboardModuleSettingsItemInput>;
@@ -6312,14 +6312,14 @@ export interface ProfilesPieChartDashboardModuleSettingsInput {
 
 export interface ProfilesPieChartDashboardModuleSettingsItemInput {
   color: Scalars["String"]["input"];
-  filter: ProfileFilterInput;
+  filter: DashboardModuleProfileFilterInput;
   label: Scalars["String"]["input"];
 }
 
 export interface ProfilesRatioDashboardModuleSettingsInput {
   /** Aggregate function. Only for type AGGREGATE */
   aggregate?: InputMaybe<ModuleResultAggregateType>;
-  filters: Array<ProfileFilterInput>;
+  filters: Array<DashboardModuleProfileFilterInput>;
   graphicType: DashboardRatioModuleSettingsType;
   /** Field to aggregate on. Only for type AGGREGATE */
   profileTypeFieldId?: InputMaybe<Scalars["GID"]["input"]>;

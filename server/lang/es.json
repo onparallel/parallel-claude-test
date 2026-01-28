@@ -1760,6 +1760,41 @@
     "context": "ZIP Code"
   },
   {
+    "term": "profiles.default-profile-type-field.matter-countries-involved",
+    "definition": "Países que intervienen en el asunto",
+    "context": "Countries involved in the matter"
+  },
+  {
+    "term": "profiles.default-profile-type-field.matter-description",
+    "definition": "Descripción del asunto",
+    "context": "Matter description"
+  },
+  {
+    "term": "profiles.default-profile-type-field.matter-id",
+    "definition": "ID asunto",
+    "context": "Matter ID"
+  },
+  {
+    "term": "profiles.default-profile-type-field.matter-kyc-date",
+    "definition": "Fecha del KYC",
+    "context": "KYC date"
+  },
+  {
+    "term": "profiles.default-profile-type-field.matter-name",
+    "definition": "Nombre",
+    "context": "Name"
+  },
+  {
+    "term": "profiles.default-profile-type-field.matter-risk",
+    "definition": "Riesgo asunto",
+    "context": "Matter risk"
+  },
+  {
+    "term": "profiles.default-profile-type-field.matter-status",
+    "definition": "Estado",
+    "context": "Status"
+  },
+  {
     "term": "profiles.default-profile-type-field.option-client-status-active",
     "definition": "Activo",
     "context": "Active"
@@ -1935,6 +1970,36 @@
     "context": "Widowed"
   },
   {
+    "term": "profiles.default-profile-type-field.option-matter-risk-high",
+    "definition": "Alto",
+    "context": "High"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-matter-risk-medium",
+    "definition": "Medio",
+    "context": "Medium"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-matter-status-closed",
+    "definition": "Cerrado",
+    "context": "Closed"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-matter-status-open",
+    "definition": "Abierto",
+    "context": "Open"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-matter-status-opportunity",
+    "definition": "Oportunidad",
+    "context": "Opportunity"
+  },
+  {
+    "term": "profiles.default-profile-type-field.option-matter-status-pending-approval",
+    "definition": "Pendiente de aprobación",
+    "context": "Pending approval"
+  },
+  {
     "term": "profiles.default-profile-type-field.option-no",
     "definition": "No",
     "context": "No"
@@ -1983,16 +2048,6 @@
     "term": "profiles.default-profile-type-field.option-yes",
     "definition": "Si",
     "context": "Yes"
-  },
-  {
-    "term": "profiles.default-profile-type.contract",
-    "definition": "Contrato",
-    "context": "Contract"
-  },
-  {
-    "term": "profiles.default-profile-type.contract-plural",
-    "definition": "Contratos",
-    "context": "Contracts"
   },
   {
     "term": "profiles.default-profile-type.individual",
@@ -2048,6 +2103,11 @@
     "term": "profiles.default-relationship-type.child",
     "definition": "Hijo/Hija",
     "context": "Child"
+  },
+  {
+    "term": "profiles.default-relationship-type.client",
+    "definition": "Cliente",
+    "context": "Client"
   },
   {
     "term": "profiles.default-relationship-type.close-associate",
@@ -2125,6 +2185,11 @@
     "context": "Managed by"
   },
   {
+    "term": "profiles.default-relationship-type.matter",
+    "definition": "Asunto",
+    "context": "Matter"
+  },
+  {
     "term": "profiles.default-relationship-type.parent",
     "definition": "Padre/Madre",
     "context": "Parent"
@@ -2135,9 +2200,19 @@
     "context": "Parent company"
   },
   {
+    "term": "profiles.default-relationship-type.participant",
+    "definition": "Participante",
+    "context": "Participant"
+  },
+  {
     "term": "profiles.default-relationship-type.participated-in-by",
     "definition": "Participada",
     "context": "Participated in by"
+  },
+  {
+    "term": "profiles.default-relationship-type.payer",
+    "definition": "Pagador",
+    "context": "Payer"
   },
   {
     "term": "profiles.default-relationship-type.shareholder",

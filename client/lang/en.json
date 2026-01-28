@@ -3570,6 +3570,16 @@
     "context": "Business and organization profiles for companies, including corporate information, legal details, and business data."
   },
   {
+    "term": "component.create-profile-type-dialog.matter",
+    "definition": "Matter",
+    "context": "Matter"
+  },
+  {
+    "term": "component.create-profile-type-dialog.matter-description",
+    "definition": "Matter and case profiles for storing matter information, details, and related documentation.",
+    "context": "Matter and case profiles for storing matter information, details, and related documentation."
+  },
+  {
     "term": "component.create-profile-type-dialog.new-profile-type",
     "definition": "New profile type",
     "context": "New profile type"
@@ -3595,6 +3605,11 @@
     "context": "Legal entities"
   },
   {
+    "term": "component.create-profile-type-dialog.plural-name-matter-helper",
+    "definition": "Matters",
+    "context": "Matters"
+  },
+  {
     "term": "component.create-profile-type-dialog.select-template",
     "definition": "Select the profile type that best fits your needs.",
     "context": "Select the profile type that best fits your needs."
@@ -3618,6 +3633,11 @@
     "term": "component.create-profile-type-dialog.singular-name-legal-entity-helper",
     "definition": "Legal entity",
     "context": "Legal entity"
+  },
+  {
+    "term": "component.create-profile-type-dialog.singular-name-matter-helper",
+    "definition": "Matter",
+    "context": "Matter"
   },
   {
     "term": "component.create-profile-type-dialog.title",

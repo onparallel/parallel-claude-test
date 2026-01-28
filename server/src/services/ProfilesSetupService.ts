@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import pMap from "p-map";
-import { indexBy, isNonNullish } from "remeda";
+import { filter, indexBy, isNonNullish, map, pipe, unique } from "remeda";
 import { assert } from "ts-essentials";
 import { CreateProfileTypeField, ProfileType, ProfileTypeStandardType } from "../db/__types";
 import { ProfileRepository } from "../db/repositories/ProfileRepository";
@@ -31,7 +31,11 @@ export type ProfileRelationshipTypeAlias =
   | "p_main_contract__annex"
   | "p_addendum__amended_by"
   | "p_contract__counterparty"
-  | "p_contact__contacted_via";
+  | "p_contact__contacted_via"
+  | "p_client__matter"
+  | "p_participant__matter"
+  | "p_payer__matter"
+  | "p_contact__matter";
 
 type ProfileRelationshipTypeDefinition = Record<
   ProfileRelationshipTypeAlias,
@@ -47,7 +51,6 @@ type CreateProfileTypeOptions = {
 export const PROFILES_SETUP_SERVICE = Symbol.for("PROFILES_SETUP_SERVICE");
 export interface IProfilesSetupService {
   createDefaultProfileType(data: CreateProfileTypeOptions, createdBy: string): Promise<ProfileType>;
-  createDefaultProfileTypes(orgId: number, createdBy: string): Promise<void>;
   createContractProfileType(
     data: CreateProfileTypeOptions,
     createdBy: string,
@@ -59,6 +62,11 @@ export interface IProfilesSetupService {
     t?: Knex.Transaction,
   ): Promise<ProfileType>;
   createLegalEntityProfileType(
+    data: CreateProfileTypeOptions,
+    createdBy: string,
+    t?: Knex.Transaction,
+  ): Promise<ProfileType>;
+  createMatterProfileType(
     data: CreateProfileTypeOptions,
     createdBy: string,
     t?: Knex.Transaction,
@@ -1396,6 +1404,128 @@ export class ProfilesSetupService implements IProfilesSetupService {
             },
           },
         ];
+      case "MATTER":
+        return [
+          {
+            type: "SHORT_TEXT",
+            name: await this.intl.getLocalizableUserText({
+              id: "profiles.default-profile-type-field.matter-id",
+              defaultMessage: "Matter ID",
+            }),
+            alias: "p_matter_id",
+          },
+          {
+            type: "SELECT",
+            name: await this.intl.getLocalizableUserText({
+              id: "profiles.default-profile-type-field.matter-status",
+              defaultMessage: "Status",
+            }),
+            alias: "p_matter_status",
+            options: {
+              values: [
+                {
+                  value: "OPPORTUNITY",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-matter-status-opportunity",
+                    defaultMessage: "Opportunity",
+                  }),
+                  isStandard: true,
+                },
+                {
+                  value: "PENDING_APPROVAL",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-matter-status-pending-approval",
+                    defaultMessage: "Pending approval",
+                  }),
+                  isStandard: true,
+                },
+                {
+                  value: "OPEN",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-matter-status-open",
+                    defaultMessage: "Open",
+                  }),
+                  isStandard: true,
+                },
+                {
+                  value: "CLOSED",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-matter-status-closed",
+                    defaultMessage: "Closed",
+                  }),
+                  isStandard: true,
+                },
+              ],
+            },
+          },
+          {
+            type: "SELECT",
+            name: await this.intl.getLocalizableUserText({
+              id: "profiles.default-profile-type-field.matter-risk",
+              defaultMessage: "Matter risk",
+            }),
+            alias: "p_matter_risk",
+            options: {
+              values: [
+                {
+                  value: "MEDIUM",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-matter-risk-medium",
+                    defaultMessage: "Medium",
+                  }),
+                  isStandard: true,
+                },
+                {
+                  value: "HIGH",
+                  label: await this.intl.getLocalizableUserText({
+                    id: "profiles.default-profile-type-field.option-matter-risk-high",
+                    defaultMessage: "High",
+                  }),
+                  isStandard: true,
+                },
+              ],
+            },
+          },
+          {
+            type: "SHORT_TEXT",
+            name: await this.intl.getLocalizableUserText({
+              id: "profiles.default-profile-type-field.matter-name",
+              defaultMessage: "Name",
+            }),
+            alias: "p_matter_name",
+          },
+          {
+            type: "TEXT",
+            name: await this.intl.getLocalizableUserText({
+              id: "profiles.default-profile-type-field.matter-description",
+              defaultMessage: "Matter description",
+            }),
+            alias: "p_matter_description",
+          },
+          {
+            type: "CHECKBOX",
+            name: await this.intl.getLocalizableUserText({
+              id: "profiles.default-profile-type-field.matter-countries-involved",
+              defaultMessage: "Countries involved in the matter",
+            }),
+            alias: "p_countries_involved",
+            options: {
+              values: [],
+              standardList: "COUNTRIES",
+            },
+          },
+          {
+            type: "DATE",
+            name: await this.intl.getLocalizableUserText({
+              id: "profiles.default-profile-type-field.matter-kyc-date",
+              defaultMessage: "KYC date",
+            }),
+            alias: "p_kyc_date",
+            options: {
+              useReplyAsExpiryDate: false,
+            },
+          },
+        ];
     }
   }
 
@@ -1404,6 +1534,13 @@ export class ProfilesSetupService implements IProfilesSetupService {
     createdBy: string,
     t?: Knex.Transaction,
   ) {
+    await this.createMissingProfileRelationshipTypesByStandardTypes(
+      data.org_id,
+      "CONTRACT",
+      createdBy,
+      t,
+    );
+
     const [contract] = await this.profiles.createProfileType(
       {
         standard_type: "CONTRACT",
@@ -1434,11 +1571,7 @@ export class ProfilesSetupService implements IProfilesSetupService {
     );
 
     await this.views.createProfileListViewsByOrgId(data.org_id, contract, createdBy, t);
-    await this.createDefaultProfileRelationshipAllowedProfileTypesByProfileType(
-      contract,
-      createdBy,
-      t,
-    );
+    await this.createProfileRelationshipAllowedProfileTypesByProfileType(contract, createdBy, t);
 
     return contract;
   }
@@ -1448,6 +1581,13 @@ export class ProfilesSetupService implements IProfilesSetupService {
     createdBy: string,
     t?: Knex.Transaction,
   ) {
+    await this.createMissingProfileRelationshipTypesByStandardTypes(
+      data.org_id,
+      "INDIVIDUAL",
+      createdBy,
+      t,
+    );
+
     const [individual] = await this.profiles.createProfileType(
       {
         standard_type: "INDIVIDUAL",
@@ -1478,11 +1618,7 @@ export class ProfilesSetupService implements IProfilesSetupService {
     );
 
     await this.views.createProfileListViewsByOrgId(data.org_id, individual, createdBy, t);
-    await this.createDefaultProfileRelationshipAllowedProfileTypesByProfileType(
-      individual,
-      createdBy,
-      t,
-    );
+    await this.createProfileRelationshipAllowedProfileTypesByProfileType(individual, createdBy, t);
 
     return individual;
   }
@@ -1492,6 +1628,13 @@ export class ProfilesSetupService implements IProfilesSetupService {
     createdBy: string,
     t?: Knex.Transaction,
   ) {
+    await this.createMissingProfileRelationshipTypesByStandardTypes(
+      data.org_id,
+      "LEGAL_ENTITY",
+      createdBy,
+      t,
+    );
+
     const [legalEntity] = await this.profiles.createProfileType(
       {
         standard_type: "LEGAL_ENTITY",
@@ -1521,120 +1664,156 @@ export class ProfilesSetupService implements IProfilesSetupService {
     );
 
     await this.views.createProfileListViewsByOrgId(data.org_id, legalEntity, createdBy, t);
-    await this.createDefaultProfileRelationshipAllowedProfileTypesByProfileType(
-      legalEntity,
-      createdBy,
-      t,
-    );
+    await this.createProfileRelationshipAllowedProfileTypesByProfileType(legalEntity, createdBy, t);
 
     return legalEntity;
   }
 
-  async createDefaultProfileTypes(orgId: number, createdBy: string) {
-    await this.createDefaultProfileRelationshipTypes(orgId, createdBy);
+  async createMatterProfileType(
+    data: CreateProfileTypeOptions,
+    createdBy: string,
+    t?: Knex.Transaction,
+  ) {
+    await this.createMissingProfileRelationshipTypesByStandardTypes(
+      data.org_id,
+      "MATTER",
+      createdBy,
+      t,
+    );
 
-    await this.profiles.withTransaction(async (t) => {
-      await this.createIndividualProfileType(
-        {
-          org_id: orgId,
-          name: await this.intl.getLocalizableUserText({
-            id: "profiles.default-profile-type.individual",
-            defaultMessage: "Individual",
-          }),
-          name_plural: await this.intl.getLocalizableUserText({
-            id: "profiles.default-profile-type.individual-plural",
-            defaultMessage: "Individuals",
-          }),
-        },
-        createdBy,
-        t,
-      );
-      await this.createLegalEntityProfileType(
-        {
-          org_id: orgId,
-          name: await this.intl.getLocalizableUserText({
-            id: "profiles.default-profile-type.legal-entity",
-            defaultMessage: "Company",
-          }),
-          name_plural: await this.intl.getLocalizableUserText({
-            id: "profiles.default-profile-type.legal-entity-plural",
-            defaultMessage: "Companies",
-          }),
-        },
-        createdBy,
-        t,
-      );
-      await this.createContractProfileType(
-        {
-          org_id: orgId,
-          name: await this.intl.getLocalizableUserText({
-            id: "profiles.default-profile-type.contract",
-            defaultMessage: "Contract",
-          }),
-          name_plural: await this.intl.getLocalizableUserText({
-            id: "profiles.default-profile-type.contract-plural",
-            defaultMessage: "Contracts",
-          }),
-        },
-        createdBy,
-        t,
-      );
-    });
+    const [matter] = await this.profiles.createProfileType(
+      {
+        standard_type: "MATTER",
+        name: data.name,
+        name_plural: data.name_plural,
+        icon: "CLIPBOARD",
+        org_id: data.org_id,
+      },
+      createdBy,
+      t,
+    );
+
+    const matterFields = await this.profiles.createProfileTypeField(
+      matter.id,
+      await this.getProfileTypeFieldsDefinition("MATTER"),
+      createdBy,
+      t,
+    );
+
+    const matterName = matterFields.find((f) => f.alias === "p_matter_name")!;
+
+    await this.profiles.updateProfileType(
+      matter.id,
+      { profile_name_pattern: [matterName.id] },
+      createdBy,
+      t,
+    );
+
+    await this.views.createProfileListViewsByOrgId(data.org_id, matter, createdBy, t);
+    await this.createProfileRelationshipAllowedProfileTypesByProfileType(matter, createdBy, t);
+
+    return matter;
   }
 
-  private async createDefaultProfileRelationshipTypes(orgId: number, createdBy: string) {
+  private async createMissingProfileRelationshipTypesByStandardTypes(
+    orgId: number,
+    standardType: ProfileTypeStandardType,
+    createdBy: string,
+    t?: Knex.Transaction,
+  ) {
+    const otherProfileTypes = await this.profiles.loadProfileTypesByOrgId.raw(orgId, t);
+    const knownStandardTypes = unique([
+      ...otherProfileTypes.map((p) => p.standard_type).filter(isNonNullish),
+      standardType,
+    ]);
+
+    // grab all relationships alias that have at least one standard type in the list (left and right)
+    // this relationships are the ones that can be used given the current standard types in DB
+    const newRelationships = pipe(
+      Object.entries(this.getProfileRelationshipAllowedProfileTypesDefinition()),
+      filter(([_, [left, right]]) => {
+        return (
+          left.some((st) => knownStandardTypes.includes(st)) &&
+          right.some((st) => knownStandardTypes.includes(st))
+        );
+      }),
+      map(([alias]) => alias as ProfileRelationshipTypeAlias),
+    );
+
+    const definition = this.getProfileRelationshipTypesDefinition();
+
     await this.profiles.createProfileRelationshipType(
-      await pMap(
-        Object.entries(this.getProfileRelationshipTypesDefinition()),
-        async ([alias, i18n]) => {
-          const [left, right] = await i18n();
-          return {
-            org_id: orgId,
-            alias,
-            left_right_name: left,
-            right_left_name: right,
-            is_reciprocal: right === null,
-          };
-        },
-      ),
+      await pMap(newRelationships, async (alias) => {
+        const i18n = definition[alias];
+        assert(isNonNullish(i18n), "I18n is required");
+
+        const [left, right] = await i18n();
+        return {
+          org_id: orgId,
+          alias,
+          left_right_name: left,
+          right_left_name: right,
+          is_reciprocal: right === null,
+        };
+      }),
       createdBy,
+      t,
     );
   }
 
-  private async createDefaultProfileRelationshipAllowedProfileTypesByProfileType(
+  private async createProfileRelationshipAllowedProfileTypesByProfileType(
     profileType: ProfileType,
     createdBy: string,
     t?: Knex.Transaction,
   ) {
     assert(profileType.standard_type, "Standard type is required");
-    // no need to pass transaction for this query, as relationship types will always be created beforehand
-    const relationshipTypes = await this.profiles.loadProfileRelationshipTypesByOrgId(
+
+    const relationshipTypes = await this.profiles.loadProfileRelationshipTypesByOrgId.raw(
       profileType.org_id,
+      t,
     );
+
+    const allProfileTypes = await this.profiles.loadProfileTypesByOrgId.raw(profileType.org_id, t);
+    const knownStandardTypes = unique(allProfileTypes.map((pt) => pt.standard_type!));
+
     const relationshipTypesByAlias = indexBy(relationshipTypes, (r) => r.alias);
     const allowedProfileTypesDefinition =
       this.getProfileRelationshipAllowedProfileTypesDefinition();
+
     await this.profiles.createProfileRelationshipAllowedProfileType(
       Object.entries(allowedProfileTypesDefinition)
-        .filter(([alias]) => isNonNullish(relationshipTypesByAlias[alias]))
-        .flatMap(([alias, [left, right]]) => [
-          ...left
-            .filter((st) => st === profileType.standard_type)
-            .map(() => ({
-              org_id: profileType.org_id,
-              allowed_profile_type_id: profileType.id,
-              profile_relationship_type_id: relationshipTypesByAlias[alias].id,
-              direction: "LEFT_RIGHT" as const,
-            })),
-          ...right
-            .filter((st) => st === profileType.standard_type)
-            .map(() => ({
-              org_id: profileType.org_id,
-              allowed_profile_type_id: profileType.id,
-              profile_relationship_type_id: relationshipTypesByAlias[alias].id,
-              direction: "RIGHT_LEFT" as const,
-            })),
-        ]),
+        .filter(
+          ([alias, [left, right]]) =>
+            isNonNullish(relationshipTypesByAlias[alias]) && // relationship must exist
+            (left.includes(profileType.standard_type!) || // left OR right must include the new profile type standard type (these are the rows we need to insert)
+              right.includes(profileType.standard_type!)), // the other side of the relationship will always have at least 1 known standard type, as the relationship exists
+        )
+        .flatMap(([alias, [left, right]]) => {
+          const knownLeft = left.filter((st) => knownStandardTypes.includes(st));
+          const knownRight = right.filter((st) => knownStandardTypes.includes(st));
+          return [
+            ...knownLeft.flatMap((st) =>
+              allProfileTypes
+                .filter((pt) => pt.standard_type === st)
+                .map((pt) => ({
+                  org_id: pt.org_id,
+                  allowed_profile_type_id: pt.id,
+                  profile_relationship_type_id: relationshipTypesByAlias[alias].id,
+                  direction: "LEFT_RIGHT" as const,
+                })),
+            ),
+            ...knownRight.flatMap((st) =>
+              allProfileTypes
+                .filter((pt) => pt.standard_type === st)
+                .map((pt) => ({
+                  org_id: pt.org_id,
+                  allowed_profile_type_id: pt.id,
+                  profile_relationship_type_id: relationshipTypesByAlias[alias].id,
+                  direction: "RIGHT_LEFT" as const,
+                })),
+            ),
+          ];
+        }),
       createdBy,
       t,
     );
@@ -1790,6 +1969,46 @@ export class ProfilesSetupService implements IProfilesSetupService {
           defaultMessage: "Contacted via",
         }),
       ],
+      p_client__matter: async () => [
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.client",
+          defaultMessage: "Client",
+        }),
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.matter",
+          defaultMessage: "Matter",
+        }),
+      ],
+      p_participant__matter: async () => [
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.participant",
+          defaultMessage: "Participant",
+        }),
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.matter",
+          defaultMessage: "Matter",
+        }),
+      ],
+      p_payer__matter: async () => [
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.payer",
+          defaultMessage: "Payer",
+        }),
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.matter",
+          defaultMessage: "Matter",
+        }),
+      ],
+      p_contact__matter: async () => [
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.contact",
+          defaultMessage: "Contact",
+        }),
+        await this.intl.getLocalizableUserText({
+          id: "profiles.default-relationship-type.matter",
+          defaultMessage: "Matter",
+        }),
+      ],
     };
   }
 
@@ -1817,6 +2036,10 @@ export class ProfilesSetupService implements IProfilesSetupService {
       p_main_contract__annex: [["CONTRACT"], ["CONTRACT"]],
       p_addendum__amended_by: [["CONTRACT"], ["CONTRACT"]],
       p_contact__contacted_via: [["INDIVIDUAL"], ["INDIVIDUAL", "LEGAL_ENTITY"]],
+      p_client__matter: [["INDIVIDUAL", "LEGAL_ENTITY"], ["MATTER"]],
+      p_participant__matter: [["INDIVIDUAL", "LEGAL_ENTITY"], ["MATTER"]],
+      p_payer__matter: [["INDIVIDUAL", "LEGAL_ENTITY"], ["MATTER"]],
+      p_contact__matter: [["INDIVIDUAL"], ["MATTER"]],
     };
   }
 }

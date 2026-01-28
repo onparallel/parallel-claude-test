@@ -34,24 +34,20 @@ describe("GraphQL/Profile Relationships", () => {
       status: "ROOT",
     })));
 
-    await profilesSetup.createDefaultProfileTypes(organization.id, "TEST");
+    individual = await profilesSetup.createIndividualProfileType(
+      { org_id: organization.id, name: { en: "Individual" }, name_plural: { en: "Individuals" } },
+      `User:${user.id}`,
+    );
+    legalEntity = await profilesSetup.createLegalEntityProfileType(
+      { org_id: organization.id, name: { en: "Company" }, name_plural: { en: "Companies" } },
+      `User:${user.id}`,
+    );
+    contract = await profilesSetup.createContractProfileType(
+      { org_id: organization.id, name: { en: "Contract" }, name_plural: { en: "Contracts" } },
+      `User:${user.id}`,
+    );
 
     await mocks.createFeatureFlags([{ name: "PROFILES", default_value: true }]);
-
-    individual = await mocks.knex
-      .from("profile_type")
-      .where({ org_id: organization.id, standard_type: "INDIVIDUAL", deleted_at: null })
-      .first();
-
-    legalEntity = await mocks.knex
-      .from("profile_type")
-      .where({ org_id: organization.id, standard_type: "LEGAL_ENTITY", deleted_at: null })
-      .first();
-
-    contract = await mocks.knex
-      .from("profile_type")
-      .where({ org_id: organization.id, standard_type: "CONTRACT", deleted_at: null })
-      .first();
   });
 
   afterAll(async () => {

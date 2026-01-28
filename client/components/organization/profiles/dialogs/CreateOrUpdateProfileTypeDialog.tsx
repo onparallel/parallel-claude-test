@@ -11,7 +11,13 @@ import {
   useRadio,
   useRadioGroup,
 } from "@chakra-ui/react";
-import { BusinessIcon, ContractIcon, FileNewIcon, UserIcon } from "@parallel/chakra/icons";
+import {
+  BusinessIcon,
+  ClipboardIcon,
+  ContractIcon,
+  FileNewIcon,
+  UserIcon,
+} from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
   useWizardDialog,
@@ -69,7 +75,7 @@ function SelectStandardTypeDialog({
 
   return (
     <ConfirmDialog
-      size="lg"
+      size="2xl"
       initialFocusRef={useSetFocusRef(setFocus, "standardType")}
       content={{
         containerProps: {
@@ -234,6 +240,11 @@ function UpdateProfileTypeDialog({
                         id="component.create-profile-type-dialog.singular-name-contract-helper"
                         defaultMessage="Contract"
                       />
+                    ) : standardType === "MATTER" ? (
+                      <FormattedMessage
+                        id="component.create-profile-type-dialog.singular-name-matter-helper"
+                        defaultMessage="Matter"
+                      />
                     ) : null,
                 }}
               />
@@ -291,6 +302,11 @@ function UpdateProfileTypeDialog({
                       <FormattedMessage
                         id="component.create-profile-type-dialog.plural-name-contract-helper"
                         defaultMessage="Contracts"
+                      />
+                    ) : standardType === "MATTER" ? (
+                      <FormattedMessage
+                        id="component.create-profile-type-dialog.plural-name-matter-helper"
+                        defaultMessage="Matters"
                       />
                     ) : null,
                 }}
@@ -376,6 +392,20 @@ const ProfileTypeRadioGroup = forwardRef<HTMLInputElement, ProfileTypeRadioProps
               id: "component.create-profile-type-dialog.contract-description",
               defaultMessage:
                 "Contract and agreement profiles for storing contract information, terms, parties, and related documentation.",
+            }),
+          },
+          {
+            key: "MATTER",
+            icon: <ClipboardIcon color="red.800" boxSize={6} />,
+            background: "red.100",
+            title: intl.formatMessage({
+              id: "component.create-profile-type-dialog.matter",
+              defaultMessage: "Matter",
+            }),
+            description: intl.formatMessage({
+              id: "component.create-profile-type-dialog.matter-description",
+              defaultMessage:
+                "Matter and case profiles for storing matter information, details, and related documentation.",
             }),
           },
           {

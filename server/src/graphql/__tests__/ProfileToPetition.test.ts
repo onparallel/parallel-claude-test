@@ -86,7 +86,19 @@ describe("GraphQL/Profiles to Petitions", () => {
 
     beforeAll(async () => {
       const profilesSetup = testClient.container.get<ProfilesSetupService>(PROFILES_SETUP_SERVICE);
-      await profilesSetup.createDefaultProfileTypes(organization.id, `User:${user.id}`);
+
+      await profilesSetup.createIndividualProfileType(
+        { org_id: organization.id, name: { en: "Individual" }, name_plural: { en: "Individuals" } },
+        `User:${user.id}`,
+      );
+      await profilesSetup.createLegalEntityProfileType(
+        { org_id: organization.id, name: { en: "Company" }, name_plural: { en: "Companies" } },
+        `User:${user.id}`,
+      );
+      await profilesSetup.createContractProfileType(
+        { org_id: organization.id, name: { en: "Contract" }, name_plural: { en: "Contracts" } },
+        `User:${user.id}`,
+      );
 
       [individual] = await mocks.knex
         .from("profile_type")

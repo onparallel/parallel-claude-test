@@ -2960,7 +2960,18 @@ describe("repositories/PetitionRepository", () => {
     let profileRelationshipTypes: ProfileRelationshipType[];
 
     beforeAll(async () => {
-      await profilesSetup.createDefaultProfileTypes(organization.id, `User:${user.id}`);
+      await profilesSetup.createIndividualProfileType(
+        { org_id: organization.id, name: { en: "Individual" }, name_plural: { en: "Individuals" } },
+        `User:${user.id}`,
+      );
+      await profilesSetup.createLegalEntityProfileType(
+        { org_id: organization.id, name: { en: "Company" }, name_plural: { en: "Companies" } },
+        `User:${user.id}`,
+      );
+      await profilesSetup.createContractProfileType(
+        { org_id: organization.id, name: { en: "Contract" }, name_plural: { en: "Contracts" } },
+        `User:${user.id}`,
+      );
 
       profileTypes = await mocks.knex
         .from("profile_type")
@@ -3095,7 +3106,18 @@ describe("repositories/PetitionRepository", () => {
       const [otherOrg] = await mocks.createRandomOrganizations(1);
       const [otherUser] = await mocks.createRandomUsers(otherOrg.id, 1);
 
-      await profilesSetup.createDefaultProfileTypes(otherOrg.id, `User:${otherUser.id}`);
+      await profilesSetup.createIndividualProfileType(
+        { org_id: otherOrg.id, name: { en: "Individual" }, name_plural: { en: "Individuals" } },
+        `User:${otherUser.id}`,
+      );
+      await profilesSetup.createLegalEntityProfileType(
+        { org_id: otherOrg.id, name: { en: "Company" }, name_plural: { en: "Companies" } },
+        `User:${otherUser.id}`,
+      );
+      await profilesSetup.createContractProfileType(
+        { org_id: otherOrg.id, name: { en: "Contract" }, name_plural: { en: "Contracts" } },
+        `User:${otherUser.id}`,
+      );
 
       const [individualPt] = await mocks.knex
         .from("profile_type")
@@ -3231,7 +3253,19 @@ describe("repositories/PetitionRepository", () => {
       const [otherOrg] = await mocks.createRandomOrganizations(1);
       const [otherUser] = await mocks.createRandomUsers(otherOrg.id, 1);
 
-      await profilesSetup.createDefaultProfileTypes(otherOrg.id, `User:${otherUser.id}`);
+      await profilesSetup.createIndividualProfileType(
+        { org_id: otherOrg.id, name: { en: "Individual" }, name_plural: { en: "Individuals" } },
+        `User:${otherUser.id}`,
+      );
+      await profilesSetup.createLegalEntityProfileType(
+        { org_id: otherOrg.id, name: { en: "Company" }, name_plural: { en: "Companies" } },
+        `User:${otherUser.id}`,
+      );
+      await profilesSetup.createContractProfileType(
+        { org_id: otherOrg.id, name: { en: "Contract" }, name_plural: { en: "Contracts" } },
+        `User:${otherUser.id}`,
+      );
+
       const otherOrgPts = await mocks.knex
 
         .from("profile_type")
