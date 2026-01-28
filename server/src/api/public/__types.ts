@@ -4581,6 +4581,8 @@ export type PetitionFieldProgress = {
 
 /** A reply to a petition field */
 export type PetitionFieldReply = Timestamps & {
+  /** When the reply was associated with a profile. */
+  associatedAt: Maybe<Scalars["DateTime"]["output"]>;
   associatedProfile: Maybe<Profile>;
   children: Maybe<Array<PetitionFieldGroupChildReply>>;
   /** The content of the reply. */

@@ -3728,6 +3728,7 @@ export interface NexusGenFieldTypes {
   };
   PetitionFieldReply: {
     // field return type
+    associatedAt: NexusGenScalars["DateTime"] | null; // DateTime
     associatedProfile: NexusGenRootTypes["Profile"] | null; // Profile
     children: NexusGenRootTypes["PetitionFieldGroupChildReply"][] | null; // [PetitionFieldGroupChildReply!]
     content: NexusGenScalars["JSONObject"]; // JSONObject!
@@ -7081,6 +7082,7 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionFieldReply: {
     // field return type name
+    associatedAt: "DateTime";
     associatedProfile: "Profile";
     children: "PetitionFieldGroupChildReply";
     content: "JSONObject";

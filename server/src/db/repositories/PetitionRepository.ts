@@ -2693,6 +2693,7 @@ export class PetitionRepository extends BaseRepository {
       .update(
         {
           ...data,
+          ...(data.associated_profile_id ? { associated_at: this.now() } : {}),
           updated_by: updatedBy,
           updated_at: this.now(),
         },
@@ -8713,6 +8714,7 @@ export class PetitionRepository extends BaseRepository {
       "petition_field_reply",
       fieldIds.map((fieldId) => ({
         ...data,
+        ...(data.associated_profile_id ? { associated_at: this.now() } : {}),
         petition_field_id: fieldId,
         user_id: user.id,
         type: "FIELD_GROUP",

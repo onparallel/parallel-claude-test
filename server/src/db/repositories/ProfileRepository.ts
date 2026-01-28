@@ -1325,6 +1325,7 @@ export class ProfileRepository extends BaseRepository {
       .whereIn("associated_profile_id", ids)
       .update({
         associated_profile_id: null,
+        associated_at: null,
         updated_at: this.now(),
         updated_by: deletedBy,
       });

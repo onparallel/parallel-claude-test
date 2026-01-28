@@ -30,23 +30,66 @@ export function useProfileNamePreview({
   return useMemo(() => {
     if (!profileType || !profileType.fields || !profileType.profileNamePattern) return null;
 
+    const mainReplyId = replies[0]?.id;
     // Get all fields from petition (including children)
     const allPetitionFields = pipe(
       petition.fields,
       flatMap((f) => [f, ...(f.children ?? [])]),
     );
 
-    const reply = replies[0];
-    const repliesWithProfileFields = reply.children?.map(({ field: _field, replies }) => {
-      const field = allPetitionFields.find((f) => f.id === _field.id);
-      return [field, replies];
-    }) as [
-      useProfileNamePreview_PetitionFieldFragment & {
-        type?: string;
-        options?: any;
-      },
-      useProfileNamePreview_PetitionFieldReplyFragment[],
-    ][];
+    // Collect all children from all replies
+    const allChildrenEntries: Array<{
+      field: useProfileNamePreview_PetitionFieldFragment;
+      replies: useProfileNamePreview_PetitionFieldReplyFragment[];
+      parentId: string | null;
+    }> = [];
+
+    for (const reply of replies) {
+      if (reply.children) {
+        for (const {
+          field: { id },
+          replies: childrenReplies,
+        } of reply.children) {
+          const field = allPetitionFields.find((f) => f.id === id);
+          if (field) {
+            allChildrenEntries.push({
+              field,
+              replies: childrenReplies,
+              parentId: field.parent?.id ?? null,
+            });
+          }
+        }
+      }
+    }
+
+    // Group by profileTypeField.id and resolve duplicates
+    // If duplicate, prefer the one where parent.id === mainReplyId
+    const repliesWithProfileFieldsMap = new Map<
+      string,
+      [
+        useProfileNamePreview_PetitionFieldFragment,
+        useProfileNamePreview_PetitionFieldReplyFragment[],
+      ]
+    >();
+
+    for (const { field, replies: fieldReplies, parentId } of allChildrenEntries) {
+      const profileTypeFieldId = (field as any).profileTypeField?.id;
+      if (!profileTypeFieldId) continue;
+
+      const existing = repliesWithProfileFieldsMap.get(profileTypeFieldId);
+      if (!existing) {
+        // First occurrence, add it
+        repliesWithProfileFieldsMap.set(profileTypeFieldId, [field, fieldReplies]);
+      } else {
+        // Duplicate found, prefer the one where parent.id === mainReplyId
+        if (parentId === mainReplyId) {
+          repliesWithProfileFieldsMap.set(profileTypeFieldId, [field, fieldReplies]);
+        }
+        // Otherwise, keep the existing one
+      }
+    }
+
+    const repliesWithProfileFields = Array.from(repliesWithProfileFieldsMap.values());
 
     // Get all profileTypeFields that are used in profile name
     const profileTypeFieldsUsedInName = profileType.fields.filter(
@@ -74,24 +117,13 @@ export function useProfileNamePreview({
 
         if (update.source.type === "FIELD") {
           const fieldId = update.source.fieldId;
-          // First try to find in replies children (fields inside FIELD_GROUP)
-          const childField = reply?.children?.find((c) => c.field.id === fieldId);
-          if (childField && childField.replies.length > 0) {
-            value = childField.replies[0]?.content?.value ?? null;
+          const petitionField = allPetitionFields.find((f) => f.id === fieldId);
+          if (petitionField && petitionField.replies.length > 0) {
+            value = petitionField.replies[0]?.content?.value ?? null;
             petitionFieldForSelect = {
-              type: (childField.field as any).type,
-              options: (childField.field as any).options,
+              type: petitionField.type ?? undefined,
+              options: petitionField.options ?? undefined,
             };
-          } else {
-            // If not found, search in all petition fields
-            const petitionField = allPetitionFields.find((f) => f.id === fieldId);
-            if (petitionField && petitionField.replies.length > 0) {
-              value = petitionField.replies[0]?.content?.value ?? null;
-              petitionFieldForSelect = {
-                type: petitionField.type ?? undefined,
-                options: petitionField.options ?? undefined,
-              };
-            }
           }
         } else if (update.source.type === "VARIABLE") {
           const finalValue = fieldLogic[0]?.finalVariables?.[update.source.name];
@@ -155,10 +187,10 @@ export function useProfileNamePreview({
     let profileName = profileType.profileNamePattern;
     for (const [profileTypeFieldId, value] of Array.from(fieldValues.entries())) {
       const pattern = `{{ ${profileTypeFieldId} }}`;
-      profileName = profileName.replace(pattern, value);
+      profileName = profileName.replaceAll(pattern, value);
     }
 
-    // Clear any unreplaced patterns
+    // Clear any unreplaced patterns {{ }}
     const cleanProfileName = profileName.replace(/{{\s*[\w\d]+\s*}}/g, "");
 
     // Return null if no patterns were replaced

@@ -227,7 +227,7 @@ function UpdateProfileFieldValueOnClosePetitionDialog({
             props.onReject();
           }}
         >
-          <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
+          <FormattedMessage id="generic.close" defaultMessage="Close" />
         </Button>
       }
       {...props}

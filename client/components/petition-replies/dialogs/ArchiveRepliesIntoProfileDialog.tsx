@@ -283,6 +283,10 @@ function ArchiveRepliesIntoProfileRow({
   const field = fields[0];
   const reply = replies[0];
 
+  const [latestAssociatedAt, setLatestAssociatedAt] = useState<string | null | undefined>(
+    reply?.associatedAt,
+  );
+
   const { data, loading, refetch } = useQuery(useArchiveRepliesIntoProfileDialog_profileDocument, {
     variables: { profileId: reply.associatedProfile?.id ?? "" },
     skip: isNullish(reply.associatedProfile?.id),
@@ -495,6 +499,10 @@ function ArchiveRepliesIntoProfileRow({
       });
       const newProfile = response.data?.archiveFieldGroupReplyIntoProfile.associatedProfile;
 
+      if (response.data?.archiveFieldGroupReplyIntoProfile.associatedAt) {
+        setLatestAssociatedAt(response.data.archiveFieldGroupReplyIntoProfile.associatedAt);
+      }
+
       setState({
         selectedProfileId: newProfile?.id ?? null,
         isSaved: true,
@@ -555,6 +563,9 @@ function ArchiveRepliesIntoProfileRow({
                 expirations,
               },
             });
+            if (response.data?.archiveFieldGroupReplyIntoProfile.associatedAt) {
+              setLatestAssociatedAt(response.data.archiveFieldGroupReplyIntoProfile.associatedAt);
+            }
           } catch (error) {
             if (isApolloError(error, "PROFILE_FIELD_VALUE_UNIQUE_CONSTRAINT")) {
               const conflicts =
@@ -577,6 +588,7 @@ function ArchiveRepliesIntoProfileRow({
             selectedProfileId: newProfile?.id ?? null,
             isSaved: true,
             isEditing: false,
+            omitUpdateChanges: true,
           }));
           savedProfile.current = newProfile ?? null;
           onRefetch();
@@ -627,14 +639,16 @@ function ArchiveRepliesIntoProfileRow({
     }
   }
 
-  const needUpdateProfile = useCheckUpdateProfile({
-    parentReplyId: reply.id,
-    profile: savedProfile.current,
-    updateProfileOnClose: mergedOptions.updateProfileOnClose,
-    petition,
-    replies,
-    fieldLogic,
-  });
+  const { hasConflicts: hasProfileConflicts, needUpdate: needUpdateProfile } =
+    useCheckUpdateProfile({
+      parentReplyId: reply.id,
+      parentAssociatedAt: latestAssociatedAt,
+      profile: savedProfile.current,
+      updateProfileOnClose: mergedOptions.updateProfileOnClose,
+      petition,
+      replies,
+      fieldLogic,
+    });
 
   // Helper function to get profile field values from updateProfileOnClose and reply children
   function getProfileFieldValues(
@@ -802,7 +816,9 @@ function ArchiveRepliesIntoProfileRow({
           )
         ) : null}
       </HStack>
-      {needUpdateProfile && !state.isEditing ? (
+      {hasProfileConflicts &&
+      (needUpdateProfile || isNullish(latestAssociatedAt)) &&
+      !state.isEditing ? (
         <HStack gap={0}>
           <Button
             colorPalette="primary"
@@ -821,6 +837,35 @@ function ArchiveRepliesIntoProfileRow({
                 defaultMessage="The information has been saved but some of the answers in this parallel differ from the values saved in the profile."
               />
             </Text>
+          </AlertPopover>
+        </HStack>
+      ) : hasProfileConflicts && !state.isEditing ? (
+        <HStack paddingX={4} justifyContent="center">
+          <CheckIcon color="green.500" />
+          <Box>
+            <FormattedMessage id="generic.saved" defaultMessage="Saved" />
+          </Box>
+          <AlertPopover boxSize={4}>
+            <Stack>
+              <Text>
+                <FormattedMessage
+                  id="component.associate-and-fill-profile-to-parallel-dialog.need-update-profile-warning"
+                  defaultMessage="The information has been saved but some of the answers in this parallel differ from the values saved in the profile."
+                />
+              </Text>
+              <Button
+                alignSelf="flex-end"
+                colorPalette="primary"
+                size="sm"
+                leftIcon={<RepeatIcon />}
+                onClick={async () => {
+                  await handleArchiveRepliesIntoProfile(state.selectedProfileId!);
+                }}
+                disabled={isDisabled}
+              >
+                <FormattedMessage id="generic.update" defaultMessage="Update" />
+              </Button>
+            </Stack>
           </AlertPopover>
         </HStack>
       ) : state.isSaved && !state.isEditing ? (
@@ -888,6 +933,7 @@ const _fragments = {
       associatedProfile {
         id
       }
+      associatedAt
       ...useCheckUpdateProfile_PetitionFieldReply
     }
   `,
@@ -1009,6 +1055,7 @@ const _mutations = [
         associatedProfile {
           ...useArchiveRepliesIntoProfileDialog_Profile
         }
+        ...useArchiveRepliesIntoProfileDialog_PetitionFieldReply
       }
     }
   `,

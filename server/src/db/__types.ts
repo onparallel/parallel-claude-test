@@ -1945,6 +1945,7 @@ export interface PetitionFieldReply {
   anonymized_at: Maybe<Date>; // timestamptz
   parent_petition_field_reply_id: Maybe<number>; // int4
   associated_profile_id: Maybe<number>; // int4
+  associated_at: Maybe<Date>; // timestamptz
 }
 
 export type CreatePetitionFieldReply = PartialProps<
@@ -1962,6 +1963,7 @@ export type CreatePetitionFieldReply = PartialProps<
   | "anonymized_at"
   | "parent_petition_field_reply_id"
   | "associated_profile_id"
+  | "associated_at"
 >;
 
 export interface PetitionListView {

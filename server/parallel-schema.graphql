@@ -5554,6 +5554,10 @@ type PetitionFieldProgress {
 A reply to a petition field
 """
 type PetitionFieldReply implements Timestamps {
+  """
+  When the reply was associated with a profile.
+  """
+  associatedAt: DateTime
   associatedProfile: Profile
   children: [PetitionFieldGroupChildReply!]
 

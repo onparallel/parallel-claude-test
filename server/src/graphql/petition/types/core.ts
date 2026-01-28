@@ -1540,6 +1540,10 @@ export const PetitionFieldReply = objectType({
         return await ctx.profiles.loadProfile(o.associated_profile_id);
       },
     });
+    t.nullable.datetime("associatedAt", {
+      description: "When the reply was associated with a profile.",
+      resolve: (o) => o.associated_at,
+    });
   },
 });
 

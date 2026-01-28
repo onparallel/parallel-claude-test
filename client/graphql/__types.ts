@@ -4739,6 +4739,8 @@ export interface PetitionFieldProgress {
 /** A reply to a petition field */
 export interface PetitionFieldReply extends Timestamps {
   __typename?: "PetitionFieldReply";
+  /** When the reply was associated with a profile. */
+  associatedAt?: Maybe<Scalars["DateTime"]["output"]>;
   associatedProfile?: Maybe<Profile>;
   children?: Maybe<Array<PetitionFieldGroupChildReply>>;
   /** The content of the reply. */
@@ -40378,6 +40380,8 @@ export type useArchiveRepliesIntoProfileDialog_PetitionFieldReplyInnerFragment =
   __typename?: "PetitionFieldReply";
   id: string;
   content: { [key: string]: any };
+  associatedAt?: string | null;
+  updatedAt: string;
   associatedProfile?: { __typename?: "Profile"; id: string } | null;
   parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
   children?: Array<{
@@ -40387,6 +40391,7 @@ export type useArchiveRepliesIntoProfileDialog_PetitionFieldReplyInnerFragment =
       __typename?: "PetitionFieldReply";
       id: string;
       content: { [key: string]: any };
+      updatedAt: string;
       parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
     }>;
   }> | null;
@@ -40396,6 +40401,8 @@ export type useArchiveRepliesIntoProfileDialog_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
   id: string;
   content: { [key: string]: any };
+  associatedAt?: string | null;
+  updatedAt: string;
   children?: Array<{
     __typename?: "PetitionFieldGroupChildReply";
     field: {
@@ -40407,6 +40414,8 @@ export type useArchiveRepliesIntoProfileDialog_PetitionFieldReplyFragment = {
       __typename?: "PetitionFieldReply";
       id: string;
       content: { [key: string]: any };
+      updatedAt: string;
+      associatedAt?: string | null;
       parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
       associatedProfile?: { __typename?: "Profile"; id: string } | null;
       children?: Array<{
@@ -40416,6 +40425,7 @@ export type useArchiveRepliesIntoProfileDialog_PetitionFieldReplyFragment = {
           __typename?: "PetitionFieldReply";
           id: string;
           content: { [key: string]: any };
+          updatedAt: string;
           parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
         }>;
       }> | null;
@@ -40456,6 +40466,8 @@ export type useArchiveRepliesIntoProfileDialog_PetitionFieldInnerFragment = {
     __typename?: "PetitionFieldReply";
     id: string;
     content: { [key: string]: any };
+    associatedAt?: string | null;
+    updatedAt: string;
     associatedProfile?: { __typename?: "Profile"; id: string } | null;
     children?: Array<{
       __typename?: "PetitionFieldGroupChildReply";
@@ -40468,6 +40480,8 @@ export type useArchiveRepliesIntoProfileDialog_PetitionFieldInnerFragment = {
         __typename?: "PetitionFieldReply";
         id: string;
         content: { [key: string]: any };
+        updatedAt: string;
+        associatedAt?: string | null;
         parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
         associatedProfile?: { __typename?: "Profile"; id: string } | null;
         children?: Array<{
@@ -40477,6 +40491,7 @@ export type useArchiveRepliesIntoProfileDialog_PetitionFieldInnerFragment = {
             __typename?: "PetitionFieldReply";
             id: string;
             content: { [key: string]: any };
+            updatedAt: string;
             parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
           }>;
         }> | null;
@@ -40512,6 +40527,8 @@ export type useArchiveRepliesIntoProfileDialog_PetitionFieldFragment = {
       __typename?: "PetitionFieldReply";
       id: string;
       content: { [key: string]: any };
+      associatedAt?: string | null;
+      updatedAt: string;
       associatedProfile?: { __typename?: "Profile"; id: string } | null;
       children?: Array<{
         __typename?: "PetitionFieldGroupChildReply";
@@ -40524,6 +40541,8 @@ export type useArchiveRepliesIntoProfileDialog_PetitionFieldFragment = {
           __typename?: "PetitionFieldReply";
           id: string;
           content: { [key: string]: any };
+          updatedAt: string;
+          associatedAt?: string | null;
           parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
           associatedProfile?: { __typename?: "Profile"; id: string } | null;
           children?: Array<{
@@ -40533,6 +40552,7 @@ export type useArchiveRepliesIntoProfileDialog_PetitionFieldFragment = {
               __typename?: "PetitionFieldReply";
               id: string;
               content: { [key: string]: any };
+              updatedAt: string;
               parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
             }>;
           }> | null;
@@ -40546,6 +40566,8 @@ export type useArchiveRepliesIntoProfileDialog_PetitionFieldFragment = {
     __typename?: "PetitionFieldReply";
     id: string;
     content: { [key: string]: any };
+    associatedAt?: string | null;
+    updatedAt: string;
     associatedProfile?: { __typename?: "Profile"; id: string } | null;
     children?: Array<{
       __typename?: "PetitionFieldGroupChildReply";
@@ -40558,6 +40580,8 @@ export type useArchiveRepliesIntoProfileDialog_PetitionFieldFragment = {
         __typename?: "PetitionFieldReply";
         id: string;
         content: { [key: string]: any };
+        updatedAt: string;
+        associatedAt?: string | null;
         parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
         associatedProfile?: { __typename?: "Profile"; id: string } | null;
         children?: Array<{
@@ -40567,6 +40591,7 @@ export type useArchiveRepliesIntoProfileDialog_PetitionFieldFragment = {
             __typename?: "PetitionFieldReply";
             id: string;
             content: { [key: string]: any };
+            updatedAt: string;
             parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
           }>;
         }> | null;
@@ -40611,6 +40636,8 @@ export type useArchiveRepliesIntoProfileDialog_PetitionFragment = {
         id: string;
         content: { [key: string]: any };
         isAnonymized: boolean;
+        updatedAt: string;
+        associatedAt?: string | null;
         associatedProfile?: { __typename?: "Profile"; id: string } | null;
         children?: Array<{
           __typename?: "PetitionFieldGroupChildReply";
@@ -40623,6 +40650,8 @@ export type useArchiveRepliesIntoProfileDialog_PetitionFragment = {
             __typename?: "PetitionFieldReply";
             id: string;
             content: { [key: string]: any };
+            updatedAt: string;
+            associatedAt?: string | null;
             parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
             associatedProfile?: { __typename?: "Profile"; id: string } | null;
             children?: Array<{
@@ -40632,6 +40661,7 @@ export type useArchiveRepliesIntoProfileDialog_PetitionFragment = {
                 __typename?: "PetitionFieldReply";
                 id: string;
                 content: { [key: string]: any };
+                updatedAt: string;
                 parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
               }>;
             }> | null;
@@ -40658,6 +40688,8 @@ export type useArchiveRepliesIntoProfileDialog_PetitionFragment = {
       id: string;
       content: { [key: string]: any };
       isAnonymized: boolean;
+      updatedAt: string;
+      associatedAt?: string | null;
       children?: Array<{
         __typename?: "PetitionFieldGroupChildReply";
         field: {
@@ -40670,6 +40702,8 @@ export type useArchiveRepliesIntoProfileDialog_PetitionFragment = {
           id: string;
           content: { [key: string]: any };
           isAnonymized: boolean;
+          updatedAt: string;
+          associatedAt?: string | null;
           parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
           associatedProfile?: { __typename?: "Profile"; id: string } | null;
           children?: Array<{
@@ -40679,6 +40713,7 @@ export type useArchiveRepliesIntoProfileDialog_PetitionFragment = {
               __typename?: "PetitionFieldReply";
               id: string;
               content: { [key: string]: any };
+              updatedAt: string;
               parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
             }>;
           }> | null;
@@ -40783,6 +40818,8 @@ export type useArchiveRepliesIntoProfileDialog_petitionQuery = {
               id: string;
               content: { [key: string]: any };
               isAnonymized: boolean;
+              updatedAt: string;
+              associatedAt?: string | null;
               associatedProfile?: { __typename?: "Profile"; id: string } | null;
               children?: Array<{
                 __typename?: "PetitionFieldGroupChildReply";
@@ -40795,6 +40832,8 @@ export type useArchiveRepliesIntoProfileDialog_petitionQuery = {
                   __typename?: "PetitionFieldReply";
                   id: string;
                   content: { [key: string]: any };
+                  updatedAt: string;
+                  associatedAt?: string | null;
                   parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
                   associatedProfile?: { __typename?: "Profile"; id: string } | null;
                   children?: Array<{
@@ -40804,6 +40843,7 @@ export type useArchiveRepliesIntoProfileDialog_petitionQuery = {
                       __typename?: "PetitionFieldReply";
                       id: string;
                       content: { [key: string]: any };
+                      updatedAt: string;
                       parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
                     }>;
                   }> | null;
@@ -40830,6 +40870,8 @@ export type useArchiveRepliesIntoProfileDialog_petitionQuery = {
             id: string;
             content: { [key: string]: any };
             isAnonymized: boolean;
+            updatedAt: string;
+            associatedAt?: string | null;
             children?: Array<{
               __typename?: "PetitionFieldGroupChildReply";
               field: {
@@ -40842,6 +40884,8 @@ export type useArchiveRepliesIntoProfileDialog_petitionQuery = {
                 id: string;
                 content: { [key: string]: any };
                 isAnonymized: boolean;
+                updatedAt: string;
+                associatedAt?: string | null;
                 parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
                 associatedProfile?: { __typename?: "Profile"; id: string } | null;
                 children?: Array<{
@@ -40851,6 +40895,7 @@ export type useArchiveRepliesIntoProfileDialog_petitionQuery = {
                     __typename?: "PetitionFieldReply";
                     id: string;
                     content: { [key: string]: any };
+                    updatedAt: string;
                     parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
                   }>;
                 }> | null;
@@ -41005,6 +41050,9 @@ export type useArchiveRepliesIntoProfileDialog_archiveFieldGroupReplyIntoProfile
   archiveFieldGroupReplyIntoProfile: {
     __typename?: "PetitionFieldReply";
     id: string;
+    content: { [key: string]: any };
+    associatedAt?: string | null;
+    updatedAt: string;
     associatedProfile?: {
       __typename?: "Profile";
       id: string;
@@ -41042,6 +41090,35 @@ export type useArchiveRepliesIntoProfileDialog_archiveFieldGroupReplyIntoProfile
         fields: Array<{ __typename?: "ProfileTypeField"; id: string; type: ProfileTypeFieldType }>;
       };
     } | null;
+    children?: Array<{
+      __typename?: "PetitionFieldGroupChildReply";
+      field: {
+        __typename?: "PetitionField";
+        id: string;
+        profileTypeField?: { __typename?: "ProfileTypeField"; id: string } | null;
+      };
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        content: { [key: string]: any };
+        updatedAt: string;
+        associatedAt?: string | null;
+        parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+        associatedProfile?: { __typename?: "Profile"; id: string } | null;
+        children?: Array<{
+          __typename?: "PetitionFieldGroupChildReply";
+          field: { __typename?: "PetitionField"; id: string };
+          replies: Array<{
+            __typename?: "PetitionFieldReply";
+            id: string;
+            content: { [key: string]: any };
+            updatedAt: string;
+            parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+          }>;
+        }> | null;
+      }>;
+    }> | null;
+    parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
   };
 };
 
@@ -73986,6 +74063,8 @@ export type useCheckUpdateProfile_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
   id: string;
   content: { [key: string]: any };
+  updatedAt: string;
+  associatedAt?: string | null;
   parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
   children?: Array<{
     __typename?: "PetitionFieldGroupChildReply";
@@ -73994,6 +74073,7 @@ export type useCheckUpdateProfile_PetitionFieldReplyFragment = {
       __typename?: "PetitionFieldReply";
       id: string;
       content: { [key: string]: any };
+      updatedAt: string;
       parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
     }>;
   }> | null;
@@ -74007,6 +74087,8 @@ export type useCheckUpdateProfile_PetitionFieldFragment = {
     __typename?: "PetitionFieldReply";
     id: string;
     content: { [key: string]: any };
+    updatedAt: string;
+    associatedAt?: string | null;
     parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
     children?: Array<{
       __typename?: "PetitionFieldGroupChildReply";
@@ -74015,6 +74097,7 @@ export type useCheckUpdateProfile_PetitionFieldFragment = {
         __typename?: "PetitionFieldReply";
         id: string;
         content: { [key: string]: any };
+        updatedAt: string;
         parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
       }>;
     }> | null;
@@ -74038,6 +74121,8 @@ export type useCheckUpdateProfile_PetitionFragment = {
         __typename?: "PetitionFieldReply";
         id: string;
         content: { [key: string]: any };
+        updatedAt: string;
+        associatedAt?: string | null;
         parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
         children?: Array<{
           __typename?: "PetitionFieldGroupChildReply";
@@ -74046,6 +74131,7 @@ export type useCheckUpdateProfile_PetitionFragment = {
             __typename?: "PetitionFieldReply";
             id: string;
             content: { [key: string]: any };
+            updatedAt: string;
             parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
           }>;
         }> | null;
@@ -74056,6 +74142,8 @@ export type useCheckUpdateProfile_PetitionFragment = {
       __typename?: "PetitionFieldReply";
       id: string;
       content: { [key: string]: any };
+      updatedAt: string;
+      associatedAt?: string | null;
       parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
       children?: Array<{
         __typename?: "PetitionFieldGroupChildReply";
@@ -74064,6 +74152,7 @@ export type useCheckUpdateProfile_PetitionFragment = {
           __typename?: "PetitionFieldReply";
           id: string;
           content: { [key: string]: any };
+          updatedAt: string;
           parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
         }>;
       }> | null;
@@ -81351,6 +81440,7 @@ export const useCheckUpdateProfile_PetitionFieldReplyFragmentDoc = gql`
   fragment useCheckUpdateProfile_PetitionFieldReply on PetitionFieldReply {
     id
     content
+    updatedAt
     parent {
       id
     }
@@ -81361,11 +81451,13 @@ export const useCheckUpdateProfile_PetitionFieldReplyFragmentDoc = gql`
       replies {
         id
         content
+        updatedAt
         parent {
           id
         }
       }
     }
+    associatedAt
   }
 ` as unknown as DocumentNode<useCheckUpdateProfile_PetitionFieldReplyFragment, unknown>;
 export const useArchiveRepliesIntoProfileDialog_PetitionFieldReplyInnerFragmentDoc = gql`
@@ -81375,6 +81467,7 @@ export const useArchiveRepliesIntoProfileDialog_PetitionFieldReplyInnerFragmentD
     associatedProfile {
       id
     }
+    associatedAt
     ...useCheckUpdateProfile_PetitionFieldReply
   }
   ${useCheckUpdateProfile_PetitionFieldReplyFragmentDoc}
@@ -91888,9 +91981,11 @@ export const useArchiveRepliesIntoProfileDialog_archiveFieldGroupReplyIntoProfil
       associatedProfile {
         ...useArchiveRepliesIntoProfileDialog_Profile
       }
+      ...useArchiveRepliesIntoProfileDialog_PetitionFieldReply
     }
   }
   ${useArchiveRepliesIntoProfileDialog_ProfileFragmentDoc}
+  ${useArchiveRepliesIntoProfileDialog_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<
   useArchiveRepliesIntoProfileDialog_archiveFieldGroupReplyIntoProfileMutation,
   useArchiveRepliesIntoProfileDialog_archiveFieldGroupReplyIntoProfileMutationVariables

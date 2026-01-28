@@ -25,9 +25,11 @@ type AdverseMediaArticle = {
  * Hook to check if a profile needs to be updated by comparing petition values
  * (from updateProfileOnClose or reply children) with current profile values.
  * Priority: updateProfileOnClose -> reply children
+ * parentReplyId is used to filter the children replies to match the parent
  */
 export function useCheckUpdateProfile({
   parentReplyId,
+  parentAssociatedAt,
   profile,
   updateProfileOnClose,
   replies,
@@ -35,16 +37,20 @@ export function useCheckUpdateProfile({
   fieldLogic,
 }: {
   parentReplyId: string;
+  parentAssociatedAt?: string | null;
   profile?: useCheckUpdateProfile_ProfileFragment | null;
   updateProfileOnClose?: UpdateProfileOnClose[] | null;
   replies: useCheckUpdateProfile_PetitionFieldReplyFragment[];
   petition: useCheckUpdateProfile_PetitionFragment;
   fieldLogic: FieldLogicResult[];
-}): boolean {
+}): { hasConflicts: boolean; needUpdate: boolean } {
   return useMemo(() => {
-    if (!profile) return false;
+    if (!profile) return { hasConflicts: false, needUpdate: false };
     const profileType = profile.profileType;
-    const reply = replies[0];
+    const mainReply = replies[0];
+
+    const parentAssociatedAtMs = parentAssociatedAt ? Date.parse(parentAssociatedAt) : NaN;
+    const canComputeNeedUpdate = !isNaN(parentAssociatedAtMs);
 
     // Get all petition fields (including children)
     const allPetitionFields = pipe(
@@ -53,31 +59,36 @@ export function useCheckUpdateProfile({
     );
 
     // Get all profileTypeFieldIds to check
-    const profileTypeFieldIdsToCheck = new Set<string>();
+    const profileTypeFieldIdsToCheck = new Map<string, string>();
 
     // 1. From updateProfileOnClose
     if (updateProfileOnClose) {
       for (const update of updateProfileOnClose) {
         if (update.source.type === "ASK_USER") continue;
-        profileTypeFieldIdsToCheck.add(update.profileTypeFieldId);
+        profileTypeFieldIdsToCheck.set(update.profileTypeFieldId, update.source.type);
       }
     }
 
     // 2. From reply children (that are not in updateProfileOnClose)
-    if (reply.children) {
-      for (const { field: _childField } of reply.children) {
-        const childField = allPetitionFields.find((f) => f.id === _childField.id);
-        if (
-          isNonNullish(childField?.profileTypeField) &&
-          !profileTypeFieldIdsToCheck.has(childField.profileTypeField.id)
-        ) {
-          profileTypeFieldIdsToCheck.add(childField.profileTypeField.id);
+    for (const reply of replies) {
+      if (reply.children) {
+        for (const { field: _childField } of reply.children) {
+          const childField = allPetitionFields.find((f) => f.id === _childField.id);
+          if (
+            isNonNullish(childField?.profileTypeField) &&
+            !profileTypeFieldIdsToCheck.has(childField.profileTypeField.id)
+          ) {
+            profileTypeFieldIdsToCheck.set(childField.profileTypeField.id, reply.id);
+          }
         }
       }
     }
 
+    let hasConflicts = false;
+    let needUpdate = false;
+
     // Check each profileTypeFieldId
-    for (const profileTypeFieldId of Array.from(profileTypeFieldIdsToCheck)) {
+    for (const [profileTypeFieldId, _] of Array.from(profileTypeFieldIdsToCheck)) {
       const profileField = profile.properties
         .filter(({ field }) => field.myPermission === "WRITE")
         .find(({ field }) => field.id === profileTypeFieldId);
@@ -99,7 +110,7 @@ export function useCheckUpdateProfile({
         if (updateFromConfig.source.type === "FIELD") {
           const fieldId = updateFromConfig.source.fieldId;
           const map = updateFromConfig.source.map;
-          const childField = reply?.children?.find((c) => c.field.id === fieldId);
+          const childField = mainReply?.children?.find((c) => c.field.id === fieldId);
 
           if (childField && childField.replies.length > 0) {
             const replyContent = childField.replies[0]?.content;
@@ -135,21 +146,58 @@ export function useCheckUpdateProfile({
           petitionFieldType = profileType.fields.find((f) => f.id === profileTypeFieldId)?.type;
         }
       } else {
-        // Get from reply children
-        const childField = allPetitionFields.find(
+        // Get from reply children (merged group: multiple replies = multiple FIELD_GROUPs as one)
+        // Consider all petition fields with this profileTypeFieldId; if field appears in several
+        // groups, prefer the value from the reply where parent.id === parentReplyId.
+        const childFieldsWithProfileType = allPetitionFields.filter(
           (f) => f.profileTypeField?.id === profileTypeFieldId,
         );
 
-        const childFieldReplies = childField?.replies.filter((r) => r.parent?.id === parentReplyId);
+        let chosenChildField: (typeof allPetitionFields)[number] | undefined;
+        let chosenReplies: typeof petitionReplies = [];
 
-        if (childField && isNonNullish(childFieldReplies) && childFieldReplies.length > 0) {
-          petitionValue = childFieldReplies[0]?.content;
-          petitionFieldType = childField.type;
-          petitionReplies = childFieldReplies;
+        for (const childField of childFieldsWithProfileType) {
+          const repliesWithParent = (childField.replies ?? []).filter(
+            (r) => r.parent?.id === parentReplyId,
+          );
+          if (repliesWithParent.length > 0) {
+            chosenChildField = childField;
+            chosenReplies = repliesWithParent;
+            break;
+          }
+        }
+        if (!chosenChildField) {
+          for (const childField of childFieldsWithProfileType) {
+            if ((childField.replies?.length ?? 0) > 0) {
+              chosenChildField = childField;
+              chosenReplies = childField.replies ?? [];
+              break;
+            }
+          }
+        }
+        if (chosenChildField && chosenReplies.length > 0) {
+          petitionValue = chosenReplies[0]?.content;
+          petitionFieldType = chosenChildField.type;
+          petitionReplies = chosenReplies;
         }
       }
 
       if (!petitionValue || !petitionFieldType) continue;
+
+      if (!needUpdate && canComputeNeedUpdate && petitionReplies.length > 0) {
+        const repliesScopedToParent =
+          petitionReplies?.filter((r) => r?.parent?.id === parentReplyId) ?? [];
+        const repliesToCheckForNeedUpdate =
+          repliesScopedToParent.length > 0 ? repliesScopedToParent : petitionReplies;
+
+        const petitionRepliesUpdatedAtMs = repliesToCheckForNeedUpdate
+          .map((r) => Date.parse(r.updatedAt))
+          .filter((t) => !isNaN(t));
+
+        if (petitionRepliesUpdatedAtMs.some((t) => t > parentAssociatedAtMs)) {
+          needUpdate = true;
+        }
+      }
 
       const profileFieldContent = profileField.value?.content;
 
@@ -178,7 +226,7 @@ export function useCheckUpdateProfile({
             profileFieldContent?.search?.falsePositivesCount ||
           petitionValue?.search?.totalCount !== profileFieldContent?.search?.totalCount
         ) {
-          return true;
+          hasConflicts = true;
         }
       } else if (petitionFieldType === "ADVERSE_MEDIA_SEARCH") {
         const fieldSearch =
@@ -213,7 +261,7 @@ export function useCheckUpdateProfile({
           difference.multiset(fieldSearch, profileSearch).length > 0 ||
           difference.multiset(fieldIdsWithClassification, profileIdsWithClassification).length > 0
         ) {
-          return true;
+          hasConflicts = true;
         }
       } else if (petitionFieldType === "FILE_UPLOAD") {
         const petitionFilesToString = petitionReplies.map((reply) => {
@@ -233,7 +281,7 @@ export function useCheckUpdateProfile({
           petitionFilesToString.length !== profileFilesToString.length ||
           difference.multiset(petitionFilesToString, profileFilesToString).length > 0
         ) {
-          return true;
+          hasConflicts = true;
         }
       } else if (petitionFieldType === "CHECKBOX") {
         const replyValue = sort<string>(petitionValue?.value ?? [], (a, b) => a.localeCompare(b));
@@ -245,7 +293,7 @@ export function useCheckUpdateProfile({
           replyValue.length !== profileValue.length ||
           replyValue.join(",") !== profileValue.join(",")
         ) {
-          return true;
+          hasConflicts = true;
         }
       } else if (petitionFieldType === "DATE") {
         const normalizeDate = (dateValue: string | null | undefined): string | null => {
@@ -259,7 +307,7 @@ export function useCheckUpdateProfile({
         const profileDate = normalizeDate(profileFieldContent?.value);
 
         if (petitionDate !== profileDate) {
-          return true;
+          hasConflicts = true;
         }
       } else {
         // Simple value comparison for text, number, date, etc.
@@ -267,12 +315,14 @@ export function useCheckUpdateProfile({
         const petitionValueToCompare =
           petitionValue?.value !== undefined ? petitionValue.value : petitionValue;
         if (petitionValueToCompare !== profileFieldContent?.value) {
-          return true;
+          hasConflicts = true;
         }
       }
+
+      if (hasConflicts && needUpdate) break;
     }
 
-    return false;
+    return { hasConflicts, needUpdate };
   }, [profile, updateProfileOnClose, replies, petition, fieldLogic, parentReplyId]);
 }
 
@@ -331,6 +381,7 @@ const _fragments = {
     fragment useCheckUpdateProfile_PetitionFieldReply on PetitionFieldReply {
       id
       content
+      updatedAt
       parent {
         id
       }
@@ -341,11 +392,13 @@ const _fragments = {
         replies {
           id
           content
+          updatedAt
           parent {
             id
           }
         }
       }
+      associatedAt
     }
   `,
   PetitionField: gql`
