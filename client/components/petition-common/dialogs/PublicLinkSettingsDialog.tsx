@@ -30,7 +30,6 @@ import {
   PublicLinkSettingsDialog_isValidSlugDocument,
   PublicLinkSettingsDialog_PetitionTemplateFragment,
   PublicLinkSettingsDialog_PublicPetitionLinkFragment,
-  PublicLinkSettingsDialog_UserFragment,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
@@ -49,7 +48,6 @@ interface PublicLinkSettingsData {
   title: string;
   description: string;
   slug: string;
-  prefillSecret: Maybe<string>;
   allowMultiplePetitions: boolean;
   petitionNamePattern: Maybe<string>;
 }
@@ -57,12 +55,10 @@ interface PublicLinkSettingsData {
 interface PublicLinkSettingsDialogProps {
   publicLink?: PublicLinkSettingsDialog_PublicPetitionLinkFragment;
   template: PublicLinkSettingsDialog_PetitionTemplateFragment;
-  user: PublicLinkSettingsDialog_UserFragment;
 }
 export function PublicLinkSettingsDialog({
   publicLink,
   template,
-  user,
   ...props
 }: DialogProps<PublicLinkSettingsDialogProps, PublicLinkSettingsData>) {
   const apollo = useApolloClient();
@@ -77,7 +73,6 @@ export function PublicLinkSettingsDialog({
         title: publicLink?.title ?? "",
         description: publicLink?.description ?? "",
         slug: publicLink?.slug ?? "",
-        prefillSecret: publicLink?.prefillSecret ?? "",
         allowMultiplePetitions: publicLink?.allowMultiplePetitions ?? false,
         petitionNamePattern: publicLink?.petitionNamePattern ?? defaultPetitionNamePattern,
       },
@@ -203,7 +198,6 @@ export function PublicLinkSettingsDialog({
             props.onResolve({
               ...pick(data, ["title", "description", "slug", "allowMultiplePetitions"]),
               petitionNamePattern: data.petitionNamePattern ?? null,
-              prefillSecret: data.prefillSecret || null,
             });
           }),
         },
@@ -457,25 +451,6 @@ export function PublicLinkSettingsDialog({
               />
             </HelpPopover>
           </FormControl>
-          {user.hasPrefillSecret ? (
-            <FormControl id="prefillSecret">
-              <FormLabel alignItems="center" display="flex">
-                <Text as="span">
-                  <FormattedMessage
-                    id="component.settings-public-link-dialog.prefill-secret-label"
-                    defaultMessage="Prefill secret"
-                  />
-                </Text>
-                <HelpPopover>
-                  <FormattedMessage
-                    id="component.settings-public-link-dialog.prefill-secret-popover"
-                    defaultMessage="JWT secret used to verify the integrity of the parameter passed to prefill the parallel. This must be set in case you use the <b>prefill</b> query parameter in your link."
-                  />
-                </HelpPopover>
-              </FormLabel>
-              <Input {...register("prefillSecret")} />
-            </FormControl>
-          ) : null}
         </Stack>
       }
       confirm={
@@ -509,11 +484,6 @@ PublicLinkSettingsDialog.queries = [
 ];
 
 const _fragments = {
-  User: gql`
-    fragment PublicLinkSettingsDialog_User on User {
-      hasPrefillSecret: hasFeatureFlag(featureFlag: PUBLIC_PETITION_LINK_PREFILL_SECRET_UI)
-    }
-  `,
   PetitionTemplate: gql`
     fragment PublicLinkSettingsDialog_PetitionTemplate on PetitionTemplate {
       name
@@ -531,7 +501,6 @@ const _fragments = {
       description
       slug
       url
-      prefillSecret
       allowMultiplePetitions
       petitionNamePattern
     }

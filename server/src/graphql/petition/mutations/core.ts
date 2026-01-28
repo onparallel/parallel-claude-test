@@ -2851,7 +2851,6 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
     title: nonNull(stringArg()),
     description: nonNull(stringArg()),
     slug: nullable(stringArg()),
-    prefillSecret: nullable(stringArg()),
     allowMultiplePetitions: nonNull(booleanArg()),
     petitionNamePattern: nullable(stringArg()),
   },
@@ -2861,15 +2860,7 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
   ),
   resolve: async (
     _,
-    {
-      templateId,
-      title,
-      description,
-      slug,
-      prefillSecret,
-      allowMultiplePetitions,
-      petitionNamePattern,
-    },
+    { templateId, title, description, slug, allowMultiplePetitions, petitionNamePattern },
     ctx,
   ) => {
     const link = await ctx.petitions.createPublicPetitionLink(
@@ -2879,7 +2870,6 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
         description,
         slug: slug ?? random(10),
         is_active: true,
-        prefill_secret: prefillSecret || null,
         allow_multiple_petitions: allowMultiplePetitions,
         petition_name_pattern: petitionNamePattern,
       },
@@ -2905,7 +2895,6 @@ export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink"
     title: stringArg(),
     description: stringArg(),
     slug: stringArg(),
-    prefillSecret: stringArg(),
     allowMultiplePetitions: booleanArg(),
     petitionNamePattern: stringArg(),
   },
@@ -2928,10 +2917,6 @@ export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink"
       publicPetitionLinkData.slug = args.slug;
     }
 
-    if (args.prefillSecret !== undefined) {
-      publicPetitionLinkData.prefill_secret = args.prefillSecret;
-    }
-
     if (isNonNullish(args.allowMultiplePetitions)) {
       publicPetitionLinkData.allow_multiple_petitions = args.allowMultiplePetitions;
     }
@@ -2949,39 +2934,6 @@ export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink"
     await ctx.petitions.updatePetitionLastChangeAt(publicLink.template_id);
 
     return publicLink;
-  },
-});
-
-export const modifyPetitionCustomProperty = mutationField("modifyPetitionCustomProperty", {
-  description: "Adds, edits or deletes a custom property on the petition",
-  type: "PetitionBase",
-  authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId", "WRITE"),
-    petitionsAreNotScheduledForDeletion("petitionId"),
-    petitionIsNotAnonymized("petitionId"),
-    userHasFeatureFlag("CUSTOM_PROPERTIES"),
-  ),
-  args: {
-    petitionId: nonNull(globalIdArg("Petition")),
-    key: nonNull(stringArg()),
-    value: stringArg(),
-  },
-  validateArgs: validateAnd(maxLength("key", 100), maxLength("value", 1000)),
-  resolve: async (_, { petitionId, key, value }, ctx) => {
-    const petition = (await ctx.petitions.loadPetition(petitionId))!;
-
-    if (
-      Object.keys(petition.custom_properties).length >= 20 &&
-      isNullish(petition.custom_properties[key])
-    ) {
-      throw new ApolloError("Max limit of properties reached", "CUSTOM_PROPERTIES_LIMIT_ERROR");
-    }
-    return await ctx.petitions.modifyPetitionCustomProperty(
-      petitionId,
-      key,
-      value ?? null,
-      `User:${ctx.user!.id}`,
-    );
   },
 });
 
@@ -3158,50 +3110,6 @@ export const renameFolder = mutationField("renameFolder", {
     return SUCCESS;
   },
 });
-
-export const createPublicPetitionLinkPrefillData = mutationField(
-  "createPublicPetitionLinkPrefillData",
-  {
-    description:
-      "Creates prefill information to be used on public petition links. Returns the URL to be used for creation and prefill of the petition.",
-    type: nonNull("String"),
-    authorize: authenticateAnd(
-      userHasFeatureFlag("PUBLIC_PETITION_LINK_PREFILL_DATA"),
-      userHasAccessToPublicPetitionLink("publicPetitionLinkId", "WRITE"),
-      publicPetitionLinkIsNotScheduledForDeletion("publicPetitionLinkId"),
-    ),
-    args: {
-      publicPetitionLinkId: nonNull(globalIdArg("PublicPetitionLink")),
-      data: nonNull("JSONObject"),
-      path: stringArg(),
-    },
-    validateArgs: validPath("path"),
-    resolve: async (_, args, ctx) => {
-      const publicLink = (await ctx.petitions.loadPublicPetitionLink(args.publicPetitionLinkId))!;
-      const template = (await ctx.petitions.loadPetition(publicLink.template_id))!;
-      const org = (await ctx.organizations.loadOrg(template.org_id))!;
-
-      const prefillData = await ctx.petitions.createPublicPetitionLinkPrefillData(
-        {
-          template_id: publicLink.template_id,
-          keycode: random(10),
-          data: args.data,
-          path: args.path ?? "/",
-        },
-        `User:${ctx.user!.id}`,
-      );
-
-      const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
-      const prefix = org.custom_host
-        ? `${protocol}://${org.custom_host}`
-        : ctx.config.misc.parallelUrl;
-
-      return `${prefix}/${template.recipient_locale}/pp/${publicLink.slug}?${new URLSearchParams({
-        pk: prefillData.keycode,
-      })}`;
-    },
-  },
-);
 
 export const linkPetitionFieldChildren = mutationField("linkPetitionFieldChildren", {
   type: "PetitionField",

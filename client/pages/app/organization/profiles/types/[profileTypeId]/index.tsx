@@ -588,7 +588,6 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
               key={`${profileType.id}-settings`}
               profileType={profileType}
               onSave={handleChangeProfileTypePattern}
-              hideKeyProcesses={!me.hasKeyProcessesFeature}
             />
           </GridItem>
           <GridItem order={{ base: 2, xl: 1 }}>
@@ -1052,7 +1051,6 @@ const _queries = [
       ...OrganizationSettingsLayout_Query
       me {
         id
-        hasKeyProcessesFeature: hasFeatureFlag(featureFlag: KEY_PROCESSES)
       }
     }
   `,

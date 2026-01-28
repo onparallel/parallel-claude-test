@@ -80,7 +80,6 @@ import {
   CreatePetitionReminder,
   CreatePetitionSignatureRequest,
   CreatePublicPetitionLink,
-  CreatePublicPetitionLinkPrefillData,
   CreateStandardListDefinition,
   OrgIntegration,
   Petition,
@@ -3188,9 +3187,9 @@ export class PetitionRepository extends BaseRepository {
             ...(sourcePetition.is_template && (data?.is_template === undefined || data?.is_template)
               ? ([] as const)
               : (["template_description"] as const)),
-            // avoid copying public_metadata and custom_properties if creating from a public template
+            // avoid copying public_metadata if creating from a public template
             ...(sourcePetition.is_template && sourcePetition.template_public
-              ? (["public_metadata", "custom_properties"] as const)
+              ? (["public_metadata"] as const)
               : ([] as const)),
           ]),
           org_id: owner.org_id,
@@ -3892,7 +3891,6 @@ export class PetitionRepository extends BaseRepository {
                   "title",
                   "description",
                   "is_active",
-                  "prefill_secret",
                   "allow_multiple_petitions",
                   "petition_name_pattern",
                 ]),
@@ -7258,29 +7256,6 @@ export class PetitionRepository extends BaseRepository {
       );
   }
 
-  async modifyPetitionCustomProperty(
-    petitionId: number,
-    key: string,
-    value: Maybe<string>,
-    updatedBy: string,
-  ) {
-    const [petition] = await this.raw<Petition>(
-      /* sql */ `
-      update petition p set custom_properties = 
-        (case 
-          when (?::text) is null then (p.custom_properties - ?) 
-          else jsonb_set(p.custom_properties, array_append('{}', ?::text), to_jsonb(?::text))
-        end),
-        updated_at = NOW(),
-        updated_by = ? 
-      where id = ?
-      returning *;
-    `,
-      [value, key, key, value, updatedBy, petitionId],
-    );
-    return petition;
-  }
-
   async getClosedPetitionsToAnonymize(orgId: number) {
     return await this.raw<Petition>(
       /* sql */ `
@@ -8366,24 +8341,6 @@ export class PetitionRepository extends BaseRepository {
 
     return result;
   }
-
-  async createPublicPetitionLinkPrefillData(
-    data: CreatePublicPetitionLinkPrefillData,
-    createdBy: string,
-  ) {
-    const [row] = await this.insert("public_petition_link_prefill_data", {
-      ...data,
-      created_by: createdBy,
-    }).select("*");
-
-    return row;
-  }
-
-  readonly loadPublicPetitionLinkPrefillDataByKeycode = this.buildLoadBy(
-    "public_petition_link_prefill_data",
-    "keycode",
-    (q) => q.whereNull("deleted_at"),
-  );
 
   async restoreDeletedPetition(petitionId: number) {
     const [petition] = await this.from("petition")

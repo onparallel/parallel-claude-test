@@ -15,7 +15,6 @@ import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { EMAILS, IEmailsService } from "../../services/EmailsService";
 import { toGlobalId } from "../../util/globalId";
-import { random } from "../../util/token";
 import { initServer, TestClient } from "./server";
 
 describe("GraphQL/PublicPetitionLink", () => {
@@ -172,46 +171,6 @@ describe("GraphQL/PublicPetitionLink", () => {
 
       expect(errors).toBeUndefined();
       expect(data?.publicPetitionLinkBySlug).toEqual({ isAvailable: false });
-    });
-
-    it("sends error when fetching a public link with prefill argument and secret is null", async () => {
-      const { errors, data } = await testClient.execute(
-        gql`
-          query ($slug: ID!, $prefill: String) {
-            publicPetitionLinkBySlug(slug: $slug, prefill: $prefill) {
-              isAvailable
-            }
-          }
-        `,
-        { slug: publicPetitionLink.slug, prefill: "<jwt>" },
-      );
-
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data?.publicPetitionLinkBySlug).toBeNull();
-    });
-
-    it("sends error when fetching a public link with prefill argument and secret is invalid", async () => {
-      await mocks.knex
-        .from("public_petition_link")
-        .where("id", publicPetitionLink.id)
-        .update({ prefill_secret: "invalid secret" });
-      const { errors, data } = await testClient.execute(
-        gql`
-          query ($slug: ID!, $prefill: String) {
-            publicPetitionLinkBySlug(slug: $slug, prefill: $prefill) {
-              isAvailable
-            }
-          }
-        `,
-        {
-          slug: publicPetitionLink.slug,
-          prefill:
-            "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmaXJzdE5hbWUiOiJBYmMiLCJsYXN0TmFtZSI6IkRlZiIsImVtYWlsIjoiYWJjQGRlZi5jb20iLCJyZXBsaWVzIjp7InRlc3QiOiJ0ZXN0In19.IqeO7MhKSIVvW15Gj2ZDlul-W_Q4fdBR-qF-OHcrQ7M",
-        },
-      );
-
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data?.publicPetitionLinkBySlug).toBeNull();
     });
 
     it("should return null if the petition is scheduled for deletion", async () => {
@@ -380,38 +339,6 @@ describe("GraphQL/PublicPetitionLink", () => {
         "PETITION_SEND",
         100,
       );
-    });
-
-    it("sends error when passing prefill argument but public link has no secret", async () => {
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation (
-            $slug: ID!
-            $contactFirstName: String!
-            $contactLastName: String!
-            $contactEmail: String!
-            $prefill: String
-          ) {
-            publicCreateAndSendPetitionFromPublicLink(
-              slug: $slug
-              contactFirstName: $contactFirstName
-              contactLastName: $contactLastName
-              contactEmail: $contactEmail
-              prefill: $prefill
-            )
-          }
-        `,
-        {
-          slug: publicPetitionLink.slug,
-          contactFirstName: "Roger",
-          contactLastName: "Waters",
-          contactEmail: "rogerwaters@rogerwaters.com",
-          prefill: "<jwt>",
-        },
-      );
-
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
     });
 
     it("creates a petition via a public link and sends it to the provided email", async () => {
@@ -831,122 +758,6 @@ describe("GraphQL/PublicPetitionLink", () => {
         { type: "WRITE", user_id: users[0].id, petition_id: lastPetition.id },
         { type: "READ", user_id: users[1].id, petition_id: lastPetition.id },
       ]);
-    });
-
-    it("sends error if prefillDataKey is unknown", async () => {
-      const [template] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
-        is_template: true,
-      }));
-      const publicLink = await mocks.createRandomPublicPetitionLink(template.id);
-
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation (
-            $slug: ID!
-            $contactFirstName: String!
-            $contactLastName: String!
-            $contactEmail: String!
-            $prefillDataKey: ID
-            $force: Boolean
-          ) {
-            publicCreateAndSendPetitionFromPublicLink(
-              prefillDataKey: $prefillDataKey
-              slug: $slug
-              contactFirstName: $contactFirstName
-              contactLastName: $contactLastName
-              contactEmail: $contactEmail
-              force: $force
-            )
-          }
-        `,
-        {
-          slug: publicLink.slug,
-          contactFirstName: "Roger",
-          contactLastName: "Waters",
-          contactEmail: "rogerwaters@rogerwaters.com",
-          prefillDataKey: "unknown",
-          force: true,
-        },
-      );
-
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
-    });
-
-    it("creates a petition with prefill info from database", async () => {
-      const [template] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
-        is_template: true,
-      }));
-
-      const [templateField] = await mocks.createRandomPetitionFields(template.id, 1, () => ({
-        type: "TEXT",
-        alias: "text",
-      }));
-
-      const keycode = random(10);
-      await mocks.knex.from("public_petition_link_prefill_data").insert({
-        keycode,
-        data: { text: "hello!" },
-        template_id: template.id,
-        path: "/A/",
-      });
-
-      const publicLink = await mocks.createRandomPublicPetitionLink(template.id);
-
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation (
-            $slug: ID!
-            $contactFirstName: String!
-            $contactLastName: String!
-            $contactEmail: String!
-            $prefillDataKey: ID
-            $force: Boolean
-          ) {
-            publicCreateAndSendPetitionFromPublicLink(
-              prefillDataKey: $prefillDataKey
-              slug: $slug
-              contactFirstName: $contactFirstName
-              contactLastName: $contactLastName
-              contactEmail: $contactEmail
-              force: $force
-            )
-          }
-        `,
-        {
-          slug: publicLink.slug,
-          contactFirstName: "Roger",
-          contactLastName: "Waters",
-          contactEmail: "rogerwaters@rogerwaters.com",
-          prefillDataKey: keycode,
-          force: true,
-        },
-      );
-
-      expect(errors).toBeUndefined();
-      expect(data!.publicCreateAndSendPetitionFromPublicLink).toEqual("SUCCESS");
-
-      const petitions = await mocks.knex
-        .from("petition")
-        .where("from_public_petition_link_id", publicLink.id)
-        .select("*");
-
-      expect(petitions).toHaveLength(1);
-
-      expect(petitions[0].path).toEqual("/A/");
-
-      const [petitionField] = await mocks.knex
-        .from("petition_field")
-        .where("from_petition_field_id", templateField.id)
-        .select("*");
-
-      const replies = await mocks.knex
-        .from("petition_field_reply")
-        .where({ petition_field_id: petitionField.id })
-        .select("*");
-
-      expect(replies).toHaveLength(1);
-      expect(replies[0].content).toEqual({ value: "hello!" });
     });
 
     it("fails if trying to create a second petition on a single-petition link", async () => {
@@ -1702,129 +1513,6 @@ describe("GraphQL/PublicPetitionLink", () => {
         {
           publicPetitionLinkId: toGlobalId("PublicPetitionLink", link.id),
           isActive: false,
-        },
-      );
-
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
-    });
-  });
-
-  describe("createPublicPetitionLinkPrefillData", () => {
-    let publicLink: PublicPetitionLink;
-
-    beforeAll(async () => {
-      await mocks.createFeatureFlags([
-        { name: "PUBLIC_PETITION_LINK_PREFILL_DATA", default_value: true },
-      ]);
-
-      const [template] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
-        is_template: true,
-        recipient_locale: "es",
-      }));
-      publicLink = await mocks.createRandomPublicPetitionLink(template.id);
-    });
-
-    afterEach(async () => {
-      await mocks.updateFeatureFlag("PUBLIC_PETITION_LINK_PREFILL_DATA", true);
-    });
-
-    it("sends error if user does not have feature flag", async () => {
-      await mocks.updateFeatureFlag("PUBLIC_PETITION_LINK_PREFILL_DATA", false);
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation ($publicPetitionLinkId: GID!, $data: JSONObject!) {
-            createPublicPetitionLinkPrefillData(
-              publicPetitionLinkId: $publicPetitionLinkId
-              data: $data
-            )
-          }
-        `,
-        {
-          publicPetitionLinkId: toGlobalId("PublicPetitionLink", publicLink.id),
-          data: {},
-        },
-      );
-
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
-    });
-
-    it("sends error if user has READ access to the template", async () => {
-      const [readTemplate] = await mocks.createRandomPetitions(
-        organization.id,
-        user.id,
-        1,
-        () => ({ is_template: true }),
-        () => ({ type: "READ" }),
-      );
-      const publicReadLink = await mocks.createRandomPublicPetitionLink(readTemplate.id);
-
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation ($publicPetitionLinkId: GID!, $data: JSONObject!) {
-            createPublicPetitionLinkPrefillData(
-              publicPetitionLinkId: $publicPetitionLinkId
-              data: $data
-            )
-          }
-        `,
-        {
-          publicPetitionLinkId: toGlobalId("PublicPetitionLink", publicReadLink.id),
-          data: {},
-        },
-      );
-
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
-    });
-
-    it("returns full URL of public petition link with pk in queryparam", async () => {
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation ($publicPetitionLinkId: GID!, $data: JSONObject!, $path: String) {
-            createPublicPetitionLinkPrefillData(
-              publicPetitionLinkId: $publicPetitionLinkId
-              data: $data
-              path: $path
-            )
-          }
-        `,
-        {
-          publicPetitionLinkId: toGlobalId("PublicPetitionLink", publicLink.id),
-          data: { abc: 1 },
-          path: "/A/",
-        },
-      );
-
-      expect(errors).toBeUndefined();
-
-      const [prefillData] = await mocks.knex
-        .from("public_petition_link_prefill_data")
-        .where("template_id", publicLink.template_id)
-        .select("*");
-
-      expect(data?.createPublicPetitionLinkPrefillData).toEqual(
-        `http://www.test-onparallel.com/es/pp/${publicLink.slug}?${new URLSearchParams({
-          pk: prefillData.keycode,
-        })}`,
-      );
-    });
-
-    it("sends error if the template is scheduled for deletion", async () => {
-      const link = await mocks.createRandomPublicPetitionLink(templates[2].id);
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation ($publicPetitionLinkId: GID!, $data: JSONObject!) {
-            createPublicPetitionLinkPrefillData(
-              publicPetitionLinkId: $publicPetitionLinkId
-              data: $data
-            )
-          }
-        `,
-        {
-          publicPetitionLinkId: toGlobalId("PublicPetitionLink", link.id),
-          data: { abc: 1 },
         },
       );
 

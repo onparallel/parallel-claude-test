@@ -961,7 +961,6 @@ export type FeatureFlag =
   | "CLIENT_PORTAL"
   | "CREATE_PROFILE_TYPE"
   | "CUSTOM_HOST_UI"
-  | "CUSTOM_PROPERTIES"
   | "DASHBOARDS"
   | "DOCUMENT_PROCESSING"
   | "DOCUSIGN_SANDBOX_PROVIDER"
@@ -970,7 +969,6 @@ export type FeatureFlag =
   | "EXPORT_CUATRECASAS"
   | "GHOST_LOGIN"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
-  | "KEY_PROCESSES"
   | "ON_BEHALF_OF"
   | "PERMISSION_MANAGEMENT"
   | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
@@ -979,8 +977,6 @@ export type FeatureFlag =
   | "PETITION_SUMMARY"
   | "PROFILES"
   | "PROFILE_SEARCH_FIELD"
-  | "PUBLIC_PETITION_LINK_PREFILL_DATA"
-  | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
   | "RECIPIENT_LANG_CA"
   | "RECIPIENT_LANG_IT"
   | "RECIPIENT_LANG_PT"
@@ -1434,8 +1430,6 @@ export type Mutation = {
   createProfilesRatioDashboardModule: Dashboard;
   /** Creates a public link from a user's template */
   createPublicPetitionLink: PublicPetitionLink;
-  /** Creates prefill information to be used on public petition links. Returns the URL to be used for creation and prefill of the petition. */
-  createPublicPetitionLinkPrefillData: Scalars["String"]["output"];
   /**
    * Removes permissions to users and groups on given petitions.
    * If the total amount of permission to add exceeds 200, a task will be created for async completion.
@@ -1537,8 +1531,6 @@ export type Mutation = {
   markSignatureIntegrationAsDefault: IOrgIntegration;
   /** Updates the limit of the current usage limit of a given organization */
   modifyCurrentUsagePeriod: Organization;
-  /** Adds, edits or deletes a custom property on the petition */
-  modifyPetitionCustomProperty: PetitionBase;
   /** Moves a group of petitions or folders to another folder. */
   movePetitions: Success;
   /** Generates a download link for a petition attachment */
@@ -2394,16 +2386,9 @@ export type MutationcreatePublicPetitionLinkArgs = {
   allowMultiplePetitions: Scalars["Boolean"]["input"];
   description: Scalars["String"]["input"];
   petitionNamePattern?: InputMaybe<Scalars["String"]["input"]>;
-  prefillSecret?: InputMaybe<Scalars["String"]["input"]>;
   slug?: InputMaybe<Scalars["String"]["input"]>;
   templateId: Scalars["GID"]["input"];
   title: Scalars["String"]["input"];
-};
-
-export type MutationcreatePublicPetitionLinkPrefillDataArgs = {
-  data: Scalars["JSONObject"]["input"];
-  path?: InputMaybe<Scalars["String"]["input"]>;
-  publicPetitionLinkId: Scalars["GID"]["input"];
 };
 
 export type MutationcreateRemovePetitionPermissionMaybeTaskArgs = {
@@ -2671,12 +2656,6 @@ export type MutationmodifyCurrentUsagePeriodArgs = {
   orgId: Scalars["GID"]["input"];
 };
 
-export type MutationmodifyPetitionCustomPropertyArgs = {
-  key: Scalars["String"]["input"];
-  petitionId: Scalars["GID"]["input"];
-  value?: InputMaybe<Scalars["String"]["input"]>;
-};
-
 export type MutationmovePetitionsArgs = {
   destination: Scalars["String"]["input"];
   folderIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
@@ -2777,8 +2756,6 @@ export type MutationpublicCreateAndSendPetitionFromPublicLinkArgs = {
   contactFirstName: Scalars["String"]["input"];
   contactLastName: Scalars["String"]["input"];
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
-  prefill?: InputMaybe<Scalars["String"]["input"]>;
-  prefillDataKey?: InputMaybe<Scalars["ID"]["input"]>;
   slug: Scalars["ID"]["input"];
 };
 
@@ -3500,7 +3477,6 @@ export type MutationupdatePublicPetitionLinkArgs = {
   description?: InputMaybe<Scalars["String"]["input"]>;
   isActive?: InputMaybe<Scalars["Boolean"]["input"]>;
   petitionNamePattern?: InputMaybe<Scalars["String"]["input"]>;
-  prefillSecret?: InputMaybe<Scalars["String"]["input"]>;
   publicPetitionLinkId: Scalars["GID"]["input"];
   slug?: InputMaybe<Scalars["String"]["input"]>;
   title?: InputMaybe<Scalars["String"]["input"]>;
@@ -3832,8 +3808,6 @@ export type Petition = PetitionBase & {
   /** The current signature request. */
   currentSignatureRequest: Maybe<PetitionSignatureRequest>;
   customLists: Array<PetitionCustomList>;
-  /** Custom user properties */
-  customProperties: Scalars["JSONObject"]["output"];
   /** The deadline of the petition. */
   deadline: Maybe<Scalars["DateTime"]["output"]>;
   defaultOnBehalf: Maybe<User>;
@@ -4172,8 +4146,6 @@ export type PetitionBase = {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
   customLists: Array<PetitionCustomList>;
-  /** Custom user properties */
-  customProperties: Scalars["JSONObject"]["output"];
   defaultOnBehalf: Maybe<User>;
   /** The effective permissions on the petition */
   effectivePermissions: Array<EffectivePetitionUserPermission>;
@@ -5146,8 +5118,6 @@ export type PetitionTemplate = PetitionBase & {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
   customLists: Array<PetitionCustomList>;
-  /** Custom user properties */
-  customProperties: Scalars["JSONObject"]["output"];
   defaultOnBehalf: Maybe<User>;
   defaultPath: Scalars["String"]["output"];
   defaultPermissions: Array<TemplateDefaultPermission>;
@@ -6337,7 +6307,6 @@ export type PublicPetitionLink = {
   isActive: Scalars["Boolean"]["output"];
   owner: User;
   petitionNamePattern: Maybe<Scalars["String"]["output"]>;
-  prefillSecret: Maybe<Scalars["String"]["output"]>;
   slug: Scalars["String"]["output"];
   template: PetitionTemplate;
   title: Scalars["String"]["output"];

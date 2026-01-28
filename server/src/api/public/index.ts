@@ -49,7 +49,6 @@ import {
   CloseProfile_closeProfileDocument,
   CompletePetition_completePetitionDocument,
   CreateContact_contactDocument,
-  CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
   CreatePetitionRecipients_petitionDocument,
   CreatePetitionRecipients_sendPetitionDocument,
   CreatePetitionRecipients_userByEmailDocument,
@@ -62,7 +61,6 @@ import {
   CreateProfile_profileFieldFileUploadCompleteDocument,
   CreateProfile_profileTypeDocument,
   DeactivatePetitionRecipient_deactivateAccessesDocument,
-  DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
   DeletePetition_deletePetitionsDocument,
   DeleteProfileRelationship_removeProfileRelationshipDocument,
   DeleteReply_deletePetitionReplyDocument,
@@ -114,7 +112,6 @@ import {
   PetitionTagFilter,
   ProfileQueryFilterInput,
   ProfileTypeFragmentDoc,
-  ReadPetitionCustomPropertiesDocument,
   RemindPetitionRecipient_sendRemindersDocument,
   RemoveUserGroupPermission_createRemovePetitionPermissionMaybeTaskDocument,
   RemoveUserPermission_createRemovePetitionPermissionMaybeTaskDocument,
@@ -219,7 +216,6 @@ import {
   Contact,
   CreateContact,
   CreateEventSubscription,
-  CreateOrUpdatePetitionCustomProperty,
   CreatePetition,
   CreatePetitionComment,
   CreateProfile,
@@ -249,7 +245,6 @@ import {
   PetitionAccess,
   PetitionBase,
   PetitionComment,
-  PetitionCustomProperties,
   PetitionField,
   PetitionFieldReply,
   Profile,
@@ -1367,120 +1362,6 @@ export function publicApi(container: Container) {
           petitionId: params.petitionId,
           tagId,
         });
-
-        return NoContent();
-      },
-    );
-
-  api
-    .path("/petitions/:petitionId/properties", {
-      params: { petitionId },
-    })
-    .get(
-      {
-        operationId: "ReadPetitionCustomProperties",
-        summary: "Get parallel custom properties",
-        description: "Returns a key-value object with the custom properties of the parallel",
-        responses: {
-          200: SuccessResponse(PetitionCustomProperties),
-        },
-        tags: ["Parallels"],
-      },
-      async ({ client, params }) => {
-        const _query = gql`
-          query ReadPetitionCustomProperties($petitionId: GID!) {
-            petition(id: $petitionId) {
-              id
-              customProperties
-            }
-          }
-        `;
-        const result = await client.request(ReadPetitionCustomPropertiesDocument, {
-          petitionId: params.petitionId,
-        });
-
-        return Ok(result.petition!.customProperties);
-      },
-    )
-    .post(
-      {
-        operationId: "CreateOrUpdatePetitionCustomProperty",
-        summary: "Create or update parallel custom property",
-        description: outdent`
-        Creates or updates a custom property on the parallel.
-
-        If the provided key already exists as a property, its value is overwritten.
-        If the provided key doesn't exist, it's added.
-
-        The parallel can have up to 20 different properties.
-      `,
-        body: JsonBody(CreateOrUpdatePetitionCustomProperty),
-        responses: {
-          200: SuccessResponse(PetitionCustomProperties),
-          409: ErrorResponse({
-            description: "You reached the maximum limit of custom properties on the parallel",
-          }),
-        },
-        tags: ["Parallels"],
-      },
-      async ({ client, body, params }) => {
-        try {
-          const _mutation = gql`
-            mutation CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomProperty(
-              $petitionId: GID!
-              $key: String!
-              $value: String
-            ) {
-              modifyPetitionCustomProperty(petitionId: $petitionId, key: $key, value: $value) {
-                customProperties
-              }
-            }
-          `;
-          const result = await client.request(
-            CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
-            { petitionId: params.petitionId, key: body.key, value: body.value },
-          );
-          return Ok(result.modifyPetitionCustomProperty.customProperties);
-        } catch (error) {
-          if (containsGraphQLError(error, "CUSTOM_PROPERTIES_LIMIT_ERROR")) {
-            throw new ConflictError(
-              "You reached the maximum limit of custom properties on the parallel.",
-            );
-          }
-          throw error;
-        }
-      },
-    );
-
-  api
-    .path("/petitions/:petitionId/properties/:key", {
-      params: { petitionId, key: stringParam({ required: true, maxLength: 100 }) },
-    })
-    .delete(
-      {
-        operationId: "DeletePetitionCustomProperty",
-        summary: "Deletes parallel custom property",
-        description: outdent`
-        Removes the provided key from the custom properties of the parallel.
-      `,
-        responses: { 204: SuccessResponse() },
-        tags: ["Parallels"],
-      },
-      async ({ client, params }) => {
-        const _mutation = gql`
-          mutation DeletePetitionCustomProperty_modifyPetitionCustomProperty(
-            $petitionId: GID!
-            $key: String!
-          ) {
-            modifyPetitionCustomProperty(petitionId: $petitionId, key: $key) {
-              id
-            }
-          }
-        `;
-        await client.request(
-          DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
-          params,
-        );
 
         return NoContent();
       },

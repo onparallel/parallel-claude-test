@@ -796,17 +796,7 @@ const _Petition = {
   title: "Petition",
   type: "object",
   additionalProperties: false,
-  required: [
-    "id",
-    "name",
-    "path",
-    "status",
-    "deadline",
-    "locale",
-    "createdAt",
-    "customProperties",
-    "isAnonymized",
-  ],
+  required: ["id", "name", "path", "status", "deadline", "locale", "createdAt", "isAnonymized"],
   properties: {
     id: {
       description: "The ID of the parallel",
@@ -850,11 +840,6 @@ const _Petition = {
       description: "ID of the template used to create the parallel",
       type: ["string", "null"],
       example: toGlobalId("Petition", 1),
-    },
-    customProperties: {
-      description: "The custom properties of the parallel",
-      type: "object",
-      example: { clientId: "1234" },
     },
     recipients: {
       description:
@@ -953,7 +938,7 @@ const _Template = {
   title: "Template",
   type: "object",
   additionalProperties: false,
-  required: ["id", "name", "path", "description", "locale", "createdAt", "customProperties"],
+  required: ["id", "name", "path", "description", "locale", "createdAt"],
   properties: {
     id: {
       description: "The ID of the template",
@@ -987,11 +972,6 @@ const _Template = {
       type: "string",
       format: "date-time",
       example: new Date(2020, 2, 15).toISOString(),
-    },
-    customProperties: {
-      description: "The custom properties of the template",
-      type: "object",
-      example: { clientId: "1234" },
     },
     fields: {
       description:
@@ -1811,33 +1791,6 @@ export const CreateEventSubscription = schema<
   oneOf: [_CreatePetitionEventSubscription, _CreateProfileEventSubscription],
 } as any);
 
-export const PetitionCustomProperties = schema({
-  type: "object",
-  additionalProperties: true,
-  example: { "Client Id": "1234" },
-} as const);
-
-export const CreateOrUpdatePetitionCustomProperty = schema({
-  title: "CreateOrUpdateCustomProperty",
-  type: "object",
-  required: ["key", "value"],
-  additionalProperties: false,
-  properties: {
-    key: {
-      description: "Key of the property",
-      example: "Client Id",
-      type: "string",
-      maxLength: 100,
-    },
-    value: {
-      description: "The value of the property",
-      type: "string",
-      example: "12345",
-      maxLength: 1000,
-    },
-  },
-} as const);
-
 export const SignatureRequestInput = schema({
   title: "SignatureRequestInput",
   type: "object",
@@ -1947,9 +1900,6 @@ export const SubmitPetitionRepliesResponse = schema({
     locale: "en",
     createdAt: new Date(2020, 1, 1).toISOString(),
     fromTemplateId: null,
-    customProperties: {
-      clientId: "1234",
-    },
     recipients: [
       {
         id: toGlobalId("PetitionAccess", 42),

@@ -303,20 +303,6 @@ export function useFeatureFlags() {
             }),
             articleId: 8837461,
           },
-
-          {
-            name: "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI",
-            title: intl.formatMessage({
-              id: "component.feature-flag-descriptions.prefill-secret-public-links-name",
-              defaultMessage: "Pre-fill public links with JWT query",
-            }),
-            description: intl.formatMessage({
-              id: "component.feature-flag-descriptions.prefill-secret-public-links-description",
-              defaultMessage:
-                "Allows you to pre-fill public links with a JWT payload in the query.",
-            }),
-            articleId: 6261913,
-          },
         ],
       },
       {
@@ -345,18 +331,6 @@ export function useFeatureFlags() {
             description: intl.formatMessage({
               id: "component.feature-flag-descriptions.petition-approval-flow-description",
               defaultMessage: "Allows setting up approval steps for petitions",
-            }),
-          },
-          {
-            name: "PUBLIC_PETITION_LINK_PREFILL_DATA",
-            title: intl.formatMessage({
-              id: "component.feature-flag-descriptions.prefill-data-public-links-name",
-              defaultMessage: "Pre-fill data in public links",
-            }),
-            description: intl.formatMessage({
-              id: "component.feature-flag-descriptions.prefill-data-public-links-description",
-              defaultMessage:
-                "Allows you to pre-fill public links with data from the preview page.",
             }),
           },
           {
@@ -390,18 +364,6 @@ export function useFeatureFlags() {
             description: intl.formatMessage({
               id: "component.feature-flag-descriptions.create-profile-type-description",
               defaultMessage: "Grants access to create profile types",
-            }),
-          },
-          {
-            name: "CUSTOM_PROPERTIES",
-            title: intl.formatMessage({
-              id: "component.feature-flag-descriptions.custom-properties-name",
-              defaultMessage: "Petition custom properties",
-            }),
-            description: intl.formatMessage({
-              id: "component.feature-flag-descriptions.custom-properties-description",
-              defaultMessage:
-                "Grants access to the API endpoint for modifying petition custom properties",
             }),
           },
           {

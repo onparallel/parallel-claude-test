@@ -1046,7 +1046,6 @@ export type FeatureFlag =
   | "CLIENT_PORTAL"
   | "CREATE_PROFILE_TYPE"
   | "CUSTOM_HOST_UI"
-  | "CUSTOM_PROPERTIES"
   | "DASHBOARDS"
   | "DOCUMENT_PROCESSING"
   | "DOCUSIGN_SANDBOX_PROVIDER"
@@ -1055,7 +1054,6 @@ export type FeatureFlag =
   | "EXPORT_CUATRECASAS"
   | "GHOST_LOGIN"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
-  | "KEY_PROCESSES"
   | "ON_BEHALF_OF"
   | "PERMISSION_MANAGEMENT"
   | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
@@ -1064,8 +1062,6 @@ export type FeatureFlag =
   | "PETITION_SUMMARY"
   | "PROFILES"
   | "PROFILE_SEARCH_FIELD"
-  | "PUBLIC_PETITION_LINK_PREFILL_DATA"
-  | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
   | "RECIPIENT_LANG_CA"
   | "RECIPIENT_LANG_IT"
   | "RECIPIENT_LANG_PT"
@@ -1538,8 +1534,6 @@ export interface Mutation {
   createProfilesRatioDashboardModule: Dashboard;
   /** Creates a public link from a user's template */
   createPublicPetitionLink: PublicPetitionLink;
-  /** Creates prefill information to be used on public petition links. Returns the URL to be used for creation and prefill of the petition. */
-  createPublicPetitionLinkPrefillData: Scalars["String"]["output"];
   /**
    * Removes permissions to users and groups on given petitions.
    * If the total amount of permission to add exceeds 200, a task will be created for async completion.
@@ -1641,8 +1635,6 @@ export interface Mutation {
   markSignatureIntegrationAsDefault: IOrgIntegration;
   /** Updates the limit of the current usage limit of a given organization */
   modifyCurrentUsagePeriod: Organization;
-  /** Adds, edits or deletes a custom property on the petition */
-  modifyPetitionCustomProperty: PetitionBase;
   /** Moves a group of petitions or folders to another folder. */
   movePetitions: Success;
   /** Generates a download link for a petition attachment */
@@ -2498,16 +2490,9 @@ export interface MutationcreatePublicPetitionLinkArgs {
   allowMultiplePetitions: Scalars["Boolean"]["input"];
   description: Scalars["String"]["input"];
   petitionNamePattern?: InputMaybe<Scalars["String"]["input"]>;
-  prefillSecret?: InputMaybe<Scalars["String"]["input"]>;
   slug?: InputMaybe<Scalars["String"]["input"]>;
   templateId: Scalars["GID"]["input"];
   title: Scalars["String"]["input"];
-}
-
-export interface MutationcreatePublicPetitionLinkPrefillDataArgs {
-  data: Scalars["JSONObject"]["input"];
-  path?: InputMaybe<Scalars["String"]["input"]>;
-  publicPetitionLinkId: Scalars["GID"]["input"];
 }
 
 export interface MutationcreateRemovePetitionPermissionMaybeTaskArgs {
@@ -2775,12 +2760,6 @@ export interface MutationmodifyCurrentUsagePeriodArgs {
   orgId: Scalars["GID"]["input"];
 }
 
-export interface MutationmodifyPetitionCustomPropertyArgs {
-  key: Scalars["String"]["input"];
-  petitionId: Scalars["GID"]["input"];
-  value?: InputMaybe<Scalars["String"]["input"]>;
-}
-
 export interface MutationmovePetitionsArgs {
   destination: Scalars["String"]["input"];
   folderIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
@@ -2881,8 +2860,6 @@ export interface MutationpublicCreateAndSendPetitionFromPublicLinkArgs {
   contactFirstName: Scalars["String"]["input"];
   contactLastName: Scalars["String"]["input"];
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
-  prefill?: InputMaybe<Scalars["String"]["input"]>;
-  prefillDataKey?: InputMaybe<Scalars["ID"]["input"]>;
   slug: Scalars["ID"]["input"];
 }
 
@@ -3604,7 +3581,6 @@ export interface MutationupdatePublicPetitionLinkArgs {
   description?: InputMaybe<Scalars["String"]["input"]>;
   isActive?: InputMaybe<Scalars["Boolean"]["input"]>;
   petitionNamePattern?: InputMaybe<Scalars["String"]["input"]>;
-  prefillSecret?: InputMaybe<Scalars["String"]["input"]>;
   publicPetitionLinkId: Scalars["GID"]["input"];
   slug?: InputMaybe<Scalars["String"]["input"]>;
   title?: InputMaybe<Scalars["String"]["input"]>;
@@ -3946,8 +3922,6 @@ export interface Petition extends PetitionBase {
   /** The current signature request. */
   currentSignatureRequest?: Maybe<PetitionSignatureRequest>;
   customLists: Array<PetitionCustomList>;
-  /** Custom user properties */
-  customProperties: Scalars["JSONObject"]["output"];
   /** The deadline of the petition. */
   deadline?: Maybe<Scalars["DateTime"]["output"]>;
   defaultOnBehalf?: Maybe<User>;
@@ -4303,8 +4277,6 @@ export interface PetitionBase {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
   customLists: Array<PetitionCustomList>;
-  /** Custom user properties */
-  customProperties: Scalars["JSONObject"]["output"];
   defaultOnBehalf?: Maybe<User>;
   /** The effective permissions on the petition */
   effectivePermissions: Array<EffectivePetitionUserPermission>;
@@ -5332,8 +5304,6 @@ export interface PetitionTemplate extends PetitionBase {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
   customLists: Array<PetitionCustomList>;
-  /** Custom user properties */
-  customProperties: Scalars["JSONObject"]["output"];
   defaultOnBehalf?: Maybe<User>;
   defaultPath: Scalars["String"]["output"];
   defaultPermissions: Array<TemplateDefaultPermission>;
@@ -6593,7 +6563,6 @@ export interface PublicPetitionLink {
   isActive: Scalars["Boolean"]["output"];
   owner: User;
   petitionNamePattern?: Maybe<Scalars["String"]["output"]>;
-  prefillSecret?: Maybe<Scalars["String"]["output"]>;
   slug: Scalars["String"]["output"];
   template: PetitionTemplate;
   title: Scalars["String"]["output"];
@@ -23183,11 +23152,6 @@ export type PublicLinkSettingsDialog_isValidSlugQueryVariables = Exact<{
 
 export type PublicLinkSettingsDialog_isValidSlugQuery = { isValidPublicPetitionLinkSlug: boolean };
 
-export type PublicLinkSettingsDialog_UserFragment = {
-  __typename?: "User";
-  hasPrefillSecret: boolean;
-};
-
 export type PublicLinkSettingsDialog_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
   name?: string | null;
@@ -23203,7 +23167,6 @@ export type PublicLinkSettingsDialog_PublicPetitionLinkFragment = {
   description: string;
   slug: string;
   url: string;
-  prefillSecret?: string | null;
   allowMultiplePetitions: boolean;
   petitionNamePattern?: string | null;
 };
@@ -26693,7 +26656,6 @@ export type PetitionComposeRightPaneTabs_UserFragment = {
   hasRecipientLangIT: boolean;
   hasRecipientLangPT: boolean;
   hasPetitionSignature: boolean;
-  hasPrefillSecret: boolean;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -26875,7 +26837,6 @@ export type PetitionComposeRightPaneTabs_PetitionBase_PetitionTemplate_Fragment 
     title: string;
     description: string;
     slug: string;
-    prefillSecret?: string | null;
     allowMultiplePetitions: boolean;
     petitionNamePattern?: string | null;
   } | null;
@@ -27174,7 +27135,6 @@ export type PetitionSettings_UserFragment = {
   hasRecipientLangIT: boolean;
   hasRecipientLangPT: boolean;
   hasPetitionSignature: boolean;
-  hasPrefillSecret: boolean;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -27334,7 +27294,6 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
     title: string;
     description: string;
     slug: string;
-    prefillSecret?: string | null;
     allowMultiplePetitions: boolean;
     petitionNamePattern?: string | null;
   } | null;
@@ -27455,7 +27414,6 @@ export type PetitionSettings_createPublicPetitionLinkMutation = {
     description: string;
     slug: string;
     url: string;
-    prefillSecret?: string | null;
     allowMultiplePetitions: boolean;
     petitionNamePattern?: string | null;
     template: {
@@ -27473,7 +27431,6 @@ export type PetitionSettings_updatePublicPetitionLinkMutationVariables = Exact<{
   title?: InputMaybe<Scalars["String"]["input"]>;
   description?: InputMaybe<Scalars["String"]["input"]>;
   slug?: InputMaybe<Scalars["String"]["input"]>;
-  prefillSecret?: InputMaybe<Scalars["String"]["input"]>;
   allowMultiplePetitions?: InputMaybe<Scalars["Boolean"]["input"]>;
   petitionNamePattern?: InputMaybe<Scalars["String"]["input"]>;
 }>;
@@ -27487,7 +27444,6 @@ export type PetitionSettings_updatePublicPetitionLinkMutation = {
     description: string;
     slug: string;
     url: string;
-    prefillSecret?: string | null;
     allowMultiplePetitions: boolean;
     petitionNamePattern?: string | null;
     template: {
@@ -33728,35 +33684,6 @@ export type PreviewPetitionFieldMutations_profilesQuery = {
       }>;
     }>;
   };
-};
-
-export type GeneratePrefilledPublicLinkDialog_createPublicPetitionLinkPrefillDataMutationVariables =
-  Exact<{
-    data: Scalars["JSONObject"]["input"];
-    path?: InputMaybe<Scalars["String"]["input"]>;
-    publicPetitionLinkId: Scalars["GID"]["input"];
-  }>;
-
-export type GeneratePrefilledPublicLinkDialog_createPublicPetitionLinkPrefillDataMutation = {
-  createPublicPetitionLinkPrefillData: string;
-};
-
-export type GeneratePrefilledPublicLinkDialog_PetitionTemplateFragment = {
-  __typename?: "PetitionTemplate";
-  id: string;
-  defaultPath: string;
-  publicLink?: { __typename?: "PublicPetitionLink"; id: string } | null;
-  fields: Array<{
-    __typename?: "PetitionField";
-    id: string;
-    type: PetitionFieldType;
-    multiple: boolean;
-    alias?: string | null;
-    isReadOnly: boolean;
-    title?: string | null;
-    previewReplies: Array<{ __typename?: "PetitionFieldReply"; content: { [key: string]: any } }>;
-    children?: Array<{ __typename?: "PetitionField"; id: string }> | null;
-  }>;
 };
 
 export type usePreviewConfirmImportFromProfileDialog_profilesQueryVariables = Exact<{
@@ -53108,12 +53035,11 @@ export type OrganizationProfileType_userQuery = {
     lastActiveAt?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasKeyProcessesFeature: boolean;
     hasBackgroundCheck: boolean;
     hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
-    hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
+    hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
@@ -56899,7 +56825,6 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     title: string;
     description: string;
     slug: string;
-    prefillSecret?: string | null;
     allowMultiplePetitions: boolean;
     petitionNamePattern?: string | null;
   } | null;
@@ -57281,7 +57206,6 @@ export type PetitionCompose_QueryFragment = {
     hasRecipientLangIT: boolean;
     hasRecipientLangPT: boolean;
     hasPetitionSignature: boolean;
-    hasPrefillSecret: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -57674,7 +57598,6 @@ export type PetitionCompose_updatePetitionMutation = {
           title: string;
           description: string;
           slug: string;
-          prefillSecret?: string | null;
           allowMultiplePetitions: boolean;
           petitionNamePattern?: string | null;
         } | null;
@@ -59483,7 +59406,6 @@ export type PetitionCompose_userQuery = {
     hasRecipientLangIT: boolean;
     hasRecipientLangPT: boolean;
     hasPetitionSignature: boolean;
-    hasPrefillSecret: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -60174,7 +60096,6 @@ export type PetitionCompose_petitionQuery = {
           title: string;
           description: string;
           slug: string;
-          prefillSecret?: string | null;
           allowMultiplePetitions: boolean;
           petitionNamePattern?: string | null;
         } | null;
@@ -61765,7 +61686,6 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
   isDocumentGenerationEnabled: boolean;
   isAnonymized: boolean;
   permanentDeletionAt?: string | null;
-  defaultPath: string;
   name?: string | null;
   path: string;
   locale: PetitionLocale;
@@ -61789,51 +61709,20 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
     __typename?: "PetitionField";
     id: string;
     type: PetitionFieldType;
-    multiple: boolean;
-    alias?: string | null;
-    isReadOnly: boolean;
     visibility?: { [key: string]: any } | null;
     options: { [key: string]: any };
     isInternal: boolean;
     optional: boolean;
+    isReadOnly: boolean;
     title?: string | null;
     unreadCommentCount: number;
     hasCommentsEnabled: boolean;
+    multiple: boolean;
+    alias?: string | null;
     commentCount: number;
     isChild: boolean;
     math?: Array<{ [key: string]: any }> | null;
     description?: string | null;
-    previewReplies: Array<{
-      __typename?: "PetitionFieldReply";
-      content: { [key: string]: any };
-      id: string;
-      status: PetitionFieldReplyStatus;
-      isAnonymized: boolean;
-      createdAt: string;
-      updatedAt: string;
-      children?: Array<{
-        __typename?: "PetitionFieldGroupChildReply";
-        field: {
-          __typename?: "PetitionField";
-          type: PetitionFieldType;
-          options: { [key: string]: any };
-          optional: boolean;
-          id: string;
-          parent?: { __typename?: "PetitionField"; id: string } | null;
-        };
-        replies: Array<{
-          __typename?: "PetitionFieldReply";
-          id: string;
-          status: PetitionFieldReplyStatus;
-          content: { [key: string]: any };
-          createdAt: string;
-          updatedAt: string;
-          isAnonymized: boolean;
-          parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-        }>;
-      }> | null;
-      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-    }>;
     replies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
@@ -61894,6 +61783,37 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
               }>;
             }> | null;
           }>;
+        };
+        replies: Array<{
+          __typename?: "PetitionFieldReply";
+          id: string;
+          status: PetitionFieldReplyStatus;
+          content: { [key: string]: any };
+          createdAt: string;
+          updatedAt: string;
+          isAnonymized: boolean;
+          parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+        }>;
+      }> | null;
+      parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+    }>;
+    previewReplies: Array<{
+      __typename?: "PetitionFieldReply";
+      content: { [key: string]: any };
+      id: string;
+      status: PetitionFieldReplyStatus;
+      isAnonymized: boolean;
+      createdAt: string;
+      updatedAt: string;
+      children?: Array<{
+        __typename?: "PetitionFieldGroupChildReply";
+        field: {
+          __typename?: "PetitionField";
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+          optional: boolean;
+          id: string;
+          parent?: { __typename?: "PetitionField"; id: string } | null;
         };
         replies: Array<{
           __typename?: "PetitionFieldReply";
@@ -62711,7 +62631,6 @@ export type PetitionPreview_updatePetitionMutation = {
         isDocumentGenerationEnabled: boolean;
         isAnonymized: boolean;
         permanentDeletionAt?: string | null;
-        defaultPath: string;
         name?: string | null;
         path: string;
         locale: PetitionLocale;
@@ -62739,51 +62658,20 @@ export type PetitionPreview_updatePetitionMutation = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
-          multiple: boolean;
-          alias?: string | null;
-          isReadOnly: boolean;
           visibility?: { [key: string]: any } | null;
           options: { [key: string]: any };
           isInternal: boolean;
           optional: boolean;
+          isReadOnly: boolean;
           title?: string | null;
           unreadCommentCount: number;
           hasCommentsEnabled: boolean;
+          multiple: boolean;
+          alias?: string | null;
           commentCount: number;
           isChild: boolean;
           math?: Array<{ [key: string]: any }> | null;
           description?: string | null;
-          previewReplies: Array<{
-            __typename?: "PetitionFieldReply";
-            content: { [key: string]: any };
-            id: string;
-            status: PetitionFieldReplyStatus;
-            isAnonymized: boolean;
-            createdAt: string;
-            updatedAt: string;
-            children?: Array<{
-              __typename?: "PetitionFieldGroupChildReply";
-              field: {
-                __typename?: "PetitionField";
-                type: PetitionFieldType;
-                options: { [key: string]: any };
-                optional: boolean;
-                id: string;
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-              };
-              replies: Array<{
-                __typename?: "PetitionFieldReply";
-                id: string;
-                status: PetitionFieldReplyStatus;
-                content: { [key: string]: any };
-                createdAt: string;
-                updatedAt: string;
-                isAnonymized: boolean;
-                parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-              }>;
-            }> | null;
-            parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-          }>;
           replies: Array<{
             __typename?: "PetitionFieldReply";
             id: string;
@@ -62844,6 +62732,37 @@ export type PetitionPreview_updatePetitionMutation = {
                     }>;
                   }> | null;
                 }>;
+              };
+              replies: Array<{
+                __typename?: "PetitionFieldReply";
+                id: string;
+                status: PetitionFieldReplyStatus;
+                content: { [key: string]: any };
+                createdAt: string;
+                updatedAt: string;
+                isAnonymized: boolean;
+                parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+              }>;
+            }> | null;
+            parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+          }>;
+          previewReplies: Array<{
+            __typename?: "PetitionFieldReply";
+            content: { [key: string]: any };
+            id: string;
+            status: PetitionFieldReplyStatus;
+            isAnonymized: boolean;
+            createdAt: string;
+            updatedAt: string;
+            children?: Array<{
+              __typename?: "PetitionFieldGroupChildReply";
+              field: {
+                __typename?: "PetitionField";
+                type: PetitionFieldType;
+                options: { [key: string]: any };
+                optional: boolean;
+                id: string;
+                parent?: { __typename?: "PetitionField"; id: string } | null;
               };
               replies: Array<{
                 __typename?: "PetitionFieldReply";
@@ -64060,7 +63979,6 @@ export type PetitionPreview_petitionQuery = {
         isDocumentGenerationEnabled: boolean;
         isAnonymized: boolean;
         permanentDeletionAt?: string | null;
-        defaultPath: string;
         name?: string | null;
         path: string;
         locale: PetitionLocale;
@@ -64088,51 +64006,20 @@ export type PetitionPreview_petitionQuery = {
           __typename?: "PetitionField";
           id: string;
           type: PetitionFieldType;
-          multiple: boolean;
-          alias?: string | null;
-          isReadOnly: boolean;
           visibility?: { [key: string]: any } | null;
           options: { [key: string]: any };
           isInternal: boolean;
           optional: boolean;
+          isReadOnly: boolean;
           title?: string | null;
           unreadCommentCount: number;
           hasCommentsEnabled: boolean;
+          multiple: boolean;
+          alias?: string | null;
           commentCount: number;
           isChild: boolean;
           math?: Array<{ [key: string]: any }> | null;
           description?: string | null;
-          previewReplies: Array<{
-            __typename?: "PetitionFieldReply";
-            content: { [key: string]: any };
-            id: string;
-            status: PetitionFieldReplyStatus;
-            isAnonymized: boolean;
-            createdAt: string;
-            updatedAt: string;
-            children?: Array<{
-              __typename?: "PetitionFieldGroupChildReply";
-              field: {
-                __typename?: "PetitionField";
-                type: PetitionFieldType;
-                options: { [key: string]: any };
-                optional: boolean;
-                id: string;
-                parent?: { __typename?: "PetitionField"; id: string } | null;
-              };
-              replies: Array<{
-                __typename?: "PetitionFieldReply";
-                id: string;
-                status: PetitionFieldReplyStatus;
-                content: { [key: string]: any };
-                createdAt: string;
-                updatedAt: string;
-                isAnonymized: boolean;
-                parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-              }>;
-            }> | null;
-            parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
-          }>;
           replies: Array<{
             __typename?: "PetitionFieldReply";
             id: string;
@@ -64193,6 +64080,37 @@ export type PetitionPreview_petitionQuery = {
                     }>;
                   }> | null;
                 }>;
+              };
+              replies: Array<{
+                __typename?: "PetitionFieldReply";
+                id: string;
+                status: PetitionFieldReplyStatus;
+                content: { [key: string]: any };
+                createdAt: string;
+                updatedAt: string;
+                isAnonymized: boolean;
+                parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+              }>;
+            }> | null;
+            parent?: { __typename?: "PetitionFieldReply"; id: string } | null;
+          }>;
+          previewReplies: Array<{
+            __typename?: "PetitionFieldReply";
+            content: { [key: string]: any };
+            id: string;
+            status: PetitionFieldReplyStatus;
+            isAnonymized: boolean;
+            createdAt: string;
+            updatedAt: string;
+            children?: Array<{
+              __typename?: "PetitionFieldGroupChildReply";
+              field: {
+                __typename?: "PetitionField";
+                type: PetitionFieldType;
+                options: { [key: string]: any };
+                optional: boolean;
+                id: string;
+                parent?: { __typename?: "PetitionField"; id: string } | null;
               };
               replies: Array<{
                 __typename?: "PetitionFieldReply";
@@ -64450,7 +64368,6 @@ export type PetitionPreview_userQuery = {
     lastActiveAt?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasPublicLinkPrefill: boolean;
     hasBackgroundCheck: boolean;
     hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
@@ -67468,12 +67385,11 @@ export type ProfileDetail_userQuery = {
     lastActiveAt?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasKeyProcessesFeature: boolean;
     hasBackgroundCheck: boolean;
     hasAdverseMediaSearch: boolean;
     hasRemovePreviewFiles: boolean;
-    hasProfilesAccess: boolean;
     hasDashboardsAccess: boolean;
+    hasProfilesAccess: boolean;
     hasShowContactsButton: boolean;
     organization: {
       __typename?: "Organization";
@@ -70607,8 +70523,6 @@ export type PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutation
   contactLastName: Scalars["String"]["input"];
   contactEmail: Scalars["String"]["input"];
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
-  prefill?: InputMaybe<Scalars["String"]["input"]>;
-  prefillDataKey?: InputMaybe<Scalars["ID"]["input"]>;
 }>;
 
 export type PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutation = {
@@ -85106,7 +85020,6 @@ export const PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc = gql`
     description
     slug
     url
-    prefillSecret
     allowMultiplePetitions
     petitionNamePattern
   }
@@ -85359,11 +85272,6 @@ export const PetitionComposeNewFieldDrawer_UserFragmentDoc = gql`
   }
   ${PetitionComposeNewFieldDrawerPetitionFields_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionComposeNewFieldDrawer_UserFragment, unknown>;
-export const PublicLinkSettingsDialog_UserFragmentDoc = gql`
-  fragment PublicLinkSettingsDialog_User on User {
-    hasPrefillSecret: hasFeatureFlag(featureFlag: PUBLIC_PETITION_LINK_PREFILL_SECRET_UI)
-  }
-` as unknown as DocumentNode<PublicLinkSettingsDialog_UserFragment, unknown>;
 export const PetitionSettings_UserFragmentDoc = gql`
   fragment PetitionSettings_User on User {
     id
@@ -85374,7 +85282,6 @@ export const PetitionSettings_UserFragmentDoc = gql`
     hasAutoAnonymize: hasFeatureFlag(featureFlag: AUTO_ANONYMIZE)
     ...useAvailablePetitionLocales_User
     ...TestModeSignatureBadge_User
-    ...PublicLinkSettingsDialog_User
     organization {
       id
       signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
@@ -85393,7 +85300,6 @@ export const PetitionSettings_UserFragmentDoc = gql`
   }
   ${useAvailablePetitionLocales_UserFragmentDoc}
   ${TestModeSignatureBadge_UserFragmentDoc}
-  ${PublicLinkSettingsDialog_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionSettings_UserFragment, unknown>;
 export const PetitionComposeRightPaneTabs_UserFragmentDoc = gql`
   fragment PetitionComposeRightPaneTabs_User on User {
@@ -85715,29 +85621,6 @@ export const RecipientViewProgressBar_PetitionFragmentDoc = gql`
   ${RecipientViewProgressBar_PetitionFieldFragmentDoc}
   ${useFieldLogic_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<RecipientViewProgressBar_PetitionFragment, unknown>;
-export const GeneratePrefilledPublicLinkDialog_PetitionTemplateFragmentDoc = gql`
-  fragment GeneratePrefilledPublicLinkDialog_PetitionTemplate on PetitionTemplate {
-    id
-    defaultPath
-    publicLink {
-      id
-    }
-    fields {
-      id
-      type
-      multiple
-      alias
-      isReadOnly
-      previewReplies @client {
-        content
-      }
-      ...PetitionFieldReference_PetitionField
-    }
-    ...useFieldsWithIndices_PetitionBase
-  }
-  ${PetitionFieldReference_PetitionFieldFragmentDoc}
-  ${useFieldsWithIndices_PetitionBaseFragmentDoc}
-` as unknown as DocumentNode<GeneratePrefilledPublicLinkDialog_PetitionTemplateFragment, unknown>;
 export const RecipientViewPetitionFieldCard_PetitionFieldFragmentDoc = gql`
   fragment RecipientViewPetitionFieldCard_PetitionField on PetitionField {
     id
@@ -86250,7 +86133,6 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
       ...useStartSignatureRequest_Petition
     }
     ... on PetitionTemplate {
-      ...GeneratePrefilledPublicLinkDialog_PetitionTemplate
       publicLink {
         id
         isActive
@@ -86289,7 +86171,6 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
   ${useSendPetitionHandler_PetitionFragmentDoc}
   ${getPetitionSignatureStatus_PetitionFragmentDoc}
   ${useStartSignatureRequest_PetitionFragmentDoc}
-  ${GeneratePrefilledPublicLinkDialog_PetitionTemplateFragmentDoc}
   ${PetitionPreview_PetitionFieldFragmentDoc}
   ${ConfirmPetitionSignersDialog_SignatureConfigFragmentDoc}
   ${LiquidPetitionVariableProvider_PetitionVariableFragmentDoc}
@@ -90918,7 +90799,6 @@ export const PetitionSettings_updatePublicPetitionLinkDocument = gql`
     $title: String
     $description: String
     $slug: String
-    $prefillSecret: String
     $allowMultiplePetitions: Boolean
     $petitionNamePattern: String
   ) {
@@ -90928,7 +90808,6 @@ export const PetitionSettings_updatePublicPetitionLinkDocument = gql`
       title: $title
       description: $description
       slug: $slug
-      prefillSecret: $prefillSecret
       allowMultiplePetitions: $allowMultiplePetitions
       petitionNamePattern: $petitionNamePattern
     ) {
@@ -91553,22 +91432,6 @@ export const PreviewPetitionFieldMutations_profilesDocument = gql`
 ` as unknown as DocumentNode<
   PreviewPetitionFieldMutations_profilesQuery,
   PreviewPetitionFieldMutations_profilesQueryVariables
->;
-export const GeneratePrefilledPublicLinkDialog_createPublicPetitionLinkPrefillDataDocument = gql`
-  mutation GeneratePrefilledPublicLinkDialog_createPublicPetitionLinkPrefillData(
-    $data: JSONObject!
-    $path: String
-    $publicPetitionLinkId: GID!
-  ) {
-    createPublicPetitionLinkPrefillData(
-      data: $data
-      publicPetitionLinkId: $publicPetitionLinkId
-      path: $path
-    )
-  }
-` as unknown as DocumentNode<
-  GeneratePrefilledPublicLinkDialog_createPublicPetitionLinkPrefillDataMutation,
-  GeneratePrefilledPublicLinkDialog_createPublicPetitionLinkPrefillDataMutationVariables
 >;
 export const usePreviewConfirmImportFromProfileDialog_profilesDocument = gql`
   query usePreviewConfirmImportFromProfileDialog_profiles(
@@ -94371,7 +94234,6 @@ export const OrganizationProfileType_userDocument = gql`
     ...OrganizationSettingsLayout_Query
     me {
       id
-      hasKeyProcessesFeature: hasFeatureFlag(featureFlag: KEY_PROCESSES)
     }
   }
   ${OrganizationSettingsLayout_QueryFragmentDoc}
@@ -95382,10 +95244,6 @@ export const PetitionPreview_petitionDocument = gql`
 export const PetitionPreview_userDocument = gql`
   query PetitionPreview_user {
     ...PetitionPreview_Query
-    me {
-      id
-      hasPublicLinkPrefill: hasFeatureFlag(featureFlag: PUBLIC_PETITION_LINK_PREFILL_DATA)
-    }
   }
   ${PetitionPreview_QueryFragmentDoc}
 ` as unknown as DocumentNode<PetitionPreview_userQuery, PetitionPreview_userQueryVariables>;
@@ -95684,10 +95542,6 @@ export const ProfileSearch_createPetitionFieldRepliesDocument = gql`
 export const ProfileDetail_userDocument = gql`
   query ProfileDetail_user {
     ...ProfileLayout_Query
-    me {
-      id
-      hasKeyProcessesFeature: hasFeatureFlag(featureFlag: KEY_PROCESSES)
-    }
   }
   ${ProfileLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<ProfileDetail_userQuery, ProfileDetail_userQueryVariables>;
@@ -96230,8 +96084,6 @@ export const PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkDocumen
     $contactLastName: String!
     $contactEmail: String!
     $force: Boolean
-    $prefill: String
-    $prefillDataKey: ID
   ) {
     publicCreateAndSendPetitionFromPublicLink(
       slug: $slug
@@ -96239,8 +96091,6 @@ export const PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkDocumen
       contactLastName: $contactLastName
       contactEmail: $contactEmail
       force: $force
-      prefill: $prefill
-      prefillDataKey: $prefillDataKey
     )
   }
 ` as unknown as DocumentNode<

@@ -335,11 +335,6 @@ export const PetitionBase = interfaceType({
         return theme.preferredTone;
       },
     });
-    t.nonNull.field("customProperties", {
-      type: "JSONObject",
-      description: "Custom user properties",
-      resolve: (o) => o.custom_properties,
-    });
     t.nonNull.field("attachmentsList", {
       description: "The attachments linked to this petition",
       type: objectType({
@@ -1667,9 +1662,6 @@ export const PublicPetitionLink = objectType({
     t.nonNull.field("template", {
       type: "PetitionTemplate",
       resolve: async (o, _, ctx) => (await ctx.petitions.loadPetition(o.template_id))!,
-    });
-    t.nullable.string("prefillSecret", {
-      resolve: (o) => o.prefill_secret,
     });
     t.nonNull.boolean("allowMultiplePetitions", {
       resolve: (o) => o.allow_multiple_petitions,

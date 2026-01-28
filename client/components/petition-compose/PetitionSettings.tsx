@@ -225,7 +225,7 @@ function _PetitionSettings({
           },
         });
       } else {
-        const publicLinkSettings = await showPublicLinkSettingDialog({ template: petition, user });
+        const publicLinkSettings = await showPublicLinkSettingDialog({ template: petition });
         const { data } = await createPublicPetitionLink({
           variables: {
             templateId: petition.id,
@@ -248,7 +248,6 @@ function _PetitionSettings({
       const publicLinkSettings = await showPublicLinkSettingDialog({
         publicLink: publicLink,
         template: petition,
-        user,
       });
 
       await updatePublicPetitionLink({
@@ -1105,7 +1104,6 @@ const _fragments = {
       hasAutoAnonymize: hasFeatureFlag(featureFlag: AUTO_ANONYMIZE)
       ...useAvailablePetitionLocales_User
       ...TestModeSignatureBadge_User
-      ...PublicLinkSettingsDialog_User
       organization {
         id
         signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
@@ -1280,7 +1278,6 @@ const _mutations = [
       $title: String
       $description: String
       $slug: String
-      $prefillSecret: String
       $allowMultiplePetitions: Boolean
       $petitionNamePattern: String
     ) {
@@ -1290,7 +1287,6 @@ const _mutations = [
         title: $title
         description: $description
         slug: $slug
-        prefillSecret: $prefillSecret
         allowMultiplePetitions: $allowMultiplePetitions
         petitionNamePattern: $petitionNamePattern
       ) {

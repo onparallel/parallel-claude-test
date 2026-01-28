@@ -6,12 +6,7 @@ import { UAParser } from "ua-parser-js";
 import { LazyPromise } from "../../util/promises/LazyPromise";
 import { authenticate, chain, checkClientServerToken, ifArgDefined } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import {
-  authenticatePublicAccess,
-  fieldBelongsToAccess,
-  taskBelongsToAccess,
-  validPublicPetitionLinkPrefill,
-} from "./authorizers";
+import { authenticatePublicAccess, fieldBelongsToAccess, taskBelongsToAccess } from "./authorizers";
 
 export const remindersOptOut = queryField("remindersOptOut", {
   description:
@@ -165,7 +160,6 @@ export const publicPetitionLinkBySlug = queryField("publicPetitionLinkBySlug", {
     slug: nonNull(idArg()),
     prefill: nullable(stringArg()),
   },
-  authorize: ifArgDefined("prefill", validPublicPetitionLinkPrefill("prefill" as never, "slug")),
   resolve: async (_, { slug }, ctx) => {
     const publicLink = await ctx.petitions.loadPublicPetitionLinkBySlug(slug);
     const petition = publicLink

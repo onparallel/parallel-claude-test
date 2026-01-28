@@ -2977,7 +2977,6 @@ export interface NexusGenFieldTypes {
     createProfilesPieChartDashboardModule: NexusGenRootTypes["Dashboard"]; // Dashboard!
     createProfilesRatioDashboardModule: NexusGenRootTypes["Dashboard"]; // Dashboard!
     createPublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
-    createPublicPetitionLinkPrefillData: string; // String!
     createRemovePetitionPermissionMaybeTask: NexusGenRootTypes["MaybeTask"]; // MaybeTask!
     createSignaturitIntegration: NexusGenRootTypes["SignatureOrgIntegration"]; // SignatureOrgIntegration!
     createTag: NexusGenRootTypes["Tag"]; // Tag!
@@ -3030,7 +3029,6 @@ export interface NexusGenFieldTypes {
     markProfileListViewAsDefault: NexusGenRootTypes["ProfileListView"]; // ProfileListView!
     markSignatureIntegrationAsDefault: NexusGenRootTypes["IOrgIntegration"]; // IOrgIntegration!
     modifyCurrentUsagePeriod: NexusGenRootTypes["Organization"]; // Organization!
-    modifyPetitionCustomProperty: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     movePetitions: NexusGenEnums["Success"]; // Success!
     petitionAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     petitionAttachmentUploadComplete: NexusGenRootTypes["PetitionAttachment"]; // PetitionAttachment!
@@ -3290,7 +3288,6 @@ export interface NexusGenFieldTypes {
     currentApprovalRequestSteps: NexusGenRootTypes["PetitionApprovalRequestStep"][] | null; // [PetitionApprovalRequestStep!]
     currentSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"] | null; // PetitionSignatureRequest
     customLists: NexusGenRootTypes["PetitionCustomList"][]; // [PetitionCustomList!]!
-    customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
     deadline: NexusGenScalars["DateTime"] | null; // DateTime
     defaultOnBehalf: NexusGenRootTypes["User"] | null; // User
     effectivePermissions: NexusGenRootTypes["EffectivePetitionUserPermission"][]; // [EffectivePetitionUserPermission!]!
@@ -3992,7 +3989,6 @@ export interface NexusGenFieldTypes {
     completingMessageSubject: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     customLists: NexusGenRootTypes["PetitionCustomList"][]; // [PetitionCustomList!]!
-    customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
     defaultOnBehalf: NexusGenRootTypes["User"] | null; // User
     defaultPath: string; // String!
     defaultPermissions: NexusGenRootTypes["TemplateDefaultPermission"][]; // [TemplateDefaultPermission!]!
@@ -4687,7 +4683,6 @@ export interface NexusGenFieldTypes {
     isActive: boolean; // Boolean!
     owner: NexusGenRootTypes["User"]; // User!
     petitionNamePattern: string | null; // String
-    prefillSecret: string | null; // String
     slug: string; // String!
     template: NexusGenRootTypes["PetitionTemplate"]; // PetitionTemplate!
     title: string; // String!
@@ -5330,7 +5325,6 @@ export interface NexusGenFieldTypes {
     completingMessageSubject: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     customLists: NexusGenRootTypes["PetitionCustomList"][]; // [PetitionCustomList!]!
-    customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
     defaultOnBehalf: NexusGenRootTypes["User"] | null; // User
     effectivePermissions: NexusGenRootTypes["EffectivePetitionUserPermission"][]; // [EffectivePetitionUserPermission!]!
     emailBody: NexusGenScalars["JSON"] | null; // JSON
@@ -6336,7 +6330,6 @@ export interface NexusGenFieldTypeNames {
     createProfilesPieChartDashboardModule: "Dashboard";
     createProfilesRatioDashboardModule: "Dashboard";
     createPublicPetitionLink: "PublicPetitionLink";
-    createPublicPetitionLinkPrefillData: "String";
     createRemovePetitionPermissionMaybeTask: "MaybeTask";
     createSignaturitIntegration: "SignatureOrgIntegration";
     createTag: "Tag";
@@ -6389,7 +6382,6 @@ export interface NexusGenFieldTypeNames {
     markProfileListViewAsDefault: "ProfileListView";
     markSignatureIntegrationAsDefault: "IOrgIntegration";
     modifyCurrentUsagePeriod: "Organization";
-    modifyPetitionCustomProperty: "PetitionBase";
     movePetitions: "Success";
     petitionAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     petitionAttachmentUploadComplete: "PetitionAttachment";
@@ -6649,7 +6641,6 @@ export interface NexusGenFieldTypeNames {
     currentApprovalRequestSteps: "PetitionApprovalRequestStep";
     currentSignatureRequest: "PetitionSignatureRequest";
     customLists: "PetitionCustomList";
-    customProperties: "JSONObject";
     deadline: "DateTime";
     defaultOnBehalf: "User";
     effectivePermissions: "EffectivePetitionUserPermission";
@@ -7351,7 +7342,6 @@ export interface NexusGenFieldTypeNames {
     completingMessageSubject: "String";
     createdAt: "DateTime";
     customLists: "PetitionCustomList";
-    customProperties: "JSONObject";
     defaultOnBehalf: "User";
     defaultPath: "String";
     defaultPermissions: "TemplateDefaultPermission";
@@ -8046,7 +8036,6 @@ export interface NexusGenFieldTypeNames {
     isActive: "Boolean";
     owner: "User";
     petitionNamePattern: "String";
-    prefillSecret: "String";
     slug: "String";
     template: "PetitionTemplate";
     title: "String";
@@ -8689,7 +8678,6 @@ export interface NexusGenFieldTypeNames {
     completingMessageSubject: "String";
     createdAt: "DateTime";
     customLists: "PetitionCustomList";
-    customProperties: "JSONObject";
     defaultOnBehalf: "User";
     effectivePermissions: "EffectivePetitionUserPermission";
     emailBody: "JSON";
@@ -9393,16 +9381,9 @@ export interface NexusGenArgTypes {
       allowMultiplePetitions: boolean; // Boolean!
       description: string; // String!
       petitionNamePattern?: string | null; // String
-      prefillSecret?: string | null; // String
       slug?: string | null; // String
       templateId: NexusGenScalars["GID"]; // GID!
       title: string; // String!
-    };
-    createPublicPetitionLinkPrefillData: {
-      // args
-      data: NexusGenScalars["JSONObject"]; // JSONObject!
-      path?: string | null; // String
-      publicPetitionLinkId: NexusGenScalars["GID"]; // GID!
     };
     createRemovePetitionPermissionMaybeTask: {
       // args
@@ -9669,12 +9650,6 @@ export interface NexusGenArgTypes {
       newLimit: number; // Int!
       orgId: NexusGenScalars["GID"]; // GID!
     };
-    modifyPetitionCustomProperty: {
-      // args
-      key: string; // String!
-      petitionId: NexusGenScalars["GID"]; // GID!
-      value?: string | null; // String
-    };
     movePetitions: {
       // args
       destination: string; // String!
@@ -9776,8 +9751,6 @@ export interface NexusGenArgTypes {
       contactFirstName: string; // String!
       contactLastName: string; // String!
       force?: boolean | null; // Boolean
-      prefill?: string | null; // String
-      prefillDataKey?: string | null; // ID
       slug: string; // ID!
     };
     publicCreateFileUploadReply: {
@@ -10499,7 +10472,6 @@ export interface NexusGenArgTypes {
       description?: string | null; // String
       isActive?: boolean | null; // Boolean
       petitionNamePattern?: string | null; // String
-      prefillSecret?: string | null; // String
       publicPetitionLinkId: NexusGenScalars["GID"]; // GID!
       slug?: string | null; // String
       title?: string | null; // String

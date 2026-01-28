@@ -1,5 +1,4 @@
 import { differenceInDays } from "date-fns";
-import { decode, JwtPayload } from "jsonwebtoken";
 import {
   booleanArg,
   idArg,
@@ -26,10 +25,10 @@ import {
 } from "../../util/slate/placeholders";
 import { fromPlainText } from "../../util/slate/utils";
 import { and, chain, checkClientServerToken, ifArgDefined, not } from "../helpers/authorize";
-import { ApolloError, ArgValidationError, ForbiddenError } from "../helpers/errors";
+import { ApolloError, ForbiddenError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/Result";
-import { validateAnd, validateIf } from "../helpers/validateArgs";
+import { validateAnd } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { validEmail } from "../helpers/validators/validEmail";
@@ -48,8 +47,6 @@ import {
   getContactAuthCookieValue,
   publicPetitionDoesNotHaveOngoingProcess,
   taskBelongsToAccess,
-  validPublicPetitionLinkPrefill,
-  validPublicPetitionLinkPrefillDataKeycode,
   validPublicPetitionLinkSlug,
 } from "./authorizers";
 
@@ -766,35 +763,9 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
             "Set to true to force the creation + send of a new petition if the contact already has an active access on this public link",
         }),
       ),
-      prefill: nullable(
-        stringArg({
-          description:
-            "JWT token containing information to prefill the petition after creating it.",
-        }),
-      ),
-      prefillDataKey: nullable(
-        idArg({ description: "key to fetch prefill information from the database." }),
-      ),
     },
-    authorize: chain(
-      validPublicPetitionLinkSlug("slug"),
-      ifArgDefined("prefill", validPublicPetitionLinkPrefill("prefill" as never, "slug")),
-      ifArgDefined(
-        "prefillDataKey",
-        validPublicPetitionLinkPrefillDataKeycode("prefillDataKey" as never),
-      ),
-    ),
-    validateArgs: validateAnd(
-      validEmail("contactEmail"),
-      validateIf(
-        (args) =>
-          [isNonNullish(args.prefill), isNonNullish(args.prefillDataKey)].filter((v) => v).length >
-          1,
-        (_, args, ctx, info) => {
-          throw new ArgValidationError(info, "prefill", "Only one of prefill or prefillDataKey");
-        },
-      ),
-    ),
+    authorize: validPublicPetitionLinkSlug("slug"),
+    validateArgs: validEmail("contactEmail"),
     resolve: async (_, args, ctx) => {
       const link = (await ctx.petitions.loadPublicPetitionLinkBySlug(args.slug))!;
 
@@ -843,24 +814,6 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
           },
           `PublicPetitionLink:${link.id}`,
         );
-
-        // prefill before creating message subject and body so replies are available on PetitionMessageContext
-        if (isNonNullish(args.prefill)) {
-          const payload = decode(args.prefill) as JwtPayload;
-          if ("replies" in payload && typeof payload.replies === "object") {
-            await ctx.petitions.prefillPetition(petition.id, payload.replies, owner.user);
-          }
-        } else if (isNonNullish(args.prefillDataKey)) {
-          const prefillData = (await ctx.petitions.loadPublicPetitionLinkPrefillDataByKeycode(
-            args.prefillDataKey,
-          ))!;
-          await ctx.petitions.prefillPetition(petition.id, prefillData.data, owner.user);
-          await ctx.petitions.updatePetition(
-            petition.id,
-            { path: prefillData.path },
-            `PublicPetitionLink:${link.id}`,
-          );
-        }
 
         const getValues = await ctx.petitionMessageContext.fetchPlaceholderValues({
           petitionId: petition.id,

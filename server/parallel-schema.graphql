@@ -1127,7 +1127,6 @@ enum FeatureFlag {
   CLIENT_PORTAL
   CREATE_PROFILE_TYPE
   CUSTOM_HOST_UI
-  CUSTOM_PROPERTIES
   DASHBOARDS
   DOCUMENT_PROCESSING
   DOCUSIGN_SANDBOX_PROVIDER
@@ -1136,7 +1135,6 @@ enum FeatureFlag {
   EXPORT_CUATRECASAS
   GHOST_LOGIN
   HIDE_RECIPIENT_VIEW_CONTENTS
-  KEY_PROCESSES
   ON_BEHALF_OF
   PERMISSION_MANAGEMENT
   PETITION_ACCESS_RECIPIENT_URL_FIELD
@@ -1145,8 +1143,6 @@ enum FeatureFlag {
   PETITION_SUMMARY
   PROFILES
   PROFILE_SEARCH_FIELD
-  PUBLIC_PETITION_LINK_PREFILL_DATA
-  PUBLIC_PETITION_LINK_PREFILL_SECRET_UI
   RECIPIENT_LANG_CA
   RECIPIENT_LANG_IT
   RECIPIENT_LANG_PT
@@ -2369,20 +2365,10 @@ type Mutation {
     allowMultiplePetitions: Boolean!
     description: String!
     petitionNamePattern: String
-    prefillSecret: String
     slug: String
     templateId: GID!
     title: String!
   ): PublicPetitionLink!
-
-  """
-  Creates prefill information to be used on public petition links. Returns the URL to be used for creation and prefill of the petition.
-  """
-  createPublicPetitionLinkPrefillData(
-    data: JSONObject!
-    path: String
-    publicPetitionLinkId: GID!
-  ): String!
 
   """
   Removes permissions to users and groups on given petitions.
@@ -2739,11 +2725,6 @@ type Mutation {
   ): Organization!
 
   """
-  Adds, edits or deletes a custom property on the petition
-  """
-  modifyPetitionCustomProperty(key: String!, petitionId: GID!, value: String): PetitionBase!
-
-  """
   Moves a group of petitions or folders to another folder.
   """
   movePetitions(
@@ -2905,16 +2886,6 @@ type Mutation {
     Set to true to force the creation + send of a new petition if the contact already has an active access on this public link
     """
     force: Boolean
-
-    """
-    JWT token containing information to prefill the petition after creating it.
-    """
-    prefill: String
-
-    """
-    key to fetch prefill information from the database.
-    """
-    prefillDataKey: ID
     slug: ID!
   ): Result!
 
@@ -3890,7 +3861,6 @@ type Mutation {
     description: String
     isActive: Boolean
     petitionNamePattern: String
-    prefillSecret: String
     publicPetitionLinkId: GID!
     slug: String
     title: String
@@ -4365,11 +4335,6 @@ type Petition implements PetitionBase {
   """
   currentSignatureRequest: PetitionSignatureRequest
   customLists: [PetitionCustomList!]!
-
-  """
-  Custom user properties
-  """
-  customProperties: JSONObject!
 
   """
   The deadline of the petition.
@@ -4913,11 +4878,6 @@ interface PetitionBase {
   """
   createdAt: DateTime!
   customLists: [PetitionCustomList!]!
-
-  """
-  Custom user properties
-  """
-  customProperties: JSONObject!
   defaultOnBehalf: User
 
   """
@@ -6465,11 +6425,6 @@ type PetitionTemplate implements PetitionBase {
   """
   createdAt: DateTime!
   customLists: [PetitionCustomList!]!
-
-  """
-  Custom user properties
-  """
-  customProperties: JSONObject!
   defaultOnBehalf: User
   defaultPath: String!
   defaultPermissions: [TemplateDefaultPermission!]!
@@ -8156,7 +8111,6 @@ type PublicPetitionLink {
   isActive: Boolean!
   owner: User!
   petitionNamePattern: String
-  prefillSecret: String
   slug: String!
   template: PetitionTemplate!
   title: String!

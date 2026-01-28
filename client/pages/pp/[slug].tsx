@@ -32,7 +32,6 @@ import {
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
-import { jwtDecode } from "jwt-decode";
 import {
   GetServerSidePropsContext,
   GetServerSidePropsResult,
@@ -52,8 +51,6 @@ interface HandleNewPublicPetitionProps {
 function PublicPetitionLink({
   slug,
   publicPetitionLink,
-  prefill,
-  prefillDataKey,
   defaultValues,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const intl = useIntl();
@@ -98,8 +95,6 @@ function PublicPetitionLink({
           contactLastName: _data?.lastName ?? "",
           contactEmail: _data?.email ?? "",
           force,
-          prefill,
-          prefillDataKey,
         },
       });
 
@@ -342,8 +337,6 @@ PublicPetitionLink.mutations = [
       $contactLastName: String!
       $contactEmail: String!
       $force: Boolean
-      $prefill: String
-      $prefillDataKey: ID
     ) {
       publicCreateAndSendPetitionFromPublicLink(
         slug: $slug
@@ -351,8 +344,6 @@ PublicPetitionLink.mutations = [
         contactLastName: $contactLastName
         contactEmail: $contactEmail
         force: $force
-        prefill: $prefill
-        prefillDataKey: $prefillDataKey
       )
     }
   `,
@@ -374,8 +365,6 @@ PublicPetitionLink.queries = [
 ];
 
 interface PublicPetitionLinkServerSideProps {
-  prefill: string | null;
-  prefillDataKey: string | null;
   slug: string;
   publicPetitionLink: PublicPetitionLink_PublicPublicPetitionLinkFragment;
   defaultValues?: PublicPetitionInitialFormData;
@@ -383,7 +372,7 @@ interface PublicPetitionLinkServerSideProps {
 
 export async function getServerSideProps({
   req,
-  query: { slug, prefill, pk: prefillDataKey },
+  query: { slug },
   locale,
 }: GetServerSidePropsContext): Promise<
   GetServerSidePropsResult<PublicPetitionLinkServerSideProps>
@@ -392,22 +381,15 @@ export async function getServerSideProps({
     const client = createApolloClient({}, { req });
     const { data } = await client.query({
       query: PublicPetitionLink_publicPetitionLinkBySlugDocument,
-      variables: {
-        slug: slug as string,
-        prefill: (prefill ?? null) as string | null,
-      },
+      variables: { slug: slug as string },
     });
 
     if (data?.publicPetitionLinkBySlug) {
       const props: PublicPetitionLinkServerSideProps = {
         slug: slug as string,
         publicPetitionLink: data.publicPetitionLinkBySlug,
-        prefill: (prefill ?? null) as string | null,
-        prefillDataKey: (prefillDataKey ?? null) as string | null,
       };
-      if (prefill && typeof prefill === "string") {
-        props.defaultValues = jwtDecode(prefill);
-      }
+
       return { props };
     } else {
       return { notFound: true };

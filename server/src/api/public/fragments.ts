@@ -159,7 +159,6 @@ export const PetitionFragment = gql`
     name
     locale
     createdAt
-    customProperties
     fields @include(if: $includeFields) {
       ...PetitionFieldWithReplies
     }
@@ -249,7 +248,6 @@ export const TemplateFragment = gql`
     locale
     description
     createdAt
-    customProperties
     fields @include(if: $includeFields) {
       ...PetitionField
     }

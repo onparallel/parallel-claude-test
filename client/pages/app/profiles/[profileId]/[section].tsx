@@ -19,7 +19,6 @@ type ProfileDetailProps = UnwrapPromise<ReturnType<typeof ProfileDetail.getIniti
 
 function ProfileDetail({ profileId, section }: ProfileDetailProps) {
   const { data: queryObject } = useAssertQuery(ProfileDetail_userDocument);
-  const { me } = queryObject;
   const {
     data: { profile },
     refetch,
@@ -41,7 +40,7 @@ function ProfileDetail({ profileId, section }: ProfileDetailProps) {
           <ProfilePetitionsTable profileId={profile.id} />
         ) : (
           <>
-            {me.hasKeyProcessesFeature ? <ProfileKeyProcesses profile={profile} /> : null}
+            <ProfileKeyProcesses profile={profile} />
             <ProfileRelationshipsTable profileId={profile.id} />
           </>
         )}
@@ -54,10 +53,6 @@ const _queries = [
   gql`
     query ProfileDetail_user {
       ...ProfileLayout_Query
-      me {
-        id
-        hasKeyProcessesFeature: hasFeatureFlag(featureFlag: KEY_PROCESSES)
-      }
     }
   `,
   gql`

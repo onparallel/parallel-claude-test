@@ -1,12 +1,7 @@
-import { Alert, AlertDescription, AlertIcon, Button, HStack } from "@chakra-ui/react";
+import { Alert, AlertDescription, AlertIcon, HStack } from "@chakra-ui/react";
 import { FormattedMessage } from "react-intl";
-import { isNonNullish } from "remeda";
 
-export function PetitionPreviewOnlyAlert({
-  onGeneratePrefilledLink,
-}: {
-  onGeneratePrefilledLink?: () => void;
-}) {
+export function PetitionPreviewOnlyAlert() {
   return (
     <Alert status="info">
       <AlertIcon />
@@ -22,14 +17,6 @@ export function PetitionPreviewOnlyAlert({
             }}
           />
         </AlertDescription>
-        {isNonNullish(onGeneratePrefilledLink) ? (
-          <Button size="sm" colorScheme="blue" marginStart={2} onClick={onGeneratePrefilledLink}>
-            <FormattedMessage
-              id="page.preview.generate-prefilled-link"
-              defaultMessage="Generate prefilled link"
-            />
-          </Button>
-        ) : null}
       </HStack>
     </Alert>
   );

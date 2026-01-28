@@ -32,7 +32,6 @@ import { useHandledTestSignatureDialog } from "@parallel/components/petition-com
 import { PetitionPreviewRightPaneTabs } from "@parallel/components/petition-preview/PetitionPreviewRightPaneTabs";
 import { PetitionPreviewStartSignatureButton } from "@parallel/components/petition-preview/PetitionPreviewStartSignatureButton";
 import { PreviewPetitionField } from "@parallel/components/petition-preview/PreviewPetitionField";
-import { useGeneratePrefilledPublicLinkDialog } from "@parallel/components/petition-preview/dialogs/GeneratePrefilledPublicLinkDialog";
 import { PetitionRepliesFieldComments } from "@parallel/components/petition-replies/PetitionRepliesFieldComments";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
 import { RecipientViewProgressBar } from "@parallel/components/recipient-view/RecipientViewProgressBar";
@@ -61,7 +60,6 @@ import {
 import { useCancelApprovalRequestFlow } from "@parallel/utils/hooks/useCancelApprovalRequestFlow";
 import { useClosePetition } from "@parallel/utils/hooks/useClosePetition";
 import { useStartApprovalRequestStep } from "@parallel/utils/hooks/useStartApprovalRequestStep";
-import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { LiquidPetitionScopeProvider } from "@parallel/utils/liquid/LiquidPetitionScopeProvider";
 import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
 import {
@@ -440,13 +438,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     ],
   );
 
-  const showGeneratePrefilledPublicLinkDialog = useGeneratePrefilledPublicLinkDialog();
-  async function handleGeneratePrefilledPublicLinkClick() {
-    try {
-      await showGeneratePrefilledPublicLinkDialog({ petitionId });
-    } catch {}
-  }
-
   const showErrorToast = useGenericErrorToast();
 
   const handleErrorFromFields = useCallback(async (error: any) => {
@@ -470,15 +461,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   }, []);
 
   const isPetitionUsageLimitReached = me.organization.isPetitionUsageLimitReached;
-
-  const showGeneratePrefilledPublicLinkButton =
-    me.hasPublicLinkPrefill &&
-    petition.__typename === "PetitionTemplate" &&
-    isNullish(petition.permanentDeletionAt) &&
-    petition.publicLink?.isActive &&
-    petition.fields.some(
-      (f) => !isFileTypeField(f.type) && isNonNullish(f.alias) && f.previewReplies.length > 0,
-    );
 
   const showSendToButton =
     isPetition &&
@@ -720,13 +702,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                     hasNotStartedApprovals={hasNotStartedApprovals}
                   />
                 ) : (
-                  <PetitionPreviewOnlyAlert
-                    onGeneratePrefilledLink={
-                      showGeneratePrefilledPublicLinkButton
-                        ? handleGeneratePrefilledPublicLinkClick
-                        : undefined
-                    }
-                  />
+                  <PetitionPreviewOnlyAlert />
                 )}
               </>
             )}
@@ -991,7 +967,6 @@ const _fragments = {
         ...useStartSignatureRequest_Petition
       }
       ... on PetitionTemplate {
-        ...GeneratePrefilledPublicLinkDialog_PetitionTemplate
         publicLink {
           id
           isActive
@@ -1090,10 +1065,6 @@ const _queries = [
   gql`
     query PetitionPreview_user {
       ...PetitionPreview_Query
-      me {
-        id
-        hasPublicLinkPrefill: hasFeatureFlag(featureFlag: PUBLIC_PETITION_LINK_PREFILL_DATA)
-      }
     }
   `,
 ];

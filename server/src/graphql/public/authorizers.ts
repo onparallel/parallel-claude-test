@@ -223,49 +223,6 @@ export function validPublicPetitionLinkSlug<
   };
 }
 
-export function validPublicPetitionLinkPrefill<
-  TypeName extends string,
-  FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, string>,
-  TArg2 extends Arg<TypeName, FieldName, string>,
->(argPrefill: TArg1, argSlug: TArg2): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx) => {
-    try {
-      const slug = getArg(args, argSlug);
-      const prefill = getArg(args, argPrefill);
-      const publicLink = await ctx.petitions.loadPublicPetitionLinkBySlug(slug);
-      if (isNonNullish(publicLink?.prefill_secret)) {
-        await ctx.jwt.verify(prefill!, { secret: publicLink!.prefill_secret });
-        return true;
-      }
-    } catch {}
-    throw new ForbiddenError("Public link prefill is not valid");
-  };
-}
-
-export function validPublicPetitionLinkPrefillDataKeycode<
-  TypeName extends string,
-  FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, string>,
->(argKeycode: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx) => {
-    const keycode = getArg(args, argKeycode);
-    const publicPrefillData =
-      await ctx.petitions.loadPublicPetitionLinkPrefillDataByKeycode(keycode);
-    if (!publicPrefillData) {
-      throw new ForbiddenError("Public prefill data not found");
-    }
-
-    const template = await ctx.petitions.loadPetition(publicPrefillData.template_id);
-
-    if (!template || !template.is_template) {
-      throw new ForbiddenError("Template not found or not a template");
-    }
-
-    return true;
-  };
-}
-
 export function taskBelongsToAccess<
   TypeName extends string,
   FieldName extends string,

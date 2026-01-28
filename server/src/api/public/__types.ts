@@ -961,7 +961,6 @@ export type FeatureFlag =
   | "CLIENT_PORTAL"
   | "CREATE_PROFILE_TYPE"
   | "CUSTOM_HOST_UI"
-  | "CUSTOM_PROPERTIES"
   | "DASHBOARDS"
   | "DOCUMENT_PROCESSING"
   | "DOCUSIGN_SANDBOX_PROVIDER"
@@ -970,7 +969,6 @@ export type FeatureFlag =
   | "EXPORT_CUATRECASAS"
   | "GHOST_LOGIN"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
-  | "KEY_PROCESSES"
   | "ON_BEHALF_OF"
   | "PERMISSION_MANAGEMENT"
   | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
@@ -979,8 +977,6 @@ export type FeatureFlag =
   | "PETITION_SUMMARY"
   | "PROFILES"
   | "PROFILE_SEARCH_FIELD"
-  | "PUBLIC_PETITION_LINK_PREFILL_DATA"
-  | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
   | "RECIPIENT_LANG_CA"
   | "RECIPIENT_LANG_IT"
   | "RECIPIENT_LANG_PT"
@@ -1434,8 +1430,6 @@ export type Mutation = {
   createProfilesRatioDashboardModule: Dashboard;
   /** Creates a public link from a user's template */
   createPublicPetitionLink: PublicPetitionLink;
-  /** Creates prefill information to be used on public petition links. Returns the URL to be used for creation and prefill of the petition. */
-  createPublicPetitionLinkPrefillData: Scalars["String"]["output"];
   /**
    * Removes permissions to users and groups on given petitions.
    * If the total amount of permission to add exceeds 200, a task will be created for async completion.
@@ -1537,8 +1531,6 @@ export type Mutation = {
   markSignatureIntegrationAsDefault: IOrgIntegration;
   /** Updates the limit of the current usage limit of a given organization */
   modifyCurrentUsagePeriod: Organization;
-  /** Adds, edits or deletes a custom property on the petition */
-  modifyPetitionCustomProperty: PetitionBase;
   /** Moves a group of petitions or folders to another folder. */
   movePetitions: Success;
   /** Generates a download link for a petition attachment */
@@ -2394,16 +2386,9 @@ export type MutationcreatePublicPetitionLinkArgs = {
   allowMultiplePetitions: Scalars["Boolean"]["input"];
   description: Scalars["String"]["input"];
   petitionNamePattern?: InputMaybe<Scalars["String"]["input"]>;
-  prefillSecret?: InputMaybe<Scalars["String"]["input"]>;
   slug?: InputMaybe<Scalars["String"]["input"]>;
   templateId: Scalars["GID"]["input"];
   title: Scalars["String"]["input"];
-};
-
-export type MutationcreatePublicPetitionLinkPrefillDataArgs = {
-  data: Scalars["JSONObject"]["input"];
-  path?: InputMaybe<Scalars["String"]["input"]>;
-  publicPetitionLinkId: Scalars["GID"]["input"];
 };
 
 export type MutationcreateRemovePetitionPermissionMaybeTaskArgs = {
@@ -2671,12 +2656,6 @@ export type MutationmodifyCurrentUsagePeriodArgs = {
   orgId: Scalars["GID"]["input"];
 };
 
-export type MutationmodifyPetitionCustomPropertyArgs = {
-  key: Scalars["String"]["input"];
-  petitionId: Scalars["GID"]["input"];
-  value?: InputMaybe<Scalars["String"]["input"]>;
-};
-
 export type MutationmovePetitionsArgs = {
   destination: Scalars["String"]["input"];
   folderIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
@@ -2777,8 +2756,6 @@ export type MutationpublicCreateAndSendPetitionFromPublicLinkArgs = {
   contactFirstName: Scalars["String"]["input"];
   contactLastName: Scalars["String"]["input"];
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
-  prefill?: InputMaybe<Scalars["String"]["input"]>;
-  prefillDataKey?: InputMaybe<Scalars["ID"]["input"]>;
   slug: Scalars["ID"]["input"];
 };
 
@@ -3500,7 +3477,6 @@ export type MutationupdatePublicPetitionLinkArgs = {
   description?: InputMaybe<Scalars["String"]["input"]>;
   isActive?: InputMaybe<Scalars["Boolean"]["input"]>;
   petitionNamePattern?: InputMaybe<Scalars["String"]["input"]>;
-  prefillSecret?: InputMaybe<Scalars["String"]["input"]>;
   publicPetitionLinkId: Scalars["GID"]["input"];
   slug?: InputMaybe<Scalars["String"]["input"]>;
   title?: InputMaybe<Scalars["String"]["input"]>;
@@ -3832,8 +3808,6 @@ export type Petition = PetitionBase & {
   /** The current signature request. */
   currentSignatureRequest: Maybe<PetitionSignatureRequest>;
   customLists: Array<PetitionCustomList>;
-  /** Custom user properties */
-  customProperties: Scalars["JSONObject"]["output"];
   /** The deadline of the petition. */
   deadline: Maybe<Scalars["DateTime"]["output"]>;
   defaultOnBehalf: Maybe<User>;
@@ -4172,8 +4146,6 @@ export type PetitionBase = {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
   customLists: Array<PetitionCustomList>;
-  /** Custom user properties */
-  customProperties: Scalars["JSONObject"]["output"];
   defaultOnBehalf: Maybe<User>;
   /** The effective permissions on the petition */
   effectivePermissions: Array<EffectivePetitionUserPermission>;
@@ -5146,8 +5118,6 @@ export type PetitionTemplate = PetitionBase & {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"]["output"];
   customLists: Array<PetitionCustomList>;
-  /** Custom user properties */
-  customProperties: Scalars["JSONObject"]["output"];
   defaultOnBehalf: Maybe<User>;
   defaultPath: Scalars["String"]["output"];
   defaultPermissions: Array<TemplateDefaultPermission>;
@@ -6337,7 +6307,6 @@ export type PublicPetitionLink = {
   isActive: Scalars["Boolean"]["output"];
   owner: User;
   petitionNamePattern: Maybe<Scalars["String"]["output"]>;
-  prefillSecret: Maybe<Scalars["String"]["output"]>;
   slug: Scalars["String"]["output"];
   template: PetitionTemplate;
   title: Scalars["String"]["output"];
@@ -7911,7 +7880,6 @@ export type PetitionFragment = {
   name: string | null;
   locale: PetitionLocale;
   createdAt: string;
-  customProperties: { [key: string]: any };
   status: PetitionStatus;
   deadline: string | null;
   isAnonymized: boolean;
@@ -8046,7 +8014,6 @@ export type TemplateFragment = {
   locale: PetitionLocale;
   description: any | null;
   createdAt: string;
-  customProperties: { [key: string]: any };
   fields?: Array<{
     id: string;
     title: string | null;
@@ -8081,7 +8048,6 @@ export type PetitionBase_Petition_Fragment = {
   name: string | null;
   locale: PetitionLocale;
   createdAt: string;
-  customProperties: { [key: string]: any };
   status: PetitionStatus;
   deadline: string | null;
   isAnonymized: boolean;
@@ -8217,7 +8183,6 @@ export type PetitionBase_PetitionTemplate_Fragment = {
   locale: PetitionLocale;
   description: any | null;
   createdAt: string;
-  customProperties: { [key: string]: any };
   fields?: Array<{
     id: string;
     title: string | null;
@@ -8660,7 +8625,6 @@ export type GetPetitions_petitionsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -8823,7 +8787,6 @@ export type CreatePetition_petitionMutation = {
         name: string | null;
         locale: PetitionLocale;
         createdAt: string;
-        customProperties: { [key: string]: any };
         status: PetitionStatus;
         deadline: string | null;
         isAnonymized: boolean;
@@ -8984,7 +8947,6 @@ export type GetPetition_petitionQuery = {
         name: string | null;
         locale: PetitionLocale;
         createdAt: string;
-        customProperties: { [key: string]: any };
         status: PetitionStatus;
         deadline: string | null;
         isAnonymized: boolean;
@@ -9184,7 +9146,6 @@ export type UpdatePetition_updatePetitionMutation = {
         name: string | null;
         locale: PetitionLocale;
         createdAt: string;
-        customProperties: { [key: string]: any };
         status: PetitionStatus;
         deadline: string | null;
         isAnonymized: boolean;
@@ -9327,7 +9288,6 @@ export type UpdatePetition_updatePetitionMutation = {
         locale: PetitionLocale;
         description: any | null;
         createdAt: string;
-        customProperties: { [key: string]: any };
         fields?: Array<{
           id: string;
           title: string | null;
@@ -9384,7 +9344,6 @@ export type ClosePetition_closePetitionMutation = {
     name: string | null;
     locale: PetitionLocale;
     createdAt: string;
-    customProperties: { [key: string]: any };
     status: PetitionStatus;
     deadline: string | null;
     isAnonymized: boolean;
@@ -9534,7 +9493,6 @@ export type ReopenPetition_reopenPetitionMutation = {
     name: string | null;
     locale: PetitionLocale;
     createdAt: string;
-    customProperties: { [key: string]: any };
     status: PetitionStatus;
     deadline: string | null;
     isAnonymized: boolean;
@@ -9684,7 +9642,6 @@ export type CompletePetition_completePetitionMutation = {
     name: string | null;
     locale: PetitionLocale;
     createdAt: string;
-    customProperties: { [key: string]: any };
     status: PetitionStatus;
     deadline: string | null;
     isAnonymized: boolean;
@@ -9851,7 +9808,6 @@ export type TagPetition_tagPetitionMutation = {
         name: string | null;
         locale: PetitionLocale;
         createdAt: string;
-        customProperties: { [key: string]: any };
         status: PetitionStatus;
         deadline: string | null;
         isAnonymized: boolean;
@@ -10006,39 +9962,6 @@ export type UntagPetition_untagPetitionMutation = {
   untagPetition: { id: string } | { id: string };
 };
 
-export type ReadPetitionCustomPropertiesQueryVariables = Exact<{
-  petitionId: Scalars["GID"]["input"];
-}>;
-
-export type ReadPetitionCustomPropertiesQuery = {
-  petition:
-    | { id: string; customProperties: { [key: string]: any } }
-    | { id: string; customProperties: { [key: string]: any } }
-    | null;
-};
-
-export type CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"]["input"];
-    key: Scalars["String"]["input"];
-    value?: InputMaybe<Scalars["String"]["input"]>;
-  }>;
-
-export type CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyMutation = {
-  modifyPetitionCustomProperty:
-    | { customProperties: { [key: string]: any } }
-    | { customProperties: { [key: string]: any } };
-};
-
-export type DeletePetitionCustomProperty_modifyPetitionCustomPropertyMutationVariables = Exact<{
-  petitionId: Scalars["GID"]["input"];
-  key: Scalars["String"]["input"];
-}>;
-
-export type DeletePetitionCustomProperty_modifyPetitionCustomPropertyMutation = {
-  modifyPetitionCustomProperty: { id: string } | { id: string };
-};
-
 export type CreatePetitionRecipients_petitionQueryVariables = Exact<{
   id: Scalars["GID"]["input"];
 }>;
@@ -10080,7 +10003,6 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
       name: string | null;
       locale: PetitionLocale;
       createdAt: string;
-      customProperties: { [key: string]: any };
       status: PetitionStatus;
       deadline: string | null;
       isAnonymized: boolean;
@@ -11246,7 +11168,6 @@ export type GetTemplates_templatesQuery = {
           locale: PetitionLocale;
           description: any | null;
           createdAt: string;
-          customProperties: { [key: string]: any };
           fields?: Array<{
             id: string;
             title: string | null;
@@ -11295,7 +11216,6 @@ export type GetTemplate_templateQuery = {
         locale: PetitionLocale;
         description: any | null;
         createdAt: string;
-        customProperties: { [key: string]: any };
         fields?: Array<{
           id: string;
           title: string | null;
@@ -11509,7 +11429,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -11656,7 +11575,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -11803,7 +11721,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -11950,7 +11867,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -12097,7 +12013,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -12244,7 +12159,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -12391,7 +12305,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -12538,7 +12451,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -12685,7 +12597,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -12832,7 +12743,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -12979,7 +12889,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -13126,7 +13035,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -13273,7 +13181,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -13420,7 +13327,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -13567,7 +13473,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -13714,7 +13619,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -13861,7 +13765,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -14008,7 +13911,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -14155,7 +14057,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -14302,7 +14203,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -14449,7 +14349,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -14596,7 +14495,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -14743,7 +14641,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -14890,7 +14787,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -15037,7 +14933,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -15184,7 +15079,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -15331,7 +15225,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -15478,7 +15371,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -15625,7 +15517,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -15772,7 +15663,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -15919,7 +15809,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -16066,7 +15955,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -16213,7 +16101,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -16360,7 +16247,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -16507,7 +16393,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -16654,7 +16539,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -16801,7 +16685,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -16948,7 +16831,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -17095,7 +16977,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -17242,7 +17123,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -17389,7 +17269,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -17536,7 +17415,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -17683,7 +17561,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -17830,7 +17707,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -17977,7 +17853,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -18124,7 +17999,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -18271,7 +18145,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -18418,7 +18291,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -18565,7 +18437,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -18712,7 +18583,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -18859,7 +18729,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -19006,7 +18875,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -19153,7 +19021,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -19300,7 +19167,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -19447,7 +19313,6 @@ export type GetPetitionEvents_PetitionEventsQuery = {
           name: string | null;
           locale: PetitionLocale;
           createdAt: string;
-          customProperties: { [key: string]: any };
           status: PetitionStatus;
           deadline: string | null;
           isAnonymized: boolean;
@@ -20525,7 +20390,6 @@ export type GetProfilePetitions_profileQuery = {
         name: string | null;
         locale: PetitionLocale;
         createdAt: string;
-        customProperties: { [key: string]: any };
         status: PetitionStatus;
         deadline: string | null;
         isAnonymized: boolean;
@@ -21069,7 +20933,6 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
     name: string | null;
     locale: PetitionLocale;
     createdAt: string;
-    customProperties: { [key: string]: any };
     status: PetitionStatus;
     deadline: string | null;
     isAnonymized: boolean;
@@ -21416,7 +21279,6 @@ export const PetitionFragmentDoc = gql`
     name
     locale
     createdAt
-    customProperties
     fields @include(if: $includeFields) {
       ...PetitionFieldWithReplies
     }
@@ -21504,7 +21366,6 @@ export const TemplateFragmentDoc = gql`
     locale
     description
     createdAt
-    customProperties
     fields @include(if: $includeFields) {
       ...PetitionField
     }
@@ -22158,44 +22019,6 @@ export const UntagPetition_untagPetitionDocument = gql`
 ` as unknown as DocumentNode<
   UntagPetition_untagPetitionMutation,
   UntagPetition_untagPetitionMutationVariables
->;
-export const ReadPetitionCustomPropertiesDocument = gql`
-  query ReadPetitionCustomProperties($petitionId: GID!) {
-    petition(id: $petitionId) {
-      id
-      customProperties
-    }
-  }
-` as unknown as DocumentNode<
-  ReadPetitionCustomPropertiesQuery,
-  ReadPetitionCustomPropertiesQueryVariables
->;
-export const CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyDocument = gql`
-  mutation CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomProperty(
-    $petitionId: GID!
-    $key: String!
-    $value: String
-  ) {
-    modifyPetitionCustomProperty(petitionId: $petitionId, key: $key, value: $value) {
-      customProperties
-    }
-  }
-` as unknown as DocumentNode<
-  CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyMutation,
-  CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyMutationVariables
->;
-export const DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument = gql`
-  mutation DeletePetitionCustomProperty_modifyPetitionCustomProperty(
-    $petitionId: GID!
-    $key: String!
-  ) {
-    modifyPetitionCustomProperty(petitionId: $petitionId, key: $key) {
-      id
-    }
-  }
-` as unknown as DocumentNode<
-  DeletePetitionCustomProperty_modifyPetitionCustomPropertyMutation,
-  DeletePetitionCustomProperty_modifyPetitionCustomPropertyMutationVariables
 >;
 export const CreatePetitionRecipients_petitionDocument = gql`
   query CreatePetitionRecipients_petition($id: GID!) {

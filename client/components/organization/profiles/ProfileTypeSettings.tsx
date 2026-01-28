@@ -49,15 +49,9 @@ const MAX_KEY_PROCESSES = 3;
 interface ProfileTypeSettingsProps extends CardProps {
   profileType: ProfileTypeSettings_ProfileTypeFragment;
   onSave: (pattern: string) => MaybePromise<void>;
-  hideKeyProcesses?: boolean;
 }
 
-export function ProfileTypeSettings({
-  profileType,
-  onSave,
-  hideKeyProcesses,
-  ...props
-}: ProfileTypeSettingsProps) {
+export function ProfileTypeSettings({ profileType, onSave, ...props }: ProfileTypeSettingsProps) {
   const intl = useIntl();
   const [orderedProcesses, setOrderedProcesses] = useState(
     sortBy(profileType.keyProcesses, (p) => p.position),
@@ -275,82 +269,81 @@ export function ProfileTypeSettings({
             </Box>
           </HStack>
         </FormControl>
-        {hideKeyProcesses ? null : (
-          <Stack>
-            <HStack justify="space-between">
-              <HStack spacing={0}>
-                <Heading size="sm">
-                  <FormattedMessage
-                    id="component.profile-type-settings.processes-heading"
-                    defaultMessage="Key processes {count}/{max}"
-                    values={{
-                      count: orderedProcesses.length,
-                      max: MAX_KEY_PROCESSES,
-                    }}
-                  />
-                </Heading>
-                <HelpPopover>
-                  <FormattedMessage
-                    id="component.profile-type-settings.processes-heading-popover"
-                    defaultMessage="Indicate the key processes that will be associated with each profile. For example: KYC, contract, etc."
-                  />
-                </HelpPopover>
-              </HStack>
-              <RestrictedFeaturePopover
-                isRestricted={maxKeyProcessesReached}
-                content={
-                  <FormattedMessage
-                    id="component.profile-type-settings.max-key-processes-popover"
-                    defaultMessage="You have reached the maximum number of key processes. Remove some to add more."
-                  />
-                }
-              >
-                <Button
-                  size="sm"
-                  fontSize="md"
-                  onClick={handleAddNewKeyProcess}
-                  isDisabled={maxKeyProcessesReached}
-                >
-                  <FormattedMessage id="generic.add" defaultMessage="Add" />
-                </Button>
-              </RestrictedFeaturePopover>
-            </HStack>
 
-            {orderedProcesses.length > 0 ? (
-              <MotionConfig reducedMotion="always">
-                <Stack
-                  listStyleType="none"
-                  as={Reorder.Group}
-                  axis="y"
-                  values={orderedProcesses}
-                  onReorder={setOrderedProcesses as any}
-                >
-                  {orderedProcesses.map((process) => {
-                    const { id } = process;
-                    return (
-                      <ProfileTypeProccess
-                        key={id}
-                        process={process}
-                        onDragEnd={() => handleProcessesReorder(orderedProcesses.map((i) => i.id))}
-                        onEdit={() => handleEditKeyProcess(process)}
-                        onRemove={() => handleRemoveKeyProcess(id)}
-                      />
-                    );
-                  })}
-                </Stack>
-              </MotionConfig>
-            ) : (
-              <Center>
-                <Text fontSize="sm" color="gray.600">
-                  <FormattedMessage
-                    id="component.profile-type-settings.no-processes-text"
-                    defaultMessage="There are no key processes yet"
-                  />
-                </Text>
-              </Center>
-            )}
-          </Stack>
-        )}
+        <Stack>
+          <HStack justify="space-between">
+            <HStack spacing={0}>
+              <Heading size="sm">
+                <FormattedMessage
+                  id="component.profile-type-settings.processes-heading"
+                  defaultMessage="Key processes {count}/{max}"
+                  values={{
+                    count: orderedProcesses.length,
+                    max: MAX_KEY_PROCESSES,
+                  }}
+                />
+              </Heading>
+              <HelpPopover>
+                <FormattedMessage
+                  id="component.profile-type-settings.processes-heading-popover"
+                  defaultMessage="Indicate the key processes that will be associated with each profile. For example: KYC, contract, etc."
+                />
+              </HelpPopover>
+            </HStack>
+            <RestrictedFeaturePopover
+              isRestricted={maxKeyProcessesReached}
+              content={
+                <FormattedMessage
+                  id="component.profile-type-settings.max-key-processes-popover"
+                  defaultMessage="You have reached the maximum number of key processes. Remove some to add more."
+                />
+              }
+            >
+              <Button
+                size="sm"
+                fontSize="md"
+                onClick={handleAddNewKeyProcess}
+                isDisabled={maxKeyProcessesReached}
+              >
+                <FormattedMessage id="generic.add" defaultMessage="Add" />
+              </Button>
+            </RestrictedFeaturePopover>
+          </HStack>
+
+          {orderedProcesses.length > 0 ? (
+            <MotionConfig reducedMotion="always">
+              <Stack
+                listStyleType="none"
+                as={Reorder.Group}
+                axis="y"
+                values={orderedProcesses}
+                onReorder={setOrderedProcesses as any}
+              >
+                {orderedProcesses.map((process) => {
+                  const { id } = process;
+                  return (
+                    <ProfileTypeProccess
+                      key={id}
+                      process={process}
+                      onDragEnd={() => handleProcessesReorder(orderedProcesses.map((i) => i.id))}
+                      onEdit={() => handleEditKeyProcess(process)}
+                      onRemove={() => handleRemoveKeyProcess(id)}
+                    />
+                  );
+                })}
+              </Stack>
+            </MotionConfig>
+          ) : (
+            <Center>
+              <Text fontSize="sm" color="gray.600">
+                <FormattedMessage
+                  id="component.profile-type-settings.no-processes-text"
+                  defaultMessage="There are no key processes yet"
+                />
+              </Text>
+            </Center>
+          )}
+        </Stack>
       </Stack>
     </Card>
   );

@@ -33,12 +33,6 @@ function petitionsBuilder(orgId: number, signatureIntegrationId: number) {
     is_template: index > 5,
     status: index > 5 ? null : "DRAFT",
     template_public: index > 7,
-    custom_properties:
-      index > 6
-        ? {
-            "client id": "12345",
-          }
-        : {},
     public_metadata:
       index > 7
         ? {
@@ -243,10 +237,7 @@ describe("GraphQL/Petitions", () => {
     // a petition from secondary user
     [otherPetition] = await mocks.createRandomPetitions(otherOrg.id, otherUser.id, 1);
 
-    await mocks.createFeatureFlags([
-      { name: "ON_BEHALF_OF", default_value: true },
-      { name: "CUSTOM_PROPERTIES", default_value: true },
-    ]);
+    await mocks.createFeatureFlags([{ name: "ON_BEHALF_OF", default_value: true }]);
 
     await mocks.knex.from("standard_list_definition").insert([
       {
@@ -1742,79 +1733,6 @@ describe("GraphQL/Petitions", () => {
       });
     });
 
-    it("copies custom properties when creating a petition from a template", async () => {
-      expect(petitions[7]).toMatchObject({
-        custom_properties: { "client id": "12345" },
-        is_template: true,
-        template_public: false,
-      });
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation (
-            $name: String
-            $locale: PetitionLocale!
-            $petitionId: GID
-            $type: PetitionBaseType
-          ) {
-            createPetition(name: $name, locale: $locale, petitionId: $petitionId, type: $type) {
-              customProperties
-            }
-          }
-        `,
-        variables: {
-          locale: "en",
-          petitionId: toGlobalId("Petition", petitions[7].id),
-          type: "PETITION",
-        },
-      });
-
-      expect(errors).toBeUndefined();
-      expect(data?.createPetition).toEqual({
-        customProperties: {
-          "client id": "12345",
-        },
-      });
-    });
-
-    it("don't copy custom properties when creating a petition from a public template of another organization", async () => {
-      const [publicTemplate] = await mocks.createRandomPetitions(
-        otherOrg.id,
-        otherUser.id,
-        1,
-        () => ({
-          is_template: true,
-          template_public: true,
-          status: null,
-          custom_properties: {
-            "private org prop": "abcd",
-          },
-        }),
-      );
-
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation (
-            $name: String
-            $locale: PetitionLocale!
-            $petitionId: GID
-            $type: PetitionBaseType
-          ) {
-            createPetition(name: $name, locale: $locale, petitionId: $petitionId, type: $type) {
-              customProperties
-            }
-          }
-        `,
-        variables: {
-          locale: "en",
-          petitionId: toGlobalId("Petition", publicTemplate.id),
-          type: "PETITION",
-        },
-      });
-
-      expect(errors).toBeUndefined();
-      expect(data?.createPetition).toEqual({ customProperties: {} });
-    });
-
     it("ignores name and locale parameters when creating a petition from a valid petitionId", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
@@ -2810,35 +2728,6 @@ describe("GraphQL/Petitions", () => {
       expect(newTemplateDefaultPermissions).toHaveLength(1);
     });
 
-    it("copies custom properties when cloning a template", async () => {
-      expect(petitions[7]).toMatchObject({
-        is_template: true,
-        template_public: false,
-        custom_properties: { "client id": "12345" },
-      });
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($petitionIds: [GID!]!) {
-            clonePetitions(petitionIds: $petitionIds) {
-              customProperties
-            }
-          }
-        `,
-        variables: {
-          petitionIds: [toGlobalId("Petition", petitions[7].id)],
-        },
-      });
-
-      expect(errors).toBeUndefined();
-      expect(data?.clonePetitions).toEqual([
-        {
-          customProperties: {
-            "client id": "12345",
-          },
-        },
-      ]);
-    });
-
     it("collaborators should not be able to clone petitions", async () => {
       expect(petitions[0]).toMatchObject({
         is_template: false,
@@ -3113,7 +3002,6 @@ describe("GraphQL/Petitions", () => {
                   template {
                     id
                   }
-                  prefillSecret
                   allowMultiplePetitions
                   petitionNamePattern
                 }
@@ -3142,7 +3030,6 @@ describe("GraphQL/Petitions", () => {
             template: {
               id: data?.clonePetitions[0].id,
             },
-            prefillSecret: publicLink.prefill_secret,
             allowMultiplePetitions: publicLink.allow_multiple_petitions,
             petitionNamePattern: publicLink.petition_name_pattern,
           },
@@ -5449,179 +5336,6 @@ describe("GraphQL/Petitions", () => {
     });
   });
 
-  describe("modifyPetitionCustomProperty", () => {
-    let petition: Petition;
-    beforeAll(async () => {
-      [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1, () => ({
-        custom_properties: {
-          "my-property": "12345",
-        },
-      }));
-    });
-
-    it("queries the petition custom properties", async () => {
-      const { errors, data } = await testClient.query({
-        query: gql`
-          query ($petitionId: GID!) {
-            petition(id: $petitionId) {
-              customProperties
-            }
-          }
-        `,
-        variables: {
-          petitionId: toGlobalId("Petition", petition.id),
-        },
-      });
-
-      expect(errors).toBeUndefined();
-      expect(data?.petition).toEqual({
-        customProperties: {
-          "my-property": "12345",
-        },
-      });
-    });
-
-    it("throws error if passing a key with more than 100 chars", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($petitionId: GID!, $key: String!, $value: String) {
-            modifyPetitionCustomProperty(petitionId: $petitionId, key: $key, value: $value) {
-              id
-            }
-          }
-        `,
-        variables: {
-          petitionId: toGlobalId("Petition", petition.id),
-          key: "x".repeat(101),
-          value: "abcd",
-        },
-      });
-
-      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
-      expect(data).toBeNull();
-    });
-
-    it("throws error if passing a value with more than 1000 chars", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($petitionId: GID!, $key: String!, $value: String) {
-            modifyPetitionCustomProperty(petitionId: $petitionId, key: $key, value: $value) {
-              id
-            }
-          }
-        `,
-        variables: {
-          petitionId: toGlobalId("Petition", petition.id),
-          key: "x",
-          value: "x".repeat(1001),
-        },
-      });
-
-      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
-      expect(data).toBeNull();
-    });
-
-    it("throws error if trying to add more than 20 distinct properties", async () => {
-      const customProperties: any = {};
-      for (let i = 0; i < 20; i++) {
-        customProperties[i] = ".";
-      }
-      await mocks
-        .knex("petition")
-        .where("id", petition.id)
-        .update("custom_properties", customProperties);
-
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($petitionId: GID!, $key: String!, $value: String) {
-            modifyPetitionCustomProperty(petitionId: $petitionId, key: $key, value: $value) {
-              id
-            }
-          }
-        `,
-        variables: {
-          petitionId: toGlobalId("Petition", petition.id),
-          key: "x",
-          value: "x",
-        },
-      });
-
-      expect(errors).toContainGraphQLError("CUSTOM_PROPERTIES_LIMIT_ERROR");
-      expect(data).toBeNull();
-    });
-
-    it("edits an already setted property", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($petitionId: GID!, $key: String!, $value: String) {
-            modifyPetitionCustomProperty(petitionId: $petitionId, key: $key, value: $value) {
-              customProperties
-            }
-          }
-        `,
-        variables: {
-          petitionId: toGlobalId("Petition", petition.id),
-          key: "15",
-          value: "abcd",
-        },
-      });
-
-      const newProperties: any = {};
-      for (let i = 0; i < 20; i++) {
-        newProperties[i] = i === 15 ? "abcd" : ".";
-      }
-
-      expect(errors).toBeUndefined();
-      expect(data?.modifyPetitionCustomProperty.customProperties).toEqual(newProperties);
-    });
-
-    it("deletes a property", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($petitionId: GID!, $key: String!, $value: String) {
-            modifyPetitionCustomProperty(petitionId: $petitionId, key: $key, value: $value) {
-              customProperties
-            }
-          }
-        `,
-        variables: {
-          petitionId: toGlobalId("Petition", petition.id),
-          key: "15",
-          value: null,
-        },
-      });
-
-      const newProperties: any = {};
-      for (let i = 0; i < 20; i++) {
-        if (i !== 15) {
-          newProperties[i] = ".";
-        }
-      }
-      expect(errors).toBeUndefined();
-      expect(data?.modifyPetitionCustomProperty.customProperties).toEqual(newProperties);
-    });
-
-    it("throws error if trying to modify properties on a private petition", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($petitionId: GID!, $key: String!, $value: String) {
-            modifyPetitionCustomProperty(petitionId: $petitionId, key: $key, value: $value) {
-              id
-            }
-          }
-        `,
-        variables: {
-          petitionId: toGlobalId("Petition", otherPetition.id),
-          key: "15",
-          value: "123",
-        },
-      });
-
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
-    });
-  });
-
   describe("completePetition", () => {
     let petitions: Petition[];
     let signatureIntegration: OrgIntegration;
@@ -6527,42 +6241,6 @@ describe("GraphQL/Petitions", () => {
           {
             petitionId: toGlobalId("Petition", readPetition.id),
             metadata: { key: "value" },
-          },
-        );
-
-        expect(errors).toContainGraphQLError("FORBIDDEN");
-        expect(data).toBeNull();
-      });
-    });
-
-    describe("modifyPetitionCustomProperty", () => {
-      it("should not be able to update custom properties with READ access", async () => {
-        const [readPetition] = await mocks.createRandomPetitions(
-          organization.id,
-          sessionUser.id,
-          1,
-          () => ({
-            custom_properties: {
-              "my-property": "12345",
-            },
-          }),
-          () => ({
-            type: "READ",
-          }),
-        );
-
-        const { errors, data } = await testClient.execute(
-          gql`
-            mutation ($petitionId: GID!, $key: String!, $value: String) {
-              modifyPetitionCustomProperty(petitionId: $petitionId, key: $key, value: $value) {
-                id
-              }
-            }
-          `,
-          {
-            petitionId: toGlobalId("Petition", readPetition.id),
-            key: "key",
-            value: "abcd",
           },
         );
 
