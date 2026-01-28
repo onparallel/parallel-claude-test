@@ -21,7 +21,7 @@ export function useProfileFieldValueFilterOperators(
                 id: "generic.profile-field-values-filter-operator-has-value-file",
                 defaultMessage: "has files",
               })
-            : field.type === "BACKGROUND_CHECK"
+            : field.type === "BACKGROUND_CHECK" || field.type === "ADVERSE_MEDIA_SEARCH"
               ? intl.formatMessage({
                   id: "generic.profile-field-values-filter-operator-has-value-bg-check",
                   defaultMessage: "has performed search",
@@ -39,7 +39,7 @@ export function useProfileFieldValueFilterOperators(
                 id: "generic.profile-field-values-filter-operator-not-has-value-file",
                 defaultMessage: "does not have files",
               })
-            : field.type === "BACKGROUND_CHECK"
+            : field.type === "BACKGROUND_CHECK" || field.type === "ADVERSE_MEDIA_SEARCH"
               ? intl.formatMessage({
                   id: "generic.profile-field-values-filter-operator-not-has-value-bg-check",
                   defaultMessage: "has not performed search",
@@ -246,6 +246,48 @@ export function useProfileFieldValueFilterOperators(
 
     if (field.type === "ADVERSE_MEDIA_SEARCH") {
       operators.push(
+        {
+          label: intl.formatMessage({
+            id: "generic.profile-field-values-filter-operator-has-results",
+            defaultMessage: "has results",
+          }),
+          value: "HAS_AM_RESULTS",
+        },
+        {
+          label: intl.formatMessage({
+            id: "generic.profile-field-values-filter-operator-does-not-have-results",
+            defaultMessage: "does not have results",
+          }),
+          value: "NOT_HAS_AM_RESULTS",
+        },
+        {
+          label: intl.formatMessage({
+            id: "generic.profile-field-values-filter-operator-has-dismissed-articles",
+            defaultMessage: "has dismissed articles",
+          }),
+          value: "HAS_DISMISSED_ARTICLES",
+        },
+        {
+          label: intl.formatMessage({
+            id: "generic.profile-field-values-filter-operator-does-not-have-dismissed-articles",
+            defaultMessage: "does not have dismissed articles",
+          }),
+          value: "NOT_HAS_DISMISSED_ARTICLES",
+        },
+        {
+          label: intl.formatMessage({
+            id: "generic.profile-field-values-filter-operator-has-saved-articles",
+            defaultMessage: "has saved articles",
+          }),
+          value: "HAS_SAVED_ARTICLES",
+        },
+        {
+          label: intl.formatMessage({
+            id: "generic.profile-field-values-filter-operator-does-not-have-saved-articles",
+            defaultMessage: "does not have saved articles",
+          }),
+          value: "NOT_HAS_SAVED_ARTICLES",
+        },
         {
           label: intl.formatMessage({
             id: "generic.profile-field-values-filter-operator-has-pending-review",

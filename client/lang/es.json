@@ -15915,6 +15915,21 @@
     "context": "contains"
   },
   {
+    "term": "generic.profile-field-values-filter-operator-does-not-have-dismissed-articles",
+    "definition": "no tiene artículos descartados",
+    "context": "does not have dismissed articles"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-does-not-have-results",
+    "definition": "no tiene resultados",
+    "context": "does not have results"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-does-not-have-saved-articles",
+    "definition": "no tiene artículos guardados",
+    "context": "does not have saved articles"
+  },
+  {
     "term": "generic.profile-field-values-filter-operator-ends-with",
     "definition": "acaba en",
     "context": "ends with"
@@ -15960,9 +15975,24 @@
     "context": "has these topics"
   },
   {
+    "term": "generic.profile-field-values-filter-operator-has-dismissed-articles",
+    "definition": "tiene artículos descartados",
+    "context": "has dismissed articles"
+  },
+  {
     "term": "generic.profile-field-values-filter-operator-has-pending-review",
     "definition": "está pendiente de revisión",
     "context": "has pending review"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-has-results",
+    "definition": "tiene resultados",
+    "context": "has results"
+  },
+  {
+    "term": "generic.profile-field-values-filter-operator-has-saved-articles",
+    "definition": "tiene artículos guardados",
+    "context": "has saved articles"
   },
   {
     "term": "generic.profile-field-values-filter-operator-has-value",

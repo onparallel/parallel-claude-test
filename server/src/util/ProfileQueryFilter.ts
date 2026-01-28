@@ -21,6 +21,14 @@ export const ProfileQueryFilterOperatorValues = [
   "LESS_THAN_OR_EQUAL",
   "GREATER_THAN",
   "GREATER_THAN_OR_EQUAL",
+
+  // EXPIRABLE FIELDS
+  "IS_EXPIRED",
+  "EXPIRES_IN",
+  "HAS_EXPIRY",
+  "NOT_HAS_EXPIRY",
+
+  // BACKGROUND_CHECK
   "HAS_BG_CHECK_RESULTS",
   "NOT_HAS_BG_CHECK_RESULTS",
   "HAS_BG_CHECK_MATCH",
@@ -29,10 +37,16 @@ export const ProfileQueryFilterOperatorValues = [
   "NOT_HAS_BG_CHECK_TOPICS",
   "HAS_ANY_BG_CHECK_TOPICS",
   "NOT_HAS_ANY_BG_CHECK_TOPICS",
-  "IS_EXPIRED",
-  "EXPIRES_IN",
-  "HAS_EXPIRY",
-  "NOT_HAS_EXPIRY",
+
+  // ADVERSE_MEDIA_SEARCH
+  "HAS_AM_RESULTS",
+  "NOT_HAS_AM_RESULTS",
+  "HAS_DISMISSED_ARTICLES",
+  "NOT_HAS_DISMISSED_ARTICLES",
+  "HAS_SAVED_ARTICLES",
+  "NOT_HAS_SAVED_ARTICLES",
+
+  // BACKGROUND_CHECK / ADVERSE_MEDIA_SEARCH
   "HAS_PENDING_REVIEW",
   "NOT_HAS_PENDING_REVIEW",
 ] as const;
@@ -226,7 +240,16 @@ export function mapAndValidateProfileQueryFilter(
           }
           break;
         case "ADVERSE_MEDIA_SEARCH":
-          validateOperator(value.operator, ["HAS_PENDING_REVIEW", "NOT_HAS_PENDING_REVIEW"]);
+          validateOperator(value.operator, [
+            "HAS_PENDING_REVIEW",
+            "NOT_HAS_PENDING_REVIEW",
+            "HAS_AM_RESULTS",
+            "NOT_HAS_AM_RESULTS",
+            "HAS_SAVED_ARTICLES",
+            "NOT_HAS_SAVED_ARTICLES",
+            "HAS_DISMISSED_ARTICLES",
+            "NOT_HAS_DISMISSED_ARTICLES",
+          ]);
           assert(isNullish(value.value), `value not needed when ${value.operator}`);
           break;
         case "USER_ASSIGNMENT":

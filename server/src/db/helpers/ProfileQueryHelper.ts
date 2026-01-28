@@ -343,7 +343,33 @@ export class ProfileQueryHelper {
               alias,
             ]);
           }
-
+          break;
+        case "HAS_AM_RESULTS":
+          if (negated) {
+            q.whereRaw(/* sql */ ` (? #>> '{articles,totalCount}')::int = 0`, [content]);
+          } else {
+            q.whereRaw(/* sql */ ` (? #>> '{articles,totalCount}')::int > 0`, [content]);
+          }
+          break;
+        case "HAS_SAVED_ARTICLES":
+          if (negated) {
+            q.whereRaw(/* sql */ `jsonb_array_length(? -> 'relevant_articles') = 0`, [content]);
+          } else {
+            q.whereRaw(/* sql */ `jsonb_array_length(? -> 'relevant_articles') > 0`, [content]);
+          }
+          break;
+        case "HAS_DISMISSED_ARTICLES":
+          if (negated) {
+            q.whereRaw(
+              /* sql */ `((jsonb_array_length(? -> 'dismissed_articles') = 0) and (jsonb_array_length(? -> 'irrelevant_articles') = 0))`,
+              [content, content],
+            );
+          } else {
+            q.whereRaw(
+              /* sql */ `((jsonb_array_length(? -> 'dismissed_articles') > 0) or (jsonb_array_length(? -> 'irrelevant_articles') > 0))`,
+              [content, content],
+            );
+          }
           break;
         default:
           throw new Error(`Operator ${operator} not implemented`);

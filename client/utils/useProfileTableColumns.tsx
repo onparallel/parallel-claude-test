@@ -477,6 +477,9 @@ export function ProfileValueFilterLine({
         "IS_EXPIRED",
         "HAS_EXPIRY",
         "HAS_PENDING_REVIEW",
+        "HAS_AM_RESULTS",
+        "HAS_DISMISSED_ARTICLES",
+        "HAS_SAVED_ARTICLES",
       ].includes(operator.startsWith("NOT_") ? operator.slice("NOT_".length) : operator) ? (
         <></>
       ) : (
