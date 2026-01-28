@@ -11,9 +11,10 @@ import { isNonNullish, pick } from "remeda";
 
 interface useAddNewSignatureProps {
   petition: useAddNewSignature_PetitionFragment;
+  addSignatureButtonRef?: React.RefObject<HTMLButtonElement>;
 }
 
-export function useAddNewSignature({ petition }: useAddNewSignatureProps) {
+export function useAddNewSignature({ petition, addSignatureButtonRef }: useAddNewSignatureProps) {
   let current: Maybe<UnwrapArray<useAddNewSignature_PetitionFragment["signatureRequests"]>> =
     petition.signatureRequests[0];
   if (
@@ -67,6 +68,9 @@ export function useAddNewSignature({ petition }: useAddNewSignatureProps) {
       } else {
         const signatureConfig = await showSignatureConfigDialog({
           petitionId: petition.id,
+          modalProps: {
+            finalFocusRef: addSignatureButtonRef,
+          },
         });
         await updateSignatureConfig({
           variables: { petitionId: petition.id, signatureConfig },

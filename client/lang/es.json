@@ -495,6 +495,11 @@
     "context": "Enter a meaningful name for the view"
   },
   {
+    "term": "component.associate-and-fill-profile-to-parallel-dialog.alert-popover-label",
+    "definition": "Presiona Enter para resolver los conflictos",
+    "context": "Press Enter to resolve the conflicts"
+  },
+  {
     "term": "component.associate-and-fill-profile-to-parallel-dialog.body",
     "definition": "Selecciona en qué perfil quieres guardar la información de cada grupo.",
     "context": "Select in which profile you want to save the information of each group."

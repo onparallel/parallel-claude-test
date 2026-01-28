@@ -141,6 +141,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const fieldRefs = useMultipleRefs<HTMLElement>();
   const signaturesRef = useRef<HTMLElement>(null);
   const variablesRef = useRef<HTMLElement>(null);
+  const associateProfileButtonRef = useRef<HTMLButtonElement>(null);
+  const exportRepliesButtonRef = useRef<HTMLButtonElement>(null);
+  const exportPdfButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     // force a rerender when active field is coming from url so the flyout repositions
@@ -351,6 +354,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     try {
       const res = await showExportRepliesDialog({
         petitionId,
+        modalProps: {
+          finalFocusRef: exportRepliesButtonRef,
+        },
       });
 
       if (res.type === "DOWNLOAD_ZIP") {
@@ -361,6 +367,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           petitionId: petition.id,
           pattern,
           externalClientId,
+          modalProps: {
+            finalFocusRef: exportPdfButtonRef,
+          },
         });
       } else if (res.type === "FILE_EXPORT_PROVIDER") {
         const integrationId = me.organization.fileExportIntegrations.items[0].id;
@@ -457,6 +466,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       await showArchiveRepliesIntoProfileDialog({
         petitionId: petition.id,
         onRefetch: () => refetch(),
+        modalProps: {
+          finalFocusRef: associateProfileButtonRef,
+        },
       });
     } catch {}
   };
@@ -639,6 +651,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         ((!petition.isAnonymized && myEffectivePermission !== "READ") ||
           petition.profiles.length > 0) ? (
           <ResponsiveButtonIcon
+            ref={associateProfileButtonRef}
             colorScheme="primary"
             data-action="associate-profile"
             icon={<ProfilesIcon />}
@@ -671,6 +684,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         ) : null}
         {showDownloadAll && !isAnonymizedOrDeletionScheduled ? (
           <ResponsiveButtonIcon
+            ref={exportRepliesButtonRef}
             icon={<DownloadIcon fontSize="lg" display="block" />}
             onClick={handleDownloadAllClick}
             label={intl.formatMessage({
@@ -681,6 +695,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         ) : null}
         {petition.isDocumentGenerationEnabled && !isAnonymizedOrDeletionScheduled ? (
           <ResponsiveButtonIcon
+            ref={exportPdfButtonRef}
             icon={<FilePdfIcon fontSize="lg" display="block" />}
             onClick={() => setTimeout(() => handlePrintPdfTask(petition.id), 100)}
             label={intl.formatMessage({

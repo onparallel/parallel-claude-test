@@ -183,7 +183,8 @@ export const PetitionApprovalsCard = chakraForwardRef<"section", PetitionApprova
       currentSignatureRequest = null;
     }
 
-    const addNewSignature = useAddNewSignature({ petition });
+    const addSignatureButtonRef = useRef<HTMLButtonElement>(null);
+    const addNewSignature = useAddNewSignature({ petition, addSignatureButtonRef });
     const handleAddNewSignature = async () => {
       await addNewSignature();
     };
@@ -530,6 +531,7 @@ export const PetitionApprovalsCard = chakraForwardRef<"section", PetitionApprova
                   currentSignatureRequest?.status === "COMPLETED" ||
                   currentSignatureRequest?.status === "CANCELLED") ? (
                   <IconButtonWithTooltip
+                    ref={addSignatureButtonRef}
                     isDisabled={isDisabled}
                     label={intl.formatMessage({
                       id: "component.petition-signatures-card.add-signature-label",

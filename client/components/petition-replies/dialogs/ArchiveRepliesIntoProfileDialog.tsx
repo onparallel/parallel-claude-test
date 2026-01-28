@@ -280,6 +280,8 @@ function ArchiveRepliesIntoProfileRow({
     );
   }
 
+  const saveProfileButtonRef = useRef<HTMLButtonElement>(null);
+
   const field = fields[0];
   const reply = replies[0];
 
@@ -484,7 +486,11 @@ function ArchiveRepliesIntoProfileRow({
       );
 
       if (hasRestrictedInChildren || hasRestrictedInUpdateProfileOnClose) {
-        await showRestrictedProfilePropertiesDialog();
+        await showRestrictedProfilePropertiesDialog({
+          modalProps: {
+            finalFocusRef: saveProfileButtonRef,
+          },
+        });
       }
 
       const response = await archiveFieldGroupReplyIntoProfile({
@@ -532,6 +538,9 @@ function ArchiveRepliesIntoProfileRow({
               petitionId: petition.id,
               profileId: profile!.id,
               conflicts,
+              modalProps: {
+                finalFocusRef: saveProfileButtonRef,
+              },
             });
           }
 
@@ -551,6 +560,9 @@ function ArchiveRepliesIntoProfileRow({
               expirations = await showConfigureExpirationsDateDialog({
                 profileId: profile!.id,
                 pendingExpirations: filteredPendingExpirations,
+                modalProps: {
+                  finalFocusRef: saveProfileButtonRef,
+                },
               });
             }
             response = await archiveFieldGroupReplyIntoProfile({
@@ -821,6 +833,7 @@ function ArchiveRepliesIntoProfileRow({
       !state.isEditing ? (
         <HStack gap={0}>
           <Button
+            ref={saveProfileButtonRef}
             colorPalette="primary"
             leftIcon={<RepeatIcon />}
             onClick={async () => {
@@ -845,7 +858,21 @@ function ArchiveRepliesIntoProfileRow({
           <Box>
             <FormattedMessage id="generic.saved" defaultMessage="Saved" />
           </Box>
-          <AlertPopover boxSize={4}>
+          <AlertPopover
+            boxSize={4}
+            focusable={true}
+            onKeyDown={async (e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                e.stopPropagation();
+                await handleArchiveRepliesIntoProfile(state.selectedProfileId!);
+              }
+            }}
+            aria-label={intl.formatMessage({
+              id: "component.associate-and-fill-profile-to-parallel-dialog.alert-popover-label",
+              defaultMessage: "Press Enter to resolve the conflicts",
+            })}
+          >
             <Stack>
               <Text>
                 <FormattedMessage

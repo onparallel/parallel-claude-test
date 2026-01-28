@@ -16,7 +16,7 @@ import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapArray } from "@parallel/utils/types";
 import { useAddNewSignature } from "@parallel/utils/useAddNewSignature";
 import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFiles";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { Card, CardHeader } from "../common/Card";
@@ -65,7 +65,8 @@ export const PetitionSignaturesCard = chakraForwardRef<"section", PetitionSignat
 
     const signatureEnvironment = getPetitionSignatureEnvironment(petition);
 
-    const addNewSignature = useAddNewSignature({ petition });
+    const addSignatureButtonRef = useRef<HTMLButtonElement>(null);
+    const addNewSignature = useAddNewSignature({ petition, addSignatureButtonRef });
     const handleAddNewSignature = async () => {
       await addNewSignature();
     };
@@ -87,6 +88,7 @@ export const PetitionSignaturesCard = chakraForwardRef<"section", PetitionSignat
               current?.status === "COMPLETED" ||
               current?.status === "CANCELLED" ? (
                 <IconButtonWithTooltip
+                  ref={addSignatureButtonRef}
                   isDisabled={isDisabled}
                   label={intl.formatMessage({
                     id: "component.petition-signatures-card.add-signature-label",
