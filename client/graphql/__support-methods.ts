@@ -998,6 +998,62 @@ export const supportMethods: {
   },
   {
     field: {
+      name: "tokenDecrypt",
+      description: "Decrypts a token",
+      args: [
+        {
+          name: "token",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "String", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "query",
+  },
+  {
+    field: {
+      name: "tokenEncrypt",
+      description: "Encrypts a token",
+      args: [
+        {
+          name: "token",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "String", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "query",
+  },
+  {
+    field: {
       name: "transferAdminPermissions",
       description:
         'Creates an "Admins" team on the organization and removes Admin-only permissions from "All Users". Org owner will be added to "Admins" team.',

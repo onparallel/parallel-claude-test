@@ -4813,6 +4813,8 @@ export interface NexusGenFieldTypes {
     tagsByName: NexusGenRootTypes["TagPagination"]; // TagPagination!
     task: NexusGenRootTypes["Task"]; // Task!
     templates: NexusGenRootTypes["PetitionBaseOrFolderPagination"]; // PetitionBaseOrFolderPagination!
+    tokenDecrypt: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    tokenEncrypt: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     userGroup: NexusGenRootTypes["UserGroup"] | null; // UserGroup
     userGroups: NexusGenRootTypes["UserGroupPagination"]; // UserGroupPagination!
   };
@@ -8167,6 +8169,8 @@ export interface NexusGenFieldTypeNames {
     tagsByName: "TagPagination";
     task: "Task";
     templates: "PetitionBaseOrFolderPagination";
+    tokenDecrypt: "SupportMethodResponse";
+    tokenEncrypt: "SupportMethodResponse";
     userGroup: "UserGroup";
     userGroups: "UserGroupPagination";
   };
@@ -11004,6 +11008,14 @@ export interface NexusGenArgTypes {
       offset?: number | null; // Int
       path?: string | null; // String
       search?: string | null; // String
+    };
+    tokenDecrypt: {
+      // args
+      token: string; // String!
+    };
+    tokenEncrypt: {
+      // args
+      token: string; // String!
     };
     userGroup: {
       // args

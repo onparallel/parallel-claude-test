@@ -8784,6 +8784,16 @@ type Query {
     """
     search: String
   ): PetitionBaseOrFolderPagination!
+
+  """
+  Decrypts a token
+  """
+  tokenDecrypt(token: String!): SupportMethodResponse!
+
+  """
+  Encrypts a token
+  """
+  tokenEncrypt(token: String!): SupportMethodResponse!
   userGroup(id: GID!): UserGroup
 
   """

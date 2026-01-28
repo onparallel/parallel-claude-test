@@ -144,3 +144,49 @@ export const petitionInformation = queryField("petitionInformation", {
     }
   },
 });
+
+export const tokenDecrypt = queryField("tokenDecrypt", {
+  description: "Decrypts a token",
+  type: "SupportMethodResponse",
+  args: {
+    token: nonNull(stringArg()),
+  },
+  authorize: superAdminAccess(),
+  resolve: async (_, { token }, ctx) => {
+    try {
+      return {
+        result: RESULT.SUCCESS,
+        message: ctx.encryption.decrypt(Buffer.from(token, "hex"), "utf8"),
+        type: "copy-to-clipboard",
+      };
+    } catch (e) {
+      return {
+        result: RESULT.FAILURE,
+        message: e instanceof Error ? e.message : "Something went wrong...",
+      };
+    }
+  },
+});
+
+export const tokenEncrypt = queryField("tokenEncrypt", {
+  description: "Encrypts a token",
+  type: "SupportMethodResponse",
+  args: {
+    token: nonNull(stringArg()),
+  },
+  authorize: superAdminAccess(),
+  resolve: async (_, { token }, ctx) => {
+    try {
+      return {
+        result: RESULT.SUCCESS,
+        message: ctx.encryption.encrypt(token, "hex"),
+        type: "copy-to-clipboard",
+      };
+    } catch (e) {
+      return {
+        result: RESULT.FAILURE,
+        message: e instanceof Error ? e.message : "Something went wrong...",
+      };
+    }
+  },
+});

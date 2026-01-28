@@ -6755,6 +6755,10 @@ export interface Query {
   task: Task;
   /** The available templates */
   templates: PetitionBaseOrFolderPagination;
+  /** Decrypts a token */
+  tokenDecrypt: SupportMethodResponse;
+  /** Encrypts a token */
+  tokenEncrypt: SupportMethodResponse;
   userGroup?: Maybe<UserGroup>;
   /** Paginated list of user groups in the organization */
   userGroups: UserGroupPagination;
@@ -7083,6 +7087,14 @@ export interface QuerytemplatesArgs {
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   path?: InputMaybe<Scalars["String"]["input"]>;
   search?: InputMaybe<Scalars["String"]["input"]>;
+}
+
+export interface QuerytokenDecryptArgs {
+  token: Scalars["String"]["input"];
+}
+
+export interface QuerytokenEncryptArgs {
+  token: Scalars["String"]["input"];
 }
 
 export interface QueryuserGroupArgs {
