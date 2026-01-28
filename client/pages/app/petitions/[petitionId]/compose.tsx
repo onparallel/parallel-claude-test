@@ -1011,7 +1011,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       try {
         await showCreatePetitionFieldGroupProfileTypeDialog({
           type,
-          petitionId: petition.id,
+          petitionId,
           profileTypeId,
           onAddField: handleAddField,
           profileTypes: queryObject.petitionComposeProfileTypes.items,

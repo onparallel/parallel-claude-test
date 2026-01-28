@@ -43,6 +43,8 @@ export function getProfileTypeStandardTypeKeywords(type: ProfileTypeStandardType
         "filial",
         "subsidiary",
       ];
+    case "MATTER":
+      return [...genericKeywords, "asunto", "expediente", "matter", "case"];
     default:
       throw new Error(`Missing keywords ProfileTypeStandardType  "${type}"`);
   }

@@ -20730,6 +20730,11 @@
     "context": "Legal representative"
   },
   {
+    "term": "util.use-get-profile-type-groups-suggestions.group-name-matter",
+    "definition": "Matter",
+    "context": "Matter"
+  },
+  {
     "term": "util.use-get-profile-type-groups-suggestions.group-name-supplier",
     "definition": "Supplier",
     "context": "Supplier"

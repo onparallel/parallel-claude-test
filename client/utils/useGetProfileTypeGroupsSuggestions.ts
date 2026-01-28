@@ -25,7 +25,11 @@ enum LegalEntityType {
   BRANCH = "BRANCH",
 }
 
-export type FIELD_GROUP_SUGGESTIONS = ContractType | IndividualType | LegalEntityType;
+enum MatterType {
+  MATTER = "MATTER",
+}
+
+export type FIELD_GROUP_SUGGESTIONS = ContractType | IndividualType | LegalEntityType | MatterType;
 
 export type FieldGroupSuggestion<T> = {
   id: T;
@@ -44,7 +48,9 @@ type SuggestionMap = {
       ? FieldGroupSuggestion<IndividualType>[]
       : K extends "LEGAL_ENTITY"
         ? FieldGroupSuggestion<LegalEntityType>[]
-        : never;
+        : K extends "MATTER"
+          ? FieldGroupSuggestion<MatterType>[]
+          : never;
 };
 
 /**
@@ -59,6 +65,23 @@ export function useGetProfileTypeGroupsSuggestions(
 
   const suggestions = useMemo(
     (): SuggestionMap => ({
+      MATTER: [
+        {
+          id: MatterType.MATTER,
+          name: intl.formatMessage({
+            id: "util.use-get-profile-type-groups-suggestions.group-name-matter",
+            defaultMessage: "Matter",
+          }),
+          settings: {
+            multiple: false,
+            isInternal: true,
+          },
+          relationship: {
+            direction: "RIGHT_LEFT",
+            alias: "p_client__matter",
+          },
+        },
+      ],
       CONTRACT: [
         {
           id: ContractType.CONTRACT,
