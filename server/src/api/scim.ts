@@ -152,43 +152,69 @@ scim
         }
 
         if (ssoIntegrations.length > 0) {
-          try {
-            const user = await req.context.accountSetup.createUser(
-              {
-                org_id: orgId,
-                status: active ? "ACTIVE" : "INACTIVE",
-                external_id: externalId,
-              },
-              {
-                // fake unique cognitoId, should update when user logs in
-                cognito_id: `${req.context.organization!.id}_${externalId}`,
-                email: email.toLowerCase(),
-                first_name: name.givenName,
-                last_name: name.familyName,
-                details: {
-                  source: "SCIM",
+          // find userData by email
+          const userData = await req.context.users.loadUserDataByEmail(email);
+
+          // if userData is found, find user by userData.id/orgId and update the user with the new data
+          if (isNonNullish(userData)) {
+            const user = (await req.context.users.loadUsersByUserDataId(userData.id)).find(
+              (u) => u.org_id === orgId,
+            );
+            if (isNonNullish(user)) {
+              await req.context.users.updateUserById(
+                user.id,
+                {
+                  status: active ? "ACTIVE" : "INACTIVE",
+                  external_id: externalId,
                 },
-                preferred_locale: "en",
-              },
-              `Provisioning:${req.context.organization!.id}`,
-            );
-            const userData = (await req.context.users.loadUserData(user.user_data_id))!;
-            res.json(
-              toScimUser({
-                ...pick(user, ["status", "external_id"]),
-                ...pick(userData, ["email", "first_name", "last_name"]),
-              }),
-            );
-          } catch (error) {
-            if (
-              error instanceof DatabaseError &&
-              error.constraint === "user__org_id__user_data_id"
-            ) {
-              req.context.logger.error(
-                `User ${email} already exists on organization ${orgId}. New externalId: ${externalId}`,
+                `Provisioning:${req.context.organization!.id}`,
               );
+            } else {
+              req.context.logger.error(
+                `Found UserData:${userData.id} but no user for Organization:${orgId}`,
+              );
+              return res.status(401).send("User not found");
             }
-            throw error;
+          } else {
+            // if userData is not found, create a new userData and user
+            try {
+              const user = await req.context.accountSetup.createUser(
+                {
+                  org_id: orgId,
+                  status: active ? "ACTIVE" : "INACTIVE",
+                  external_id: externalId,
+                },
+                {
+                  // fake unique cognitoId, should update when user logs in
+                  cognito_id: `${req.context.organization!.id}_${externalId}`,
+                  email: email.toLowerCase(),
+                  first_name: name.givenName,
+                  last_name: name.familyName,
+                  details: {
+                    source: "SCIM",
+                  },
+                  preferred_locale: "en",
+                },
+                `Provisioning:${req.context.organization!.id}`,
+              );
+              const userData = (await req.context.users.loadUserData(user.user_data_id))!;
+              res.json(
+                toScimUser({
+                  ...pick(user, ["status", "external_id"]),
+                  ...pick(userData, ["email", "first_name", "last_name"]),
+                }),
+              );
+            } catch (error) {
+              if (
+                error instanceof DatabaseError &&
+                error.constraint === "user__org_id__user_data_id"
+              ) {
+                req.context.logger.error(
+                  `User ${email} already exists on organization ${orgId}. New externalId: ${externalId}`,
+                );
+              }
+              throw error;
+            }
           }
         } else {
           res.sendStatus(401);

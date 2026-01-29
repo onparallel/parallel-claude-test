@@ -456,6 +456,19 @@ export class UserRepository extends BaseRepository {
       return userDataIds.map((id) => resultsById[id]?.path ?? null);
     },
   );
+
+  readonly loadUserDataByEmail = this.buildLoader<string, UserData | null>(async (emails, t) => {
+    if (emails.length === 0) {
+      return [];
+    }
+    const userData = await this.from("user_data", t)
+      .whereIn("email", emails)
+      .whereNull("deleted_at")
+      .select("*");
+
+    const byEmail = indexBy(userData, (x) => x.email);
+    return emails.map((email) => byEmail[email] ?? null);
+  });
 }
 
 @injectable()
