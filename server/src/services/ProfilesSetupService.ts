@@ -50,7 +50,7 @@ type CreateProfileTypeOptions = {
 
 export const PROFILES_SETUP_SERVICE = Symbol.for("PROFILES_SETUP_SERVICE");
 export interface IProfilesSetupService {
-  createDefaultProfileType(data: CreateProfileTypeOptions, createdBy: string): Promise<ProfileType>;
+  createBlankProfileType(data: CreateProfileTypeOptions, createdBy: string): Promise<ProfileType>;
   createContractProfileType(
     data: CreateProfileTypeOptions,
     createdBy: string,
@@ -71,6 +71,7 @@ export interface IProfilesSetupService {
     createdBy: string,
     t?: Knex.Transaction,
   ): Promise<ProfileType>;
+  createDefaultProfileTypes(orgId: number, createdBy: string): Promise<ProfileType[]>;
   getProfileTypeFieldsDefinition(
     standardType: ProfileTypeStandardType,
   ): Promise<StandardProfileTypeFieldDefinition[]>;
@@ -89,7 +90,40 @@ export class ProfilesSetupService implements IProfilesSetupService {
     @inject(ViewRepository) private views: ViewRepository,
   ) {}
 
-  async createDefaultProfileType(data: CreateProfileTypeOptions, createdBy: string) {
+  async createDefaultProfileTypes(orgId: number, createdBy: string) {
+    return [
+      await this.createIndividualProfileType(
+        {
+          org_id: orgId,
+          name: await this.intl.getLocalizableUserText({
+            id: "profiles.default-profile-type.individual",
+            defaultMessage: "Individual",
+          }),
+          name_plural: await this.intl.getLocalizableUserText({
+            id: "profiles.default-profile-type.individual-plural",
+            defaultMessage: "Individuals",
+          }),
+        },
+        createdBy,
+      ),
+      await this.createLegalEntityProfileType(
+        {
+          org_id: orgId,
+          name: await this.intl.getLocalizableUserText({
+            id: "profiles.default-profile-type.legal-entity",
+            defaultMessage: "Company",
+          }),
+          name_plural: await this.intl.getLocalizableUserText({
+            id: "profiles.default-profile-type.legal-entity-plural",
+            defaultMessage: "Companies",
+          }),
+        },
+        createdBy,
+      ),
+    ];
+  }
+
+  async createBlankProfileType(data: CreateProfileTypeOptions, createdBy: string) {
     return await this.profiles.withTransaction(async (t) => {
       const [profileType] = await this.profiles.createProfileType(data, createdBy, t);
 
