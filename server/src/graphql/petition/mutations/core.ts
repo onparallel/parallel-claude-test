@@ -3482,10 +3482,11 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
             )
           : [];
 
-      const updateOnCloseConfig =
+      const updateOnCloseConfig = (
         (fieldGroup.options
           .updateProfileOnClose as PetitionFieldOptions["FIELD_GROUP"]["updateProfileOnClose"]) ??
-        [];
+        []
+      ).concat(otherRelevantGroups.flatMap((g) => g.options.updateProfileOnClose ?? []));
 
       type CollectedReplySource =
         | {
@@ -3604,11 +3605,6 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
                   type: field.type,
                 },
                 replies: field.replies
-                  .filter(
-                    (r) =>
-                      r.parent_petition_field_reply_id === null ||
-                      r.parent_petition_field_reply_id === args.parentReplyId,
-                  )
                   .map((r) => {
                     const finalValue =
                       field.type === "SELECT" && isNullish(field.options.standardList)

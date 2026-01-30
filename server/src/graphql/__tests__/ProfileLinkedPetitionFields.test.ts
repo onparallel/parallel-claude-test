@@ -11625,6 +11625,267 @@ describe("ProfileLinkedPetitionFields", () => {
         },
       });
     });
+
+    it("combines updateProfileOnClose configurations on multiple field groups with same profile type and group name", async () => {
+      const [expirationDateField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "DATE",
+      }));
+
+      const [secondFieldGroup] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "FIELD_GROUP",
+        profile_type_id: contract.id,
+        multiple: false,
+        options: JSON.stringify({
+          groupName: "Contract",
+          updateProfileOnClose: [
+            {
+              profileTypeFieldId: contractFields["p_expiration_date"].id,
+              source: { type: "FIELD", fieldId: expirationDateField.id },
+            },
+          ],
+        }),
+      }));
+
+      await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        parent_petition_field_id: secondFieldGroup.id,
+        profile_type_field_id: contractFields["p_payment_terms"].id,
+        type: "SHORT_TEXT",
+      }));
+
+      const [profile] = await mocks.createRandomProfiles(organization.id, contract.id, 1);
+      const [parentReply] = await mocks.createFieldGroupReply(fieldGroup.id, undefined, 1, () => ({
+        user_id: user.id,
+      }));
+
+      await mocks.createRandomTextReply(isConfidentialField.id, undefined, 1, () => ({
+        user_id: user.id,
+        type: "SELECT",
+        content: { value: "YES" },
+      }));
+
+      await mocks.createRandomTextReply(countryField.id, undefined, 1, () => ({
+        user_id: user.id,
+        type: "SELECT",
+        content: { value: "AR" },
+      }));
+
+      await mocks.createRandomTextReply(notesField.id, undefined, 1, () => ({
+        user_id: user.id,
+        type: "SHORT_TEXT",
+        content: { value: "Payment terms" },
+      }));
+
+      const [secondParentReply] = await mocks.createFieldGroupReply(
+        secondFieldGroup.id,
+        undefined,
+        1,
+        () => ({
+          user_id: user.id,
+        }),
+      );
+
+      await mocks.createRandomTextReply(expirationDateField.id, undefined, 1, () => ({
+        user_id: user.id,
+        type: "DATE",
+        content: { value: "2027-10-14" },
+        parent_petition_field_reply_id: secondParentReply.id,
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $parentReplyId: GID!
+            $profileId: GID!
+          ) {
+            archiveFieldGroupReplyIntoProfile(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              parentReplyId: $parentReplyId
+              profileId: $profileId
+              conflictResolutions: []
+              expirations: []
+            ) {
+              id
+              associatedProfile {
+                properties {
+                  field {
+                    alias
+                  }
+                  value {
+                    content
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fieldGroup.id),
+          parentReplyId: toGlobalId("PetitionFieldReply", parentReply.id),
+          profileId: toGlobalId("Profile", profile.id),
+        },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.archiveFieldGroupReplyIntoProfile).toEqual({
+        id: toGlobalId("PetitionFieldReply", parentReply.id),
+        associatedProfile: {
+          properties: [
+            {
+              field: {
+                alias: "p_counterparty",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_contract_type",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_effective_date",
+              },
+              value: {
+                content: { value: "2025-10-14" },
+              },
+            },
+            {
+              field: {
+                alias: "p_expiration_date",
+              },
+              value: {
+                content: { value: "2027-10-14" },
+              },
+            },
+            {
+              field: {
+                alias: "p_jurisdiction",
+              },
+              value: {
+                content: { value: "AR" },
+              },
+            },
+            {
+              field: {
+                alias: "p_contract_value",
+              },
+              value: {
+                content: { value: 100 },
+              },
+            },
+            {
+              field: {
+                alias: "p_contract_currency",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_payment_terms",
+              },
+              value: {
+                content: { value: "Payment terms" },
+              },
+            },
+            {
+              field: {
+                alias: "p_renewal_terms",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_original_document",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_amendments",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_termination_clauses",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_confidentiality_agreement",
+              },
+              value: { content: { value: "Y" } },
+            },
+            {
+              field: {
+                alias: "p_performance_metrics",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_dispute_resolution_mechanism",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_compliance_obligations",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_security_provisions",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_notes",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_billing_contact_full_name",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_billing_contact_email",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_legal_contact_full_name",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_legal_contact_email",
+              },
+              value: null,
+            },
+            {
+              field: {
+                alias: "p_signature_date",
+              },
+              value: null,
+            },
+          ],
+        },
+      });
+    });
   });
 
   describe("updatePetitionFieldGroupRelationships", () => {
