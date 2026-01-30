@@ -155,8 +155,20 @@ scim
           // find userData by email
           const userData = await req.context.users.loadUserDataByEmail(email);
 
-          // if userData is found, find user by userData.id/orgId and update the user with the new data
+          // if userData is found:
           if (isNonNullish(userData)) {
+            // first update the userData with the new data
+            if (userData.first_name !== name.givenName || userData.last_name !== name.familyName) {
+              await req.context.users.updateUserData(
+                userData.id,
+                {
+                  first_name: name.givenName,
+                  last_name: name.familyName,
+                },
+                `Provisioning:${req.context.organization!.id}`,
+              );
+            }
+            // find user by userData.id/orgId and update the user with the new data
             const user = (await req.context.users.loadUsersByUserDataId(userData.id)).find(
               (u) => u.org_id === orgId,
             );
@@ -175,6 +187,16 @@ scim
               );
               return res.status(401).send("User not found");
             }
+
+            res.json(
+              toScimUser({
+                status: active ? "ACTIVE" : "INACTIVE",
+                external_id: externalId,
+                email: email,
+                first_name: name.givenName,
+                last_name: name.familyName,
+              }),
+            );
           } else {
             // if userData is not found, create a new userData and user
             try {
