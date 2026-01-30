@@ -96,28 +96,11 @@ export class AnonymizerCronWorker extends CronWorker<"anonymizer"> {
   }
 
   private async profilesAnonymizer(config: Config["cronWorkers"]["anonymizer"]) {
-    // profile field files and values are deleted after 30 days of being removed
-    await this.deleteRemovedProfileFilesAndValues(config);
-
     // delete profiles in DELETION_SCHEDULED status for more than 90 days
     await this.deleteProfilesScheduledForDeletion(config);
 
     // anonymize profiles deleted more than 30 days ago
     await this.anonymizeDeletedProfiles(config);
-  }
-
-  private async deleteRemovedProfileFilesAndValues(config: Config["cronWorkers"]["anonymizer"]) {
-    const filesCount = await this.profiles.deleteRemovedProfileFieldFiles(
-      config.anonymizeAfterDays,
-      "AnonymizerWorker",
-    );
-    this.logger.debug(`Deleted ${filesCount} profile field files`);
-
-    const valuesCount = await this.profiles.deleteRemovedProfileFieldValues(
-      config.anonymizeAfterDays,
-      "AnonymizerWorker",
-    );
-    this.logger.debug(`Deleted ${valuesCount} profile field values`);
   }
 
   private async deleteProfilesScheduledForDeletion(config: Config["cronWorkers"]["anonymizer"]) {

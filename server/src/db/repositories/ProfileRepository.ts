@@ -2672,28 +2672,6 @@ export class ProfileRepository extends BaseRepository {
     return profileFieldFiles.map((p) => p.id);
   }
 
-  async deleteRemovedProfileFieldFiles(daysAfterRemoval: number, deletedBy: string) {
-    return await this.from("profile_field_file")
-      .whereNull("deleted_at")
-      .whereNotNull("removed_at")
-      .whereRaw(/* sql */ `"removed_at" < NOW() - make_interval(days => ?)`, [daysAfterRemoval])
-      .update({
-        deleted_at: this.now(),
-        deleted_by: deletedBy,
-      });
-  }
-
-  async deleteRemovedProfileFieldValues(daysAfterRemoval: number, deletedBy: string) {
-    return await this.from("profile_field_value")
-      .whereNull("deleted_at")
-      .whereNotNull("removed_at")
-      .whereRaw(/* sql */ `"removed_at" < NOW() - make_interval(days => ?)`, [daysAfterRemoval])
-      .update({
-        deleted_at: this.now(),
-        deleted_by: deletedBy,
-      });
-  }
-
   async anonymizeProfile(profileIds: number[], t?: Knex.Transaction) {
     if (profileIds.length === 0) {
       return [];
