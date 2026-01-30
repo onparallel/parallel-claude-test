@@ -603,7 +603,7 @@ export function petitionHasRepliableFields<
   };
 }
 
-export const petitionsAreEditable = createPetitionAuthorizer((petition) =>
+export const petitionIsNotRestricted = createPetitionAuthorizer((petition) =>
   isNullish(petition.restricted_at),
 );
 
@@ -773,6 +773,16 @@ export const petitionHasStatus = createPetitionAuthorizer(
     return true;
   },
 );
+
+export const petitionIsNotClosed = createPetitionAuthorizer((petition) => {
+  if (petition.status === "CLOSED") {
+    throw new ApolloError(
+      `Expected petition to have status CLOSED but got ${petition.status}`,
+      "PETITION_STATUS_ERROR",
+    );
+  }
+  return true;
+});
 
 export function userHasPermissionInFolders<
   TypeName extends string,
@@ -1571,18 +1581,56 @@ export function commentIsNotFromApprovalRequest<
 export function petitionDoesNotHaveStartedProcess<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>,
+  TArg extends Arg<TypeName, FieldName, number>,
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const [processType] = await ctx.petitions.getPetitionStartedProcesses(
-      unMaybeArray(getArg(args, argName)),
-    );
-    if (isNonNullish(processType)) {
+    const petitionId = getArg(args, argName);
+    const [process] = await ctx.petitions.getPetitionStartedProcesses(petitionId);
+    if (isNonNullish(process)) {
+      const processType = process.type;
       throw new ApolloError(
         `Petition has an ongoing ${processType.toLowerCase()} process`,
         `ONGOING_PROCESS_ERROR`,
         { processType },
       );
+    }
+
+    return true;
+  };
+}
+
+/**
+ * A petition can be edited by a certain user it it does not have any ongoing process,
+ * or if it has an ongoing approval and the user is an assigned approver of the current step.
+ * If the user is an assigned approver, the editions will not update petition status.
+ */
+export function userCanUpdatePetitionReplies<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, number>,
+>(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const petitionId = getArg(args, argName);
+    const startedProcesses = await ctx.petitions.getPetitionStartedProcesses(petitionId);
+
+    if (startedProcesses.some((p) => p.type === "SIGNATURE")) {
+      throw new ApolloError(`Petition has an ongoing signature process`, `ONGOING_PROCESS_ERROR`, {
+        processType: "SIGNATURE",
+      });
+    } else if (startedProcesses.some((p) => p.type === "APPROVAL")) {
+      const process = startedProcesses.find((p) => p.type === "APPROVAL")!;
+      const stepApprovers =
+        await ctx.approvalRequests.loadPetitionApprovalRequestStepApproversByStepId(
+          process.step.id,
+        );
+      if (process.step.allow_edit && stepApprovers.some((a) => a.user_id === ctx.user!.id)) {
+        return true;
+      }
+
+      // none of the approvers is the current user, edition is blocked
+      throw new ApolloError(`Petition has an ongoing approval process`, `ONGOING_PROCESS_ERROR`, {
+        processType: "APPROVAL",
+      });
     }
 
     return true;

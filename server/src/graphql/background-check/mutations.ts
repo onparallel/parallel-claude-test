@@ -1,5 +1,6 @@
 import { booleanArg, list, mutationField, nonNull, stringArg } from "nexus";
 import { isNonNullish, isNullish, uniqueBy } from "remeda";
+import { assert } from "ts-essentials";
 import { BackgroundCheckContent } from "../../services/BackgroundCheckService";
 import { includesSameElements } from "../../util/includesSameElements";
 import { authenticateAnd } from "../helpers/authorize";
@@ -68,6 +69,12 @@ export const updateBackgroundCheckEntity = mutationField("updateBackgroundCheckE
         "User",
         ctx.user!.id,
       );
+
+      const petition = await ctx.petitions.loadPetition(params.petitionId);
+      assert(petition, "Petition not found");
+      if (!petition.enable_interaction_with_recipients) {
+        await ctx.petitionsHelper.resetPetitionStatusAsUser(params.petitionId, ctx.user!.id);
+      }
     }
 
     async function profileParamsResolver(
@@ -238,6 +245,12 @@ export const updateBackgroundCheckSearchFalsePositives = mutationField(
           "User",
           ctx.user!.id,
         );
+
+        const petition = await ctx.petitions.loadPetition(params.petitionId);
+        assert(petition, "Petition not found");
+        if (!petition.enable_interaction_with_recipients) {
+          await ctx.petitionsHelper.resetPetitionStatusAsUser(params.petitionId, ctx.user!.id);
+        }
       }
 
       async function profileParamsResolver(params: NumericParams<ProfileReplyParams>) {

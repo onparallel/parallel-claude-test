@@ -7,7 +7,7 @@ import { validateRegex } from "../../helpers/validators/validateRegex";
 import {
   petitionDoesNotHaveStartedProcess,
   petitionIsNotAnonymized,
-  petitionsAreEditable,
+  petitionIsNotRestricted,
   petitionsAreNotScheduledForDeletion,
   userHasAccessToPetitions,
 } from "../authorizers";
@@ -37,7 +37,7 @@ export const createPetitionVariable = mutationField("createPetitionVariable", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     petitionsAreNotScheduledForDeletion("petitionId"),
-    petitionsAreEditable("petitionId"),
+    petitionIsNotRestricted("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     petitionVariableCanBeCreated("petitionId", "data"),
@@ -87,7 +87,7 @@ export const updatePetitionVariable = mutationField("updatePetitionVariable", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     petitionsAreNotScheduledForDeletion("petitionId"),
-    petitionsAreEditable("petitionId"),
+    petitionIsNotRestricted("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionIsNotAnonymized("petitionId"),
   ),
@@ -128,7 +128,7 @@ export const deletePetitionVariable = mutationField("deletePetitionVariable", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     petitionsAreNotScheduledForDeletion("petitionId"),
-    petitionsAreEditable("petitionId"),
+    petitionIsNotRestricted("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     variableIsNotReferencedInLogicConditions("petitionId", "name"),

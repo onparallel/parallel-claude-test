@@ -149,15 +149,15 @@ export const PetitionApprovalsCard = chakraForwardRef<"section", PetitionApprova
       ...(!reviewAfterApproval ? approvalSteps : []),
     ] as PetitionApprovalRequestStep[];
 
-    const pendingOrNotStartedStepIndex = approvalStepsWithSignature.findIndex(
-      (s) => s.status === "PENDING" || s.status === "NOT_STARTED",
+    const rejectedPendingOrNotStartedIndex = approvalStepsWithSignature.findIndex(
+      (s) => s.status === "REJECTED" || s.status === "PENDING" || s.status === "NOT_STARTED",
     );
 
     const signatureIndex = approvalStepsWithSignature.findIndex((s) => s.id === "signature");
     const lastStepIndex = approvalStepsWithSignature.length - 1;
 
     const [tabIndex, setTabIndex] = useState(
-      pendingOrNotStartedStepIndex === -1 ? lastStepIndex : pendingOrNotStartedStepIndex,
+      rejectedPendingOrNotStartedIndex === -1 ? lastStepIndex : rejectedPendingOrNotStartedIndex,
     );
     const autoChangeTabIndex = useRef(true);
 
@@ -165,7 +165,8 @@ export const PetitionApprovalsCard = chakraForwardRef<"section", PetitionApprova
       const pendingOrNotStartedStepIndex = approvalStepsWithSignature.findIndex(
         (s) => s.status === "PENDING" || s.status === "NOT_STARTED",
       );
-      if (pendingOrNotStartedStepIndex !== -1 && autoChangeTabIndex.current) {
+      const hasFinalRejection = approvalStepsWithSignature.some((s) => s.status === "REJECTED");
+      if (pendingOrNotStartedStepIndex !== -1 && autoChangeTabIndex.current && !hasFinalRejection) {
         setTabIndex(pendingOrNotStartedStepIndex);
       }
     }, [approvalStepsWithSignature.map((s) => s.status).join(","), autoChangeTabIndex.current]);

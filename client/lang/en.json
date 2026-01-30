@@ -1345,6 +1345,16 @@
     "context": "An approval step is activated after completing the form. The parallel cannot be closed until all approval steps have been completed."
   },
   {
+    "term": "component.configure-approval-steps-dialog.checkbox-allow-edit",
+    "definition": "Allow approver to edit replies",
+    "context": "Allow approver to edit replies"
+  },
+  {
+    "term": "component.configure-approval-steps-dialog.checkbox-allow-edit-help",
+    "definition": "Replies are locked by default when approvals begin. Enable this option to allow approvers to modify them.",
+    "context": "Replies are locked by default when approvals begin. Enable this option to allow approvers to modify them."
+  },
+  {
     "term": "component.configure-approval-steps-dialog.checkbox-start-approval-manually",
     "definition": "Start approval manually",
     "context": "Start approval manually"
@@ -13775,7 +13785,12 @@
     "context": "{user} shared this parallel with {other} as {permissionType} {timeAgo}"
   },
   {
-    "term": "component.timeline-user-permission-edited-event.description",
+    "term": "component.timeline-user-permission-edited-event.triggered-by-system-description",
+    "definition": "{other}'s permission was updated to {permissionType} {timeAgo}",
+    "context": "{other}'s permission was updated to {permissionType} {timeAgo}"
+  },
+  {
+    "term": "component.timeline-user-permission-edited-event.triggered-by-user-description",
     "definition": "{user} updated {other}'s permission to {permissionType} {timeAgo}",
     "context": "{user} updated {other}'s permission to {permissionType} {timeAgo}"
   },

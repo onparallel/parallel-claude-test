@@ -1,5 +1,6 @@
 import { booleanArg, nonNull, nullable, queryField, stringArg } from "nexus";
 import { isNonNullish, isNullish } from "remeda";
+import { assert } from "ts-essentials";
 import { ProfileFieldValue } from "../../db/__types";
 import { BackgroundCheckContent, EntitySearchRequest } from "../../services/BackgroundCheckService";
 import { authenticateAnd } from "../helpers/authorize";
@@ -54,6 +55,8 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
       query: EntitySearchRequest,
       params: NumericParams<PetitionReplyParams>,
     ) {
+      const petition = await ctx.petitions.loadPetition(params.petitionId);
+      assert(petition, "Petition not found");
       const fieldReplies = await ctx.petitions.loadRepliesForField(params.fieldId);
       const reply = fieldReplies.find(
         (r) =>
@@ -63,7 +66,6 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
 
       // no reply is saved, create a new one if coming from a petition, return search if coming from a template
       if (isNullish(reply)) {
-        const petition = (await ctx.petitions.loadPetition(params.petitionId))!;
         const search = await ctx.backgroundCheck.entitySearch(query, ctx.user!.org_id);
         const newContent = {
           query,
@@ -92,6 +94,10 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
             },
             `User:${ctx.user!.id}`,
           );
+
+          if (!petition.enable_interaction_with_recipients) {
+            await ctx.petitionsHelper.resetPetitionStatusAsUser(params.petitionId, ctx.user!.id);
+          }
         }
         return ctx.backgroundCheck.mapBackgroundCheckSearch(newContent);
       }
@@ -125,6 +131,10 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
           "User",
           ctx.user!.id,
         );
+
+        if (!petition.enable_interaction_with_recipients) {
+          await ctx.petitionsHelper.resetPetitionStatusAsUser(params.petitionId, ctx.user!.id);
+        }
 
         return ctx.backgroundCheck.mapBackgroundCheckSearch(newContent);
       }
@@ -161,6 +171,10 @@ export const backgroundCheckEntitySearch = queryField("backgroundCheckEntitySear
         "User",
         ctx.user!.id,
       );
+
+      if (!petition.enable_interaction_with_recipients) {
+        await ctx.petitionsHelper.resetPetitionStatusAsUser(params.petitionId, ctx.user!.id);
+      }
 
       return ctx.backgroundCheck.mapBackgroundCheckSearch(newContent);
     }
@@ -435,6 +449,12 @@ export const backgroundCheckEntityDetails = queryField("backgroundCheckEntityDet
         "User",
         ctx.user!.id,
       );
+
+      const petition = await ctx.petitions.loadPetition(params.petitionId);
+      assert(petition, "Petition not found");
+      if (!petition.enable_interaction_with_recipients) {
+        await ctx.petitionsHelper.resetPetitionStatusAsUser(params.petitionId, ctx.user!.id);
+      }
 
       return ctx.backgroundCheck.mapBackgroundCheckEntity(newDetails, newDetails.id);
     }

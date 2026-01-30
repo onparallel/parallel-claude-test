@@ -1,5 +1,6 @@
 import { mutationField, nonNull, nullable, stringArg } from "nexus";
 import { uniqueBy } from "remeda";
+import { assert } from "ts-essentials";
 import { AdverseMediaSearchContent } from "../../services/AdverseMediaSearchService";
 import { authenticateAnd } from "../helpers/authorize";
 import { ForbiddenError } from "../helpers/errors";
@@ -116,6 +117,12 @@ export const classifyAdverseMediaArticle = mutationField("classifyAdverseMediaAr
         "User",
         ctx.user!.id,
       );
+
+      const petition = await ctx.petitions.loadPetition(params.petitionId);
+      assert(petition, "Petition not found");
+      if (!petition.enable_interaction_with_recipients) {
+        await ctx.petitionsHelper.resetPetitionStatusAsUser(params.petitionId, ctx.user!.id);
+      }
     }
 
     async function profileParamsResolver(params: NumericParams<ProfileReplyParams>) {

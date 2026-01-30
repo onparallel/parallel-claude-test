@@ -180,6 +180,7 @@ export type AiCompletionLogStatus = "COMPLETED" | "FAILED" | "PENDING";
 
 export interface ApprovalFlowConfig {
   __typename?: "ApprovalFlowConfig";
+  allowEdit: Scalars["Boolean"]["output"];
   /** List of users that are assigned to approve this step. */
   approvers: Array<Maybe<User>>;
   manualStart: Scalars["Boolean"]["output"];
@@ -191,6 +192,8 @@ export interface ApprovalFlowConfig {
 }
 
 export interface ApprovalFlowConfigInput {
+  /** Whether the approvers can edite the replies of the petition fields */
+  allowEdit: Scalars["Boolean"]["input"];
   /** Forces step to start manually after completing, signing, or approving a previous step. */
   manualStart: Scalars["Boolean"]["input"];
   name: Scalars["String"]["input"];
@@ -4094,6 +4097,7 @@ export type PetitionApprovalRequestStatus =
 
 export interface PetitionApprovalRequestStep {
   __typename?: "PetitionApprovalRequestStep";
+  allowEdit: Scalars["Boolean"]["output"];
   approvalType: PetitionApprovalRequestStepApprovalType;
   approvers: Array<PetitionApprovalRequestStepApprover>;
   id: Scalars["GID"]["output"];
@@ -7983,6 +7987,7 @@ export interface UserPermissionEditedEvent extends PetitionEvent {
   permissionType: PetitionPermissionType;
   permissionUser?: Maybe<User>;
   petition?: Maybe<Petition>;
+  triggeredBy: PetitionEventTriggeredBy;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -18980,6 +18985,7 @@ export type PetitionActivityTimeline_PetitionEvent_UserPermissionAddedEvent_Frag
 export type PetitionActivityTimeline_PetitionEvent_UserPermissionEditedEvent_Fragment = {
   __typename?: "UserPermissionEditedEvent";
   id: string;
+  triggeredBy: PetitionEventTriggeredBy;
   permissionType: PetitionPermissionType;
   createdAt: string;
   user?: {
@@ -20909,6 +20915,7 @@ export type TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment = 
 
 export type TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragment = {
   __typename?: "UserPermissionEditedEvent";
+  triggeredBy: PetitionEventTriggeredBy;
   permissionType: PetitionPermissionType;
   createdAt: string;
   user?: {
@@ -23283,6 +23290,7 @@ export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
     manualStart: boolean;
+    allowEdit: boolean;
   }> | null;
   signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
@@ -23461,6 +23469,7 @@ export type SignatureConfigDialog_PetitionBase_PetitionTemplate_Fragment = {
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
     manualStart: boolean;
+    allowEdit: boolean;
   }> | null;
   fields: Array<{
     __typename?: "PetitionField";
@@ -23666,6 +23675,7 @@ export type SignatureConfigDialog_petitionQuery = {
           values: Array<string>;
           visibility?: { [key: string]: any } | null;
           manualStart: boolean;
+          allowEdit: boolean;
         }> | null;
         signatureRequests: Array<{
           __typename?: "PetitionSignatureRequest";
@@ -23847,6 +23857,7 @@ export type SignatureConfigDialog_petitionQuery = {
           values: Array<string>;
           visibility?: { [key: string]: any } | null;
           manualStart: boolean;
+          allowEdit: boolean;
         }> | null;
         fields: Array<{
           __typename?: "PetitionField";
@@ -26753,6 +26764,7 @@ export type PetitionComposeRightPaneTabs_PetitionBase_Petition_Fragment = {
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
     manualStart: boolean;
+    allowEdit: boolean;
   }> | null;
   automaticNumberingConfig?: {
     __typename?: "AutomaticNumberingConfig";
@@ -26871,6 +26883,7 @@ export type PetitionComposeRightPaneTabs_PetitionBase_PetitionTemplate_Fragment 
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
     manualStart: boolean;
+    allowEdit: boolean;
   }> | null;
   automaticNumberingConfig?: {
     __typename?: "AutomaticNumberingConfig";
@@ -27237,6 +27250,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
     manualStart: boolean;
+    allowEdit: boolean;
   }> | null;
   automaticNumberingConfig?: {
     __typename?: "AutomaticNumberingConfig";
@@ -27328,6 +27342,7 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
     manualStart: boolean;
+    allowEdit: boolean;
   }> | null;
   automaticNumberingConfig?: {
     __typename?: "AutomaticNumberingConfig";
@@ -27767,6 +27782,7 @@ export type ConfigureApprovalStepsDialog_PetitionBase_Petition_Fragment = {
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
     manualStart: boolean;
+    allowEdit: boolean;
   }> | null;
   fields: Array<{
     __typename?: "PetitionField";
@@ -27833,6 +27849,7 @@ export type ConfigureApprovalStepsDialog_PetitionBase_PetitionTemplate_Fragment 
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
     manualStart: boolean;
+    allowEdit: boolean;
   }> | null;
   fields: Array<{
     __typename?: "PetitionField";
@@ -27909,6 +27926,7 @@ export type ConfigureApprovalStepsDialog_petitionQuery = {
           values: Array<string>;
           visibility?: { [key: string]: any } | null;
           manualStart: boolean;
+          allowEdit: boolean;
         }> | null;
         fields: Array<{
           __typename?: "PetitionField";
@@ -27978,6 +27996,7 @@ export type ConfigureApprovalStepsDialog_petitionQuery = {
           values: Array<string>;
           visibility?: { [key: string]: any } | null;
           manualStart: boolean;
+          allowEdit: boolean;
         }> | null;
         fields: Array<{
           __typename?: "PetitionField";
@@ -35947,6 +35966,7 @@ export type PetitionApprovalsCard_PetitionFragment = {
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
     manualStart: boolean;
+    allowEdit: boolean;
     approvers: Array<{
       __typename?: "User";
       id: string;
@@ -36156,6 +36176,7 @@ export type PetitionApprovalsCard_PetitionPollingFragment = {
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
     manualStart: boolean;
+    allowEdit: boolean;
     approvers: Array<{
       __typename?: "User";
       id: string;
@@ -36367,6 +36388,7 @@ export type PetitionApprovalsCard_cancelPetitionApprovalRequestStepMutation = {
         values: Array<string>;
         visibility?: { [key: string]: any } | null;
         manualStart: boolean;
+        allowEdit: boolean;
         approvers: Array<{
           __typename?: "User";
           id: string;
@@ -36723,6 +36745,7 @@ export type PetitionApprovalsCard_skipPetitionApprovalRequestStepMutation = {
         values: Array<string>;
         visibility?: { [key: string]: any } | null;
         manualStart: boolean;
+        allowEdit: boolean;
         approvers: Array<{
           __typename?: "User";
           id: string;
@@ -37081,6 +37104,7 @@ export type PetitionApprovalsCard_rejectPetitionApprovalRequestStepMutation = {
         values: Array<string>;
         visibility?: { [key: string]: any } | null;
         manualStart: boolean;
+        allowEdit: boolean;
         approvers: Array<{
           __typename?: "User";
           id: string;
@@ -37438,6 +37462,7 @@ export type PetitionApprovalsCard_approvePetitionApprovalRequestStepMutation = {
         values: Array<string>;
         visibility?: { [key: string]: any } | null;
         manualStart: boolean;
+        allowEdit: boolean;
         approvers: Array<{
           __typename?: "User";
           id: string;
@@ -37709,6 +37734,7 @@ export type PetitionApprovalsCard_petitionQuery = {
           values: Array<string>;
           visibility?: { [key: string]: any } | null;
           manualStart: boolean;
+          allowEdit: boolean;
           approvers: Array<{
             __typename?: "User";
             id: string;
@@ -55946,6 +55972,7 @@ export type PetitionActivity_eventsQuery = {
             | {
                 __typename?: "UserPermissionEditedEvent";
                 id: string;
+                triggeredBy: PetitionEventTriggeredBy;
                 permissionType: PetitionPermissionType;
                 createdAt: string;
                 user?: {
@@ -56643,6 +56670,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
     manualStart: boolean;
+    allowEdit: boolean;
   }> | null;
   selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
   variables: Array<
@@ -56934,6 +56962,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
     manualStart: boolean;
+    allowEdit: boolean;
   }> | null;
   selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
   signatureConfig?: {
@@ -57605,6 +57634,7 @@ export type PetitionCompose_updatePetitionMutation = {
           values: Array<string>;
           visibility?: { [key: string]: any } | null;
           manualStart: boolean;
+          allowEdit: boolean;
         }> | null;
         automaticNumberingConfig?: {
           __typename?: "AutomaticNumberingConfig";
@@ -57707,6 +57737,7 @@ export type PetitionCompose_updatePetitionMutation = {
           values: Array<string>;
           visibility?: { [key: string]: any } | null;
           manualStart: boolean;
+          allowEdit: boolean;
         }> | null;
         automaticNumberingConfig?: {
           __typename?: "AutomaticNumberingConfig";
@@ -59892,6 +59923,7 @@ export type PetitionCompose_petitionQuery = {
           values: Array<string>;
           visibility?: { [key: string]: any } | null;
           manualStart: boolean;
+          allowEdit: boolean;
         }> | null;
         selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
         variables: Array<
@@ -60205,6 +60237,7 @@ export type PetitionCompose_petitionQuery = {
           values: Array<string>;
           visibility?: { [key: string]: any } | null;
           manualStart: boolean;
+          allowEdit: boolean;
         }> | null;
         selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
         signatureConfig?: {
@@ -61352,6 +61385,18 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
     status: PetitionSignatureRequestStatus;
     cancelReason?: string | null;
   } | null;
+  currentApprovalRequestSteps?: Array<{
+    __typename?: "PetitionApprovalRequestStep";
+    id: string;
+    status: PetitionApprovalRequestStepStatus;
+    allowEdit: boolean;
+    stepName: string;
+    approvers: Array<{
+      __typename?: "PetitionApprovalRequestStepApprover";
+      id: string;
+      user?: { __typename?: "User"; id: string; fullName?: string | null; email: string } | null;
+    }>;
+  }> | null;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -61698,17 +61743,6 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
         }>;
       }
   >;
-  currentApprovalRequestSteps?: Array<{
-    __typename?: "PetitionApprovalRequestStep";
-    id: string;
-    stepName: string;
-    status: PetitionApprovalRequestStepStatus;
-    approvers: Array<{
-      __typename?: "PetitionApprovalRequestStepApprover";
-      id: string;
-      user?: { __typename?: "User"; id: string; fullName?: string | null; email: string } | null;
-    }>;
-  }> | null;
   automaticNumberingConfig?: {
     __typename?: "AutomaticNumberingConfig";
     numberingType: AutomaticNumberingType;
@@ -62280,6 +62314,23 @@ export type PetitionPreview_updatePetitionMutation = {
           status: PetitionSignatureRequestStatus;
           cancelReason?: string | null;
         } | null;
+        currentApprovalRequestSteps?: Array<{
+          __typename?: "PetitionApprovalRequestStep";
+          id: string;
+          status: PetitionApprovalRequestStepStatus;
+          allowEdit: boolean;
+          stepName: string;
+          approvers: Array<{
+            __typename?: "PetitionApprovalRequestStepApprover";
+            id: string;
+            user?: {
+              __typename?: "User";
+              id: string;
+              fullName?: string | null;
+              email: string;
+            } | null;
+          }>;
+        }> | null;
         organization: {
           __typename?: "Organization";
           id: string;
@@ -62630,22 +62681,6 @@ export type PetitionPreview_updatePetitionMutation = {
               }>;
             }
         >;
-        currentApprovalRequestSteps?: Array<{
-          __typename?: "PetitionApprovalRequestStep";
-          id: string;
-          stepName: string;
-          status: PetitionApprovalRequestStepStatus;
-          approvers: Array<{
-            __typename?: "PetitionApprovalRequestStepApprover";
-            id: string;
-            user?: {
-              __typename?: "User";
-              id: string;
-              fullName?: string | null;
-              email: string;
-            } | null;
-          }>;
-        }> | null;
         automaticNumberingConfig?: {
           __typename?: "AutomaticNumberingConfig";
           numberingType: AutomaticNumberingType;
@@ -63142,6 +63177,18 @@ export type PetitionPreview_completePetitionMutation = {
       status: PetitionSignatureRequestStatus;
       cancelReason?: string | null;
     } | null;
+    currentApprovalRequestSteps?: Array<{
+      __typename?: "PetitionApprovalRequestStep";
+      id: string;
+      status: PetitionApprovalRequestStepStatus;
+      allowEdit: boolean;
+      stepName: string;
+      approvers: Array<{
+        __typename?: "PetitionApprovalRequestStepApprover";
+        id: string;
+        user?: { __typename?: "User"; id: string; fullName?: string | null; email: string } | null;
+      }>;
+    }> | null;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -63488,17 +63535,6 @@ export type PetitionPreview_completePetitionMutation = {
           }>;
         }
     >;
-    currentApprovalRequestSteps?: Array<{
-      __typename?: "PetitionApprovalRequestStep";
-      id: string;
-      stepName: string;
-      status: PetitionApprovalRequestStepStatus;
-      approvers: Array<{
-        __typename?: "PetitionApprovalRequestStepApprover";
-        id: string;
-        user?: { __typename?: "User"; id: string; fullName?: string | null; email: string } | null;
-      }>;
-    }> | null;
     automaticNumberingConfig?: {
       __typename?: "AutomaticNumberingConfig";
       numberingType: AutomaticNumberingType;
@@ -63628,6 +63664,23 @@ export type PetitionPreview_petitionQuery = {
           status: PetitionSignatureRequestStatus;
           cancelReason?: string | null;
         } | null;
+        currentApprovalRequestSteps?: Array<{
+          __typename?: "PetitionApprovalRequestStep";
+          id: string;
+          status: PetitionApprovalRequestStepStatus;
+          allowEdit: boolean;
+          stepName: string;
+          approvers: Array<{
+            __typename?: "PetitionApprovalRequestStepApprover";
+            id: string;
+            user?: {
+              __typename?: "User";
+              id: string;
+              fullName?: string | null;
+              email: string;
+            } | null;
+          }>;
+        }> | null;
         organization: {
           __typename?: "Organization";
           id: string;
@@ -63978,22 +64031,6 @@ export type PetitionPreview_petitionQuery = {
               }>;
             }
         >;
-        currentApprovalRequestSteps?: Array<{
-          __typename?: "PetitionApprovalRequestStep";
-          id: string;
-          stepName: string;
-          status: PetitionApprovalRequestStepStatus;
-          approvers: Array<{
-            __typename?: "PetitionApprovalRequestStepApprover";
-            id: string;
-            user?: {
-              __typename?: "User";
-              id: string;
-              fullName?: string | null;
-              email: string;
-            } | null;
-          }>;
-        }> | null;
         automaticNumberingConfig?: {
           __typename?: "AutomaticNumberingConfig";
           numberingType: AutomaticNumberingType;
@@ -64996,6 +65033,7 @@ export type PetitionReplies_PetitionFragment = {
     values: Array<string>;
     visibility?: { [key: string]: any } | null;
     manualStart: boolean;
+    allowEdit: boolean;
     approvers: Array<{
       __typename?: "User";
       id: string;
@@ -66046,6 +66084,7 @@ export type PetitionReplies_petitionQuery = {
           values: Array<string>;
           visibility?: { [key: string]: any } | null;
           manualStart: boolean;
+          allowEdit: boolean;
           approvers: Array<{
             __typename?: "User";
             id: string;
@@ -70915,6 +70954,7 @@ export type Fragments_FullApprovalFlowConfigFragment = {
   values: Array<string>;
   visibility?: { [key: string]: any } | null;
   manualStart: boolean;
+  allowEdit: boolean;
 };
 
 export type GetMyIdQueryVariables = Exact<{ [key: string]: never }>;
@@ -78033,6 +78073,7 @@ export const TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragment
     user {
       ...UserReference_User
     }
+    triggeredBy
     permissionUser {
       ...UserReference_User
     }
@@ -79681,6 +79722,7 @@ export const Fragments_FullApprovalFlowConfigFragmentDoc = gql`
     values
     visibility
     manualStart
+    allowEdit
   }
 ` as unknown as DocumentNode<Fragments_FullApprovalFlowConfigFragment, unknown>;
 export const SignatureConfigDialog_PetitionBaseFragmentDoc = gql`
@@ -86238,6 +86280,17 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
         status
       }
       currentApprovalRequestStatus
+      currentApprovalRequestSteps {
+        id
+        status
+        allowEdit
+        approvers {
+          id
+          user {
+            id
+          }
+        }
+      }
       ...RecipientViewProgressBar_Petition
       ...useSendPetitionHandler_Petition
       ...getPetitionSignatureStatus_Petition

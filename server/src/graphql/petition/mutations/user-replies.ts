@@ -19,7 +19,7 @@ import { fromGlobalId, toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { never } from "../../../util/never";
 import { random } from "../../../util/token";
-import { and, authenticateAnd, chain, not } from "../../helpers/authorize";
+import { and, authenticateAnd, chain } from "../../helpers/authorize";
 import { ApolloError, ForbiddenError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { jsonObjectArg } from "../../helpers/scalars/JSON";
@@ -31,14 +31,15 @@ import {
   fieldTypeSwitch,
   fieldsBelongsToPetition,
   petitionDoesNotHaveStartedProcess,
-  petitionHasStatus,
   petitionIsNotAnonymized,
+  petitionIsNotClosed,
   petitionsAreNotScheduledForDeletion,
   petitionsAreOfTypePetition,
   repliesBelongsToPetition,
   replyCanBeDeleted,
   replyCanBeUpdated,
   replyIsForFieldOfType,
+  userCanUpdatePetitionReplies,
   userHasAccessToPetitions,
   userHasEnabledIntegration,
   userHasFeatureFlag,
@@ -74,13 +75,13 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", "WRITE"),
+    userCanUpdatePetitionReplies("petitionId"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["FILE_UPLOAD"]),
     fieldCanBeReplied((args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId })),
     petitionIsNotAnonymized("petitionId"),
-    not(petitionHasStatus("petitionId", "CLOSED")),
-    petitionDoesNotHaveStartedProcess("petitionId"),
+    petitionIsNotClosed("petitionId"),
   ),
   validateArgs: validateCreateFileReplyInput("fieldId", "parentReplyId", "file"),
 
@@ -102,7 +103,9 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
         `User:${ctx.user!.id}`,
       );
 
-      const [presignedPostData, [reply]] = await Promise.all([
+      const [petition, field, presignedPostData, [reply]] = await Promise.all([
+        ctx.petitions.loadPetition(args.petitionId),
+        ctx.petitions.loadField(args.fieldId),
         ctx.storage.fileUploads.getSignedUploadEndpoint(key, contentType, size),
         ctx.petitions.createPetitionFieldReply(
           args.petitionId,
@@ -117,6 +120,13 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
           `User:${ctx.user!.id}`,
         ),
       ]);
+
+      assert(petition, "Petition not found");
+      assert(field, "Field not found");
+      if (!field.is_internal || !petition.enable_interaction_with_recipients) {
+        await ctx.petitionsHelper.resetPetitionStatusAsUser(args.petitionId, ctx.user!.id);
+      }
+
       return { presignedPostData, reply };
     } catch (error) {
       if (error instanceof Error && error.message === "PETITION_SEND_LIMIT_REACHED") {
@@ -143,7 +153,7 @@ export const createFileUploadReplyComplete = mutationField("createFileUploadRepl
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["FILE_UPLOAD"]),
     petitionIsNotAnonymized("petitionId"),
-    not(petitionHasStatus("petitionId", "CLOSED")),
+    petitionIsNotClosed("petitionId"),
   ),
   resolve: async (_, args, ctx) => {
     const reply = (await ctx.petitions.loadFieldReply(args.replyId))!;
@@ -170,19 +180,19 @@ export const updateFileUploadReply = mutationField("updateFileUploadReply", {
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", "WRITE"),
+    userCanUpdatePetitionReplies("petitionId"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["FILE_UPLOAD"]),
     replyCanBeUpdated("replyId"),
     petitionIsNotAnonymized("petitionId"),
-    not(petitionHasStatus("petitionId", "CLOSED")),
-    petitionDoesNotHaveStartedProcess("petitionId"),
+    petitionIsNotClosed("petitionId"),
   ),
   validateArgs: validateUpdateFileReplyInput("file", "replyId"),
   resolve: async (_, args, ctx) => {
     const oldReply = (await ctx.petitions.loadFieldReply(args.replyId))!;
 
-    const { size, filename, contentType } = await args.file;
+    const { size, filename, contentType } = args.file;
     const key = random(16);
 
     const [newFile] = await ctx.files.createFileUpload(
@@ -216,6 +226,16 @@ export const updateFileUploadReply = mutationField("updateFileUploadReply", {
       ),
     ]);
 
+    const [petition, field] = await Promise.all([
+      ctx.petitions.loadPetition(args.petitionId),
+      ctx.petitions.loadField(oldReply.petition_field_id),
+    ]);
+    assert(petition, "Petition not found");
+    assert(field, "Field not found");
+    if (!field.is_internal || !petition.enable_interaction_with_recipients) {
+      await ctx.petitionsHelper.resetPetitionStatusAsUser(args.petitionId, ctx.user!.id);
+    }
+
     return { presignedPostData, reply };
   },
 });
@@ -234,7 +254,7 @@ export const updateFileUploadReplyComplete = mutationField("updateFileUploadRepl
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["FILE_UPLOAD"]),
     petitionIsNotAnonymized("petitionId"),
-    not(petitionHasStatus("petitionId", "CLOSED")),
+    petitionIsNotClosed("petitionId"),
   ),
   resolve: async (_, args, ctx) => {
     const reply = (await ctx.petitions.loadFieldReply(args.replyId))!;
@@ -276,10 +296,10 @@ export const deletePetitionReply = mutationField("deletePetitionReply", {
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", "WRITE"),
+    userCanUpdatePetitionReplies("petitionId"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     petitionIsNotAnonymized("petitionId"),
-    not(petitionHasStatus("petitionId", "CLOSED")),
-    petitionDoesNotHaveStartedProcess("petitionId"),
+    petitionIsNotClosed("petitionId"),
     chain(
       replyCanBeDeleted("replyId"),
       replyCanBeUpdated("replyId"),
@@ -287,7 +307,22 @@ export const deletePetitionReply = mutationField("deletePetitionReply", {
     ),
   ),
   resolve: async (_, args, ctx) => {
-    const { field, reply } = await ctx.petitions.deletePetitionFieldReply(args.replyId, ctx.user!);
+    const reply = await ctx.petitions.deletePetitionFieldReply(
+      args.petitionId,
+      args.replyId,
+      ctx.user!,
+    );
+
+    const [petition, field] = await Promise.all([
+      ctx.petitions.loadPetition(args.petitionId),
+      ctx.petitions.loadField(reply.petition_field_id),
+    ]);
+
+    assert(petition, "Petition not found");
+    assert(field, "Field not found");
+    if (!field.is_internal || !petition.enable_interaction_with_recipients) {
+      await ctx.petitionsHelper.resetPetitionStatusAsUser(args.petitionId, ctx.user!.id);
+    }
 
     if (reply.associated_profile_id) {
       const removedAssociation = await ctx.petitions.safeRemovePetitionProfileAssociation(
@@ -329,6 +364,7 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", "WRITE"),
+    userCanUpdatePetitionReplies("petitionId"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["ES_TAX_DOCUMENTS", "ID_VERIFICATION"]),
@@ -343,8 +379,7 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
       ),
     }),
     petitionIsNotAnonymized("petitionId"),
-    not(petitionHasStatus("petitionId", "CLOSED")),
-    petitionDoesNotHaveStartedProcess("petitionId"),
+    petitionIsNotClosed("petitionId"),
   ),
   validateArgs: validateCreateFileReplyInput("fieldId", "parentReplyId"),
   resolve: async (_, { petitionId, fieldId, parentReplyId }, ctx) => {
@@ -367,6 +402,10 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
         },
         petition.recipient_locale,
       );
+
+      if (!field.is_internal || !petition.enable_interaction_with_recipients) {
+        await ctx.petitionsHelper.resetPetitionStatusAsUser(petitionId, ctx.user!.id);
+      }
 
       return {
         type: "WINDOW",
@@ -402,6 +441,10 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
           petition.recipient_locale,
         );
 
+        if (!field.is_internal || !petition.enable_interaction_with_recipients) {
+          await ctx.petitionsHelper.resetPetitionStatusAsUser(petitionId, ctx.user!.id);
+        }
+
         return {
           type: "WINDOW",
           url: session.url,
@@ -434,11 +477,13 @@ export const retryAsyncFieldCompletion = mutationField("retryAsyncFieldCompletio
     fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
     userHasFeatureFlag("ES_TAX_DOCUMENTS_FIELD"),
     petitionIsNotAnonymized("petitionId"),
-    not(petitionHasStatus("petitionId", "CLOSED")),
+    petitionIsNotClosed("petitionId"),
   ),
   resolve: async (_, { petitionId, fieldId, parentReplyId }, ctx) => {
     const petition = await ctx.petitions.loadPetition(petitionId);
+    const field = await ctx.petitions.loadField(fieldId);
     assert(petition, "Petition not found");
+    assert(field, "Field not found");
 
     try {
       const session = await ctx.bankflip.createRetrySession(
@@ -453,6 +498,10 @@ export const retryAsyncFieldCompletion = mutationField("retryAsyncFieldCompletio
         },
         petition.recipient_locale,
       );
+
+      if (!field.is_internal || !petition.enable_interaction_with_recipients) {
+        await ctx.petitionsHelper.resetPetitionStatusAsUser(petitionId, ctx.user!.id);
+      }
 
       return {
         type: "WINDOW",
@@ -477,10 +526,10 @@ export const bulkCreatePetitionReplies = mutationField("bulkCreatePetitionReplie
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", "WRITE"),
+    petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     petitionIsNotAnonymized("petitionId"),
-    not(petitionHasStatus("petitionId", "CLOSED")),
-    petitionDoesNotHaveStartedProcess("petitionId"),
+    petitionIsNotClosed("petitionId"),
   ),
   resolve: async (_, args, ctx) => {
     try {
@@ -511,13 +560,13 @@ export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
     userHasEnabledIntegration("DOW_JONES_KYC"),
     userHasFeatureFlag("DOW_JONES_KYC"),
     userHasAccessToPetitions("petitionId", "WRITE"),
+    userCanUpdatePetitionReplies("petitionId"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["DOW_JONES_KYC"]),
     fieldCanBeReplied((args) => ({ id: args.fieldId, parentReplyId: args.parentReplyId })),
     petitionIsNotAnonymized("petitionId"),
-    not(petitionHasStatus("petitionId", "CLOSED")),
-    petitionDoesNotHaveStartedProcess("petitionId"),
+    petitionIsNotClosed("petitionId"),
   ),
   validateArgs: validateCreateFileReplyInput("fieldId", "parentReplyId"),
   resolve: async (_, args, ctx) => {
@@ -551,31 +600,39 @@ export const createDowJonesKycReply = mutationField("createDowJonesKycReply", {
         `User:${ctx.user!.id}`,
       );
 
-      const [reply] = await ctx.petitions.createPetitionFieldReply(
-        args.petitionId,
-        {
-          petition_field_id: args.fieldId,
-          user_id: ctx.user!.id,
-          type: "DOW_JONES_KYC",
-          parent_petition_field_reply_id: args.parentReplyId ?? null,
-          content: {
-            file_upload_id: fileUpload.id,
-            entity: {
-              profileId: args.profileId,
-              type: dowJonesProfile.data.attributes.basic.type,
-              name: ctx.dowJonesKyc.entityFullName(
-                dowJonesProfile.data.attributes.basic.name_details.primary_name,
-              ),
-              iconHints:
-                dowJonesProfile.data.attributes.person?.icon_hints ??
-                dowJonesProfile.data.attributes.entity?.icon_hints ??
-                [],
+      const [petition, [reply]] = await Promise.all([
+        ctx.petitions.loadPetition(args.petitionId),
+        ctx.petitions.createPetitionFieldReply(
+          args.petitionId,
+          {
+            petition_field_id: args.fieldId,
+            user_id: ctx.user!.id,
+            type: "DOW_JONES_KYC",
+            parent_petition_field_reply_id: args.parentReplyId ?? null,
+            content: {
+              file_upload_id: fileUpload.id,
+              entity: {
+                profileId: args.profileId,
+                type: dowJonesProfile.data.attributes.basic.type,
+                name: ctx.dowJonesKyc.entityFullName(
+                  dowJonesProfile.data.attributes.basic.name_details.primary_name,
+                ),
+                iconHints:
+                  dowJonesProfile.data.attributes.person?.icon_hints ??
+                  dowJonesProfile.data.attributes.entity?.icon_hints ??
+                  [],
+              },
             },
+            status: "PENDING",
           },
-          status: "PENDING",
-        },
-        `User:${ctx.user!.id}`,
-      );
+          `User:${ctx.user!.id}`,
+        ),
+      ]);
+
+      assert(petition, "Petition not found");
+      if (!petition.enable_interaction_with_recipients) {
+        await ctx.petitionsHelper.resetPetitionStatusAsUser(args.petitionId, ctx.user!.id);
+      }
 
       return reply;
     } catch (error) {
@@ -597,6 +654,7 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
   type: list("PetitionFieldReply"),
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", "WRITE"),
+    userCanUpdatePetitionReplies("petitionId"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     petitionsAreOfTypePetition("petitionId"),
     fieldsBelongsToPetition("petitionId", (args) => args.fields.map((field) => field.id)),
@@ -609,8 +667,7 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
       args.fields.map((field) => field.parentReplyId).filter(isNonNullish),
     ),
     petitionIsNotAnonymized("petitionId"),
-    not(petitionHasStatus("petitionId", "CLOSED")),
-    petitionDoesNotHaveStartedProcess("petitionId"),
+    petitionIsNotClosed("petitionId"),
   ),
   validateArgs: validateAnd(
     notEmptyArray("fields"),
@@ -641,8 +698,8 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
       await ctx.orgCredits.ensurePetitionHasConsumedCredit(args.petitionId, `User:${ctx.user!.id}`);
 
       const fields = await ctx.petitions.loadField(unique(args.fields.map((field) => field.id)));
-
-      if (fields.some((f) => f?.type === "PROFILE_SEARCH")) {
+      assert(fields.every(isNonNullish), "Fields not found");
+      if (fields.some((f) => f.type === "PROFILE_SEARCH")) {
         const hasFeatureFlag = await ctx.featureFlags.orgHasFeatureFlag(
           ctx.user!.org_id,
           "PROFILE_SEARCH_FIELD",
@@ -653,7 +710,7 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
       }
 
       const fileReplyIds = args.fields
-        .filter((field) => isFileTypeField(fields.find((f) => f!.id === field.id)!.type))
+        .filter((field) => isFileTypeField(fields.find((f) => f.id === field.id)!.type))
         .map((field) => fromGlobalId(field.content.petitionFieldReplyId, "PetitionFieldReply").id);
 
       const fileReplies =
@@ -668,7 +725,7 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
       const data: CreatePetitionFieldReply[] = await pMap(
         args.fields,
         async (fieldReply) => {
-          const field = fields.find((f) => f!.id === fieldReply.id)!;
+          const field = fields.find((f) => f.id === fieldReply.id)!;
           if (isFileTypeField(field.type)) {
             // on FILE replies, clone the FileUpload from the passed reply and insert it as a new one
             const reply = fileReplies.find(
@@ -705,11 +762,18 @@ export const createPetitionFieldReplies = mutationField("createPetitionFieldRepl
         },
       );
 
-      return await ctx.petitions.createPetitionFieldReply(
-        args.petitionId,
-        data,
-        `User:${ctx.user!.id}`,
-      );
+      const [petition, replies] = await Promise.all([
+        ctx.petitions.loadPetition(args.petitionId),
+        ctx.petitions.createPetitionFieldReply(args.petitionId, data, `User:${ctx.user!.id}`),
+      ]);
+
+      assert(petition, "Petition not found");
+
+      if (fields.some((f) => !f.is_internal) || !petition.enable_interaction_with_recipients) {
+        await ctx.petitionsHelper.resetPetitionStatusAsUser(args.petitionId, ctx.user!.id);
+      }
+
+      return replies;
     } catch (error) {
       if (error instanceof Error && error.message === "PETITION_SEND_LIMIT_REACHED") {
         throw new ApolloError(
@@ -727,6 +791,7 @@ export const updatePetitionFieldReplies = mutationField("updatePetitionFieldRepl
   type: list("PetitionFieldReply"),
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", "WRITE"),
+    userCanUpdatePetitionReplies("petitionId"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     repliesBelongsToPetition("petitionId", (args) => args.replies.map((r) => r.id)),
     replyIsForFieldOfType(
@@ -746,8 +811,7 @@ export const updatePetitionFieldReplies = mutationField("updatePetitionFieldRepl
     ),
     replyCanBeUpdated((args) => args.replies.map((r) => r.id)),
     petitionIsNotAnonymized("petitionId"),
-    not(petitionHasStatus("petitionId", "CLOSED")),
-    petitionDoesNotHaveStartedProcess("petitionId"),
+    petitionIsNotClosed("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -781,7 +845,7 @@ export const updatePetitionFieldReplies = mutationField("updatePetitionFieldRepl
       };
     });
 
-    return await ctx.petitions.updatePetitionFieldRepliesContent(
+    const updatedReplies = await ctx.petitions.updatePetitionFieldRepliesContent(
       args.petitionId,
       await pMap(
         replyInput,
@@ -798,5 +862,17 @@ export const updatePetitionFieldReplies = mutationField("updatePetitionFieldRepl
       "User",
       ctx.user!.id,
     );
+
+    const petition = await ctx.petitions.loadPetition(args.petitionId);
+    const updatedFields = await ctx.petitions.loadField(
+      unique(updatedReplies.map((r) => r.petition_field_id)),
+    );
+    assert(petition, "Petition not found");
+    assert(updatedFields.every(isNonNullish), "Fields not found");
+    if (updatedFields.some((f) => !f.is_internal) || !petition.enable_interaction_with_recipients) {
+      await ctx.petitionsHelper.resetPetitionStatusAsUser(args.petitionId, ctx.user!.id);
+    }
+
+    return updatedReplies;
   },
 });

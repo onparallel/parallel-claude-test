@@ -165,7 +165,8 @@ import {
   petitionHasRepliableFields,
   petitionHasStatus,
   petitionIsNotAnonymized,
-  petitionsAreEditable,
+  petitionIsNotClosed,
+  petitionIsNotRestricted,
   petitionsAreInPath,
   petitionsAreNotPublicTemplates,
   petitionsAreNotScheduledForDeletion,
@@ -179,6 +180,7 @@ import {
   replyIsForFieldOfType,
   replyStatusCanBeUpdated,
   templateDoesNotHavePublicPetitionLink,
+  userCanUpdatePetitionReplies,
   userHasAccessToCreatePetitionFromProfilePrefillInput,
   userHasAccessToPetitions,
   userHasAccessToUpdatePetitionFieldGroupRelationshipsInput,
@@ -625,7 +627,7 @@ export const updateFieldPositions = mutationField("updateFieldPositions", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
-    petitionsAreEditable("petitionId"),
+    petitionIsNotRestricted("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
@@ -644,14 +646,12 @@ export const updateFieldPositions = mutationField("updateFieldPositions", {
   },
   resolve: async (_, args, ctx) => {
     try {
-      await ctx.petitions.updateFieldPositions(
+      return await ctx.petitions.updateFieldPositions(
         args.petitionId,
         args.fieldIds,
         args.parentFieldId ?? null,
         `User:${ctx.user!.id}`,
       );
-
-      return await ctx.petitions.updatePetitionLastChangeAt(args.petitionId);
     } catch (e) {
       if (e instanceof Error) {
         if (e.message === "INVALID_PETITION_FIELD_IDS") {
@@ -916,12 +916,12 @@ export const updatePetition = mutationField("updatePetition", {
         "data.automaticNumberingConfig",
         "data.approvalFlowConfig",
       ],
-      and(petitionsAreEditable("petitionId"), petitionDoesNotHaveStartedProcess("petitionId")),
+      and(petitionIsNotRestricted("petitionId"), petitionDoesNotHaveStartedProcess("petitionId")),
     ),
-    ifSomeDefined(["data.locale"], petitionsAreEditable("petitionId")),
+    ifSomeDefined(["data.locale"], petitionIsNotRestricted("petitionId")),
     ifSomeDefined(
       ["data.emailBody", "data.emailSubject"],
-      or(petitionsAreEditable("petitionId"), petitionsAreOfTypePetition("petitionId")),
+      or(petitionIsNotRestricted("petitionId"), petitionsAreOfTypePetition("petitionId")),
     ),
     // only allow to update petition name if anonymized
     ifSomeDefined(
@@ -1249,6 +1249,7 @@ export const updatePetition = mutationField("updatePetition", {
                 return fromGlobalId(id);
               }),
               manual_start: config.manualStart ?? false,
+              allow_edit: config.allowEdit,
               visibility: fieldLogic?.field.visibility ?? null,
             } satisfies ApprovalRequestStepConfig;
           }),
@@ -1278,7 +1279,7 @@ export const updateTemplateDocumentTheme = mutationField("updateTemplateDocument
     userHasAccessToPetitions("templateId", "WRITE"),
     petitionsAreNotScheduledForDeletion("templateId"),
     petitionsAreNotPublicTemplates("templateId"),
-    petitionsAreEditable("templateId"),
+    petitionIsNotRestricted("templateId"),
     petitionIsNotAnonymized("templateId"),
     userHasAccessToOrganizationTheme("orgThemeId"),
   ),
@@ -1302,7 +1303,7 @@ export const createPetitionField = mutationField("createPetitionField", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
-    petitionsAreEditable("petitionId"),
+    petitionIsNotRestricted("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     ifArgEquals("type", "ES_TAX_DOCUMENTS", userHasFeatureFlag("ES_TAX_DOCUMENTS_FIELD")),
@@ -1396,7 +1397,7 @@ export const clonePetitionField = mutationField("clonePetitionField", {
     userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
-    petitionsAreEditable("petitionId"),
+    petitionIsNotRestricted("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
@@ -1422,7 +1423,7 @@ export const deletePetitionField = mutationField("deletePetitionField", {
     petitionsAreNotScheduledForDeletion("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldIsNotFixed("fieldId"),
-    petitionsAreEditable("petitionId"),
+    petitionIsNotRestricted("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
@@ -1497,7 +1498,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
-    petitionsAreEditable("petitionId"),
+    petitionIsNotRestricted("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
@@ -2001,7 +2002,7 @@ export const approveOrRejectPetitionFieldReplies = mutationField(
     authorize: authenticateAnd(
       userHasAccessToPetitions("petitionId", "WRITE"),
       petitionsAreNotScheduledForDeletion("petitionId"),
-      not(petitionHasStatus("petitionId", "CLOSED")),
+      petitionIsNotClosed("petitionId"),
     ),
     args: {
       petitionId: nonNull(globalIdArg("Petition")),
@@ -2029,7 +2030,7 @@ export const updatePetitionFieldRepliesStatus = mutationField("updatePetitionFie
     repliesBelongsToField("petitionFieldId", "petitionFieldReplyIds"),
     replyStatusCanBeUpdated("petitionFieldId"),
     not(fieldHasType("petitionFieldId", "FIELD_GROUP")),
-    not(petitionHasStatus("petitionId", "CLOSED")),
+    petitionIsNotClosed("petitionId"),
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -2601,7 +2602,7 @@ export const changePetitionFieldType = mutationField("changePetitionFieldType", 
     userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
-    petitionsAreEditable("petitionId"),
+    petitionIsNotRestricted("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     not(fieldHasType("fieldId", "FIELD_GROUP")),
@@ -3122,7 +3123,7 @@ export const linkPetitionFieldChildren = mutationField("linkPetitionFieldChildre
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
-    petitionsAreEditable("petitionId"),
+    petitionIsNotRestricted("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
@@ -3193,7 +3194,7 @@ export const unlinkPetitionFieldChildren = mutationField("unlinkPetitionFieldChi
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
-    petitionsAreEditable("petitionId"),
+    petitionIsNotRestricted("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
@@ -3267,7 +3268,7 @@ export const linkFieldGroupToProfileType = mutationField("linkFieldGroupToProfil
     userHasFeatureFlag("PROFILES"),
     userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
-    petitionsAreEditable("petitionId"),
+    petitionIsNotRestricted("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
@@ -3309,7 +3310,7 @@ export const createProfileLinkedPetitionField = mutationField("createProfileLink
     userHasFeatureFlag("PROFILES"),
     userHasAccessToPetitions("petitionId", "WRITE"),
     petitionsAreNotScheduledForDeletion("petitionId"),
-    petitionsAreEditable("petitionId"),
+    petitionIsNotRestricted("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
@@ -3368,7 +3369,7 @@ export const archiveFieldGroupReplyIntoProfile = mutationField(
       petitionsAreNotScheduledForDeletion("petitionId"),
       petitionsAreNotPublicTemplates("petitionId"),
       petitionIsNotAnonymized("petitionId"),
-      petitionHasStatus("petitionId", ["CLOSED"]),
+      petitionHasStatus("petitionId", "CLOSED"),
       fieldsBelongsToPetition("petitionId", "petitionFieldId"),
       fieldHasType("petitionFieldId", ["FIELD_GROUP"]),
       fieldIsLinkedToProfileType("petitionFieldId"),
@@ -4276,7 +4277,7 @@ export const updatePetitionFieldGroupRelationships = mutationField(
       userHasFeatureFlag("PROFILES"),
       userHasAccessToPetitions("petitionId", "WRITE"),
       petitionsAreNotScheduledForDeletion("petitionId"),
-      petitionsAreEditable("petitionId"),
+      petitionIsNotRestricted("petitionId"),
       petitionDoesNotHaveStartedProcess("petitionId"),
       petitionsAreNotPublicTemplates("petitionId"),
       petitionIsNotAnonymized("petitionId"),
@@ -4388,9 +4389,12 @@ export const createPetitionFromProfile = mutationField("createPetitionFromProfil
     ),
   },
   resolve: async (_, args, ctx) => {
+    const template = await ctx.petitions.loadPetition(args.templateId);
+    assert(template, "Template not found");
+
     const petition = await ctx.petitions.createPetitionFromId(
       args.templateId,
-      { isTemplate: false },
+      { isTemplate: false, status: args.prefill.length === 0 ? "DRAFT" : "PENDING" },
       ctx.user!,
     );
 
@@ -4482,6 +4486,7 @@ export const prefillPetitionFromProfiles = mutationField("prefillPetitionFromPro
   authorize: authenticateAnd(
     userHasFeatureFlag("PROFILES"),
     userHasAccessToPetitions("petitionId"),
+    userCanUpdatePetitionReplies("petitionId"),
     petitionsAreNotScheduledForDeletion("petitionId"),
     petitionsAreOfTypePetition("petitionId"),
     petitionIsNotAnonymized("petitionId"),
@@ -4557,6 +4562,12 @@ export const prefillPetitionFromProfiles = mutationField("prefillPetitionFromPro
         replies,
         ctx.user!,
       );
+
+      const petition = await ctx.petitions.loadPetition(args.petitionId);
+      assert(petition, "Petition not found");
+      if (!petition.enable_interaction_with_recipients) {
+        await ctx.petitionsHelper.resetPetitionStatusAsUser(args.petitionId, ctx.user!.id);
+      }
     }
 
     const profileIds = unique(args.prefill.flatMap((p) => p.profileIds));
@@ -4583,6 +4594,7 @@ export const createFieldGroupRepliesFromProfiles = mutationField(
       petitionIsNotAnonymized("petitionId"),
       petitionsAreOfTypePetition("petitionId"),
       userHasAccessToPetitions("petitionId"),
+      userCanUpdatePetitionReplies("petitionId"),
       petitionsAreNotScheduledForDeletion("petitionId"),
       fieldsBelongsToPetition("petitionId", "petitionFieldId"),
       fieldHasType("petitionFieldId", ["FIELD_GROUP"]),
@@ -4667,6 +4679,12 @@ export const createFieldGroupRepliesFromProfiles = mutationField(
           replies,
           ctx.user!,
         );
+
+        const petition = await ctx.petitions.loadPetition(args.petitionId);
+        assert(petition, "Petition not found");
+        if (!petition.enable_interaction_with_recipients) {
+          await ctx.petitionsHelper.resetPetitionStatusAsUser(args.petitionId, ctx.user!.id);
+        }
       }
 
       await ctx.profiles.associateProfilesToPetition(
@@ -4691,7 +4709,7 @@ export const enableAutomaticNumberingOnPetitionFields = mutationField(
       userHasAccessToPetitions("petitionId", "WRITE"),
       petitionsAreNotScheduledForDeletion("petitionId"),
       petitionIsNotAnonymized("petitionId"),
-      petitionsAreEditable("petitionId"),
+      petitionIsNotRestricted("petitionId"),
       petitionDoesNotHaveStartedProcess("petitionId"),
       petitionsAreNotPublicTemplates("petitionId"),
     ),

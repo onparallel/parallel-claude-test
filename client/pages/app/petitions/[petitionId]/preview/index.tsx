@@ -554,6 +554,13 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     }
   }, [petition]);
 
+  const hasStartedProcess = isPetition && petition.hasStartedProcess;
+  const isAllowedToEditReplies =
+    isPetition &&
+    hasStartedProcess &&
+    petition.currentApprovalRequestSteps?.some(
+      (s) => s.status === "PENDING" && s.allowEdit && s.approvers.some((a) => a.user?.id === me.id),
+    );
   return (
     <RecipientViewSidebarContextProvider>
       <ToneProvider value={petition.organization.brandTheme.preferredTone}>
@@ -790,7 +797,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                                   (isPetition && petition.status === "CLOSED") ||
                                   petition.isAnonymized ||
                                   isPetitionUsageLimitReached ||
-                                  (isPetition && petition.hasStartedProcess) ||
+                                  (hasStartedProcess && !isAllowedToEditReplies) ||
                                   isNonNullish(petition.permanentDeletionAt)
                                 }
                                 isCacheOnly={!isPetition}
@@ -961,6 +968,17 @@ const _fragments = {
           status
         }
         currentApprovalRequestStatus
+        currentApprovalRequestSteps {
+          id
+          status
+          allowEdit
+          approvers {
+            id
+            user {
+              id
+            }
+          }
+        }
         ...RecipientViewProgressBar_Petition
         ...useSendPetitionHandler_Petition
         ...getPetitionSignatureStatus_Petition

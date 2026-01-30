@@ -1284,7 +1284,7 @@ describe("GraphQL/Petition Approval Request", () => {
                 data: {
                   permissionType: "READ",
                   permissionUserId: toGlobalId("User", otherUsers[0].id),
-                  userId: toGlobalId("User", user.id),
+                  userId: null,
                 },
               },
               {

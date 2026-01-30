@@ -7,6 +7,10 @@ export function getPetitionApprovalRequestStatus(steps: PetitionApprovalRequestS
 
   const filteredSteps = steps.filter((s) => s.status !== "NOT_APPLICABLE");
 
+  if (filteredSteps.some((step) => step.status === "REJECTED")) {
+    return "REJECTED";
+  }
+
   if (
     filteredSteps.some((step) => step.status === "PENDING") ||
     (filteredSteps.some((step) => step.status === "APPROVED" || step.status === "SKIPPED") &&
@@ -14,12 +18,11 @@ export function getPetitionApprovalRequestStatus(steps: PetitionApprovalRequestS
   ) {
     return "PENDING";
   }
+
   if (filteredSteps.every((step) => step.status === "NOT_STARTED")) {
     return "NOT_STARTED";
   }
-  if (filteredSteps.some((step) => step.status === "REJECTED")) {
-    return "REJECTED";
-  }
+
   if (filteredSteps.every((step) => step.status === "SKIPPED" || step.status === "APPROVED")) {
     return "APPROVED";
   }

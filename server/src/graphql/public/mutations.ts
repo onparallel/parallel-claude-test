@@ -302,12 +302,13 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
                 throw e;
               }
             }
-
-            await ctx.petitions.updatePetition(
-              petition.id,
-              { status: "PENDING", closed_at: null },
-              `PetitionAccess:${access!.id}`,
-            );
+            if (petition.status === "DRAFT") {
+              await ctx.petitions.updatePetition(
+                petition.id,
+                { status: "PENDING", closed_at: null },
+                `PetitionAccess:${access!.id}`,
+              );
+            }
           }
         }
 

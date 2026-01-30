@@ -84,6 +84,7 @@ import {
   OrgIntegration,
   Petition,
   PetitionAccess,
+  PetitionApprovalRequestStep,
   PetitionApprovalRequestStepStatus,
   PetitionAttachment,
   PetitionAttachmentType,
@@ -1520,8 +1521,9 @@ export class PetitionRepository extends BaseRepository {
     {
       name,
       isTemplate,
+      status,
       creditsUsed,
-    }: { name?: Maybe<string>; isTemplate: boolean; creditsUsed?: number },
+    }: { name?: Maybe<string>; isTemplate: boolean; status?: PetitionStatus; creditsUsed?: number },
     user: User,
   ) {
     const original = (await this.loadPetition(petitionId))!;
@@ -1539,7 +1541,7 @@ export class PetitionRepository extends BaseRepository {
       user,
       {
         is_template: isTemplate,
-        status: isTemplate ? null : "DRAFT",
+        status: status ?? (isTemplate ? null : "DRAFT"),
         name: original.is_template && !isTemplate ? name : original.name,
         credits_used: creditsUsed ?? 0,
       },
@@ -1994,6 +1996,7 @@ export class PetitionRepository extends BaseRepository {
       {
         updated_at: this.now(),
         updated_by: updatedBy,
+        last_change_at: this.now(),
       },
       "*",
     );
@@ -2471,8 +2474,6 @@ export class PetitionRepository extends BaseRepository {
     }
 
     const fieldIds = unique(dataArray.map((d) => d.petition_field_id));
-    const fields = await this.loadField(fieldIds);
-
     for (const fieldId of fieldIds) {
       this.loadRepliesForField.dataloader.clear(fieldId);
     }
@@ -2485,20 +2486,6 @@ export class PetitionRepository extends BaseRepository {
         created_by: createdBy,
       })),
     );
-    const petition = (await this.loadPetition(petitionId))!;
-
-    if (fields.some((f) => !f!.is_internal) || !petition.enable_interaction_with_recipients) {
-      await this.updatePetition(
-        petitionId,
-        {
-          status: "PENDING",
-          closed_at: null,
-        },
-        createdBy,
-      );
-      // clear cache to make sure petition status is updated in next graphql calls
-      this.loadPetition.dataloader.clear(petitionId);
-    }
 
     await this.createReplyCreatedOrUpdatedEvents(petitionId, replies, "REPLY_CREATED");
 
@@ -2515,10 +2502,7 @@ export class PetitionRepository extends BaseRepository {
   ) {
     const replyIds = unique(data.map((d) => d.id));
 
-    const [fields, oldReplies] = await Promise.all([
-      this.loadFieldForReply(replyIds),
-      this.loadFieldReply(replyIds),
-    ]);
+    const oldReplies = await this.loadFieldReply(replyIds);
 
     const updatedBy = `${updater}:${updaterId}`;
 
@@ -2552,22 +2536,6 @@ export class PetitionRepository extends BaseRepository {
       ],
       t,
     );
-
-    const petition = (await this.loadPetition(petitionId))!;
-
-    if (fields.some((f) => !f!.is_internal) || !petition.enable_interaction_with_recipients) {
-      await this.updatePetition(
-        petitionId,
-        {
-          status: "PENDING",
-          closed_at: null,
-        },
-        updatedBy,
-        t,
-      );
-      // clear cache to make sure petition status is updated in next graphql calls
-      this.loadPetition.dataloader.clear(petitionId);
-    }
 
     if (skipEventCreation) {
       return replies;
@@ -2638,16 +2606,6 @@ export class PetitionRepository extends BaseRepository {
       return null;
     }
 
-    await this.updatePetition(
-      petitionId,
-      {
-        status: "PENDING",
-        closed_at: null,
-      },
-      `User:${userId}`,
-      t,
-    );
-
     await this.createOrUpdateReplyEvents(petitionId, [reply], { user_id: userId }, t);
     if (oldReply && oldReply.status !== "PENDING") {
       await this.createEvent(
@@ -2702,32 +2660,17 @@ export class PetitionRepository extends BaseRepository {
     return reply;
   }
 
-  async deletePetitionFieldReply(replyId: number, deleter: User | PetitionAccess) {
+  async deletePetitionFieldReply(
+    petitionId: number,
+    replyId: number,
+    deleter: User | PetitionAccess,
+  ) {
     const isContact = "keycode" in deleter;
     const deletedBy = isContact ? `Contact:${deleter.contact_id}` : `User:${deleter.id}`;
 
     const reply = await this.loadFieldReply(replyId);
-    const field = await this.loadField(reply!.petition_field_id);
-    if (!field) {
-      throw new Error("Petition field not found");
-    }
     if (!reply) {
       throw new Error("Petition field reply not found");
-    }
-
-    const petition = (await this.loadPetition(field.petition_id))!;
-
-    if (!petition.enable_interaction_with_recipients || !field.is_internal) {
-      await this.updatePetition(
-        field.petition_id,
-        {
-          status: "PENDING",
-          closed_at: null,
-        },
-        deletedBy,
-      );
-      // clear cache to make sure petition status is updated in next graphql calls
-      this.loadPetition.dataloader.clear(field.petition_id);
     }
 
     const [deletedReplies] = await Promise.all([
@@ -2742,7 +2685,7 @@ export class PetitionRepository extends BaseRepository {
       this.createEventWithDelay(
         {
           type: "REPLY_DELETED",
-          petition_id: field!.petition_id,
+          petition_id: petitionId,
           data: {
             ...(isContact ? { petition_access_id: deleter.id } : { user_id: deleter.id }),
             petition_field_id: reply.petition_field_id,
@@ -2762,7 +2705,7 @@ export class PetitionRepository extends BaseRepository {
       await this.files.deleteFileUpload(fileUploadIds, deletedBy);
     }
 
-    return { field, reply };
+    return reply;
   }
 
   /**
@@ -6165,8 +6108,13 @@ export class PetitionRepository extends BaseRepository {
     }, t);
   }
 
-  /** ensures every user in array has at least READ permission on the petition */
-  async ensureMinimalPermissions(petitionId: number, userIds: number[], createdBy: string) {
+  /** ensures every user in array has at least the given permission on the petition */
+  async ensureMinimalPermissions(
+    petitionId: number,
+    userIds: number[],
+    permissionType: PetitionPermissionType,
+    createdBy: string,
+  ) {
     if (userIds.length === 0) {
       return [];
     }
@@ -6174,19 +6122,49 @@ export class PetitionRepository extends BaseRepository {
       userIds.map((userId) => ({
         petition_id: petitionId,
         user_id: userId,
-        type: "READ" as const,
+        type: permissionType,
         created_by: createdBy,
         updated_by: createdBy,
       })),
-      async (chunk) =>
-        await this.raw<PetitionPermission>(
+      async (chunk) => {
+        return await this.raw<PetitionPermission & { is_update: boolean }>(
           /* sql */ `
-            ? on conflict (petition_id, user_id)
-            where deleted_at is null and from_user_group_id is null and user_group_id is null 
-              do nothing returning *;
+            with existing_permissions as (
+              select petition_id, user_id, type as original_type
+              from petition_permission
+              where petition_id = ?
+                and user_id = any(?)
+                and deleted_at is null
+                and from_user_group_id is null
+                and user_group_id is null
+            ),
+            upserted as (
+              ? on conflict (petition_id, user_id)
+              where deleted_at is null and from_user_group_id is null and user_group_id is null 
+                do update set
+                  type = least(EXCLUDED.type, petition_permission.type), -- update to the best permission between the new and the existing one
+                  updated_at = now(),
+                  updated_by = ?
+              returning *
+            )
+            select 
+              u.*,
+              case when ep.original_type != u.type then true else false end as is_update
+            from upserted u
+            left join existing_permissions ep on u.petition_id = ep.petition_id and u.user_id = ep.user_id
+            where ep.petition_id is null or ep.original_type != u.type; -- exclude conflicts without type change
           `,
-          [this.from("petition_permission").insert(chunk)],
-        ),
+          [
+            petitionId,
+            this.sqlArray(
+              chunk.map((c) => c.user_id),
+              "int",
+            ),
+            this.from("petition_permission").insert(chunk),
+            createdBy,
+          ],
+        );
+      },
       {
         chunkSize: 100,
         concurrency: 1,
@@ -8097,8 +8075,14 @@ export class PetitionRepository extends BaseRepository {
    * If the field is configured to be replied only from profile, the reply will be ignored.
    */
   async prefillPetition(petitionId: number, prefill: Record<string, any>, owner: User) {
+    const petition = await this.loadPetition(petitionId);
+    assert(petition, "Petition not found");
     const fields = await this.loadAllFieldsByPetitionId(petitionId);
     const parsedReplies = await this.parsePrefillReplies(prefill, fields, null, owner.org_id);
+
+    if (parsedReplies.length === 0) {
+      return petition;
+    }
 
     const [fieldGroupReplies, otherReplies] = partition(
       parsedReplies,
@@ -8191,7 +8175,22 @@ export class PetitionRepository extends BaseRepository {
       }
     }
 
-    return (await this.loadPetition(petitionId))!;
+    const updatedFields = parsedReplies.map((r) => {
+      const field = fields.find((f) => f.id === r.fieldId);
+      assert(field, "Field not found");
+      return field;
+    });
+
+    if (updatedFields.some((f) => !f.is_internal) || !petition.enable_interaction_with_recipients) {
+      await this.updatePetition(
+        petitionId,
+        { status: "PENDING", closed_at: null },
+        `User:${owner.id}`,
+      );
+      this.loadPetition.dataloader.clear(petitionId);
+    }
+
+    return petition;
   }
 
   readonly loadEmptyFieldGroupReplies = this.buildLoadMultipleBy(
@@ -9464,7 +9463,10 @@ export class PetitionRepository extends BaseRepository {
     if (ids.length === 0) {
       return [];
     }
-    const processes: ("SIGNATURE" | "APPROVAL")[] = [];
+    const processes: (
+      | { type: "SIGNATURE" }
+      | { type: "APPROVAL"; step: PetitionApprovalRequestStep }
+    )[] = [];
     const currentSignature = await this.loadLatestPetitionSignatureByPetitionId.raw(ids);
 
     if (
@@ -9472,17 +9474,18 @@ export class PetitionRepository extends BaseRepository {
         (s) => isNonNullish(s) && ["ENQUEUED", "PROCESSING", "PROCESSED"].includes(s.status),
       )
     ) {
-      processes.push("SIGNATURE");
+      processes.push({ type: "SIGNATURE" });
     }
 
     const currentApprovalRequests = await this.from("petition_approval_request_step")
       .whereIn("petition_id", ids)
       .whereNull("deprecated_at")
       .whereIn("status", ["PENDING", "SKIPPED", "APPROVED", "REJECTED"])
+      .orderBy("step_number", "desc")
       .select("*");
 
     if (currentApprovalRequests.length > 0) {
-      processes.push("APPROVAL");
+      processes.push({ type: "APPROVAL", step: currentApprovalRequests[0] });
     }
 
     return processes;

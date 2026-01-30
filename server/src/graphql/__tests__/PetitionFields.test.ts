@@ -6707,7 +6707,7 @@ describe("GraphQL/Petition Fields", () => {
         },
       );
 
-      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(errors).toContainGraphQLError("PETITION_STATUS_ERROR");
       expect(data).toBeNull();
     });
 
@@ -7002,7 +7002,7 @@ describe("GraphQL/Petition Fields", () => {
           status: "REJECTED",
         },
       );
-      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(errors).toContainGraphQLError("PETITION_STATUS_ERROR");
       expect(data).toBeNull();
     });
   });

@@ -21,7 +21,7 @@ import {
   petitionAttachmentBelongsToPetition,
   petitionDoesNotHaveStartedProcess,
   petitionIsNotAnonymized,
-  petitionsAreEditable,
+  petitionIsNotRestricted,
   petitionsAreNotPublicTemplates,
   petitionsAreNotScheduledForDeletion,
   userHasAccessToPetitions,
@@ -189,7 +189,7 @@ export const createPetitionAttachmentUploadLink = mutationField(
       petitionsAreNotScheduledForDeletion("petitionId"),
       petitionsAreNotPublicTemplates("petitionId"),
       petitionIsNotAnonymized("petitionId"),
-      petitionsAreEditable("petitionId"),
+      petitionIsNotRestricted("petitionId"),
       petitionDoesNotHaveStartedProcess("petitionId"),
       petitionCanUploadAttachments("petitionId", "data", 10),
     ),
@@ -268,7 +268,7 @@ export const petitionAttachmentUploadComplete = mutationField("petitionAttachmen
     petitionAttachmentBelongsToPetition("petitionId", "attachmentId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
-    petitionsAreEditable("petitionId"),
+    petitionIsNotRestricted("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
   ),
   resolve: async (_, args, ctx) => {
@@ -296,7 +296,7 @@ export const deletePetitionAttachment = mutationField("deletePetitionAttachment"
     petitionAttachmentBelongsToPetition("petitionId", "attachmentId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
-    petitionsAreEditable("petitionId"),
+    petitionIsNotRestricted("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
   ),
   resolve: async (_, args, ctx) => {
@@ -360,7 +360,7 @@ export const reorderPetitionAttachments = mutationField("reorderPetitionAttachme
     isValidPetitionAttachmentReorder("petitionId", "attachmentType", "attachmentIds"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
-    petitionsAreEditable("petitionId"),
+    petitionIsNotRestricted("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
   ),
   args: {
@@ -389,7 +389,7 @@ export const updatePetitionAttachmentType = mutationField("updatePetitionAttachm
     petitionAttachmentBelongsToPetition("petitionId", "attachmentId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
-    petitionsAreEditable("petitionId"),
+    petitionIsNotRestricted("petitionId"),
     petitionDoesNotHaveStartedProcess("petitionId"),
   ),
   args: {
@@ -421,7 +421,7 @@ export const updatePetitionAttachmentVisibility = mutationField(
       petitionAttachmentBelongsToPetition("petitionId", "attachmentId"),
       petitionsAreNotPublicTemplates("petitionId"),
       petitionIsNotAnonymized("petitionId"),
-      petitionsAreEditable("petitionId"),
+      petitionIsNotRestricted("petitionId"),
       petitionDoesNotHaveStartedProcess("petitionId"),
     ),
     args: {

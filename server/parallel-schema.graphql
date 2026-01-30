@@ -156,6 +156,8 @@ enum AiCompletionLogStatus {
 }
 
 type ApprovalFlowConfig {
+  allowEdit: Boolean!
+
   """
   List of users that are assigned to approve this step.
   """
@@ -172,6 +174,11 @@ type ApprovalFlowConfig {
 }
 
 input ApprovalFlowConfigInput {
+  """
+  Whether the approvers can edite the replies of the petition fields
+  """
+  allowEdit: Boolean!
+
   """
   Forces step to start manually after completing, signing, or approving a previous step.
   """
@@ -4665,6 +4672,7 @@ enum PetitionApprovalRequestStatus {
 }
 
 type PetitionApprovalRequestStep {
+  allowEdit: Boolean!
   approvalType: PetitionApprovalRequestStepApprovalType!
   approvers: [PetitionApprovalRequestStepApprover!]!
   id: GID!
@@ -9961,6 +9969,7 @@ type UserPermissionEditedEvent implements PetitionEvent {
   permissionType: PetitionPermissionType!
   permissionUser: User
   petition: Petition
+  triggeredBy: PetitionEventTriggeredBy!
   type: PetitionEventType!
   user: User
 }

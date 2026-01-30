@@ -29,6 +29,7 @@ import {
   AdverseMediaSearchContent,
   IAdverseMediaSearchService,
 } from "./AdverseMediaSearchService";
+import { APPROVALS_SERVICE, IApprovalsService } from "./ApprovalsService";
 import { BackgroundCheckContent } from "./BackgroundCheckService";
 import { ENCRYPTION_SERVICE, IEncryptionService } from "./EncryptionService";
 import {
@@ -45,10 +46,11 @@ export class PetitionsHelperService {
     @inject(PetitionRepository) private petitions: PetitionRepository,
     @inject(ProfileRepository) private profiles: ProfileRepository,
     @inject(FileRepository) private files: FileRepository,
+    @inject(UserRepository) private users: UserRepository,
     @inject(ORGANIZATION_CREDITS_SERVICE) private orgCredits: IOrganizationCreditsService,
     @inject(ENCRYPTION_SERVICE) private encryption: IEncryptionService,
     @inject(ADVERSE_MEDIA_SEARCH_SERVICE) private adverseMedia: IAdverseMediaSearchService,
-    @inject(UserRepository) private users: UserRepository,
+    @inject(APPROVALS_SERVICE) private approvals: IApprovalsService,
   ) {}
 
   async userCanWriteOnPetitionField(
@@ -84,14 +86,24 @@ export class PetitionsHelperService {
       );
     }
 
-    const [processType] = await this.petitions.getPetitionStartedProcesses(petitionId);
-    if (isNonNullish(processType)) {
-      throw new ApolloError(
-        `Petition has an ongoing ${processType.toLowerCase()} process`,
-        `ONGOING_PROCESS_ERROR`,
-        { processType },
+    const startedProcesses = await this.petitions.getPetitionStartedProcesses(petitionId);
+    if (startedProcesses.some((p) => p.type === "SIGNATURE")) {
+      throw new ApolloError(`Petition has an ongoing signature process`, `ONGOING_PROCESS_ERROR`, {
+        processType: "SIGNATURE",
+      });
+    } else if (startedProcesses.some((p) => p.type === "APPROVAL")) {
+      const process = startedProcesses.find((p) => p.type === "APPROVAL")!;
+      const userIsApprover = await this.approvals.userIsApproverOfApprovalRequestStep(
+        process.step.id,
+        userId,
       );
+      if (!process.step.allow_edit || !userIsApprover) {
+        throw new ApolloError(`Petition has an ongoing approval process`, `ONGOING_PROCESS_ERROR`, {
+          processType: "APPROVAL",
+        });
+      }
     }
+
     if (isNonNullish(overwriteReplyId)) {
       const updateCheck = await this.petitions.repliesCanBeUpdated([overwriteReplyId]);
       if (updateCheck === "REPLY_ALREADY_APPROVED") {
@@ -644,5 +656,31 @@ export class PetitionsHelperService {
         `User:${user.id}`,
       );
     }
+  }
+
+  async resetPetitionStatusAsUser(petitionId: number, userId: number) {
+    const startedProcesses = await this.petitions.getPetitionStartedProcesses(petitionId);
+    const approvalProcess = startedProcesses.find((p) => p.type === "APPROVAL");
+    const userIsApprover = approvalProcess
+      ? await this.approvals.userIsApproverOfApprovalRequestStep(approvalProcess.step.id, userId)
+      : false;
+    // approvers of current step do not update petition status
+    if (!userIsApprover) {
+      await this.petitions.updatePetition(
+        petitionId,
+        { status: "PENDING", closed_at: null },
+        `User:${userId}`,
+      );
+      this.petitions.loadPetition.dataloader.clear(petitionId);
+    }
+  }
+
+  async resetPetitionStatusAsContact(petitionId: number, contactId: number) {
+    await this.petitions.updatePetition(
+      petitionId,
+      { status: "PENDING", closed_at: null },
+      `Contact:${contactId}`,
+    );
+    this.petitions.loadPetition.dataloader.clear(petitionId);
   }
 }

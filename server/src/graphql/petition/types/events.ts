@@ -423,8 +423,15 @@ export const UserPermissionEditedEvent = createPetitionEvent("UserPermissionEdit
   t.nullable.field("user", {
     type: "User",
     resolve: async (root, _, ctx) => {
+      if (isNullish(root.data.user_id)) {
+        return null;
+      }
       return await ctx.users.loadUser(root.data.user_id);
     },
+  });
+  t.nonNull.field("triggeredBy", {
+    type: "PetitionEventTriggeredBy",
+    resolve: (root) => (isNonNullish(root.data.user_id) ? "USER" : "SYSTEM"),
   });
   t.field("permissionType", {
     type: "PetitionPermissionType",

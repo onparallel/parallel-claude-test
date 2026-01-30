@@ -243,7 +243,7 @@ export function mapPetitionEventPayload(event: PetitionEvent) {
     }
     case "USER_PERMISSION_EDITED": {
       return {
-        userId: toGlobalId("User", event.data.user_id),
+        userId: event.data.user_id ? toGlobalId("User", event.data.user_id) : null,
         permissionUserId: toGlobalId("User", event.data.permission_user_id),
         permissionType: event.data.permission_type,
       };

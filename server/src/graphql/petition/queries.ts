@@ -21,7 +21,6 @@ import {
   authenticateAnd,
   ifArgDefined,
   ifArgEquals,
-  not,
   or,
 } from "../helpers/authorize";
 import { ArgValidationError, ForbiddenError } from "../helpers/errors";
@@ -34,8 +33,8 @@ import { contextUserHasPermission } from "../users/authorizers";
 import {
   fieldHasType,
   fieldsBelongsToPetition,
-  petitionHasStatus,
   petitionIsNotAnonymized,
+  petitionIsNotClosed,
   petitionsArePublicTemplates,
   userHasAccessToPetitions,
   userHasFeatureFlag,
@@ -516,7 +515,7 @@ export const conflictCheckProfileSearch = queryField("conflictCheckProfileSearch
     userHasFeatureFlag("PROFILE_SEARCH_FIELD"),
     userHasAccessToPetitions("petitionId"),
     petitionIsNotAnonymized("petitionId"),
-    not(petitionHasStatus("petitionId", "CLOSED")),
+    petitionIsNotClosed("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", "PROFILE_SEARCH"),
   ),

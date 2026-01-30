@@ -165,6 +165,7 @@ export type AiCompletionLog = Timestamps & {
 export type AiCompletionLogStatus = "COMPLETED" | "FAILED" | "PENDING";
 
 export type ApprovalFlowConfig = {
+  allowEdit: Scalars["Boolean"]["output"];
   /** List of users that are assigned to approve this step. */
   approvers: Array<Maybe<User>>;
   manualStart: Scalars["Boolean"]["output"];
@@ -176,6 +177,8 @@ export type ApprovalFlowConfig = {
 };
 
 export type ApprovalFlowConfigInput = {
+  /** Whether the approvers can edite the replies of the petition fields */
+  allowEdit: Scalars["Boolean"]["input"];
   /** Forces step to start manually after completing, signing, or approving a previous step. */
   manualStart: Scalars["Boolean"]["input"];
   name: Scalars["String"]["input"];
@@ -3976,6 +3979,7 @@ export type PetitionApprovalRequestStatus =
   | "REJECTED";
 
 export type PetitionApprovalRequestStep = {
+  allowEdit: Scalars["Boolean"]["output"];
   approvalType: PetitionApprovalRequestStepApprovalType;
   approvers: Array<PetitionApprovalRequestStepApprover>;
   id: Scalars["GID"]["output"];
@@ -7679,6 +7683,7 @@ export type UserPermissionEditedEvent = PetitionEvent & {
   permissionType: PetitionPermissionType;
   permissionUser: Maybe<User>;
   petition: Maybe<Petition>;
+  triggeredBy: PetitionEventTriggeredBy;
   type: PetitionEventType;
   user: Maybe<User>;
 };

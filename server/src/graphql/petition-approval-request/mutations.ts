@@ -643,7 +643,7 @@ export const rejectPetitionApprovalRequestStep = mutationField(
         const petition = await ctx.petitions.loadPetition(args.petitionId);
         assert(petition?.approval_flow_config);
         for (const [step, config] of zip(newSteps, petition.approval_flow_config)) {
-          const userIds = await ctx.approvals.extractUserIdsFromApprovalFlowConfig(config);
+          const userIds = await ctx.approvals.extractUserIdsFromApprovalRequestStepConfig(config);
 
           await ctx.approvalRequests.createPetitionApprovalRequestStepApprovers(
             step.id,

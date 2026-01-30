@@ -78,14 +78,17 @@ export type FeatureFlagName =
   | "ES_TAX_DOCUMENTS_FIELD"
   | "REMOVE_PARALLEL_BRANDING"
   | "CUSTOM_HOST_UI"
+  | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
   | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
   | "AUTO_ANONYMIZE"
   | "TEMPLATE_REPLIES_PREVIEW_URL"
   | "DOW_JONES_KYC"
+  | "PUBLIC_PETITION_LINK_PREFILL_DATA"
   | "DOCUSIGN_SANDBOX_PROVIDER"
   | "CLIENT_PORTAL"
   | "PROFILES"
   | "PERMISSION_MANAGEMENT"
+  | "CUSTOM_PROPERTIES"
   | "BULK_PETITION_SEND_TASK"
   | "TEMPLATE_REPLIES_CSV_EXPORT_TASK"
   | "SETTING_DELEGATE_ACCESS"
@@ -96,6 +99,7 @@ export type FeatureFlagName =
   | "BACKGROUND_CHECK"
   | "CREATE_PROFILE_TYPE"
   | "SHOW_CONTACTS_BUTTON"
+  | "KEY_PROCESSES"
   | "DASHBOARDS"
   | "PETITION_APPROVAL_FLOW"
   | "PROFILE_SEARCH_FIELD"
@@ -116,14 +120,17 @@ export const FeatureFlagNameValues = [
   "ES_TAX_DOCUMENTS_FIELD",
   "REMOVE_PARALLEL_BRANDING",
   "CUSTOM_HOST_UI",
+  "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI",
   "PETITION_ACCESS_RECIPIENT_URL_FIELD",
   "AUTO_ANONYMIZE",
   "TEMPLATE_REPLIES_PREVIEW_URL",
   "DOW_JONES_KYC",
+  "PUBLIC_PETITION_LINK_PREFILL_DATA",
   "DOCUSIGN_SANDBOX_PROVIDER",
   "CLIENT_PORTAL",
   "PROFILES",
   "PERMISSION_MANAGEMENT",
+  "CUSTOM_PROPERTIES",
   "BULK_PETITION_SEND_TASK",
   "TEMPLATE_REPLIES_CSV_EXPORT_TASK",
   "SETTING_DELEGATE_ACCESS",
@@ -134,6 +141,7 @@ export const FeatureFlagNameValues = [
   "BACKGROUND_CHECK",
   "CREATE_PROFILE_TYPE",
   "SHOW_CONTACTS_BUTTON",
+  "KEY_PROCESSES",
   "DASHBOARDS",
   "PETITION_APPROVAL_FLOW",
   "PROFILE_SEARCH_FIELD",
@@ -1542,6 +1550,7 @@ export interface Petition {
   skip_forward_security: boolean; // bool
   public_metadata: Maybe<any>; // jsonb
   from_public_petition_link_id: Maybe<number>; // int4
+  custom_properties: any; // jsonb
   restricted_by_user_id: Maybe<number>; // int4
   restricted_at: Maybe<Date>; // timestamptz
   restricted_password_hash: Maybe<string>; // varchar
@@ -1603,6 +1612,7 @@ export type CreatePetition = PartialProps<
   | "skip_forward_security"
   | "public_metadata"
   | "from_public_petition_link_id"
+  | "custom_properties"
   | "restricted_by_user_id"
   | "restricted_at"
   | "restricted_password_hash"
@@ -1691,11 +1701,18 @@ export interface PetitionApprovalRequestStep {
   updated_by: Maybe<string>; // varchar
   deprecated_at: Maybe<Date>; // timestamptz
   manual_start: boolean; // bool
+  allow_edit: boolean; // bool
 }
 
 export type CreatePetitionApprovalRequestStep = PartialProps<
   Omit<PetitionApprovalRequestStep, "id">,
-  "created_at" | "created_by" | "updated_at" | "updated_by" | "deprecated_at" | "manual_start"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deprecated_at"
+  | "manual_start"
+  | "allow_edit"
 >;
 
 export interface PetitionApprovalRequestStepApprover {
@@ -2581,6 +2598,7 @@ export interface PublicPetitionLink {
   created_by: Maybe<string>; // varchar
   updated_at: Date; // timestamptz
   updated_by: Maybe<string>; // varchar
+  prefill_secret: Maybe<string>; // varchar
   allow_multiple_petitions: boolean; // bool
   petition_name_pattern: Maybe<string>; // varchar
 }
@@ -2592,6 +2610,7 @@ export type CreatePublicPetitionLink = PartialProps<
   | "created_by"
   | "updated_at"
   | "updated_by"
+  | "prefill_secret"
   | "allow_multiple_petitions"
   | "petition_name_pattern"
 >;

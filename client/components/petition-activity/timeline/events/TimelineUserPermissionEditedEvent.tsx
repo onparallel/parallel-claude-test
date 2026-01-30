@@ -20,24 +20,44 @@ export function TimelineUserPermissionEditedEvent({
     <TimelineItem
       icon={<TimelineIcon icon={UserArrowIcon} color="white" backgroundColor="yellow.500" />}
     >
-      <FormattedMessage
-        id="component.timeline-user-permission-edited-event.description"
-        defaultMessage="{user} updated {other}'s permission to {permissionType} {timeAgo}"
-        values={{
-          user: <UserReference user={event.user} />,
-          other: <UserReference user={event.permissionUser} />,
-          permissionType: (
-            <PetitionPermissionTypeText
-              as="em"
-              type={event.permissionType}
-              textTransform="lowercase"
-            />
-          ),
-          timeAgo: (
-            <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
-          ),
-        }}
-      />
+      {event.triggeredBy === "USER" ? (
+        <FormattedMessage
+          id="component.timeline-user-permission-edited-event.triggered-by-user-description"
+          defaultMessage="{user} updated {other}'s permission to {permissionType} {timeAgo}"
+          values={{
+            user: <UserReference user={event.user} />,
+            other: <UserReference user={event.permissionUser} />,
+            permissionType: (
+              <PetitionPermissionTypeText
+                as="em"
+                type={event.permissionType}
+                textTransform="lowercase"
+              />
+            ),
+            timeAgo: (
+              <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+            ),
+          }}
+        />
+      ) : (
+        <FormattedMessage
+          id="component.timeline-user-permission-edited-event.triggered-by-system-description"
+          defaultMessage="{other}'s permission was updated to {permissionType} {timeAgo}"
+          values={{
+            other: <UserReference user={event.permissionUser} />,
+            permissionType: (
+              <PetitionPermissionTypeText
+                as="em"
+                type={event.permissionType}
+                textTransform="lowercase"
+              />
+            ),
+            timeAgo: (
+              <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+            ),
+          }}
+        />
+      )}
     </TimelineItem>
   );
 }
@@ -48,6 +68,7 @@ const _fragments = {
       user {
         ...UserReference_User
       }
+      triggeredBy
       permissionUser {
         ...UserReference_User
       }

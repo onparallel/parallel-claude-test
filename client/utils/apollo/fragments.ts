@@ -19,6 +19,7 @@ const FullApprovalFlowConfig = gql`
     values
     visibility
     manualStart
+    allowEdit
   }
 `;
 

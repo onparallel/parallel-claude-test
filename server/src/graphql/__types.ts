@@ -126,6 +126,7 @@ export interface NexusGenInputs {
   };
   ApprovalFlowConfigInput: {
     // input type
+    allowEdit: boolean; // Boolean!
     manualStart: boolean; // Boolean!
     name: string; // String!
     type: NexusGenEnums["ApprovalFlowType"]; // ApprovalFlowType!
@@ -938,6 +939,7 @@ export interface NexusGenObjects {
     values: { id: number; type: "User" | "UserGroup" | "PetitionField" }[];
     visibility?: any;
     manual_start: boolean;
+    allow_edit: boolean;
   };
   AsyncFieldCompletionResponse: {
     // root type
@@ -2198,6 +2200,7 @@ export interface NexusGenFieldTypes {
   };
   ApprovalFlowConfig: {
     // field return type
+    allowEdit: boolean; // Boolean!
     approvers: Array<NexusGenRootTypes["User"] | null>; // [User]!
     manualStart: boolean; // Boolean!
     name: string; // String!
@@ -3387,6 +3390,7 @@ export interface NexusGenFieldTypes {
   };
   PetitionApprovalRequestStep: {
     // field return type
+    allowEdit: boolean; // Boolean!
     approvalType: NexusGenEnums["PetitionApprovalRequestStepApprovalType"]; // PetitionApprovalRequestStepApprovalType!
     approvers: NexusGenRootTypes["PetitionApprovalRequestStepApprover"][]; // [PetitionApprovalRequestStepApprover!]!
     id: NexusGenScalars["GID"]; // GID!
@@ -5218,6 +5222,7 @@ export interface NexusGenFieldTypes {
     permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
     permissionUser: NexusGenRootTypes["User"] | null; // User
     petition: NexusGenRootTypes["Petition"] | null; // Petition
+    triggeredBy: NexusGenEnums["PetitionEventTriggeredBy"]; // PetitionEventTriggeredBy!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
   };
@@ -5554,6 +5559,7 @@ export interface NexusGenFieldTypeNames {
   };
   ApprovalFlowConfig: {
     // field return type name
+    allowEdit: "Boolean";
     approvers: "User";
     manualStart: "Boolean";
     name: "String";
@@ -6743,6 +6749,7 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionApprovalRequestStep: {
     // field return type name
+    allowEdit: "Boolean";
     approvalType: "PetitionApprovalRequestStepApprovalType";
     approvers: "PetitionApprovalRequestStepApprover";
     id: "GID";
@@ -8574,6 +8581,7 @@ export interface NexusGenFieldTypeNames {
     permissionType: "PetitionPermissionType";
     permissionUser: "User";
     petition: "Petition";
+    triggeredBy: "PetitionEventTriggeredBy";
     type: "PetitionEventType";
     user: "User";
   };

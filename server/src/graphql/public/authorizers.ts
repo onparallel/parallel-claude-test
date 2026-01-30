@@ -263,9 +263,10 @@ export function publicPetitionDoesNotHaveOngoingProcess<
     assert(access, "Access not found");
     const petitionId = access.petition_id;
 
-    const [processType] = await ctx.petitions.getPetitionStartedProcesses(petitionId);
+    const [process] = await ctx.petitions.getPetitionStartedProcesses(petitionId);
 
-    if (isNonNullish(processType)) {
+    if (isNonNullish(process)) {
+      const processType = process.type;
       throw new ApolloError(
         `Petition has an ongoing ${processType.toLowerCase()} process`,
         `ONGOING_PROCESS_ERROR`,

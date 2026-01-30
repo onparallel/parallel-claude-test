@@ -40,7 +40,8 @@ export interface IApprovalsService {
     commentId?: number | null,
     userId?: number | null,
   ): Promise<PetitionApprovalRequestStep>;
-  extractUserIdsFromApprovalFlowConfig(config: ApprovalRequestStepConfig): Promise<number[]>;
+  extractUserIdsFromApprovalRequestStepConfig(config: ApprovalRequestStepConfig): Promise<number[]>;
+  userIsApproverOfApprovalRequestStep(stepId: number, userId: number): Promise<boolean>;
 }
 
 @injectable()
@@ -106,6 +107,7 @@ export class ApprovalsService implements IApprovalsService {
             step_number: index,
             manual_start:
               isFirstStep && opts?.forceStartFirstStepManually ? true : step.manual_start,
+            allow_edit: step.allow_edit,
           };
         },
       ),
@@ -114,7 +116,7 @@ export class ApprovalsService implements IApprovalsService {
 
     // on each step, insert its approvers
     for (const [step, config] of zip(approvalRequestSteps, composedPetition.approvalFlowConfig)) {
-      const userIds = await this.extractUserIdsFromApprovalFlowConfig(config);
+      const userIds = await this.extractUserIdsFromApprovalRequestStepConfig(config);
 
       await this.approvalRequests.createPetitionApprovalRequestStepApprovers(
         step.id,
@@ -127,6 +129,7 @@ export class ApprovalsService implements IApprovalsService {
         const newPermissions = await this.petitions.ensureMinimalPermissions(
           step.petition_id,
           userIds,
+          step.allow_edit ? "WRITE" : "READ",
           startedBy,
         );
 
@@ -137,7 +140,7 @@ export class ApprovalsService implements IApprovalsService {
             data: {
               permission_user_id: p.user_id!,
               permission_type: p.type,
-              user_id: userId ?? null,
+              user_id: null, // this event was not explicitly triggered by the user, so set it to null
             },
           })),
         );
@@ -289,17 +292,18 @@ export class ApprovalsService implements IApprovalsService {
     const newPermissions = await this.petitions.ensureMinimalPermissions(
       step.petition_id,
       approvers.map((a) => a.user_id),
+      step.allow_edit ? "WRITE" : "READ",
       `User:${userId}`,
     );
 
     await this.petitions.createEvent(
       newPermissions.map((p) => ({
-        type: "USER_PERMISSION_ADDED",
+        type: p.is_update ? "USER_PERMISSION_EDITED" : "USER_PERMISSION_ADDED",
         petition_id: step.petition_id,
         data: {
           permission_user_id: p.user_id!,
           permission_type: p.type,
-          user_id: userId ?? null,
+          user_id: null, // this event was not explicitly triggered by the user, so set it to null
         },
       })),
     );
@@ -319,7 +323,7 @@ export class ApprovalsService implements IApprovalsService {
     return step;
   }
 
-  async extractUserIdsFromApprovalFlowConfig(config: ApprovalRequestStepConfig) {
+  async extractUserIdsFromApprovalRequestStepConfig(config: ApprovalRequestStepConfig) {
     const userGroupsIds = unique(
       config.values.filter((v) => v.type === "UserGroup").map((v) => v.id),
     );
@@ -347,5 +351,11 @@ export class ApprovalsService implements IApprovalsService {
       ...groupMembers.map((m) => m.user_id),
       ...replies.map((r) => r.content.value as number),
     ]);
+  }
+
+  async userIsApproverOfApprovalRequestStep(stepId: number, userId: number) {
+    const stepApprovers =
+      await this.approvalRequests.loadPetitionApprovalRequestStepApproversByStepId(stepId);
+    return stepApprovers.some((a) => a.user_id === userId);
   }
 }

@@ -208,6 +208,7 @@ function ConfigureApprovalStepsDialog({
                     type: "ANY",
                     values: [],
                     manualStart: false,
+                    allowEdit: false,
                   })
                 }
               >
@@ -447,6 +448,26 @@ function ApprovalCard({ index, petition, onRemove }: ApprovalCardProps) {
                 <FormattedMessage
                   id="component.configure-approval-steps-dialog.checkbox-start-approval-manually-help"
                   defaultMessage="Prevents steps from starting automatically after completing, signing, or approving a previous step."
+                />
+              </Text>
+            </HelpPopover>
+          </HStack>
+        </Checkbox>
+      </FormControl>
+      <FormControl>
+        <Checkbox {...register(`approvals.${index}.allowEdit`)} backgroundColor="white">
+          <HStack spacing={1}>
+            <Text>
+              <FormattedMessage
+                id="component.configure-approval-steps-dialog.checkbox-allow-edit"
+                defaultMessage="Allow approver to edit replies"
+              />
+            </Text>
+            <HelpPopover>
+              <Text>
+                <FormattedMessage
+                  id="component.configure-approval-steps-dialog.checkbox-allow-edit-help"
+                  defaultMessage="Replies are locked by default when approvals begin. Enable this option to allow approvers to modify them."
                 />
               </Text>
             </HelpPopover>

@@ -23,6 +23,9 @@ export const ApprovalFlowConfigInput = inputObjectType({
       description:
         "Forces step to start manually after completing, signing, or approving a previous step.",
     });
+    t.nonNull.boolean("allowEdit", {
+      description: "Whether the approvers can edite the replies of the petition fields",
+    });
   },
 });
 
@@ -39,7 +42,7 @@ export const ApprovalFlowConfig = objectType({
       description: "List of users that are assigned to approve this step.",
       type: "User",
       resolve: async (o, _, ctx) => {
-        const userIds = await ctx.approvals.extractUserIdsFromApprovalFlowConfig(o);
+        const userIds = await ctx.approvals.extractUserIdsFromApprovalRequestStepConfig(o);
         return userIds.length > 0 ? await ctx.users.loadUser(userIds) : [];
       },
     });
@@ -59,9 +62,12 @@ export const ApprovalFlowConfig = objectType({
         return null;
       },
     });
+
     t.nonNull.boolean("manualStart", {
       resolve: (o) => o.manual_start,
     });
+
+    t.nonNull.boolean("allowEdit", { resolve: (o) => o.allow_edit });
   },
   sourceType: /* ts */ `
     {
@@ -70,6 +76,7 @@ export const ApprovalFlowConfig = objectType({
       values: { id: number; type: "User" | "UserGroup" | "PetitionField" }[];
       visibility?: any;
       manual_start: boolean;
+      allow_edit: boolean;
     }
   `,
 });
@@ -101,6 +108,7 @@ export const PetitionApprovalRequestStep = objectType({
         members: PetitionApprovalRequestStepStatusValues,
       }),
     });
+    t.nonNull.boolean("allowEdit", { resolve: (o) => o.allow_edit });
     t.nonNull.field("approvalType", {
       type: enumType({
         name: "PetitionApprovalRequestStepApprovalType",

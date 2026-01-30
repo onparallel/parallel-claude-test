@@ -17,6 +17,7 @@ export interface ApprovalRequestStepConfig {
   values: { id: number; type: "User" | "UserGroup" | "PetitionField" }[];
   visibility?: PetitionFieldVisibility | null;
   manual_start: boolean;
+  allow_edit: boolean;
 }
 
 export class PetitionApprovalRequestRepository extends BaseRepository {

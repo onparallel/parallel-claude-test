@@ -157,6 +157,10 @@ export const adverseMediaArticleSearch = queryField("adverseMediaArticleSearch",
         );
       }
 
+      if (!petition.enable_interaction_with_recipients) {
+        await ctx.petitionsHelper.resetPetitionStatusAsUser(params.petitionId, ctx.user!.id);
+      }
+
       return await ctx.petitionsHelper.mapReplyContentFromDatabase({
         type: "ADVERSE_MEDIA_SEARCH",
         content,

@@ -107,11 +107,18 @@ export const publicCreatePetitionFieldReplies = mutationField("publicCreatePetit
       { concurrency: 1 },
     );
 
-    return await ctx.petitions.createPetitionFieldReply(
+    const replies = await ctx.petitions.createPetitionFieldReply(
       ctx.access!.petition_id,
       data,
       `Contact:${ctx.contact!.id}`,
     );
+
+    await ctx.petitionsHelper.resetPetitionStatusAsContact(
+      ctx.access!.petition_id,
+      ctx.contact!.id,
+    );
+
+    return replies;
   },
 });
 
@@ -175,12 +182,19 @@ export const publicUpdatePetitionFieldReplies = mutationField("publicUpdatePetit
       { concurrency: 1 },
     );
 
-    return await ctx.petitions.updatePetitionFieldRepliesContent(
+    const updatedReplies = await ctx.petitions.updatePetitionFieldRepliesContent(
       ctx.access!.petition_id,
       mappedRepliesInput,
       "PetitionAccess",
       ctx.access!.id,
     );
+
+    await ctx.petitionsHelper.resetPetitionStatusAsContact(
+      ctx.access!.petition_id,
+      ctx.access!.contact_id!,
+    );
+
+    return updatedReplies;
   },
 });
 
@@ -200,14 +214,19 @@ export const publicDeletePetitionFieldReply = mutationField("publicDeletePetitio
     replyId: nonNull(globalIdArg("PetitionFieldReply")),
   },
   resolve: async (_, args, ctx) => {
-    const { field, reply } = await ctx.petitions.deletePetitionFieldReply(
+    const petitionId = ctx.access!.petition_id;
+    const reply = await ctx.petitions.deletePetitionFieldReply(
+      petitionId,
       args.replyId,
       ctx.access!,
     );
+    const field = await ctx.petitions.loadField(reply.petition_field_id);
+    assert(field, "Field not found");
+    await ctx.petitionsHelper.resetPetitionStatusAsContact(petitionId, ctx.access!.contact_id!);
 
     if (reply.associated_profile_id) {
       const removedAssociation = await ctx.petitions.safeRemovePetitionProfileAssociation(
-        ctx.access!.petition_id,
+        petitionId,
         reply.associated_profile_id,
       );
       if (removedAssociation) {
@@ -219,7 +238,7 @@ export const publicDeletePetitionFieldReply = mutationField("publicDeletePetitio
             petition_access_id: ctx.access!.id,
           },
         });
-        const petition = await ctx.petitions.loadPetition(ctx.access!.petition_id);
+        const petition = await ctx.petitions.loadPetition(petitionId);
         assert(petition, "Petition not found");
         await ctx.profiles.createEvent({
           type: "PETITION_DISASSOCIATED",
@@ -317,6 +336,12 @@ export const publicCreateFileUploadReply = mutationField("publicCreateFileUpload
         `Contact:${ctx.contact!.id}`,
       ),
     ]);
+
+    await ctx.petitionsHelper.resetPetitionStatusAsContact(
+      ctx.access!.petition_id,
+      ctx.contact!.id,
+    );
+
     return { presignedPostData, reply };
   },
 });
@@ -427,6 +452,11 @@ export const publicStartAsyncFieldCompletion = mutationField("publicStartAsyncFi
         petition.recipient_locale,
       );
 
+      await ctx.petitionsHelper.resetPetitionStatusAsContact(
+        ctx.access!.petition_id,
+        ctx.access!.contact_id!,
+      );
+
       return {
         type: "WINDOW",
         url: session.widgetLink,
@@ -460,6 +490,11 @@ export const publicStartAsyncFieldCompletion = mutationField("publicStartAsyncFi
             parentReplyId: parentReplyId ? toGlobalId("PetitionFieldReply", parentReplyId) : null,
           },
           petition.recipient_locale,
+        );
+
+        await ctx.petitionsHelper.resetPetitionStatusAsContact(
+          ctx.access!.petition_id,
+          ctx.access!.contact_id!,
         );
 
         return {
@@ -511,6 +546,11 @@ export const publicRetryAsyncFieldCompletion = mutationField("publicRetryAsyncFi
             : null,
         },
         petition.recipient_locale,
+      );
+
+      await ctx.petitionsHelper.resetPetitionStatusAsContact(
+        ctx.access!.petition_id,
+        ctx.access!.contact_id!,
       );
 
       return {

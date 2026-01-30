@@ -70,7 +70,7 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     permission_user_id: number;
   };
   USER_PERMISSION_EDITED: {
-    user_id: number;
+    user_id: number | null; // null if the permission was edited by the system
     permission_user_id: number;
     permission_type: PetitionPermissionType;
   };
