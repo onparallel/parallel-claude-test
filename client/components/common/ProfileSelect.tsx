@@ -7,7 +7,6 @@ import {
   ProfileSelect_ProfileTypesDocument,
   ProfileSelect_profileDocument,
   ProfileSelect_profilesSimpleDocument,
-  useCreateProfileDialog_ProfileFragment,
 } from "@parallel/graphql/__types";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomAsyncCreatableSelectProps } from "@parallel/utils/react-select/types";
@@ -70,7 +69,6 @@ export interface ProfileSelectProps<
   defaultOptions?: boolean;
   canCreateProfiles?: boolean;
   hideProfileType?: boolean;
-  onCreateProfile?: (profile: useCreateProfileDialog_ProfileFragment) => void;
 }
 
 export const ProfileSelect = forwardRef(function ProfileSelect<
@@ -90,7 +88,6 @@ export const ProfileSelect = forwardRef(function ProfileSelect<
     defaultCreateProfileFieldValues,
     excludeProfiles,
     canCreateProfiles,
-    onCreateProfile,
     ...props
   }: ProfileSelectProps<IsMulti, IsSync, OptionType>,
   ref: ForwardedRef<ProfileSelectInstance<IsMulti, OptionType>>,

@@ -664,7 +664,7 @@ function ArchiveRepliesIntoProfileRow({
 
   // Helper function to get profile field values from updateProfileOnClose and reply children
   function getProfileFieldValues(
-    reply: useArchiveRepliesIntoProfileDialog_PetitionFieldReplyFragment,
+    replies: useArchiveRepliesIntoProfileDialog_PetitionFieldReplyFragment[],
   ): Record<string, any> {
     // Get all petition fields (including children)
     const allPetitionFields = pipe(
@@ -683,9 +683,10 @@ function ArchiveRepliesIntoProfileRow({
       }
     }
 
-    // 2. From reply children (that are not in updateProfileOnClose)
-    if (reply.children) {
-      for (const { field: _childField } of reply.children) {
+    // 2. From reply children (that are not in updateProfileOnClose) — all replies, first found has priority
+    for (const r of replies) {
+      if (!r.children) continue;
+      for (const { field: _childField } of r.children) {
         const childField = allPetitionFields.find((f) => f.id === _childField.id);
         if (
           isNonNullish(childField?.profileTypeField) &&
@@ -711,11 +712,17 @@ function ArchiveRepliesIntoProfileRow({
         // Get value from updateProfileOnClose
         if (updateFromConfig.source.type === "FIELD") {
           const fieldId = updateFromConfig.source.fieldId;
-          const childField = reply?.children?.find((c) => c.field.id === fieldId);
-
-          if (childField && childField.replies.length > 0) {
-            value = childField.replies[0]?.content?.value;
-          } else {
+          for (const r of replies) {
+            const childField = r.children?.find((c) => c.field.id === fieldId);
+            if (childField && childField.replies.length > 0) {
+              const v = childField.replies[0]?.content?.value;
+              if (!isNullish(v)) {
+                value = v;
+                break;
+              }
+            }
+          }
+          if (isNullish(value)) {
             const petitionField = allPetitionFields.find((f) => f.id === fieldId);
             if (petitionField && petitionField.replies.length > 0) {
               value = petitionField.replies[0]?.content?.value;
@@ -728,13 +735,18 @@ function ArchiveRepliesIntoProfileRow({
           value = (petition as { closedAt?: string | null }).closedAt ?? null;
         }
       } else {
-        // Get from reply children
-        const childField = reply.children?.find(
-          (c) => c.field.profileTypeField?.id === profileTypeFieldId,
-        );
-
-        if (isNonNullish(childField) && childField.replies.length > 0) {
-          value = childField.replies[0]?.content?.value;
+        // Get from reply children — first reply with a value has priority
+        for (const r of replies) {
+          const childField = r.children?.find(
+            (c) => c.field.profileTypeField?.id === profileTypeFieldId,
+          );
+          if (isNonNullish(childField) && childField.replies.length > 0) {
+            const v = childField.replies[0]?.content?.value;
+            if (!isNullish(v)) {
+              value = v;
+              break;
+            }
+          }
         }
       }
 
@@ -746,7 +758,7 @@ function ArchiveRepliesIntoProfileRow({
     return fieldValues;
   }
 
-  const profileFieldValues = getProfileFieldValues(reply);
+  const profileFieldValues = getProfileFieldValues(replies);
 
   return (
     <>
@@ -790,7 +802,7 @@ function ArchiveRepliesIntoProfileRow({
             }}
             defaultOptions
             canCreateProfiles
-            defaultCreateProfileName={profileName || ""}
+            defaultCreateProfileName={profileName ?? ""}
             defaultCreateProfileFieldValues={profileFieldValues}
             createOptionPosition="first"
             profileTypeId={field?.profileType?.id}
