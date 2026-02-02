@@ -33,11 +33,22 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           show_full_output: true
+          additional_permissions: |
+            gh pr comment
+            gh pr review
+            git diff
+            git log
+            git remote
           prompt: |
-            Review the code changes in this pull request.
+            You are reviewing Pull Request #${{ github.event.pull_request.number }} in repository ${{ github.repository }}.
 
-            The changed files are in this repository. Use the Read tool to examine them.
-            Look at the git diff to understand what changed.
+            PR Title: ${{ github.event.pull_request.title }}
+            PR Author: ${{ github.event.pull_request.user.login }}
+            Base branch: ${{ github.base_ref }}
+            Head branch: ${{ github.head_ref }}
+
+            IMPORTANT: Read the diff file at /tmp/pr-diff.txt to see the changes.
+            Also use the Read tool to examine the changed files in detail.
 
             Issues to look for:
             1. SQL injection (string concatenation in SQL queries) - CRITICAL
@@ -46,8 +57,13 @@ jobs:
             4. Using 'let' when 'const' would be better
             5. Security vulnerabilities
 
-            After reviewing, provide a summary of issues found as a comment.
-            If you find CRITICAL issues, clearly mark them.
+            After reviewing, use this command to post your review comment:
+            gh pr comment ${{ github.event.pull_request.number }} --body "YOUR_REVIEW_HERE"
+
+            Or use gh pr review to leave a formal review:
+            gh pr review ${{ github.event.pull_request.number }} --comment --body "YOUR_REVIEW_HERE"
+
+            If you find CRITICAL issues, clearly mark them in your comment.
 
 concurrency:
   group: ${{ github.ref }}-claude-review
