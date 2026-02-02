@@ -20,47 +20,58 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Create MCP Config
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get PR diff
+        id: diff
         run: |
-          cat > /tmp/mcp-config.json << EOF
-          {
-            "mcpServers": {
-              "github": {
-                "command": "npx",
-                "args": ["-y", "@modelcontextprotocol/server-github"],
-                "env": {
-                  "GITHUB_PERSONAL_ACCESS_TOKEN": "${GH_TOKEN}"
-                }
-              }
-            }
-          }
-          EOF
+          git fetch origin ${{ github.base_ref }}
+          git diff origin/${{ github.base_ref }}...HEAD > /tmp/pr-diff.txt
+          echo "Diff file created"
 
       - name: Run Claude Code Review
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           show_full_output: true
-          claude_args: |
-            --mcp-config /tmp/mcp-config.json
-            --allowedTools mcp__github__*
+          settings: |
+            {
+              "permissions": {
+                "allow": [
+                  "Bash(gh pr:*)",
+                  "Bash(gh api:*)",
+                  "Bash(git:*)",
+                  "Read(*)",
+                  "mcp__github__*"
+                ],
+                "deny": []
+              }
+            }
           prompt: |
-            You are a code reviewer. Review this pull request and leave comments directly on the PR.
+            You are reviewing Pull Request #${{ github.event.pull_request.number }} in repository ${{ github.repository }}.
 
-            Use the GitHub MCP tools to create review comments:
-            - Use mcp__github__create_pull_request_review to submit a review with comments
-            - Use mcp__github__get_pull_request_diff to see the changes
+            STEP 1: Read the diff file at /tmp/pr-diff.txt to see what changed.
 
-            Look for these issues and comment on them:
-            1. SQL injection vulnerabilities (string concatenation in queries)
+            STEP 2: Review the changed files and look for these issues:
+            1. SQL injection vulnerabilities (string concatenation in queries) - CRITICAL
             2. console.log statements (should not be in production code)
             3. Unused variables
             4. 'let' that should be 'const' (when variable is never reassigned)
             5. Security issues
 
-            For each issue found, create a review comment on the specific line.
+            STEP 3: After your analysis, post a comment on the PR using:
+            gh pr comment ${{ github.event.pull_request.number }} --body "YOUR_REVIEW_HERE"
+
+            Format your review as:
+            ## Code Review Summary
+
+            ### Critical Issues (if any)
+            - List critical issues here
+
+            ### Code Quality Issues
+            - List other issues here
+
+            ### Suggestions
+            - List suggestions here
 
 concurrency:
   group: ${{ github.ref }}-claude-review
