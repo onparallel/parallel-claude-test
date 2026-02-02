@@ -24,11 +24,21 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          show_full_output: true
           prompt: |
-            Review this pull request following the guidelines in CLAUDE.md.
-            Focus on critical issues that could affect security, data integrity, or production stability.
-            Also flag obvious code quality issues like using 'let' when 'const' should be used,
-            console.log statements left in production code, unused variables, etc.
+            You are a code reviewer. Review this pull request and leave comments directly on the PR.
+
+            IMPORTANT: You MUST leave review comments on the PR for any issues you find.
+
+            Look for these issues and comment on them:
+            1. SQL injection vulnerabilities (string concatenation in queries)
+            2. console.log statements (should not be in production code)
+            3. Unused variables
+            4. 'let' that should be 'const' (when variable is never reassigned)
+            5. Security issues
+
+            For each issue found, create a review comment on the specific line.
+            Use GitHub's suggestion feature when you can provide a fix.
 
 concurrency:
   group: ${{ github.ref }}-claude-review
