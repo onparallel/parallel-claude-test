@@ -20,16 +20,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get PR diff
-        id: diff
+      - name: Get PR info
+        id: pr-info
         run: |
           git fetch origin ${{ github.base_ref }}
           git diff origin/${{ github.base_ref }}...HEAD > /tmp/pr-diff.txt
-          echo "Diff file created"
+          echo "head_sha=${{ github.event.pull_request.head.sha }}" >> $GITHUB_OUTPUT
 
       - name: Run Claude Code Review
-        id: claude-review
         uses: anthropics/claude-code-action@v1
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ steps.pr-info.outputs.head_sha }}
+          REPO: ${{ github.repository }}
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -38,71 +41,95 @@ jobs:
             {
               "permissions": {
                 "allow": [
-                  "Bash(gh pr:*)",
                   "Bash(gh api:*)",
-                  "Bash(git:*)",
+                  "Bash(gh pr:*)",
                   "Bash(echo:*)",
+                  "Bash(cat:*)",
                   "Read(*)",
-                  "Write(*)",
-                  "mcp__github__*"
-                ],
-                "deny": []
+                  "Write(*)"
+                ]
               }
             }
           prompt: |
-            You are reviewing Pull Request #${{ github.event.pull_request.number }} in repository ${{ github.repository }}.
+            You are reviewing Pull Request #${{ github.event.pull_request.number }} in ${{ github.repository }}.
 
-            STEP 1: Read the diff file at /tmp/pr-diff.txt to see what changed.
+            HEAD_SHA: ${{ steps.pr-info.outputs.head_sha }}
 
-            STEP 2: Review the changed files and look for these issues:
+            ## Your Task
+            Review the code and create GitHub suggestions that can be accepted with one click.
 
-            CRITICAL ISSUES (will fail the PR check):
-            - SQL injection vulnerabilities (string concatenation in queries)
-            - Security vulnerabilities (XSS, command injection, etc.)
+            ## Steps
+
+            ### STEP 1: Read and analyze the diff
+            Read /tmp/pr-diff.txt to understand what changed.
+
+            ### STEP 2: Identify issues
+            Look for:
+
+            CRITICAL (will fail the check):
+            - SQL injection (string concatenation in queries)
+            - Security vulnerabilities (XSS, command injection)
+            - Multi-tenancy violations (missing org_id filters)
             - Data loss risks
-            - Production-breaking bugs
-            - Hardcoded secrets or credentials
+            - Hardcoded secrets
 
-            CODE QUALITY ISSUES (suggestions only, won't fail):
-            - console.log statements (should not be in production code)
+            CODE QUALITY (suggestions only):
+            - console.log statements
             - Unused variables
-            - 'let' that should be 'const'
-            - Performance improvements
-            - Code style suggestions
+            - let that should be const
+            - Performance issues
 
-            STEP 3: Write a file /tmp/review-result.txt with ONLY one of these two values:
-            - "CRITICAL" if you found any critical issues
-            - "OK" if you only found suggestions or no issues
+            ### STEP 3: Create review with inline suggestions
+            For each issue, create a GitHub review with inline suggestions using this command:
 
-            STEP 4: Post a comment on the PR using:
-            gh pr comment ${{ github.event.pull_request.number }} --body "YOUR_REVIEW_HERE"
+            ```bash
+            gh api -X POST /repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews \
+              --field body="Review summary here" \
+              --field commit_id="${{ steps.pr-info.outputs.head_sha }}" \
+              --field event="REQUEST_CHANGES" \
+              --field comments='[
+                {
+                  "path": "path/to/file.ts",
+                  "line": 25,
+                  "body": "Issue description\n\n```suggestion\nfixed code here\n```"
+                }
+              ]'
+            ```
 
-            Format your review as:
-            ## Code Review Summary
+            IMPORTANT:
+            - Use "line" (not "position") - the actual line number in the NEW file
+            - Use event="REQUEST_CHANGES" for critical issues, "COMMENT" for suggestions only
+            - The suggestion block must contain the EXACT replacement code for that line
+            - Multiple lines can be suggested using "start_line" and "line" together
 
-            ### ❌ Critical Issues (if any)
-            - List critical issues here with file:line references
+            ### STEP 4: Write result file
+            Write to /tmp/review-result.txt:
+            - "CRITICAL" if you found critical issues
+            - "OK" if only minor suggestions or no issues
 
-            ### ⚠️ Code Quality Issues (if any)
-            - List suggestions here
-
-            ### ✅ Verdict
-            - If critical issues: "This PR should NOT be merged until critical issues are fixed."
-            - If only suggestions: "This PR can be merged. Consider addressing the suggestions above."
+            Example for multi-line suggestion:
+            ```json
+            {
+              "path": "file.ts",
+              "start_line": 10,
+              "line": 12,
+              "body": "Replace these lines:\n\n```suggestion\nline 10 replacement\nline 11 replacement\nline 12 replacement\n```"
+            }
+            ```
 
       - name: Check for critical issues
         run: |
           if [ -f /tmp/review-result.txt ]; then
             RESULT=$(cat /tmp/review-result.txt)
             echo "Review result: $RESULT"
-            if [ "$RESULT" = "CRITICAL" ]; then
-              echo "❌ Critical issues found - failing the check"
+            if echo "$RESULT" | grep -q "CRITICAL"; then
+              echo "❌ Critical issues found - failing check"
               exit 1
             else
               echo "✅ No critical issues found"
             fi
           else
-            echo "⚠️ Review result file not found, assuming OK"
+            echo "⚠️ Result file not found, assuming OK"
           fi
 
 concurrency:
