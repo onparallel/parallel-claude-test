@@ -27,6 +27,7 @@ import { PrintPdfRunner } from "./task-runners/PrintPdfRunner";
 import { ProfileNamePatternUpdatedRunner } from "./task-runners/ProfileNamePatternUpdatedRunner";
 import { ProfilesExcelExportRunner } from "./task-runners/ProfilesExcelExportRunner";
 import { ProfilesExcelImportRunner } from "./task-runners/ProfilesExcelImportRunner";
+import { ProfileSyncRunner } from "./task-runners/ProfileSyncRunner";
 import { TemplateRepliesCsvExportRunner } from "./task-runners/TemplateRepliesCsvExportRunner";
 import { TemplateRepliesReportRunner } from "./task-runners/TemplateRepliesReportRunner";
 import { TemplatesOverviewReportRunner } from "./task-runners/TemplatesOverviewReportRunner";
@@ -85,6 +86,8 @@ export class TaskWorkerQueue extends QueueWorker<TaskWorkerPayload> {
     dashboardRefreshRunner: DashboardRefreshRunner,
     @inject(DocumentProcessingRunner)
     documentProcessingRunner: DocumentProcessingRunner,
+    @inject(ProfileSyncRunner)
+    profileSyncRunner: ProfileSyncRunner,
   ) {
     super();
     this.runners = {
@@ -110,6 +113,7 @@ export class TaskWorkerQueue extends QueueWorker<TaskWorkerPayload> {
       PROFILES_EXCEL_EXPORT: profilesExcelExportRunner,
       DASHBOARD_REFRESH: dashboardRefreshRunner,
       DOCUMENT_PROCESSING: documentProcessingRunner,
+      PROFILE_SYNC: profileSyncRunner,
     };
   }
 

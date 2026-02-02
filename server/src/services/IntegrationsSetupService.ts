@@ -1,5 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
+import { omit } from "remeda";
 import { CreateOrgIntegration, OrgIntegration } from "../db/__types";
 import {
   EnhancedOrgIntegration,
@@ -31,6 +32,14 @@ import {
   EInformaProfileExternalSourceIntegration,
 } from "../integrations/profile-external-source/einforma/EInformaProfileExternalSourceIntegration";
 import {
+  SAP_PROFILE_SYNC_INTEGRATION,
+  SapProfileSyncIntegration,
+} from "../integrations/profile-sync/sap/SapProfileSyncIntegration";
+import {
+  ISapProfileSyncIntegrationSettingsValidator,
+  PROFILE_SYNC_INTEGRATION_SETTINGS_VALIDATOR,
+} from "../integrations/profile-sync/sap/SapProfileSyncIntegrationSettingsValidator";
+import {
   SignaturitEnvironment,
   SignaturitIntegration,
 } from "../integrations/signature/SignaturitIntegration";
@@ -38,6 +47,22 @@ import { Replace } from "../util/types";
 
 export const INTEGRATIONS_SETUP_SERVICE = Symbol.for("INTEGRATIONS_SETUP_SERVICE");
 export interface IIntegrationsSetupService {
+  createSapProfileSyncIntegration(
+    data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default"> & {
+      settings: IntegrationSettings<"PROFILE_SYNC", "SAP">;
+    },
+    createdBy: string,
+    t?: Knex.Transaction,
+  ): Promise<EnhancedOrgIntegration<"PROFILE_SYNC", "SAP">>;
+  updateSapProfileSyncIntegration(
+    integrationId: number,
+    orgId: number,
+    data: Replace<
+      Partial<OrgIntegration>,
+      { settings: IntegrationSettings<"PROFILE_SYNC", "SAP"> }
+    >,
+    t?: Knex.Transaction,
+  ): Promise<void>;
   createSignaturitIntegration(
     data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default">,
     apiKey: string,
@@ -173,7 +198,43 @@ export class IntegrationsSetupService implements IIntegrationsSetupService {
     private companiesHouseProfileExternalSourceIntegration: CompaniesHouseProfileExternalSourceIntegration,
     @inject(IMANAGE_FILE_EXPORT_INTEGRATION)
     private iManageFileExportIntegration: IManageFileExportIntegration,
+    @inject(SAP_PROFILE_SYNC_INTEGRATION)
+    private sapProfileSyncIntegration: SapProfileSyncIntegration,
+    @inject(PROFILE_SYNC_INTEGRATION_SETTINGS_VALIDATOR)
+    private profileSyncSettingsValidator: ISapProfileSyncIntegrationSettingsValidator,
   ) {}
+
+  async createSapProfileSyncIntegration(
+    data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default"> & {
+      settings: IntegrationSettings<"PROFILE_SYNC", "SAP">;
+    },
+    createdBy: string,
+    t?: Knex.Transaction,
+  ) {
+    await this.profileSyncSettingsValidator.validate(data.org_id, {
+      ...omit(data.settings, ["CREDENTIALS"]),
+      authorization: data.settings.CREDENTIALS,
+    });
+
+    return await this.sapProfileSyncIntegration.createOrgIntegration(data, createdBy, t);
+  }
+
+  async updateSapProfileSyncIntegration(
+    integrationId: number,
+    orgId: number,
+    data: Replace<
+      Partial<OrgIntegration>,
+      { settings: IntegrationSettings<"PROFILE_SYNC", "SAP"> }
+    >,
+    t?: Knex.Transaction,
+  ) {
+    await this.profileSyncSettingsValidator.validate(orgId, {
+      ...omit(data.settings, ["CREDENTIALS"]),
+      authorization: data.settings.CREDENTIALS,
+    });
+
+    await this.sapProfileSyncIntegration.updateOrgIntegration(integrationId, data, t);
+  }
 
   async createSignaturitIntegration(
     data: Pick<CreateOrgIntegration, "org_id" | "name" | "is_default">,

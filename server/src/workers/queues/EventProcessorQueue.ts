@@ -50,6 +50,7 @@ import {
   PROFILE_EVENT_SUBSCRIPTIONS_LISTENER,
   ProfileEventSubscriptionsListener,
 } from "./event-listeners/ProfileEventSubscriptionsListener";
+import { PROFILE_SYNC_LISTENER, ProfileSyncListener } from "./event-listeners/ProfileSyncListener";
 import {
   USER_NOTIFICATIONS_LISTENER,
   UserNotificationsListener,
@@ -108,6 +109,8 @@ export class EventProcessor extends QueueWorker<EventProcessorPayload> {
     clientRiskUpdateListener: ClientRiskUpdateListener,
     @inject(KYC_REFRESH_DATE_UPDATE_LISTENER)
     kycRefreshDateUpdateListener: KycRefreshDateUpdateListener,
+    @inject(PROFILE_SYNC_LISTENER)
+    profileSyncListener: ProfileSyncListener,
   ) {
     super();
 
@@ -120,6 +123,7 @@ export class EventProcessor extends QueueWorker<EventProcessorPayload> {
       .register(petitionApprovalProcessListener)
       .register(petitionEventSubscriptionsListener)
       .register(profileEventSubscriptionsListener)
+      .register(profileSyncListener)
       .register(userNotificationsListener)
       .register(petitionActivityListener)
       .register(analyticsEventListener);

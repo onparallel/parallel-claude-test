@@ -1065,6 +1065,7 @@ export type FeatureFlag =
   | "PETITION_SUMMARY"
   | "PROFILES"
   | "PROFILE_SEARCH_FIELD"
+  | "PROFILE_SYNC"
   | "RECIPIENT_LANG_CA"
   | "RECIPIENT_LANG_IT"
   | "RECIPIENT_LANG_PT"
@@ -1226,6 +1227,7 @@ export type IntegrationType =
   | "FILE_EXPORT"
   | "ID_VERIFICATION"
   | "PROFILE_EXTERNAL_SOURCE"
+  | "PROFILE_SYNC"
   | "SIGNATURE"
   | "SSO"
   | "USER_PROVISIONING";
@@ -1545,6 +1547,8 @@ export interface Mutation {
    * Otherwise, it will create and enqueue a Task to be executed asynchronously; and return the Task object.
    */
   createRemovePetitionPermissionMaybeTask: MaybeTask;
+  /** Creates a new SAP Profile Sync integration on the provided organization, or updates it if the organization already has one. */
+  createSapProfileSyncIntegration: SupportMethodResponse;
   /** Creates a new Signaturit integration on the user's organization */
   createSignaturitIntegration: SignatureOrgIntegration;
   /** Creates a tag in the user's organization */
@@ -1791,6 +1795,8 @@ export interface Mutation {
   transferOrganizationOwnership: SupportMethodResponse;
   /** Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions. */
   transferPetitionOwnership: Array<PetitionBase>;
+  /** Triggers a initial sync of a SAP Profile Sync integration */
+  triggerSapProfileSyncInitialSync: SupportMethodResponse;
   unarchiveProfileType: Array<ProfileType>;
   unlinkPetitionFieldChildren: PetitionField;
   /** Unpins a profile type to the user's navigation manu */
@@ -2062,6 +2068,7 @@ export interface MutationclosePetitionsFromTemplateArgs {
 
 export interface MutationcloseProfileArgs {
   profileIds: Array<Scalars["GID"]["input"]>;
+  source?: InputMaybe<ProfileFieldPropertyValueSource>;
 }
 
 export interface MutationcompletePetitionArgs {
@@ -2431,6 +2438,7 @@ export interface MutationcreateProfileListViewArgs {
 export interface MutationcreateProfileRelationshipArgs {
   profileId: Scalars["GID"]["input"];
   relationships: Array<CreateProfileRelationshipInput>;
+  source?: InputMaybe<ProfileFieldPropertyValueSource>;
 }
 
 export interface MutationcreateProfileRelationshipsExcelArgs {
@@ -2503,6 +2511,11 @@ export interface MutationcreateRemovePetitionPermissionMaybeTaskArgs {
   removeAll?: InputMaybe<Scalars["Boolean"]["input"]>;
   userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+}
+
+export interface MutationcreateSapProfileSyncIntegrationArgs {
+  orgId: Scalars["GID"]["input"];
+  settings: Scalars["String"]["input"];
 }
 
 export interface MutationcreateSignaturitIntegrationArgs {
@@ -2637,12 +2650,14 @@ export interface MutationdeletePetitionsArgs {
 export interface MutationdeleteProfileArgs {
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
   profileIds: Array<Scalars["GID"]["input"]>;
+  source?: InputMaybe<ProfileFieldPropertyValueSource>;
 }
 
 export interface MutationdeleteProfileFieldFileArgs {
   profileFieldFileIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   profileId: Scalars["GID"]["input"];
   profileTypeFieldId: Scalars["GID"]["input"];
+  source?: InputMaybe<ProfileFieldPropertyValueSource>;
 }
 
 export interface MutationdeleteProfileListViewArgs {
@@ -3012,6 +3027,7 @@ export interface MutationremovePetitionPasswordArgs {
 export interface MutationremoveProfileRelationshipArgs {
   profileId: Scalars["GID"]["input"];
   profileRelationshipIds: Array<Scalars["GID"]["input"]>;
+  source?: InputMaybe<ProfileFieldPropertyValueSource>;
 }
 
 export interface MutationremoveProfileTypeProcessArgs {
@@ -3220,6 +3236,11 @@ export interface MutationtransferOrganizationOwnershipArgs {
 export interface MutationtransferPetitionOwnershipArgs {
   petitionIds: Array<Scalars["GID"]["input"]>;
   userId: Scalars["GID"]["input"];
+}
+
+export interface MutationtriggerSapProfileSyncInitialSyncArgs {
+  orgId: Scalars["GID"]["input"];
+  output: ProfileSyncIntegrationOutputType;
 }
 
 export interface MutationunarchiveProfileTypeArgs {
@@ -5860,7 +5881,8 @@ export type ProfileFieldPropertyValueSource =
   | "MANUAL"
   | "PARALLEL_API"
   | "PARALLEL_MONITORING"
-  | "PETITION_FIELD_REPLY";
+  | "PETITION_FIELD_REPLY"
+  | "PROFILE_SYNC";
 
 export interface ProfileFieldResponse {
   /** Time when the response was anonymized. */
@@ -6131,6 +6153,9 @@ export interface ProfileSubscription {
   id: Scalars["GID"]["output"];
   user: User;
 }
+
+/** Output type */
+export type ProfileSyncIntegrationOutputType = "DATABASE" | "EXCEL";
 
 export interface ProfileType extends Timestamps {
   __typename?: "ProfileType";
@@ -7567,6 +7592,7 @@ export type TaskName =
   | "PROFILES_EXCEL_EXPORT"
   | "PROFILES_EXCEL_IMPORT"
   | "PROFILE_NAME_PATTERN_UPDATED"
+  | "PROFILE_SYNC"
   | "TEMPLATES_OVERVIEW_REPORT"
   | "TEMPLATE_REPLIES_CSV_EXPORT"
   | "TEMPLATE_REPLIES_REPORT"

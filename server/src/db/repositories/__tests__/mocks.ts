@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { Duration } from "date-fns";
 import { Knex } from "knex";
 import PostgresInterval from "postgres-interval";
-import { isNonNullish, isNullish, omitBy, range } from "remeda";
+import { isNonNullish, isNullish, omitBy, range, unique } from "remeda";
 import { USER_COGNITO_ID } from "../../../../test/mocks";
 import { IEncryptionService } from "../../../services/EncryptionService";
 import { fullName } from "../../../util/fullName";
@@ -32,6 +32,8 @@ import {
   CreatePetitionField,
   CreatePetitionFieldReply,
   CreateProfileFieldValue,
+  CreateProfileType,
+  CreateProfileTypeField,
   CreateTag,
   CreateTemporaryFile,
   CreateUser,
@@ -71,7 +73,6 @@ import {
   ProfileEvent,
   ProfileEventType,
   ProfileEventTypeValues,
-  ProfileFieldValue,
   ProfileType,
   ProfileTypeField,
   ProfileTypeFieldType,
@@ -1344,6 +1345,10 @@ export class Mocks {
     );
   }
 
+  async createProfileType(data: CreateProfileType) {
+    return await this.knex<ProfileType>("profile_type").insert(data, "*");
+  }
+
   async createRandomProfileTypeFields(
     orgId: number,
     profileTypeId: number,
@@ -1375,6 +1380,14 @@ export class Mocks {
     );
   }
 
+  async createProfileTypeFields(
+    orgId: number,
+    profileTypeId: number,
+    data: Omit<CreateProfileTypeField, "org_id" | "profile_type_id" | "position">[],
+  ) {
+    return this.createRandomProfileTypeFields(orgId, profileTypeId, data.length, (i) => data[i]);
+  }
+
   async createRandomProfiles(
     orgId: number,
     profileTypeId: number,
@@ -1402,13 +1415,16 @@ export class Mocks {
         ? []
         : await this.knex
             .from("profile_type_field")
-            .whereIn(
-              "id",
-              values.map((v) => v.profile_type_field_id),
-            )
+            .whereIn("id", unique(values.map((v) => v.profile_type_field_id)))
             .select("*");
 
-    const rows = await this.knex<ProfileFieldValue>("profile_field_value").insert(
+    await this.knex
+      .from("profile_field_value")
+      .where("profile_id", profileId)
+      .whereIn("profile_type_field_id", unique(values.map((v) => v.profile_type_field_id)))
+      .update({ removed_at: this.knex.raw("now()") });
+
+    const rows = await this.knex("profile_field_value").insert(
       values.map((v) => ({
         ...v,
         profile_id: profileId,

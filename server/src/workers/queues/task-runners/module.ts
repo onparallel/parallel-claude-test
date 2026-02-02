@@ -15,6 +15,7 @@ import { PetitionSharingRunner } from "./PetitionSharingRunner";
 import { PetitionSummaryRunner } from "./PetitionSummaryRunner";
 import { PrintPdfRunner } from "./PrintPdfRunner";
 import { ProfileNamePatternUpdatedRunner } from "./ProfileNamePatternUpdatedRunner";
+import { ProfileSyncRunner } from "./ProfileSyncRunner";
 import { ProfilesExcelExportRunner } from "./ProfilesExcelExportRunner";
 import { ProfilesExcelImportRunner } from "./ProfilesExcelImportRunner";
 import { TemplateRepliesCsvExportRunner } from "./TemplateRepliesCsvExportRunner";
@@ -45,4 +46,5 @@ export const taskRunnersModule = new ContainerModule((options) => {
   options.bind(ProfilesExcelExportRunner).toSelf();
   options.bind(DashboardRefreshRunner).toSelf();
   options.bind(DocumentProcessingRunner).toSelf();
+  options.bind(ProfileSyncRunner).toSelf();
 });

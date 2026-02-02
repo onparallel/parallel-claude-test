@@ -474,7 +474,10 @@ describe("repositories/ProfileRepository", () => {
           profile_type_id: profileType.id,
           status: "OPEN",
         },
-        user.id,
+        {
+          source: "MANUAL",
+          userId: user.id,
+        },
       );
 
       await repo.updateProfileFieldValues(
@@ -564,7 +567,23 @@ describe("repositories/ProfileRepository", () => {
     it("does nothing if updating SHORT_TEXT field with exactly same content", async () => {
       const [profile] = await repo.createProfiles(
         { org_id: organization.id, profile_type_id: profileType.id, status: "OPEN" },
-        user.id,
+        {
+          source: "MANUAL",
+          userId: user.id,
+        },
+      );
+
+      await repo.createEvent(
+        {
+          type: "PROFILE_CREATED",
+          org_id: organization.id,
+          profile_id: profile.id,
+          data: {
+            user_id: user.id,
+            org_integration_id: null,
+          },
+        },
+        "MANUAL",
       );
 
       const dbEvents1 = await mocks.knex
@@ -630,7 +649,23 @@ describe("repositories/ProfileRepository", () => {
     it("does nothing if updating CHECKBOX field with exactly same content", async () => {
       const [profile] = await repo.createProfiles(
         { org_id: organization.id, profile_type_id: profileType.id, status: "OPEN" },
-        user.id,
+        {
+          source: "MANUAL",
+          userId: user.id,
+        },
+      );
+
+      await repo.createEvent(
+        {
+          type: "PROFILE_CREATED",
+          org_id: organization.id,
+          profile_id: profile.id,
+          data: {
+            user_id: user.id,
+            org_integration_id: null,
+          },
+        },
+        "MANUAL",
       );
 
       const dbEvents1 = await mocks.knex
@@ -696,7 +731,23 @@ describe("repositories/ProfileRepository", () => {
     it("updates BACKGROUND_CHECK field with exactly same content", async () => {
       const [profile] = await repo.createProfiles(
         { org_id: organization.id, profile_type_id: profileType.id, status: "OPEN" },
-        user.id,
+        {
+          source: "MANUAL",
+          userId: user.id,
+        },
+      );
+
+      await repo.createEvent(
+        {
+          type: "PROFILE_CREATED",
+          org_id: organization.id,
+          profile_id: profile.id,
+          data: {
+            user_id: user.id,
+            org_integration_id: null,
+          },
+        },
+        "MANUAL",
       );
 
       const dbEvents1 = await mocks.knex
@@ -892,7 +943,23 @@ describe("repositories/ProfileRepository", () => {
     it("updates ADVERSE_MEDIA_SEARCH field with exactly same content", async () => {
       const [profile] = await repo.createProfiles(
         { org_id: organization.id, profile_type_id: profileType.id, status: "OPEN" },
-        user.id,
+        {
+          source: "MANUAL",
+          userId: user.id,
+        },
+      );
+
+      await repo.createEvent(
+        {
+          type: "PROFILE_CREATED",
+          org_id: organization.id,
+          profile_id: profile.id,
+          data: {
+            user_id: user.id,
+            org_integration_id: null,
+          },
+        },
+        "MANUAL",
       );
 
       const dbEvents1 = await mocks.knex
@@ -1128,7 +1195,10 @@ describe("repositories/ProfileRepository", () => {
     it("removes draft when removing value", async () => {
       const [profile] = await repo.createProfiles(
         { org_id: organization.id, profile_type_id: profileType.id, status: "OPEN" },
-        user.id,
+        {
+          source: "MANUAL",
+          userId: user.id,
+        },
       );
 
       await mocks.createProfileFieldValues(profile.id, [
@@ -1184,7 +1254,10 @@ describe("repositories/ProfileRepository", () => {
     it("sets active_monitoring when creating BACKGROUND_CHECK and ADVERSE_MEDIA_SEARCH values", async () => {
       const [profile] = await repo.createProfiles(
         { org_id: organization.id, profile_type_id: profileType.id, status: "OPEN" },
-        user.id,
+        {
+          source: "MANUAL",
+          userId: user.id,
+        },
       );
 
       await repo.updateProfileFieldValues(
@@ -1274,7 +1347,10 @@ describe("repositories/ProfileRepository", () => {
     it("maintains active_monitoring value when updating", async () => {
       const [profile] = await repo.createProfiles(
         { org_id: organization.id, profile_type_id: profileType.id, status: "OPEN" },
-        user.id,
+        {
+          source: "MANUAL",
+          userId: user.id,
+        },
       );
 
       await mocks.createProfileFieldValues(profile.id, [
@@ -1324,7 +1400,10 @@ describe("repositories/ProfileRepository", () => {
     it("sets pending_review value when updating", async () => {
       const [profile] = await repo.createProfiles(
         { org_id: organization.id, profile_type_id: profileType.id, status: "OPEN" },
-        user.id,
+        {
+          source: "MANUAL",
+          userId: user.id,
+        },
       );
 
       await mocks.createProfileFieldValues(profile.id, [
@@ -1375,7 +1454,10 @@ describe("repositories/ProfileRepository", () => {
     it("sets pending_review value when creating", async () => {
       const [profile] = await repo.createProfiles(
         { org_id: organization.id, profile_type_id: profileType.id, status: "OPEN" },
-        user.id,
+        {
+          source: "MANUAL",
+          userId: user.id,
+        },
       );
 
       await repo.updateProfileFieldValues(

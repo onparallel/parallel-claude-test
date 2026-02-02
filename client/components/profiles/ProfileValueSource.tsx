@@ -6,16 +6,16 @@ import { Button, Text } from "../ui";
 
 export function ProfileValueSource({
   source,
-  sourceName,
+  externalSourceName,
+  createdBy,
   petitionId,
   parentReplyId,
-  externalSourceName,
 }: {
   source?: ProfileFieldPropertyValueSource | null;
-  sourceName?: React.ReactNode;
+  externalSourceName?: string | null;
+  createdBy?: React.ReactNode;
   petitionId?: string | null;
   parentReplyId?: string | null;
-  externalSourceName?: string | null;
 }) {
   const goToPetition = useGoToPetition();
   const handleClick = useCallback(() => {
@@ -28,33 +28,33 @@ export function ProfileValueSource({
     externalSourceName ? (
       <FormattedMessage
         id="component.profile-value-source.external-with-external-source-name"
-        defaultMessage="Imported from {externalSourceName} by {sourceName}"
-        values={{ externalSourceName, sourceName }}
+        defaultMessage="Imported from {externalSourceName} by {createdBy}"
+        values={{ externalSourceName, createdBy }}
       />
     ) : (
       <FormattedMessage
         id="component.profile-value-source.external"
-        defaultMessage="Imported from external source by {sourceName}"
-        values={{ sourceName }}
+        defaultMessage="Imported from external source by {createdBy}"
+        values={{ createdBy }}
       />
     )
   ) : source === "MANUAL" ? (
     <FormattedMessage
       id="component.profile-value-source.manual"
-      defaultMessage="Manually edited by {sourceName}"
-      values={{ sourceName }}
+      defaultMessage="Manually edited by {createdBy}"
+      values={{ createdBy }}
     />
   ) : source === "EXCEL_IMPORT" ? (
     <FormattedMessage
       id="component.profile-value-source.excel-import"
-      defaultMessage="Manually imported by {sourceName}"
-      values={{ sourceName }}
+      defaultMessage="Manually imported by {createdBy}"
+      values={{ createdBy }}
     />
   ) : source === "PARALLEL_API" ? (
     <FormattedMessage
       id="component.profile-value-source.parallel-api"
-      defaultMessage="Edited by API by {sourceName}"
-      values={{ sourceName }}
+      defaultMessage="Edited by API by {createdBy}"
+      values={{ createdBy }}
     />
   ) : source === "PARALLEL_MONITORING" ? (
     <FormattedMessage
@@ -64,15 +64,21 @@ export function ProfileValueSource({
   ) : source === "PETITION_FIELD_REPLY" ? (
     <FormattedMessage
       id="component.profile-value-source.petition-field-reply"
-      defaultMessage="Imported from {parallelLink} by {sourceName}"
+      defaultMessage="Imported from {parallelLink} by {createdBy}"
       values={{
         parallelLink: (
           <Button as="a" variant="link" onClick={handleClick}>
             {"parallel"}
           </Button>
         ),
-        sourceName,
+        createdBy,
       }}
+    />
+  ) : source === "PROFILE_SYNC" ? (
+    <FormattedMessage
+      id="component.profile-value-source.profile-sync"
+      defaultMessage="Imported from {externalSourceName}"
+      values={{ externalSourceName }}
     />
   ) : (
     <Text textStyle="hint">{"-"}</Text>

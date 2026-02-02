@@ -52,7 +52,6 @@ import {
   ProfileFieldValue,
   ProfileRelationship,
   ProfileRelationshipTypeAllowedProfileType,
-  ProfileRelationshipTypeDirection,
   ProfileStatus,
   ProfileType,
   ProfileTypeField,
@@ -85,6 +84,7 @@ import { SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 
 type ProfileUpdateSource = (typeof ProfileUpdateSource)[number];
+const LowPriorityEventSources: ProfileUpdateSource[] = ["EXCEL_IMPORT", "PROFILE_SYNC"];
 
 @injectable()
 export class ProfileRepository extends BaseRepository {
@@ -1059,9 +1059,11 @@ export class ProfileRepository extends BaseRepository {
 
   async createProfiles(
     data: MaybeArray<CreateProfile>,
-    userId: number | null,
-    orgIntegrationId?: number,
-    source?: ProfileUpdateSource,
+    from: {
+      userId?: number | null;
+      orgIntegrationId?: number | null;
+      source?: ProfileUpdateSource | null;
+    },
     t?: Knex.Transaction,
   ) {
     const dataArr = unMaybeArray(data);
@@ -1069,35 +1071,19 @@ export class ProfileRepository extends BaseRepository {
       return [];
     }
 
-    return await this.withTransaction(async (t) => {
-      const profiles = await this.insert(
-        "profile",
-        dataArr.map((p) => ({
-          ...p,
-          created_at: this.now(),
-          created_by: userId
-            ? `User:${userId}`
-            : orgIntegrationId
-              ? `OrgIntegration:${orgIntegrationId}`
-              : null,
-        })),
-        t,
-      );
-      await this.createEvent(
-        profiles.map((p) => ({
-          org_id: p.org_id,
-          profile_id: p.id,
-          type: "PROFILE_CREATED",
-          data: {
-            user_id: userId,
-            org_integration_id: orgIntegrationId ?? null,
-          },
-        })),
-        source,
-        t,
-      );
-      return profiles;
-    }, t);
+    return await this.insert(
+      "profile",
+      dataArr.map((p) => ({
+        ...p,
+        created_at: this.now(),
+        created_by: from.userId
+          ? `User:${from.userId}`
+          : from.orgIntegrationId
+            ? `OrgIntegration:${from.orgIntegrationId}`
+            : null,
+      })),
+      t,
+    );
   }
 
   async updateProfileStatus(profileIds: number[], status: ProfileStatus, updatedBy: string) {
@@ -1396,11 +1382,28 @@ export class ProfileRepository extends BaseRepository {
           org_id: orgId,
           profile_type_id: profileTypeId,
         },
-        userId,
-        externalSourceIntegrationId,
+        {
+          source,
+          userId,
+          orgIntegrationId: externalSourceIntegrationId,
+        },
+        t,
+      );
+
+      await this.createEvent(
+        {
+          org_id: orgId,
+          profile_id: profile.id,
+          type: "PROFILE_CREATED",
+          data: {
+            user_id: userId,
+            org_integration_id: externalSourceIntegrationId ?? null,
+          },
+        },
         source,
         t,
       );
+
       if (fields.length > 0) {
         const events = await this.updateProfileFieldValues(
           fields.map((f) => ({ ...f, profileId: profile.id })),
@@ -1489,7 +1492,7 @@ export class ProfileRepository extends BaseRepository {
           ),
           with_no_previous_values as (
             -- insert values where a profile_field_value does not exist yet
-            insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, source, external_source_integration_id, active_monitoring, pending_review, review_reason,petition_field_reply_id, profile_type_field_is_unique)
+            insert into profile_field_value (profile_id, profile_type_field_id, type, content, expiry_date, created_by_user_id, source, external_source_integration_id, active_monitoring, pending_review, review_reason, petition_field_reply_id, profile_type_field_is_unique)
             select 
               nv.profile_id, 
               nv.profile_type_field_id, 
@@ -1978,7 +1981,7 @@ export class ProfileRepository extends BaseRepository {
     }
     const profileEvents = await this.insert("profile_event", eventsArray, t);
 
-    if (source === "EXCEL_IMPORT") {
+    if (LowPriorityEventSources.includes(source)) {
       await this.queues.enqueueEventsWithLowPriority(profileEvents, "profile_event", t);
     } else {
       await this.queues.enqueueEvents(profileEvents, "profile_event", t);
@@ -3158,7 +3161,6 @@ export class ProfileRepository extends BaseRepository {
       {
         orgId: number;
         profileRelationshipTypeId: number;
-        direction: ProfileRelationshipTypeDirection;
       },
       ProfileRelationshipTypeAllowedProfileType[],
       string
@@ -3173,22 +3175,15 @@ export class ProfileRepository extends BaseRepository {
             "profile_relationship_type_id",
             keys.map((k) => k.profileRelationshipTypeId),
           )
-          .whereIn(
-            "direction",
-            keys.map((k) => k.direction),
-          )
           .whereNull("deleted_at")
           .select("*");
 
-        const results = groupBy(
-          rows,
-          keyBuilder(["org_id", "profile_relationship_type_id", "direction"]),
-        );
+        const results = groupBy(rows, keyBuilder(["org_id", "profile_relationship_type_id"]));
         return keys
-          .map(keyBuilder(["orgId", "profileRelationshipTypeId", "direction"]))
+          .map(keyBuilder(["orgId", "profileRelationshipTypeId"]))
           .map((key) => results[key] ?? []);
       },
-      { cacheKeyFn: keyBuilder(["orgId", "profileRelationshipTypeId", "direction"]) },
+      { cacheKeyFn: keyBuilder(["orgId", "profileRelationshipTypeId"]) },
     );
 
   async getProfileRelationshipTypeAllowedProfileTypesByAllowedProfileTypeId(
@@ -3346,19 +3341,159 @@ export class ProfileRepository extends BaseRepository {
     );
 
     // postpone event enqueuing until all queries were executed, to ensure no conflicts thrown
-    if (source === "EXCEL_IMPORT") {
+    if (LowPriorityEventSources.includes(source)) {
       await this.queues.enqueueEventsWithLowPriority(events, "profile_event", t);
     } else {
       await this.queues.enqueueEvents(events, "profile_event", t);
     }
   }
 
-  async removeProfileRelationships(profileRelationshipIds: number[], user: User) {
-    return await this.from("profile_relationship")
-      .where("org_id", user.org_id)
-      .whereIn("id", profileRelationshipIds)
-      .update({ removed_at: this.now(), removed_by_user_id: user.id })
-      .returning("*");
+  /**
+   * Sync profile relationships for a given profile, making sure the profile only has the relationships specified in data array.
+   * If the profile has relationships not specified in data array, they will be deleted if ifMissing is "DELETE".
+   */
+  async syncProfileRelationships(
+    profileId: number,
+    data: {
+      profileRelationshipTypeId: number;
+      direction: "LEFT" | "RIGHT";
+      ifMissing: "IGNORE" | "DELETE";
+      profileIds: number[];
+    }[],
+    orgId: number,
+    integrationId: number,
+    t?: Knex.Transaction,
+  ) {
+    // first make sure to create every relationship present in data array
+    await this.createProfileRelationship(
+      data
+        .map((d) =>
+          d.profileIds.map((otherProfileId) => ({
+            org_id: orgId,
+            created_by_integration_id: integrationId,
+            left_side_profile_id: d.direction === "LEFT" ? otherProfileId : profileId,
+            right_side_profile_id: d.direction === "RIGHT" ? otherProfileId : profileId,
+            profile_relationship_type_id: d.profileRelationshipTypeId,
+          })),
+        )
+        .flat(),
+      "PROFILE_SYNC",
+      t,
+    );
+
+    // then find profile relationships that are not present in data array and need to be deleted
+    const allProfileRelationships = await this.loadProfileRelationshipsByProfileId.raw(
+      profileId,
+      t,
+    );
+
+    const relationshipsToDelete = data
+      .filter((d) => d.ifMissing === "DELETE")
+      .flatMap((d) => {
+        return allProfileRelationships.filter(
+          (r) =>
+            // a relationship needs to be deleted if it is of the same type as the relationship in data array and the other side profile is not present in data array
+            r.profile_relationship_type_id === d.profileRelationshipTypeId &&
+            (d.direction === "LEFT"
+              ? r.right_side_profile_id === profileId &&
+                !d.profileIds.includes(r.left_side_profile_id)
+              : r.left_side_profile_id === profileId &&
+                !d.profileIds.includes(r.right_side_profile_id)),
+        );
+      });
+
+    await this.removeProfileRelationships(
+      relationshipsToDelete.map((r) => r.id),
+      "REMOVED_BY_PROFILE_SYNC",
+      null,
+      integrationId,
+      orgId,
+      "PROFILE_SYNC",
+      t,
+    );
+  }
+
+  async removeProfileRelationships(
+    profileRelationshipIds: number[],
+    reason: string,
+    userId: number | null,
+    integrationId: number | null,
+    orgId: number,
+    source: ProfileUpdateSource,
+    t?: Knex.Transaction,
+  ) {
+    if (profileRelationshipIds.length === 0) {
+      return;
+    }
+
+    const events = await pMapChunk(
+      profileRelationshipIds,
+      async (idsChunk) => {
+        return await this.raw<ProfileEvent>(
+          /* sql */ `
+          with removed_relationships as (
+            update profile_relationship
+            set 
+              removed_at = now(), 
+              removed_by_user_id = :userId::int
+            where 
+              id in :idsChunk 
+              and removed_at is null
+            returning *
+          )
+          insert into profile_event (org_id, profile_id, type, data)
+          select
+            :orgId::int as org_id,
+            rr.left_side_profile_id,
+            'PROFILE_RELATIONSHIP_REMOVED'::profile_event_type,
+            jsonb_build_object(
+              'user_id', :userId::int,
+              'org_integration_id', :integrationId::int,
+              'profile_relationship_id', rr.id,
+              'other_side_profile_id', rr.right_side_profile_id,
+              'profile_relationship_type_id', rr.profile_relationship_type_id,
+              'profile_relationship_type_alias', prt.alias,
+              'reason', :reason::text
+            )
+            from removed_relationships rr join profile_relationship_type prt on rr.profile_relationship_type_id = prt.id
+            union all
+            select
+              :orgId::int as org_id,
+              rr.right_side_profile_id,
+              'PROFILE_RELATIONSHIP_REMOVED'::profile_event_type,
+              jsonb_build_object(
+                'user_id', :userId::int,
+                'org_integration_id', :integrationId::int,
+                'profile_relationship_id', rr.id,
+                'other_side_profile_id', rr.left_side_profile_id,
+                'profile_relationship_type_id', rr.profile_relationship_type_id,
+                'profile_relationship_type_alias', prt.alias,
+                'reason', :reason::text
+              )
+              from removed_relationships rr join profile_relationship_type prt on rr.profile_relationship_type_id = prt.id
+            returning *
+          `,
+          {
+            idsChunk: this.sqlIn(idsChunk, "int"),
+            userId,
+            integrationId,
+            orgId,
+            reason,
+          },
+          t,
+        );
+      },
+      {
+        concurrency: 1,
+        chunkSize: 1000,
+      },
+    );
+
+    if (LowPriorityEventSources.includes(source)) {
+      await this.queues.enqueueEventsWithLowPriority(events, "profile_event", t);
+    } else {
+      await this.queues.enqueueEvents(events, "profile_event", t);
+    }
   }
 
   async removeProfileRelationshipsByProfileId(profileIds: number[], user: User) {
@@ -3940,5 +4075,16 @@ export class ProfileRepository extends BaseRepository {
 
   readonly loadProfileFieldValueById = this.buildLoadBy("profile_field_value", "id", (q) =>
     q.whereNull("anonymized_at"),
+  );
+
+  readonly loadProfileFieldValuesByProfileTypeFieldId = this.buildLoadMultipleBy(
+    "profile_field_value",
+    "profile_type_field_id",
+    (q) =>
+      q
+        .whereNull("deleted_at")
+        .whereNull("removed_at")
+        .whereNull("anonymized_at")
+        .where("is_draft", false),
   );
 }

@@ -55,7 +55,14 @@ import {
   IntegrationsSetupService,
 } from "./IntegrationsSetupService";
 import { IJwtService, JWT_SERVICE, JwtService } from "./JwtService";
-import { ILogger, LOGGER, createLogger } from "./Logger";
+import {
+  ILogger,
+  LOGGER,
+  LOGGER_FACTORY,
+  LoggerFactory,
+  createLogger,
+  getLoggerFactory,
+} from "./Logger";
 import { IOrgLimitsService, ORG_LIMITS_SERVICE, OrgLimitsService } from "./OrgLimitsService";
 import {
   IOrganizationCreditsService,
@@ -99,6 +106,7 @@ import {
   PROFILE_EXTERNAL_SOURCE_SERVICE,
   ProfileExternalSourcesService,
 } from "./ProfileExternalSourcesService";
+import { PROFILE_SYNC_SERVICE, ProfileSyncService } from "./ProfileSyncService";
 import { PROFILE_TYPE_FIELD_SERVICE, ProfileTypeFieldService } from "./ProfileTypeFieldService";
 import { PROFILE_VALIDATION_SERVICE, ProfileValidationService } from "./ProfileValidationService";
 import { PROFILES_HELPER_SERVICE, ProfilesHelperService } from "./ProfilesHelperService";
@@ -116,6 +124,7 @@ import { IStorageService, STORAGE_SERVICE, StorageService } from "./StorageServi
 export const servicesModule = new ContainerModule((options) => {
   // Singleton Scope
   options.bind<ILogger>(LOGGER).toDynamicValue(createLogger).inSingletonScope();
+  options.bind<LoggerFactory>(LOGGER_FACTORY).toFactory(getLoggerFactory);
   options.bind<IQueuesService>(QUEUES_SERVICE).to(QueuesService).inSingletonScope();
   options.bind<IEmailsService>(EMAILS).to(EmailsService).inSingletonScope();
   options.bind<IAnalyticsService>(ANALYTICS).to(AnalyticsService).inSingletonScope();
@@ -180,4 +189,6 @@ export const servicesModule = new ContainerModule((options) => {
   options.bind(PROFILES_HELPER_SERVICE).to(ProfilesHelperService);
   options.bind(PROFILE_VALIDATION_SERVICE).to(ProfileValidationService);
   options.bind(PROFILE_TYPE_FIELD_SERVICE).to(ProfileTypeFieldService);
+
+  options.bind(PROFILE_SYNC_SERVICE).to(ProfileSyncService);
 });

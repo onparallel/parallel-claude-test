@@ -172,6 +172,9 @@ export function buildConfig() {
       "adverse-media-monitor": {
         rule: process.env.WORKERS_ADVERSE_MEDIA_MONITOR_RULE!,
       },
+      "sap-profile-polling": {
+        rule: process.env.WORKERS_SAP_PROFILE_POLLING_RULE!,
+      },
     },
     imageProxy: {
       secret: process.env.IMAGE_PROXY_SIGNATURE_SECRET!,

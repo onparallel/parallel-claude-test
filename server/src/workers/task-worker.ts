@@ -11,6 +11,8 @@ createQueueWorker("task-worker", TaskWorkerQueue, {
   forkTimeout: async ({ taskName }) => {
     if (taskName === "BULK_PETITION_SEND") {
       return 30 * 60_000;
+    } else if (taskName === "PROFILE_SYNC") {
+      return 10 * 60_000;
     } else if (taskName === "EXPORT_REPLIES") {
       return 5 * 60_000;
     } else if (taskName === "PROFILES_EXCEL_IMPORT") {

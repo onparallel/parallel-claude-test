@@ -50,6 +50,7 @@
     "worker:background-check-monitor": "cross-env NODE_ENV=development ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/background-check-monitor.ts",
     "worker:adverse-media-monitor": "cross-env NODE_ENV=development ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/adverse-media-monitor.ts",
     "worker:background-check-profile-search": "cross-env NODE_ENV=development ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/background-check-profile-search.ts",
+    "worker:sap-profile-polling": "cross-env NODE_ENV=development ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/sap-profile-polling.ts",
     "localtunnel": "ts-node ./bin/launch-localtunnel.ts",
     "storybook": "concurrently \"yarn storybook:server\" \"yarn storybook:client\"",
     "storybook:server": "SERVER_STORIES_PORT=5001 ts-node-dev --watch ./stories.tsx --ignore-watch ./src --files ./stories.tsx --transpile-only --respawn",
@@ -126,6 +127,7 @@
     "inversify": "^7.1.0",
     "ip-location-api": "^2.0.1",
     "json-schema-to-ts": "^3.1.0",
+    "jsonpath-plus": "^10.3.0",
     "jsonwebtoken": "^9.0.2",
     "knex": "^3.1.0",
     "libphonenumber-js": "^1.11.7",
@@ -167,6 +169,7 @@
     "ua-parser-js": "^1.0.38",
     "winston": "^3.14.2",
     "winston-cloudwatch": "^6.3.0",
+    "xml-js": "^1.6.11",
     "yargs": "^17.7.2"
   },
   "devDependencies": {

@@ -760,7 +760,8 @@ export interface NexusGenEnums {
     | "MANUAL"
     | "PARALLEL_API"
     | "PARALLEL_MONITORING"
-    | "PETITION_FIELD_REPLY";
+    | "PETITION_FIELD_REPLY"
+    | "PROFILE_SYNC";
   ProfileQueryFilterGroupLogicalOperator: "AND" | "OR";
   ProfileQueryFilterOperator:
     | "CONTAIN"
@@ -801,6 +802,7 @@ export interface NexusGenEnums {
   ProfileRelationshipDirection: "LEFT_RIGHT" | "RIGHT_LEFT";
   ProfileRelationshipSide: "LEFT" | "RIGHT";
   ProfileStatus: db.ProfileStatus;
+  ProfileSyncIntegrationOutputType: "DATABASE" | "EXCEL";
   ProfileTypeFieldPermissionType: db.ProfileTypeFieldPermissionType;
   ProfileTypeFieldType: db.ProfileTypeFieldType;
   ProfileTypeIcon:
@@ -2987,6 +2989,7 @@ export interface NexusGenFieldTypes {
     createProfilesRatioDashboardModule: NexusGenRootTypes["Dashboard"]; // Dashboard!
     createPublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
     createRemovePetitionPermissionMaybeTask: NexusGenRootTypes["MaybeTask"]; // MaybeTask!
+    createSapProfileSyncIntegration: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createSignaturitIntegration: NexusGenRootTypes["SignatureOrgIntegration"]; // SignatureOrgIntegration!
     createTag: NexusGenRootTypes["Tag"]; // Tag!
     createTemplateRepliesCsvExportTask: NexusGenRootTypes["Task"]; // Task!
@@ -3118,6 +3121,7 @@ export interface NexusGenFieldTypes {
     transferAdminPermissions: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     transferOrganizationOwnership: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     transferPetitionOwnership: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
+    triggerSapProfileSyncInitialSync: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     unarchiveProfileType: NexusGenRootTypes["ProfileType"][]; // [ProfileType!]!
     unlinkPetitionFieldChildren: NexusGenRootTypes["PetitionField"]; // PetitionField!
     unpinProfileType: NexusGenRootTypes["ProfileType"]; // ProfileType!
@@ -6346,6 +6350,7 @@ export interface NexusGenFieldTypeNames {
     createProfilesRatioDashboardModule: "Dashboard";
     createPublicPetitionLink: "PublicPetitionLink";
     createRemovePetitionPermissionMaybeTask: "MaybeTask";
+    createSapProfileSyncIntegration: "SupportMethodResponse";
     createSignaturitIntegration: "SignatureOrgIntegration";
     createTag: "Tag";
     createTemplateRepliesCsvExportTask: "Task";
@@ -6477,6 +6482,7 @@ export interface NexusGenFieldTypeNames {
     transferAdminPermissions: "SupportMethodResponse";
     transferOrganizationOwnership: "SupportMethodResponse";
     transferPetitionOwnership: "PetitionBase";
+    triggerSapProfileSyncInitialSync: "SupportMethodResponse";
     unarchiveProfileType: "ProfileType";
     unlinkPetitionFieldChildren: "PetitionField";
     unpinProfileType: "ProfileType";
@@ -8970,6 +8976,7 @@ export interface NexusGenArgTypes {
     closeProfile: {
       // args
       profileIds: NexusGenScalars["GID"][]; // [GID!]!
+      source?: NexusGenEnums["ProfileFieldPropertyValueSource"] | null; // ProfileFieldPropertyValueSource
     };
     completePetition: {
       // args
@@ -9339,6 +9346,7 @@ export interface NexusGenArgTypes {
       // args
       profileId: NexusGenScalars["GID"]; // GID!
       relationships: NexusGenInputs["CreateProfileRelationshipInput"][]; // [CreateProfileRelationshipInput!]!
+      source?: NexusGenEnums["ProfileFieldPropertyValueSource"] | null; // ProfileFieldPropertyValueSource
     };
     createProfileRelationshipsExcel: {
       // args
@@ -9411,6 +9419,11 @@ export interface NexusGenArgTypes {
       removeAll?: boolean | null; // Boolean
       userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
       userIds?: NexusGenScalars["GID"][] | null; // [GID!]
+    };
+    createSapProfileSyncIntegration: {
+      // args
+      orgId: NexusGenScalars["GID"]; // GID!
+      settings: string; // String!
     };
     createSignaturitIntegration: {
       // args
@@ -9545,12 +9558,14 @@ export interface NexusGenArgTypes {
       // args
       force?: boolean | null; // Boolean
       profileIds: NexusGenScalars["GID"][]; // [GID!]!
+      source?: NexusGenEnums["ProfileFieldPropertyValueSource"] | null; // ProfileFieldPropertyValueSource
     };
     deleteProfileFieldFile: {
       // args
       profileFieldFileIds?: NexusGenScalars["GID"][] | null; // [GID!]
       profileId: NexusGenScalars["GID"]; // GID!
       profileTypeFieldId: NexusGenScalars["GID"]; // GID!
+      source?: NexusGenEnums["ProfileFieldPropertyValueSource"] | null; // ProfileFieldPropertyValueSource
     };
     deleteProfileListView: {
       // args
@@ -9920,6 +9935,7 @@ export interface NexusGenArgTypes {
       // args
       profileId: NexusGenScalars["GID"]; // GID!
       profileRelationshipIds: NexusGenScalars["GID"][]; // [GID!]!
+      source?: NexusGenEnums["ProfileFieldPropertyValueSource"] | null; // ProfileFieldPropertyValueSource
     };
     removeProfileTypeProcess: {
       // args
@@ -10128,6 +10144,11 @@ export interface NexusGenArgTypes {
       // args
       petitionIds: NexusGenScalars["GID"][]; // [GID!]!
       userId: NexusGenScalars["GID"]; // GID!
+    };
+    triggerSapProfileSyncInitialSync: {
+      // args
+      orgId: NexusGenScalars["GID"]; // GID!
+      output: NexusGenEnums["ProfileSyncIntegrationOutputType"]; // ProfileSyncIntegrationOutputType!
     };
     unarchiveProfileType: {
       // args

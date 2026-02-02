@@ -1,9 +1,12 @@
 import { DeleteSuppressedDestinationCommand, SESv2Client } from "@aws-sdk/client-sesv2";
 import Ajv from "ajv";
-import { booleanArg, intArg, mutationField, nonNull, nullable, stringArg } from "nexus";
-import { indexBy, isNonNullish, isNullish, round, unique } from "remeda";
+import safeStringify from "fast-safe-stringify";
+import { booleanArg, enumType, intArg, mutationField, nonNull, nullable, stringArg } from "nexus";
+import { indexBy, isNonNullish, isNullish, omit, round, unique } from "remeda";
 import { assert } from "ts-essentials";
 import { UserGroupPermissionName } from "../../db/__types";
+import { SettingsValidationError } from "../../integrations/profile-sync/sap/errors";
+import { SapProfileSyncIntegrationSettings } from "../../integrations/profile-sync/sap/types";
 import { getAssertionErrorMessage, isAssertionError } from "../../util/assert";
 import { awsLogger } from "../../util/awsLogger";
 import { toBytes } from "../../util/fileSize";
@@ -1749,5 +1752,148 @@ export const cloneProfileTypeToOrg = mutationField("cloneProfileTypeToOrg", {
         message: error instanceof Error ? error.message : "Unknown error",
       };
     }
+  },
+});
+
+export const createSapProfileSyncIntegration = mutationField("createSapProfileSyncIntegration", {
+  type: "SupportMethodResponse",
+  description:
+    "Creates a new SAP Profile Sync integration on the provided organization, or updates it if the organization already has one.",
+  authorize: superAdminAccess(),
+  args: {
+    orgId: nonNull(globalIdArg("Organization")),
+    settings: nonNull(stringArg({ description: "Full settings JSON object @form:type=textarea" })),
+  },
+  resolve: async (_, args, ctx) => {
+    try {
+      const validator = new Ajv();
+
+      const settings = JSON.parse(args.settings);
+      const isValid = validator.validate(
+        {
+          type: "object",
+          additionalProperties: false,
+          required: ["baseUrl", "authorization", "mappings"],
+          properties: {
+            baseUrl: { type: "string" },
+            authorization: {
+              type: "object",
+              required: ["type", "user", "password"],
+              additionalProperties: false,
+              properties: {
+                type: { type: "string", enum: ["BASIC"] },
+                user: { type: "string" },
+                password: { type: "string" },
+              },
+            },
+            mappings: { type: "array", minItems: 1, items: { type: "object" } },
+            additionalHeaders: { type: "object" },
+          },
+        },
+        settings,
+      );
+
+      if (!isValid) {
+        return {
+          result: RESULT.FAILURE,
+          message: validator.errorsText(),
+        };
+      }
+
+      const [integration] = await ctx.integrations.loadIntegrationsByOrgId(
+        args.orgId,
+        "PROFILE_SYNC",
+        "SAP",
+      );
+
+      if (isNullish(integration)) {
+        await ctx.integrationsSetup.createSapProfileSyncIntegration(
+          {
+            org_id: args.orgId,
+            name: "SAP",
+            is_default: true,
+            settings: {
+              ...(omit(settings, ["authorization"]) as SapProfileSyncIntegrationSettings),
+              CREDENTIALS: settings.authorization,
+            },
+          },
+          `User:${ctx.realUser!.id}`,
+        );
+        return {
+          result: RESULT.SUCCESS,
+          message: `Integration created successfully`,
+        };
+      } else {
+        await ctx.integrationsSetup.updateSapProfileSyncIntegration(integration.id, args.orgId, {
+          settings: {
+            ...(omit(settings, ["authorization"]) as SapProfileSyncIntegrationSettings),
+            CREDENTIALS: settings.authorization,
+          },
+        });
+        return {
+          result: RESULT.SUCCESS,
+          message: `Integration updated successfully`,
+        };
+      }
+    } catch (error) {
+      return {
+        result: RESULT.FAILURE,
+        message:
+          error instanceof SettingsValidationError
+            ? `${error.path}: ${error.message}`
+            : error instanceof Response
+              ? `${error.status} ${error.statusText}`
+              : error instanceof Error
+                ? error.message
+                : safeStringify(error),
+      };
+    }
+  },
+});
+
+export const triggerSapProfileSyncInitialSync = mutationField("triggerSapProfileSyncInitialSync", {
+  type: "SupportMethodResponse",
+  description: "Triggers a initial sync of a SAP Profile Sync integration",
+  authorize: superAdminAccess(),
+  args: {
+    orgId: nonNull(globalIdArg("Organization")),
+    output: nonNull(
+      enumType({
+        description: "Output type",
+        members: ["EXCEL", "DATABASE"],
+        name: "ProfileSyncIntegrationOutputType",
+      }),
+    ),
+  },
+  resolve: async (_, args, ctx) => {
+    const [integration] = await ctx.integrations.loadIntegrationsByOrgId(
+      args.orgId,
+      "PROFILE_SYNC",
+      "SAP",
+    );
+
+    if (!integration) {
+      return {
+        result: RESULT.FAILURE,
+        message: "Integration not found",
+      };
+    }
+
+    const task = await ctx.tasks.createTask(
+      {
+        name: "PROFILE_SYNC",
+        input: {
+          type: "INITIAL",
+          integration_id: integration.id,
+          output: args.output,
+        },
+      },
+      `User:${ctx.realUser!.id}`,
+    );
+
+    return {
+      result: RESULT.SUCCESS,
+      message: `Initial sync enqueued to start. Refer to Task:${task.id} for more details.`,
+    };
   },
 });

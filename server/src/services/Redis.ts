@@ -58,6 +58,11 @@ export class Redis implements IRedis {
   }
 
   async withConnection(): Promise<AsyncDisposable> {
+    if (this.client.isOpen) {
+      return {
+        [Symbol.asyncDispose]: async () => {},
+      };
+    }
     await this.client.connect();
     return {
       [Symbol.asyncDispose]: async () => {

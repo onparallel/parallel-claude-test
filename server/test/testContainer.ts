@@ -2,6 +2,11 @@ import { createContainer } from "../src/container";
 import { DOW_JONES_CLIENT, IDowJonesClient } from "../src/integrations/dow-jones/DowJonesClient";
 import { EINFORMA_PROFILE_EXTERNAL_SOURCE_INTEGRATION } from "../src/integrations/profile-external-source/einforma/EInformaProfileExternalSourceIntegration";
 import { IProfileExternalSourceIntegration } from "../src/integrations/profile-external-source/ProfileExternalSourceIntegration";
+
+import {
+  ISapOdataClient,
+  SAP_ODATA_CLIENT,
+} from "../src/integrations/profile-sync/sap/SapOdataClient";
 import {
   ADVERSE_MEDIA_SEARCH_SERVICE,
   IAdverseMediaSearchService,
@@ -35,6 +40,7 @@ import {
   MockFetchService,
   MockQueuesService,
   MockRedis,
+  MockSapOdataClient,
   MockStorage,
 } from "./mocks";
 
@@ -96,5 +102,9 @@ export async function createTestContainer() {
   container.load(taskRunnersModule);
 
   container.bind(BackgroundCheckProfileSearchQueue).toSelf();
+
+  await container.unbind(SAP_ODATA_CLIENT);
+  container.bind<ISapOdataClient>(SAP_ODATA_CLIENT).toConstantValue(new MockSapOdataClient());
+
   return container;
 }

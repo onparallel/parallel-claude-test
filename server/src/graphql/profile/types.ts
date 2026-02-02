@@ -28,6 +28,7 @@ export const ProfileUpdateSource = [
   "PARALLEL_API",
   "PARALLEL_MONITORING",
   "PETITION_FIELD_REPLY",
+  "PROFILE_SYNC",
 ] as const;
 
 type ProfileUpdateSource = (typeof ProfileUpdateSource)[number];
@@ -451,7 +452,7 @@ export const ProfileFieldResponse = interfaceType({
         const integration = await ctx.integrations.loadIntegration(
           o.external_source_integration_id,
         );
-        if (!integration || integration.type !== "PROFILE_EXTERNAL_SOURCE") {
+        if (!integration) {
           return null;
         }
 
@@ -638,9 +639,13 @@ export const ProfileRelationshipType = objectType({
       resolve: async (o, _, ctx) => {
         const allowedProfileTypes =
           await ctx.profiles.loadProfileRelationshipTypeAllowedProfileTypesByProfileRelationshipTypeId(
-            { profileRelationshipTypeId: o.id, direction: "LEFT_RIGHT", orgId: ctx.user!.org_id },
+            { profileRelationshipTypeId: o.id, orgId: ctx.user!.org_id },
           );
-        return unique(allowedProfileTypes.map((p) => p.allowed_profile_type_id));
+        return unique(
+          allowedProfileTypes
+            .filter((a) => a.direction === "LEFT_RIGHT")
+            .map((p) => p.allowed_profile_type_id),
+        );
       },
     });
     t.nonNull.list.nonNull.globalId("allowedRightLeftProfileTypeIds", {
@@ -648,9 +653,13 @@ export const ProfileRelationshipType = objectType({
       resolve: async (o, _, ctx) => {
         const allowedProfileTypes =
           await ctx.profiles.loadProfileRelationshipTypeAllowedProfileTypesByProfileRelationshipTypeId(
-            { profileRelationshipTypeId: o.id, direction: "RIGHT_LEFT", orgId: ctx.user!.org_id },
+            { profileRelationshipTypeId: o.id, orgId: ctx.user!.org_id },
           );
-        return unique(allowedProfileTypes.map((p) => p.allowed_profile_type_id));
+        return unique(
+          allowedProfileTypes
+            .filter((a) => a.direction === "RIGHT_LEFT")
+            .map((p) => p.allowed_profile_type_id),
+        );
       },
     });
   },

@@ -980,6 +980,7 @@ export type FeatureFlag =
   | "PETITION_SUMMARY"
   | "PROFILES"
   | "PROFILE_SEARCH_FIELD"
+  | "PROFILE_SYNC"
   | "RECIPIENT_LANG_CA"
   | "RECIPIENT_LANG_IT"
   | "RECIPIENT_LANG_PT"
@@ -1132,6 +1133,7 @@ export type IntegrationType =
   | "FILE_EXPORT"
   | "ID_VERIFICATION"
   | "PROFILE_EXTERNAL_SOURCE"
+  | "PROFILE_SYNC"
   | "SIGNATURE"
   | "SSO"
   | "USER_PROVISIONING";
@@ -1441,6 +1443,8 @@ export type Mutation = {
    * Otherwise, it will create and enqueue a Task to be executed asynchronously; and return the Task object.
    */
   createRemovePetitionPermissionMaybeTask: MaybeTask;
+  /** Creates a new SAP Profile Sync integration on the provided organization, or updates it if the organization already has one. */
+  createSapProfileSyncIntegration: SupportMethodResponse;
   /** Creates a new Signaturit integration on the user's organization */
   createSignaturitIntegration: SignatureOrgIntegration;
   /** Creates a tag in the user's organization */
@@ -1687,6 +1691,8 @@ export type Mutation = {
   transferOrganizationOwnership: SupportMethodResponse;
   /** Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions. */
   transferPetitionOwnership: Array<PetitionBase>;
+  /** Triggers a initial sync of a SAP Profile Sync integration */
+  triggerSapProfileSyncInitialSync: SupportMethodResponse;
   unarchiveProfileType: Array<ProfileType>;
   unlinkPetitionFieldChildren: PetitionField;
   /** Unpins a profile type to the user's navigation manu */
@@ -1958,6 +1964,7 @@ export type MutationclosePetitionsFromTemplateArgs = {
 
 export type MutationcloseProfileArgs = {
   profileIds: Array<Scalars["GID"]["input"]>;
+  source?: InputMaybe<ProfileFieldPropertyValueSource>;
 };
 
 export type MutationcompletePetitionArgs = {
@@ -2327,6 +2334,7 @@ export type MutationcreateProfileListViewArgs = {
 export type MutationcreateProfileRelationshipArgs = {
   profileId: Scalars["GID"]["input"];
   relationships: Array<CreateProfileRelationshipInput>;
+  source?: InputMaybe<ProfileFieldPropertyValueSource>;
 };
 
 export type MutationcreateProfileRelationshipsExcelArgs = {
@@ -2399,6 +2407,11 @@ export type MutationcreateRemovePetitionPermissionMaybeTaskArgs = {
   removeAll?: InputMaybe<Scalars["Boolean"]["input"]>;
   userGroupIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   userIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
+};
+
+export type MutationcreateSapProfileSyncIntegrationArgs = {
+  orgId: Scalars["GID"]["input"];
+  settings: Scalars["String"]["input"];
 };
 
 export type MutationcreateSignaturitIntegrationArgs = {
@@ -2533,12 +2546,14 @@ export type MutationdeletePetitionsArgs = {
 export type MutationdeleteProfileArgs = {
   force?: InputMaybe<Scalars["Boolean"]["input"]>;
   profileIds: Array<Scalars["GID"]["input"]>;
+  source?: InputMaybe<ProfileFieldPropertyValueSource>;
 };
 
 export type MutationdeleteProfileFieldFileArgs = {
   profileFieldFileIds?: InputMaybe<Array<Scalars["GID"]["input"]>>;
   profileId: Scalars["GID"]["input"];
   profileTypeFieldId: Scalars["GID"]["input"];
+  source?: InputMaybe<ProfileFieldPropertyValueSource>;
 };
 
 export type MutationdeleteProfileListViewArgs = {
@@ -2908,6 +2923,7 @@ export type MutationremovePetitionPasswordArgs = {
 export type MutationremoveProfileRelationshipArgs = {
   profileId: Scalars["GID"]["input"];
   profileRelationshipIds: Array<Scalars["GID"]["input"]>;
+  source?: InputMaybe<ProfileFieldPropertyValueSource>;
 };
 
 export type MutationremoveProfileTypeProcessArgs = {
@@ -3116,6 +3132,11 @@ export type MutationtransferOrganizationOwnershipArgs = {
 export type MutationtransferPetitionOwnershipArgs = {
   petitionIds: Array<Scalars["GID"]["input"]>;
   userId: Scalars["GID"]["input"];
+};
+
+export type MutationtriggerSapProfileSyncInitialSyncArgs = {
+  orgId: Scalars["GID"]["input"];
+  output: ProfileSyncIntegrationOutputType;
 };
 
 export type MutationunarchiveProfileTypeArgs = {
@@ -5644,7 +5665,8 @@ export type ProfileFieldPropertyValueSource =
   | "MANUAL"
   | "PARALLEL_API"
   | "PARALLEL_MONITORING"
-  | "PETITION_FIELD_REPLY";
+  | "PETITION_FIELD_REPLY"
+  | "PROFILE_SYNC";
 
 export type ProfileFieldResponse = {
   /** Time when the response was anonymized. */
@@ -5898,6 +5920,9 @@ export type ProfileSubscription = {
   id: Scalars["GID"]["output"];
   user: User;
 };
+
+/** Output type */
+export type ProfileSyncIntegrationOutputType = "DATABASE" | "EXCEL";
 
 export type ProfileType = Timestamps & {
   /** Time when the response was created. */
@@ -7275,6 +7300,7 @@ export type TaskName =
   | "PROFILES_EXCEL_EXPORT"
   | "PROFILES_EXCEL_IMPORT"
   | "PROFILE_NAME_PATTERN_UPDATED"
+  | "PROFILE_SYNC"
   | "TEMPLATES_OVERVIEW_REPORT"
   | "TEMPLATE_REPLIES_CSV_EXPORT"
   | "TEMPLATE_REPLIES_REPORT"
@@ -23077,7 +23103,11 @@ export const UpdateProfileFieldValue_deleteProfileFieldFileDocument = gql`
     $profileId: GID!
     $profileTypeFieldId: GID!
   ) {
-    deleteProfileFieldFile(profileId: $profileId, profileTypeFieldId: $profileTypeFieldId)
+    deleteProfileFieldFile(
+      profileId: $profileId
+      profileTypeFieldId: $profileTypeFieldId
+      source: PARALLEL_API
+    )
   }
 ` as unknown as DocumentNode<
   UpdateProfileFieldValue_deleteProfileFieldFileMutation,
@@ -23085,7 +23115,7 @@ export const UpdateProfileFieldValue_deleteProfileFieldFileDocument = gql`
 >;
 export const deleteProfile_deleteProfileDocument = gql`
   mutation deleteProfile_deleteProfile($profileId: GID!) {
-    deleteProfile(profileIds: [$profileId], force: true)
+    deleteProfile(profileIds: [$profileId], force: true, source: PARALLEL_API)
   }
 ` as unknown as DocumentNode<
   deleteProfile_deleteProfileMutation,
@@ -23098,7 +23128,7 @@ export const CloseProfile_closeProfileDocument = gql`
     $includeRelationships: Boolean!
     $includeSubscribers: Boolean!
   ) {
-    closeProfile(profileIds: [$profileId]) {
+    closeProfile(profileIds: [$profileId], source: PARALLEL_API) {
       ...Profile
     }
   }
@@ -23174,7 +23204,11 @@ export const CreateProfileRelationship_createProfileRelationshipDocument = gql`
     $profileId: GID!
     $relationships: [CreateProfileRelationshipInput!]!
   ) {
-    createProfileRelationship(profileId: $profileId, relationships: $relationships) {
+    createProfileRelationship(
+      profileId: $profileId
+      relationships: $relationships
+      source: PARALLEL_API
+    ) {
       id
       relationships {
         ...ProfileRelationship
@@ -23194,6 +23228,7 @@ export const DeleteProfileRelationship_removeProfileRelationshipDocument = gql`
     removeProfileRelationship(
       profileId: $profileId
       profileRelationshipIds: [$profileRelationshipId]
+      source: PARALLEL_API
     )
   }
 ` as unknown as DocumentNode<

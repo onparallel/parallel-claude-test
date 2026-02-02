@@ -21,6 +21,7 @@ if [[ "$COMMAND" == "start" ]]; then
     sudo systemctl ${COMMAND} parallel-expiring-properties-cron.service
     sudo systemctl ${COMMAND} parallel-background-check-monitor-cron.service
     sudo systemctl ${COMMAND} parallel-adverse-media-monitor-cron.service
+    sudo systemctl ${COMMAND} parallel-sap-profile-polling-cron.service
   fi 
 else
   sudo systemctl ${COMMAND} parallel-*-queue.service

@@ -44,7 +44,6 @@ export class BackgroundCheckProfileSearchQueue extends QueueWorker<BackgroundChe
       { source: "PARALLEL_MONITORING" },
     );
     await this.profiles.createProfileUpdatedEvents(events, payload.orgId, {
-      userId: null,
       source: "PARALLEL_MONITORING",
     });
   }

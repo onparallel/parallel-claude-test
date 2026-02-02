@@ -23,6 +23,10 @@ import { UserGroupRepository } from "./db/repositories/UserGroupRepository";
 import { UserRepository } from "./db/repositories/UserRepository";
 import { ViewRepository } from "./db/repositories/ViewRepository";
 import { DOW_JONES_CLIENT, IDowJonesClient } from "./integrations/dow-jones/DowJonesClient";
+import {
+  SAP_PROFILE_SYNC_INTEGRATION_FACTORY,
+  SapProfileSyncIntegrationFactory,
+} from "./integrations/profile-sync/sap/SapProfileSyncIntegration";
 import { ACCOUNT_SETUP_SERVICE, IAccountSetupService } from "./services/AccountSetupService";
 import {
   ADVERSE_MEDIA_SEARCH_SERVICE,
@@ -163,6 +167,10 @@ export class ApiContext {
     public readonly integrationsSetup: IIntegrationsSetupService,
     @inject(PROFILES_SETUP_SERVICE)
     public readonly profilesSetup: IProfilesSetupService,
+
+    // Factories
+    @inject(SAP_PROFILE_SYNC_INTEGRATION_FACTORY)
+    public readonly sapProfileSyncIntegrationFactory: SapProfileSyncIntegrationFactory,
 
     // Repositories
     public readonly contacts: ContactRepository,

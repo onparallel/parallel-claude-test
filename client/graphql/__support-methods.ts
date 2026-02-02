@@ -583,6 +583,47 @@ export const supportMethods: {
   },
   {
     field: {
+      name: "createSapProfileSyncIntegration",
+      description:
+        "Creates a new SAP Profile Sync integration on the provided organization, or updates it if the organization already has one.",
+      args: [
+        {
+          name: "orgId",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "GID", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "settings",
+          description: "Full settings JSON object @form:type=textarea",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "String", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
       name: "deleteAzureOpenAiIntegration",
       description: "Removes the Azure OpenAI integration of the user's organization",
       args: [
@@ -1123,6 +1164,46 @@ export const supportMethods: {
   },
   {
     field: {
+      name: "triggerSapProfileSyncInitialSync",
+      description: "Triggers a initial sync of a SAP Profile Sync integration",
+      args: [
+        {
+          name: "orgId",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "GID", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "output",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "ENUM", name: "ProfileSyncIntegrationOutputType", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
       name: "updateBackgroundCheckOrganizationThreshold",
       description: "Updates the threshold for the background check service",
       args: [
@@ -1530,6 +1611,21 @@ export const schemaTypes: IntrospectionType[] = [
     enumValues: [
       { name: "en", description: null, isDeprecated: false, deprecationReason: null },
       { name: "es", description: null, isDeprecated: false, deprecationReason: null },
+    ],
+    possibleTypes: null,
+  },
+  {
+    kind: "ENUM",
+    name: "ProfileSyncIntegrationOutputType",
+    description: "Output type",
+    specifiedByURL: null,
+    isOneOf: null,
+    fields: null,
+    inputFields: null,
+    interfaces: null,
+    enumValues: [
+      { name: "DATABASE", description: null, isDeprecated: false, deprecationReason: null },
+      { name: "EXCEL", description: null, isDeprecated: false, deprecationReason: null },
     ],
     possibleTypes: null,
   },

@@ -110,9 +110,10 @@ export class ProfileExcelImportService extends ProfileExcelService {
             org_id: user.org_id,
             profile_type_id: profileTypeId,
           })),
-          user.id,
-          undefined,
-          "EXCEL_IMPORT",
+          {
+            source: "EXCEL_IMPORT",
+            userId: user.id,
+          },
         );
 
         const events = await this.profiles.updateProfileFieldValues(
@@ -135,6 +136,19 @@ export class ProfileExcelImportService extends ProfileExcelService {
             userId: user.id,
             source: "EXCEL_IMPORT",
           },
+        );
+
+        await this.profiles.createEvent(
+          profiles.map((p) => ({
+            type: "PROFILE_CREATED",
+            org_id: user.org_id,
+            profile_id: p.id,
+            data: {
+              user_id: user.id,
+              org_integration_id: null,
+            },
+          })),
+          "EXCEL_IMPORT",
         );
 
         await this.profiles.createProfileUpdatedEvents(events, user.org_id, {

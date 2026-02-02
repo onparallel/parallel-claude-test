@@ -338,15 +338,18 @@ export const deletePetitionReply = mutationField("deletePetitionReply", {
             user_id: ctx.user!.id,
           },
         });
-        await ctx.profiles.createEvent({
-          type: "PETITION_DISASSOCIATED",
-          profile_id: removedAssociation.profile_id,
-          org_id: ctx.user!.org_id,
-          data: {
-            petition_id: removedAssociation.petition_id,
-            user_id: ctx.user!.id,
+        await ctx.profiles.createEvent(
+          {
+            type: "PETITION_DISASSOCIATED",
+            profile_id: removedAssociation.profile_id,
+            org_id: ctx.user!.org_id,
+            data: {
+              petition_id: removedAssociation.petition_id,
+              user_id: ctx.user!.id,
+            },
           },
-        });
+          "MANUAL",
+        );
       }
     }
 

@@ -240,15 +240,18 @@ export const publicDeletePetitionFieldReply = mutationField("publicDeletePetitio
         });
         const petition = await ctx.petitions.loadPetition(petitionId);
         assert(petition, "Petition not found");
-        await ctx.profiles.createEvent({
-          type: "PETITION_DISASSOCIATED",
-          profile_id: removedAssociation.profile_id,
-          org_id: petition.org_id,
-          data: {
-            petition_id: removedAssociation.petition_id,
-            petition_access_id: ctx.access!.id,
+        await ctx.profiles.createEvent(
+          {
+            type: "PETITION_DISASSOCIATED",
+            profile_id: removedAssociation.profile_id,
+            org_id: petition.org_id,
+            data: {
+              petition_id: removedAssociation.petition_id,
+              petition_access_id: ctx.access!.id,
+            },
           },
-        });
+          "MANUAL",
+        );
       }
     }
 

@@ -14,7 +14,7 @@ import {
   PETITIONS_HELPER_SERVICE,
   PetitionsHelperService,
 } from "../services/PetitionsHelperService";
-import { createCronWorker, CronWorker } from "./helpers/createCronWorker";
+import { CronWorker } from "./helpers/createCronWorker";
 import { requiresRefresh } from "./helpers/monitoringUtils";
 
 @injectable()
@@ -237,5 +237,3 @@ export class BackgroundCheckMonitorCronWorker extends CronWorker<"background-che
     return true;
   }
 }
-
-createCronWorker("background-check-monitor", BackgroundCheckMonitorCronWorker);

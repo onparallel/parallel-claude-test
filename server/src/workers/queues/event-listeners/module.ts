@@ -30,6 +30,7 @@ import {
   PROFILE_EVENT_SUBSCRIPTIONS_LISTENER,
   ProfileEventSubscriptionsListener,
 } from "./ProfileEventSubscriptionsListener";
+import { PROFILE_SYNC_LISTENER, ProfileSyncListener } from "./ProfileSyncListener";
 import {
   USER_NOTIFICATIONS_LISTENER,
   UserNotificationsListener,
@@ -51,4 +52,5 @@ export const eventListenersModule = new ContainerModule((options) => {
   options.bind(PETITION_APPROVAL_PROCESS_LISTENER).to(PetitionApprovalProcessListener);
   options.bind(CLIENT_RISK_UPDATE_LISTENER).to(ClientRiskUpdateListener);
   options.bind(KYC_REFRESH_DATE_UPDATE_LISTENER).to(KycRefreshDateUpdateListener);
+  options.bind(PROFILE_SYNC_LISTENER).to(ProfileSyncListener);
 });

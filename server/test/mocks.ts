@@ -2,9 +2,9 @@ import { faker } from "@faker-js/faker/locale/af_ZA";
 import { RedisCommandRawReply } from "@redis/client/dist/lib/commands";
 import { IncomingMessage } from "http";
 import { inject, injectable } from "inversify";
-import { isNonNullish, pick } from "remeda";
+import { isDeepEqual, isNonNullish, keys, pick } from "remeda";
 import { Readable } from "stream";
-import { ProfileTypeStandardType, User, UserLocale } from "../src/db/__types";
+import { ProfileTypeFieldType, ProfileTypeStandardType, User, UserLocale } from "../src/db/__types";
 import {
   EnhancedOrgIntegration,
   IntegrationRepository,
@@ -25,6 +25,13 @@ import {
   EInformaProfileExternalSourceIntegration,
   EInformaSearchParams,
 } from "../src/integrations/profile-external-source/einforma/EInformaProfileExternalSourceIntegration";
+import {
+  ISapOdataClient,
+  SapODataQueryParams,
+} from "../src/integrations/profile-sync/sap/SapOdataClient";
+import { ISapProfileSyncIntegrationSettingsValidator } from "../src/integrations/profile-sync/sap/SapProfileSyncIntegrationSettingsValidator";
+import { MockSapOdataClientError } from "../src/integrations/profile-sync/sap/errors";
+import { SapEntityDefinition } from "../src/integrations/profile-sync/sap/types";
 import { BackgroundCheckProfileProps } from "../src/pdf/documents/BackgroundCheckProfileTypst";
 import {
   AdverseMediaSearchService,
@@ -203,14 +210,18 @@ class MockStorageImpl implements IStorageImpl {
 
 @injectable()
 export class MockStorage implements IStorageService {
+  private _fileUploads = new MockStorageImpl();
+  private _publicFiles = new MockStorageImpl();
+  private _temporaryFiles = new MockStorageImpl();
+
   public get fileUploads() {
-    return new MockStorageImpl();
+    return this._fileUploads;
   }
   public get publicFiles() {
-    return new MockStorageImpl();
+    return this._publicFiles;
   }
   public get temporaryFiles() {
-    return new MockStorageImpl();
+    return this._temporaryFiles;
   }
 }
 
@@ -613,5 +624,234 @@ export class MockAdverseMediaSearchService
     }
 
     return article;
+  }
+}
+
+@injectable()
+export class MockSapOdataClient implements ISapOdataClient {
+  clearCache(): void {}
+
+  [Symbol.dispose]() {}
+
+  private calls: MockSapOdataClientMethodCall[] = [];
+
+  private assert(condition: boolean, message: string) {
+    if (!condition) {
+      throw new MockSapOdataClientError(message);
+    }
+  }
+
+  getMetadata(servicePath: string): Promise<string> {
+    const [args, result] = this.getNextCall("getMetadata");
+    this.checkNextCallArguments("getMetadata", () => {
+      this.assert(
+        args[0] === servicePath,
+        `servicePath is not equal. Expected: ${JSON.stringify(args[0])}, Actual: ${JSON.stringify(servicePath)}`,
+      );
+    });
+    return Promise.resolve(result);
+  }
+
+  getEntitySet(
+    entityDefinition: SapEntityDefinition,
+    params?: SapODataQueryParams,
+  ): Promise<{ results: any[] }> {
+    const [args, result] = this.getNextCall("getEntitySet");
+    this.checkNextCallArguments("getEntitySet", () => {
+      this.compareEntityDefinition(args[0], entityDefinition);
+      this.compareSapODataQueryParams(args[1], params);
+    });
+    return Promise.resolve(result);
+  }
+
+  getEntity(
+    entityDefinition: SapEntityDefinition,
+    entityKey: Record<string, any>,
+    params?: SapODataQueryParams,
+  ): Promise<any> {
+    const [args, result] = this.getNextCall("getEntity");
+    this.checkNextCallArguments("getEntity", () => {
+      this.compareEntityDefinition(args[0], entityDefinition);
+      this.compareEntityKey(args[1], entityKey);
+      this.compareSapODataQueryParams(args[2], params);
+    });
+    return Promise.resolve(result);
+  }
+
+  getEntityNavigationProperty(
+    entityDefinition: SapEntityDefinition,
+    navigationProperty: string,
+    entityKey: Record<string, any>,
+    params?: SapODataQueryParams,
+  ): Promise<any> {
+    const [args, result] = this.getNextCall("getEntityNavigationProperty");
+    this.checkNextCallArguments("getEntityNavigationProperty", () => {
+      this.compareEntityDefinition(args[0], entityDefinition);
+      this.assert(
+        args[1] === navigationProperty,
+        `navigationProperty is not equal. Expected: ${JSON.stringify(navigationProperty)}, Actual: ${JSON.stringify(args[1])}`,
+      );
+      this.compareEntityKey(args[2], entityKey);
+      this.compareSapODataQueryParams(args[3], params);
+    });
+    return Promise.resolve(result);
+  }
+
+  updateEntity(
+    entityDefinition: SapEntityDefinition,
+    entityKey: Record<string, any>,
+    values: Record<string, any>,
+  ): Promise<any> {
+    const [args, result] = this.getNextCall("updateEntity");
+    this.checkNextCallArguments("updateEntity", () => {
+      this.compareEntityDefinition(args[0], entityDefinition);
+      this.compareEntityKey(args[1], entityKey);
+
+      this.compareValuesWithRegex(args[2], values);
+    });
+    return Promise.resolve(result);
+  }
+
+  configure(): void {}
+
+  private getNextCall(call: MockSapOdataClientMethod) {
+    const next = this.calls.shift()!;
+    this.assert(
+      next !== undefined,
+      `Expected next SapODataClient method call to be ${call}, but got undefined`,
+    );
+    const [nextCall, params, result] = next;
+    this.assert(
+      nextCall === call,
+      `Expected next SapODataClient method call to be ${call}, but got ${nextCall}`,
+    );
+    return [params, result];
+  }
+
+  private checkNextCallArguments(method: MockSapOdataClientMethod, checkfn: () => void) {
+    try {
+      checkfn();
+    } catch (error) {
+      if (error instanceof MockSapOdataClientError) {
+        throw new MockSapOdataClientError(
+          `SapODataClient.${method} called with unexpected arguments: ${error.message}`,
+        );
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  private compareEntityDefinition(expected: SapEntityDefinition, actual: SapEntityDefinition) {
+    this.assert(
+      isDeepEqual(expected, actual),
+      `entityDefinition is not equal. Expected: ${JSON.stringify(expected)}, Actual: ${JSON.stringify(actual)}`,
+    );
+  }
+
+  private compareSapODataQueryParams(
+    expected: SapODataQueryParams | undefined,
+    actual: SapODataQueryParams | undefined,
+  ) {
+    this.assert(
+      isDeepEqual(expected?.$orderby, actual?.$orderby),
+      `params.$orderby parameters are not equal. Expected: ${JSON.stringify(expected?.$orderby)}, Actual: ${JSON.stringify(actual?.$orderby)}`,
+    );
+    this.assert(
+      isDeepEqual(expected?.$filter, actual?.$filter),
+      `params.$filter parameters are not equal. Expected: ${JSON.stringify(expected?.$filter)}, Actual: ${JSON.stringify(actual?.$filter)}`,
+    );
+    const expectedSelect = Array.from(expected?.$select ?? []).sort();
+    const actualSelect = Array.from(actual?.$select ?? []).sort();
+    this.assert(
+      isDeepEqual(expectedSelect, actualSelect),
+      `params.$select parameters are not equal. Expected: ${JSON.stringify(expectedSelect)}, Actual: ${JSON.stringify(actualSelect)}`,
+    );
+    const expectedExpand = Array.from(expected?.$expand ?? []).sort();
+    const actualExpand = Array.from(actual?.$expand ?? []).sort();
+    this.assert(
+      isDeepEqual(expectedExpand, actualExpand),
+      `params.$expand parameters are not equal. Expected: ${JSON.stringify(expectedExpand)}, Actual: ${JSON.stringify(actualExpand)}`,
+    );
+    return true;
+  }
+
+  private compareEntityKey(expected: Record<string, any>, actual: Record<string, any>) {
+    this.assert(
+      isDeepEqual(expected, pick(actual, keys(expected))),
+      `entityKey is not equal. Expected: ${JSON.stringify(expected)}, Actual: ${JSON.stringify(actual)}`,
+    );
+  }
+
+  private compareValuesWithRegex(expected: Record<string, any>, actual: Record<string, any>) {
+    const expectedKeys = keys(expected);
+    const actualKeys = keys(actual);
+
+    this.assert(
+      isDeepEqual(expectedKeys.sort(), actualKeys.sort()),
+      `values keys are not equal. Expected: ${JSON.stringify(expectedKeys)}, Actual: ${JSON.stringify(actualKeys)}`,
+    );
+
+    for (const key of expectedKeys) {
+      const expectedValue = expected[key];
+      const actualValue = actual[key];
+
+      if (expectedValue instanceof RegExp) {
+        this.assert(
+          expectedValue.test(String(actualValue)),
+          `values.${key} does not match regex. Expected: ${expectedValue}, Actual: ${JSON.stringify(actualValue)}`,
+        );
+      } else {
+        this.assert(
+          isDeepEqual(expectedValue, actualValue),
+          `values.${key} is not equal. Expected: ${JSON.stringify(expectedValue)}, Actual: ${JSON.stringify(actualValue)}`,
+        );
+      }
+    }
+  }
+
+  public setNextExpectedCalls(calls: MockSapOdataClientMethodCall[]) {
+    this.calls = calls;
+  }
+
+  public assertNoMoreCalls() {
+    this.assert(
+      this.calls.length === 0,
+      `Expected no more calls, but got ${this.calls.length} left.`,
+    );
+  }
+}
+
+type MockSapOdataClientMethod =
+  | "getMetadata"
+  | "getEntity"
+  | "getEntitySet"
+  | "getEntityNavigationProperty"
+  | "updateEntity";
+
+export type MockSapOdataClientMethodCall = {
+  [K in MockSapOdataClientMethod]: readonly [
+    K,
+    readonly [...Parameters<ISapOdataClient[K]>],
+    Awaited<ReturnType<ISapOdataClient[K]>>,
+  ];
+}[MockSapOdataClientMethod];
+
+@injectable()
+export class MockSapProfileSyncIntegrationSettingsValidator
+  implements ISapProfileSyncIntegrationSettingsValidator
+{
+  allowedFieldTypes: ProfileTypeFieldType[] = [
+    "SHORT_TEXT",
+    "TEXT",
+    "SELECT",
+    "PHONE",
+    "NUMBER",
+    "DATE",
+    "USER_ASSIGNMENT",
+  ];
+
+  async validate() {
+    return Promise.resolve();
   }
 }

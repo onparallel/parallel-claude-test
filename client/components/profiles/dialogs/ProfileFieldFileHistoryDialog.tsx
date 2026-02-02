@@ -188,7 +188,7 @@ function useProfileFieldFileHistoryDialogColumns({
           return (
             <ProfileValueSource
               source={profileFieldFile.source}
-              sourceName={
+              createdBy={
                 profileFieldFile.createdBy ? (
                   <UserReference user={profileFieldFile.createdBy} />
                 ) : (

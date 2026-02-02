@@ -15486,7 +15486,7 @@ describe("GraphQL/Profiles", () => {
           },
         })),
         organization.id,
-        { userId: sessionUser.id },
+        { source: "MANUAL", userId: sessionUser.id },
       );
 
       await profilesRepo.deleteProfileFieldFiles(pffs1[0].id, sessionUser.id);
@@ -15505,7 +15505,7 @@ describe("GraphQL/Profiles", () => {
           },
         ],
         organization.id,
-        { userId: sessionUser.id },
+        { source: "MANUAL", userId: sessionUser.id },
       );
 
       pffs2 = await profilesRepo.createProfileFieldFiles(
@@ -15529,7 +15529,7 @@ describe("GraphQL/Profiles", () => {
           },
         })),
         organization.id,
-        { userId: sessionUser.id },
+        { source: "MANUAL", userId: sessionUser.id },
       );
     });
 

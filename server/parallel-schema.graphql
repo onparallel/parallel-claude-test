@@ -1150,6 +1150,7 @@ enum FeatureFlag {
   PETITION_SUMMARY
   PROFILES
   PROFILE_SEARCH_FIELD
+  PROFILE_SYNC
   RECIPIENT_LANG_CA
   RECIPIENT_LANG_IT
   RECIPIENT_LANG_PT
@@ -1338,6 +1339,7 @@ enum IntegrationType {
   FILE_EXPORT
   ID_VERIFICATION
   PROFILE_EXTERNAL_SOURCE
+  PROFILE_SYNC
   SIGNATURE
   SSO
   USER_PROVISIONING
@@ -1678,7 +1680,7 @@ type Mutation {
   """
   Closes a profile that is in OPEN or DELETION_SCHEDULED status
   """
-  closeProfile(profileIds: [GID!]!): [Profile!]!
+  closeProfile(profileIds: [GID!]!, source: ProfileFieldPropertyValueSource): [Profile!]!
 
   """
   Marks a petition as COMPLETED.
@@ -2302,6 +2304,7 @@ type Mutation {
   createProfileRelationship(
     profileId: GID!
     relationships: [CreateProfileRelationshipInput!]!
+    source: ProfileFieldPropertyValueSource
   ): Profile!
 
   """
@@ -2394,6 +2397,18 @@ type Mutation {
     userGroupIds: [GID!]
     userIds: [GID!]
   ): MaybeTask!
+
+  """
+  Creates a new SAP Profile Sync integration on the provided organization, or updates it if the organization already has one.
+  """
+  createSapProfileSyncIntegration(
+    orgId: GID!
+
+    """
+    Full settings JSON object @form:type=textarea
+    """
+    settings: String!
+  ): SupportMethodResponse!
 
   """
   Creates a new Signaturit integration on the user's organization
@@ -2559,11 +2574,13 @@ type Mutation {
     """
     force: Boolean
     profileIds: [GID!]!
+    source: ProfileFieldPropertyValueSource
   ): Success!
   deleteProfileFieldFile(
     profileFieldFileIds: [GID!]
     profileId: GID!
     profileTypeFieldId: GID!
+    source: ProfileFieldPropertyValueSource
   ): Result!
 
   """
@@ -3100,7 +3117,11 @@ type Mutation {
   """
   Disassociates two profiles with a relationship.
   """
-  removeProfileRelationship(profileId: GID!, profileRelationshipIds: [GID!]!): Success!
+  removeProfileRelationship(
+    profileId: GID!
+    profileRelationshipIds: [GID!]!
+    source: ProfileFieldPropertyValueSource
+  ): Success!
   removeProfileTypeProcess(profileTypeProcessId: GID!): ProfileType!
 
   """
@@ -3384,6 +3405,14 @@ type Mutation {
   Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions.
   """
   transferPetitionOwnership(petitionIds: [GID!]!, userId: GID!): [PetitionBase!]!
+
+  """
+  Triggers a initial sync of a SAP Profile Sync integration
+  """
+  triggerSapProfileSyncInitialSync(
+    orgId: GID!
+    output: ProfileSyncIntegrationOutputType!
+  ): SupportMethodResponse!
   unarchiveProfileType(profileTypeIds: [GID!]!): [ProfileType!]!
   unlinkPetitionFieldChildren(
     childrenFieldIds: [GID!]!
@@ -7137,6 +7166,7 @@ enum ProfileFieldPropertyValueSource {
   PARALLEL_API
   PARALLEL_MONITORING
   PETITION_FIELD_REPLY
+  PROFILE_SYNC
 }
 
 interface ProfileFieldResponse {
@@ -7450,6 +7480,14 @@ enum ProfileStatus {
 type ProfileSubscription {
   id: GID!
   user: User!
+}
+
+"""
+Output type
+"""
+enum ProfileSyncIntegrationOutputType {
+  DATABASE
+  EXCEL
 }
 
 type ProfileType implements Timestamps {
@@ -9418,6 +9456,7 @@ enum TaskName {
   PROFILES_EXCEL_EXPORT
   PROFILES_EXCEL_IMPORT
   PROFILE_NAME_PATTERN_UPDATED
+  PROFILE_SYNC
   TEMPLATES_OVERVIEW_REPORT
   TEMPLATE_REPLIES_CSV_EXPORT
   TEMPLATE_REPLIES_REPORT

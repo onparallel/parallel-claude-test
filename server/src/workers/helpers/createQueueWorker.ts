@@ -191,7 +191,7 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
                         });
                       }
                     },
-                    { concurrency: processBatchWithConcurrency },
+                    { concurrency: processBatchWithConcurrency, stopOnError: false },
                   );
                   const queuesService = container.get<IQueuesService>(QUEUES_SERVICE);
                   await queuesService.waitForPendingMessages(30_000);

@@ -4,7 +4,7 @@ import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
 import { ProfileQueryFilter } from "../../util/ProfileQueryFilter";
 import { ProfileQuerySortBy } from "../../util/ProfileQuerySortBy";
 import { Maybe, Replace } from "../../util/types";
-import { Task as DbTask, TaskName, UserLocale } from "../__types";
+import { Task as DbTask, ProfileSyncLogSyncType, TaskName, UserLocale } from "../__types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
 
@@ -134,6 +134,11 @@ export type TaskInput<TName extends TaskName> = {
     file_upload_id: number;
     integration_id: number;
     model: string;
+  };
+  PROFILE_SYNC: {
+    type: ProfileSyncLogSyncType;
+    integration_id: number;
+    output: "EXCEL" | "DATABASE";
   };
 }[TName];
 
@@ -302,6 +307,11 @@ export type TaskOutput<TName extends TaskName> = {
     success: boolean;
     classification_ai_completion_log_id?: number;
     extraction_ai_completion_log_id?: number;
+  };
+  PROFILE_SYNC: {
+    success: boolean;
+    profile_sync_log_id?: number;
+    error?: any;
   };
 }[TName];
 

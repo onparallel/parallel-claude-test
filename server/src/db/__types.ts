@@ -103,7 +103,8 @@ export type FeatureFlagName =
   | "DOCUMENT_PROCESSING"
   | "ADVERSE_MEDIA_SEARCH"
   | "SIGN_WITH_DIGITAL_CERTIFICATE"
-  | "SIGN_WITH_EMBEDDED_IMAGE";
+  | "SIGN_WITH_EMBEDDED_IMAGE"
+  | "PROFILE_SYNC";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -142,6 +143,7 @@ export const FeatureFlagNameValues = [
   "ADVERSE_MEDIA_SEARCH",
   "SIGN_WITH_DIGITAL_CERTIFICATE",
   "SIGN_WITH_EMBEDDED_IMAGE",
+  "PROFILE_SYNC",
 ] as FeatureFlagName[];
 
 export type IntegrationType =
@@ -153,7 +155,8 @@ export type IntegrationType =
   | "ID_VERIFICATION"
   | "DOCUMENT_PROCESSING"
   | "PROFILE_EXTERNAL_SOURCE"
-  | "FILE_EXPORT";
+  | "FILE_EXPORT"
+  | "PROFILE_SYNC";
 
 export const IntegrationTypeValues = [
   "SIGNATURE",
@@ -165,6 +168,7 @@ export const IntegrationTypeValues = [
   "DOCUMENT_PROCESSING",
   "PROFILE_EXTERNAL_SOURCE",
   "FILE_EXPORT",
+  "PROFILE_SYNC",
 ] as IntegrationType[];
 
 export type LicenseCodeStatus = "PENDING" | "REDEEMED" | "EXPIRED";
@@ -533,6 +537,22 @@ export type ProfileStatus = "OPEN" | "CLOSED" | "DELETION_SCHEDULED";
 
 export const ProfileStatusValues = ["OPEN", "CLOSED", "DELETION_SCHEDULED"] as ProfileStatus[];
 
+export type ProfileSyncLogStatus = "PENDING" | "COMPLETED" | "FAILED";
+
+export const ProfileSyncLogStatusValues = [
+  "PENDING",
+  "COMPLETED",
+  "FAILED",
+] as ProfileSyncLogStatus[];
+
+export type ProfileSyncLogSyncType = "INITIAL" | "TO_LOCAL" | "TO_REMOTE";
+
+export const ProfileSyncLogSyncTypeValues = [
+  "INITIAL",
+  "TO_LOCAL",
+  "TO_REMOTE",
+] as ProfileSyncLogSyncType[];
+
 export type ProfileTypeFieldPermissionType = "HIDDEN" | "READ" | "WRITE";
 
 export const ProfileTypeFieldPermissionTypeValues = [
@@ -622,7 +642,8 @@ export type TaskName =
   | "DASHBOARD_REFRESH"
   | "PROFILES_EXCEL_EXPORT"
   | "DOCUMENT_PROCESSING"
-  | "BACKGROUND_CHECK_RESULTS_PDF";
+  | "BACKGROUND_CHECK_RESULTS_PDF"
+  | "PROFILE_SYNC";
 
 export const TaskNameValues = [
   "PRINT_PDF",
@@ -647,6 +668,7 @@ export const TaskNameValues = [
   "PROFILES_EXCEL_EXPORT",
   "DOCUMENT_PROCESSING",
   "BACKGROUND_CHECK_RESULTS_PDF",
+  "PROFILE_SYNC",
 ] as TaskName[];
 
 export type TaskStatus = "ENQUEUED" | "PROCESSING" | "COMPLETED" | "FAILED";
@@ -800,6 +822,7 @@ export interface TableTypes {
   profile_relationship_type: ProfileRelationshipType;
   profile_relationship_type_allowed_profile_type: ProfileRelationshipTypeAllowedProfileType;
   profile_subscription: ProfileSubscription;
+  profile_sync_log: ProfileSyncLog;
   profile_type: ProfileType;
   profile_type_field: ProfileTypeField;
   profile_type_field_permission: ProfileTypeFieldPermission;
@@ -879,6 +902,7 @@ export interface TableCreateTypes {
   profile_relationship_type: CreateProfileRelationshipType;
   profile_relationship_type_allowed_profile_type: CreateProfileRelationshipTypeAllowedProfileType;
   profile_subscription: CreateProfileSubscription;
+  profile_sync_log: CreateProfileSyncLog;
   profile_type: CreateProfileType;
   profile_type_field: CreateProfileTypeField;
   profile_type_field_permission: CreateProfileTypeFieldPermission;
@@ -958,6 +982,7 @@ export interface TablePrimaryKeys {
   profile_relationship_type: "id";
   profile_relationship_type_allowed_profile_type: "id";
   profile_subscription: "id";
+  profile_sync_log: "id";
   profile_type: "id";
   profile_type_field: "id";
   profile_type_field_permission: "id";
@@ -2421,6 +2446,25 @@ export interface ProfileSubscription {
 export type CreateProfileSubscription = PartialProps<
   Omit<ProfileSubscription, "id">,
   "created_at" | "created_by" | "deleted_at" | "deleted_by"
+>;
+
+export interface ProfileSyncLog {
+  id: number; // int4
+  integration_id: number; // int4
+  sync_type: ProfileSyncLogSyncType; // profile_sync_log_sync_type
+  status: ProfileSyncLogStatus; // profile_sync_log_status
+  sync_data: any; // jsonb
+  output: Maybe<any>; // jsonb
+  error: Maybe<any>; // jsonb
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+}
+
+export type CreateProfileSyncLog = PartialProps<
+  Omit<ProfileSyncLog, "id">,
+  "sync_data" | "output" | "error" | "created_at" | "created_by" | "updated_at" | "updated_by"
 >;
 
 export interface ProfileType {

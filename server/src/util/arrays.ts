@@ -1,4 +1,13 @@
-import { identity, sumBy } from "remeda";
+import { identity, purry, sumBy } from "remeda";
+
+function _withIndices(array: any[]) {
+  return array.map((item, index) => [item, index] as const);
+}
+export function withIndices<T>(array: T[]): [T, number][];
+export function withIndices<T>(): (array: T[]) => [T, number][];
+export function withIndices(...args: unknown[]) {
+  return purry(_withIndices, args);
+}
 
 /**
  * Chunk the input array and keep adding elements to the current chunk as long as `predicate` returns true.

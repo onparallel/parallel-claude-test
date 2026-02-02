@@ -76,6 +76,7 @@ if [[ "$INSTANCE_NUMBER" == "1" ]]; then
   sudo systemctl enable parallel-expiring-properties-cron.service
   sudo systemctl enable parallel-background-check-monitor-cron.service
   sudo systemctl enable parallel-adverse-media-monitor-cron.service
+  sudo systemctl enable parallel-sap-profile-polling-cron.service
 fi
 
 sudo amazon-cloudwatch-agent-ctl -a fetch-config -s -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json

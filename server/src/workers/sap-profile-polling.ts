@@ -1,0 +1,95 @@
+import { inject, injectable } from "inversify";
+import { isNonNullish } from "remeda";
+import { IntegrationRepository } from "../db/repositories/IntegrationRepository";
+import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
+import {
+  SAP_PROFILE_SYNC_INTEGRATION_FACTORY,
+  SapProfileSyncIntegrationFactory,
+} from "../integrations/profile-sync/sap/SapProfileSyncIntegration";
+import { LOGGER_FACTORY, LoggerFactory } from "../services/Logger";
+import { IRedis, REDIS } from "../services/Redis";
+import { createCronWorker, CronWorker } from "./helpers/createCronWorker";
+
+async function withRedisLock(
+  client: IRedis,
+): Promise<AsyncDisposable & { alreadyLocked: boolean }> {
+  const redisLockKey = `sap-profile-polling:lock`;
+  const lock = await client.get(redisLockKey);
+  const alreadyLocked = isNonNullish(lock);
+
+  if (!alreadyLocked) {
+    await client.set(redisLockKey, "true", 60 * 60); // 1 hour lock
+  }
+
+  return {
+    alreadyLocked,
+    [Symbol.asyncDispose]: async () => {
+      // Only delete the lock if we actually acquired it
+      if (!alreadyLocked) {
+        await client.delete(redisLockKey);
+      }
+    },
+  };
+}
+
+@injectable()
+export class SapProfilePollingCronWorker extends CronWorker<"sap-profile-polling"> {
+  constructor(
+    @inject(REDIS) private redis: IRedis,
+    @inject(LOGGER_FACTORY) private loggerFactory: LoggerFactory,
+    @inject(SAP_PROFILE_SYNC_INTEGRATION_FACTORY)
+    private sapProfileSyncIntegrationFactory: SapProfileSyncIntegrationFactory,
+    @inject(OrganizationRepository) private organizations: OrganizationRepository,
+    @inject(IntegrationRepository) private integrations: IntegrationRepository,
+  ) {
+    super();
+  }
+
+  async handler() {
+    await using _ = await this.redis.withConnection();
+
+    // use a lock to make sure this job does not run concurrently
+    // this lock will be released automatically when the job finishes, or after 1 hour if it is not released for any reason
+    await using lock = await withRedisLock(this.redis);
+    if (lock.alreadyLocked) {
+      // if the cron is triggered again while the job is running (lock is already set), it will early return here
+      return;
+    }
+
+    const organizations = await this.organizations.getOrganizationsWithFeatureFlag([
+      "PROFILES",
+      "PROFILE_SYNC",
+    ]);
+
+    const orgIntegrations = (
+      await Promise.all(
+        organizations.map((o) => this.integrations.loadIntegrationsByOrgId(o.id, "PROFILE_SYNC")),
+      )
+    ).flat();
+
+    for (const integration of orgIntegrations) {
+      const logger = this.loggerFactory(`SapProfilePolling:${integration.id}`);
+      const syncLogs = await this.integrations.loadProfileSyncLogByIntegrationId(integration.id);
+
+      const latestLocalSync = syncLogs.findLast(
+        (l) =>
+          ["INITIAL", "TO_LOCAL"].includes(l.sync_type) &&
+          l.status === "COMPLETED" &&
+          l.output?.output === "DATABASE",
+      );
+
+      if (latestLocalSync) {
+        logger.info(
+          `Polling for changed entities since ${latestLocalSync.created_at.toISOString()}`,
+        );
+        await this.sapProfileSyncIntegrationFactory(integration.id).pollForChangedEntities(
+          latestLocalSync.created_at,
+        );
+      } else {
+        logger.info("No local sync found, skipping...");
+      }
+    }
+  }
+}
+
+createCronWorker("sap-profile-polling", SapProfilePollingCronWorker);

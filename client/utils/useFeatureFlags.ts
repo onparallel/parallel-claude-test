@@ -227,6 +227,18 @@ export function useFeatureFlags() {
                 "Enables the Adverse media search petition field on the organization.",
             }),
           },
+          {
+            name: "PROFILE_SYNC",
+            title: intl.formatMessage({
+              id: "component.feature-flag-descriptions.profile-sync-name",
+              defaultMessage: "Profile sync",
+            }),
+            description: intl.formatMessage({
+              id: "component.feature-flag-descriptions.profile-sync-description",
+              defaultMessage:
+                "Enables the profile sync feature on the organization with external sources like SAP.",
+            }),
+          },
         ],
       },
       {

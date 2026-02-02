@@ -1,6 +1,10 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { isNonNullish, isNullish, unique } from "remeda";
+import {
+  SapProfileSyncIntegrationSettingsAuthorization,
+  SapProfileSyncIntegrationSettings as _SapProfileSyncIntegrationSettings,
+} from "../../integrations/profile-sync/sap/types";
 import { SignaturitBrandingIdKey } from "../../integrations/signature/SignaturitIntegration";
 import { keyBuilder } from "../../util/keyBuilder";
 import { Replace } from "../../util/types";
@@ -8,6 +12,7 @@ import {
   CreateDocumentProcessingLog,
   CreateFileExportLog,
   CreateOrgIntegration,
+  CreateProfileSyncLog,
   FileExportLog,
   IntegrationType,
   OrgIntegration,
@@ -24,6 +29,7 @@ interface IntegrationProviders {
   DOCUMENT_PROCESSING: "BANKFLIP";
   PROFILE_EXTERNAL_SOURCE: "EINFORMA" | "COMPANIES_HOUSE";
   FILE_EXPORT: "IMANAGE";
+  PROFILE_SYNC: "SAP";
 }
 
 type SignaturitSettings = {
@@ -105,6 +111,11 @@ interface IManageFileExportSettings {
   CLIENT_ID: string;
 }
 
+interface SapProfileSyncIntegrationSettings
+  extends Omit<_SapProfileSyncIntegrationSettings, "authorization"> {
+  CREDENTIALS: SapProfileSyncIntegrationSettingsAuthorization;
+}
+
 export type IntegrationProvider<TType extends IntegrationType> =
   TType extends keyof IntegrationProviders ? IntegrationProviders[TType] : string;
 
@@ -147,6 +158,11 @@ export type IntegrationSettings<
   FILE_EXPORT: TProvider extends IntegrationProviders["FILE_EXPORT"]
     ? {
         IMANAGE: IManageFileExportSettings;
+      }[TProvider]
+    : never;
+  PROFILE_SYNC: TProvider extends IntegrationProviders["PROFILE_SYNC"]
+    ? {
+        SAP: SapProfileSyncIntegrationSettings;
       }[TProvider]
     : never;
 }[TType];
@@ -523,4 +539,52 @@ export class IntegrationRepository extends BaseRepository {
         updated_at: this.now(),
       });
   }
+
+  readonly loadProfileSyncLogByIntegrationId = this.buildLoadMultipleBy(
+    "profile_sync_log",
+    "integration_id",
+    (q) => q.orderBy("created_at", "asc"),
+  );
+
+  async createProfileSyncLog(data: CreateProfileSyncLog, createdBy: string) {
+    const [log] = await this.insert("profile_sync_log", {
+      ...data,
+      created_at: this.now(),
+    }).returning("*");
+
+    return log;
+  }
+
+  async updateProfileSyncLog(id: number, data: Partial<CreateProfileSyncLog>, updatedBy: string) {
+    const [log] = await this.from("profile_sync_log")
+      .where("id", id)
+      .update(
+        {
+          ...data,
+          updated_by: updatedBy,
+          updated_at: this.now(),
+        },
+        "*",
+      );
+
+    return log;
+  }
+
+  async appendProfileSyncLogSyncData(id: number, data: any) {
+    await this.from("profile_sync_log")
+      .where("id", id)
+      .update({
+        sync_data: this.knex.raw("sync_data || ?", this.json(data)),
+        updated_at: this.now(),
+      });
+  }
+
+  readonly loadIntegrationHasCompletedInitialProfileSyncToDatabase = this.buildLoadExistsBy(
+    "profile_sync_log",
+    "integration_id",
+    (q) =>
+      q
+        .where({ sync_type: "INITIAL", status: "COMPLETED" })
+        .whereRaw(/* sql */ `output->>'output' = 'DATABASE'`),
+  );
 }

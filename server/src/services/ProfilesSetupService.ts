@@ -1447,6 +1447,7 @@ export class ProfilesSetupService implements IProfilesSetupService {
               defaultMessage: "Matter ID",
             }),
             alias: "p_matter_id",
+            is_unique: true,
           },
           {
             type: "SELECT",

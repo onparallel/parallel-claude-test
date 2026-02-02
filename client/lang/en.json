@@ -4840,6 +4840,16 @@
     "context": "Profile search field"
   },
   {
+    "term": "component.feature-flag-descriptions.profile-sync-description",
+    "definition": "Enables the profile sync feature on the organization with external sources like SAP.",
+    "context": "Enables the profile sync feature on the organization with external sources like SAP."
+  },
+  {
+    "term": "component.feature-flag-descriptions.profile-sync-name",
+    "definition": "Profile sync",
+    "context": "Profile sync"
+  },
+  {
     "term": "component.feature-flag-descriptions.profiles-description",
     "definition": "Grants access to profiles",
     "context": "Grants access to profiles"
@@ -10581,28 +10591,28 @@
   },
   {
     "term": "component.profile-value-source.excel-import",
-    "definition": "Manually imported by {sourceName}",
-    "context": "Manually imported by {sourceName}"
+    "definition": "Manually imported by {createdBy}",
+    "context": "Manually imported by {createdBy}"
   },
   {
     "term": "component.profile-value-source.external",
-    "definition": "Imported from external source by {sourceName}",
-    "context": "Imported from external source by {sourceName}"
+    "definition": "Imported from external source by {createdBy}",
+    "context": "Imported from external source by {createdBy}"
   },
   {
     "term": "component.profile-value-source.external-with-external-source-name",
-    "definition": "Imported from {externalSourceName} by {sourceName}",
-    "context": "Imported from {externalSourceName} by {sourceName}"
+    "definition": "Imported from {externalSourceName} by {createdBy}",
+    "context": "Imported from {externalSourceName} by {createdBy}"
   },
   {
     "term": "component.profile-value-source.manual",
-    "definition": "Manually edited by {sourceName}",
-    "context": "Manually edited by {sourceName}"
+    "definition": "Manually edited by {createdBy}",
+    "context": "Manually edited by {createdBy}"
   },
   {
     "term": "component.profile-value-source.parallel-api",
-    "definition": "Edited by API by {sourceName}",
-    "context": "Edited by API by {sourceName}"
+    "definition": "Edited by API by {createdBy}",
+    "context": "Edited by API by {createdBy}"
   },
   {
     "term": "component.profile-value-source.parallel-monitoring",
@@ -10611,8 +10621,13 @@
   },
   {
     "term": "component.profile-value-source.petition-field-reply",
-    "definition": "Imported from {parallelLink} by {sourceName}",
-    "context": "Imported from {parallelLink} by {sourceName}"
+    "definition": "Imported from {parallelLink} by {createdBy}",
+    "context": "Imported from {parallelLink} by {createdBy}"
+  },
+  {
+    "term": "component.profile-value-source.profile-sync",
+    "definition": "Imported from {externalSourceName}",
+    "context": "Imported from {externalSourceName}"
   },
   {
     "term": "component.profiles-chart-module-settings.global-filter",

@@ -39,7 +39,6 @@ import {
 import {
   ProfileFieldExpiryUpdatedEvent,
   ProfileFieldFileAddedEvent,
-  ProfileRelationshipRemovedEvent,
 } from "../../db/events/ProfileEvent";
 import { ProfileRepository } from "../../db/repositories/ProfileRepository";
 import { ProfileExternalSourceRequestError } from "../../integrations/profile-external-source/ProfileExternalSourceIntegration";
@@ -1184,8 +1183,9 @@ export const deleteProfile = mutationField("deleteProfile", {
   args: {
     profileIds: nonNull(list(nonNull(globalIdArg("Profile")))),
     force: booleanArg({ description: "pass force=true to delete profiles with replies" }),
+    source: nullable("ProfileFieldPropertyValueSource"),
   },
-  resolve: async (_, { profileIds, force }, ctx) => {
+  resolve: async (_, { profileIds, force, source }, ctx) => {
     const values = (await ctx.profiles.loadProfileFieldValuesByProfileId(profileIds)).flat();
     const files = (await ctx.profiles.loadProfileFieldFilesByProfileId(profileIds)).flat();
 
@@ -1250,6 +1250,7 @@ export const deleteProfile = mutationField("deleteProfile", {
             },
           };
         }),
+        source ?? "MANUAL",
       );
     }
 
@@ -1711,8 +1712,9 @@ export const deleteProfileFieldFile = mutationField("deleteProfileFieldFile", {
     profileId: nonNull(globalIdArg("Profile")),
     profileTypeFieldId: nonNull(globalIdArg("ProfileTypeField")),
     profileFieldFileIds: list(nonNull(globalIdArg("ProfileFieldFile"))),
+    source: nullable("ProfileFieldPropertyValueSource"),
   },
-  resolve: async (_, { profileId, profileFieldFileIds, profileTypeFieldId }, ctx) => {
+  resolve: async (_, { profileId, profileFieldFileIds, profileTypeFieldId, source }, ctx) => {
     try {
       let deletedProfileFieldFiles: ProfileFieldFile[] = [];
       if (isNonNullish(profileFieldFileIds)) {
@@ -1742,6 +1744,7 @@ export const deleteProfileFieldFile = mutationField("deleteProfileFieldFile", {
             },
           })),
           ctx.user!.org_id,
+
           { userId: ctx.user!.id, source: "MANUAL" },
         );
       }
@@ -2126,6 +2129,7 @@ export const disassociateProfilesFromPetitions = mutationField(
             petition_id: d.petition_id,
           },
         })),
+        "MANUAL",
       );
 
       return RESULT.SUCCESS;
@@ -2162,6 +2166,7 @@ export const reopenProfile = mutationField("reopenProfile", {
           user_id: ctx.user!.id,
         },
       })),
+      "MANUAL",
     );
 
     return profiles;
@@ -2180,8 +2185,9 @@ export const closeProfile = mutationField("closeProfile", {
   ),
   args: {
     profileIds: nonNull(list(nonNull(globalIdArg("Profile")))),
+    source: nullable("ProfileFieldPropertyValueSource"),
   },
-  resolve: async (_, { profileIds }, ctx) => {
+  resolve: async (_, { profileIds, source }, ctx) => {
     const profiles = await ctx.profiles.updateProfileStatus(
       profileIds,
       "CLOSED",
@@ -2197,6 +2203,7 @@ export const closeProfile = mutationField("closeProfile", {
           user_id: ctx.user!.id,
         },
       })),
+      source ?? "MANUAL",
     );
 
     return profiles;
@@ -2232,6 +2239,7 @@ export const scheduleProfileForDeletion = mutationField("scheduleProfileForDelet
           user_id: ctx.user!.id,
         },
       })),
+      "MANUAL",
     );
 
     return profiles;
@@ -2268,6 +2276,7 @@ export const createProfileRelationship = mutationField("createProfileRelationshi
         ),
       ),
     ),
+    source: nullable("ProfileFieldPropertyValueSource"),
   },
   resolve: async (_, args, ctx) => {
     const relationshipTypes = await ctx.profiles.loadProfileRelationshipType(
@@ -2294,7 +2303,7 @@ export const createProfileRelationship = mutationField("createProfileRelationshi
           right_side_profile_id: rightId,
         };
       }),
-      "MANUAL",
+      args.source ?? "MANUAL",
     );
 
     return (await ctx.profiles.loadProfile(args.profileId))!;
@@ -2312,54 +2321,17 @@ export const removeProfileRelationship = mutationField("removeProfileRelationshi
   args: {
     profileId: nonNull(globalIdArg("Profile")),
     profileRelationshipIds: nonNull(list(nonNull(globalIdArg("ProfileRelationship")))),
+    source: nullable("ProfileFieldPropertyValueSource"),
   },
   validateArgs: notEmptyArray("profileRelationshipIds"),
   resolve: async (_, args, ctx) => {
-    const relationships = await ctx.profiles.removeProfileRelationships(
+    await ctx.profiles.removeProfileRelationships(
       args.profileRelationshipIds,
-      ctx.user!,
-    );
-
-    const relationshipTypes = await ctx.profiles.loadProfileRelationshipType(
-      relationships.map((r) => r.profile_relationship_type_id),
-    );
-
-    await ctx.profiles.createEvent(
-      relationships.flatMap((r) => {
-        const relationshipType = relationshipTypes.find(
-          (rt) => rt!.id === r.profile_relationship_type_id,
-        );
-        return [
-          {
-            org_id: ctx.user!.org_id,
-            profile_id: r.left_side_profile_id,
-            type: "PROFILE_RELATIONSHIP_REMOVED",
-            data: {
-              user_id: ctx.user!.id,
-              profile_relationship_id: r.id,
-              other_side_profile_id: r.right_side_profile_id,
-              profile_relationship_type_id: r.profile_relationship_type_id,
-              profile_relationship_type_alias: relationshipType?.alias ?? null,
-              reason: "REMOVED_BY_USER",
-              org_integration_id: null,
-            },
-          },
-          {
-            org_id: ctx.user!.org_id,
-            profile_id: r.right_side_profile_id,
-            type: "PROFILE_RELATIONSHIP_REMOVED",
-            data: {
-              user_id: ctx.user!.id,
-              profile_relationship_id: r.id,
-              other_side_profile_id: r.left_side_profile_id,
-              profile_relationship_type_id: r.profile_relationship_type_id,
-              profile_relationship_type_alias: relationshipType?.alias ?? null,
-              reason: "REMOVED_BY_USER",
-              org_integration_id: null,
-            },
-          },
-        ] satisfies ProfileRelationshipRemovedEvent<true>[];
-      }),
+      "REMOVED_BY_USER",
+      ctx.user!.id,
+      null,
+      ctx.user!.org_id,
+      args.source ?? "MANUAL",
     );
 
     return RESULT.SUCCESS;

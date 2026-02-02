@@ -1,0 +1,1146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:sap="http://www.sap.com/Protocols/SAPData">
+    <edmx:Reference Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_AGGREGATION',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="Org.OData.Aggregation.V1" Alias="Aggregation"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_ANALYTICS',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.Analytics.v1" Alias="Analytics"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CAPABILITIES',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="Org.OData.Capabilities.V1" Alias="Capabilities"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CODELIST',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.CodeList.v1" Alias="SAP__CodeList"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMON',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.Common.v1" Alias="Common"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMUNICATION',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.Communication.v1" Alias="Communication"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_MEASURES',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="Org.OData.Measures.V1" Alias="Measures"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_ODM',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.ODM.v1" Alias="SAP__ODM"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_PERSONALDATA',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.PersonalData.v1" Alias="PersonalData"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_UI',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.UI.v1" Alias="UI"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_VALIDATION',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="Org.OData.Validation.V1" Alias="Validation"/>
+    </edmx:Reference>
+    <edmx:DataServices m:DataServiceVersion="2.0">
+        <Schema Namespace="YY1_ANTIMONEYLAUNDERING_CDS" xml:lang="en" sap:schema-version="1" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+            <EntityType Name="P_Scbo_UserType" sap:label="User" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="name"/>
+                </Key>
+                <Property Name="name" Type="Edm.String" Nullable="false" MaxLength="12" sap:display-format="UpperCase" sap:label="User" sap:quickinfo="User Name in User Master Record"/>
+                <Property Name="description" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="Description of the Technical User Account"/>
+            </EntityType>
+            <EntityType Name="YY1_ACTIVITYType" sap:label="Activity" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="SAP_UUID"/>
+                </Key>
+                <Property Name="SAP_UUID" Type="Edm.Guid" Nullable="false" sap:label="UUID" sap:quickinfo="16 Byte UUID in 16 Bytes (Raw Format)"/>
+                <Property Name="ID" Type="Edm.String" MaxLength="10" sap:display-format="NonNegative" sap:label="ID"/>
+                <Property Name="SAP_Description" Type="Edm.String" MaxLength="250" sap:label="Description"/>
+                <Property Name="RiskRate" Type="Edm.Decimal" Precision="5" Scale="2" sap:label="Risk rate"/>
+                <Property Name="IsUEFactor" Type="Edm.Boolean" sap:label="Is UE activity"/>
+                <Property Name="CommitteeAuthRequired" Type="Edm.Boolean" sap:label="Committee auth required"/>
+                <Property Name="SAP_CreatedDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:label="Created On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_CreatedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="SAP_CreatedByUser_Text" sap:label="Created By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_CreatedByUser_Text" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="Description of the Technical User Account" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:label="Last Changed On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="SAP_LastChangedByUser_Text" sap:label="Last Changed By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedByUser_Text" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="Description of the Technical User Account" sap:creatable="false" sap:updatable="false"/>
+            </EntityType>
+            <EntityType Name="YY1_AMOUNTOPERATIONType" sap:label="Amount operation" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="SAP_UUID"/>
+                </Key>
+                <Property Name="SAP_UUID" Type="Edm.Guid" Nullable="false" sap:label="UUID" sap:quickinfo="16 Byte UUID in 16 Bytes (Raw Format)"/>
+                <Property Name="ID" Type="Edm.String" MaxLength="10" sap:display-format="NonNegative" sap:label="ID"/>
+                <Property Name="SAP_Description" Type="Edm.String" MaxLength="250" sap:label="Description"/>
+                <Property Name="RiskRate" Type="Edm.Decimal" Precision="5" Scale="2" sap:label="Risk rate"/>
+                <Property Name="SAP_CreatedDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:label="Created On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_CreatedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="SAP_CreatedByUser_Text" sap:label="Created By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_CreatedByUser_Text" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="Description of the Technical User Account" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:label="Last Changed On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="SAP_LastChangedByUser_Text" sap:label="Last Changed By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedByUser_Text" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="Description of the Technical User Account" sap:creatable="false" sap:updatable="false"/>
+            </EntityType>
+            <EntityType Name="YY1_ANTIMONEYLAUNDERINGType" sap:label="Anti money laundering" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="SAP_UUID"/>
+                </Key>
+                <Property Name="SAP_UUID" Type="Edm.Guid" Nullable="false" sap:label="UUID" sap:quickinfo="16 Byte UUID in 16 Bytes (Raw Format)"/>
+                <Property Name="BusinessPartner" Type="Edm.String" MaxLength="10" sap:label="Business Partner"/>
+                <Property Name="SAP_Description" Type="Edm.String" MaxLength="80" sap:label="Description"/>
+                <Property Name="Activity" Type="Edm.String" MaxLength="10" sap:display-format="NonNegative" sap:text="Activity_Text" sap:label="Activity" sap:value-list="standard"/>
+                <Property Name="Activity_Text" Type="Edm.String" MaxLength="250" sap:label="Description" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="AmountOperation" Type="Edm.String" MaxLength="10" sap:display-format="NonNegative" sap:text="AmountOperation_Text" sap:label="Amount operation" sap:value-list="standard"/>
+                <Property Name="AmountOperation_Text" Type="Edm.String" MaxLength="250" sap:label="Description" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Antiquity" Type="Edm.String" MaxLength="10" sap:display-format="NonNegative" sap:text="Antiquity_Text" sap:label="Antiquity" sap:value-list="standard"/>
+                <Property Name="Antiquity_Text" Type="Edm.String" MaxLength="250" sap:label="Description" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="CountryRates" Type="Edm.String" MaxLength="10" sap:display-format="NonNegative" sap:text="CountryRates_Text" sap:label="Country" sap:value-list="standard"/>
+                <Property Name="CountryRates_Text" Type="Edm.String" MaxLength="250" sap:label="Description" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="LegalForm" Type="Edm.String" MaxLength="10" sap:display-format="NonNegative" sap:text="LegalForm_Text" sap:label="Legal form" sap:value-list="standard"/>
+                <Property Name="LegalForm_Text" Type="Edm.String" MaxLength="250" sap:label="Description" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="RepresentationType" Type="Edm.String" MaxLength="10" sap:display-format="NonNegative" sap:text="RepresentationType_Text" sap:label="Representation type" sap:value-list="standard"/>
+                <Property Name="RepresentationType_Text" Type="Edm.String" MaxLength="200" sap:label="Description" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Service" Type="Edm.String" MaxLength="10" sap:display-format="NonNegative" sap:text="Service_Text" sap:label="Service" sap:value-list="standard"/>
+                <Property Name="Service_Text" Type="Edm.String" MaxLength="250" sap:label="Description" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="RiskRate" Type="Edm.Decimal" Precision="5" Scale="2" sap:label="Risk rate"/>
+                <Property Name="ScoringDate" Type="Edm.DateTime" Precision="0" sap:display-format="Date" sap:label="Scoring date"/>
+                <Property Name="ReviewDate" Type="Edm.DateTime" Precision="0" sap:display-format="Date" sap:label="Review date"/>
+                <Property Name="RiskLevel" Type="Edm.String" MaxLength="10" sap:display-format="NonNegative" sap:text="RiskLevel_Text" sap:label="Risk level" sap:value-list="standard"/>
+                <Property Name="RiskLevel_Text" Type="Edm.String" MaxLength="80" sap:label="Description" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="DocumentationUploaded" Type="Edm.Boolean" sap:label="Documentation uploaded"/>
+                <Property Name="DevelopedActivity" Type="Edm.String" MaxLength="100" sap:label="Developed activity"/>
+                <Property Name="EstateOrigin" Type="Edm.String" MaxLength="100" sap:label="Estate origin"/>
+                <Property Name="GlobalConflictCheck" Type="Edm.Boolean" sap:label="Global conflict check"/>
+                <Property Name="MoneyLaunderingCheck" Type="Edm.Boolean" sap:label="Money laundering check"/>
+                <Property Name="WorldRiskCheck" Type="Edm.Boolean" sap:label="World risk check"/>
+                <Property Name="SAP_CreatedDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:label="Created On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_CreatedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="SAP_CreatedByUser_Text" sap:label="Created By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_CreatedByUser_Text" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="Description of the Technical User Account" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:label="Last Changed On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="SAP_LastChangedByUser_Text" sap:label="Last Changed By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedByUser_Text" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="Description of the Technical User Account" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="OCIMembersApprovers" Type="Edm.String" MaxLength="500" sap:label="OCIMembersApprovers"/>
+                <Property Name="OCIMembersRejectors" Type="Edm.String" MaxLength="500" sap:label="OCIMembersRejectors"/>
+                <NavigationProperty Name="to_Activity" Relationship="YY1_ANTIMONEYLAUNDERING_CDS.assoc_28CE249A987F63474D0E5DC5D3BE1F29" FromRole="FromRole_assoc_28CE249A987F63474D0E5DC5D3BE1F29" ToRole="ToRole_assoc_28CE249A987F63474D0E5DC5D3BE1F29"/>
+                <NavigationProperty Name="to_AmountOperation" Relationship="YY1_ANTIMONEYLAUNDERING_CDS.assoc_6FDFAB7E3D968D1BA661299F1F583E01" FromRole="FromRole_assoc_6FDFAB7E3D968D1BA661299F1F583E01" ToRole="ToRole_assoc_6FDFAB7E3D968D1BA661299F1F583E01"/>
+                <NavigationProperty Name="to_Antiquity" Relationship="YY1_ANTIMONEYLAUNDERING_CDS.assoc_781439339CC1B9182B38E54087694361" FromRole="FromRole_assoc_781439339CC1B9182B38E54087694361" ToRole="ToRole_assoc_781439339CC1B9182B38E54087694361"/>
+                <NavigationProperty Name="to_CountryRates" Relationship="YY1_ANTIMONEYLAUNDERING_CDS.assoc_D907FA721CA73D3A843BA3E9E76D34AD" FromRole="FromRole_assoc_D907FA721CA73D3A843BA3E9E76D34AD" ToRole="ToRole_assoc_D907FA721CA73D3A843BA3E9E76D34AD"/>
+                <NavigationProperty Name="to_LegalForm" Relationship="YY1_ANTIMONEYLAUNDERING_CDS.assoc_990143F09F550AFA518ED921033BC2F0" FromRole="FromRole_assoc_990143F09F550AFA518ED921033BC2F0" ToRole="ToRole_assoc_990143F09F550AFA518ED921033BC2F0"/>
+                <NavigationProperty Name="to_RepresentationType" Relationship="YY1_ANTIMONEYLAUNDERING_CDS.assoc_C6FFC16F5732E7C06711743EAEAFEDFB" FromRole="FromRole_assoc_C6FFC16F5732E7C06711743EAEAFEDFB" ToRole="ToRole_assoc_C6FFC16F5732E7C06711743EAEAFEDFB"/>
+                <NavigationProperty Name="to_RiskLevel" Relationship="YY1_ANTIMONEYLAUNDERING_CDS.assoc_09EA4C7FDEC5BDE076A3C81E897F2D63" FromRole="FromRole_assoc_09EA4C7FDEC5BDE076A3C81E897F2D63" ToRole="ToRole_assoc_09EA4C7FDEC5BDE076A3C81E897F2D63"/>
+                <NavigationProperty Name="to_SAPSysAdminDataChangeUser" Relationship="YY1_ANTIMONEYLAUNDERING_CDS.assoc_8209C964E86EB422294F24A3FF5C39A4" FromRole="FromRole_assoc_8209C964E86EB422294F24A3FF5C39A4" ToRole="ToRole_assoc_8209C964E86EB422294F24A3FF5C39A4"/>
+                <NavigationProperty Name="to_SAPSysAdminDataCreateUser" Relationship="YY1_ANTIMONEYLAUNDERING_CDS.assoc_E2A0E110343E250FA8C8C860799453D4" FromRole="FromRole_assoc_E2A0E110343E250FA8C8C860799453D4" ToRole="ToRole_assoc_E2A0E110343E250FA8C8C860799453D4"/>
+                <NavigationProperty Name="to_Service" Relationship="YY1_ANTIMONEYLAUNDERING_CDS.assoc_5B1485302CD6A15B15C3D298429F2504" FromRole="FromRole_assoc_5B1485302CD6A15B15C3D298429F2504" ToRole="ToRole_assoc_5B1485302CD6A15B15C3D298429F2504"/>
+                <NavigationProperty Name="to__Activity" Relationship="YY1_ANTIMONEYLAUNDERING_CDS.assoc_958689577C54CC5085EDF6C125A0ADCA" FromRole="FromRole_assoc_958689577C54CC5085EDF6C125A0ADCA" ToRole="ToRole_assoc_958689577C54CC5085EDF6C125A0ADCA"/>
+                <NavigationProperty Name="to__AmountOperation" Relationship="YY1_ANTIMONEYLAUNDERING_CDS.assoc_77F4D0CE04F8370F342A657028FD2260" FromRole="FromRole_assoc_77F4D0CE04F8370F342A657028FD2260" ToRole="ToRole_assoc_77F4D0CE04F8370F342A657028FD2260"/>
+                <NavigationProperty Name="to__Antiquity" Relationship="YY1_ANTIMONEYLAUNDERING_CDS.assoc_B4828B51476ED33AE8EAF3B0CD59DF97" FromRole="FromRole_assoc_B4828B51476ED33AE8EAF3B0CD59DF97" ToRole="ToRole_assoc_B4828B51476ED33AE8EAF3B0CD59DF97"/>
+                <NavigationProperty Name="to__CountryRates" Relationship="YY1_ANTIMONEYLAUNDERING_CDS.assoc_8F3F9905328D107D523E7654007A74E4" FromRole="FromRole_assoc_8F3F9905328D107D523E7654007A74E4" ToRole="ToRole_assoc_8F3F9905328D107D523E7654007A74E4"/>
+                <NavigationProperty Name="to__LegalForm" Relationship="YY1_ANTIMONEYLAUNDERING_CDS.assoc_5C435059E35FC0D23A946538FE72D291" FromRole="FromRole_assoc_5C435059E35FC0D23A946538FE72D291" ToRole="ToRole_assoc_5C435059E35FC0D23A946538FE72D291"/>
+                <NavigationProperty Name="to__RepresentationType" Relationship="YY1_ANTIMONEYLAUNDERING_CDS.assoc_24BBAC70776997E893862132685E5DB8" FromRole="FromRole_assoc_24BBAC70776997E893862132685E5DB8" ToRole="ToRole_assoc_24BBAC70776997E893862132685E5DB8"/>
+                <NavigationProperty Name="to__RiskLevel" Relationship="YY1_ANTIMONEYLAUNDERING_CDS.assoc_0750D195146172226EABD1B8570AD85C" FromRole="FromRole_assoc_0750D195146172226EABD1B8570AD85C" ToRole="ToRole_assoc_0750D195146172226EABD1B8570AD85C"/>
+                <NavigationProperty Name="to__Service" Relationship="YY1_ANTIMONEYLAUNDERING_CDS.assoc_88F4629F7406BD37FBB3E3F5BB5C95C1" FromRole="FromRole_assoc_88F4629F7406BD37FBB3E3F5BB5C95C1" ToRole="ToRole_assoc_88F4629F7406BD37FBB3E3F5BB5C95C1"/>
+            </EntityType>
+            <EntityType Name="YY1_ANTIQUITYType" sap:label="Antiquity" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="SAP_UUID"/>
+                </Key>
+                <Property Name="SAP_UUID" Type="Edm.Guid" Nullable="false" sap:label="UUID" sap:quickinfo="16 Byte UUID in 16 Bytes (Raw Format)"/>
+                <Property Name="ID" Type="Edm.String" MaxLength="10" sap:display-format="NonNegative" sap:label="ID"/>
+                <Property Name="SAP_Description" Type="Edm.String" MaxLength="250" sap:label="Description"/>
+                <Property Name="RiskRate" Type="Edm.Decimal" Precision="5" Scale="2" sap:label="Risk rate"/>
+                <Property Name="SAP_CreatedDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:label="Created On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_CreatedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="SAP_CreatedByUser_Text" sap:label="Created By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_CreatedByUser_Text" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="Description of the Technical User Account" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:label="Last Changed On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="SAP_LastChangedByUser_Text" sap:label="Last Changed By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedByUser_Text" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="Description of the Technical User Account" sap:creatable="false" sap:updatable="false"/>
+            </EntityType>
+            <EntityType Name="YY1_COUNTRYRATESType" sap:label="Country rates" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="SAP_UUID"/>
+                </Key>
+                <Property Name="SAP_UUID" Type="Edm.Guid" Nullable="false" sap:label="UUID" sap:quickinfo="16 Byte UUID in 16 Bytes (Raw Format)"/>
+                <Property Name="ID" Type="Edm.String" MaxLength="10" sap:display-format="NonNegative" sap:label="ID"/>
+                <Property Name="SAP_Description" Type="Edm.String" MaxLength="250" sap:label="Description"/>
+                <Property Name="RiskRate" Type="Edm.Decimal" Precision="5" Scale="2" sap:label="Risk rate"/>
+                <Property Name="IsUECountry" Type="Edm.Boolean" sap:label="Is UE country"/>
+                <Property Name="CommitteeAuthRequired" Type="Edm.Boolean" sap:label="Committee auth required"/>
+                <Property Name="SAP_CreatedDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:label="Created On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_CreatedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="SAP_CreatedByUser_Text" sap:label="Created By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_CreatedByUser_Text" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="Description of the Technical User Account" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:label="Last Changed On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="SAP_LastChangedByUser_Text" sap:label="Last Changed By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedByUser_Text" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="Description of the Technical User Account" sap:creatable="false" sap:updatable="false"/>
+            </EntityType>
+            <EntityType Name="YY1_LEGALFORMType" sap:label="Legal form" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="SAP_UUID"/>
+                </Key>
+                <Property Name="SAP_UUID" Type="Edm.Guid" Nullable="false" sap:label="UUID" sap:quickinfo="16 Byte UUID in 16 Bytes (Raw Format)"/>
+                <Property Name="ID" Type="Edm.String" MaxLength="10" sap:display-format="NonNegative" sap:label="ID"/>
+                <Property Name="SAP_Description" Type="Edm.String" MaxLength="250" sap:label="Description"/>
+                <Property Name="IsUEFactor" Type="Edm.Boolean" sap:label="Is UE legal form"/>
+                <Property Name="RiskRate" Type="Edm.Decimal" Precision="5" Scale="2" sap:label="Risk rate"/>
+                <Property Name="SAP_CreatedDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:label="Created On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_CreatedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="SAP_CreatedByUser_Text" sap:label="Created By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_CreatedByUser_Text" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="Description of the Technical User Account" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:label="Last Changed On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="SAP_LastChangedByUser_Text" sap:label="Last Changed By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedByUser_Text" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="Description of the Technical User Account" sap:creatable="false" sap:updatable="false"/>
+            </EntityType>
+            <EntityType Name="YY1_REPRESENTATIONTYPEType" sap:label="Representation type" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="SAP_UUID"/>
+                </Key>
+                <Property Name="SAP_UUID" Type="Edm.Guid" Nullable="false" sap:label="UUID" sap:quickinfo="16 Byte UUID in 16 Bytes (Raw Format)"/>
+                <Property Name="ID" Type="Edm.String" MaxLength="10" sap:display-format="NonNegative" sap:label="ID"/>
+                <Property Name="SAP_Description" Type="Edm.String" MaxLength="200" sap:label="Description"/>
+                <Property Name="RiskRate" Type="Edm.Decimal" Precision="5" Scale="2" sap:label="Risk rate"/>
+                <Property Name="SAP_CreatedDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:label="Created On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_CreatedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="SAP_CreatedByUser_Text" sap:label="Created By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_CreatedByUser_Text" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="Description of the Technical User Account" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:label="Last Changed On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="SAP_LastChangedByUser_Text" sap:label="Last Changed By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedByUser_Text" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="Description of the Technical User Account" sap:creatable="false" sap:updatable="false"/>
+            </EntityType>
+            <EntityType Name="YY1_RISKRATESType" sap:label="Risk rates" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="SAP_UUID"/>
+                </Key>
+                <Property Name="SAP_UUID" Type="Edm.Guid" Nullable="false" sap:label="UUID" sap:quickinfo="16 Byte UUID in 16 Bytes (Raw Format)"/>
+                <Property Name="ID" Type="Edm.String" MaxLength="10" sap:display-format="NonNegative" sap:label="ID"/>
+                <Property Name="SAP_Description" Type="Edm.String" MaxLength="80" sap:label="Description"/>
+                <Property Name="RiskRateFrom" Type="Edm.Decimal" Precision="3" Scale="2" sap:label="Risk rate from"/>
+                <Property Name="RiskRateTo" Type="Edm.Decimal" Precision="5" Scale="2" sap:label="Risk rate to"/>
+                <Property Name="DueDiligence" Type="Edm.String" MaxLength="10" sap:display-format="NonNegative" sap:text="DueDiligence_Text" sap:label="Due diligence" sap:value-list="standard"/>
+                <Property Name="DueDiligence_Text" Type="Edm.String" MaxLength="80" sap:label="Description" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="IsUECountry" Type="Edm.Boolean" sap:label="Is UE country"/>
+                <Property Name="DocumentationUploaded" Type="Edm.Boolean" sap:label="NO USAR" sap:quickinfo="DocumentationUploaded"/>
+                <Property Name="FollowUp" Type="Edm.Decimal" Precision="3" Scale="0" sap:label="Follow up (years)"/>
+                <Property Name="CommitteeAuth" Type="Edm.Boolean" sap:label="Committee auth"/>
+                <Property Name="GracePeriod" Type="Edm.Decimal" Precision="3" Scale="0" sap:label="Grace period (days)"/>
+                <Property Name="NewLogic" Type="Edm.Boolean" sap:label="New Logic"/>
+                <Property Name="SAP_CreatedDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:label="Created On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_CreatedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="SAP_CreatedByUser_Text" sap:label="Created By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_CreatedByUser_Text" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="Description of the Technical User Account" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:label="Last Changed On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="SAP_LastChangedByUser_Text" sap:label="Last Changed By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedByUser_Text" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="Description of the Technical User Account" sap:creatable="false" sap:updatable="false"/>
+                <NavigationProperty Name="to__DueDiligence" Relationship="YY1_ANTIMONEYLAUNDERING_CDS.assoc_25070D699999272FCA7E75A3BB5E9E49" FromRole="FromRole_assoc_25070D699999272FCA7E75A3BB5E9E49" ToRole="ToRole_assoc_25070D699999272FCA7E75A3BB5E9E49"/>
+            </EntityType>
+            <EntityType Name="YY1_SERVICEType" sap:label="Service" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="SAP_UUID"/>
+                </Key>
+                <Property Name="SAP_UUID" Type="Edm.Guid" Nullable="false" sap:label="UUID" sap:quickinfo="16 Byte UUID in 16 Bytes (Raw Format)"/>
+                <Property Name="ID" Type="Edm.String" MaxLength="10" sap:display-format="NonNegative" sap:label="ID"/>
+                <Property Name="SAP_Description" Type="Edm.String" MaxLength="250" sap:label="Description"/>
+                <Property Name="RiskRate" Type="Edm.Decimal" Precision="5" Scale="2" sap:label="Risk rate"/>
+                <Property Name="SAP_CreatedDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:label="Created On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_CreatedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="SAP_CreatedByUser_Text" sap:label="Created By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_CreatedByUser_Text" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="Description of the Technical User Account" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:label="Last Changed On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:text="SAP_LastChangedByUser_Text" sap:label="Last Changed By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedByUser_Text" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="Description of the Technical User Account" sap:creatable="false" sap:updatable="false"/>
+            </EntityType>
+            <EntityType Name="YY1_VH_ACTIVITYType" sap:label="Activity" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.String" Nullable="false" MaxLength="10" sap:display-format="NonNegative" sap:text="SAP_Description" sap:label="ID"/>
+                <Property Name="SAP_Description" Type="Edm.String" MaxLength="250" sap:label="Description"/>
+                <Property Name="RiskRate" Type="Edm.Decimal" Precision="5" Scale="2" sap:label="Risk rate"/>
+                <Property Name="IsUEFactor" Type="Edm.Boolean" sap:label="Is UE activity"/>
+                <Property Name="CommitteeAuthRequired" Type="Edm.Boolean" sap:label="Committee auth required"/>
+                <Property Name="sap_uuid" Type="Edm.Guid" sap:label="UUID" sap:quickinfo="16 Byte UUID in 16 Bytes (Raw Format)"/>
+            </EntityType>
+            <EntityType Name="YY1_VH_AMOUNTOPERATIONType" sap:label="Amount operation" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.String" Nullable="false" MaxLength="10" sap:display-format="NonNegative" sap:text="SAP_Description" sap:label="ID"/>
+                <Property Name="SAP_Description" Type="Edm.String" MaxLength="250" sap:label="Description"/>
+                <Property Name="RiskRate" Type="Edm.Decimal" Precision="5" Scale="2" sap:label="Risk rate"/>
+                <Property Name="SAP_CreatedDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:label="Created On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_CreatedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:label="Created By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="sap_uuid" Type="Edm.Guid" sap:label="UUID" sap:quickinfo="16 Byte UUID in 16 Bytes (Raw Format)"/>
+            </EntityType>
+            <EntityType Name="YY1_VH_ANTIQUITYType" sap:label="Antiquity" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.String" Nullable="false" MaxLength="10" sap:display-format="NonNegative" sap:text="SAP_Description" sap:label="ID"/>
+                <Property Name="SAP_Description" Type="Edm.String" MaxLength="250" sap:label="Description"/>
+                <Property Name="RiskRate" Type="Edm.Decimal" Precision="5" Scale="2" sap:label="Risk rate"/>
+                <Property Name="SAP_CreatedDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:label="Created On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_CreatedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:label="Created By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="sap_uuid" Type="Edm.Guid" sap:label="UUID" sap:quickinfo="16 Byte UUID in 16 Bytes (Raw Format)"/>
+            </EntityType>
+            <EntityType Name="YY1_VH_COUNTRYRATESType" sap:label="Country rates" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.String" Nullable="false" MaxLength="10" sap:display-format="NonNegative" sap:text="SAP_Description" sap:label="ID"/>
+                <Property Name="SAP_Description" Type="Edm.String" MaxLength="250" sap:label="Description"/>
+                <Property Name="RiskRate" Type="Edm.Decimal" Precision="5" Scale="2" sap:label="Risk rate"/>
+                <Property Name="IsUECountry" Type="Edm.Boolean" sap:label="Is UE country"/>
+                <Property Name="CommitteeAuthRequired" Type="Edm.Boolean" sap:label="Committee auth required"/>
+                <Property Name="sap_uuid" Type="Edm.Guid" sap:label="UUID" sap:quickinfo="16 Byte UUID in 16 Bytes (Raw Format)"/>
+            </EntityType>
+            <EntityType Name="YY1_VH_DUEDILIGENCEType" sap:label="Due diligence" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.String" Nullable="false" MaxLength="10" sap:display-format="NonNegative" sap:text="SAP_Description" sap:label="ID"/>
+                <Property Name="SAP_Description" Type="Edm.String" MaxLength="80" sap:label="Description"/>
+                <Property Name="SAP_CreatedDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:label="Created On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_CreatedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:label="Created By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_LastChangedDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:label="Last Changed On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="sap_uuid" Type="Edm.Guid" sap:label="UUID" sap:quickinfo="16 Byte UUID in 16 Bytes (Raw Format)"/>
+            </EntityType>
+            <EntityType Name="YY1_VH_LEGALFORMType" sap:label="Legal form" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.String" Nullable="false" MaxLength="10" sap:display-format="NonNegative" sap:text="SAP_Description" sap:label="ID"/>
+                <Property Name="SAP_Description" Type="Edm.String" MaxLength="250" sap:label="Description"/>
+                <Property Name="IsUEFactor" Type="Edm.Boolean" sap:label="Is UE legal form"/>
+                <Property Name="RiskRate" Type="Edm.Decimal" Precision="5" Scale="2" sap:label="Risk rate"/>
+                <Property Name="SAP_CreatedDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:label="Created On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="sap_uuid" Type="Edm.Guid" sap:label="UUID" sap:quickinfo="16 Byte UUID in 16 Bytes (Raw Format)"/>
+            </EntityType>
+            <EntityType Name="YY1_VH_REPRESENTATIONTYPEType" sap:label="Representation type" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.String" Nullable="false" MaxLength="10" sap:display-format="NonNegative" sap:text="SAP_Description" sap:label="ID"/>
+                <Property Name="SAP_Description" Type="Edm.String" MaxLength="200" sap:label="Description"/>
+                <Property Name="RiskRate" Type="Edm.Decimal" Precision="5" Scale="2" sap:label="Risk rate"/>
+                <Property Name="SAP_CreatedDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:label="Created On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_CreatedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:label="Created By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="sap_uuid" Type="Edm.Guid" sap:label="UUID" sap:quickinfo="16 Byte UUID in 16 Bytes (Raw Format)"/>
+            </EntityType>
+            <EntityType Name="YY1_VH_RISKRATESType" sap:label="Risk rates" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.String" Nullable="false" MaxLength="10" sap:display-format="NonNegative" sap:text="SAP_Description" sap:label="ID"/>
+                <Property Name="SAP_Description" Type="Edm.String" MaxLength="80" sap:label="Description"/>
+                <Property Name="RiskRateFrom" Type="Edm.Decimal" Precision="3" Scale="2" sap:label="Risk rate from"/>
+                <Property Name="RiskRateTo" Type="Edm.Decimal" Precision="5" Scale="2" sap:label="Risk rate to"/>
+                <Property Name="DueDiligence" Type="Edm.String" MaxLength="10" sap:display-format="NonNegative" sap:label="Due diligence"/>
+                <Property Name="sap_uuid" Type="Edm.Guid" sap:label="UUID" sap:quickinfo="16 Byte UUID in 16 Bytes (Raw Format)"/>
+            </EntityType>
+            <EntityType Name="YY1_VH_SERVICEType" sap:label="Service" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.String" Nullable="false" MaxLength="10" sap:display-format="NonNegative" sap:text="SAP_Description" sap:label="ID"/>
+                <Property Name="SAP_Description" Type="Edm.String" MaxLength="250" sap:label="Description"/>
+                <Property Name="RiskRate" Type="Edm.Decimal" Precision="5" Scale="2" sap:label="Risk rate"/>
+                <Property Name="SAP_CreatedDateTime" Type="Edm.DateTimeOffset" Precision="7" sap:label="Created On" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="SAP_CreatedByUser" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:label="Created By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="sap_uuid" Type="Edm.Guid" sap:label="UUID" sap:quickinfo="16 Byte UUID in 16 Bytes (Raw Format)"/>
+            </EntityType>
+            <Association Name="assoc_6FDFAB7E3D968D1BA661299F1F583E01" sap:content-version="1">
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType" Multiplicity="1" Role="FromRole_assoc_6FDFAB7E3D968D1BA661299F1F583E01"/>
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_AMOUNTOPERATIONType" Multiplicity="0..1" Role="ToRole_assoc_6FDFAB7E3D968D1BA661299F1F583E01"/>
+            </Association>
+            <Association Name="assoc_781439339CC1B9182B38E54087694361" sap:content-version="1">
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType" Multiplicity="1" Role="FromRole_assoc_781439339CC1B9182B38E54087694361"/>
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIQUITYType" Multiplicity="0..1" Role="ToRole_assoc_781439339CC1B9182B38E54087694361"/>
+            </Association>
+            <Association Name="assoc_D907FA721CA73D3A843BA3E9E76D34AD" sap:content-version="1">
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType" Multiplicity="1" Role="FromRole_assoc_D907FA721CA73D3A843BA3E9E76D34AD"/>
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_COUNTRYRATESType" Multiplicity="0..1" Role="ToRole_assoc_D907FA721CA73D3A843BA3E9E76D34AD"/>
+            </Association>
+            <Association Name="assoc_990143F09F550AFA518ED921033BC2F0" sap:content-version="1">
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType" Multiplicity="1" Role="FromRole_assoc_990143F09F550AFA518ED921033BC2F0"/>
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_LEGALFORMType" Multiplicity="0..1" Role="ToRole_assoc_990143F09F550AFA518ED921033BC2F0"/>
+            </Association>
+            <Association Name="assoc_C6FFC16F5732E7C06711743EAEAFEDFB" sap:content-version="1">
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType" Multiplicity="1" Role="FromRole_assoc_C6FFC16F5732E7C06711743EAEAFEDFB"/>
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_REPRESENTATIONTYPEType" Multiplicity="0..1" Role="ToRole_assoc_C6FFC16F5732E7C06711743EAEAFEDFB"/>
+            </Association>
+            <Association Name="assoc_09EA4C7FDEC5BDE076A3C81E897F2D63" sap:content-version="1">
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType" Multiplicity="1" Role="FromRole_assoc_09EA4C7FDEC5BDE076A3C81E897F2D63"/>
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_RISKRATESType" Multiplicity="0..1" Role="ToRole_assoc_09EA4C7FDEC5BDE076A3C81E897F2D63"/>
+            </Association>
+            <Association Name="assoc_8209C964E86EB422294F24A3FF5C39A4" sap:content-version="1">
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType" Multiplicity="1" Role="FromRole_assoc_8209C964E86EB422294F24A3FF5C39A4"/>
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.P_Scbo_UserType" Multiplicity="0..1" Role="ToRole_assoc_8209C964E86EB422294F24A3FF5C39A4"/>
+            </Association>
+            <Association Name="assoc_E2A0E110343E250FA8C8C860799453D4" sap:content-version="1">
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType" Multiplicity="1" Role="FromRole_assoc_E2A0E110343E250FA8C8C860799453D4"/>
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.P_Scbo_UserType" Multiplicity="0..1" Role="ToRole_assoc_E2A0E110343E250FA8C8C860799453D4"/>
+            </Association>
+            <Association Name="assoc_5B1485302CD6A15B15C3D298429F2504" sap:content-version="1">
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType" Multiplicity="1" Role="FromRole_assoc_5B1485302CD6A15B15C3D298429F2504"/>
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_SERVICEType" Multiplicity="0..1" Role="ToRole_assoc_5B1485302CD6A15B15C3D298429F2504"/>
+            </Association>
+            <Association Name="assoc_958689577C54CC5085EDF6C125A0ADCA" sap:content-version="1">
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType" Multiplicity="1" Role="FromRole_assoc_958689577C54CC5085EDF6C125A0ADCA"/>
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_ACTIVITYType" Multiplicity="0..1" Role="ToRole_assoc_958689577C54CC5085EDF6C125A0ADCA"/>
+            </Association>
+            <Association Name="assoc_77F4D0CE04F8370F342A657028FD2260" sap:content-version="1">
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType" Multiplicity="1" Role="FromRole_assoc_77F4D0CE04F8370F342A657028FD2260"/>
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_AMOUNTOPERATIONType" Multiplicity="0..1" Role="ToRole_assoc_77F4D0CE04F8370F342A657028FD2260"/>
+            </Association>
+            <Association Name="assoc_B4828B51476ED33AE8EAF3B0CD59DF97" sap:content-version="1">
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType" Multiplicity="1" Role="FromRole_assoc_B4828B51476ED33AE8EAF3B0CD59DF97"/>
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_ANTIQUITYType" Multiplicity="0..1" Role="ToRole_assoc_B4828B51476ED33AE8EAF3B0CD59DF97"/>
+            </Association>
+            <Association Name="assoc_8F3F9905328D107D523E7654007A74E4" sap:content-version="1">
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType" Multiplicity="1" Role="FromRole_assoc_8F3F9905328D107D523E7654007A74E4"/>
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_COUNTRYRATESType" Multiplicity="0..1" Role="ToRole_assoc_8F3F9905328D107D523E7654007A74E4"/>
+            </Association>
+            <Association Name="assoc_5C435059E35FC0D23A946538FE72D291" sap:content-version="1">
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType" Multiplicity="1" Role="FromRole_assoc_5C435059E35FC0D23A946538FE72D291"/>
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_LEGALFORMType" Multiplicity="0..1" Role="ToRole_assoc_5C435059E35FC0D23A946538FE72D291"/>
+            </Association>
+            <Association Name="assoc_24BBAC70776997E893862132685E5DB8" sap:content-version="1">
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType" Multiplicity="1" Role="FromRole_assoc_24BBAC70776997E893862132685E5DB8"/>
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_REPRESENTATIONTYPEType" Multiplicity="0..1" Role="ToRole_assoc_24BBAC70776997E893862132685E5DB8"/>
+            </Association>
+            <Association Name="assoc_0750D195146172226EABD1B8570AD85C" sap:content-version="1">
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType" Multiplicity="1" Role="FromRole_assoc_0750D195146172226EABD1B8570AD85C"/>
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_RISKRATESType" Multiplicity="0..1" Role="ToRole_assoc_0750D195146172226EABD1B8570AD85C"/>
+            </Association>
+            <Association Name="assoc_88F4629F7406BD37FBB3E3F5BB5C95C1" sap:content-version="1">
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType" Multiplicity="1" Role="FromRole_assoc_88F4629F7406BD37FBB3E3F5BB5C95C1"/>
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_SERVICEType" Multiplicity="0..1" Role="ToRole_assoc_88F4629F7406BD37FBB3E3F5BB5C95C1"/>
+            </Association>
+            <Association Name="assoc_28CE249A987F63474D0E5DC5D3BE1F29" sap:content-version="1">
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType" Multiplicity="1" Role="FromRole_assoc_28CE249A987F63474D0E5DC5D3BE1F29"/>
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ACTIVITYType" Multiplicity="0..1" Role="ToRole_assoc_28CE249A987F63474D0E5DC5D3BE1F29"/>
+            </Association>
+            <Association Name="assoc_25070D699999272FCA7E75A3BB5E9E49" sap:content-version="1">
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_RISKRATESType" Multiplicity="1" Role="FromRole_assoc_25070D699999272FCA7E75A3BB5E9E49"/>
+                <End Type="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_DUEDILIGENCEType" Multiplicity="0..1" Role="ToRole_assoc_25070D699999272FCA7E75A3BB5E9E49"/>
+            </Association>
+            <EntityContainer Name="YY1_ANTIMONEYLAUNDERING_CDS_Entities" m:IsDefaultEntityContainer="true" sap:message-scope-supported="true" sap:supported-formats="atom json xlsx">
+                <EntitySet Name="P_Scbo_User" EntityType="YY1_ANTIMONEYLAUNDERING_CDS.P_Scbo_UserType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:addressable="false" sap:content-version="1"/>
+                <EntitySet Name="YY1_ACTIVITY" EntityType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ACTIVITYType" sap:searchable="true" sap:content-version="1"/>
+                <EntitySet Name="YY1_AMOUNTOPERATION" EntityType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_AMOUNTOPERATIONType" sap:searchable="true" sap:content-version="1"/>
+                <EntitySet Name="YY1_ANTIMONEYLAUNDERING" EntityType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType" sap:searchable="true" sap:content-version="1"/>
+                <EntitySet Name="YY1_ANTIQUITY" EntityType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIQUITYType" sap:searchable="true" sap:content-version="1"/>
+                <EntitySet Name="YY1_COUNTRYRATES" EntityType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_COUNTRYRATESType" sap:searchable="true" sap:content-version="1"/>
+                <EntitySet Name="YY1_LEGALFORM" EntityType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_LEGALFORMType" sap:searchable="true" sap:content-version="1"/>
+                <EntitySet Name="YY1_REPRESENTATIONTYPE" EntityType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_REPRESENTATIONTYPEType" sap:searchable="true" sap:content-version="1"/>
+                <EntitySet Name="YY1_RISKRATES" EntityType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_RISKRATESType" sap:searchable="true" sap:content-version="1"/>
+                <EntitySet Name="YY1_SERVICE" EntityType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_SERVICEType" sap:searchable="true" sap:content-version="1"/>
+                <EntitySet Name="YY1_VH_ACTIVITY" EntityType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_ACTIVITYType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:searchable="true" sap:content-version="1"/>
+                <EntitySet Name="YY1_VH_AMOUNTOPERATION" EntityType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_AMOUNTOPERATIONType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:searchable="true" sap:content-version="1"/>
+                <EntitySet Name="YY1_VH_ANTIQUITY" EntityType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_ANTIQUITYType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:searchable="true" sap:content-version="1"/>
+                <EntitySet Name="YY1_VH_COUNTRYRATES" EntityType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_COUNTRYRATESType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:searchable="true" sap:content-version="1"/>
+                <EntitySet Name="YY1_VH_DUEDILIGENCE" EntityType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_DUEDILIGENCEType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:searchable="true" sap:content-version="1"/>
+                <EntitySet Name="YY1_VH_LEGALFORM" EntityType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_LEGALFORMType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:searchable="true" sap:content-version="1"/>
+                <EntitySet Name="YY1_VH_REPRESENTATIONTYPE" EntityType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_REPRESENTATIONTYPEType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:searchable="true" sap:content-version="1"/>
+                <EntitySet Name="YY1_VH_RISKRATES" EntityType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_RISKRATESType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:searchable="true" sap:content-version="1"/>
+                <EntitySet Name="YY1_VH_SERVICE" EntityType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_SERVICEType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:searchable="true" sap:content-version="1"/>
+                <AssociationSet Name="assoc_09EA4C7FDEC5BDE076A3C81E897F2D63" Association="YY1_ANTIMONEYLAUNDERING_CDS.assoc_09EA4C7FDEC5BDE076A3C81E897F2D63" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="YY1_ANTIMONEYLAUNDERING" Role="FromRole_assoc_09EA4C7FDEC5BDE076A3C81E897F2D63"/>
+                    <End EntitySet="YY1_RISKRATES" Role="ToRole_assoc_09EA4C7FDEC5BDE076A3C81E897F2D63"/>
+                </AssociationSet>
+                <AssociationSet Name="assoc_5B1485302CD6A15B15C3D298429F2504" Association="YY1_ANTIMONEYLAUNDERING_CDS.assoc_5B1485302CD6A15B15C3D298429F2504" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="YY1_ANTIMONEYLAUNDERING" Role="FromRole_assoc_5B1485302CD6A15B15C3D298429F2504"/>
+                    <End EntitySet="YY1_SERVICE" Role="ToRole_assoc_5B1485302CD6A15B15C3D298429F2504"/>
+                </AssociationSet>
+                <AssociationSet Name="assoc_E2A0E110343E250FA8C8C860799453D4" Association="YY1_ANTIMONEYLAUNDERING_CDS.assoc_E2A0E110343E250FA8C8C860799453D4" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="YY1_ANTIMONEYLAUNDERING" Role="FromRole_assoc_E2A0E110343E250FA8C8C860799453D4"/>
+                    <End EntitySet="P_Scbo_User" Role="ToRole_assoc_E2A0E110343E250FA8C8C860799453D4"/>
+                </AssociationSet>
+                <AssociationSet Name="assoc_990143F09F550AFA518ED921033BC2F0" Association="YY1_ANTIMONEYLAUNDERING_CDS.assoc_990143F09F550AFA518ED921033BC2F0" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="YY1_ANTIMONEYLAUNDERING" Role="FromRole_assoc_990143F09F550AFA518ED921033BC2F0"/>
+                    <End EntitySet="YY1_LEGALFORM" Role="ToRole_assoc_990143F09F550AFA518ED921033BC2F0"/>
+                </AssociationSet>
+                <AssociationSet Name="assoc_25070D699999272FCA7E75A3BB5E9E49" Association="YY1_ANTIMONEYLAUNDERING_CDS.assoc_25070D699999272FCA7E75A3BB5E9E49" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="YY1_RISKRATES" Role="FromRole_assoc_25070D699999272FCA7E75A3BB5E9E49"/>
+                    <End EntitySet="YY1_VH_DUEDILIGENCE" Role="ToRole_assoc_25070D699999272FCA7E75A3BB5E9E49"/>
+                </AssociationSet>
+                <AssociationSet Name="assoc_28CE249A987F63474D0E5DC5D3BE1F29" Association="YY1_ANTIMONEYLAUNDERING_CDS.assoc_28CE249A987F63474D0E5DC5D3BE1F29" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="YY1_ANTIMONEYLAUNDERING" Role="FromRole_assoc_28CE249A987F63474D0E5DC5D3BE1F29"/>
+                    <End EntitySet="YY1_ACTIVITY" Role="ToRole_assoc_28CE249A987F63474D0E5DC5D3BE1F29"/>
+                </AssociationSet>
+                <AssociationSet Name="assoc_5C435059E35FC0D23A946538FE72D291" Association="YY1_ANTIMONEYLAUNDERING_CDS.assoc_5C435059E35FC0D23A946538FE72D291" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="YY1_ANTIMONEYLAUNDERING" Role="FromRole_assoc_5C435059E35FC0D23A946538FE72D291"/>
+                    <End EntitySet="YY1_VH_LEGALFORM" Role="ToRole_assoc_5C435059E35FC0D23A946538FE72D291"/>
+                </AssociationSet>
+                <AssociationSet Name="assoc_6FDFAB7E3D968D1BA661299F1F583E01" Association="YY1_ANTIMONEYLAUNDERING_CDS.assoc_6FDFAB7E3D968D1BA661299F1F583E01" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="YY1_ANTIMONEYLAUNDERING" Role="FromRole_assoc_6FDFAB7E3D968D1BA661299F1F583E01"/>
+                    <End EntitySet="YY1_AMOUNTOPERATION" Role="ToRole_assoc_6FDFAB7E3D968D1BA661299F1F583E01"/>
+                </AssociationSet>
+                <AssociationSet Name="assoc_0750D195146172226EABD1B8570AD85C" Association="YY1_ANTIMONEYLAUNDERING_CDS.assoc_0750D195146172226EABD1B8570AD85C" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="YY1_ANTIMONEYLAUNDERING" Role="FromRole_assoc_0750D195146172226EABD1B8570AD85C"/>
+                    <End EntitySet="YY1_VH_RISKRATES" Role="ToRole_assoc_0750D195146172226EABD1B8570AD85C"/>
+                </AssociationSet>
+                <AssociationSet Name="assoc_24BBAC70776997E893862132685E5DB8" Association="YY1_ANTIMONEYLAUNDERING_CDS.assoc_24BBAC70776997E893862132685E5DB8" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="YY1_ANTIMONEYLAUNDERING" Role="FromRole_assoc_24BBAC70776997E893862132685E5DB8"/>
+                    <End EntitySet="YY1_VH_REPRESENTATIONTYPE" Role="ToRole_assoc_24BBAC70776997E893862132685E5DB8"/>
+                </AssociationSet>
+                <AssociationSet Name="assoc_958689577C54CC5085EDF6C125A0ADCA" Association="YY1_ANTIMONEYLAUNDERING_CDS.assoc_958689577C54CC5085EDF6C125A0ADCA" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="YY1_ANTIMONEYLAUNDERING" Role="FromRole_assoc_958689577C54CC5085EDF6C125A0ADCA"/>
+                    <End EntitySet="YY1_VH_ACTIVITY" Role="ToRole_assoc_958689577C54CC5085EDF6C125A0ADCA"/>
+                </AssociationSet>
+                <AssociationSet Name="assoc_88F4629F7406BD37FBB3E3F5BB5C95C1" Association="YY1_ANTIMONEYLAUNDERING_CDS.assoc_88F4629F7406BD37FBB3E3F5BB5C95C1" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="YY1_ANTIMONEYLAUNDERING" Role="FromRole_assoc_88F4629F7406BD37FBB3E3F5BB5C95C1"/>
+                    <End EntitySet="YY1_VH_SERVICE" Role="ToRole_assoc_88F4629F7406BD37FBB3E3F5BB5C95C1"/>
+                </AssociationSet>
+                <AssociationSet Name="assoc_77F4D0CE04F8370F342A657028FD2260" Association="YY1_ANTIMONEYLAUNDERING_CDS.assoc_77F4D0CE04F8370F342A657028FD2260" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="YY1_ANTIMONEYLAUNDERING" Role="FromRole_assoc_77F4D0CE04F8370F342A657028FD2260"/>
+                    <End EntitySet="YY1_VH_AMOUNTOPERATION" Role="ToRole_assoc_77F4D0CE04F8370F342A657028FD2260"/>
+                </AssociationSet>
+                <AssociationSet Name="assoc_781439339CC1B9182B38E54087694361" Association="YY1_ANTIMONEYLAUNDERING_CDS.assoc_781439339CC1B9182B38E54087694361" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="YY1_ANTIMONEYLAUNDERING" Role="FromRole_assoc_781439339CC1B9182B38E54087694361"/>
+                    <End EntitySet="YY1_ANTIQUITY" Role="ToRole_assoc_781439339CC1B9182B38E54087694361"/>
+                </AssociationSet>
+                <AssociationSet Name="assoc_C6FFC16F5732E7C06711743EAEAFEDFB" Association="YY1_ANTIMONEYLAUNDERING_CDS.assoc_C6FFC16F5732E7C06711743EAEAFEDFB" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="YY1_ANTIMONEYLAUNDERING" Role="FromRole_assoc_C6FFC16F5732E7C06711743EAEAFEDFB"/>
+                    <End EntitySet="YY1_REPRESENTATIONTYPE" Role="ToRole_assoc_C6FFC16F5732E7C06711743EAEAFEDFB"/>
+                </AssociationSet>
+                <AssociationSet Name="assoc_D907FA721CA73D3A843BA3E9E76D34AD" Association="YY1_ANTIMONEYLAUNDERING_CDS.assoc_D907FA721CA73D3A843BA3E9E76D34AD" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="YY1_ANTIMONEYLAUNDERING" Role="FromRole_assoc_D907FA721CA73D3A843BA3E9E76D34AD"/>
+                    <End EntitySet="YY1_COUNTRYRATES" Role="ToRole_assoc_D907FA721CA73D3A843BA3E9E76D34AD"/>
+                </AssociationSet>
+                <AssociationSet Name="assoc_8F3F9905328D107D523E7654007A74E4" Association="YY1_ANTIMONEYLAUNDERING_CDS.assoc_8F3F9905328D107D523E7654007A74E4" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="YY1_ANTIMONEYLAUNDERING" Role="FromRole_assoc_8F3F9905328D107D523E7654007A74E4"/>
+                    <End EntitySet="YY1_VH_COUNTRYRATES" Role="ToRole_assoc_8F3F9905328D107D523E7654007A74E4"/>
+                </AssociationSet>
+                <AssociationSet Name="assoc_8209C964E86EB422294F24A3FF5C39A4" Association="YY1_ANTIMONEYLAUNDERING_CDS.assoc_8209C964E86EB422294F24A3FF5C39A4" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="YY1_ANTIMONEYLAUNDERING" Role="FromRole_assoc_8209C964E86EB422294F24A3FF5C39A4"/>
+                    <End EntitySet="P_Scbo_User" Role="ToRole_assoc_8209C964E86EB422294F24A3FF5C39A4"/>
+                </AssociationSet>
+                <AssociationSet Name="assoc_B4828B51476ED33AE8EAF3B0CD59DF97" Association="YY1_ANTIMONEYLAUNDERING_CDS.assoc_B4828B51476ED33AE8EAF3B0CD59DF97" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="YY1_ANTIMONEYLAUNDERING" Role="FromRole_assoc_B4828B51476ED33AE8EAF3B0CD59DF97"/>
+                    <End EntitySet="YY1_VH_ANTIQUITY" Role="ToRole_assoc_B4828B51476ED33AE8EAF3B0CD59DF97"/>
+                </AssociationSet>
+                <FunctionImport Name="YY1_ACTIVITYSap_upsert" ReturnType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ACTIVITYType" EntitySet="YY1_ACTIVITY" m:HttpMethod="POST">
+                    <Parameter Name="ID" Type="Edm.String" Mode="In" MaxLength="10" sap:label="Numeric length 10"/>
+                    <Parameter Name="SAP_Description" Type="Edm.String" Mode="In" MaxLength="250" sap:label="Text of length 250"/>
+                    <Parameter Name="RiskRate" Type="Edm.Decimal" Mode="In" Precision="5" Scale="2" sap:label="Risk rate"/>
+                    <Parameter Name="IsUEFactor" Type="Edm.Boolean" Mode="In" sap:label="TRUE"/>
+                    <Parameter Name="CommitteeAuthRequired" Type="Edm.Boolean" Mode="In" sap:label="TRUE"/>
+                </FunctionImport>
+                <FunctionImport Name="YY1_AMOUNTOPERATIONSap_upsert" ReturnType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_AMOUNTOPERATIONType" EntitySet="YY1_AMOUNTOPERATION" m:HttpMethod="POST">
+                    <Parameter Name="ID" Type="Edm.String" Mode="In" MaxLength="10" sap:label="Numeric length 10"/>
+                    <Parameter Name="SAP_Description" Type="Edm.String" Mode="In" MaxLength="250" sap:label="Text of length 250"/>
+                    <Parameter Name="RiskRate" Type="Edm.Decimal" Mode="In" Precision="5" Scale="2" sap:label="Risk rate"/>
+                </FunctionImport>
+                <FunctionImport Name="YY1_ANTIMONEYLAUNDERINGSap_upsert" ReturnType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType" EntitySet="YY1_ANTIMONEYLAUNDERING" m:HttpMethod="POST">
+                    <Parameter Name="BusinessPartner" Type="Edm.String" Mode="In" MaxLength="10" sap:label="Text of length 10"/>
+                    <Parameter Name="SAP_Description" Type="Edm.String" Mode="In" MaxLength="80" sap:label="Text of length 80"/>
+                    <Parameter Name="Activity" Type="Edm.String" Mode="In" MaxLength="10" sap:label="Numeric length 10"/>
+                    <Parameter Name="AmountOperation" Type="Edm.String" Mode="In" MaxLength="10" sap:label="Numeric length 10"/>
+                    <Parameter Name="Antiquity" Type="Edm.String" Mode="In" MaxLength="10" sap:label="Numeric length 10"/>
+                    <Parameter Name="CountryRates" Type="Edm.String" Mode="In" MaxLength="10" sap:label="Numeric length 10"/>
+                    <Parameter Name="LegalForm" Type="Edm.String" Mode="In" MaxLength="10" sap:label="Numeric length 10"/>
+                    <Parameter Name="RepresentationType" Type="Edm.String" Mode="In" MaxLength="10" sap:label="Numeric length 10"/>
+                    <Parameter Name="Service" Type="Edm.String" Mode="In" MaxLength="10" sap:label="Numeric length 10"/>
+                    <Parameter Name="RiskRate" Type="Edm.Decimal" Mode="In" Precision="5" Scale="2" sap:label="Risk rate"/>
+                    <Parameter Name="ScoringDate" Type="Edm.DateTime" Mode="In" Precision="0" sap:label="Scoring date" sap:display-format="Date"/>
+                    <Parameter Name="ReviewDate" Type="Edm.DateTime" Mode="In" Precision="0" sap:label="Review date" sap:display-format="Date"/>
+                    <Parameter Name="RiskLevel" Type="Edm.String" Mode="In" MaxLength="10" sap:label="Numeric length 10"/>
+                    <Parameter Name="DocumentationUploaded" Type="Edm.Boolean" Mode="In" sap:label="TRUE"/>
+                    <Parameter Name="DevelopedActivity" Type="Edm.String" Mode="In" MaxLength="100" sap:label="Text of length 100"/>
+                    <Parameter Name="EstateOrigin" Type="Edm.String" Mode="In" MaxLength="100" sap:label="Text of length 100"/>
+                    <Parameter Name="GlobalConflictCheck" Type="Edm.Boolean" Mode="In" sap:label="TRUE"/>
+                    <Parameter Name="MoneyLaunderingCheck" Type="Edm.Boolean" Mode="In" sap:label="TRUE"/>
+                    <Parameter Name="WorldRiskCheck" Type="Edm.Boolean" Mode="In" sap:label="TRUE"/>
+                    <Parameter Name="OCIMembersApprovers" Type="Edm.String" Mode="In" MaxLength="500" sap:label="Text of length 500"/>
+                    <Parameter Name="OCIMembersRejectors" Type="Edm.String" Mode="In" MaxLength="500" sap:label="Text of length 500"/>
+                </FunctionImport>
+                <FunctionImport Name="YY1_ANTIQUITYSap_upsert" ReturnType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIQUITYType" EntitySet="YY1_ANTIQUITY" m:HttpMethod="POST">
+                    <Parameter Name="ID" Type="Edm.String" Mode="In" MaxLength="10" sap:label="Numeric length 10"/>
+                    <Parameter Name="SAP_Description" Type="Edm.String" Mode="In" MaxLength="250" sap:label="Text of length 250"/>
+                    <Parameter Name="RiskRate" Type="Edm.Decimal" Mode="In" Precision="5" Scale="2" sap:label="Risk rate"/>
+                </FunctionImport>
+                <FunctionImport Name="YY1_COUNTRYRATESSap_upsert" ReturnType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_COUNTRYRATESType" EntitySet="YY1_COUNTRYRATES" m:HttpMethod="POST">
+                    <Parameter Name="ID" Type="Edm.String" Mode="In" MaxLength="10" sap:label="Numeric length 10"/>
+                    <Parameter Name="SAP_Description" Type="Edm.String" Mode="In" MaxLength="250" sap:label="Text of length 250"/>
+                    <Parameter Name="RiskRate" Type="Edm.Decimal" Mode="In" Precision="5" Scale="2" sap:label="Risk rate"/>
+                    <Parameter Name="IsUECountry" Type="Edm.Boolean" Mode="In" sap:label="TRUE"/>
+                    <Parameter Name="CommitteeAuthRequired" Type="Edm.Boolean" Mode="In" sap:label="TRUE"/>
+                </FunctionImport>
+                <FunctionImport Name="YY1_LEGALFORMSap_upsert" ReturnType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_LEGALFORMType" EntitySet="YY1_LEGALFORM" m:HttpMethod="POST">
+                    <Parameter Name="ID" Type="Edm.String" Mode="In" MaxLength="10" sap:label="Numeric length 10"/>
+                    <Parameter Name="SAP_Description" Type="Edm.String" Mode="In" MaxLength="250" sap:label="Text of length 250"/>
+                    <Parameter Name="IsUEFactor" Type="Edm.Boolean" Mode="In" sap:label="TRUE"/>
+                    <Parameter Name="RiskRate" Type="Edm.Decimal" Mode="In" Precision="5" Scale="2" sap:label="Risk rate"/>
+                </FunctionImport>
+                <FunctionImport Name="YY1_REPRESENTATIONTYPESap_upsert" ReturnType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_REPRESENTATIONTYPEType" EntitySet="YY1_REPRESENTATIONTYPE" m:HttpMethod="POST">
+                    <Parameter Name="ID" Type="Edm.String" Mode="In" MaxLength="10" sap:label="Numeric length 10"/>
+                    <Parameter Name="SAP_Description" Type="Edm.String" Mode="In" MaxLength="200" sap:label="Text of length 200"/>
+                    <Parameter Name="RiskRate" Type="Edm.Decimal" Mode="In" Precision="5" Scale="2" sap:label="Risk rate"/>
+                </FunctionImport>
+                <FunctionImport Name="YY1_RISKRATESSap_upsert" ReturnType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_RISKRATESType" EntitySet="YY1_RISKRATES" m:HttpMethod="POST">
+                    <Parameter Name="ID" Type="Edm.String" Mode="In" MaxLength="10" sap:label="Numeric length 10"/>
+                    <Parameter Name="SAP_Description" Type="Edm.String" Mode="In" MaxLength="80" sap:label="Text of length 80"/>
+                    <Parameter Name="RiskRateFrom" Type="Edm.Decimal" Mode="In" Precision="3" Scale="2" sap:label="Risk rate from"/>
+                    <Parameter Name="RiskRateTo" Type="Edm.Decimal" Mode="In" Precision="5" Scale="2" sap:label="Risk rate to"/>
+                    <Parameter Name="DueDiligence" Type="Edm.String" Mode="In" MaxLength="10" sap:label="Numeric length 10"/>
+                    <Parameter Name="IsUECountry" Type="Edm.Boolean" Mode="In" sap:label="TRUE"/>
+                    <Parameter Name="DocumentationUploaded" Type="Edm.Boolean" Mode="In" sap:label="TRUE"/>
+                    <Parameter Name="FollowUp" Type="Edm.Decimal" Mode="In" Precision="3" Scale="0" sap:label="Follow up (years)"/>
+                    <Parameter Name="CommitteeAuth" Type="Edm.Boolean" Mode="In" sap:label="TRUE"/>
+                    <Parameter Name="GracePeriod" Type="Edm.Decimal" Mode="In" Precision="3" Scale="0" sap:label="Grace period (days)"/>
+                    <Parameter Name="NewLogic" Type="Edm.Boolean" Mode="In" sap:label="TRUE"/>
+                </FunctionImport>
+                <FunctionImport Name="YY1_SERVICESap_upsert" ReturnType="YY1_ANTIMONEYLAUNDERING_CDS.YY1_SERVICEType" EntitySet="YY1_SERVICE" m:HttpMethod="POST">
+                    <Parameter Name="ID" Type="Edm.String" Mode="In" MaxLength="10" sap:label="Numeric length 10"/>
+                    <Parameter Name="SAP_Description" Type="Edm.String" Mode="In" MaxLength="250" sap:label="Text of length 250"/>
+                    <Parameter Name="RiskRate" Type="Edm.Decimal" Mode="In" Precision="5" Scale="2" sap:label="Risk rate"/>
+                </FunctionImport>
+            </EntityContainer>
+            <Annotation Term="Core.SchemaVersion" String="1.0.0" xmlns="http://docs.oasis-open.org/odata/ns/edm"/>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType/Activity" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="Activity"/>
+                        <PropertyValue Property="CollectionPath" String="YY1_VH_ACTIVITY"/>
+                        <PropertyValue Property="SearchSupported" Bool="true"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="Activity"/>
+                                    <PropertyValue Property="ValueListProperty" String="ID"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="RiskRate"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="IsUEFactor"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="CommitteeAuthRequired"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="SAP_Description"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType/AmountOperation" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="Amount operation"/>
+                        <PropertyValue Property="CollectionPath" String="YY1_VH_AMOUNTOPERATION"/>
+                        <PropertyValue Property="SearchSupported" Bool="true"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="AmountOperation"/>
+                                    <PropertyValue Property="ValueListProperty" String="ID"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="RiskRate"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="SAP_Description"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="SAP_CreatedDateTime"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="SAP_CreatedByUser"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType/Antiquity" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="Antiquity"/>
+                        <PropertyValue Property="CollectionPath" String="YY1_VH_ANTIQUITY"/>
+                        <PropertyValue Property="SearchSupported" Bool="true"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="Antiquity"/>
+                                    <PropertyValue Property="ValueListProperty" String="ID"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="RiskRate"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="SAP_Description"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="SAP_CreatedDateTime"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="SAP_CreatedByUser"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType/CountryRates" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="Country rates"/>
+                        <PropertyValue Property="CollectionPath" String="YY1_VH_COUNTRYRATES"/>
+                        <PropertyValue Property="SearchSupported" Bool="true"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="CountryRates"/>
+                                    <PropertyValue Property="ValueListProperty" String="ID"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="RiskRate"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="IsUECountry"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="CommitteeAuthRequired"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="SAP_Description"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType/LegalForm" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="Legal form"/>
+                        <PropertyValue Property="CollectionPath" String="YY1_VH_LEGALFORM"/>
+                        <PropertyValue Property="SearchSupported" Bool="true"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="LegalForm"/>
+                                    <PropertyValue Property="ValueListProperty" String="ID"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="IsUEFactor"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="RiskRate"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="SAP_Description"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="SAP_CreatedDateTime"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType/RepresentationType" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="Representation type"/>
+                        <PropertyValue Property="CollectionPath" String="YY1_VH_REPRESENTATIONTYPE"/>
+                        <PropertyValue Property="SearchSupported" Bool="true"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="RepresentationType"/>
+                                    <PropertyValue Property="ValueListProperty" String="ID"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="RiskRate"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="SAP_Description"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="SAP_CreatedDateTime"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="SAP_CreatedByUser"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType/Service" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="Service"/>
+                        <PropertyValue Property="CollectionPath" String="YY1_VH_SERVICE"/>
+                        <PropertyValue Property="SearchSupported" Bool="true"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="Service"/>
+                                    <PropertyValue Property="ValueListProperty" String="ID"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="RiskRate"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="SAP_Description"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="SAP_CreatedDateTime"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="SAP_CreatedByUser"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType/RiskLevel" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="Risk rates"/>
+                        <PropertyValue Property="CollectionPath" String="YY1_VH_RISKRATES"/>
+                        <PropertyValue Property="SearchSupported" Bool="true"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="RiskLevel"/>
+                                    <PropertyValue Property="ValueListProperty" String="ID"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="RiskRateFrom"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="RiskRateTo"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="DueDiligence"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="SAP_Description"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_RISKRATESType/DueDiligence" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="Due diligence"/>
+                        <PropertyValue Property="CollectionPath" String="YY1_VH_DUEDILIGENCE"/>
+                        <PropertyValue Property="SearchSupported" Bool="true"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="DueDiligence"/>
+                                    <PropertyValue Property="ValueListProperty" String="ID"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="SAP_Description"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="SAP_CreatedDateTime"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="SAP_CreatedByUser"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="SAP_LastChangedDateTime"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERING_CDS_Entities" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ApplyMultiUnitBehaviorForSortingAndFiltering" Bool="true"/>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ACTIVITYType/ID" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_AMOUNTOPERATIONType/ID" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType/BusinessPartner" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIQUITYType/ID" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_COUNTRYRATESType/ID" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_LEGALFORMType/ID" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_REPRESENTATIONTYPEType/ID" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_RISKRATESType/ID" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_SERVICEType/ID" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_ACTIVITYType/ID" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_AMOUNTOPERATIONType/ID" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_ANTIQUITYType/ID" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_COUNTRYRATESType/ID" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_DUEDILIGENCEType/ID" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_LEGALFORMType/ID" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_REPRESENTATIONTYPEType/ID" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_RISKRATESType/ID" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_VH_SERVICEType/ID" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERING_CDS_Entities/YY1_ANTIMONEYLAUNDERING" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Capabilities.NavigationRestrictions">
+                    <Record>
+                        <PropertyValue Property="RestrictedProperties">
+                            <Collection>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to_Activity"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="true"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to_AmountOperation"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="true"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to_Antiquity"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="true"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to_CountryRates"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="true"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to_LegalForm"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="true"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to_RepresentationType"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="true"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to_RiskLevel"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="true"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to_SAPSysAdminDataChangeUser"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to_SAPSysAdminDataCreateUser"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to_Service"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="true"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to__Activity"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to__AmountOperation"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to__Antiquity"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to__CountryRates"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to__LegalForm"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to__RepresentationType"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to__RiskLevel"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to__Service"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERING_CDS_Entities/YY1_RISKRATES" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Capabilities.NavigationRestrictions">
+                    <Record>
+                        <PropertyValue Property="RestrictedProperties">
+                            <Collection>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to__DueDiligence"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ACTIVITYType" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.SemanticKey">
+                    <Collection>
+                        <PropertyPath>ID</PropertyPath>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_AMOUNTOPERATIONType" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.SemanticKey">
+                    <Collection>
+                        <PropertyPath>ID</PropertyPath>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERINGType" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.SemanticKey">
+                    <Collection>
+                        <PropertyPath>BusinessPartner</PropertyPath>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIQUITYType" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.SemanticKey">
+                    <Collection>
+                        <PropertyPath>ID</PropertyPath>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_COUNTRYRATESType" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.SemanticKey">
+                    <Collection>
+                        <PropertyPath>ID</PropertyPath>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_LEGALFORMType" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.SemanticKey">
+                    <Collection>
+                        <PropertyPath>ID</PropertyPath>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_REPRESENTATIONTYPEType" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.SemanticKey">
+                    <Collection>
+                        <PropertyPath>ID</PropertyPath>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_RISKRATESType" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.SemanticKey">
+                    <Collection>
+                        <PropertyPath>ID</PropertyPath>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_SERVICEType" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.SemanticKey">
+                    <Collection>
+                        <PropertyPath>ID</PropertyPath>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="YY1_ANTIMONEYLAUNDERING_CDS.YY1_ANTIMONEYLAUNDERING_CDS_Entities" xmlns="http://docs.oasis-open.org/odata/ns/edm"/>
+            <atom:link rel="self" href="/sap/opu/odata/sap/YY1_ANTIMONEYLAUNDERING_CDS/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+            <atom:link rel="latest-version" href="/sap/opu/odata/sap/YY1_ANTIMONEYLAUNDERING_CDS/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>

@@ -337,6 +337,17 @@
           "append_dimensions": {
             "Process": "parallel-adverse-media-monitor-cron"
           }
+        },
+        {
+          "pid_file": "/var/run/parallel-sap-profile-polling-cron.pid",
+          "measurement": [
+            "cpu_usage",
+            "memory_rss"
+          ],
+          "metrics_collection_interval": 10,
+          "append_dimensions": {
+            "Process": "parallel-sap-profile-polling-cron"
+          }
         }
       ]
     }

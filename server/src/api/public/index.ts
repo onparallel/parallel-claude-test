@@ -4904,7 +4904,11 @@ export function publicApi(container: Container) {
               $profileId: GID!
               $profileTypeFieldId: GID!
             ) {
-              deleteProfileFieldFile(profileId: $profileId, profileTypeFieldId: $profileTypeFieldId)
+              deleteProfileFieldFile(
+                profileId: $profileId
+                profileTypeFieldId: $profileTypeFieldId
+                source: PARALLEL_API
+              )
             }
           `,
         ];
@@ -5045,7 +5049,7 @@ export function publicApi(container: Container) {
       async ({ client, params }) => {
         const _mutation = gql`
           mutation deleteProfile_deleteProfile($profileId: GID!) {
-            deleteProfile(profileIds: [$profileId], force: true)
+            deleteProfile(profileIds: [$profileId], force: true, source: PARALLEL_API)
           }
         `;
 
@@ -5088,7 +5092,7 @@ export function publicApi(container: Container) {
           $includeRelationships: Boolean!
           $includeSubscribers: Boolean!
         ) {
-          closeProfile(profileIds: [$profileId]) {
+          closeProfile(profileIds: [$profileId], source: PARALLEL_API) {
             ...Profile
           }
         }
@@ -5308,7 +5312,11 @@ export function publicApi(container: Container) {
             $profileId: GID!
             $relationships: [CreateProfileRelationshipInput!]!
           ) {
-            createProfileRelationship(profileId: $profileId, relationships: $relationships) {
+            createProfileRelationship(
+              profileId: $profileId
+              relationships: $relationships
+              source: PARALLEL_API
+            ) {
               id
               relationships {
                 ...ProfileRelationship
@@ -5378,6 +5386,7 @@ export function publicApi(container: Container) {
             removeProfileRelationship(
               profileId: $profileId
               profileRelationshipIds: [$profileRelationshipId]
+              source: PARALLEL_API
             )
           }
         `;

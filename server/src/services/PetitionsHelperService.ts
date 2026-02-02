@@ -603,15 +603,18 @@ export class PetitionsHelperService {
               },
             });
 
-            await this.profiles.createEvent({
-              type: "PETITION_DISASSOCIATED",
-              org_id: user.org_id,
-              profile_id: disassociated.profile_id,
-              data: {
-                user_id: user.id,
-                petition_id: disassociated.petition_id,
+            await this.profiles.createEvent(
+              {
+                type: "PETITION_DISASSOCIATED",
+                org_id: user.org_id,
+                profile_id: disassociated.profile_id,
+                data: {
+                  user_id: user.id,
+                  petition_id: disassociated.petition_id,
+                },
               },
-            });
+              "MANUAL",
+            );
           }
         }
         // if parent reply already exists on petition, make sure to delete every old reply
