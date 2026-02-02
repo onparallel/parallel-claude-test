@@ -1,0 +1,123 @@
+name: Claude Documentation Check
+
+on:
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  docs-check:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get PR diff
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          git diff origin/${{ github.base_ref }}...HEAD > /tmp/pr-diff.txt
+          echo "Diff file created"
+
+      - name: Run Claude Documentation Check
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          show_full_output: true
+          settings: |
+            {
+              "permissions": {
+                "allow": [
+                  "Bash(gh pr:*)",
+                  "Bash(echo:*)",
+                  "Read(*)",
+                  "Write(*)"
+                ]
+              }
+            }
+          prompt: |
+            You are a documentation reviewer for PR #${{ github.event.pull_request.number }} in ${{ github.repository }}.
+
+            ## Your Task
+            Check if the code changes in this PR affect any functionality that is documented in /docs/core/.
+            If changes affect documented behavior, suggest documentation updates.
+
+            ## Steps
+
+            ### STEP 1: Read the PR diff
+            Read /tmp/pr-diff.txt to understand what code changed.
+
+            ### STEP 2: Read existing documentation
+            Read all files in /docs/core/ to understand what is documented.
+            Focus on understanding:
+            - What tables/entities are documented
+            - What workflows/features are documented
+            - What API endpoints or behaviors are documented
+
+            ### STEP 3: Analyze impact
+            Determine if the code changes affect any documented functionality:
+            - New fields added to documented tables
+            - Changed behavior of documented features
+            - New API endpoints that should be documented
+            - Removed or renamed entities
+
+            ### STEP 4: Write result file
+            Write to /tmp/docs-result.txt:
+            - "NEEDS_UPDATE" if documentation needs to be updated
+            - "OK" if no documentation changes are needed
+
+            ### STEP 5: Post review comment
+            Use: gh pr comment ${{ github.event.pull_request.number }} --body "YOUR_ANALYSIS"
+
+            Format your comment as:
+
+            ## 📚 Documentation Review
+
+            ### Analysis
+            [Brief description of what code changed and whether it affects documentation]
+
+            ### Documentation Status
+            - ✅ No documentation updates needed (if OK)
+            - ❌ Documentation updates required (if NEEDS_UPDATE)
+
+            ### Suggested Changes (if NEEDS_UPDATE)
+            For each file that needs updates, provide the suggested change using this exact format:
+
+            **File: `docs/core/path/to/file.md`**
+            ```suggestion
+            [The new or modified content that should be added/changed]
+            ```
+
+            IMPORTANT for suggestions:
+            - Follow the existing documentation style (concise, no column details)
+            - Use tables for summaries when appropriate
+            - Use ## headers for sections
+            - Keep descriptions brief and focused on purpose, not implementation
+            - Reference related tables/features when relevant
+
+      - name: Check documentation status
+        run: |
+          if [ -f /tmp/docs-result.txt ]; then
+            RESULT=$(cat /tmp/docs-result.txt)
+            echo "Documentation check result: $RESULT"
+            if [ "$RESULT" = "NEEDS_UPDATE" ]; then
+              echo "❌ Documentation updates required - failing check"
+              exit 1
+            else
+              echo "✅ Documentation is up to date"
+            fi
+          else
+            echo "⚠️ Result file not found, assuming OK"
+          fi
+
+concurrency:
+  group: ${{ github.ref }}-docs-check
+  cancel-in-progress: true
