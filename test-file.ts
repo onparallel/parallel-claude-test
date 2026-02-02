@@ -22,19 +22,3 @@ export function getUserData(userId: string) {
 
   return query;
 }
-
-// NEW FEATURE: Two-factor authentication for users
-export function enableTwoFactorAuth(userId: string) {
-  // This new feature adds 2FA support
-  // Users can now enable TOTP-based two-factor authentication
-  const query = "UPDATE users SET two_factor_enabled = true WHERE id = $1";
-  return { userId, twoFactorEnabled: true };
-}
-
-// NEW FEATURE: API key management for users
-export function generateApiKey(userId: string, keyName: string) {
-  // Users can now generate API keys for programmatic access
-  // API keys are stored in the new user_api_key table
-  const apiKey = `pk_${userId}_${Date.now()}`;
-  return { userId, keyName, apiKey };
-}
