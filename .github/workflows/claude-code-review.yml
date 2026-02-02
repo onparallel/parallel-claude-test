@@ -20,18 +20,38 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Create MCP Config
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cat > /tmp/mcp-config.json << EOF
+          {
+            "mcpServers": {
+              "github": {
+                "command": "npx",
+                "args": ["-y", "@modelcontextprotocol/server-github"],
+                "env": {
+                  "GITHUB_PERSONAL_ACCESS_TOKEN": "${GH_TOKEN}"
+                }
+              }
+            }
+          }
+          EOF
+
       - name: Run Claude Code Review
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           show_full_output: true
-          additional_permissions: |
-            gh pr *
-            gh api *
+          claude_args: |
+            --mcp-config /tmp/mcp-config.json
+            --allowedTools mcp__github__*
           prompt: |
             You are a code reviewer. Review this pull request and leave comments directly on the PR.
 
-            IMPORTANT: You MUST leave review comments on the PR for any issues you find.
+            Use the GitHub MCP tools to create review comments:
+            - Use mcp__github__create_pull_request_review to submit a review with comments
+            - Use mcp__github__get_pull_request_diff to see the changes
 
             Look for these issues and comment on them:
             1. SQL injection vulnerabilities (string concatenation in queries)
@@ -41,7 +61,6 @@ jobs:
             5. Security issues
 
             For each issue found, create a review comment on the specific line.
-            Use GitHub's suggestion feature when you can provide a fix.
 
 concurrency:
   group: ${{ github.ref }}-claude-review
