@@ -28,6 +28,7 @@ jobs:
           echo "Diff file created"
 
       - name: Run Claude Code Review
+        id: claude-review
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -40,7 +41,9 @@ jobs:
                   "Bash(gh pr:*)",
                   "Bash(gh api:*)",
                   "Bash(git:*)",
+                  "Bash(echo:*)",
                   "Read(*)",
+                  "Write(*)",
                   "mcp__github__*"
                 ],
                 "deny": []
@@ -52,26 +55,55 @@ jobs:
             STEP 1: Read the diff file at /tmp/pr-diff.txt to see what changed.
 
             STEP 2: Review the changed files and look for these issues:
-            1. SQL injection vulnerabilities (string concatenation in queries) - CRITICAL
-            2. console.log statements (should not be in production code)
-            3. Unused variables
-            4. 'let' that should be 'const' (when variable is never reassigned)
-            5. Security issues
 
-            STEP 3: After your analysis, post a comment on the PR using:
+            CRITICAL ISSUES (will fail the PR check):
+            - SQL injection vulnerabilities (string concatenation in queries)
+            - Security vulnerabilities (XSS, command injection, etc.)
+            - Data loss risks
+            - Production-breaking bugs
+            - Hardcoded secrets or credentials
+
+            CODE QUALITY ISSUES (suggestions only, won't fail):
+            - console.log statements (should not be in production code)
+            - Unused variables
+            - 'let' that should be 'const'
+            - Performance improvements
+            - Code style suggestions
+
+            STEP 3: Write a file /tmp/review-result.txt with ONLY one of these two values:
+            - "CRITICAL" if you found any critical issues
+            - "OK" if you only found suggestions or no issues
+
+            STEP 4: Post a comment on the PR using:
             gh pr comment ${{ github.event.pull_request.number }} --body "YOUR_REVIEW_HERE"
 
             Format your review as:
             ## Code Review Summary
 
-            ### Critical Issues (if any)
-            - List critical issues here
+            ### ❌ Critical Issues (if any)
+            - List critical issues here with file:line references
 
-            ### Code Quality Issues
-            - List other issues here
-
-            ### Suggestions
+            ### ⚠️ Code Quality Issues (if any)
             - List suggestions here
+
+            ### ✅ Verdict
+            - If critical issues: "This PR should NOT be merged until critical issues are fixed."
+            - If only suggestions: "This PR can be merged. Consider addressing the suggestions above."
+
+      - name: Check for critical issues
+        run: |
+          if [ -f /tmp/review-result.txt ]; then
+            RESULT=$(cat /tmp/review-result.txt)
+            echo "Review result: $RESULT"
+            if [ "$RESULT" = "CRITICAL" ]; then
+              echo "❌ Critical issues found - failing the check"
+              exit 1
+            else
+              echo "✅ No critical issues found"
+            fi
+          else
+            echo "⚠️ Review result file not found, assuming OK"
+          fi
 
 concurrency:
   group: ${{ github.ref }}-claude-review
