@@ -46,7 +46,8 @@ jobs:
                   "Bash(echo:*)",
                   "Bash(cat:*)",
                   "Read(*)",
-                  "Write(*)"
+                  "Write(*)",
+                  "Edit(*)"
                 ]
               }
             }
