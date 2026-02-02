@@ -20,11 +20,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get PR diff
+      - name: Get PR info
+        id: pr-info
         run: |
           git fetch origin ${{ github.base_ref }}
           git diff origin/${{ github.base_ref }}...HEAD > /tmp/pr-diff.txt
-          echo "Diff file created"
+          echo "head_sha=${{ github.event.pull_request.head.sha }}" >> $GITHUB_OUTPUT
 
       - name: Run Claude Documentation Check
         uses: anthropics/claude-code-action@v1
@@ -36,8 +37,10 @@ jobs:
             {
               "permissions": {
                 "allow": [
+                  "Bash(gh api:*)",
                   "Bash(gh pr:*)",
                   "Bash(echo:*)",
+                  "Bash(cat:*)",
                   "Read(*)",
                   "Write(*)"
                 ]
@@ -46,9 +49,10 @@ jobs:
           prompt: |
             You are a documentation reviewer for PR #${{ github.event.pull_request.number }} in ${{ github.repository }}.
 
+            HEAD_SHA: ${{ steps.pr-info.outputs.head_sha }}
+
             ## Your Task
-            Check if the code changes in this PR affect any functionality that is documented in /docs/core/.
-            If changes affect documented behavior, suggest documentation updates.
+            Check if code changes affect documented functionality and suggest documentation updates.
 
             ## Steps
 
@@ -56,59 +60,82 @@ jobs:
             Read /tmp/pr-diff.txt to understand what code changed.
 
             ### STEP 2: Read existing documentation
-            Read all files in /docs/core/ to understand what is documented.
-            Focus on understanding:
-            - What tables/entities are documented
-            - What workflows/features are documented
-            - What API endpoints or behaviors are documented
+            Read files in /docs/core/ to understand what is documented.
 
             ### STEP 3: Analyze impact
-            Determine if the code changes affect any documented functionality:
-            - New fields added to documented tables
+            Determine if changes affect documented functionality:
+            - New features that should be documented
             - Changed behavior of documented features
-            - New API endpoints that should be documented
-            - Removed or renamed entities
+            - New API endpoints or tables
+            - New user roles or permissions
 
-            ### STEP 4: Write result file
-            Write to /tmp/docs-result.txt:
-            - "NEEDS_UPDATE" if documentation needs to be updated
-            - "OK" if no documentation changes are needed
+            ### STEP 4: Create documentation suggestions
+            If documentation needs updates, you have two options:
 
-            ### STEP 5: Post review comment
-            Use: gh pr comment ${{ github.event.pull_request.number }} --body "YOUR_ANALYSIS"
+            OPTION A - If docs file exists and needs modification:
+            Create a review with inline suggestions on the existing docs file:
 
-            Format your comment as:
-
-            ## 📚 Documentation Review
-
-            ### Analysis
-            [Brief description of what code changed and whether it affects documentation]
-
-            ### Documentation Status
-            - ✅ No documentation updates needed (if OK)
-            - ❌ Documentation updates required (if NEEDS_UPDATE)
-
-            ### Suggested Changes (if NEEDS_UPDATE)
-            For each file that needs updates, provide the suggested change using this exact format:
-
-            **File: `docs/core/path/to/file.md`**
-            ```suggestion
-            [The new or modified content that should be added/changed]
+            ```bash
+            gh api -X POST /repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews \
+              --field body="📚 Documentation updates needed" \
+              --field commit_id="${{ steps.pr-info.outputs.head_sha }}" \
+              --field event="REQUEST_CHANGES" \
+              --field comments='[
+                {
+                  "path": "docs/core/users/users.md",
+                  "line": 15,
+                  "body": "Add the new feature here:\n\n```suggestion\nexisting line\n- New feature: Two-factor authentication\n```"
+                }
+              ]'
             ```
 
-            IMPORTANT for suggestions:
-            - Follow the existing documentation style (concise, no column details)
-            - Use tables for summaries when appropriate
+            OPTION B - If documentation file doesn't exist or needs new sections:
+            First, create a commit with the new documentation:
+
+            1. Create/modify the documentation file using the Write tool
+            2. Then create a commit:
+            ```bash
+            git add docs/
+            git commit -m "docs: add documentation for new features"
+            git push
+            ```
+
+            DOCUMENTATION STYLE RULES:
+            - Keep descriptions brief and focused on PURPOSE, not implementation
+            - Use tables for summaries (| Column | Description |)
             - Use ## headers for sections
-            - Keep descriptions brief and focused on purpose, not implementation
-            - Reference related tables/features when relevant
+            - Don't list database columns - just describe what the table/feature does
+            - Reference related features when relevant
+
+            ### STEP 5: Write result file
+            Write to /tmp/docs-result.txt:
+            - "NEEDS_UPDATE" if documentation needs to be updated
+            - "OK" if no documentation changes needed
+
+            ### STEP 6: Post summary comment
+            Always post a summary using:
+            ```bash
+            gh pr comment ${{ github.event.pull_request.number }} --body "YOUR_SUMMARY"
+            ```
+
+            Format:
+            ## 📚 Documentation Review
+
+            ### Status
+            ✅ No updates needed / ❌ Updates required
+
+            ### Changes detected
+            - [List features that need documentation]
+
+            ### Actions taken
+            - [What suggestions/commits were created]
 
       - name: Check documentation status
         run: |
           if [ -f /tmp/docs-result.txt ]; then
             RESULT=$(cat /tmp/docs-result.txt)
             echo "Documentation check result: $RESULT"
-            if [ "$RESULT" = "NEEDS_UPDATE" ]; then
+            if echo "$RESULT" | grep -q "NEEDS_UPDATE"; then
               echo "❌ Documentation updates required - failing check"
               exit 1
             else
