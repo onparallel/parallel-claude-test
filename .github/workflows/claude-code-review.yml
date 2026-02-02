@@ -20,15 +20,34 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Get PR diff
+        id: diff
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          git diff origin/${{ github.base_ref }}...HEAD > /tmp/pr-diff.txt
+          echo "Diff saved to /tmp/pr-diff.txt"
+
       - name: Run Claude Code Review
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          show_full_output: true
           prompt: |
-            Review this pull request following the guidelines in CLAUDE.md.
-            Focus on critical issues that could affect security, data integrity, or production stability.
-            Also flag obvious code quality issues like using 'let' when 'const' should be used,
-            console.log statements left in production code, unused variables, etc.
+            Review the code changes in this pull request.
+
+            The changed files are in this repository. Use the Read tool to examine them.
+            Look at the git diff to understand what changed.
+
+            Issues to look for:
+            1. SQL injection (string concatenation in SQL queries) - CRITICAL
+            2. console.log statements left in code
+            3. Unused variables
+            4. Using 'let' when 'const' would be better
+            5. Security vulnerabilities
+
+            After reviewing, provide a summary of issues found as a comment.
+            If you find CRITICAL issues, clearly mark them.
 
 concurrency:
   group: ${{ github.ref }}-claude-review
