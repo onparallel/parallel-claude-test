@@ -10,7 +10,7 @@ jobs:
     name: Documentation Check
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
       id-token: write
 
@@ -19,13 +19,18 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get PR info
-        id: pr-info
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Get PR diff
         run: |
           git fetch origin ${{ github.base_ref }}
           git diff origin/${{ github.base_ref }}...HEAD > /tmp/pr-diff.txt
-          echo "head_sha=${{ github.event.pull_request.head.sha }}" >> $GITHUB_OUTPUT
 
       - name: Run Claude Documentation Check
         uses: anthropics/claude-code-action@v1
@@ -37,7 +42,7 @@ jobs:
             {
               "permissions": {
                 "allow": [
-                  "Bash(gh api:*)",
+                  "Bash(git:*)",
                   "Bash(gh pr:*)",
                   "Bash(echo:*)",
                   "Bash(cat:*)",
@@ -49,10 +54,8 @@ jobs:
           prompt: |
             You are a documentation reviewer for PR #${{ github.event.pull_request.number }} in ${{ github.repository }}.
 
-            HEAD_SHA: ${{ steps.pr-info.outputs.head_sha }}
-
             ## Your Task
-            Check if code changes affect documented functionality and suggest documentation updates.
+            Check if code changes affect documented functionality. If yes, UPDATE the documentation directly with a commit.
 
             ## Steps
 
@@ -69,51 +72,35 @@ jobs:
             - New API endpoints or tables
             - New user roles or permissions
 
-            ### STEP 4: Create documentation suggestions
-            If documentation needs updates, you have two options:
+            ### STEP 4: Update documentation (if needed)
+            If documentation needs updates:
 
-            OPTION A - If docs file exists and needs modification:
-            Create a review with inline suggestions on the existing docs file:
+            1. Use the Write tool to update the documentation files
+            2. Follow these STYLE RULES:
+               - Keep descriptions brief and focused on PURPOSE
+               - Use tables for summaries (| Column | Description |)
+               - Use ## headers for sections
+               - Don't list database columns - describe what the feature does
+               - Reference related features when relevant
 
-            ```bash
-            gh api -X POST /repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews \
-              --field body="📚 Documentation updates needed" \
-              --field commit_id="${{ steps.pr-info.outputs.head_sha }}" \
-              --field event="REQUEST_CHANGES" \
-              --field comments='[
-                {
-                  "path": "docs/core/users/users.md",
-                  "line": 15,
-                  "body": "Add the new feature here:\n\n```suggestion\nexisting line\n- New feature: Two-factor authentication\n```"
-                }
-              ]'
-            ```
-
-            OPTION B - If documentation file doesn't exist or needs new sections:
-            First, create a commit with the new documentation:
-
-            1. Create/modify the documentation file using the Write tool
-            2. Then create a commit:
+            3. Commit and push the changes:
             ```bash
             git add docs/
-            git commit -m "docs: add documentation for new features"
+            git commit -m "docs: update documentation for new features
+
+            - [List what was documented]
+
+            Co-Authored-By: Claude <noreply@anthropic.com>"
             git push
             ```
 
-            DOCUMENTATION STYLE RULES:
-            - Keep descriptions brief and focused on PURPOSE, not implementation
-            - Use tables for summaries (| Column | Description |)
-            - Use ## headers for sections
-            - Don't list database columns - just describe what the table/feature does
-            - Reference related features when relevant
-
             ### STEP 5: Write result file
             Write to /tmp/docs-result.txt:
-            - "NEEDS_UPDATE" if documentation needs to be updated
+            - "UPDATED" if you made documentation changes
             - "OK" if no documentation changes needed
+            - "NEEDS_UPDATE" if docs need updates but you couldn't make them
 
             ### STEP 6: Post summary comment
-            Always post a summary using:
             ```bash
             gh pr comment ${{ github.event.pull_request.number }} --body "YOUR_SUMMARY"
             ```
@@ -122,13 +109,12 @@ jobs:
             ## 📚 Documentation Review
 
             ### Status
-            ✅ No updates needed / ❌ Updates required
+            - ✅ Documentation is up to date
+            - 📝 Documentation updated (committed)
+            - ❌ Documentation needs manual update
 
-            ### Changes detected
-            - [List features that need documentation]
-
-            ### Actions taken
-            - [What suggestions/commits were created]
+            ### Changes Made (if updated)
+            - [List what was added/changed in docs]
 
       - name: Check documentation status
         run: |
@@ -136,10 +122,10 @@ jobs:
             RESULT=$(cat /tmp/docs-result.txt)
             echo "Documentation check result: $RESULT"
             if echo "$RESULT" | grep -q "NEEDS_UPDATE"; then
-              echo "❌ Documentation updates required - failing check"
+              echo "❌ Documentation updates required but not made - failing check"
               exit 1
             else
-              echo "✅ Documentation is up to date"
+              echo "✅ Documentation is OK or was updated"
             fi
           else
             echo "⚠️ Result file not found, assuming OK"
