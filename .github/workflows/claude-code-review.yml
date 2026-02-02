@@ -1,0 +1,35 @@
+name: Claude Code Review
+
+on:
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  claude-review:
+    name: Claude Code Review
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Claude Code Review
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Review this pull request following the guidelines in CLAUDE.md.
+            Focus on critical issues that could affect security, data integrity, or production stability.
+            Also flag obvious code quality issues like using 'let' when 'const' should be used,
+            console.log statements left in production code, unused variables, etc.
+
+concurrency:
+  group: ${{ github.ref }}-claude-review
+  cancel-in-progress: true
