@@ -2,11 +2,11 @@ name: Server tests
 
 on:
   push:
-    branches: [master]
+    branches: [develop]
     paths:
       - "server/**"
   pull_request:
-    branches: [master]
+    branches: [develop]
     paths:
       - "server/**"
 

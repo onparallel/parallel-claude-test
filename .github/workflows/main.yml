@@ -2,13 +2,13 @@ name: Code linting
 
 on:
   push:
-    branches: [master]
+    branches: [develop]
     paths-ignore:
       - "docs/**"
       - "ops/**"
 
   pull_request:
-    branches: [master]
+    branches: [develop]
     paths-ignore:
       - "docs/**"
       - "ops/**"
