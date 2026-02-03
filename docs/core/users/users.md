@@ -40,3 +40,24 @@ Users have roles that determine their permissions:
 - **Admin**: Full access to all features
 - **User**: Standard access
 - **Guest**: Read-only access
+
+---
+
+## 4. User Management
+
+### Delete User
+
+Allows deletion of users from the system. Deletion is scoped to the organization to maintain multi-tenancy isolation.
+
+**Purpose**: Remove user accounts while ensuring data remains isolated by organization.
+
+### Bulk Import Users
+
+Enables importing multiple users at once into an organization.
+
+**Purpose**: Streamline onboarding when adding multiple users simultaneously (e.g., during team migration or initial setup).
+
+| Feature | Description |
+|---------|-------------|
+| Delete User | Remove a user account from an organization |
+| Bulk Import | Import multiple users into an organization at once |
