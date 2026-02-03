@@ -531,6 +531,7 @@ export function getOsborneSapSettings({
                         operator: "eq",
                         right: { type: "literal", value: "'{{businessPartnerId}}'" },
                       },
+                      ...(projectFilter ? [projectFilter] : []),
                     ],
                   },
                   filterParams: {

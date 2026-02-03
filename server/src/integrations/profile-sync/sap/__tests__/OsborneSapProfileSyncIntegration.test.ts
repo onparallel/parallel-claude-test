@@ -129,6 +129,15 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
             type: "SHORT_TEXT",
             is_unique: true,
           },
+          ...(profileTypeId === individual.id
+            ? [
+                {
+                  name: { en: "Full name", es: "Nombre completo" },
+                  alias: "full_name",
+                  type: "SHORT_TEXT",
+                } as const,
+              ]
+            : []),
           ...(profileTypeId === legalEntity.id
             ? [
                 {
@@ -362,7 +371,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
           country: individualFields["p_country_of_residence"].id,
           email: individualFields["p_email"].id,
           phone: individualFields["p_phone_number"].id,
-          name: individualFields["p_first_name"].id,
+          name: individualFields["full_name"].id,
           taxNumber: individualFields["p_tax_id"].id,
           clientStatus: individualFields["oc_client_status"].id,
           isNewClient: individualFields["is_new_client"].id,
@@ -383,7 +392,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
           addressId: legalEntityFields["p_registered_address"].id,
           city: legalEntityFields["p_city"].id,
           postalCode: legalEntityFields["p_zip"].id,
-          country: legalEntityFields["p_country_of_incorporation"].id,
+          country: legalEntityFields["p_country"].id,
           phone: legalEntityFields["p_phone_number"].id,
           name: legalEntityFields["p_entity_name"].id,
           taxNumber: legalEntityFields["p_tax_id"].id,
@@ -505,7 +514,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
               is_new_client: "NO",
               oc_client_status: "_01",
               p_tax_id: "ESB67505586",
-              p_first_name: "Parallel - Pruebas locales  NO TOCAR",
+              full_name: "Parallel - Pruebas locales  NO TOCAR",
               p_address: "C/Noguera Pallaresa 43",
               p_city: "Madrid",
               p_zip: "08014",
@@ -540,7 +549,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
               is_new_client: "YES",
               oc_client_status: "_05",
               p_city: "Barcelona",
-              p_country_of_incorporation: "ES",
+              p_country: "ES",
               p_entity_name: "Parallel - Pruebas locales  NO TOCAR",
               p_entity_type: "LIMITED_LIABILITY_COMPANY",
               p_registered_address: "C/...",
@@ -630,10 +639,10 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
       expect(fileUploadSpy).toHaveBeenCalledTimes(3);
     }, 60_000);
 
-    it.skip(
-      "initialSync with bulk data BusinessPartner le '1001500'",
+    it(
+      "initialSync with bulk data BusinessPartner le '1001500' and projects created after 2025-01-01",
       async () => {
-        // There are 2000 BPs with ID le '1001500', excluding '3'
+        // There are 2000 BPs with ID le '1001500'
         const orgIntegration = await createSapIntegration(
           getOsborneSapSettings({
             ...osborneSettings,
@@ -644,11 +653,6 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
                   left: { type: "property", name: "BusinessPartner" },
                   operator: "le",
                   right: { type: "literal", value: "'1001500'" },
-                },
-                {
-                  left: { type: "property", name: "BusinessPartner" },
-                  operator: "ne",
-                  right: { type: "literal", value: "'3'" },
                 },
               ],
             },
@@ -661,9 +665,9 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
                   right: { type: "literal", value: "'1001500'" },
                 },
                 {
-                  left: { type: "property", name: "Customer" },
-                  operator: "ne",
-                  right: { type: "literal", value: "'3'" },
+                  left: { type: "property", name: "CreatedOn" },
+                  operator: "ge",
+                  right: { type: "literal", value: "datetime'2025-01-01T00:00:00'" },
                 },
               ],
             },
@@ -682,7 +686,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
         const legalEntityProfiles = profiles.filter((p) => p.profile_type_id === legalEntity.id);
         const matterProfiles = profiles.filter((p) => p.profile_type_id === matter.id);
 
-        expect(individualProfiles.length + legalEntityProfiles.length).toBe(2000);
+        expect(individualProfiles.length + legalEntityProfiles.length).toBe(2001);
         expect(matterProfiles.length).toBe(1759);
 
         const syncLog = await mocks.knex
