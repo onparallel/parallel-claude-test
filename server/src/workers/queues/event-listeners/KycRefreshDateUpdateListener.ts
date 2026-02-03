@@ -198,6 +198,60 @@ const CONFIG: Config[] =
               },
             ],
           },
+          // Addleshaw Goddard
+          {
+            orgId: 45316,
+            profileTypes: [
+              // Individuals
+              {
+                profileTypeId: 11321,
+                statusProfileTypeFieldId: 197392,
+                clientStatusValuesForKycRefresh: ["ACTIVE"],
+                riskProfileTypeFieldId: 197385,
+                lastKycDateProfileTypeFieldId: 201690,
+                nextKycDateProfileTypeFieldId: 201689,
+                dateIntervalsByRisk: {
+                  HIGH: { years: 1 },
+                  MEDIUM: { years: 4 },
+                  LOW: { years: 5 },
+                },
+              },
+              // Companies
+              {
+                profileTypeId: 11322,
+                statusProfileTypeFieldId: 197424,
+                clientStatusValuesForKycRefresh: ["ACTIVE"],
+                riskProfileTypeFieldId: 197411,
+                lastKycDateProfileTypeFieldId: 201691,
+                nextKycDateProfileTypeFieldId: 201692,
+                dateIntervalsByRisk: {
+                  HIGH: { years: 1 },
+                  MEDIUM: { years: 4 },
+                  LOW: { years: 5 },
+                },
+              },
+            ],
+          },
+          // Ability 5
+          {
+            orgId: 45335,
+            profileTypes: [
+              // Portfolio companies
+              {
+                profileTypeId: 11389,
+                statusProfileTypeFieldId: 199520,
+                clientStatusValuesForKycRefresh: ["ACTIVE"],
+                riskProfileTypeFieldId: 199507,
+                lastKycDateProfileTypeFieldId: 200543,
+                nextKycDateProfileTypeFieldId: 200544,
+                dateIntervalsByRisk: {
+                  HIGH: { years: 1 },
+                  MEDIUM: { years: 3 },
+                  LOW: { years: 5 },
+                },
+              },
+            ],
+          },
         ]
       : [];
 
