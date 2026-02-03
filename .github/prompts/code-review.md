@@ -21,45 +21,71 @@ Read the DIFF_FILE provided in the context to understand what changed.
 - console.log statements
 - Unused variables
 - let that should be const
-- Performance issues
 
 ### STEP 3: Create review with inline suggestions
 
-For each issue, create a GitHub review with inline suggestions. Use the PR_NUMBER, REPOSITORY, and HEAD_SHA from the context.
+**IMPORTANT: Use a JSON file to avoid shell escaping issues.**
 
-```bash
-gh api -X POST /repos/{REPOSITORY}/pulls/{PR_NUMBER}/reviews \
-  --field body="Review summary here" \
-  --field commit_id="{HEAD_SHA}" \
-  --field event="REQUEST_CHANGES" \
-  --field comments='[
-    {
-      "path": "path/to/file.ts",
-      "line": 25,
-      "body": "Issue description\n\n```suggestion\nfixed code here\n```"
-    }
-  ]'
-```
+1. First, create a JSON file with the review payload using the Write tool to write to /tmp/review.json
 
-**IMPORTANT:**
-- Use "line" (not "position") - the actual line number in the NEW file
-- Use event="REQUEST_CHANGES" for critical issues, "COMMENT" for suggestions only
-- The suggestion block must contain the EXACT replacement code for that line
-- Multiple lines can be suggested using "start_line" and "line" together
-
-### STEP 4: Write result file
-
-Write to /tmp/review-result.txt:
-- "CRITICAL" if you found critical issues
-- "OK" if only minor suggestions or no issues
-
-## Multi-line Suggestion Example
-
+The JSON structure must be:
 ```json
 {
-  "path": "file.ts",
-  "start_line": 10,
-  "line": 12,
-  "body": "Replace these lines:\n\n```suggestion\nline 10 replacement\nline 11 replacement\nline 12 replacement\n```"
+  "body": "## Code Review Summary\n\nDescription of issues...",
+  "event": "REQUEST_CHANGES",
+  "comments": [
+    {
+      "path": "src/file.ts",
+      "line": 14,
+      "body": "**Issue title**\n\n```suggestion\nthe fixed code for this line\n```"
+    }
+  ]
 }
+```
+
+2. Then submit the review:
+```bash
+gh api -X POST /repos/{REPOSITORY}/pulls/{PR_NUMBER}/reviews --input /tmp/review.json
+```
+
+**Rules for the comments array:**
+- "path": relative path to the file from repo root
+- "line": the line number in the NEW version of the file
+- "start_line": (optional) for multi-line suggestions
+- "body": must include a ```suggestion block with the EXACT replacement code
+
+**The suggestion block replaces the entire line(s). Include only what should appear after the fix.**
+
+### STEP 4: Write result file
+Write to /tmp/review-result.txt:
+- "CRITICAL" if you found critical issues
+- "OK" if only suggestions or no issues
+
+## Complete Example
+
+For a file with SQL injection on line 14:
+
+/tmp/review.json:
+```json
+{
+  "body": "## Code Review\n\n### Critical Issues Found\n\n1. **SQL Injection** on line 14 - using string concatenation\n2. **Missing org_id** on line 22 - multi-tenancy violation",
+  "event": "REQUEST_CHANGES",
+  "comments": [
+    {
+      "path": "src/user-service.ts",
+      "line": 14,
+      "body": "🚨 **SQL Injection Vulnerability**\n\nUsing string concatenation with user input. Use parameterized queries.\n\n```suggestion\n  const query = \"SELECT * FROM users WHERE id = $1\";\n```"
+    },
+    {
+      "path": "src/user-service.ts",
+      "line": 22,
+      "body": "🚨 **Multi-tenancy Violation**\n\nMissing org_id filter.\n\n```suggestion\n  const query = \"UPDATE users SET email = $1 WHERE id = $2 AND org_id = $3\";\n```"
+    }
+  ]
+}
+```
+
+Then run:
+```bash
+gh api -X POST /repos/{REPOSITORY}/pulls/{PR_NUMBER}/reviews --input /tmp/review.json
 ```
