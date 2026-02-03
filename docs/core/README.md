@@ -7,7 +7,9 @@ Documentation of the main entities and features.
 | Folder | Description |
 |--------|-------------|
 | [users/](./users/) | User management and authentication |
+| [products/](./products/) | Product management and pricing |
 
 ## Quick Links
 
 - [Users Documentation](./users/users.md)
+- [Products Documentation](./products/products.md)
