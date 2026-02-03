@@ -1,0 +1,45 @@
+name: Merge develop to staging
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: '¿Confirmar merge de develop a staging?'
+        required: true
+        type: boolean
+        default: false
+  # schedule:
+  #   - cron: '0 23 * * *'
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'schedule' || inputs.confirm == true }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: staging
+      
+      - name: Merge develop into staging via API
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              const result = await github.rest.repos.merge({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                base: 'staging',
+                head: 'develop',
+                commit_message: 'Merge develop into staging'
+              });
+              console.log('Merge successful:', result.data.sha);
+            } catch (error) {
+              if (error.status === 409) {
+                console.log('No changes to merge or conflict detected');
+              } else {
+                throw error;
+              }
+            }
