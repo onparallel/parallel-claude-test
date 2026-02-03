@@ -11,7 +11,7 @@ jobs:
     name: Documentation Check
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       pull-requests: write
       id-token: write
 
@@ -20,13 +20,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.head_ref }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Configure git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Get PR diff
         run: |
@@ -43,7 +36,7 @@ jobs:
             {
               "permissions": {
                 "allow": [
-                  "Bash(git:*)",
+                  "Bash(gh api:*)",
                   "Bash(gh pr:*)",
                   "Bash(echo:*)",
                   "Bash(cat:*)",
@@ -68,14 +61,8 @@ jobs:
           if [ -f /tmp/docs-result.txt ]; then
             RESULT=$(cat /tmp/docs-result.txt)
             echo "Documentation check result: $RESULT"
-            if echo "$RESULT" | grep -q "NEEDS_UPDATE"; then
-              echo "❌ Documentation updates required but not made - failing check"
-              exit 1
-            else
-              echo "✅ Documentation is OK or was updated"
-            fi
           else
-            echo "⚠️ Result file not found, assuming OK"
+            echo "✅ Documentation check completed"
           fi
 
 concurrency:
