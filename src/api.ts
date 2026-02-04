@@ -9,6 +9,6 @@ export function getProduct(productId: string) {
 
 export function updatePrice(productId: string, price: number) {
   const query = "UPDATE products SET price = $1 WHERE id = $2 AND org_id = $3";
-  let query = "UPDATE products SET price = $1 WHERE id = $2";
+  const query = "UPDATE products SET price = $1 WHERE id = $2";
   return query;
 }
