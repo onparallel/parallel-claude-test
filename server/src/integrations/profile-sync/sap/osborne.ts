@@ -147,9 +147,14 @@ export function getOsborneSapSettings({
             },
             fieldMappings: [
               {
-                remoteEntityFields: ["OrganizationBPName1"],
+                remoteEntityFields: ["BusinessPartnerFullName"],
                 profileTypeFieldIds: [profileTypeFieldIds.name],
                 direction: "TO_LOCAL",
+              },
+              {
+                remoteEntityFields: ["OrganizationBPName1"],
+                profileTypeFieldIds: [profileTypeFieldIds.name],
+                direction: "TO_REMOTE",
               },
               {
                 remoteEntityFields: ["YY1_AMT_CLIENT_STATUS_bus"],
