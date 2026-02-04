@@ -7,6 +7,7 @@ import yargs from "yargs";
 import { CONFIG, Config } from "../../config";
 import { createContainer } from "../../container";
 import { ILogger, LOGGER } from "../../services/Logger";
+import { IRedis, REDIS } from "../../services/Redis";
 import { loadEnv } from "../../util/loadEnv";
 import { stopwatch } from "../../util/stopwatch";
 
@@ -40,6 +41,8 @@ export async function createCronWorker<Q extends keyof Config["cronWorkers"]>(
       "Run once",
       () => {},
       async () => {
+        const redis = container.get<IRedis>(REDIS);
+        await redis.connect();
         const worker = container.get<CronWorker<Q>>(workerImplementation);
         try {
           await worker.handler(config["cronWorkers"][name]);
@@ -54,8 +57,10 @@ export async function createCronWorker<Q extends keyof Config["cronWorkers"]>(
       "start",
       "Start the cron job",
       () => {},
-      () => {
+      async () => {
         const logger = container.get<ILogger>(LOGGER);
+        const redis = container.get<IRedis>(REDIS);
+        await redis.connect();
         let running = false;
         const events = new EventEmitter();
         const job = new CronJob(config.cronWorkers[name].rule, async function () {

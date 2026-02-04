@@ -8,6 +8,7 @@ import { CONFIG, Config } from "../../config";
 import { createContainer } from "../../container";
 import { ILogger, LOGGER } from "../../services/Logger";
 import { IQueuesService, QUEUES_SERVICE } from "../../services/QueuesService";
+import { IRedis, REDIS } from "../../services/Redis";
 import { awsLogger } from "../../util/awsLogger";
 import { BatchProcessor } from "../../util/BatchProcessor";
 import { loadEnv } from "../../util/loadEnv";
@@ -119,6 +120,8 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
       async ({ payload }: { payload: string }) => {
         const container = createContainer();
         const logger = container.get<ILogger>(LOGGER);
+        const redis = container.get<IRedis>(REDIS);
+        await redis.connect();
         additionalModules.forEach((module) => container.load(module));
         container.bind(workerImplementation).toSelf();
         const worker = container.get<QueueWorker<QueueWorkerPayload<Q>>>(workerImplementation);
@@ -146,6 +149,10 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
         additionalModules.forEach((module) => container.load(module));
         container.bind(workerImplementation).toSelf();
         const logger = container.get<ILogger>(LOGGER);
+        if (!forkHandlers) {
+          const redis = container.get<IRedis>(REDIS);
+          await redis.connect();
+        }
         const config = container.get<Config>(CONFIG);
         const queueConfig = config.queueWorkers[name];
         const consumer = Consumer.create({
