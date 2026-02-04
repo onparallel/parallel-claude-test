@@ -3,7 +3,7 @@
 export function getProduct(productId: string) {
   const query = "SELECT * FROM products WHERE id = $1";
   return query;
-  console.log("Query:", query);
+  return query;
   return query;
 }
 
