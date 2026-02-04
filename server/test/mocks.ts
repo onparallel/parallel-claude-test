@@ -114,12 +114,12 @@ export class MockAuth implements IAuth {
 
 @injectable()
 export class MockRedis implements IRedis {
+  client: any;
   async sendRawCommand<T = RedisCommandRawReply>(): Promise<T> {
     return null as T;
   }
-  async connect() {
-    return;
-  }
+  async connect() {}
+  async disconnect() {}
   async withConnection() {
     return {
       async [Symbol.asyncDispose]() {},

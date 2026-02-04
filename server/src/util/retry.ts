@@ -22,8 +22,12 @@ export async function retry<TResult>(
   let iteration = 0;
   do {
     try {
+      signal?.throwIfAborted();
       return await operation(iteration++);
     } catch (error) {
+      if (signal?.aborted) {
+        throw new Error("The operation was aborted.");
+      }
       if (error instanceof StopRetryError) {
         throw error.cause;
       }

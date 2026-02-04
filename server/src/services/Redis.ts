@@ -4,10 +4,12 @@ import { isNonNullish } from "remeda";
 import { CONFIG, Config } from "../config";
 
 export interface IRedis {
+  readonly client: RedisClient;
   /**
    * Connect to redis
    */
   connect(): Promise<void>;
+  disconnect(): Promise<void>;
 
   sendRawCommand: RedisClient["sendCommand"];
 
@@ -40,7 +42,7 @@ type RedisClient = ReturnType<typeof redis.createClient>;
 
 @injectable()
 export class Redis implements IRedis {
-  private readonly client: RedisClient;
+  public readonly client: RedisClient;
   public readonly sendRawCommand: RedisClient["sendCommand"];
 
   constructor(@inject(CONFIG) config: Config) {
@@ -55,6 +57,10 @@ export class Redis implements IRedis {
 
   async connect() {
     await this.client.connect();
+  }
+
+  async disconnect() {
+    await this.client.disconnect();
   }
 
   async withConnection(): Promise<AsyncDisposable> {

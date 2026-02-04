@@ -2,6 +2,7 @@ import { SendMessageBatchCommand, SendMessageCommand, SQSClient } from "@aws-sdk
 import { createHash } from "crypto";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
+import { RateLimiterQueue } from "rate-limiter-flexible";
 import { isNonNullish } from "remeda";
 import { Memoize } from "typescript-memoize";
 import { CONFIG, Config } from "../config";
@@ -9,10 +10,12 @@ import { TableTypes } from "../db/helpers/BaseRepository";
 import { awsLogger } from "../util/awsLogger";
 import { pMapChunk } from "../util/promises/pMapChunk";
 import { waitFor } from "../util/promises/waitFor";
+import { retry } from "../util/retry";
 import { random } from "../util/token";
 import { MaybeArray, unMaybeArray } from "../util/types";
 import { QueueWorkerPayload } from "../workers/helpers/createQueueWorker";
 import { ILogger, LOGGER } from "./Logger";
+import { IRateLimitService, RATE_LIMIT_SERVICE } from "./RateLimitService";
 
 export interface IQueuesService {
   waitForPendingMessages(maxWaitTime?: number): Promise<void>;
@@ -54,8 +57,11 @@ export interface IQueuesService {
 
 export const QUEUES_SERVICE = Symbol.for("QUEUES_SERVICE");
 
+const QUEUE_SEND_MESSAGE_RATE_LIMIT = 250; // Rate limit is actually 300 per second, use 250 to be safe
+
 @injectable()
 export class QueuesService implements IQueuesService {
+  rateLimiter: RateLimiterQueue;
   @Memoize() private get sqs() {
     return new SQSClient({
       ...this.config.aws,
@@ -69,17 +75,32 @@ export class QueuesService implements IQueuesService {
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(LOGGER) private logger: ILogger,
-  ) {}
+    @inject(RATE_LIMIT_SERVICE) private rateLimit: IRateLimitService,
+  ) {
+    this.rateLimiter = this.rateLimit.getRateLimiter({
+      points: QUEUE_SEND_MESSAGE_RATE_LIMIT,
+    });
+  }
 
   private hash(value: string) {
     return createHash("md5").update(value).digest("hex");
   }
 
   public async waitForPendingMessages(maxWaitTime?: number) {
-    if (isNonNullish(maxWaitTime)) {
-      await Promise.race([Promise.all(this.pending), waitFor(maxWaitTime)]);
-    } else {
-      await Promise.all(this.pending);
+    const controller = new AbortController();
+    try {
+      await Promise.race([
+        Promise.all(this.pending),
+        ...(isNonNullish(maxWaitTime) ? [waitFor(maxWaitTime)] : []),
+        retry(
+          async () => {
+            this.logger.info(`Waiting for pending SQS messages ${this.pending.length}...`);
+          },
+          { signal: controller.signal, delay: 3000, maxRetries: 100 },
+        ),
+      ]);
+    } finally {
+      controller.abort();
     }
   }
 
@@ -130,6 +151,7 @@ export class QueuesService implements IQueuesService {
       await pMapChunk(
         messages,
         async (batch) => {
+          await this.rateLimiter.removeTokens(1, queue);
           await this.sqs.send(
             new SendMessageBatchCommand({
               QueueUrl: queueUrl,
@@ -146,6 +168,7 @@ export class QueuesService implements IQueuesService {
         { chunkSize: 10, concurrency: 100 },
       );
     } else {
+      await this.rateLimiter.removeTokens(1, queue);
       await this.sqs.send(
         new SendMessageCommand({
           QueueUrl: queueUrl,

@@ -116,6 +116,7 @@ import {
   ProfilesSetupService,
 } from "./ProfilesSetupService";
 import { IQueuesService, QUEUES_SERVICE, QueuesService } from "./QueuesService";
+import { IRateLimitService, RATE_LIMIT_SERVICE, RateLimitService } from "./RateLimitService";
 import { IRedis, REDIS, Redis } from "./Redis";
 import { ISignatureService, SIGNATURE, SignatureService } from "./SignatureService";
 import { ISmtp, SMTP, Smtp } from "./Smtp";
@@ -129,6 +130,7 @@ export const servicesModule = new ContainerModule((options) => {
   options.bind<IEmailsService>(EMAILS).to(EmailsService).inSingletonScope();
   options.bind<IAnalyticsService>(ANALYTICS).to(AnalyticsService).inSingletonScope();
   options.bind<IRedis>(REDIS).to(Redis).inSingletonScope();
+  options.bind<IRateLimitService>(RATE_LIMIT_SERVICE).to(RateLimitService).inSingletonScope();
   options.bind<ISmtp>(SMTP).to(Smtp).inSingletonScope();
   options.bind<IPrinter>(PRINTER).to(Printer).inSingletonScope();
   options.bind<IStorageService>(STORAGE_SERVICE).to(StorageService).inSingletonScope();

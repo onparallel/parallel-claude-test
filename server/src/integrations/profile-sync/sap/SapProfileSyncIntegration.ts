@@ -1251,7 +1251,7 @@ export class SapProfileSyncIntegration extends GenericIntegration<
           const response = await this.storage.temporaryFiles.uploadFile(
             path,
             "application/json",
-            Buffer.from(data),
+            Buffer.from(JSON.stringify(data), "utf8"),
           );
           const file = await this.files.createTemporaryFile(
             {
