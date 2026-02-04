@@ -38992,6 +38992,17 @@ export type PetitionRepliesPopoverField_dataQuery = {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
         } | null;
+        currentApprovalRequestSteps?: Array<{
+          __typename?: "PetitionApprovalRequestStep";
+          id: string;
+          status: PetitionApprovalRequestStepStatus;
+          allowEdit: boolean;
+          approvers: Array<{
+            __typename?: "PetitionApprovalRequestStepApprover";
+            id: string;
+            user?: { __typename?: "User"; id: string } | null;
+          }>;
+        }> | null;
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -91945,6 +91956,17 @@ export const PetitionRepliesPopoverField_dataDocument = gql`
         isAnonymized
         myEffectivePermission {
           permissionType
+        }
+        currentApprovalRequestSteps {
+          id
+          status
+          allowEdit
+          approvers {
+            id
+            user {
+              id
+            }
+          }
         }
       }
       ...PreviewPetitionField_PetitionBase

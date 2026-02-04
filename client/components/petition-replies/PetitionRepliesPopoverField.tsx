@@ -126,6 +126,18 @@ function LazyPreviewPetitionField({
 
   const myEffectivePermission = petition?.myEffectivePermission!.permissionType;
 
+  const isAllowedToEditReplies =
+    isNonNullish(petition) &&
+    isNonNullish(petition.currentApprovalRequestSteps) &&
+    petition.currentApprovalRequestSteps.some(
+      (s) =>
+        s.status === "PENDING" &&
+        s.allowEdit &&
+        s.approvers.some(
+          (a) => isNonNullish(a.user) && isNonNullish(user) && a.user.id === user?.id,
+        ),
+    );
+
   return isNonNullish(field) &&
     isNonNullish(petition) &&
     isNonNullish(user) &&
@@ -139,7 +151,7 @@ function LazyPreviewPetitionField({
           petition.status === "CLOSED" ||
           petition.isAnonymized ||
           user.organization.isPetitionUsageLimitReached ||
-          petition.hasStartedProcess
+          (petition.hasStartedProcess && !isAllowedToEditReplies)
         }
         isCacheOnly={false}
         myEffectivePermission={myEffectivePermission}
@@ -177,6 +189,17 @@ const _queries = [
           isAnonymized
           myEffectivePermission {
             permissionType
+          }
+          currentApprovalRequestSteps {
+            id
+            status
+            allowEdit
+            approvers {
+              id
+              user {
+                id
+              }
+            }
           }
         }
         ...PreviewPetitionField_PetitionBase
