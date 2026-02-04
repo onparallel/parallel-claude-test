@@ -101,7 +101,7 @@ export function useProfileTableColumns(
         {
           key: "subscribers",
           label: intl.formatMessage({
-            id: "component.profile-table-columns.subscribed",
+            id: "util.use-profile-table-columns.subscribed-plural",
             defaultMessage: "Subscribed",
           }),
           align: "left",
@@ -135,6 +135,23 @@ export function useProfileTableColumns(
           },
           CellContent: ({ row: { createdAt } }) => (
             <DateTime value={createdAt} format={FORMATS.LLL} whiteSpace="nowrap" />
+          ),
+        },
+        {
+          key: "updatedAt",
+          isSortable: true,
+          label: intl.formatMessage({
+            id: "generic.updated-at",
+            defaultMessage: "Updated at",
+          }),
+          headerProps: {
+            minWidth: "160px",
+          },
+          cellProps: {
+            minWidth: "160px",
+          },
+          CellContent: ({ row: { updatedAt } }) => (
+            <DateTime value={updatedAt} format={FORMATS.LLL} whiteSpace="nowrap" />
           ),
         },
       ])
@@ -809,6 +826,7 @@ const _fragments = {
     fragment useProfileTableColumns_Profile on Profile {
       id
       createdAt
+      updatedAt
       subscribers {
         id
         user {

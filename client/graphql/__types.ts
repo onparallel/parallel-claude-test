@@ -67827,6 +67827,7 @@ export type Profiles_ProfileFragment = {
   status: ProfileStatus;
   localizableName: { [locale in UserLocale]?: string };
   createdAt: string;
+  updatedAt: string;
   profileType: {
     __typename?: "ProfileType";
     id: string;
@@ -68009,6 +68010,7 @@ export type Profiles_profilesQuery = {
       status: ProfileStatus;
       localizableName: { [locale in UserLocale]?: string };
       createdAt: string;
+      updatedAt: string;
       properties: Array<{
         __typename?: "ProfileFieldProperty";
         field: {
@@ -75591,6 +75593,7 @@ export type useProfileTableColumns_ProfileFragment = {
   __typename?: "Profile";
   id: string;
   createdAt: string;
+  updatedAt: string;
   localizableName: { [locale in UserLocale]?: string };
   status: ProfileStatus;
   subscribers: Array<{
@@ -75632,6 +75635,7 @@ export type useProfileTableColumns_ProfileWithPropertiesFragment = {
   __typename?: "Profile";
   id: string;
   createdAt: string;
+  updatedAt: string;
   localizableName: { [locale in UserLocale]?: string };
   status: ProfileStatus;
   properties: Array<{
@@ -87315,6 +87319,7 @@ export const useProfileTableColumns_ProfileFragmentDoc = gql`
   fragment useProfileTableColumns_Profile on Profile {
     id
     createdAt
+    updatedAt
     subscribers {
       id
       user {

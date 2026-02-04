@@ -10260,7 +10260,7 @@
     "context": "Relationship"
   },
   {
-    "term": "component.profile-table-columns.subscribed",
+    "term": "util.use-profile-table-columns.subscribed-plural",
     "definition": "Subscribed",
     "context": "Subscribed"
   },
@@ -16683,6 +16683,11 @@
     "term": "generic.update",
     "definition": "Update",
     "context": "Update"
+  },
+  {
+    "term": "generic.updated-at",
+    "definition": "Updated at",
+    "context": "Updated at"
   },
   {
     "term": "generic.upgrade",

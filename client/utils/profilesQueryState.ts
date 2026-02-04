@@ -16,8 +16,8 @@ const QUERY_STATE = {
   items: values([10, 25, 50]).orDefault(10),
   search: string(),
   sort: sorting(
-    (field): field is "name" | "createdAt" | `field_${number}` =>
-      ["name", "createdAt"].includes(field) || !!field.match(/^field_[A-Za-z\d]+$/),
+    (field): field is "name" | "createdAt" | "updatedAt" | `field_${number}` =>
+      ["name", "createdAt", "updatedAt"].includes(field) || !!field.match(/^field_[A-Za-z\d]+$/),
   ),
   type: string(),
   status: values(["OPEN", "CLOSED", "DELETION_SCHEDULED"]).list(),
