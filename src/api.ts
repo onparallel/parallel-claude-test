@@ -1,7 +1,7 @@
 // API Service
 
 export function getProduct(productId: string) {
-  // SQL injection - string concatenation
+  const query = "SELECT * FROM products WHERE id = $1";
   const query = "SELECT * FROM products WHERE id = " + productId;
   console.log("Query:", query);
   return query;
