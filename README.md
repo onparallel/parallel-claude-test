@@ -1,101 +1,83 @@
 # Parallel
 
-## Client
+Petition and profile management SaaS platform for legal/compliance workflows.
 
-The client uses the following libraries:
+## Quick Start
 
-- [Next.js](https://github.com/zeit/next.js/) as the main framework
-- [Chakra UI](https://chakra-ui.com/) as the main UI library
-- [Apollo Client](https://www.apollographql.com/docs/react/) for fetching data from the GraphQl API
-- [react-intl](https://github.com/formatjs/react-intl) for translating the app.
-- [react-select](https://react-select.com/)
-- [react-hook-form](https://react-hook-form.com/)
+- [Getting Started](./getting-started.md) - Setup your local development environment
 
-### Commands
+For comprehensive documentation including architecture, patterns, and implementation details, see [CLAUDE.md](./CLAUDE.md).
 
-- `yarn dev`: Runs the client locally with live-reload.
-- `yarn build`: Creates a production build of the next app.
-- `yarn start`: Serves the production build locally.
-- `yarn generate-graphql-types`: Generates the interfaces for all the queries, mutations and fragments used in the client (`graphql/__types.ts`). It uses [GraphQL Code Generator](https://the-guild.dev/graphql/codegen)
-- `yarn extract-i18n-terms`: Extracts the translation terms into `lang/[locale].json`.
+## Documentation
 
-## Server
+### Core Entities
 
-The backend uses the following libraries:
+| File                                           | Main Table     | Description                  |
+| ---------------------------------------------- | -------------- | ---------------------------- |
+| [petitions.md](./docs/core/petitions.md)       | `petition`     | Cases, files, or requests    |
+| [profiles.md](./docs/core/profiles.md)         | `profile`      | Flexible entity management   |
+| [organization.md](./docs/core/organization.md) | `organization` | Organization settings        |
+| [users.md](./docs/core/users.md)               | `user`         | System users and permissions |
+| [workers.md](./docs/core/workers.md)           | -              | Background worker processes  |
 
-- [GraphQL Nexus](https://nexus.js.org/) for creating the GraphQL schema with full TypeScript support.
-- [InversifyJS](http://inversify.io/) for doing Dependency Injection.
-- [Knex.js](https://knexjs.org/) for building and running SQL queries.
-- [Dataloader](https://github.com/graphql/dataloader) for avoiding the N + 1 query problem with GraphQL.
+### Operations
 
-As external dependencies, the backend uses:
+| File                                      | Description                      |
+| ----------------------------------------- | -------------------------------- |
+| [image.md](./docs/image.md)               | Server image and release process |
+| [certificates.md](./docs/certificates.md) | SSL certificate management       |
+| [fail2ban.md](./docs/fail2ban.md)         | IP banning configuration         |
 
-- [Ghostscript](https://ghostscript.com/)
-- [ImageMagick](https://imagemagick.org/)
-- [Exiftool](https://exiftool.org/)
-- [QPdf](https://qpdf.sourceforge.io/)
-- [Typst](https://typst.app/)
+## Technology Stack
 
-This libraries are used to generate a PDF document binder containing the replies of a given petition.
-You can install this dependencies via brew:
+### Client
 
-`brew install ghostscript imagemagick exiftool qpdf typst`
+- [TypeScript](https://www.typescriptlang.org/) - Type-safe JavaScript
+- [Next.js](https://github.com/zeit/next.js/) - Main framework
+- [Chakra UI](https://chakra-ui.com/) - UI library
+- [Apollo Client](https://www.apollographql.com/docs/react/) - GraphQL client
+- [react-intl](https://github.com/formatjs/react-intl) - Internationalization
+- [react-hook-form](https://react-hook-form.com/) - Form handling
+- [Slate](https://docs.slatejs.org/) / [Plate](https://platejs.org/) - Rich text editing
+- [Sentry](https://sentry.io/) - Error tracking
 
-On dev environment, we use [Ngrok](https://ngrok.com/) to launch a local tunnel in order to:
+### Server
 
-- Receive webhook events from different integrations (Signaturit, Docusign, Bankflip, ...)
-- Receive custom emails from AWS Cognito (SignUp, ResendCode, AdminCreateUser, ForgotPassword). After launching ngrok, you will need to configure the https localtunnel url on AWS Lambda function "cognito-custom-messages-development" as an environment variable.
+- [TypeScript](https://www.typescriptlang.org/) - Type-safe JavaScript
+- [Express.js](https://expressjs.com/) - HTTP server
+- [GraphQL Nexus](https://nexus.js.org/) - GraphQL schema with TypeScript
+- [InversifyJS](http://inversify.io/) - Dependency Injection
+- [Knex.js](https://knexjs.org/) - SQL query builder
+- [PostgreSQL](https://www.postgresql.org/) - Primary database
+- [Dataloader](https://github.com/graphql/dataloader) - N+1 query prevention
+- [Redis](https://redis.io/) - Caching and sessions
+- [AWS SQS](https://aws.amazon.com/sqs/) - Message queuing
+- [Typst](https://typst.app/) - PDF generation
 
-`brew install ngrok`
+## Commands
 
-Once you install ngrok, you will have to create an account in order to provide an auth token.
-Sign up for an account: https://dashboard.ngrok.com/signup
-Install your authtoken: https://dashboard.ngrok.com/get-started/your-authtoken
+### Client
 
-In order to launch the localtunnel, run:
-
-`yarn workspace @parallel/server localtunnel`
-
-This command will run ngrok command and write the URL to a text file located in server/bin/localtunnel-dev.url so the integrations can read it.
-
-### Commands
-
-- `yarn dev`: Runs a local server with livereload.
-- `yarn build`: Compiles the source into `dist`.
-- `yarn migrate`: Runs the migrations.
-- `yarn migrate-dryrun`: Shows which migrations will run.
-- `yarn migrate-make`: Creates a new migration file on `migrations`.
-- `yarn migrate-down`: Rolls back the latest migration.
-- `yarn seed`: Runs the seed file to populate a dev database.
-- `yarn generate-db-types`: Generates the TypeScript interfaces from the database schema (`src/db/__types.ts`).
-- `yarn test`: Creates a testing stack and runs the tests.
-- `yarn extract-i18n-terms`: Extracts the translation terms into `lang/[locale].json`.
-
-### Testing
-
-Testing uses the [jest](https://jestjs.io/) testing framework. In order to run the tests execute:
-
-```
-yarn test
+```bash
+cd client/
+yarn dev                    # Run with live-reload
+yarn build                  # Production build
+yarn generate-graphql-types # Generate GraphQL types
+yarn extract-i18n-terms     # Extract translation terms
 ```
 
-# Naming conventions
+### Server
 
-## Repository methods
-
-Try to use the following convention for method names as much as possible
-
-_prefixEntity_\[By*Property*]
-
-where **_prefix_** is one of:
-
-- load: reads from the database and exposes a DataLoader
-- get: reads from the database
-- update: updates existing rows
-- create: creates new rows
-- delete: deletes or marks as delete
-- clone: clones existing rows
-
-**_Entity_** is the name of the main entity involved
-
-Optionally add **By*Property*** if you are accessing data by properties other than _id_
+```bash
+cd server/
+yarn dev                # Run API with live-reload
+yarn dev-workers        # Run all workers (in separate terminal)
+yarn build              # Compile to dist
+yarn migrate            # Run migrations
+yarn migrate-make       # Create new migration
+yarn migrate-down       # Rollback migration
+yarn seed               # Seed dev database
+yarn generate-db-types  # Generate DB types
+yarn test               # Run tests
+yarn extract-i18n-terms # Extract translation terms
+```

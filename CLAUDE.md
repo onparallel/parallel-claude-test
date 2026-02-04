@@ -2,6 +2,26 @@
 
 > **Purpose**: Quick reference for AI assistants working with the Parallel codebase.
 
+## Quick Navigation
+
+**Core Concepts:**
+[Project Overview](#1-project-overview) • [Domain Model](#2-core-domain-model) • [Architecture](#3-architecture-patterns) • [Gotchas](#8-critical-gotchas)
+
+**Frontend:**
+[Component Patterns](#component-patterns) • [GraphQL](#graphql-schema-nexus) • [Forms & State](#forms-react-hook-form) • [i18n](#internationalization-i18n)
+
+**Backend:**
+[Services](#core-services) • [Repositories](#repository-pattern) • [Events](#event-driven-architecture) • [Queues](#queueworker-system)
+
+**Guides:**
+[Modification Patterns](#9-modification-patterns) • [Development Workflow](#10-development-workflow) • [Key Files](#11-key-files-reference)
+
+## Agent Behavior Guidelines
+
+### Documentation
+
+When editing README files or other documentation markdown files, **always use the `crafting-effective-readmes` skill**. This ensures documentation follows best practices and is tailored to the appropriate audience.
+
 ## 1. Project Overview
 
 ### What is Parallel?
@@ -153,6 +173,47 @@ Organization members who access the dashboard.
 
 **Permissions**: Cascade through groups, `DENY` overrides `GRANT`
 
+### Approval Flows
+
+**Table**: `petition_approval_request`
+
+**Purpose**: Multi-stage approval workflows for petitions
+
+**Key Fields**:
+- `petition_id`: Associated petition
+- `step_order`: Approval sequence
+- `approver_user_id`: Required approver
+- `status`: `PENDING | APPROVED | REJECTED`
+
+**Service**: `ApprovalsService` (injected as `ctx.approvals`)
+
+**Flow**:
+1. Create approval requests when petition moves to approval stage
+2. Notify approvers
+3. Track approval/rejection
+4. Proceed to next step or complete petition
+
+**Example**: See [server/src/services/ApprovalsService.ts](server/src/services/ApprovalsService.ts)
+
+### Views (List Customization)
+
+**Tables**: `petition_list_view`, `profile_list_view`
+
+**Purpose**: User-customized list views with saved filters and columns
+
+**Key Fields**:
+- `user_id`: View owner
+- `name`: View name
+- `filters`: JSON filter configuration
+- `visible_columns`: Array of column names
+- `sort_by`: Sort configuration
+
+**Repository**: `ViewRepository`
+
+**Usage**: Users can save frequently-used filter/sort combinations
+
+**Example**: See view management in list pages
+
 ### Events
 
 Events drive asynchronous behavior.
@@ -188,6 +249,28 @@ Key services: `auth`, `emails`, `signature`, `storage`, `encryption`, `jwt`, `re
 
 Key repositories: `petitions`, `profiles`, `contacts`, `users`, `organizations`, `tasks`, `integrations`, etc.
 
+#### Module Registration
+
+InversifyJS modules are defined in `module.ts` files. Registration patterns differ for services vs repositories.
+
+**Services** (`server/src/services/module.ts`):
+- Import: `{ SERVICE_SYMBOL, ServiceClass, IServiceInterface }`
+- Register: `options.bind<IServiceInterface>(SERVICE_SYMBOL).to(ServiceClass).inSingletonScope();`
+- Singleton scope for stateless services
+- Request scope for services that need request context
+
+**Repositories** (`server/src/db/module.ts`):
+- Import: `{ RepositoryClass }`
+- Register: `options.bind<RepositoryClass>(RepositoryClass).toSelf();`
+- No symbol needed, bind to class itself
+- Request scope by default
+
+**Integrations** (`server/src/integrations/module.ts`):
+- Similar to services pattern
+- Often includes factory functions for multi-provider integrations
+
+**Example:** See [server/src/services/module.ts:118-128](server/src/services/module.ts#L118-L128) for QueuesService registration
+
 ### Repository Pattern
 
 **Location**: `server/src/db/repositories/`
@@ -210,6 +293,10 @@ Key repositories: `petitions`, `profiles`, `contacts`, `users`, `organizations`,
 - `buildLoader`: Advanced custom DataLoader
 
 **Example**: `PetitionRepository.loadPetition` (DataLoader via `buildLoadBy`), `PetitionRepository.getPetitionVariables` (direct query)
+
+**Real-world examples:**
+- [server/src/db/repositories/PetitionRepository.ts](server/src/db/repositories/PetitionRepository.ts) - complex repository with all DataLoader patterns
+- [server/src/db/repositories/ProfileRepository.ts](server/src/db/repositories/ProfileRepository.ts) - advanced DataLoader usage
 
 **Critical Patterns**:
 
@@ -253,6 +340,10 @@ await this.createEvent(
 
 **Event Listeners**: Implement `EventListener<EventType>`, register in `server/src/workers/queues/event-listeners/module.ts`, inject in `EventProcessorQueue` and call `.register()`
 
+**Real-world examples:**
+- [server/src/workers/queues/event-listeners/PetitionActivityListener.ts](server/src/workers/queues/event-listeners/PetitionActivityListener.ts) - petition event listener
+- [server/src/workers/queues/event-listeners/ProfileSyncListener.ts](server/src/workers/queues/event-listeners/ProfileSyncListener.ts) - profile event listener with side effects
+
 **Critical**: Design for idempotency - workers may receive duplicate messages
 
 ### Queue/Worker System
@@ -274,6 +365,11 @@ await this.createEvent(
 **Enqueuing**: `await ctx.queues.enqueueMessages("queue-name", { body: {...} }, t)`
 
 **Task Pattern**: Extend `TaskRunner<TaskName>`, register in module, inject in `TaskWorkerQueue`
+
+**Real-world examples:**
+- [server/src/workers/queues/task-runners/ExportRepliesRunner.ts](server/src/workers/queues/task-runners/ExportRepliesRunner.ts) - export task
+- [server/src/workers/queues/task-runners/ProfileSyncRunner.ts](server/src/workers/queues/task-runners/ProfileSyncRunner.ts) - sync task
+- [server/src/workers/queues/task-runners/PrintPdfRunner.ts](server/src/workers/queues/task-runners/PrintPdfRunner.ts) - PDF generation task
 
 **Workers**: Individual processes (e.g., `email-sender.ts`, `event-processor.ts`), consume SQS queues
 
@@ -306,6 +402,10 @@ await this.createEvent(
 **Interface**: `ISignatureClient` with methods: `startSignatureRequest`, `getSignatureRequest`, `cancelSignatureRequest`, `downloadSignedDocument`, `downloadAuditTrail`, `canSendSignatureReminder`, `sendPendingSignatureReminder`
 
 **Factory**: `signatureClientFactory(provider, integrationId)` returns appropriate client
+
+**Real-world examples:**
+- [server/src/integrations/signature/DocusignClient.ts](server/src/integrations/signature/DocusignClient.ts) - complete OAuth integration
+- [server/src/integrations/signature/SignaturitClient.ts](server/src/integrations/signature/SignaturitClient.ts) - API key integration
 
 **Flow**:
 
@@ -346,6 +446,26 @@ await this.createEvent(
 **Polling Worker**: `sap-profile-polling.ts` triggers scheduled syncs
 
 **Critical**: OData pagination required, last-write-wins conflict resolution
+
+### Feature Flags
+
+**Table**: `feature_flag`
+
+**Purpose**: Enable/disable features per organization
+
+**Key Fields**:
+- `organization_id`: Organization scope
+- `flag_name`: Feature identifier (enum)
+- `enabled`: Boolean flag
+
+**Usage in code**:
+```typescript
+const hasFeature = await ctx.featureFlags.checkFlag(organizationId, "FEATURE_NAME");
+```
+
+**Common flags**: Check `server/src/db/__types.ts` for `FeatureFlagName` enum
+
+**Example**: See feature flag checks in resolvers and services
 
 ### Background Checks & Adverse Media
 
@@ -418,6 +538,11 @@ const _mutations = [
 
 **Naming Convention**: `ComponentName_EntityType` for fragments, `ComponentName_queryName` for queries/mutations.
 
+**Real-world examples:**
+- [client/utils/useUnpinProfileType.ts](client/utils/useUnpinProfileType.ts) - mutation hook with fragments
+- [client/pages/app/petitions/[petitionId]/compose.tsx](client/pages/app/petitions/[petitionId]/compose.tsx) - page with queries
+- [client/components/profiles/ProfileForm.tsx](client/components/profiles/ProfileForm.tsx) - component with fragments and queries
+
 **Component Types**:
 
 - `components/common/`: Reusable UI (Card, EmptyState, DataTable)
@@ -447,6 +572,10 @@ MyPage.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
 
 export default compose(withApolloData)(MyPage);
 ```
+
+**Real-world examples:**
+- [client/pages/app/petitions/index.tsx](client/pages/app/petitions/index.tsx) - SSR with fetchQuery
+- [client/pages/app/profiles/index.tsx](client/pages/app/profiles/index.tsx) - SSR with multiple queries
 
 **Cache Updates**: Use `update` function in mutations, not `refetchQueries`. Normalize with global IDs.
 
@@ -588,6 +717,10 @@ const label = intl.formatMessage({ id: "generic.save", defaultMessage: "Save" })
 | `SignatureService`  | Signature orchestration (provider abstraction)             |
 | `QueuesService`     | Queue/worker message management                            |
 
+**Real-world examples:**
+- [server/src/services/EmailsService.ts](server/src/services/EmailsService.ts) - service with multiple integrations
+- [server/src/services/PetitionsHelperService.ts](server/src/services/PetitionsHelperService.ts) - complex business logic service
+
 ### Petition Services
 
 | Service                       | Purpose                             |
@@ -691,7 +824,7 @@ yarn workspace @parallel/server generate-db-types # Regenerate types
 
 ### GraphQL Code Generation
 
-**Server**: `server/parallel-schema.graphql` (auto-generated by Nexus during dev)
+**Server**: `server/parallel-schema.graphql` (auto-generated by Nexus when running `yarn dev`)
 
 **Client**:
 
@@ -705,10 +838,22 @@ Generates `client/graphql/__types.ts` from operations defined in components and 
 
 ### Internationalization
 
-**Server**: `server/lang/{en,es,ca,it,pt}.json` - service messages
-**Client**: `client/lang/{en,es}.json` - app messages, `client/lang/recipient/` - recipient messages (5 locales)
+**Files**:
 
-**Extract**: `yarn workspace @parallel/[server|client] extract-i18n-terms`
+- `server/lang/{en,es,ca,it,pt}.json` - service messages (emails)
+- `client/lang/{en,es}.json` - app messages
+- `client/lang/recipient/{en,es,ca,it,pt}.json` - recipient-facing messages (5 locales)
+
+**Commands**:
+
+- `yarn workspace @parallel/[server|client] extract-i18n-terms` - Extract translation terms from code
+- `yarn workspace @parallel/[server|client] generate-i18n-files` - Generate translation files (runs during build, no need to run manually)
+
+**Workflow for adding new translations**:
+
+1. Add `<FormattedMessage>` or `intl.formatMessage()` in code with `id` and `defaultMessage`
+2. Run `yarn extract-i18n-terms` in the appropriate workspace
+3. Populate the new terms in the corresponding `lang/[locale].json` files
 
 **Usage (server)**: `await ctx.i18n.formatMessage({ id: "key" }, { placeholders })`
 **Usage (client)**: `<FormattedMessage id="key" values={{ placeholders }} />`
@@ -847,7 +992,44 @@ Use DataLoaders for **all** relations in GraphQL resolvers. Batch database queri
 
 ---
 
-## 10. Key Files Reference
+## 10. Development Workflow
+
+For local development setup and running the application, see [getting-started.md](./getting-started.md).
+
+### Database Migrations
+
+**Naming Convention**: kebab-case (table/column names use underscores to match DB convention)
+
+**Examples**:
+- `add-column-petition_field_reply__associated_at.ts` - adding column to table
+- `add-profile_type__standard_type__matter.ts` - adding enum value
+- `add-petition_field-index.ts` - adding database index
+- `remove-feature-flags.ts` - removing deprecated features
+
+**Commands** (from `server/` directory):
+```bash
+# Create new migration (use kebab-case)
+yarn migrate-make add-field-to-profile
+
+# Run migrations
+yarn migrate
+
+# Rollback last migration
+yarn migrate-down
+
+# Regenerate DB types (always after migrations)
+yarn generate-db-types
+```
+
+**Example migration**: See `server/migrations/` for patterns
+
+### Common Development Gotchas
+- Always run `generate-db-types` after migrations
+- Always run `generate-graphql-types` after GraphQL schema changes (server) or operation changes (client)
+- Worker processes must be restarted separately from API server
+- Clear Redis cache if seeing stale data: `redis-cli FLUSHDB`
+
+## 11. Key Files Reference
 
 ### Configuration
 
@@ -867,8 +1049,6 @@ Use DataLoaders for **all** relations in GraphQL resolvers. Batch database queri
 ### Documentation
 
 - `README.md`: Commands, naming conventions, setup
-- `docs/graphql.md`: GraphQL patterns and workflow
-- `docs/translations.md`: i18n implementation
 - `server/src/integrations/signature/README.md`: Signature provider setup
 
 ### Example Implementations

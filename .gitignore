@@ -21,3 +21,4 @@ e2e/playwright/.cache/
 
 .DS_Store
 yarn-error.log
+.playwright-mcp

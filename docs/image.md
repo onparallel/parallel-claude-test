@@ -2,11 +2,13 @@
 
 The server image is built by running the build-image script
 
-```
+```bash
 cd bin
-yarn tac --code xxxxxx
+yarn tac --code <MFA_CODE>  # Get temporary AWS admin credentials
 yarn build-image --image [server|builder]
 ```
+
+Where `<MFA_CODE>` is your AWS Multi-Factor Authentication code.
 
 This script will install all the dependencies needed, including:
 
