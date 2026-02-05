@@ -125,12 +125,36 @@ export function PetitionFieldLogicConditionEditor({
         )
       ) : variable?.__typename === "PetitionVariableEnum" ? (
         <HStack>
-          <Text as="span">
-            <FormattedMessage
-              id="component.petition-field-logic-condition-editor.is-equal-to"
-              defaultMessage="is equal to"
-            />
-          </Text>
+          <SimpleSelect
+            size="sm"
+            options={[
+              { label: "=", value: "EQUAL" },
+              { label: "≠", value: "NOT_EQUAL" },
+              { label: "<", value: "LESS_THAN" },
+              { label: ">", value: "GREATER_THAN" },
+              { label: "≤", value: "LESS_THAN_OR_EQUAL" },
+              { label: "≥", value: "GREATER_THAN_OR_EQUAL" },
+            ]}
+            value={condition.operator}
+            onChange={(operator) => {
+              if (operator) {
+                onConditionChange({ ...condition, operator });
+              }
+            }}
+            styles={{
+              menu: (styles) => ({
+                ...styles,
+                minWidth: "100%",
+                width: "unset",
+                insetInlineStart: "50%",
+                transform: "translateX(-50%)",
+              }),
+              option: (styles) => ({
+                ...styles,
+                whiteSpace: "nowrap",
+              }),
+            }}
+          />
           <Box flex="1">
             <PetitionFieldMathEnumSelect
               value={condition.value as string}
@@ -283,7 +307,7 @@ function ConditionMultipleValueModifier({
           ...styles,
           minWidth: "100%",
           width: "unset",
-          insetStart: "50%",
+          insetInlineStart: "50%",
           transform: "translateX(-50%)",
         }),
         option: (styles) => ({
@@ -863,7 +887,7 @@ function ConditionPredicate({
               ...styles,
               minWidth: "100%",
               width: "unset",
-              insetStart: "50%",
+              insetInlineStart: "50%",
               transform: "translateX(-50%)",
             }),
             option: (styles) => ({
@@ -892,7 +916,7 @@ function ConditionPredicate({
               ...styles,
               minWidth: "100%",
               width: "unset",
-              insetStart: "50%",
+              insetInlineStart: "50%",
               transform: "translateX(-50%)",
             }),
             option: (styles) => ({
