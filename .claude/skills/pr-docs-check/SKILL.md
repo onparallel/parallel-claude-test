@@ -5,7 +5,7 @@ description: Check if a PR requires documentation updates
 
 # PR Documentation Check
 
-Check if a Pull Request requires documentation updates.
+Check if a Pull Request requires documentation updates and show suggested changes in VS Code.
 
 ## Instructions
 
@@ -59,19 +59,47 @@ Determine if the code changes affect documented functionality:
 ### Changes That Need Documentation
 (List each change and why it needs docs)
 
-### Suggested Documentation Updates
-
-#### File: `docs/core/[filename].md`
-
-Add/update the following:
-
-[Exact content to add or change]
+### Files to update
+- docs/core/[filename].md
 ```
 
-### Step 7: Offer to post comment
+### Step 7: Create suggested changes and open in VS Code
 
-If documentation updates are needed, ask if you should post the suggestions as a PR comment:
+If documentation updates are needed:
 
+1. **For existing files that need updates:**
+   - Read the current file content
+   - Create a modified version with the suggested changes at `/tmp/docs-suggestions/[filename].suggested.md`
+   - Open VS Code diff view:
+   ```bash
+   code --diff docs/core/[filename].md /tmp/docs-suggestions/[filename].suggested.md
+   ```
+
+2. **For new files that should be created:**
+   - Create the new file content at `/tmp/docs-suggestions/[filename].new.md`
+   - Open it in VS Code:
+   ```bash
+   code /tmp/docs-suggestions/[filename].new.md
+   ```
+
+**Always create the temp directory first:**
+```bash
+mkdir -p /tmp/docs-suggestions
+```
+
+### Step 8: Ask user what to do
+
+Use AskUserQuestion to ask the user:
+- "Apply changes" - Copy the suggested files to their final locations
+- "Post as PR comment" - Post the suggestions as a comment on the PR
+- "Skip" - Do nothing
+
+**If user chooses "Apply changes":**
+```bash
+cp /tmp/docs-suggestions/[filename].suggested.md docs/core/[filename].md
+```
+
+**If user chooses "Post as PR comment":**
 ```bash
 gh pr comment <PR_NUMBER> --body "documentation suggestions here"
 ```
