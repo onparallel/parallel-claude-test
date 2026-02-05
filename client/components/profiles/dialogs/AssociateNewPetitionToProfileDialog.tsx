@@ -13,7 +13,6 @@ import {
   Radio,
   RadioGroup,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
@@ -26,6 +25,7 @@ import { PetitionFieldReference } from "@parallel/components/common/PetitionFiel
 import { PetitionSelect, PetitionSelectInstance } from "@parallel/components/common/PetitionSelect";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import { usePreviewImportFromProfileFormatErrorDialog } from "@parallel/components/petition-preview/dialogs/PreviewImportFromProfileFormatErrorDialog";
+import { Text } from "@parallel/components/ui";
 import {
   CreatePetitionFromProfilePrefillInput,
   useAssociateNewPetitionToProfileDialog_createPetitionFromProfileDocument,

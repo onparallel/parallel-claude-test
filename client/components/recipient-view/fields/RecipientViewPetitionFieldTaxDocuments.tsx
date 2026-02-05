@@ -1,4 +1,4 @@
-import { Box, Button, Flex, HStack, List, Progress, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, HStack, List, Progress, Stack } from "@chakra-ui/react";
 import { ExclamationOutlineIcon } from "@parallel/chakra/icons";
 import { useTone } from "@parallel/components/common/ToneProvider";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
@@ -18,6 +18,7 @@ import {
   RecipientViewPetitionFieldLayout,
   RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
+import { Text } from "@parallel/components/ui";
 
 export interface RecipientViewPetitionFieldTaxDocumentsProps
   extends Omit<
@@ -250,6 +251,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
             defaultMessage="Follow the steps to upload the documentation you need."
             values={{ tone }}
           />
+
           {filteredCompletedFieldReplies.length ? (
             <>
               {" ("}
@@ -258,6 +260,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
                 defaultMessage="{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
                 values={{ count: filteredCompletedFieldReplies.length }}
               />
+
               {")"}
             </>
           ) : null}
@@ -328,6 +331,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
         ) : (
           <Box />
         )}
+
         {filteredReplies.length > 0 && state === "IDLE" ? (
           <Button variant="link" onClick={handleChangePerson}>
             <FormattedMessage
@@ -375,6 +379,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
               borderRadius="full"
               width="100%"
             />
+
             <Button size="sm" fontWeight="normal" onClick={handleCancelClick}>
               <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
             </Button>

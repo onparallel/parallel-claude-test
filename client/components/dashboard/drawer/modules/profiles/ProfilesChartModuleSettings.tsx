@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { FormControl, FormErrorMessage, Radio, RadioGroup, Stack, Text } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, Radio, RadioGroup, Stack } from "@chakra-ui/react";
 import { Divider } from "@parallel/components/common/Divider";
 import { ProfileTypeFieldSelect } from "@parallel/components/common/ProfileTypeFieldSelect";
 import { ProfilesChartModuleSettings_ProfileTypeFragment } from "@parallel/graphql/__types";
@@ -12,6 +12,7 @@ import { DashboardModuleChartType } from "../../components/DashboardModuleChartT
 import { DashboardModuleFormLabel } from "../../components/DashboardModuleFormLabel";
 import { ProfilesModuleFilterEditor } from "../../components/ProfilesModuleFilterEditor";
 import { defaultDashboardModuleProfileFilter } from "../../utils/moduleUtils";
+import { Text } from "@parallel/components/ui";
 
 export function ProfilesChartModuleSettings({
   profileType,
@@ -110,6 +111,7 @@ export function ProfilesChartModuleSettings({
                   filterFields={(f) => f.type === "SELECT" || f.type === "USER_ASSIGNMENT"}
                   onChange={(v) => onChange(v?.id)}
                 />
+
                 <FormErrorMessage>
                   <FormattedMessage
                     id="generic.required-field-error"
@@ -119,6 +121,7 @@ export function ProfilesChartModuleSettings({
               </FormControl>
             )}
           />
+
           <Divider />
           <Text textTransform="uppercase" color="gray.600" fontSize="sm" fontWeight={500}>
             <FormattedMessage

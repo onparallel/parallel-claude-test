@@ -1,4 +1,4 @@
-import { Center, Flex, List, Stack, Text } from "@chakra-ui/react";
+import { Center, Flex, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
@@ -20,6 +20,7 @@ import {
   RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
+import { Text } from "@parallel/components/ui";
 export interface RecipientViewPetitionFieldNumberProps
   extends Omit<
     RecipientViewPetitionFieldLayoutProps,
@@ -303,6 +304,7 @@ export function RecipientViewPetitionFieldNumber({
               defaultMessage="{count, plural, =1 {1 reply submitted} other {# replies submitted}}"
               values={{ count: filteredReplies.length }}
             />
+
             {")"}
           </Text>
         ) : hasAlreadyRepliedError ? (

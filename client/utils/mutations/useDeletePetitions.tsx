@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useApolloClient, useMutation, useQuery } from "@apollo/client/react";
-import { Button, Center, ListItem, Spinner, Stack, Text, UnorderedList } from "@chakra-ui/react";
+import { Button, Center, ListItem, Spinner, Stack, UnorderedList } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
@@ -12,6 +12,7 @@ import {
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { PathName } from "@parallel/components/common/PathName";
 import { PetitionNameWithPath } from "@parallel/components/common/PetitionNameWithPath";
+import { Text } from "@parallel/components/ui";
 import {
   PetitionBaseType,
   useDeletePetitions_deletePetitionsDocument,
@@ -27,7 +28,7 @@ import { partitionOnTypename } from "../apollo/typename";
 import { withError } from "../promises/withError";
 import { useHasPermission } from "../useHasPermission";
 
-export function useDeletePetitions({ modalProps }: { modalProps?: BaseModalProps } = {}) {
+export function useDeletePetitions({ modalProps } = {} as { modalProps?: BaseModalProps }) {
   const intl = useIntl();
   const showErrorDialog = useErrorDialog();
   const confirmDelete = useDialog(ConfirmDeletePetitionsDialog);
@@ -45,11 +46,7 @@ export function useDeletePetitions({ modalProps }: { modalProps?: BaseModalProps
       deletePermanently,
       force,
       dryrun,
-    }: {
-      deletePermanently?: boolean;
-      force?: boolean;
-      dryrun?: boolean;
-    },
+    }: { deletePermanently?: boolean; force?: boolean; dryrun?: boolean },
   ) => {
     const [folders, petitions] = partitionOnTypename(petitionsOrFolders, "PetitionFolder");
     const petitionIds = petitions.map((p) => p.id);
@@ -164,6 +161,7 @@ export function useDeletePetitions({ modalProps }: { modalProps?: BaseModalProps
                           relativePath={currentPath}
                         />
                       ),
+
                       type,
                     }}
                   />
@@ -174,6 +172,7 @@ export function useDeletePetitions({ modalProps }: { modalProps?: BaseModalProps
                       defaultMessage="The following {type, select, PETITION {parallels} other{templates}} cannot be deleted because they have been shared with you through a team:"
                       values={{ type }}
                     />
+
                     <UnorderedList paddingStart={4} pt={2}>
                       {conflictingPetitions.map((petition) => (
                         <ListItem key={petition!.id}>
@@ -183,6 +182,7 @@ export function useDeletePetitions({ modalProps }: { modalProps?: BaseModalProps
                     </UnorderedList>
                   </>
                 ),
+
               modalProps,
             });
             // can't delete a public template
@@ -209,6 +209,7 @@ export function useDeletePetitions({ modalProps }: { modalProps?: BaseModalProps
                       id="component.delete-petitions.public-templates-error-plural"
                       defaultMessage="The following templates cannot be deleted because they are public:"
                     />
+
                     <UnorderedList paddingStart={2} pt={2}>
                       {conflictingPetitions.map((petition) => (
                         <ListItem key={petition!.id}>
@@ -218,6 +219,7 @@ export function useDeletePetitions({ modalProps }: { modalProps?: BaseModalProps
                     </UnorderedList>
                   </>
                 ),
+
               modalProps,
             });
           }
@@ -402,11 +404,7 @@ function ConfirmDeleteSharedPetitionsDialog({
   type,
   currentPath,
   ...props
-}: DialogProps<{
-  petitionIds: string[];
-  type: PetitionBaseType;
-  currentPath?: string;
-}>) {
+}: DialogProps<{ petitionIds: string[]; type: PetitionBaseType; currentPath?: string }>) {
   const { data, loading } = useQuery(useDeletePetitions_petitionsDocument, {
     variables: { ids: petitionIds },
     fetchPolicy: "cache-and-network",
@@ -532,6 +530,7 @@ function useConfirmDeletePermanentlyPetitionsDialog() {
               values={{ count }}
             />
           ),
+
         description: (
           <Stack>
             <Text>
@@ -630,6 +629,7 @@ function useConfirmDeletePermanentlyPetitionsDialog() {
             </Text>
           </Stack>
         ),
+
         modalProps,
       });
     },

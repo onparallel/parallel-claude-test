@@ -1,7 +1,8 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Button, Center, Flex, HStack, Image, Stack, Text } from "@chakra-ui/react";
+import { Button, Center, Flex, HStack, Image, Stack } from "@chakra-ui/react";
 import { AddIcon, LockClosedIcon, PlusCircleIcon } from "@parallel/chakra/icons";
+import { Text } from "@parallel/components/ui";
 import {
   ProfileKeyProcesses_associateProfileToPetitionDocument,
   ProfileKeyProcesses_createPetitionFromProfileDocument,
@@ -342,7 +343,7 @@ function KeyProcessCard({
               </Link>
             ) : (
               <Text
-                noOfLines={2}
+                lineClamp={2}
                 fontWeight={500}
                 textStyle={isNullish(latestPetition?.name) ? "hint" : undefined}
               >
@@ -473,6 +474,7 @@ function PlaceholderEmpty({ profileTypeId }: { profileTypeId: string }) {
         width={100}
         src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/profiles/empty-key-processes.png`}
       />
+
       <Text color="gray.500" fontStyle="italic">
         <FormattedMessage
           id="component.profile-key-processes.placeholder"

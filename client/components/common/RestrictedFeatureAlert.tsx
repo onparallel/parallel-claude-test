@@ -1,7 +1,8 @@
-import { Alert, AlertDescription, AlertIcon, AlertProps, Text } from "@chakra-ui/react";
+import { Alert, AlertDescription, AlertIcon, AlertProps } from "@chakra-ui/react";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { FormattedMessage } from "react-intl";
 import { Link } from "./Link";
+import { Text } from "@parallel/components/ui";
 
 export function RestrictedFeatureAlert({ children, ...props }: AlertProps) {
   const userCanListOrgUsers = useHasPermission("USERS:LIST_USERS");

@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-imports */
 import { Text as ChakraText, Link, Stack } from "@chakra-ui/react";
 import { Text } from "@parallel/components/ui";
 import { untranslated } from "@parallel/utils/untranslated";

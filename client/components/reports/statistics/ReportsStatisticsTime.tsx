@@ -10,7 +10,6 @@ import {
   TableContainer,
   Tbody,
   Td,
-  Text,
   Th,
   Thead,
   Tr,
@@ -41,6 +40,7 @@ import { Chart } from "react-chartjs-2";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { getTimeSpan, TimeSpan } from "../common/TimeSpan";
+import { Text } from "@parallel/components/ui";
 
 type RadioValues = "opened" | "first_reply" | "completed" | "signed" | "closed";
 
@@ -587,6 +587,7 @@ function useDownloadTimeReportExcel() {
             style: { numFmt: "0.00" },
           },
         ];
+
         worksheet.spliceRows(1, 0, []);
         worksheet.mergeCells("B1:G1");
         worksheet.getCell("A1").value =

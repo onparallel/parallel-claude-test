@@ -1,4 +1,4 @@
-import { Box, Grid, Stack, Text } from "@chakra-ui/react";
+import { Box, Grid, Stack } from "@chakra-ui/react";
 import { Divider } from "@parallel/components/common/Divider";
 import {
   LocalizableUserText,
@@ -13,6 +13,7 @@ import {
   PetitionRepliesMetadataGender,
   PetitionRepliesMetadataText,
 } from "./PetitionRepliesMetadata";
+import { Text } from "@parallel/components/ui";
 
 interface Schema {
   type: "object" | "array" | "string" | "number";

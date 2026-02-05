@@ -1,6 +1,7 @@
-import { Center, Spinner, Text } from "@chakra-ui/react";
+import { Center, Spinner } from "@chakra-ui/react";
 import { LoadingDynamicText } from "@parallel/components/reports/common/LoadingDynamicText";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export function ReportsLoadingMessage() {
   return (

@@ -1,4 +1,5 @@
-import { Box, useToast } from "@chakra-ui/react";
+import { useToast } from "@chakra-ui/react";
+import { Box } from "@parallel/components/ui";
 import copy from "copy-to-clipboard";
 import { ReactNode, useCallback } from "react";
 

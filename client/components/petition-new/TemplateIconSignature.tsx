@@ -1,9 +1,10 @@
 import { gql } from "@apollo/client";
-import { PopoverProps, Text } from "@chakra-ui/react";
+import { PopoverProps } from "@chakra-ui/react";
 import { SignatureIcon } from "@parallel/chakra/icons";
 import { TemplateIconSignature_SignatureConfigFragment } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 import { SmallPopover } from "../common/SmallPopover";
+import { Text } from "@parallel/components/ui";
 
 export interface TemplateIconSignatureProps extends PopoverProps {
   signatureConfig: TemplateIconSignature_SignatureConfigFragment;

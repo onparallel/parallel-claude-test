@@ -14,7 +14,6 @@ import {
   Input,
   ScaleFade,
   Stack,
-  Text,
   useToast,
 } from "@chakra-ui/react";
 import { CheckIcon, QuestionOutlineIcon } from "@parallel/chakra/icons";
@@ -41,6 +40,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
 import { useTone } from "../common/ToneProvider";
 import { useRecipientViewContactlessHelpDialog } from "./dialogs/RecipientViewContactlessHelpDialog";
+import { Text } from "@parallel/components/ui";
 
 export interface RecipientViewContactlessFormData {
   firstName: string;
@@ -297,6 +297,7 @@ export function RecipientViewContactlessForm({
                     defaultMessage="Enter your data to access"
                     values={{ tone }}
                   />
+
                   <IconButton
                     marginStart={2}
                     icon={<QuestionOutlineIcon />}
@@ -393,6 +394,7 @@ export function RecipientViewContactlessForm({
                       {email}
                     </Text>
                   ),
+
                   tone,
                 }}
               />

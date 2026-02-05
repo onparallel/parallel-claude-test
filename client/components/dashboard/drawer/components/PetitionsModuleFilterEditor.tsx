@@ -1,4 +1,4 @@
-import { Button, Grid, HStack, Stack, Text } from "@chakra-ui/react";
+import { Button, Grid, HStack, Stack } from "@chakra-ui/react";
 import { PlusCircleFilledIcon } from "@parallel/chakra/icons";
 import { MultiCheckboxSimpleSelect } from "@parallel/components/common/MultiCheckboxSimpleSelect";
 import { PetitionSelect } from "@parallel/components/common/PetitionSelect";
@@ -13,6 +13,7 @@ import { ReactNode, useCallback, useMemo } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { DashboardModuleFilterContainer } from "./DashboardModuleFilterContainer";
+import { Text } from "@parallel/components/ui";
 
 interface PetitionsModuleFilterEditorProps {
   field: string;
@@ -273,6 +274,7 @@ function LogicalOperatorFilterContainer({
           />
         </Text>
       )}
+
       <HStack>
         <Button
           variant="outline"

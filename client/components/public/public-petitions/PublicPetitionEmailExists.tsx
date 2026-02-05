@@ -1,6 +1,7 @@
-import { Button, Img, Stack, Text } from "@chakra-ui/react";
+import { Button, Img, Stack } from "@chakra-ui/react";
 import { Logo } from "@parallel/components/common/Logo";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 interface PublicPetitionEmailExistsProps {
   organizationName: string;

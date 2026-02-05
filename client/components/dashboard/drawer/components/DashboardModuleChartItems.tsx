@@ -1,14 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  Button,
-  FormControl,
-  FormErrorMessage,
-  HStack,
-  Input,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Button, FormControl, FormErrorMessage, HStack, Input, Stack } from "@chakra-ui/react";
 import { AddIcon, DeleteIcon, PlusCircleFilledIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
@@ -25,6 +16,7 @@ import {
 import { DashboardModuleFormLabel } from "./DashboardModuleFormLabel";
 import { PetitionsModuleFilterEditor } from "./PetitionsModuleFilterEditor";
 import { ProfilesModuleFilterEditor } from "./ProfilesModuleFilterEditor";
+import { Text } from "@parallel/components/ui";
 
 export function DashboardModuleChartItems({
   isProfileTypeModule,
@@ -79,6 +71,7 @@ export function DashboardModuleChartItems({
           ? defaultDashboardModuleProfileFilter()
           : defaultDashboardModulePetitionFilter(),
       ],
+
       color: "#000000",
     });
     if (fields.length >= 0) {
@@ -124,6 +117,7 @@ export function DashboardModuleChartItems({
               onClick={handleAddNewChartItem}
               isDisabled={isDisabled}
             />
+
             <IconButtonWithTooltip
               label={intl.formatMessage({ id: "generic.delete", defaultMessage: "Delete" })}
               icon={<DeleteIcon />}
@@ -208,6 +202,7 @@ export function DashboardModuleChartItems({
                   })}
                   onBlur={() => rerenderSelect()}
                 />
+
                 <FormErrorMessage>
                   <FormattedMessage
                     id="generic.required-field-error"

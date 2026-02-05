@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Badge, Center, Flex, Stack, Text, useToast } from "@chakra-ui/react";
+import { Badge, Center, Flex, Stack, useToast } from "@chakra-ui/react";
 import { KeyIcon, LogInIcon, UsersIcon } from "@parallel/chakra/icons";
 import { AdminOrganizationMembersListTableHeader } from "@parallel/components/admin-organizations/AdminOrganizationMembersListTableHeader";
 import { AdminOrganizationsLayout } from "@parallel/components/admin-organizations/AdminOrganizationsLayout";
@@ -38,6 +38,7 @@ import { useSelection } from "@parallel/utils/useSelectionState";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { sort } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 const SORTING = ["fullName", "email", "createdAt", "lastActiveAt"] as const;
 
@@ -396,6 +397,7 @@ function useOrganizationMembersTableColumns() {
                                 ) : (
                                   <UsersIcon marginEnd={1} marginBottom={0.5} />
                                 )}
+
                                 <LocalizableUserTextRender
                                   value={userGroup.localizableName}
                                   default={userGroup.name}
@@ -461,6 +463,7 @@ function useOrganizationMembersTableColumns() {
         ),
       },
     ],
+
     [intl.locale],
   );
 }

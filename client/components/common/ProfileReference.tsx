@@ -1,11 +1,12 @@
 import { gql } from "@apollo/client";
-import { HTMLChakraProps, Text } from "@chakra-ui/react";
+import { HTMLChakraProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { ProfileReference_ProfileFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";
 import { Link } from "./Link";
+import { Text } from "@parallel/components/ui";
 
 interface ProfileReferenceProps {
   profile?: ProfileReference_ProfileFragment | null;

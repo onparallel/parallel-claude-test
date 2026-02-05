@@ -9,9 +9,9 @@ import {
   LinkBox,
   LinkOverlay,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { CommentIcon, EditIcon } from "@parallel/chakra/icons";
+import { Text } from "@parallel/components/ui";
 import { PetitionComments_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -131,7 +131,7 @@ export function PetitionComments({ petition, onSelectField }: PetitionCommentsPr
                     tabIndex={-1}
                   >
                     <Text
-                      noOfLines={2}
+                      lineClamp={2}
                       fontWeight={600}
                       fontStyle={field.title ? undefined : "hint"}
                     >
@@ -154,13 +154,14 @@ export function PetitionComments({ petition, onSelectField }: PetitionCommentsPr
                 </HStack>
                 <HStack color="gray.600" justify="space-between">
                   <Box flex="1">
-                    <Text noOfLines={2} fontSize="sm" as="span" wordBreak="break-all">
+                    <Text lineClamp={2} fontSize="sm" as="span" wordBreak="break-all">
                       <UserOrContactReference
                         userOrAccess={comment.author}
                         userUseYou
                         _activeContact={{ fontWeight: "bold" }}
                         contactAsLink={false}
                       />
+
                       {`: `}
 
                       {comment.isApproval ? (

@@ -1,6 +1,7 @@
-import { Heading, Text } from "@chakra-ui/react";
+import { Heading } from "@chakra-ui/react";
 import { FormattedMessage } from "react-intl";
 import { PublicContainer } from "../layout/PublicContainer";
+import { Text } from "@parallel/components/ui";
 
 export function PublicTemplatesHero() {
   return (

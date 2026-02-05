@@ -1,4 +1,4 @@
-import { Center, Flex, List, Stack, Text } from "@chakra-ui/react";
+import { Center, Flex, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -28,6 +28,7 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
+import { Text } from "@parallel/components/ui";
 
 export interface RecipientViewPetitionFieldTextProps
   extends Omit<
@@ -274,6 +275,7 @@ export function RecipientViewPetitionFieldText({
             data-testid="recipient-view-field-text-new-reply-textarea"
             {...inputProps}
           />
+
           <Center boxSize={10} position="absolute" insetEnd={0} bottom={0}>
             <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
           </Center>

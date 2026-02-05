@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import { Button, FormControl, FormHelperText, FormLabel, Stack, Text } from "@chakra-ui/react";
+import { Button, FormControl, FormHelperText, FormLabel, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
@@ -8,7 +8,7 @@ import { localizableUserTextRender } from "@parallel/components/common/Localizab
 import { ProfileTypeFieldSelect } from "@parallel/components/common/ProfileTypeFieldSelect";
 import { SimpleSelect, useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { BackgroundCheckEntityTypeSelect } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityTypeSelect";
-import { Box, Checkbox, HStack } from "@parallel/components/ui";
+import { Box, Checkbox, HStack, Text } from "@parallel/components/ui";
 import { ConfigureProfileBackgroundCheckAutomateSearchDialog_profileTypeDocument } from "@parallel/graphql/__types";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { Controller, useForm } from "react-hook-form";
@@ -179,6 +179,7 @@ export function ConfigureProfileBackgroundCheckAutomateSearchDialog({
                   defaultMessage="Name of entity"
                 />
               )}
+
               <Text as="span" marginStart={1}>
                 *
               </Text>
@@ -201,6 +202,7 @@ export function ConfigureProfileBackgroundCheckAutomateSearchDialog({
                 );
               }}
             />
+
             {!textFields.length ? (
               <FormHelperText>
                 <FormattedMessage
@@ -245,6 +247,7 @@ export function ConfigureProfileBackgroundCheckAutomateSearchDialog({
                 );
               }}
             />
+
             {!dateFields.length ? (
               <FormHelperText>
                 <FormattedMessage
@@ -290,6 +293,7 @@ export function ConfigureProfileBackgroundCheckAutomateSearchDialog({
                 );
               }}
             />
+
             {!countryFields.length ? (
               <FormHelperText>
                 <FormattedMessage
@@ -329,6 +333,7 @@ export function ConfigureProfileBackgroundCheckAutomateSearchDialog({
                     );
                   }}
                 />
+
                 {!countryFields.length ? (
                   <FormHelperText>
                     <FormattedMessage
@@ -348,6 +353,7 @@ export function ConfigureProfileBackgroundCheckAutomateSearchDialog({
                     id="component.configure-profile-automate-search-dialog.activation-conditions-label"
                     defaultMessage="Add activation conditions"
                   />
+
                   <HelpPopover>
                     <FormattedMessage
                       id="component.configure-profile-automate-search-dialog.activation-conditions-help"

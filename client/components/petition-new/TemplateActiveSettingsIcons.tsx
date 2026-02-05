@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { HStack, StackProps, Text } from "@chakra-ui/react";
+import { HStack, StackProps } from "@chakra-ui/react";
 import { LinkIcon, LockClosedIcon } from "@parallel/chakra/icons";
 import { LocaleBadge } from "@parallel/components/common/LocaleBadge";
 import { TemplateActiveSettingsIcons_PetitionTemplateFragment } from "@parallel/graphql/__types";
@@ -9,6 +9,7 @@ import { TemplateIconCompliance } from "./TemplateIconCompliance";
 import { TemplateIconDefaultPermissions } from "./TemplateIconDefaultPermissions";
 import { TemplateIconReminders } from "./TemplateIconReminders";
 import { TemplateIconSignature } from "./TemplateIconSignature";
+import { Text } from "@parallel/components/ui";
 
 export interface TemplateActiveSettingsIconsProps extends StackProps {
   template: TemplateActiveSettingsIcons_PetitionTemplateFragment;

@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
-import { Button, HStack, Stack, Text } from "@chakra-ui/react";
+import { Button, HStack, Stack } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Text } from "@parallel/components/ui";
 import { RecipientSuggestion_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { PropsWithChildren } from "react";
@@ -50,7 +51,8 @@ export const RecipientSuggestion = chakraForwardRef<
               fieldIndex={petitionFieldIndex}
               hideIcon
             />
-            <Text fontSize="sm" noOfLines={2}>
+
+            <Text fontSize="sm" lineClamp={2}>
               {petitionField.title || (
                 <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
               )}

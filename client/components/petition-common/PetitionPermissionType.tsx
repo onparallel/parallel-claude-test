@@ -1,7 +1,7 @@
-import { Text } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionPermissionType } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export const PetitionPermissionTypeText = chakraForwardRef<
   "span",

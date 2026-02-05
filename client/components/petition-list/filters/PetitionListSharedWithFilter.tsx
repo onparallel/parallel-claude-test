@@ -8,7 +8,6 @@ import {
   HStack,
   IconButton,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { CloseIcon, PlusCircleFilledIcon } from "@parallel/chakra/icons";
 import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
@@ -28,6 +27,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
 import { useSearchUsers } from "../../../utils/useSearchUsers";
 import { UserSelect } from "../../common/UserSelect";
+import { Text } from "@parallel/components/ui";
 
 export function PetitionListSharedWithFilter() {
   const { control, setValue, watch } = useFormContext<{
@@ -68,6 +68,7 @@ export function PetitionListSharedWithFilter() {
           />
         </Text>
       )}
+
       {filters.length > 1 ? (
         <Flex justifyContent="flex-start">
           <Button
@@ -105,6 +106,7 @@ export function PetitionListSharedWithFilter() {
             <FormattedMessage id="generic.add-filter" defaultMessage="Add filter" />
           </Button>
         )}
+
         <Spacer />
         <ButtonGroup spacing={2}>
           <Button size="sm" onClick={() => setValue("filter.filters", [])}>
@@ -194,6 +196,7 @@ export function PetitionListSharedWithFilterLine({
         size="sm"
         onClick={onRemove}
       />
+
       <Controller
         control={control}
         name={`${path}.operator`}
@@ -226,6 +229,7 @@ export function PetitionListSharedWithFilterLine({
               onChange={(userOrGroup) => onChange(userOrGroup?.id ?? (null as any))}
               onSearch={handleSearchUsersAndGroups}
             />
+
             <FormErrorMessage>
               {error?.type === "required" ? (
                 <FormattedMessage

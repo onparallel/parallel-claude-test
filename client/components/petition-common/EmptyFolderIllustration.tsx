@@ -1,6 +1,7 @@
-import { Center, Image, Stack, Text } from "@chakra-ui/react";
+import { Center, Image, Stack } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 interface EmptyFolderIllustrationProps {
   isTemplate: boolean;
@@ -17,6 +18,7 @@ export const EmptyFolderIllustration = chakraForwardRef<"div", EmptyFolderIllust
             width="100%"
             src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/empty_folder.svg`}
           />
+
           <Text paddingTop={5} fontWeight="600">
             <FormattedMessage
               id="component.empty-folder-illustration.title"

@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Badge, FormControl, FormLabel, HStack, Text } from "@chakra-ui/react";
+import { Badge, FormControl, FormLabel, HStack } from "@chakra-ui/react";
 import { FieldDateIcon, HistoryIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import {
@@ -50,6 +50,7 @@ import { ProfileFormFieldSelect } from "./ProfileFormFieldSelect";
 import { ProfileFormFieldShortText } from "./ProfileFormFieldShortText";
 import { ProfileFormFieldText } from "./ProfileFormFieldText";
 import { ProfileFormFieldUserAssignment } from "./ProfileFormFieldUserAssignment";
+import { Text } from "@parallel/components/ui";
 
 export interface ProfileFormFieldProps {
   onRefetch?: () => void;
@@ -223,6 +224,7 @@ export function ProfileFormField(props: ProfileFormFieldProps) {
                       id: reply.id,
                     },
                   ],
+
                   { shouldDirty: true },
                 );
                 if (needsExpirationDialog) {
@@ -427,6 +429,7 @@ export function ProfileFormField(props: ProfileFormFieldProps) {
             placement="start"
             onClick={handleShowHistory}
           />
+
           {needsExpirationDialog ? (
             <ProfileFormFieldExpirationButton
               isDisabled={fieldIsEmpty || props.isDisabled === true}

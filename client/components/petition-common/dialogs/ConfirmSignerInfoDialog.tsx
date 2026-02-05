@@ -14,7 +14,6 @@ import {
   Input,
   Stack,
   Switch,
-  Text,
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
@@ -33,6 +32,7 @@ import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
 import type { SignerSelectSelection } from "./ConfirmPetitionSignersDialog";
+import { Text } from "@parallel/components/ui";
 
 const MAX_FILE_SIZE = 1024 * 1024 * 1;
 
@@ -57,9 +57,7 @@ function ConfirmSignerInfoDialog({
   ...props
 }: DialogProps<
   ConfirmSignerInfoDialogProps,
-  SignatureConfigInputSigner & {
-    signWithEmbeddedImage?: File;
-  }
+  SignatureConfigInputSigner & { signWithEmbeddedImage?: File }
 >) {
   const intl = useIntl();
 
@@ -187,6 +185,7 @@ function ConfirmSignerInfoDialog({
                   defaultMessage: "example@company.com",
                 })}
               />
+
               <FormErrorMessage>
                 <FormattedMessage
                   id="generic.forms-invalid-email-error"
@@ -195,6 +194,7 @@ function ConfirmSignerInfoDialog({
               </FormErrorMessage>
             </FormControl>
           )}
+
           <FormControl isInvalid={!!errors.firstName}>
             <FormLabel fontWeight={500}>
               <FormattedMessage id="generic.forms-first-name-label" defaultMessage="First name" />

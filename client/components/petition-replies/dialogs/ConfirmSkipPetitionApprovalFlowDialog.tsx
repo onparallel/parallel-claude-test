@@ -1,4 +1,4 @@
-import { Button, FormControl, Stack, Text } from "@chakra-ui/react";
+import { Button, FormControl, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
+import { Text } from "@parallel/components/ui";
 
 export function ConfirmSkipPetitionApprovalFlowDialog(props: DialogProps<{}, string>) {
   const intl = useIntl();

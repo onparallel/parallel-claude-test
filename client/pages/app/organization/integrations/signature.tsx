@@ -9,7 +9,6 @@ import {
   Image,
   Spacer,
   Stack,
-  Text,
   useToast,
 } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
@@ -44,6 +43,7 @@ import { useDocusignConsentPopup } from "@parallel/utils/useDocusignConsentPopup
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
@@ -239,6 +239,7 @@ function IntegrationsSignature() {
                   defaultMessage: "Reload",
                 })}
               />
+
               <Spacer />
               <Button
                 isDisabled={!me.hasPetitionSignature}
@@ -253,6 +254,7 @@ function IntegrationsSignature() {
             </Stack>
           }
         />
+
         {!me.hasPetitionSignature ? (
           <ContactSupportAlert
             body={
@@ -458,6 +460,7 @@ function useSignatureTokensTableColumns() {
         IntegrationsSignature_SignatureOrgIntegrationFragment,
         SignatureTokensTableContext
       >[],
+
     [intl.locale],
   );
 }

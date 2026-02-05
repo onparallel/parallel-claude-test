@@ -1,9 +1,10 @@
-import { HStack, Stack, Text } from "@chakra-ui/react";
+import { HStack, Stack } from "@chakra-ui/react";
 import { Divider } from "@parallel/components/common/Divider";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { PetitionRepliesMetadataText } from "./PetitionRepliesMetadata";
+import { Text } from "@parallel/components/ui";
 
 interface CurrencyAmount {
   value: number;
@@ -74,6 +75,7 @@ export function PetitionRepliesFieldFileUploadPayslipReply({
                 })}
                 content={period}
               />
+
               <PetitionRepliesMetadataText
                 label={intl.formatMessage({
                   id: "component.petition-replies-field-file-upload-payslip-reply.net-salary",
@@ -81,6 +83,7 @@ export function PetitionRepliesFieldFileUploadPayslipReply({
                 })}
                 content={formatCurrencyAmount(data.netPay)}
               />
+
               <PetitionRepliesMetadataText
                 label={intl.formatMessage({
                   id: "component.petition-replies-field-file-upload-payslip-reply.total-deduction",
@@ -88,6 +91,7 @@ export function PetitionRepliesFieldFileUploadPayslipReply({
                 })}
                 content={formatCurrencyAmount(data.totalDeduction)}
               />
+
               <PetitionRepliesMetadataText
                 label={intl.formatMessage({
                   id: "component.petition-replies-field-file-upload-payslip-reply.total-accrued",
@@ -104,6 +108,7 @@ export function PetitionRepliesFieldFileUploadPayslipReply({
                 })}
                 content={data.employeeName}
               />
+
               <PetitionRepliesMetadataText
                 label={intl.formatMessage({
                   id: "component.petition-replies-field-file-upload-payslip-reply.employee-id",
@@ -111,6 +116,7 @@ export function PetitionRepliesFieldFileUploadPayslipReply({
                 })}
                 content={data.employeeId}
               />
+
               <PetitionRepliesMetadataText
                 label={intl.formatMessage({
                   id: "component.petition-replies-field-file-upload-payslip-reply.employer-name",
@@ -118,6 +124,7 @@ export function PetitionRepliesFieldFileUploadPayslipReply({
                 })}
                 content={data.employerName}
               />
+
               <PetitionRepliesMetadataText
                 label={intl.formatMessage({
                   id: "component.petition-replies-field-id-verification-reply.employer-id",

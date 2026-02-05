@@ -1,5 +1,4 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Text } from "@chakra-ui/react";
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import {
@@ -8,6 +7,7 @@ import {
   PlateCombobox,
 } from "@parallel/components/common/slate/PlateCombobox";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
+import { Box, Flex, Text } from "@parallel/components/ui";
 import {
   createPlaceholderPlugin_PetitionBaseFragment,
   createPlaceholderPlugin_PetitionFieldFragment,

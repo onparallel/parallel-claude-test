@@ -9,7 +9,6 @@ import {
   FormLabel,
   HStack,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { FieldDateIcon } from "@parallel/chakra/icons";
 import { DateInput } from "@parallel/components/common/DateInput";
@@ -27,6 +26,7 @@ import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 interface UpdateProfileFieldExpirationDialogResult {
   expiryDate: string | null;

@@ -12,7 +12,6 @@ import {
   Portal,
   Progress,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import {
@@ -72,6 +71,7 @@ import { RestrictedFeaturePopover } from "../common/RestrictedFeaturePopover";
 import { PetitionComposeVisibilityAccordion } from "../petition-common/PetitionComposeVisibilityAccordion";
 import { PetitionVisibilityEditor } from "./logic/PetitionVisibilityEditor";
 import { PetitionComposeDragActiveIndicator } from "./PetitionComposeDragActiveIndicator";
+import { Text } from "@parallel/components/ui";
 
 const MAX_FILE_SIZE = 1024 * 1024 * 50;
 const TOTAL_MAX_FILES_SIZE = 1024 * 1024 * 10;
@@ -233,6 +233,7 @@ export const PetitionComposeAttachments = chakraForwardRef<"div", PetitionCompos
                     defaultMessage="Too many attachments"
                   />
                 ),
+
                 message: (
                   <FormattedMessage
                     id="component.petition-compose-attachments.too-many-attachments"
@@ -254,6 +255,7 @@ export const PetitionComposeAttachments = chakraForwardRef<"div", PetitionCompos
                 defaultMessage="Invalid attachment"
               />
             ),
+
             message: (
               <FormattedMessage
                 id="component.petition-compose-attachments.invalid-attachment-message"
@@ -467,6 +469,7 @@ export const PetitionComposeAttachments = chakraForwardRef<"div", PetitionCompos
               />
             </Text>
           )}
+
           {totalMaxFilesSizeExceeded || hasDocumentFieldsWithAttachments ? (
             <Box>
               {totalMaxFilesSizeExceeded ? (
@@ -729,6 +732,7 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
     ) : (
       <BackCoverIcon />
     );
+
   const buttonColor = type === "FRONT" || type === "BACK" ? "tags.brown" : "tags.green";
 
   const uploadHasFailed = !isUploading && !isComplete;
@@ -933,6 +937,7 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
               size="sm"
               variant="ghost"
             />
+
             <IconButtonWithTooltip
               ref={previewRef}
               size="sm"
@@ -958,6 +963,7 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
                 )
               }
             />
+
             <IconButtonWithTooltip
               size="sm"
               fontSize="md"

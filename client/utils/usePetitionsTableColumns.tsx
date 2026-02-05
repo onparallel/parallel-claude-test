@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Flex, HStack, IconButton, Stack, Text, VisuallyHidden } from "@chakra-ui/react";
+import { Flex, HStack, IconButton, Stack, VisuallyHidden } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import {
   AlertCircleIcon,
@@ -30,6 +30,7 @@ import { PetitionListSharedWithFilter } from "@parallel/components/petition-list
 import { PetitionListTagFilter } from "@parallel/components/petition-list/filters/PetitionListTagFilter";
 import { PetitionTemplateFilter } from "@parallel/components/petition-list/filters/PetitionTemplateFilter";
 import { TemplateActiveSettingsIcons } from "@parallel/components/petition-new/TemplateActiveSettingsIcons";
+import { Text } from "@parallel/components/ui";
 import {
   PetitionApprovalRequestStepStatus,
   PetitionBaseType,

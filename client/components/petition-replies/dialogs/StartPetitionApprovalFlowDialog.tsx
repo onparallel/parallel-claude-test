@@ -8,7 +8,6 @@ import {
   Input,
   ListItem,
   Stack,
-  Text,
   UnorderedList,
 } from "@chakra-ui/react";
 import { ThumbsUpIcon } from "@parallel/chakra/icons";
@@ -20,6 +19,7 @@ import { useStartPetitionApprovalFlowDialog_PetitionApprovalRequestStepFragment 
 import { useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 interface StartPetitionApprovalFlowDialogProps {
   step: useStartPetitionApprovalFlowDialog_PetitionApprovalRequestStepFragment;
@@ -98,10 +98,9 @@ export function StartPetitionApprovalFlowDialog({
             <UnorderedList paddingStart={3}>
               {step.approvers.map(({ user }, index) => {
                 return user ? (
-                  <ListItem
-                    key={index}
-                    fontWeight={500}
-                  >{`${user.fullName} (${user.email})`}</ListItem>
+                  <ListItem key={index} fontWeight={500}>
+                    {`${user.fullName} (${user.email})`}
+                  </ListItem>
                 ) : null;
               })}
             </UnorderedList>
@@ -156,6 +155,7 @@ export function StartPetitionApprovalFlowDialog({
                               }
                             }}
                           />
+
                           <Button
                             size="sm"
                             fontSize="md"

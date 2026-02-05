@@ -11,7 +11,6 @@ import {
   LinkBox,
   LinkOverlay,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { ReportsIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -29,6 +28,7 @@ import { useHandleNavigation } from "@parallel/utils/navigation";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export function Reports() {
   const intl = useIntl();

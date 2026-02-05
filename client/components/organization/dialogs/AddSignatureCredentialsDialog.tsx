@@ -14,7 +14,6 @@ import {
   RadioGroup,
   Stack,
   Switch,
-  Text,
   useCounter,
   useToast,
 } from "@chakra-ui/react";
@@ -32,6 +31,7 @@ import { useDocusignConsentPopup } from "@parallel/utils/useDocusignConsentPopup
 import { MouseEvent, useEffect } from "react";
 import { Controller, FormProvider, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 const PROVIDERS: SignatureOrgIntegrationProvider[] = ["SIGNATURIT", "DOCUSIGN"];
 type SignatureCredentials<TProvider extends SignatureOrgIntegrationProvider> = {
@@ -240,6 +240,7 @@ function SignaturitCredentialsInput() {
             id="component.add-signature-credentials-dialog.signaturit-api-key-label"
             defaultMessage="API Key"
           />
+
           <HelpPopover>
             <FormattedMessage
               id="component.add-signature-credentials-dialog.signaturit-api-key-help"
@@ -292,6 +293,7 @@ function DocusignCredentialsInput({ hasDocusignSandbox }: { hasDocusignSandbox: 
               id="component.add-signature-credentials-dialog.docusign-environment"
               defaultMessage="Demo mode"
             />
+
             <HelpPopover>
               <Text fontSize="sm">
                 <FormattedMessage

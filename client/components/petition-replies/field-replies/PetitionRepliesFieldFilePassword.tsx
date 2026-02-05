@@ -1,9 +1,10 @@
-import { HStack, Text } from "@chakra-ui/react";
+import { HStack } from "@chakra-ui/react";
 import { EyeIcon, EyeOffIcon } from "@parallel/chakra/icons";
 import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboardButton";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export function PetitionRepliesFieldFilePassword({ password }: { password: string }) {
   const intl = useIntl();

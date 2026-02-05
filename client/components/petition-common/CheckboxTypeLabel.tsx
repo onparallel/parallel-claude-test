@@ -1,6 +1,7 @@
-import { Text, TextProps } from "@chakra-ui/react";
+import { TextProps } from "@chakra-ui/react";
 import { FormattedMessage } from "react-intl";
 import { useTone } from "../common/ToneProvider";
+import { Text } from "@parallel/components/ui";
 
 export interface CheckboxTypeLabelProps extends TextProps {
   options: any;

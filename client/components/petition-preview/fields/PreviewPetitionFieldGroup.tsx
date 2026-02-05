@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, Stack, Text, useToast } from "@chakra-ui/react";
+import { Box, Button, Flex, Stack, useToast } from "@chakra-ui/react";
 import { ChevronRightIcon, ImportIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { NakedLink } from "@parallel/components/common/Link";
@@ -49,6 +49,7 @@ import { PreviewPetitionFieldProfileSearch } from "./PreviewPetitionFieldProfile
 import { PreviewPetitionFieldUserAssignment } from "./PreviewPetitionFieldUserAssignment";
 import { PreviewPetitionFieldAdverseMediaSearch } from "./adverse-media-search/PreviewPetitionFieldAdverseMediaSearch";
 import { PreviewPetitionFieldBackgroundCheck } from "./background-check/PreviewPetitionFieldBackgroundCheck";
+import { Text } from "@parallel/components/ui";
 
 export interface PreviewPetitionFieldGroupProps
   extends Omit<

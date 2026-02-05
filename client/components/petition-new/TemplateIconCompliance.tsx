@@ -1,7 +1,8 @@
-import { PopoverProps, Text } from "@chakra-ui/react";
+import { PopoverProps } from "@chakra-ui/react";
 import { TimeIcon } from "@parallel/chakra/icons";
 import { FormattedMessage } from "react-intl";
 import { SmallPopover } from "../common/SmallPopover";
+import { Text } from "@parallel/components/ui";
 
 export interface TemplateIconComplianceProps extends PopoverProps {
   anonymizeAfterMonths: number;

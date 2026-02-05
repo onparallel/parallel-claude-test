@@ -9,7 +9,6 @@ import {
   MenuItem,
   MenuList,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
@@ -21,6 +20,7 @@ import {
 } from "@parallel/components/common/UserSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Text } from "@parallel/components/ui";
 import {
   useProfileSubscribersDialog_UserFragment,
   useProfileSubscribersDialog_subscribeToProfileDocument,
@@ -169,7 +169,7 @@ function ProfileSubscribersDialog({
                 <UserAvatar role="presentation" user={user} size="sm" />
                 <Box flex="1" minWidth={0} fontSize="sm" marginStart={2}>
                   <Flex direction="row" alignItems="center" gap={1}>
-                    <Text noOfLines={1} wordBreak="break-all">
+                    <Text lineClamp={1} wordBreak="break-all">
                       {user.fullName}
                     </Text>
                     {me.id === user.id ? (
@@ -180,7 +180,7 @@ function ProfileSubscribersDialog({
                       </Text>
                     ) : null}
                   </Flex>
-                  <Text color="gray.500" noOfLines={1}>
+                  <Text color="gray.500" lineClamp={1}>
                     {user.email}
                   </Text>
                 </Box>

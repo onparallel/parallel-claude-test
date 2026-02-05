@@ -11,7 +11,6 @@ import {
   Skeleton,
   Spinner,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import {
   ArrowBackIcon,
@@ -53,6 +52,7 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 function DowJonesFieldProfileDetails({
   petitionId,
@@ -181,6 +181,7 @@ function DowJonesFieldProfileDetails({
             })}
             onClick={handleGoBackClick}
           />
+
           <Heading as="h1" size="md">
             <FormattedMessage
               id="component.dow-jones-profile-details.profile-details"
@@ -630,6 +631,7 @@ function useDowJonesKycSanctionsColumns() {
         },
       },
     ],
+
     [intl.locale],
   );
 }
@@ -705,6 +707,7 @@ function useDowJonesKycRelationshipsColumns() {
         },
       },
     ],
+
     [intl.locale],
   );
 }

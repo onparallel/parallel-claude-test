@@ -9,7 +9,6 @@ import {
   Grid,
   Spinner,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { PlusCircleIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
@@ -25,7 +24,7 @@ import {
   PetitionUpdateProfileOnCloseSourceSelect,
   PetitionUpdateProfileOnCloseSourceSelectOptionValue,
 } from "@parallel/components/petition-compose/PetitionUpdateProfileOnCloseSourceSelect";
-import { Input } from "@parallel/components/ui";
+import { Input, Text } from "@parallel/components/ui";
 import {
   ConfigureUpdateProfileOnCloseDialog_petitionDocument,
   ConfigureUpdateProfileOnCloseDialog_profileTypeDocument,
@@ -448,6 +447,7 @@ function UpdatePropertyCard({
               );
             }}
           />
+
           <FormErrorMessage>
             {errors.updates?.[index]?.profileTypeFieldId?.message}
           </FormErrorMessage>
@@ -766,6 +766,7 @@ function UpdatePropertySelectMapping({
               cursor: "not-allowed",
             }}
           />
+
           <FormControl isInvalid={isNonNullish(errors.updates?.[index]?.source)}>
             <Controller
               shouldUnregister={true}

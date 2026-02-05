@@ -8,13 +8,12 @@ import {
   MenuItem,
   MenuList,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import { ChevronDownIcon, DeleteIcon, UserArrowIcon, UserIcon } from "@parallel/chakra/icons";
 import { SubscribedNotificationsIcon } from "@parallel/components/common/SubscribedNotificationsIcon";
 import { UserAvatar } from "@parallel/components/common/UserAvatar";
-import { Avatar } from "@parallel/components/ui";
+import { Avatar, Text } from "@parallel/components/ui";
 import {
   PetitionPermissionTypeRW,
   TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragment,
@@ -58,7 +57,7 @@ export function TemplateDefaultUserPermissionRow({
         {isNonNullish(permission) ? (
           <>
             <Stack direction={"row"} spacing={1} align="center">
-              <Text noOfLines={1} wordBreak="break-all">
+              <Text lineClamp={1} wordBreak="break-all">
                 {permission.user.fullName}{" "}
                 {userId === permission.user.id ? (
                   <Text as="span">
@@ -70,7 +69,7 @@ export function TemplateDefaultUserPermissionRow({
               </Text>
               {isSubscribed ? <SubscribedNotificationsIcon /> : null}
             </Stack>
-            <Text color="gray.500" noOfLines={1}>
+            <Text color="gray.500" lineClamp={1}>
               {permission.user.email}
             </Text>
           </>

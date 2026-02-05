@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useLazyQuery } from "@apollo/client/react";
-import { Button, FormControl, FormErrorMessage, FormLabel, Stack, Text } from "@chakra-ui/react";
+import { Button, FormControl, FormErrorMessage, FormLabel, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
   useWizardDialog,
@@ -23,6 +23,7 @@ import { useRef } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 type PreviewImportFromProfileDialogSteps = {
   SELECT_PROFILES: {
@@ -50,9 +51,7 @@ function PreviewImportFromProfileDialogSelectProfiles({
 }: WizardStepDialogProps<
   PreviewImportFromProfileDialogSteps,
   "SELECT_PROFILES",
-  {
-    profileIds: string[];
-  }
+  { profileIds: string[] }
 >) {
   const {
     handleSubmit,
@@ -156,6 +155,7 @@ function PreviewImportFromProfileDialogSelectProfiles({
                 />
               )}
             />
+
             <FormErrorMessage>
               <FormattedMessage
                 id="component.preview-import-from-profile-dialog.profile-error"
@@ -189,9 +189,7 @@ function PreviewImportFromProfileDialogPrefillFieldGroups({
 }: WizardStepDialogProps<
   PreviewImportFromProfileDialogSteps,
   "PREFILL_FIELD_GROUPS",
-  {
-    prefill: CreatePetitionFromProfilePrefillInput[];
-  }
+  { prefill: CreatePetitionFromProfilePrefillInput[] }
 >) {
   const form = useForm<{ prefill: CreatePetitionFromProfilePrefillInput[] }>({
     defaultValues: { prefill: [] },

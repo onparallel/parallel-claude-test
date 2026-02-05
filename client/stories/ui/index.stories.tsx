@@ -1,6 +1,7 @@
-import { Box, Grid, GridItem, Link, Stack, Text } from "@chakra-ui/react";
+import { Box, Grid, GridItem, Link, Stack } from "@chakra-ui/react";
 import { untranslated } from "@parallel/utils/untranslated";
 import { Meta, StoryObj } from "@storybook/react";
+import { Text } from "@parallel/components/ui";
 
 const meta = {
   title: "UI (v3)/Introduction",

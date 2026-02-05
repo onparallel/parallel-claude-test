@@ -10,7 +10,6 @@ import {
   Skeleton,
   Spinner,
   Stack,
-  Text,
   UnorderedList,
 } from "@chakra-ui/react";
 import { InfoCircleFilledIcon } from "@parallel/chakra/icons";
@@ -27,6 +26,7 @@ import {
 import { useRef } from "react";
 import { FormattedDate, FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 export function useStandardListDetailsDialog() {
   return useDialog(StandardListDetailsDialog);
@@ -36,10 +36,7 @@ export function StandardListDetailsDialog({
   standardListId,
   isTemplate,
   ...props
-}: DialogProps<{
-  standardListId: string;
-  isTemplate: boolean;
-}>) {
+}: DialogProps<{ standardListId: string; isTemplate: boolean }>) {
   const intl = useIntl();
   const focusRef = useRef<HTMLButtonElement>(null);
   const { data, loading } = useQuery(StandardListDetailsDialog_standardListDefinitionDocument, {
@@ -70,6 +67,7 @@ export function StandardListDetailsDialog({
                 {localizableUserTextRender({ intl, value: title, default: "" })}
               </Heading>
             )}
+
             <Text fontSize="md" fontWeight={400}>
               <FormattedMessage
                 id="component.standard-list-details-dialog.source"
@@ -140,6 +138,7 @@ export function StandardListDetailsDialog({
                         process.env.NEXT_PUBLIC_ASSETS_URL ?? ""
                       }/static/countries/flags/${value.key.toLowerCase()}.png`}
                     />
+
                     <Box as="span">
                       {[value.prefix, value.label ?? value.key, value.suffix]
                         .filter(isNonNullish)

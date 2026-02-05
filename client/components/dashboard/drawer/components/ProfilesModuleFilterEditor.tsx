@@ -1,14 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  Button,
-  FormControl,
-  FormErrorMessage,
-  Grid,
-  HStack,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Button, FormControl, FormErrorMessage, Grid, HStack, Stack } from "@chakra-ui/react";
 import { AddIcon, CloseIcon, PlusCircleFilledIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { MultiCheckboxSimpleSelect } from "@parallel/components/common/MultiCheckboxSimpleSelect";
@@ -31,6 +22,7 @@ import { Controller, get, useFieldArray, useFormContext } from "react-hook-form"
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { DashboardModuleFilterContainer } from "./DashboardModuleFilterContainer";
+import { Text } from "@parallel/components/ui";
 
 const MAX_GROUP_DEPTH = 2;
 
@@ -71,6 +63,7 @@ export function ProfilesModuleFilterEditor({
           </DashboardModuleFilterContainer>
         )}
       />
+
       <DashboardModuleFilterContainer
         label={
           <FormattedMessage
@@ -243,6 +236,7 @@ function FilterGroupComponent({
             </FormErrorMessage>
           </Box>
         )}
+
         <HStack>
           {depth < MAX_GROUP_DEPTH ? (
             <Button

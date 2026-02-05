@@ -21,7 +21,6 @@ import {
   RadioGroup,
   Spinner,
   Stack,
-  Text,
   UnorderedList,
 } from "@chakra-ui/react";
 import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
@@ -35,6 +34,7 @@ import {
   useWizardDialog,
   WizardStepDialogProps,
 } from "@parallel/components/common/dialogs/WizardDialog";
+import { Text } from "@parallel/components/ui";
 import {
   SignatureConfigDialog_meDocument,
   SignatureConfigDialog_PetitionBaseFragment,
@@ -252,6 +252,7 @@ function SignatureConfigDialogStep1({
               }),
             },
           ]),
+
       ...(petition.__typename === "Petition" && petition.hasStartedProcess
         ? []
         : [
@@ -263,6 +264,7 @@ function SignatureConfigDialogStep1({
               }),
             },
           ]),
+
       ...(user.hasPetitionApprovalFlow && isNonNullish(petition.approvalFlowConfig)
         ? [
             {
@@ -275,6 +277,7 @@ function SignatureConfigDialogStep1({
           ]
         : []),
     ],
+
     [intl.locale, user, petition, useCustomDocument],
   );
 
@@ -324,6 +327,7 @@ function SignatureConfigDialogStep1({
             id="component.signature-config-dialog.step-1-header"
             defaultMessage="eSignature configuration"
           />
+
           <Text marginStart={2} color="gray.600" fontSize="md" fontWeight="400">
             1/{formData.includePresetSigners ? 3 : 2}
           </Text>
@@ -405,6 +409,7 @@ function SignatureConfigDialogStep1({
                       id="component.signature-config-dialog.custom-document-label"
                       defaultMessage="I will upload a document when launching the signature"
                     />
+
                     <HelpPopover>
                       <FormattedMessage
                         id="component.signature-config-dialog.custom-document-label-help"
@@ -422,6 +427,7 @@ function SignatureConfigDialogStep1({
                 id="component.signature-config-dialog.title-label"
                 defaultMessage="Title of the document"
               />
+
               <Text color="gray.500" marginStart={1}>
                 (<FormattedMessage id="generic.optional" defaultMessage="Optional" />)
               </Text>
@@ -465,6 +471,7 @@ function SignatureConfigDialogStep1({
                         !petition.isReviewFlowEnabled || reviewBeforeSendOptions.length === 1
                       }
                     />
+
                     <Text marginTop={2} color="gray.500" fontSize="sm">
                       {review === "AFTER_APPROVAL" ? (
                         <FormattedMessage
@@ -564,6 +571,7 @@ function SignatureConfigDialogStep2({
             id="component.signature-config-dialog.step-2-header"
             defaultMessage="Set up document signatures"
           />
+
           <Text marginStart={2} color="gray.600" fontSize="md" fontWeight="400">
             2/{includePresetSigners ? 3 : 2}
           </Text>
@@ -825,6 +833,7 @@ function SignatureConfigDialogStep3({
             id="component.signature-config-dialog.step-3-header"
             defaultMessage="Add signers"
           />
+
           <Text marginStart={2} color="gray.600" fontSize="md" fontWeight="400">
             3/3
           </Text>
@@ -911,6 +920,7 @@ function SignatureConfigDialogStep3({
                 defaultMessage: "Add a contact to sign",
               })}
             />
+
             <SuggestedSigners
               user={user}
               petition={petition}

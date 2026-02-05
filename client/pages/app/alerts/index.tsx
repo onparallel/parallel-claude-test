@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Flex, Heading, HStack, Image, Stack, Text } from "@chakra-ui/react";
+import { Box, Center, Flex, Heading, HStack, Image, Stack } from "@chakra-ui/react";
 import { RepeatIcon, TimeAlarmIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -40,6 +40,7 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { isPast, sub } from "date-fns";
 import { ChangeEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
@@ -141,6 +142,7 @@ function Alerts() {
                       paddingBottom={2}
                       src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/alerts/empty-alerts.svg`}
                     />
+
                     <Text fontWeight="bold">
                       <FormattedMessage
                         id="page.alerts.no-alerts"
@@ -213,6 +215,7 @@ function AlertsListHeader({ shape, state, onStateChange, onReload }: AlertsListH
           defaultMessage: "Reload",
         })}
       />
+
       <Box flex="0 1 400px">
         <SearchInput value={search ?? ""} onChange={handleSearchChange} />
       </Box>
@@ -403,6 +406,7 @@ function useAlertsTableColumns(): TableColumn<Alerts_ProfileFieldPropertyFragmen
         },
       },
     ],
+
     [intl.locale],
   );
 }

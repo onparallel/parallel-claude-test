@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Center, Grid, HStack, Text, useToast } from "@chakra-ui/react";
+import { Box, Center, Grid, HStack, useToast } from "@chakra-ui/react";
 import { AddIcon, SignatureIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
@@ -27,6 +27,7 @@ import { CurrentSignatureRequestRow } from "./CurrentSignatureRequestRow";
 import { NewSignatureRequestRow } from "./NewSignatureRequestRow";
 import { OlderSignatureRequestRows } from "./OlderSignatureRequestRows";
 import { CommentsButton } from "./PetitionRepliesField";
+import { Text } from "@parallel/components/ui";
 
 export interface PetitionSignaturesCardProps {
   petition: PetitionSignaturesCard_PetitionFragment;
@@ -84,6 +85,7 @@ export const PetitionSignaturesCard = chakraForwardRef<"section", PetitionSignat
                 hasUnreadComments={petition.unreadGeneralCommentCount > 0}
                 onClick={onToggleGeneralComments}
               />
+
               {!petition.signatureConfig?.isEnabled ||
               current?.status === "COMPLETED" ||
               current?.status === "CANCELLED" ? (

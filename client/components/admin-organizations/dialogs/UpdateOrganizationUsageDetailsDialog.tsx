@@ -12,7 +12,6 @@ import {
   NumberInputField,
   NumberInputStepper,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
@@ -25,6 +24,7 @@ import { ReactNode, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedDate, FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 interface UpdateOrganizationUsageDetailsDialogProps {
   header: ReactNode;
@@ -377,6 +377,7 @@ export function UpdateOrganizationUsageDetailsDialog({
                               id="component.update-organization-usage-details-dialog.start-new-period-label"
                               defaultMessage="Start new period"
                             />
+
                             {'"'}
                           </Text>
                         ),

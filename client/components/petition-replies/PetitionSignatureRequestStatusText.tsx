@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client";
-import { Stack, Text } from "@chakra-ui/react";
+import { Stack } from "@chakra-ui/react";
 import { AlertCircleIcon, CheckIcon, PaperPlaneIcon, TimeIcon } from "@parallel/chakra/icons";
 import { PetitionSignatureRequestStatusText_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export function PetitionSignatureRequestStatusText({
   signature,
@@ -23,6 +24,7 @@ export function PetitionSignatureRequestStatusText({
           </Text>
         </Stack>
       );
+
     case "PROCESSED":
       return (
         <Stack direction="row" display="inline-flex" alignItems="center" color="yellow.600">
@@ -35,6 +37,7 @@ export function PetitionSignatureRequestStatusText({
           </Text>
         </Stack>
       );
+
     case "CANCELLING":
       return (
         <Stack direction="row" display="inline-flex" alignItems="center" color="red.500">
@@ -47,6 +50,7 @@ export function PetitionSignatureRequestStatusText({
           </Text>
         </Stack>
       );
+
     case "CANCELLED":
       return (
         <Stack direction="row" display="inline-flex" alignItems="center" color="red.500">
@@ -66,6 +70,7 @@ export function PetitionSignatureRequestStatusText({
           </Text>
         </Stack>
       );
+
     case "COMPLETED":
       return (
         <Stack direction="row" display="inline-flex" alignItems="center" color="green.500">

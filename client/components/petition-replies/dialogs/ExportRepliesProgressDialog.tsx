@@ -11,7 +11,6 @@ import {
   Progress,
   Spinner,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { CheckIcon, CloudUploadIcon } from "@parallel/chakra/icons";
 import {
@@ -32,6 +31,7 @@ import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { pick } from "remeda";
 import { useExportFailedDialog } from "./ExportFailedDialog";
+import { Text } from "@parallel/components/ui";
 
 export interface ExportRepliesProgressDialogProps {
   externalClientId: string;

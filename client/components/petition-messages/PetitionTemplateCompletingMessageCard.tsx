@@ -9,7 +9,6 @@ import {
   Image,
   Input,
   Switch,
-  Text,
 } from "@chakra-ui/react";
 import { AppWindowIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -29,6 +28,7 @@ import { CloseableAlert } from "../common/CloseableAlert";
 import { HelpPopover } from "../common/HelpPopover";
 import { PaddedCollapse } from "../common/PaddedCollapse";
 import { RichTextEditor } from "../common/slate/RichTextEditor";
+import { Text } from "@parallel/components/ui";
 
 interface PetitionTemplateCompletingMessageCardProps {
   petition: PetitionTemplateCompletingMessageCard_PetitionTemplateFragment;
@@ -110,11 +110,13 @@ export const PetitionTemplateCompletingMessageCard = chakraForwardRef<
             id="component.petition-template-completing-message.card-header"
             defaultMessage="Thank you message"
           />
+
           <HelpPopover>
             <FormattedMessage
               id="component.petition-template-completing-message.popover"
               defaultMessage="Your message will be displayed in a pop-up upon completion."
             />
+
             <Image
               marginTop={2}
               src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/templates/thankyou_message_${intl.locale}.gif`}

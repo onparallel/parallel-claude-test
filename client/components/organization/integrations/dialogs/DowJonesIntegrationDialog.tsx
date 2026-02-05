@@ -8,7 +8,6 @@ import {
   HStack,
   Input,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { ArrowForwardIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
@@ -19,6 +18,7 @@ import { isNotEmptyText } from "@parallel/utils/strings";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 interface DowJonesIntegrationDialogData {
   clientId: string;
@@ -123,6 +123,7 @@ export function DowJonesIntegrationDialog({ ...props }: DialogProps) {
                 validate: { isNotEmptyText },
               })}
             />
+
             <FormErrorMessage>
               <FormattedMessage
                 id="generic.field-required-error"
@@ -142,6 +143,7 @@ export function DowJonesIntegrationDialog({ ...props }: DialogProps) {
               autoComplete="off"
               {...register("password", { required: true, validate: { isNotEmptyText } })}
             />
+
             <FormErrorMessage>
               <FormattedMessage
                 id="generic.field-required-error"

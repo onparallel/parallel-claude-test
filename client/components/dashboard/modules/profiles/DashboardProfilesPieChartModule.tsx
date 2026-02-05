@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Grid, GridItem, Square, Stack, Text } from "@chakra-ui/react";
+import { Box, Center, Grid, GridItem, Square, Stack } from "@chakra-ui/react";
 import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { ScrollShadows } from "@parallel/components/common/ScrollShadows";
@@ -19,6 +19,7 @@ import { DashboardLinkToResults } from "../../shared/DashboardLinkToResults";
 import { DashboardModuleAlertIncongruent } from "../../shared/DashboardModuleAlertIncongruent";
 import { DashboardModuleCard } from "../../shared/DashboardModuleCard";
 import { DashboardModuleSpinner } from "../../shared/DashboardModuleSpinner";
+import { Text } from "@parallel/components/ui";
 
 export const DashboardProfilesPieChartModule = forwardRef<
   HTMLDivElement,
@@ -48,6 +49,7 @@ export const DashboardProfilesPieChartModule = forwardRef<
           hoverBorderColor: "white",
         },
       ],
+
       labels:
         module.profilesPieChartResult?.items?.map(({ label }) =>
           label === null
@@ -236,6 +238,7 @@ export const DashboardProfilesPieChartModule = forwardRef<
                             (<FormattedNumber value={item.count} />)
                           </GridItem>
                         )}
+
                         <GridItem textAlign="end" fontSize="sm">
                           {totalCount === 0 ? (
                             "-"

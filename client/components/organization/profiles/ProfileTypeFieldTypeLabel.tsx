@@ -1,4 +1,4 @@
-import { Box, Icon, Text } from "@chakra-ui/react";
+import { Box, Icon } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PaidBadge } from "@parallel/components/common/PaidBadge";
 import { ProfileTypeFieldType } from "@parallel/graphql/__types";
@@ -6,6 +6,7 @@ import { PROFILE_TYPE_FIELD_CONFIG } from "@parallel/utils/profileFields";
 import { useHasAdverseMediaSearch } from "@parallel/utils/useHasAdverseMediaSearch";
 import { useHasBackgroundCheck } from "@parallel/utils/useHasBackgroundCheck";
 import { useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 interface ProfileTypeFieldTypeLabelProps {
   type: ProfileTypeFieldType;

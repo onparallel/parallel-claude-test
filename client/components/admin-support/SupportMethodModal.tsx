@@ -11,7 +11,6 @@ import {
   ModalHeader,
   ModalOverlay,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
 import { SupportMethodResponse } from "@parallel/graphql/__types";
@@ -22,6 +21,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { HtmlBlock } from "../common/HtmlBlock";
 import { getDefaultInputTypeValue } from "./helpers";
 import { SupportMethodArgumentInput } from "./SupportMethodArgumentInput";
+import { Text } from "@parallel/components/ui";
 
 interface MethodModalProps {
   field: IntrospectionField;

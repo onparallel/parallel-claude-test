@@ -7,7 +7,6 @@ import {
   NumberInputField,
   NumberInputStepper,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { SimpleSelect, useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { StandardListSelect } from "@parallel/components/common/StandardListSelect";
@@ -21,6 +20,7 @@ import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettin
 import { ImportOptionsSettingsRow } from "../rows/ImportOptionsSettingsRow";
 import { SettingsRow } from "../rows/SettingsRow";
 import { SettingsRowSwitch } from "../rows/SettingsRowSwitch";
+import { Text } from "@parallel/components/ui";
 
 type CheckboxLimitType = "UNLIMITED" | "EXACT" | "RANGE" | "RADIO";
 
@@ -200,6 +200,7 @@ export function PetitionComposeCheckboxSettings({
         onChange={handleFieldEdit}
         isDisabled={isReadOnly || field.isLinkedToProfileTypeField}
       />
+
       <SettingsRowSwitch
         isDisabled={isReadOnly || field.isLinkedToProfileTypeField}
         isChecked={limitType !== "RADIO"}
@@ -273,6 +274,7 @@ export function PetitionComposeCheckboxSettings({
               </NumberInputStepper>
             </NumberInput>
           )}
+
           {(limitType === "EXACT" || limitType === "RANGE") && (
             <NumberInput
               value={max}

@@ -16,7 +16,6 @@ import {
   Radio,
   RadioGroup,
   Stack,
-  Text,
   UnorderedList,
 } from "@chakra-ui/react";
 import { AddIcon, DeleteIcon } from "@parallel/chakra/icons";
@@ -50,6 +49,7 @@ import { SuggestionsButton } from "./SuggestionsButton";
 import { ConfirmDialog } from "./dialogs/ConfirmDialog";
 import { DialogProps, isDialogError, useDialog } from "./dialogs/DialogProvider";
 import { useErrorDialog } from "./dialogs/ErrorDialog";
+import { Text } from "@parallel/components/ui";
 
 interface RecipientSelectGroupsProps {
   showErrors?: boolean;
@@ -108,6 +108,7 @@ export function RecipientSelectGroups({
               defaultMessage="Unknown contacts"
             />
           ),
+
           message: (
             <Stack>
               <Text>
@@ -144,6 +145,7 @@ export function RecipientSelectGroups({
                         {chunks}
                       </Link>
                     ),
+
                     count: unknownEmails.length,
                   }}
                 />
@@ -173,6 +175,7 @@ export function RecipientSelectGroups({
             ...(newRecipientGroups[i + groupNumber] ?? []),
             ...emails[i].map((e) => contactByEmail[e]),
           ],
+
           (c) => c.id,
         );
       }
@@ -422,6 +425,7 @@ export function RecipientSelectGroups({
                   defaultMessage="{total, plural, =1{For:} other{(Parallel {number}) For:}}"
                   values={{ total: recipientGroups.length, number: index + 1 }}
                 />
+
                 {!hasLinkedFieldGroupReplied && canAddRecipientGroups && index === 0 ? (
                   <HelpPopover>
                     <Stack>

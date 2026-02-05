@@ -9,7 +9,6 @@ import {
   PopoverCloseButton,
   PopoverContent,
   PopoverTrigger,
-  Text,
 } from "@chakra-ui/react";
 import { Popover } from "@parallel/chakra/components";
 import { CloudOkIcon, DownloadIcon, HelpOutlineIcon, UserArrowIcon } from "@parallel/chakra/icons";
@@ -28,6 +27,7 @@ import { useLastSaved } from "./LastSavedProvider";
 import { RecipientViewMenuButton } from "./RecipientViewMenuButton";
 import { useRecipientViewHelpDialog } from "./dialogs/RecipientViewHelpDialog";
 import { useDelegateAccess } from "./hooks/useDelegateAccess";
+import { Text } from "@parallel/components/ui";
 
 interface RecipientViewHeaderProps {
   access: RecipientViewHeader_PublicPetitionAccessFragment;
@@ -112,6 +112,7 @@ export const RecipientViewHeader = chakraForwardRef<"section", RecipientViewHead
           ) : (
             <Logo width="152px" height="36px" />
           )}
+
           {lastSaved ? (
             <SmallPopover
               content={
@@ -221,6 +222,7 @@ export const RecipientViewHeader = chakraForwardRef<"section", RecipientViewHead
               })}
               variant="outline"
             />
+
             {hasClientPortalAccess ? null : (
               <IconButtonWithTooltip
                 onClick={showHelpModal}

@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Stack } from "@chakra-ui/react";
 import { SignatureIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
@@ -9,6 +9,7 @@ import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
+import { Text } from "@parallel/components/ui";
 
 export interface TimelineSignatureStartedEventProps {
   event: TimelineSignatureStartedEvent_SignatureStartedEventFragment;
@@ -35,6 +36,7 @@ export function TimelineSignatureStartedEvent({ event }: TimelineSignatureStarte
               timeAgo: (
                 <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
               ),
+
               signingMode: event.signature.signatureConfig.signingMode,
             }}
           />

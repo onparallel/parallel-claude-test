@@ -8,7 +8,6 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
-  Text,
   useBreakpointValue,
 } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -27,6 +26,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { CloseButton } from "../common/CloseButton";
 import { PetitionComposeNewFieldDrawerPetitionFields } from "./PetitionComposeNewFieldDrawerPetitionFields";
 import { PetitionComposeNewFieldDrawerProfileTypeFields } from "./PetitionComposeNewFieldDrawerProfileTypeFields";
+import { Text } from "@parallel/components/ui";
 
 interface PetitionComposeNewFieldDrawerProps {
   user: PetitionComposeNewFieldDrawer_UserFragment;

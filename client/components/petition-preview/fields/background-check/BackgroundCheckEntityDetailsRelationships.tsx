@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, HStack, Text } from "@chakra-ui/react";
+import { Box, Center, HStack } from "@chakra-ui/react";
 import { BusinessIcon, UserIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { Table, TableColumn } from "@parallel/components/common/Table";
@@ -10,6 +10,7 @@ import { useRouter } from "next/router";
 import { useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish, unique } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 export function BackgroundCheckEntityDetailsRelationships({
   entityId,
@@ -276,6 +277,7 @@ function useBackgroundCheckRelationshipsColumns(entityId: string) {
         },
       },
     ],
+
     [intl.locale, entityId],
   );
 }

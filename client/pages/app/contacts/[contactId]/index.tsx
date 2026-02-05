@@ -11,7 +11,6 @@ import {
   FormLabel,
   Input,
   Stack,
-  Text,
   ThemingProps,
 } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
@@ -48,6 +47,7 @@ import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 type ContactProps = UnwrapPromise<ReturnType<typeof Contact.getInitialProps>>;
 
@@ -320,6 +320,7 @@ function useContactPetitionAccessesColumns() {
             <SignatureIcon />
           </Tooltip>
         ),
+
         label: (intl) =>
           intl.formatMessage({
             id: "petitions.header.signature",
@@ -374,6 +375,7 @@ function useContactPetitionAccessesColumns() {
         ),
       },
     ],
+
     [intl.locale],
   );
 }

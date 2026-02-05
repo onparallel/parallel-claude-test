@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { HStack, Text } from "@chakra-ui/react";
+import { HStack } from "@chakra-ui/react";
 import { CircleCheckIcon, TimeIcon, XCircleIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineReplyStatusChangedEvent_ReplyStatusChangedEventFragment } from "@parallel/graphql/__types";
@@ -10,6 +10,7 @@ import { UserOrContactReference } from "../../../common/UserOrContactReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 import { TimelineSeeReplyButton } from "../common/TimelineSeeReplyButton";
+import { Text } from "@parallel/components/ui";
 
 export interface TimelineReplyStatusChangedEventProps {
   event: TimelineReplyStatusChangedEvent_ReplyStatusChangedEventFragment;

@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, FormControl, FormLabel, HStack, Stack, Text } from "@chakra-ui/react";
+import { Box, FormControl, FormLabel, HStack, Stack } from "@chakra-ui/react";
 import { EmailIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
@@ -19,6 +19,7 @@ import { HelpPopover } from "../common/HelpPopover";
 import { UserSelect } from "../common/UserSelect";
 import { MessageEmailBodyFormControl } from "../petition-common/MessageEmailBodyFormControl";
 import { MessageEmailSubjectFormControl } from "../petition-common/MessageEmailSubjectFormControl";
+import { Text } from "@parallel/components/ui";
 
 interface PetitionTemplateRequestMessageCardProps {
   petition: PetitionTemplateRequestMessageCard_PetitionTemplateFragment;
@@ -120,6 +121,7 @@ export const PetitionTemplateRequestMessageCard = chakraForwardRef<
             petition={petition}
             isDisabled={isDisabled}
           />
+
           <MessageEmailBodyFormControl
             id={`request-message-${petition.id}-body`}
             marginTop={4}

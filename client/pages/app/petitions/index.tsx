@@ -15,7 +15,6 @@ import {
   MenuOptionGroup,
   Portal,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import {
@@ -93,6 +92,7 @@ import { MotionConfig } from "framer-motion";
 import { MouseEvent, PropsWithChildren, ReactNode, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { firstBy, isNonNullish, isNullish, map, omit, pick, pipe } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 function rowKeyProp(row: Petitions_PetitionBaseOrFolderFragment) {
   return row.__typename === "PetitionFolder" ? row.folderId : (row as any).id;
@@ -596,6 +596,7 @@ function Petitions() {
                   defaultMessage: "New",
                 })}
               />
+
               <Portal>
                 <MenuList minWidth="fit-content">
                   <MenuItem onClick={handleCreateFolder} isDisabled={!userCanChangePath}>
@@ -634,6 +635,7 @@ function Petitions() {
             </AlertDescription>
           </CloseableAlert>
         )}
+
         {queryState.scheduledForDeletion && (
           <Alert status="info" variant="subtle" borderRadius="md" padding={4}>
             <AlertIcon />
@@ -646,6 +648,7 @@ function Petitions() {
             </AlertDescription>
           </Alert>
         )}
+
         <Flex direction="column" flex={1} minHeight={0} paddingBottom={16}>
           <TablePage
             flex="0 1 auto"
@@ -764,6 +767,7 @@ function CustomFooter({
         value: "DELETION_SCHEDULED",
       },
     ],
+
     [],
   );
   return (
@@ -775,6 +779,7 @@ function CustomFooter({
         size="sm"
         variant="ghost"
       />
+
       {children}
     </>
   );
@@ -933,11 +938,13 @@ function usePetitionListActions({
   const restrictWhenCantChangePath = (button: ReactNode) => (
     <RestrictedFeaturePopover isRestricted={!userCanChangePath}>{button}</RestrictedFeaturePopover>
   );
+
   const restrictWhenCantCreateTemplate = (button: ReactNode) => (
     <RestrictedFeaturePopover isRestricted={!userCanCreateTemplate}>
       {button}
     </RestrictedFeaturePopover>
   );
+
   const restrictWhenCantCreatePetition = (button: ReactNode) => (
     <RestrictedFeaturePopover isRestricted={!userCanCreatePetition}>
       {button}
@@ -960,6 +967,7 @@ function usePetitionListActions({
         children: (
           <FormattedMessage id="generic.delete-permanently" defaultMessage="Delete permanently" />
         ),
+
         colorScheme: "red",
       },
     ];
@@ -1012,6 +1020,7 @@ function usePetitionListActions({
               defaultMessage="Save as template"
             />
           ),
+
           wrap: restrictWhenCantCreateTemplate,
         }
       : {
@@ -1022,6 +1031,7 @@ function usePetitionListActions({
           children: (
             <FormattedMessage id="generic.create-petition" defaultMessage="Create parallel" />
           ),
+
           wrap: restrictWhenCantCreatePetition,
         },
     {

@@ -8,14 +8,13 @@ import {
   MenuItem,
   MenuList,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import { ChevronDownIcon, DeleteIcon, UsersIcon } from "@parallel/chakra/icons";
 import { SubscribedNotificationsIcon } from "@parallel/components/common/SubscribedNotificationsIcon";
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
 import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
-import { Avatar } from "@parallel/components/ui";
+import { Avatar, Text } from "@parallel/components/ui";
 import {
   PetitionPermissionTypeRW,
   TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment,
@@ -47,7 +46,7 @@ export function TemplateDefaultUserGroupPermissionRow({
       </Avatar.Root>
       <Box flex="1" minWidth={0} fontSize="sm" marginStart={2}>
         <Stack direction={"row"} spacing={1} align="center">
-          <Text noOfLines={1} wordBreak="break-all">
+          <Text lineClamp={1} wordBreak="break-all">
             <UserGroupReference userGroup={group} />
           </Text>
           {permission.isSubscribed ? <SubscribedNotificationsIcon /> : null}
@@ -62,7 +61,7 @@ export function TemplateDefaultUserGroupPermissionRow({
             userGroupId={group.id}
             userDetails={() => (permission.isSubscribed ? <SubscribedNotificationsIcon /> : null)}
           >
-            <Text color="gray.500" cursor="default" noOfLines={1}>
+            <Text color="gray.500" cursor="default" lineClamp={1}>
               <FormattedMessage
                 id="generic.n-group-members"
                 defaultMessage="{count, plural, =1 {1 member} other {# members}}"

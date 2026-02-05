@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Stack, Text } from "@chakra-ui/react";
+import { Stack } from "@chakra-ui/react";
 import { CheckIcon, CloseIcon, TimeIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
@@ -11,6 +11,7 @@ import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import { DateTime } from "../common/DateTime";
 import { SmallPopover } from "../common/SmallPopover";
+import { Text } from "@parallel/components/ui";
 
 function DatesList({
   sentAt,
@@ -107,6 +108,7 @@ export const PetitionSignatureRequestSignerStatusIcon = chakraForwardRef<
           <CheckIcon ref={ref} color="green.500" {...(props as any)} />
         </SmallPopover>
       );
+
     case "BOUNCED":
     case "DECLINED":
       return (
@@ -125,6 +127,7 @@ export const PetitionSignatureRequestSignerStatusIcon = chakraForwardRef<
           <CloseIcon ref={ref} color="red.500" fontSize="12px" {...(props as any)} />
         </SmallPopover>
       );
+
     case "PENDING":
       return (
         <SmallPopover
@@ -135,6 +138,7 @@ export const PetitionSignatureRequestSignerStatusIcon = chakraForwardRef<
           <TimeIcon ref={ref} color="yellow.500" {...(props as any)} />
         </SmallPopover>
       );
+
     case "NOT_STARTED":
       if (signingMode === "SEQUENTIAL") {
         return (

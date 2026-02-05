@@ -1,12 +1,4 @@
-import {
-  Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Button, FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
 import { Select } from "@parallel/chakra/components";
 import { UserPlusIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
@@ -18,6 +10,7 @@ import { isValidEmail } from "@parallel/utils/validation";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 interface InviteUserDialogData {
   email: string;
@@ -82,6 +75,7 @@ export function InviteUserDialog({ ...props }: DialogProps<{}, InviteUserDialogD
                 defaultMessage: "name@example.com",
               })}
             />
+
             <FormErrorMessage>
               <FormattedMessage
                 id="generic.forms-invalid-email-error"

@@ -5,13 +5,13 @@ import {
   Button,
   Flex,
   Stack,
-  Text,
   useToast,
 } from "@chakra-ui/react";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { CloseableAlert } from "../common/CloseableAlert";
+import { Text } from "@parallel/components/ui";
 
 interface EmailVerificationRequiredAlertProps {
   isOpen: boolean;

@@ -6,7 +6,6 @@ import {
   HStack,
   Input,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
 import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
@@ -24,6 +23,7 @@ import { ChangeEvent, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";
 import { SettingsRow } from "./SettingsRow";
+import { Text } from "@parallel/components/ui";
 
 export type AliasErrorType = "UNIQUE" | "INVALID";
 
@@ -104,6 +104,7 @@ export function SettingsRowAlias({ field, onFieldEdit, isReadOnly }: SettingsRow
                   id="component.settings-row-alias.alias-description"
                   defaultMessage="Allows to easily identify the field in API replies. In addition, it can be inserted into the field description to automatically replace the content."
                 />
+
                 <HelpCenterLink marginStart={1} articleId={6323096}>
                   <FormattedMessage id="generic.learn-more" defaultMessage="Learn more" />
                 </HelpCenterLink>
@@ -125,6 +126,7 @@ export function SettingsRowAlias({ field, onFieldEdit, isReadOnly }: SettingsRow
               onChange={handleAliasChange}
               maxLength={100}
             />
+
             {showAliasButtons ? (
               <>
                 <CopyLiquidReferenceButton
@@ -133,6 +135,7 @@ export function SettingsRowAlias({ field, onFieldEdit, isReadOnly }: SettingsRow
                   size="sm"
                   variant="outline"
                 />
+
                 {hideLiquidReferenceButtons ? null : (
                   <MoreLiquidReferencesButton
                     field={field}

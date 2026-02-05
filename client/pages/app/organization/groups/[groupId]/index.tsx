@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Badge, Center, Flex, Text, useToast } from "@chakra-ui/react";
+import { Badge, Center, Flex, useToast } from "@chakra-ui/react";
 import { UserXIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TableColumn } from "@parallel/components/common/Table";
@@ -30,6 +30,7 @@ import { useSelection } from "@parallel/utils/useSelectionState";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { sort, sortBy } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 const SORTING = ["fullName", "email", "addedAt"] as const;
 
@@ -316,6 +317,7 @@ function useOrganizationGroupTableColumns(): TableColumn<OrganizationGroup_UserG
         ),
       },
     ],
+
     [intl.locale],
   );
 }

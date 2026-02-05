@@ -1,4 +1,3 @@
-import { Text } from "@chakra-ui/react";
 import {
   SimpleOption,
   SimpleSelect,
@@ -11,6 +10,7 @@ import {
 import { forwardRef } from "react";
 import { useIntl } from "react-intl";
 import { SelectInstance, components } from "react-select";
+import { Text } from "@parallel/components/ui";
 
 export type ShortTextFormatSelectProps = Omit<SimpleSelectProps<string>, "options">;
 

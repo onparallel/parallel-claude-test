@@ -12,10 +12,10 @@ import {
   LinkOverlay,
   Spinner,
   Stack,
-  Text,
   usePrevious,
 } from "@chakra-ui/react";
 import { ChevronLeftIcon, CommentIcon, EditIcon } from "@parallel/chakra/icons";
+import { Text } from "@parallel/components/ui";
 import {
   RecipientViewComments_PublicPetitionAccessFragment,
   RecipientViewComments_PublicPetitionFieldFragment,
@@ -249,6 +249,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
               label={intl.formatMessage({ id: "generic.go-back", defaultMessage: "Go back" })}
               onClick={() => setFieldId(null)}
             />
+
             {isNonNullish(field) ? (
               field.title ? (
                 <Heading as="h3" size="sm" fontWeight={500} noOfLines={2}>
@@ -357,6 +358,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
                   onKeyDown={handleKeyDown}
                   onChange={(e) => setDraft(e.target.value)}
                 />
+
                 {deviceType === null ? (
                   // show only on desktop
                   <Text fontSize="sm" color="gray.600">
@@ -727,7 +729,7 @@ function LastFieldComment({
           tabIndex={-1}
         >
           {field.title ? (
-            <Text noOfLines={2} fontWeight={600}>
+            <Text lineClamp={2} fontWeight={600}>
               {field.title}
             </Text>
           ) : (
@@ -752,7 +754,7 @@ function LastFieldComment({
       </HStack>
       <HStack color="gray.600" justify="space-between">
         <Box flex="1">
-          <Text noOfLines={2} fontSize="sm" as="span" wordBreak="break-all">
+          <Text lineClamp={2} fontSize="sm" as="span" wordBreak="break-all">
             {`${
               isAuthor
                 ? intl.formatMessage({ id: "generic.you", defaultMessage: "You" })
@@ -763,6 +765,7 @@ function LastFieldComment({
                       defaultMessage: "Unknown",
                     })
             }: `}
+
             <PublicPetitionFieldCommentExcerpt as="span" comment={comment} />
           </Text>
         </Box>

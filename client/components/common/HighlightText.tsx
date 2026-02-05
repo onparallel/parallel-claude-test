@@ -1,8 +1,8 @@
-import { Text } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import escapeStringRegexp from "escape-string-regexp";
 import { Fragment } from "react";
 import { isNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 export interface HighlightTextProps {
   children?: string;

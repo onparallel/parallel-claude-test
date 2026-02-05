@@ -1,8 +1,9 @@
-import { Badge, HStack, Text } from "@chakra-ui/react";
+import { Badge, HStack } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { BusinessIcon, UserIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { isNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 const LABELS = {
   "SI-PERSON": "Special Interest - Person",
@@ -52,6 +53,7 @@ export const DowJonesRiskLabel = chakraForwardRef<"span", { risk: string }>(
     ) : (
       <UserIcon />
     );
+
     return (
       <Tooltip placement="right" label={label} isDisabled={isNullish(label)}>
         <Badge

@@ -10,7 +10,6 @@ import {
   List,
   ListItem,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { DeleteIcon, RelationshipIcon } from "@parallel/chakra/icons";
 import { ContactSupportAlert } from "@parallel/components/common/ContactSupportAlert";
@@ -31,6 +30,7 @@ import {
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { groupBy, isNonNullish, unique } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 interface CreateProfileRelationshipsDialogProps {
   profile: useCreateProfileRelationshipsDialog_ProfileFragment;
@@ -133,6 +133,7 @@ function CreateProfileRelationshipsDialog({
                     ] as const,
                 ),
               ],
+
               ([key]) => key,
             );
             let valid = true;
@@ -239,6 +240,7 @@ function CreateProfileRelationshipsDialog({
               </Button>
             </Box>
           )}
+
           <Stack
             border="1px solid"
             borderColor="gray.300"
@@ -447,6 +449,7 @@ function ProfileRelationshipRow({
           isDisabled={!canRemove}
         />
       )}
+
       {isNonNullish(errors.relationships?.[index]?.type) ? (
         <FormErrorMessage gridColumn={"1 / -1"} margin={0}>
           {errors.relationships?.[index]?.type === "duplicated" ? (

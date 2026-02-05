@@ -1,12 +1,13 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Stack, Text } from "@chakra-ui/react";
+import { Stack } from "@chakra-ui/react";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import { useDeleteTag_deleteTagDocument } from "@parallel/graphql/__types";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { isApolloError } from "../apollo/isApolloError";
+import { Text } from "@parallel/components/ui";
 
 export function useDeleteTag() {
   const [deleteTag] = useMutation(useDeleteTag_deleteTagDocument);
@@ -84,6 +85,7 @@ function useConfirmDeleteTagDialog() {
             values={{ tag: name }}
           />
         ),
+
         description: (
           <Stack>
             <Text>

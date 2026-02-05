@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, HStack, List, ListItem, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, HStack, List, ListItem, Stack } from "@chakra-ui/react";
 import { BusinessIcon, SearchIcon, ShortSearchIcon, UserIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
@@ -30,6 +30,7 @@ import { OverflownText } from "./OverflownText";
 import { SimpleFileButton } from "./SimpleFileButton";
 import { SmallPopover } from "./SmallPopover";
 import { UserReference } from "./UserReference";
+import { Text } from "@parallel/components/ui";
 
 export interface PetitionFieldRepliesContentProps {
   petitionId: string;
@@ -144,6 +145,7 @@ const PetitionFieldRepliesContentNonFile = chakraForwardRef<
                   {...FORMATS["L+LT"]}
                   timeZone={reply.content.timezone}
                 />
+
                 {" ("}
                 {prettifyTimezone(reply.content.timezone)}
                 {")"}
@@ -299,6 +301,7 @@ function PetitionFieldBackgroundCheck({
           ) : (
             <BusinessIcon boxSize={4} />
           )}
+
           <OverflownText minWidth="40px">{content.entity.name}</OverflownText>
 
           {isNullish(content.entity?.properties?.topics) ? null : (

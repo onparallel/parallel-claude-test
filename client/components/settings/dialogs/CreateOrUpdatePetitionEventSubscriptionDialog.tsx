@@ -16,7 +16,6 @@ import {
   Radio,
   RadioGroup,
   Stack,
-  Text,
   useCounter,
 } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
@@ -54,6 +53,7 @@ import Select from "react-select/async";
 import { isNonNullish, isNullish } from "remeda";
 import { assert } from "ts-essentials";
 import { useDeleteWebhookSignatureKeysDialog } from "./ConfirmDeleteWebhookSignatureKeysDialog";
+import { Text } from "@parallel/components/ui";
 interface CreateOrUpdatePetitionEventSubscriptionDialogProps {
   eventSubscription?: CreateOrUpdatePetitionEventSubscriptionDialog_PetitionEventSubscriptionFragment;
   initialStep?: number;
@@ -86,6 +86,7 @@ interface CreateOrUpdatePetitionEventSubscriptionDialogFormData {
   fromTemplate: Maybe<
     Omit<CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseFragment, "__typename">
   >;
+
   fromTemplateFields: PetitionFieldSelection[];
   ignoreOwnerEvents: boolean;
 }
@@ -365,6 +366,7 @@ export function CreateOrUpdatePetitionEventSubscriptionDialog({
               defaultMessage="Signature keys"
             />
           )}
+
           <Text marginStart={2} color="gray.600" fontSize="md" fontWeight="400">
             {currentStep + 1}/2
           </Text>
@@ -396,6 +398,7 @@ export function CreateOrUpdatePetitionEventSubscriptionDialog({
                   defaultMessage: "https://www.example.com",
                 })}
               />
+
               <FormErrorMessage>
                 {errors.eventsUrl?.type === "validate" || errors.eventsUrl?.type === "required" ? (
                   <FormattedMessage
@@ -512,6 +515,7 @@ export function CreateOrUpdatePetitionEventSubscriptionDialog({
                             defaultMessage: "Search events...",
                           })}
                         />
+
                         <FormErrorMessage>
                           <FormattedMessage
                             id="component.create-event-subscription-dialog.invalid-event-types"
@@ -564,6 +568,7 @@ export function CreateOrUpdatePetitionEventSubscriptionDialog({
                   id="component.create-event-subscription-dialog.ignore-owner-events"
                   defaultMessage="Ignore events produced by this user"
                 />
+
                 <HelpPopover>
                   <Text fontSize="sm">
                     <FormattedMessage
@@ -581,6 +586,7 @@ export function CreateOrUpdatePetitionEventSubscriptionDialog({
                 id="component.create-event-subscription-dialog.signature-keys-explanation"
                 defaultMessage="You can validate the integrity and authenticity of the events you receive in your subscription by creating a signature key."
               />
+
               <HelpCenterLink marginStart={1} articleId={7035199}>
                 <FormattedMessage id="generic.learn-more" defaultMessage="Learn more" />
               </HelpCenterLink>

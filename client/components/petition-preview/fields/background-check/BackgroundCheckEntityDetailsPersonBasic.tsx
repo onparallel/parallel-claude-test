@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, HStack, Image, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, HStack, Image, Stack } from "@chakra-ui/react";
 import {
   CheckIcon,
   DeleteIcon,
@@ -19,6 +19,7 @@ import {
 } from "@parallel/utils/useLoadOpenSanctionsCountryNames";
 import { Fragment } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export function BackgroundCheckEntityDetailsPersonBasic({
   isDisabled,
@@ -197,6 +198,7 @@ export function BackgroundCheckEntityDetailsPersonBasic({
               ) : (
                 <Box boxSize={6}></Box>
               );
+
             return (
               <HStack key={nationCode}>
                 {flag}

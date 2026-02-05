@@ -9,7 +9,6 @@ import {
   Flex,
   HStack,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { CalculatorIcon } from "@parallel/chakra/icons";
 import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
@@ -28,6 +27,7 @@ import { FormattedMessage } from "react-intl";
 import { isNullish, pick } from "remeda";
 import { PetitionFieldMathEditor } from "../logic/PetitionFieldMathEditor";
 import { useCreatePetitionVariableDialog } from "./CreateOrUpdatePetitionVariableDialog";
+import { Text } from "@parallel/components/ui";
 
 interface EditPetitionFieldCalculationsDialogProps {
   field: useEditPetitionFieldCalculationsDialog_PetitionFieldFragment;

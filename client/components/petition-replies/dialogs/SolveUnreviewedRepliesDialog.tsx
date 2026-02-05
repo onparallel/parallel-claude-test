@@ -1,10 +1,11 @@
-import { Box, Button, Flex, Radio, RadioGroup, Stack, Text, useTheme } from "@chakra-ui/react";
+import { Box, Button, Flex, Radio, RadioGroup, Stack, useTheme } from "@chakra-ui/react";
 import { CheckIcon, CloseIcon, ForbiddenIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import deepmerge from "deepmerge";
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 type SolveUnreviewedRepliesDialogAction = "APPROVE" | "REJECT" | "NOTHING";
 

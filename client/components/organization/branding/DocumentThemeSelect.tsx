@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Badge, Box, Button, HStack, Stack, Text } from "@chakra-ui/react";
+import { Badge, Box, Button, HStack, Stack } from "@chakra-ui/react";
 import { DocumentThemeSelect_OrganizationThemeFragment } from "@parallel/graphql/__types";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomSelectProps } from "@parallel/utils/react-select/types";
@@ -12,6 +12,7 @@ import Select, {
   SelectInstance,
   SingleValueProps,
 } from "react-select";
+import { Text } from "@parallel/components/ui";
 
 type Selection = DocumentThemeSelect_OrganizationThemeFragment;
 export type DocumentThemeSelectInstance = SelectInstance<Selection>;

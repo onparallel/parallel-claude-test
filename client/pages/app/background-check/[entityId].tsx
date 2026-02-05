@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Center, HStack, Skeleton, Spinner, Stack, Text, useToast } from "@chakra-ui/react";
+import { Box, Center, HStack, Skeleton, Spinner, Stack, useToast } from "@chakra-ui/react";
 import { RepeatIcon, ShortSearchIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -39,6 +39,7 @@ import { useRouter } from "next/router";
 import { useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, pick } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 function BackgroundCheckProfileDetails({
   entityId,
@@ -272,12 +273,14 @@ function BackgroundCheckProfileDetails({
               backgroundColor="white"
               isDisabled={isDisabled}
             />
+
             <Box>
               <Text as="span" fontWeight={600}>
                 <FormattedMessage
                   id="component.background-check-search-result.searching-for"
                   defaultMessage="Searching for"
                 />
+
                 {": "}
               </Text>
               <Text as="span">
@@ -302,6 +305,7 @@ function BackgroundCheckProfileDetails({
                 />
               </Text>
             )}
+
             {details?.isStoredEntity && !isReadOnly ? (
               <IconButtonWithTooltip
                 variant="outline"
@@ -405,6 +409,7 @@ function BackgroundCheckProfileDetails({
                   onSave={handleSaveClick}
                   data={details}
                 />
+
                 <BackgroundCheckEntityDetailsCompanyOverview overview={details} />
               </>
             ) : details.__typename === "BackgroundCheckEntityDetailsPerson" ? (
@@ -420,6 +425,7 @@ function BackgroundCheckProfileDetails({
                   onSave={handleSaveClick}
                   data={details}
                 />
+
                 <BackgroundCheckEntityDetailsPersonOverview overview={details} />
               </>
             ) : null}

@@ -16,12 +16,11 @@ import {
   ModalHeader,
   ModalOverlay,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { QuestionOutlineIcon } from "@parallel/chakra/icons";
 import { NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
-import { Collapsible } from "@parallel/components/ui";
+import { Collapsible, Text } from "@parallel/components/ui";
 import { isValidEmail } from "@parallel/utils/validation";
 import useResizeObserver from "@react-hook/resize-observer";
 import { useRef, useState } from "react";
@@ -100,6 +99,7 @@ export function PublicPetitionInitialForm({
         ) : (
           <Logo width="152px" height="40px" />
         )}
+
         <Stack spacing={0} maxWidth={{ base: "auto", md: "25rem" }}>
           <Text fontSize="sm" color="gray.500" fontWeight="600">
             {organizationName}
@@ -126,6 +126,7 @@ export function PublicPetitionInitialForm({
                 height="50px"
                 background="linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,1) 100%)"
               />
+
               <Button variant="outline" size="sm" onClick={handleToggleShowMore} marginTop={4}>
                 <FormattedMessage
                   id="generic.show-more-less"
@@ -144,6 +145,7 @@ export function PublicPetitionInitialForm({
               id="public-petition.help.form-title"
               defaultMessage="Enter your data to access"
             />
+
             <IconButton
               marginStart={2}
               rounded="full"
@@ -177,6 +179,7 @@ export function PublicPetitionInitialForm({
                 },
               })}
             />
+
             <FormErrorMessage>
               <FormattedMessage
                 id="generic.forms.required-first-name-error"
@@ -198,6 +201,7 @@ export function PublicPetitionInitialForm({
                 },
               })}
             />
+
             <FormErrorMessage>
               <FormattedMessage
                 id="generic.forms.required-last-name-error"
@@ -215,6 +219,7 @@ export function PublicPetitionInitialForm({
               autoComplete="email"
               {...register("email", { required: true, validate: { isValidEmail } })}
             />
+
             <FormErrorMessage>
               <FormattedMessage
                 id="generic.forms-invalid-email-error"
@@ -262,6 +267,7 @@ export function PublicPetitionInitialForm({
                 defaultMessage: "Close",
               })}
             />
+
             <ModalBody>
               <Stack spacing={4}>
                 <Text>

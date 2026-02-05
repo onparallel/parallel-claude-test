@@ -7,7 +7,6 @@ import {
   FormLabel,
   HStack,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
@@ -23,6 +22,7 @@ import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 interface ConfirmDeactivateUserDialogData {
   userId: string;
@@ -157,6 +157,7 @@ function ConfirmDeactivateUserDialog({
                 />
               )}
             />
+
             <FormErrorMessage>
               <FormattedMessage
                 id="organization.confirm-deactivate.user-select.input-error"

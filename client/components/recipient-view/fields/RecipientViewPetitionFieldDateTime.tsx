@@ -1,4 +1,4 @@
-import { Box, Button, Center, Flex, HStack, List, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Center, Flex, HStack, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon, FieldDateIcon } from "@parallel/chakra/icons";
 import { DateInput } from "@parallel/components/common/DateInput";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -30,6 +30,7 @@ import {
   RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
+import { Text } from "@parallel/components/ui";
 
 interface FieldDateTimeReply {
   datetime: string;
@@ -428,6 +429,7 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
               id="component.recipient-view-petition-field-date-time.select-timezone"
               defaultMessage="Select the time zone you need."
             />
+
             <Button
               variant="link"
               fontWeight={600}
@@ -449,6 +451,7 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
               defaultMessage="You are using the time zone {timezone}."
               values={{ timezone: prettifyTimezone(timezone) }}
             />
+
             <Button
               variant="link"
               fontWeight={600}

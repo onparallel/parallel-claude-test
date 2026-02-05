@@ -13,7 +13,6 @@ import {
   Input,
   Stack,
   Switch,
-  Text,
 } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import {
@@ -98,6 +97,7 @@ import { PetitionFieldMathEditor } from "./logic/PetitionFieldMathEditor";
 
 import { PetitionComposeVisibilityAccordion } from "../petition-common/PetitionComposeVisibilityAccordion";
 import { PetitionVisibilityEditor } from "./logic/PetitionVisibilityEditor";
+import { Text } from "@parallel/components/ui";
 
 export type PetitionComposeFieldSelection =
   | PetitionComposeField_PetitionFieldFragment
@@ -137,6 +137,7 @@ export interface PetitionComposeFieldProps {
     | "onFocusPrevField"
     | "onFocusNextField"
   >;
+
   onUpdateFieldPositions: (fieldIds: string[], parentFieldId?: string) => void;
   onUnlinkField: (parentFieldId: string, childrenFieldIds: string[]) => void;
   onLinkField?: (parentFieldId: string, childrenFieldIds: string[]) => void;
@@ -258,6 +259,7 @@ const _PetitionComposeField = chakraForwardRef<
               defaultMessage="Invalid attachment"
             />
           ),
+
           message: (
             <FormattedMessage
               id="component.petition-compose-field.invalid-attachment-message"
@@ -284,6 +286,7 @@ const _PetitionComposeField = chakraForwardRef<
                   defaultMessage="Too many attachments"
                 />
               ),
+
               message: (
                 <FormattedMessage
                   id="component.petition-compose-field.too-many-attachments"
@@ -511,6 +514,7 @@ const _PetitionComposeField = chakraForwardRef<
                 <DragHandleIcon role="presentation" />
               </Box>
             )}
+
             {field.optional ? null : (
               <Box marginX={-2} position="relative">
                 <Tooltip
@@ -536,6 +540,7 @@ const _PetitionComposeField = chakraForwardRef<
                 </Tooltip>
               </Box>
             )}
+
             <Stack spacing={1} flex="1">
               <Box position="relative">
                 <PetitionComposeFieldInner
@@ -567,6 +572,7 @@ const _PetitionComposeField = chakraForwardRef<
                   onUpdateFieldPositions={onUpdateFieldPositions}
                   showAddField={showAddField}
                 />
+
                 <PetitionComposeFieldActions
                   field={field}
                   isActive={isActive}
@@ -785,6 +791,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
           onClick={onTypeIndicatorClick}
           isFixedWidth={!field.isChild}
         />
+
         {field.isInternal ? <InternalFieldBadge /> : null}
         {field.options.showNumbering ? <NumberingBadge /> : null}
         {"isLinkedToProfileTypeField" in field &&
@@ -1037,6 +1044,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
             isDisabled={isReadOnly}
           />
         )}
+
         {field.attachments.length ? (
           <Flex flexWrap="wrap" gridGap={2}>
             {field.attachments.map((attachment) => (
@@ -1106,6 +1114,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
                   id="component.petition-compose-field.dynamic-select-not-configured"
                   defaultMessage="Click on field settings to configure this field"
                 />
+
                 <Text as="span" marginStart={1} position="relative" top="-1px">
                   (<SettingsIcon />)
                 </Text>
@@ -1272,6 +1281,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
             />
           </SmallPopover>
         )}
+
         {hasMath ? (
           <ConfimationPopover
             description={
@@ -1329,6 +1339,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
           })}
           onClick={onAttachmentClick}
         />
+
         <IconButtonWithTooltip
           icon={<CopyIcon />}
           size="sm"
@@ -1342,6 +1353,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
           onClick={onCloneField}
           isDisabled={isReadOnly || field.isLinkedToProfileTypeField}
         />
+
         <IconButtonWithTooltip
           data-action="show-field-settings"
           data-testid="compose-field-settings-button"
@@ -1359,6 +1371,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
           aria-expanded={isActive}
           onClick={onSettingsClick}
         />
+
         <ConfimationPopover
           description={
             <FormattedMessage
@@ -1749,11 +1762,13 @@ const PetitionComposeFieldVariablesAccordion = chakraForwardRef<
                       transform={isExpanded ? "rotate(90deg)" : undefined}
                       marginEnd={2}
                     />
+
                     <CalculatorIcon />
                     <FormattedMessage
                       id="component.petition-compose-field.calculations-title"
                       defaultMessage="Calculations"
                     />
+
                     <HelpPopover marginStart={1}>
                       <Text fontSize="sm">
                         <FormattedMessage

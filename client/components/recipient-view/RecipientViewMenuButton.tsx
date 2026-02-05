@@ -10,7 +10,6 @@ import {
   MenuList,
   Portal,
   Stack,
-  Text,
   useBreakpointValue,
 } from "@chakra-ui/react";
 import { Menu, Tooltip } from "@parallel/chakra/components";
@@ -28,6 +27,7 @@ import { NakedLink } from "../common/Link";
 import { useTone } from "../common/ToneProvider";
 import { Avatar } from "../ui";
 import { useRecipientViewHelpDialog } from "./dialogs/RecipientViewHelpDialog";
+import { Text } from "@parallel/components/ui";
 export function RecipientViewMenuButton({
   keycode,
   hasClientPortalAccess,

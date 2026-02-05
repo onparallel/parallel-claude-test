@@ -1,16 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  Heading,
-  HStack,
-  Skeleton,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Button, Center, Flex, Heading, HStack, Skeleton, Stack } from "@chakra-ui/react";
 import { CheckIcon, DeleteIcon, SaveIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -41,6 +31,7 @@ import { useRouter } from "next/router";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 type DowJonesFieldSearchResults_Selection =
   DowJonesFieldSearchResults_DowJonesKycEntitySearchResultFragment;
@@ -182,6 +173,7 @@ function DowJonesFieldSearchResults({
             <Skeleton height="24px" width="50px" />
           </HStack>
         )}
+
         <TablePage
           isHighlightable
           columns={columns}
@@ -212,6 +204,7 @@ function DowJonesFieldSearchResults({
                       id="component.dow-jones-search-result.searching-for"
                       defaultMessage="Searching for"
                     />
+
                     {": "}
                   </Text>
                   <Text as="span" whiteSpace="nowrap">
@@ -224,6 +217,7 @@ function DowJonesFieldSearchResults({
                       id="component.dow-jones-search-result.date-of-birth"
                       defaultMessage="Date of birth"
                     />
+
                     {": "}
                   </Text>
                   <Text as="span" whiteSpace="nowrap">
@@ -410,6 +404,7 @@ function useDowJonesKycDataColumns() {
         },
       },
     ],
+
     [intl.locale],
   );
 }

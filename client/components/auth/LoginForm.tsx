@@ -8,7 +8,6 @@ import {
   FormLabel,
   Input,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { LockClosedIcon } from "@parallel/chakra/icons";
 import { Link } from "@parallel/components/common/Link";
@@ -20,6 +19,7 @@ import router, { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export interface LoginData {
   email: string;
@@ -102,6 +102,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
               defaultMessage: "example@company.com",
             })}
           />
+
           <FormErrorMessage>
             <FormattedMessage
               id="generic.forms-invalid-email-error"
@@ -133,6 +134,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
             )}
           </FormControl>
         )}
+
         <Button
           ref={buttonRef}
           marginTop={6}

@@ -8,7 +8,6 @@ import {
   HStack,
   ListItem,
   Stack,
-  Text,
   UnorderedList,
 } from "@chakra-ui/react";
 import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
@@ -27,6 +26,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { DialogProps, useDialog } from "./DialogProvider";
+import { Text } from "@parallel/components/ui";
 
 interface ConfirmCommentMentionAndShareDialogProps {
   petitionId: string;
@@ -109,6 +109,7 @@ function ConfirmCommentMentionAndShareDialog({
               ),
             }}
           />
+
           <UnorderedList paddingStart={2}>
             {[...users, ...groups].map((t, i) => (
               <ListItem key={i}>

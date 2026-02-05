@@ -6,10 +6,10 @@ import {
   FormLabel,
   Input,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 interface PublicSignupFormNameData {
   firstName: string;
@@ -73,6 +73,7 @@ export function PublicSignupFormName({ onNext }: PublicSignupFormNameProps) {
             autoFocus
             autoComplete="given-name"
           />
+
           <FormErrorMessage>
             <FormattedMessage
               id="component.public-signup-form-name.invalid-first-name-error"
@@ -94,6 +95,7 @@ export function PublicSignupFormName({ onNext }: PublicSignupFormNameProps) {
             })}
             autoComplete="family-name"
           />
+
           <FormErrorMessage>
             <FormattedMessage
               id="component.public-signup-form-name.invalid-last-name-error"

@@ -10,7 +10,6 @@ import {
   Image,
   Skeleton,
   Stack,
-  Text,
   useToast,
 } from "@chakra-ui/react";
 import {
@@ -39,7 +38,7 @@ import { usePreviewPetitionFieldBackgroundCheckReplaceReplyDialog } from "@paral
 import { BackgroundCheckSearchDifferencesAlert } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckSearchDifferencesAlert";
 import { useBackgroundCheckContentsNotUpdatedDialog } from "@parallel/components/profiles/dialogs/BackgroundCheckContentsNotUpdatedDialog";
 import { useConfirmModifyBackgroundCheckSearch } from "@parallel/components/profiles/dialogs/ConfirmModifyBackgroundCheckSearchDialog";
-import { Tooltip } from "@parallel/components/ui";
+import { Text, Tooltip } from "@parallel/components/ui";
 import {
   BackgroundCheckEntitySearchType,
   BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchDocument,
@@ -77,6 +76,7 @@ type BackgroundCheckFieldSearchResults_Selection = { isNew: boolean } & (
       type: "Company";
     } & BackgroundCheckFieldSearchResults_BackgroundCheckEntitySearchSchema_BackgroundCheckEntitySearchCompany_Fragment)
 );
+
 interface BackgroundCheckFieldSearchResultsTableContext {
   savedEntityId: string | null;
   onDeleteEntity: (entityId: string) => void;
@@ -478,6 +478,7 @@ function BackgroundCheckFieldSearchResults({
               <Skeleton height="24px" width="100%" maxWidth="260px" />
             </>
           )}
+
           {!isReadOnly &&
           !isDisabled &&
           result?.hasPendingReview &&
@@ -520,6 +521,7 @@ function BackgroundCheckFieldSearchResults({
                     id="component.background-check-search-result.searching-for"
                     defaultMessage="Searching for"
                   />
+
                   {": "}
                 </Text>
                 <Text as="span">
@@ -541,6 +543,7 @@ function BackgroundCheckFieldSearchResults({
                   })}
                   breakpoint="lg"
                 />
+
                 <Button
                   variant="outline"
                   fontWeight={500}
@@ -599,6 +602,7 @@ function BackgroundCheckFieldSearchResults({
                   width="100%"
                   src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/search/empty-search.svg`}
                 />
+
                 <Stack textAlign="center">
                   <Text>
                     <FormattedMessage
@@ -669,6 +673,7 @@ function useBackgroundCheckDataColumns({ type }: { type: string | null }) {
                   <BusinessIcon />
                 </Tooltip>
               )}
+
               {row.name}
               {row.isNew ? <NewResultItemBadge /> : null}
             </Flex>
@@ -933,6 +938,7 @@ function useBackgroundCheckDataColumns({ type }: { type: string | null }) {
                       handleSaveClick();
                     }}
                   />
+
                   <ResponsiveButtonIcon
                     label={
                       row.type === "Person"
@@ -965,6 +971,7 @@ function useBackgroundCheckDataColumns({ type }: { type: string | null }) {
         },
       },
     ],
+
     [intl.locale, countries, type],
   );
 }

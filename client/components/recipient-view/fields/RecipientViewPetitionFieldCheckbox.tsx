@@ -1,4 +1,4 @@
-import { Box, Checkbox, HStack, Stack, Text } from "@chakra-ui/react";
+import { Box, Checkbox, HStack, Stack } from "@chakra-ui/react";
 import { DeleteIcon, RadioButtonSelected } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { LocalizableUserText } from "@parallel/components/common/LocalizableUserTextRender";
@@ -29,6 +29,7 @@ import {
   RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
+import { Text } from "@parallel/components/ui";
 
 type SelectOptionValue = {
   label: LocalizableUserText;
@@ -218,6 +219,7 @@ export function RecipientViewPetitionFieldCheckbox({
                 id="generic.reply-not-available"
                 defaultMessage="Reply not available"
               />
+
               {")"}
             </Text>
           ) : null}
@@ -247,6 +249,7 @@ export function RecipientViewPetitionFieldCheckbox({
                   values={{ count: checkedItemsLength }}
                 />
               )}
+
               {showRadio ? null : ")"}
             </Box>
           ) : null}

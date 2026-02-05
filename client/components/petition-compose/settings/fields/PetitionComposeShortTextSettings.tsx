@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Stack, Text } from "@chakra-ui/react";
+import { Box, Stack } from "@chakra-ui/react";
 import { ShortTextFormatSelect } from "@parallel/components/common/ShortTextFormatSelect";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { useShortTextFormatsSelectOptions } from "@parallel/utils/useShortTextFormats";
@@ -7,6 +7,7 @@ import { FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { SettingsRow } from "../rows/SettingsRow";
+import { Text } from "@parallel/components/ui";
 
 export function PetitionComposeShortTextSettings({
   field,

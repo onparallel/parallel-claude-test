@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Flex, Heading, Text } from "@chakra-ui/react";
+import { Box, Center, Flex, Heading } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { AddIcon } from "@parallel/chakra/icons";
 import { FieldDescription } from "@parallel/components/common/FieldDescription";
@@ -17,6 +17,7 @@ import { MouseEvent, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { CommentsButton } from "../CommentsButton";
+import { Text } from "@parallel/components/ui";
 
 export type RecipientViewPetitionFieldLayout_PetitionFieldSelection =
   | RecipientViewPetitionFieldLayout_PublicPetitionFieldFragment
@@ -61,6 +62,7 @@ export function RecipientViewPetitionFieldLayout({
                 <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
               </Text>
             )}
+
             {field.optional ? null : (
               <Tooltip
                 placement="right"

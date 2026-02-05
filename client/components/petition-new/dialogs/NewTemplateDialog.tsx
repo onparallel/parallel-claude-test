@@ -1,9 +1,10 @@
-import { Box, Button, Center, HStack, Image, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Center, HStack, Image, Stack } from "@chakra-ui/react";
 import { CheckedBoxIcon, ContractIcon, FileNewIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { ReactNode, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 type NewTemplateDialogData = string | null;
 

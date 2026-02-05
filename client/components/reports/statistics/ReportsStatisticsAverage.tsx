@@ -8,7 +8,6 @@ import {
   ListItem,
   OrderedList,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import {
   CheckIcon,
@@ -26,6 +25,7 @@ import { downloadSpreadsheet } from "@parallel/utils/downloadSpreadsheet";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { TimeSpan } from "../common/TimeSpan";
+import { Text } from "@parallel/components/ui";
 
 export function ReportsStatisticsAverage({
   report,
@@ -230,6 +230,7 @@ export function ReportsStatisticsAverage({
                   borderRadius="full"
                   background="yellow.400"
                 />
+
                 <CheckIcon color="green.400" />
               </HStack>
             </GridItem>
@@ -252,6 +253,7 @@ export function ReportsStatisticsAverage({
                   borderRadius="full"
                   background="green.600"
                 />
+
                 <DoubleCheckIcon color="green.500" />
                 {pendingToComplete && !completeToClose ? (
                   <Text textStyle="hint">
@@ -327,6 +329,7 @@ export function ReportsStatisticsAverage({
                       borderRadius="full"
                       background="yellow.400"
                     />
+
                     <SignatureIcon />
                   </HStack>
                 </GridItem>
@@ -474,6 +477,7 @@ function useDownloadAverageReportExcel() {
             style: { numFmt: "0.00" },
           },
         ];
+
         worksheet.spliceRows(1, 0, []);
         worksheet.mergeCells("B1:F1");
         worksheet.mergeCells("G1:J1");

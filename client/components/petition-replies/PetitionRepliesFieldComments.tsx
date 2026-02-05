@@ -11,7 +11,6 @@ import {
   HStack,
   Spinner,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { ChevronLeftIcon, CommentIcon, NoteIcon } from "@parallel/chakra/icons";
 import {
@@ -44,6 +43,7 @@ import {
   PetitionCommentsAndNotesEditorInstance,
 } from "../petition-common/PetitionCommentsAndNotesEditor";
 import { useFailureGeneratingLinkDialog } from "./dialogs/FailureGeneratingLinkDialog";
+import { Text } from "@parallel/components/ui";
 
 export interface PetitionRepliesFieldCommentsProps {
   petition: PetitionRepliesFieldComments_PetitionBaseFragment;
@@ -220,6 +220,7 @@ export function PetitionRepliesFieldComments({
           onClick={() => onClose()}
           display={{ base: "none", lg: "flex" }}
         />
+
         {showGeneralComments ? (
           <Heading as="h3" size="sm" fontWeight={500}>
             <FormattedMessage
@@ -410,6 +411,7 @@ const _queries = [
     }
   `,
 ];
+
 const _mutations = [
   gql`
     mutation PetitionRepliesFieldComments_petitionCommentAttachmentDownloadLink(

@@ -19,7 +19,6 @@ import {
   MenuList,
   Spinner,
   Stack,
-  Text,
   UnorderedList,
   useToast,
 } from "@chakra-ui/react";
@@ -32,7 +31,7 @@ import { SubscribedNotificationsIcon } from "@parallel/components/common/Subscri
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
 import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
 import { UserReference } from "@parallel/components/common/UserReference";
-import { Avatar } from "@parallel/components/ui";
+import { Avatar, Text } from "@parallel/components/ui";
 import {
   PetitionActivity_petitionDocument,
   PetitionBaseType,
@@ -409,6 +408,7 @@ export function PetitionSharingDialog({
                     id="component.petition-sharing-dialog.subscribe"
                     defaultMessage="Subscribe to notifications"
                   />
+
                   <HelpPopover>
                     <FormattedMessage
                       id="component.petition-sharing-dialog.subscribe-help"
@@ -425,7 +425,7 @@ export function PetitionSharingDialog({
                     <UserAvatar role="presentation" user={user} size="sm" />
                     <Box flex="1" minWidth={0} fontSize="sm" marginStart={2}>
                       <Flex direction="row" alignItems="center" gap={1}>
-                        <Text noOfLines={1} wordBreak="break-all">
+                        <Text lineClamp={1} wordBreak="break-all">
                           {user.fullName}
                         </Text>
                         {userId === user.id ? (
@@ -442,7 +442,7 @@ export function PetitionSharingDialog({
                           <SubscribedNotificationsIcon />
                         ) : null}
                       </Flex>
-                      <Text color="gray.500" noOfLines={1}>
+                      <Text color="gray.500" lineClamp={1}>
                         {user.email}
                       </Text>
                     </Box>
@@ -540,7 +540,7 @@ export function PetitionSharingDialog({
                         <Avatar.Fallback name={group.name} />
                       </Avatar.Root>
                       <Box flex="1" minWidth={0} fontSize="sm" marginStart={2}>
-                        <Text noOfLines={1} wordBreak="break-all">
+                        <Text lineClamp={1} wordBreak="break-all">
                           <UserGroupReference userGroup={group} />
                         </Text>
                         <Flex
@@ -563,7 +563,7 @@ export function PetitionSharingDialog({
                               return null;
                             }}
                           >
-                            <Text color="gray.500" cursor="default" noOfLines={1}>
+                            <Text color="gray.500" cursor="default" lineClamp={1}>
                               <FormattedMessage
                                 id="generic.n-group-members"
                                 defaultMessage="{count, plural, =1 {1 member} other {# members}}"
@@ -806,9 +806,7 @@ const _queries = [
 function ConfirmRemovePetitionPermissionDialog({
   name,
   ...props
-}: DialogProps<{
-  name?: Maybe<ReactNode>;
-}>) {
+}: DialogProps<{ name?: Maybe<ReactNode> }>) {
   return (
     <ConfirmDialog
       closeOnEsc={true}

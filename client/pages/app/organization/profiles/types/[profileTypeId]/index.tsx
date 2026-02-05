@@ -20,7 +20,6 @@ import {
   MenuItem,
   MenuList,
   Stack,
-  Text,
   useToast,
 } from "@chakra-ui/react";
 import {
@@ -60,6 +59,7 @@ import { useProfileTypeFieldsInPatternDialog } from "@parallel/components/organi
 import { useUpdateProfileTypeFieldDialog } from "@parallel/components/organization/profiles/dialogs/UpdateProfileTypeFieldDialog";
 import { useProfileTypeFieldReferencedAutoSearchConfigDialog } from "@parallel/components/profiles/dialogs/ProfileTypeFieldReferencedAutoSearchConfigDialog";
 import { useProfileTypeFieldReferencedMonitoringDialog } from "@parallel/components/profiles/dialogs/ProfileTypeFieldReferencedMonitoringDialog";
+import { Text } from "@parallel/components/ui";
 import {
   OrganizationProfileType_ProfileTypeFieldFragment,
   OrganizationProfileType_cloneProfileTypeDocument,
@@ -504,6 +504,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
                 icon={<EditSimpleIcon />}
                 onClick={handleChangeProfileTypeName}
               />
+
               {isNonNullish(profileType.standardType) ? (
                 <Box minWidth={0} color="gray.500">
                   <OverflownText>
@@ -541,6 +542,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
                         />
                       </MenuItem>
                     )}
+
                     <MenuDivider />
                     {profileType.archivedAt ? (
                       <MenuItem
@@ -608,6 +610,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
                 onSelectionChange={onChangeSelectedIds}
                 onReorder={handleReorderProperties}
               />
+
               <Center>
                 <Button colorScheme="primary" leftIcon={<AddIcon />} onClick={handleAddNewProperty}>
                   <FormattedMessage
@@ -836,7 +839,7 @@ const ProfileTypeField = chakraForwardRef<"div", ProfileTypeFieldProps>(function
             <DragHandleIcon role="presentation" boxSize={3} />
           </Box>
           <ProfileTypeFieldTypeIndicator type={item.type} fieldIndex={index + 1} />
-          <Text as="span" flex="1" noOfLines={1}>
+          <Text as="span" flex="1" lineClamp={1}>
             <LocalizableUserTextRender
               value={item.name}
               default={intl.formatMessage({
@@ -960,6 +963,7 @@ function useConfirmDeleteProfileTypeFieldDialog() {
             }}
           />
         ),
+
         description: (
           <>
             <Text>
@@ -983,6 +987,7 @@ function useConfirmDeleteProfileTypeFieldDialog() {
                 />
               </Text>
             )}
+
             {subscriptionsCount > 0 && (
               <Text>
                 <FormattedMessage

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import { Button, List, ListItem, Stack, Text } from "@chakra-ui/react";
+import { Button, List, ListItem, Stack } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
@@ -9,6 +9,7 @@ import { PreviewImportFromProfileFormatErrorDialog_profilesDocument } from "@par
 import { useRef } from "react";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish, unique, uniqueBy } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 export interface PreviewImportFromProfileFormatErrorDialogProps {
   profileTypeId: string;

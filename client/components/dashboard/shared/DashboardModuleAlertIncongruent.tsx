@@ -1,6 +1,6 @@
-import { Text } from "@chakra-ui/react";
 import { AlertPopover } from "@parallel/components/common/AlertPopover";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export function DashboardModuleAlertIncongruent() {
   return (

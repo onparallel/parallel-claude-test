@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Center, Flex, HStack, Heading, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Center, Flex, HStack, Heading, Stack } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { AddIcon, DeleteIcon, EditSimpleIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
@@ -39,6 +39,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish, zip } from "remeda";
 import { RecipientViewPetitionFieldIdVerification } from "./RecipientViewPetitionFieldIdVerification";
 import { RecipientViewPetitionFieldLayoutProps } from "./RecipientViewPetitionFieldLayout";
+import { Text } from "@parallel/components/ui";
 
 export interface RecipientViewPetitionFieldGroupProps
   extends Omit<
@@ -321,6 +322,7 @@ export function RecipientViewPetitionFieldGroupLayout({
                   <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
                 </Text>
               )}
+
               {field.optional ? null : (
                 <Tooltip
                   placement="right"

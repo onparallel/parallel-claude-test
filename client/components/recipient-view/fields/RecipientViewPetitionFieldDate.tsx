@@ -1,4 +1,4 @@
-import { Center, Flex, List, Stack, Text } from "@chakra-ui/react";
+import { Center, Flex, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon, FieldDateIcon } from "@parallel/chakra/icons";
 import { DateInput } from "@parallel/components/common/DateInput";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -28,6 +28,7 @@ import {
   RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
+import { Text } from "@parallel/components/ui";
 
 export interface RecipientViewPetitionFieldDateProps
   extends Omit<

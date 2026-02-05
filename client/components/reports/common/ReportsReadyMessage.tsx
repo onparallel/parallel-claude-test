@@ -1,5 +1,6 @@
-import { Image, Text } from "@chakra-ui/react";
+import { Image } from "@chakra-ui/react";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export function ReportsReadyMessage({ title, body }: { title?: string; body?: string }) {
   return (
@@ -11,6 +12,7 @@ export function ReportsReadyMessage({ title, body }: { title?: string; body?: st
         marginBottom={6}
         src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/reports/reports-empty.svg`}
       />
+
       <Text fontWeight="bold">
         {title ?? (
           <FormattedMessage

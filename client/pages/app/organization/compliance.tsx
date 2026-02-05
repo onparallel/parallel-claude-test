@@ -22,7 +22,6 @@ import {
   TableContainer,
   Tbody,
   Td,
-  Text,
   Th,
   Thead,
   Tr,
@@ -44,6 +43,7 @@ import { compose } from "@parallel/utils/compose";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 interface ComplianceFormData {
   period: number | null;
@@ -207,6 +207,7 @@ function OrganizationCompliance() {
                       </NumberInput>
                     )}
                   />
+
                   <Text>
                     <FormattedMessage id="page.compliance.months" defaultMessage="months" />
                   </Text>

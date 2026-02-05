@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, HStack, MenuButton, MenuItem, MenuList, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, HStack, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import {
   CheckIcon,
@@ -12,6 +12,7 @@ import {
 import { ButtonWithMoreOptions } from "@parallel/components/common/ButtonWithMoreOptions";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { Text } from "@parallel/components/ui";
 import {
   AdverseMediaArticleHeader_AdverseMediaArticleFragment,
   AdverseMediaArticleRelevance,
@@ -49,7 +50,7 @@ export function AdverseMediaArticleHeader({
             flex="1"
             fontSize="lg"
             fontWeight={500}
-            noOfLines={1}
+            lineClamp={1}
             dangerouslySetInnerHTML={{ __html: article.header }}
           />
         ) : null}
@@ -70,6 +71,7 @@ export function AdverseMediaArticleHeader({
               })}
             />
           )}
+
           {isNonNullish(article) ? (
             article.classification !== null ? (
               <Menu>

@@ -1,12 +1,4 @@
-import {
-  Box,
-  Button,
-  Center,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Button, Center, FormControl, FormErrorMessage, FormLabel } from "@chakra-ui/react";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { PASSWORD_REGEX } from "@parallel/utils/validation";
 import { ReactElement, useEffect } from "react";
@@ -14,6 +6,7 @@ import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { PasswordStrengthIndicator } from "../common/PasswordStrengthIndicator";
 import { PinInput } from "../ui";
+import { Text } from "@parallel/components/ui";
 
 export interface PasswordResetData {
   verificationCode: string;
@@ -111,6 +104,7 @@ export function PasswordResetForm({
                 defaultMessage="The verification code is invalid"
               />
             )}
+
             {(errors.verificationCode?.type === "required" ||
               errors.verificationCode?.type === "minLength") && (
               <FormattedMessage
@@ -136,6 +130,7 @@ export function PasswordResetForm({
               pattern: PASSWORD_REGEX,
             })}
           />
+
           <PasswordStrengthIndicator password={password} />
           <FormErrorMessage>
             {errors.password && (
@@ -144,6 +139,7 @@ export function PasswordResetForm({
                 defaultMessage="The password must have a least 8 characters"
               />
             )}
+
             {isInvalidPassword ? (
               <FormattedMessage
                 id="generic.invalid-password-policy-error"
@@ -165,6 +161,7 @@ export function PasswordResetForm({
               validate: (value) => value === getValues().password,
             })}
           />
+
           <FormErrorMessage>
             <FormattedMessage
               id="generic.passwords-must-match-error"

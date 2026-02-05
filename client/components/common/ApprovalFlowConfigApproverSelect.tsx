@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useApolloClient, useQuery } from "@apollo/client/react";
-import { Box, HStack, Text } from "@chakra-ui/react";
+import { Box, HStack } from "@chakra-ui/react";
 import { UsersIcon } from "@parallel/chakra/icons";
 import {
   ApprovalFlowConfigApproverSelect_PetitionBaseFragment,
@@ -45,6 +45,7 @@ import { UserDropdownEmpty } from "./UserDropdownEmpty";
 import { UserGroupMembersPopover } from "./UserGroupMembersPopover";
 import { userGroupReferenceText } from "./UserGroupReference";
 import { UserSelectOption } from "./UserSelectOption";
+import { Text } from "@parallel/components/ui";
 
 type FieldOf<T extends ApprovalFlowConfigApproverSelect_PetitionBaseFragment> = UnwrapArray<
   Exclude<T["fields"], null | undefined>
@@ -500,6 +501,7 @@ function MenuListWithPlaceholder<T extends ApprovalFlowConfigApproverSelect_Peti
           </Text>
         </Box>
       )}
+
       {children}
     </components.MenuList>
   );
@@ -568,6 +570,7 @@ function MultiValueLabel<T extends ApprovalFlowConfigApproverSelect_PetitionBase
             isTooltipDisabled
             flexShrink={0}
           />
+
           <Box
             paddingEnd={1}
             flex="1"
@@ -665,6 +668,7 @@ function ApprovalFlowConfigApproverSelectOption<
           isTooltipDisabled
           flexShrink={0}
         />
+
         <Box
           fontSize="sm"
           paddingEnd={1}

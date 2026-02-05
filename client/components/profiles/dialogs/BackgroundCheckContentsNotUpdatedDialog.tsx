@@ -1,8 +1,7 @@
-import { Text } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button, Stack } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import { useRef } from "react";
 import { FormattedMessage } from "react-intl";
 

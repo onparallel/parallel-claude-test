@@ -14,7 +14,6 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
-  Text,
   useToast,
 } from "@chakra-ui/react";
 import { CheckIcon, DeleteIcon, SaveIcon, SearchIcon } from "@parallel/chakra/icons";
@@ -48,6 +47,7 @@ import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, pick } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 type ProfileSearchProps = UnwrapPromise<ReturnType<typeof ProfileSearch.getInitialProps>>;
 
@@ -175,6 +175,7 @@ function ProfileSearch({ fieldId, petitionId, profileTypeIds, parentReplyId }: P
                   width="100%"
                   maxWidth={{ base: "100%", md: "420px" }}
                 />
+
                 <Box marginStart={2}>
                   <Button type="submit" leftIcon={<SearchIcon />}>
                     <FormattedMessage id="page.profile-check.search" defaultMessage="Search" />
@@ -565,6 +566,7 @@ function useProfileSearchTableColumns({
         },
       },
     ],
+
     [intl.locale, profileTypeId],
   );
 }

@@ -13,7 +13,6 @@ import {
   HStack,
   Spinner,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { LinkIcon } from "@parallel/chakra/icons";
 import {
@@ -57,6 +56,7 @@ import { HelpPopover } from "../../common/HelpPopover";
 import { RecipientSelectGroups } from "../../common/RecipientSelectGroups";
 import { SendButton } from "../../petition-common/SendButton";
 import { useContactlessLinkDialog } from "./ContactlessLinkDialog";
+import { Text } from "@parallel/components/ui";
 
 export interface AddPetitionAccessDialogProps {
   onSearchContacts?: ContactSelectProps["onSearchContacts"];

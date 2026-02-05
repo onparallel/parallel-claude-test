@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Button, Checkbox, FormControl, FormLabel, Input, Stack, Text } from "@chakra-ui/react";
+import { Button, Checkbox, FormControl, FormLabel, Input, Stack } from "@chakra-ui/react";
 import { DoubleCheckIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
@@ -15,6 +15,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { HelpPopover } from "../../common/HelpPopover";
 import { PaddedCollapse } from "../../common/PaddedCollapse";
 import { RichTextEditor, RichTextEditorInstance } from "../../common/slate/RichTextEditor";
+import { Text } from "@parallel/components/ui";
 
 interface ClosePetitionDialogInput {
   petition: useClosePetitionDialog_PetitionFragment;
@@ -111,6 +112,7 @@ export function ClosePetitionDialog({
                   />
                 </Checkbox>
               )}
+
               <PaddedCollapse open={requiredMessage || sendMessage}>
                 <Stack>
                   <RichTextEditor
@@ -125,6 +127,7 @@ export function ClosePetitionDialog({
                     })}
                     placeholderOptions={placeholders}
                   />
+
                   <Checkbox
                     onChange={(e) => {
                       setAttachPdfExport(e.target.checked);
@@ -156,6 +159,7 @@ export function ClosePetitionDialog({
                             id="component.close-petition-dialog.attach-pdf-export-title"
                             defaultMessage="Title of the document"
                           />
+
                           <HelpPopover placement="auto">
                             <FormattedMessage
                               id="component.close-petition-dialog.attach-pdf-export-title-help"

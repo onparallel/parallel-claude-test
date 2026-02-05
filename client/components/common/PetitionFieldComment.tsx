@@ -9,7 +9,6 @@ import {
   MenuList,
   Spacer,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { ThumbsDownIcon, ThumbsUpIcon } from "@parallel/chakra/icons";
 import { PetitionFieldComment_PetitionFieldCommentFragment } from "@parallel/graphql/__types";
@@ -32,6 +31,7 @@ import {
   CommentEditorProps,
   CommentEditorValue,
 } from "./slate/CommentEditor";
+import { Text } from "@parallel/components/ui";
 
 interface PetitionFieldCommentProps
   extends Pick<CommentEditorProps, "defaultMentionables" | "onSearchMentionables"> {
@@ -249,6 +249,7 @@ export function PetitionFieldComment({
             onKeyDown={handleKeyDown}
             onChange={setContent}
           />
+
           <Stack direction="row" justifyContent="flex-end" marginTop={2}>
             <Button size="sm" onClick={handleCancelClick}>
               <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
@@ -261,6 +262,7 @@ export function PetitionFieldComment({
       ) : (
         <PetitionFieldCommentContent fontSize="md" comment={comment} />
       )}
+
       {isNonNullish(comment.attachments) ? (
         <HStack marginTop={1} flexWrap="wrap">
           {comment.attachments.map((attachment) => {

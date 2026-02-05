@@ -1,6 +1,7 @@
-import { Flex, Text, useFormControl, useTheme } from "@chakra-ui/react";
+import { useFormControl, useTheme } from "@chakra-ui/react";
 import { ChevronDownIcon, CloseIcon } from "@parallel/chakra/icons";
 import { CloseButton } from "@parallel/components/common/CloseButton";
+import { Flex, Text } from "@parallel/components/ui";
 import { useRehydrated } from "@parallel/utils/useRehydrated";
 import { useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";

@@ -14,7 +14,6 @@ import {
   Radio,
   RadioGroup,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
 import { NakedLink } from "@parallel/components/common/Link";
@@ -35,6 +34,7 @@ import { useRouter } from "next/router";
 import { FormEvent, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 type OptOutProps = UnwrapPromise<ReturnType<typeof getServerSideProps>>["props"];
 
@@ -69,13 +69,15 @@ function OptOut(props: OptOutProps) {
   return (
     <>
       <Head>
-        <title>{
-          // eslint-disable-next-line formatjs/no-literal-string-in-jsx
-          `Parallel | ${intl.formatMessage({
-            id: "page.opt-out.title",
-            defaultMessage: "Opt out from emails",
-          })}`
-        }</title>
+        <title>
+          {
+            // eslint-disable-next-line formatjs/no-literal-string-in-jsx
+            `Parallel | ${intl.formatMessage({
+              id: "page.opt-out.title",
+              defaultMessage: "Opt out from emails",
+            })}`
+          }
+        </title>
       </Head>
       <Grid
         gridTemplateRows="auto 1fr auto"
@@ -126,6 +128,7 @@ function OptOut(props: OptOutProps) {
                     id="page.opt-out.feedback-title"
                     defaultMessage="Please let us know why you would like to stop receiving reminders related with this process."
                   />
+
                   {" *"}
                 </Heading>
                 <RadioGroup name="opt-out-reason" onChange={setReason}>
@@ -149,6 +152,7 @@ function OptOut(props: OptOutProps) {
                         onChange={(event) => setother(event.target.value)}
                         value={other}
                       />
+
                       <FormErrorMessage>
                         <FormattedMessage
                           id="page.opt-out.other-error-message"

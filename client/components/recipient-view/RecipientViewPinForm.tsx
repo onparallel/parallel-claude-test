@@ -1,7 +1,8 @@
-import { Button, Flex, HStack, Text } from "@chakra-ui/react";
+import { Button, Flex, HStack } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { PinInput } from "../ui";
+import { Text } from "@parallel/components/ui";
 
 interface RecipientViewPinFormProps {
   onSubmit: (code: string) => void;

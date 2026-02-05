@@ -1,9 +1,10 @@
-import { HStack, SystemProps, Text, TypographyProps } from "@chakra-ui/react";
+import { HStack, SystemProps, TypographyProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionStatus } from "@parallel/graphql/__types";
 import { usePetitionStatusColor } from "@parallel/utils/usePetitionStatusColor";
 import { usePetitionStatusLabels } from "@parallel/utils/usePetitionStatusLabels";
 import { PetitionStatusIcon } from "./PetitionStatusIcon";
+import { Text } from "@parallel/components/ui";
 
 interface PetitionStatusLabelProps {
   spacing?: SystemProps["margin"];

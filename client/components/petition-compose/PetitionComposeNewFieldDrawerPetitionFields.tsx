@@ -6,7 +6,6 @@ import {
   Icon,
   Image,
   Stack,
-  Text,
   useBreakpointValue,
   useDisclosure,
 } from "@chakra-ui/react";
@@ -37,6 +36,7 @@ import { SearchInput } from "../common/SearchInput";
 import { SmallPopover } from "../common/SmallPopover";
 import { getProfileTypeIcon } from "../organization/profiles/getProfileTypeIcon";
 import { PetitionFieldTypeLabel } from "./PetitionFieldTypeLabel";
+import { Text } from "@parallel/components/ui";
 
 const FIELD_GROUP_EXCLUDED_FIELD_TYPES = ["FIELD_GROUP", "HEADING"] as PetitionFieldType[];
 
@@ -159,6 +159,7 @@ export function PetitionComposeNewFieldDrawerPetitionFields({
                   c.category,
                   ...getProfileTypeStandardTypeKeywords(profileType.standardType!),
                 ],
+
                 label: localizableUserTextRender({
                   intl,
                   value: profileType.name,
@@ -297,6 +298,7 @@ export function PetitionComposeNewFieldDrawerPetitionFields({
             width="100%"
             src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/search/empty-search.svg`}
           />
+
           <Text textAlign="center" paddingX={4}>
             <FormattedMessage
               id="generic.search-no-results"

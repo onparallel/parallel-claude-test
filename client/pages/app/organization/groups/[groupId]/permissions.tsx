@@ -12,7 +12,6 @@ import {
   HStack,
   ListItem,
   Stack,
-  Text,
   UnorderedList,
 } from "@chakra-ui/react";
 import { CircleCheckIcon, DashIcon, ForbiddenIcon } from "@parallel/chakra/icons";
@@ -43,6 +42,7 @@ import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { OptionProps, SingleValueProps, components } from "react-select";
 import { zip } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 type PermissionsGroupProps = UnwrapPromise<ReturnType<typeof PermissionsGroup.getInitialProps>>;
 
@@ -607,6 +607,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
           ]
         : []),
     ],
+
     [intl.locale],
   );
 
@@ -724,6 +725,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
           />
         </Box>
       )}
+
       <Flex
         padding={4}
         gap={4}

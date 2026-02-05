@@ -1,9 +1,10 @@
 import { gql } from "@apollo/client";
-import { Box, Circle, Flex, LinkBox, LinkOverlay, Stack, Text } from "@chakra-ui/react";
+import { Box, Circle, Flex, LinkBox, LinkOverlay, Stack } from "@chakra-ui/react";
 import { EmailIcon, EmailOpenedIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { NakedLink } from "@parallel/components/common/Link";
+import { Text } from "@parallel/components/ui";
 import { PetitionUserNotification_PetitionUserNotificationFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
@@ -83,6 +84,7 @@ export const PetitionUserNotification = forwardRef<HTMLElement, PetitionUserNoti
               marginEnd={1}
             />
           )}
+
           {icon}
         </Flex>
         <Stack flex="1 1 auto" minWidth="0" spacing={0} ref={bodyRef}>
@@ -108,7 +110,7 @@ export const PetitionUserNotification = forwardRef<HTMLElement, PetitionUserNoti
                 as="div"
                 position="relative"
                 paddingX={4}
-                noOfLines={1}
+                lineClamp={1}
                 fontSize="sm"
                 minWidth="0"
                 fontWeight={petition.name ? "bold" : "normal"}
@@ -131,7 +133,7 @@ export const PetitionUserNotification = forwardRef<HTMLElement, PetitionUserNoti
           <Text
             data-testid="notification-text"
             fontWeight={isRead ? "normal" : "medium"}
-            noOfLines={3}
+            lineClamp={3}
             paddingX={4}
             paddingBottom={1}
             paddingTop={0.5}

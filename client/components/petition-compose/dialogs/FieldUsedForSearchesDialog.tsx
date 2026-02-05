@@ -1,8 +1,9 @@
-import { Box, Button, Text } from "@chakra-ui/react";
+import { Box, Button } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 function FieldUsedForSearchesDialog({
   fieldTitle,

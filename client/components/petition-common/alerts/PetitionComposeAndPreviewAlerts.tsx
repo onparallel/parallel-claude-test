@@ -9,7 +9,6 @@ import {
   HStack,
   MenuItem,
   MenuList,
-  Text,
 } from "@chakra-ui/react";
 import { TimeIcon } from "@parallel/chakra/icons";
 import { ButtonWithMoreOptions } from "@parallel/components/common/ButtonWithMoreOptions";
@@ -19,6 +18,7 @@ import {
   PetitionStatus,
 } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 interface PetitionComposeAndPreviewAlertsProps {
   petitionStatus: PetitionStatus;

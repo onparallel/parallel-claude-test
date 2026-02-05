@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Heading, HStack, Image, Stack, Text } from "@chakra-ui/react";
+import { Box, Heading, HStack, Image, Stack } from "@chakra-ui/react";
 import { DocumentIcon, FileImageIcon, MessageSquareIcon } from "@parallel/chakra/icons";
 import { Divider } from "@parallel/components/common/Divider";
 import { NormalLink } from "@parallel/components/common/Link";
@@ -7,6 +7,7 @@ import { AdverseMediaArticleDetails_AdverseMediaArticleFragment } from "@paralle
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 export function AdverseMediaArticleDetails({
   article,
@@ -90,6 +91,7 @@ export function AdverseMediaArticleDetails({
             <Image src={firstImage} alt="" />
           </Box>
         )}
+
         {article.body ? (
           <Text
             dangerouslySetInnerHTML={{ __html: article.body }}

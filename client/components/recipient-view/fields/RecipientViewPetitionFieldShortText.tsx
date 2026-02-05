@@ -1,4 +1,4 @@
-import { Center, Flex, FormControl, HStack, List, Stack, Text } from "@chakra-ui/react";
+import { Center, Flex, FormControl, HStack, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { FormatFormErrorMessage, ShortTextInput } from "@parallel/components/common/ShortTextInput";
@@ -30,6 +30,7 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
+import { Text } from "@parallel/components/ui";
 
 export interface RecipientViewPetitionFieldShortTextProps
   extends Omit<
@@ -333,6 +334,7 @@ export function RecipientViewPetitionFieldShortText({
               {...inputProps}
               format={format}
             />
+
             <Center boxSize={10} position="absolute" insetEnd={0} bottom={0}>
               <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
             </Center>
@@ -455,6 +457,7 @@ export const RecipientViewPetitionFieldReplyShortText = forwardRef<
             {...props}
             format={format}
           />
+
           <Center boxSize={10} position="absolute" insetEnd={0} bottom={0}>
             <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} reply={reply} />
           </Center>

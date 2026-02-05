@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client";
-import { Box, Center, HStack, Image, Stack, Text, useMultiStyleConfig } from "@chakra-ui/react";
+import { Box, Center, HStack, Image, Stack, useMultiStyleConfig } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
+import { Text } from "@parallel/components/ui";
 import { PublicTemplateCard_PetitionTemplateFragment } from "@parallel/graphql/__types";
 import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
 import { useRoleButton } from "@parallel/utils/useRoleButton";
@@ -83,14 +84,15 @@ export const PublicTemplateCard = chakraForwardRef<"div", PublicTemplateCardProp
             </HStack>
 
             {template.name ? (
-              <Text as="h2" fontSize="lg" noOfLines={2} fontWeight="bold">
+              <Text as="h2" fontSize="lg" lineClamp={2} fontWeight="bold">
                 {template.name}
               </Text>
             ) : (
-              <Text as="h2" fontSize="lg" noOfLines={2} fontWeight="normal" fontStyle="italic">
+              <Text as="h2" fontSize="lg" lineClamp={2} fontWeight="normal" fontStyle="italic">
                 <FormattedMessage id="generic.unnamed-template" defaultMessage="Unnamed template" />
               </Text>
             )}
+
             <Spacer />
             <TemplateActiveSettingsIcons template={template} spacing={2.5} />
           </Stack>

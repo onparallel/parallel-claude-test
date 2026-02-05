@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { HStack, Stack, Table, Tbody, Td, Text, Th, Thead, Tr } from "@chakra-ui/react";
+import { HStack, Stack, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import { ArrowBackIcon, EyeOffIcon, ForbiddenIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldSelect } from "@parallel/components/common/PetitionFieldSelect";
@@ -20,6 +20,7 @@ import { OverflownText } from "./OverflownText";
 import { PetitionFieldRepliesContent } from "./PetitionFieldRepliesContent";
 import { ScrollTableContainer } from "./ScrollTableContainer";
 import { SmallPopover } from "./SmallPopover";
+import { Text } from "@parallel/components/ui";
 
 export interface MapFieldsTableProps {
   petition: MapFieldsTable_PetitionBaseFragment;

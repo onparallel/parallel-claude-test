@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Text } from "@chakra-ui/react";
+
 import { UsersIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { UserGroupReference_UserGroupFragment, UserLocale } from "@parallel/graphql/__types";
@@ -7,6 +7,7 @@ import { Maybe } from "@parallel/utils/types";
 import { FormattedMessage } from "react-intl";
 import { LocalizableUserTextRender, localizableUserTextRender } from "./LocalizableUserTextRender";
 import { SmallPopover } from "./SmallPopover";
+import { Text } from "@parallel/components/ui";
 
 interface UserGroupReferenceProps {
   userGroup?: Maybe<UserGroupReference_UserGroupFragment>;

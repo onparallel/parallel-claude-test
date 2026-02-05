@@ -1,4 +1,4 @@
-import { Center, Flex, HStack, Image, Square, Stack, Text, useTheme } from "@chakra-ui/react";
+import { Center, Flex, HStack, Image, Square, Stack, useTheme } from "@chakra-ui/react";
 import { DownloadIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
@@ -8,6 +8,7 @@ import { useMemo } from "react";
 import { Doughnut } from "react-chartjs-2";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../../common/IconButtonWithTooltip";
+import { Text } from "@parallel/components/ui";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -54,6 +55,7 @@ export function ReportsDoughnutChart({
           { count: closedPetitions },
         ),
       ],
+
       datasets: [
         {
           data: [pendingPetitions, completedPetitions, closedPetitions],

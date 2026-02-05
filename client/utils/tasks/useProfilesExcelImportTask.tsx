@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
 import { useApolloClient } from "@apollo/client/react";
-import { Text } from "@chakra-ui/react";
 import { BaseModalProps } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { useTaskProgressDialog } from "@parallel/components/common/dialogs/TaskProgressDialog";
+import { Text } from "@parallel/components/ui";
 import { useProfilesExcelImportTask_createProfilesExcelImportTaskDocument } from "@parallel/graphql/__types";
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";

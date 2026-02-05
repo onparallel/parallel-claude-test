@@ -11,7 +11,6 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
-  Text,
 } from "@chakra-ui/react";
 import { CircleCheckFilledIcon, TimeIcon } from "@parallel/chakra/icons";
 import {
@@ -25,6 +24,7 @@ import { Link, NakedLink, NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { Tone, useCompletingMessageDialog_PublicPetitionFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 function CompletingMessageDialog({
   petition,
@@ -70,6 +70,7 @@ function CompletingMessageDialog({
             ) : (
               <Logo width="152px" height="40px" />
             )}
+
             <ModalCloseButton
               top={0}
               insetEnd={0}

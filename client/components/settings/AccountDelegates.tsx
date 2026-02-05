@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Button, FormControl, FormLabel, Heading, Stack, StackProps, Text } from "@chakra-ui/react";
+import { Button, FormControl, FormLabel, Heading, Stack, StackProps } from "@chakra-ui/react";
 import { UserSelect, UserSelectInstance } from "@parallel/components/common/UserSelect";
 import { AccountDelegates_UserFragment, UserSelect_UserFragment } from "@parallel/graphql/__types";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
@@ -7,6 +7,7 @@ import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ContactSupportAlert } from "../common/ContactSupportAlert";
+import { Text } from "@parallel/components/ui";
 
 export interface AccountDelegatesData {
   delegates: UserSelect_UserFragment[];
@@ -86,6 +87,7 @@ export function AccountDelegates({ user, onSubmit, ...props }: AccountDelegatesP
                 })}
               />
             )}
+
             <FormLabel>
               <FormattedMessage
                 id="component.account-delegates.delegates-label"

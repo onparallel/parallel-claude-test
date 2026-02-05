@@ -1,5 +1,5 @@
-import { Link, Stack, Text } from "@chakra-ui/react";
-import { Button, Collapsible } from "@parallel/components/ui";
+import { Link, Stack } from "@chakra-ui/react";
+import { Button, Collapsible, Text } from "@parallel/components/ui";
 import { untranslated } from "@parallel/utils/untranslated";
 import { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";

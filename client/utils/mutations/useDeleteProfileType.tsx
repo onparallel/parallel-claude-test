@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useApolloClient, useMutation } from "@apollo/client/react";
-import { Alert, AlertDescription, AlertIcon, Button, Stack, Text } from "@chakra-ui/react";
+import { Alert, AlertDescription, AlertIcon, Button, Stack } from "@chakra-ui/react";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
@@ -14,6 +14,7 @@ import Link from "next/link";
 import { useCallback } from "react";
 import { FormattedMessage } from "react-intl";
 import { isApolloError } from "../apollo/isApolloError";
+import { Text } from "@parallel/components/ui";
 
 export function useDeleteProfileType() {
   const [deleteProfileType] = useMutation(useDeleteProfileType_deleteProfileTypeDocument);
@@ -134,6 +135,7 @@ function useConfirmDeleteProfileTypeDialog() {
             }}
           />
         ),
+
         description: (
           <Stack>
             <Text>
@@ -251,6 +253,7 @@ function useConfirmDeleteProfileTypeWithSubscriptionsDialog() {
           }}
         />
       ),
+
       description: (
         <Stack>
           <FormattedMessage

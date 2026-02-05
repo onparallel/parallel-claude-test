@@ -1,18 +1,16 @@
 import { gql } from "@apollo/client";
-import { Text, TextProps } from "@chakra-ui/react";
+import { TextProps } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { SignerReference_PetitionSignerFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { DeletedContact } from "./DeletedContact";
+import { Text } from "@parallel/components/ui";
 
 export function SignerReference({
   signer,
   isFull,
   ...props
-}: {
-  signer?: Maybe<SignerReference_PetitionSignerFragment>;
-  isFull?: boolean;
-} & TextProps) {
+}: { signer?: Maybe<SignerReference_PetitionSignerFragment>; isFull?: boolean } & TextProps) {
   return signer ? (
     <Tooltip isDisabled={!signer.fullName && !isFull} label={signer.email}>
       <Text as="span" color="primary.600" {...props}>

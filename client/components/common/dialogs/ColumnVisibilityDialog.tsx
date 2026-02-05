@@ -7,7 +7,6 @@ import {
   List,
   ListItem,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { DragHandleIcon, EyeIcon, EyeOffIcon } from "@parallel/chakra/icons";
 import { Reorder, useDragControls } from "framer-motion";
@@ -18,6 +17,7 @@ import { IconButtonWithTooltip } from "../IconButtonWithTooltip";
 import { TableColumn } from "../Table";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { DialogProps, useDialog } from "./DialogProvider";
+import { Text } from "@parallel/components/ui";
 
 interface ColumnVisibilityDialogProps<T extends string> {
   columns: TableColumn<any, any, any>[];

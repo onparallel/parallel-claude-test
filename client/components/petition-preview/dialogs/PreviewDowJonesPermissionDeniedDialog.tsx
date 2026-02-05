@@ -1,9 +1,10 @@
-import { Button, HStack, Text } from "@chakra-ui/react";
+import { Button, HStack } from "@chakra-ui/react";
 import { ExclamationOutlineIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { Link } from "@parallel/components/common/Link";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export function PreviewDowJonesPermissionDeniedDialog({ ...props }: DialogProps<{}>) {
   return (

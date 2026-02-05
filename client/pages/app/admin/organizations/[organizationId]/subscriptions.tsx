@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Badge, Button, Center, Flex, Grid, HStack, Stack, Text } from "@chakra-ui/react";
+import { Badge, Button, Center, Flex, Grid, HStack, Stack } from "@chakra-ui/react";
 import { AdminOrganizationsLayout } from "@parallel/components/admin-organizations/AdminOrganizationsLayout";
 import { AdminOrganizationsSubscriptionCard } from "@parallel/components/admin-organizations/AdminOrganizationsSubscriptionCard";
 import { useUpdateOrganizationCurrentUsagePeriodDialog } from "@parallel/components/admin-organizations/dialogs/UpdateOrganizationCurrentUsagePeriodDialog";
@@ -33,6 +33,7 @@ import { add, Duration } from "date-fns";
 import { useMemo } from "react";
 import { FormattedDate, FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 type AdminOrganizationsSubscriptionsProps = UnwrapPromise<
   ReturnType<typeof AdminOrganizationsSubscriptions.getInitialProps>
 >;

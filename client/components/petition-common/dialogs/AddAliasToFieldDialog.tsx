@@ -7,7 +7,6 @@ import {
   HStack,
   Input,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
@@ -23,6 +22,7 @@ import { useCallback, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { PetitionFieldTypeIndicator } from "../PetitionFieldTypeIndicator";
+import { Text } from "@parallel/components/ui";
 
 interface AddAliasToFieldDialogProps {
   field: AddAliasToFieldDialog_PetitionFieldFragment;

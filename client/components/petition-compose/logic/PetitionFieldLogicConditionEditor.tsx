@@ -8,7 +8,6 @@ import {
   NumberInputField,
   NumberInputStepper,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { InfoCircleIcon } from "@parallel/chakra/icons";
 import { BackgroundCheckTopicSelect } from "@parallel/components/common/BackgroundCheckTopicSelect";
@@ -53,6 +52,7 @@ import { useStandardListDetailsDialog } from "../dialogs/StandardListDetailsDial
 import { PetitionFieldLogicConditionSubjectSelect } from "./PetitionFieldLogicConditionSubjectSelect";
 import { PetitionFieldSelection, usePetitionFieldLogicContext } from "./PetitionFieldLogicContext";
 import { PetitionFieldMathEnumSelect } from "./PetitionFieldMathEnumSelect";
+import { Text } from "@parallel/components/ui";
 
 export function PetitionFieldLogicConditionEditor({
   condition,
@@ -90,6 +90,7 @@ export function PetitionFieldLogicConditionEditor({
         isReadOnly={isReadOnly}
         showErrors={showErrors}
       />
+
       {isReadOnly ? (
         variable?.__typename === "PetitionVariableEnum" ? (
           <>
@@ -155,6 +156,7 @@ export function PetitionFieldLogicConditionEditor({
               }),
             }}
           />
+
           <Box flex="1">
             <PetitionFieldMathEnumSelect
               value={condition.value as string}
@@ -185,9 +187,7 @@ function ConditionMultipleValueModifier({
   value: condition,
   onChange,
   isReadOnly,
-}: ValueProps<PetitionFieldLogicCondition, false> & {
-  isReadOnly?: boolean;
-}) {
+}: ValueProps<PetitionFieldLogicCondition, false> & { isReadOnly?: boolean }) {
   assert("fieldId" in condition);
   const { fieldsWithIndices } = usePetitionFieldLogicContext();
   const conditionField = fieldsWithIndices.find(([f]) => f.id === condition.fieldId)![0];
@@ -254,6 +254,7 @@ function ConditionMultipleValueModifier({
             value: "NONE",
           },
         ];
+
         if (conditionField.type !== "DYNAMIC_SELECT") {
           // do not show "number of replies" option for dynamic select sub-columns
           options.push({
@@ -784,6 +785,7 @@ function ConditionPredicate({
         "ALL_IS_IN_LIST",
         "NONE_IS_IN_LIST",
       ];
+
       const equalityOperators = ["EQUAL", "NOT_EQUAL"];
       const multiSelectOperators = ["IS_ONE_OF", "NOT_IS_ONE_OF"];
       const containOperators = ["CONTAIN", "NOT_CONTAIN"];
@@ -926,6 +928,7 @@ function ConditionPredicate({
           }}
         />
       )}
+
       <Box {...(isReadOnly ? { as: "span" } : { flex: "1", minWidth: 20 })}>
         {isVariableCondition ? (
           <ConditionPredicateValueFloat
@@ -1118,6 +1121,7 @@ function ConditionPredicateValueDatetime({
         isDisabled={isReadOnly}
         opacity={isReadOnly ? "1 !important" : undefined}
       />
+
       {icon}
     </HStack>
   );
@@ -1228,6 +1232,7 @@ function ConditionPredicateValueNumber({
         })}
         opacity={isReadOnly ? "1 !important" : undefined}
       />
+
       <NumberInputStepper>
         <NumberIncrementStepper />
         <NumberDecrementStepper />
@@ -1353,6 +1358,7 @@ function ConditionPredicateValueString({
         ) : (
           <FormattedNumber value={condition.value as number} maximumFractionDigits={0} />
         )}
+
         {'"'}
       </Box>
     ) : (

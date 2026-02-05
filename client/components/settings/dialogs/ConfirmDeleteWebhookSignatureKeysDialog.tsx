@@ -1,7 +1,8 @@
-import { Stack, Text } from "@chakra-ui/react";
+import { Stack } from "@chakra-ui/react";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import { useCallback } from "react";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export function useDeleteWebhookSignatureKeysDialog() {
   const showDialog = useConfirmDeleteDialog();
@@ -13,6 +14,7 @@ export function useDeleteWebhookSignatureKeysDialog() {
           defaultMessage="Delete signature key"
         />
       ),
+
       description: (
         <Stack>
           <Text>

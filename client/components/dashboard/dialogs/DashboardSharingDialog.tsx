@@ -11,7 +11,6 @@ import {
   MenuItem,
   MenuList,
   Stack,
-  Text,
   useToast,
 } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
@@ -23,7 +22,7 @@ import { UserGroupReference } from "@parallel/components/common/UserGroupReferen
 import { UserReference } from "@parallel/components/common/UserReference";
 
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
-import { Avatar } from "@parallel/components/ui";
+import { Avatar, Text } from "@parallel/components/ui";
 import {
   DashboardPermissionType,
   DashboardSharingDialog_createDashboardPermissionsDocument,
@@ -56,13 +55,7 @@ export function DashboardSharingDialog({
   dashboardId,
   userId,
   ...props
-}: DialogProps<
-  {
-    dashboardId: string;
-    userId: string;
-  },
-  { lostAccess?: boolean }
->) {
+}: DialogProps<{ dashboardId: string; userId: string }, { lostAccess?: boolean }>) {
   const intl = useIntl();
 
   const { data, refetch } = useQuery(DashboardSharingDialog_DashboardQueryDocument, {
@@ -127,6 +120,7 @@ export function DashboardSharingDialog({
         value: "READ",
       },
     ],
+
     [],
   );
 
@@ -333,7 +327,7 @@ export function DashboardSharingDialog({
                 <UserAvatar role="presentation" user={user} size="sm" />
                 <Box flex="1" minWidth={0} fontSize="sm" marginStart={2}>
                   <Flex direction="row" alignItems="center" gap={1}>
-                    <Text noOfLines={1} wordBreak="break-all">
+                    <Text lineClamp={1} wordBreak="break-all">
                       {user.fullName}
                     </Text>
                     {userId === user.id ? (
@@ -344,7 +338,7 @@ export function DashboardSharingDialog({
                       </Text>
                     ) : null}
                   </Flex>
-                  <Text color="gray.500" noOfLines={1}>
+                  <Text color="gray.500" lineClamp={1}>
                     {user.email}
                   </Text>
                 </Box>
@@ -424,7 +418,7 @@ export function DashboardSharingDialog({
                     <Avatar.Fallback name={userGroup.name} />
                   </Avatar.Root>
                   <Box flex="1" minWidth={0} fontSize="sm" marginStart={2}>
-                    <Text noOfLines={1} wordBreak="break-all">
+                    <Text lineClamp={1} wordBreak="break-all">
                       <UserGroupReference userGroup={userGroup} />
                     </Text>
                     <Flex
@@ -434,7 +428,7 @@ export function DashboardSharingDialog({
                       alignItems="center"
                     >
                       <UserGroupMembersPopover userGroupId={userGroup.id}>
-                        <Text color="gray.500" cursor="default" noOfLines={1}>
+                        <Text color="gray.500" cursor="default" lineClamp={1}>
                           <FormattedMessage
                             id="generic.n-group-members"
                             defaultMessage="{count, plural, =1 {1 member} other {# members}}"
@@ -670,12 +664,7 @@ function ConfirmUpdateDashboardPermissionDialog({
   );
 }
 
-function ConfirmStopSharingDashboardDialog({
-  name,
-  ...props
-}: DialogProps<{
-  name: ReactNode;
-}>) {
+function ConfirmStopSharingDashboardDialog({ name, ...props }: DialogProps<{ name: ReactNode }>) {
   return (
     <ConfirmDialog
       closeOnEsc={true}

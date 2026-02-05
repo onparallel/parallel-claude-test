@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Flex, HStack, Stack, Text } from "@chakra-ui/react";
+import { Box, Center, Flex, HStack, Stack } from "@chakra-ui/react";
 import { Dropzone } from "@parallel/components/common/Dropzone";
 import { FileAttachment } from "@parallel/components/common/FileAttachment";
 import { FileSize } from "@parallel/components/common/FileSize";
@@ -15,6 +15,7 @@ import { differenceWith, isNullish, sumBy } from "remeda";
 import { ProfileFormInnerData } from "../ProfileFormInner";
 import { ProfileFormFieldProps } from "./ProfileFormField";
 import { ProfileFieldExpiresAtIcon } from "./ProfileFormFieldInputGroup";
+import { Text } from "@parallel/components/ui";
 
 interface ProfileFormFieldFileUploadProps extends ProfileFormFieldProps {
   showSuggestionsButton: boolean;

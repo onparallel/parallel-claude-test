@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Button, Center, Flex, Heading, Text, useToast } from "@chakra-ui/react";
+import { Button, Center, Flex, Heading, useToast } from "@chakra-ui/react";
 import { CopyIcon, DeleteIcon, KeyIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { OverflownText } from "@parallel/components/common/OverflownText";
@@ -42,6 +42,7 @@ import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 const SORTING = ["name", "members", "createdAt"] as const;
 
@@ -411,6 +412,7 @@ function useOrganizationGroupsTableColumns(): TableColumn<OrganizationGroups_Use
         ),
       },
     ],
+
     [intl.locale],
   );
 }
@@ -423,10 +425,7 @@ function ConfirmDeleteGroupsDialog({
   groupIds,
   name,
   ...props
-}: DialogProps<{
-  name: string;
-  groupIds?: string[];
-}>) {
+}: DialogProps<{ name: string; groupIds?: string[] }>) {
   const count = groupIds?.length ?? 1;
 
   return (

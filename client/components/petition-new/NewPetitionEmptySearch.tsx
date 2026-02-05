@@ -1,6 +1,7 @@
-import { Center, Image, Stack, Text } from "@chakra-ui/react";
+import { Center, Image, Stack } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 interface NewPetitionEmptySearchProps {
   onClickPublicTemplates?: () => void;
@@ -18,6 +19,7 @@ export const NewPetitionEmptySearch = chakraForwardRef<"div", NewPetitionEmptySe
             width="100%"
             src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/search/empty-search.svg`}
           />
+
           <Text paddingTop={6}>
             <FormattedMessage
               id="component.new-petition-empty-search.no-results"
@@ -40,6 +42,7 @@ export const NewPetitionEmptySearch = chakraForwardRef<"div", NewPetitionEmptySe
                       {chunks}
                     </Text>
                   ),
+
                   LinkPublic: (chunks: any) => (
                     <Text
                       as="strong"

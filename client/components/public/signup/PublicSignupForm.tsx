@@ -9,7 +9,6 @@ import {
   Input,
   InputGroup,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { NormalLink } from "@parallel/components/common/Link";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
@@ -22,6 +21,7 @@ import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
+import { Text } from "@parallel/components/ui";
 
 interface PublicSignupFormData {
   email: string;
@@ -174,6 +174,7 @@ export function PublicSignupForm({ onNext, email, source }: PublicSignupFormProp
             })}
             autoComplete="new-password"
           />
+
           <PasswordStrengthIndicator password={password} />
           <FormErrorMessage>
             <FormattedMessage
@@ -198,6 +199,7 @@ export function PublicSignupForm({ onNext, email, source }: PublicSignupFormProp
                 {chunks}
               </NormalLink>
             ),
+
             Policy: (chunks: any) => (
               <NormalLink role="a" href="legal/privacy" target="_blank">
                 {chunks}

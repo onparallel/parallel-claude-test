@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Button, Center, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Center, Stack } from "@chakra-ui/react";
 import { DeleteIcon, RepeatIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -26,6 +26,7 @@ import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 function Tokens() {
   const intl = useIntl();
@@ -97,6 +98,7 @@ function Tokens() {
                 defaultMessage: "Reload",
               })}
             />
+
             <Spacer />
             <Button colorScheme="primary" onClick={handleGenerateNewToken}>
               <FormattedMessage id="page.tokens.create-token" defaultMessage="Create token" />
@@ -217,6 +219,7 @@ function useApiTokensColumns(): TableColumn<Tokens_UserAuthenticationTokenFragme
         ),
       },
     ],
+
     [intl.locale],
   );
 }
@@ -232,6 +235,7 @@ function useConfirmDeleteAccessTokenDialog() {
           values={{ count }}
         />
       ),
+
       description: (
         <Stack>
           <Text>

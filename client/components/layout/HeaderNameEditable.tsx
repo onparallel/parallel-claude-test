@@ -1,15 +1,9 @@
 import { gql } from "@apollo/client";
-import {
-  Editable,
-  EditableInput,
-  EditablePreview,
-  Flex,
-  Text,
-  UseEditableProps,
-} from "@chakra-ui/react";
+import { Editable, EditableInput, EditablePreview, Flex, UseEditableProps } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { CloudErrorIcon, CloudOkIcon, CloudUploadIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Text } from "@parallel/components/ui";
 import { HeaderNameEditable_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useImperativeHandle, useRef, useState } from "react";
@@ -95,7 +89,7 @@ export const HeaderNameEditable = chakraForwardRef<
               <Text
                 color={name ? "default" : "gray.400"}
                 paddingX={1}
-                noOfLines={1}
+                lineClamp={1}
                 wordBreak="break-all"
               >
                 {name || placeholder}
@@ -158,6 +152,7 @@ export const HeaderNameEditable = chakraForwardRef<
                     </Flex>
                   </Tooltip>
                 )}
+
                 <EditableInput
                   paddingY={0}
                   paddingX={1}

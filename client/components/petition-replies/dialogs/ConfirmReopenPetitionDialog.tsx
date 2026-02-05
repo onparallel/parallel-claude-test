@@ -1,7 +1,8 @@
-import { Button, Stack, Text } from "@chakra-ui/react";
+import { Button, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export function ConfirmReopenPetitionDialog(props: DialogProps) {
   return (

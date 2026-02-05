@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import { Button, Center, Icon, Skeleton, Spinner, Stack, Text } from "@chakra-ui/react";
+import { Button, Center, Icon, Skeleton, Spinner, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
   useWizardDialog,
@@ -13,7 +13,7 @@ import {
   ProfileFormInner,
   useProfileFormInnerSubmitHandler,
 } from "@parallel/components/profiles/ProfileFormInner";
-import { HStack } from "@parallel/components/ui";
+import { HStack, Text } from "@parallel/components/ui";
 import {
   UpdateProfileFieldValueOnClosePetitionDialog_PetitionBaseFragment,
   UpdateProfileFieldValueOnClosePetitionDialog_petitionDocument,

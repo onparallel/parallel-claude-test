@@ -1,12 +1,13 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import { Button, ListItem, Stack, Text, UnorderedList } from "@chakra-ui/react";
+import { Button, ListItem, Stack, UnorderedList } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { ProfileReference } from "@parallel/components/common/ProfileReference";
 import { usePreviewConfirmImportFromProfileDialog_profilesDocument } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export function PreviewConfirmImportFromProfileDialog({
   profileIds,

@@ -1,8 +1,9 @@
-import { Image, Stack, Text } from "@chakra-ui/react";
+import { Image, Stack } from "@chakra-ui/react";
 import { UserSelect_UserGroupFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { NoticeProps } from "react-select";
 import { UserSelect, UserSelectProps } from "./UserSelect";
+import { Text } from "@parallel/components/ui";
 
 interface UserGroupSelectProps<IsMulti extends boolean>
   extends UserSelectProps<IsMulti, true, false, UserSelect_UserGroupFragment> {}
@@ -41,6 +42,7 @@ function NoOptionsMessage(props: NoticeProps) {
             width="100%"
             src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/search/empty-search.svg`}
           />
+
           <Text as="strong">
             <FormattedMessage
               id="component.user-group-select.no-options"

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useApolloClient } from "@apollo/client/react";
-import { HStack, Text } from "@chakra-ui/react";
+import { HStack } from "@chakra-ui/react";
 import { UserIcon } from "@parallel/chakra/icons";
 import { CloseButton } from "@parallel/components/common/CloseButton";
 import {
@@ -23,6 +23,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { ActionMeta, GroupBase, MultiValue, MultiValueProps, SelectInstance } from "react-select";
 import AsyncCreatableSelect from "react-select/async-creatable";
 import { isNonNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 const MAX_TERMS_ALLOWED = 10;
 

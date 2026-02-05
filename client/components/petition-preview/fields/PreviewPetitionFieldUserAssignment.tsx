@@ -1,4 +1,4 @@
-import { Box, Center, FormControl, forwardRef, List, Stack, Text } from "@chakra-ui/react";
+import { Box, Center, FormControl, forwardRef, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { UserSelect, UserSelectSelection } from "@parallel/components/common/UserSelect";
@@ -19,6 +19,7 @@ import {
   RecipientViewPetitionFieldLayoutProps,
 } from "../../recipient-view/fields/RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "../../recipient-view/fields/RecipientViewPetitionFieldReplyStatusIndicator";
+import { Text } from "@parallel/components/ui";
 
 interface PreviewPetitionFieldUserAssignmentProps
   extends Omit<
@@ -199,6 +200,7 @@ export const PreviewPetitionFieldUserAssignment = ({
               onSearch={handleSearchUsers}
               isInvalid={isInvalid || hasAlreadyRepliedError}
             />
+
             <Center height="100%" position="absolute" insetEnd="42px" top={0}>
               <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
             </Center>
@@ -297,6 +299,7 @@ const RecipientViewPetitionFieldReplyUserAssignment = forwardRef(
                     : undefined
                 }
               />
+
               <Center height="100%" position="absolute" insetEnd="42px" top={0}>
                 <RecipientViewPetitionFieldReplyStatusIndicator reply={reply} isSaving={isSaving} />
               </Center>

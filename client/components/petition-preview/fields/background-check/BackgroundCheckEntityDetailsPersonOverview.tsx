@@ -1,10 +1,11 @@
 import { gql } from "@apollo/client";
-import { Table as ChakraTable, TableContainer, Tbody, Td, Text, Tr } from "@chakra-ui/react";
+import { Table as ChakraTable, TableContainer, Tbody, Td, Tr } from "@chakra-ui/react";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { ExternalLink } from "@parallel/components/common/ExternalLink";
 import { ViewMoreText } from "@parallel/components/common/ViewMoreText";
 import { BackgroundCheckEntityDetailsPersonOverview_BackgroundCheckEntityDetailsPersonFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export function BackgroundCheckEntityDetailsPersonOverview({
   overview,

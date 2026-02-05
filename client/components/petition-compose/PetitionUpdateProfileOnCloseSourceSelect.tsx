@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Badge, Box, Flex, HStack, Text } from "@chakra-ui/react";
+import { Badge, Box, Flex, HStack } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
@@ -29,6 +29,7 @@ import Select, {
 } from "react-select";
 import { isNonNullish, isNullish } from "remeda";
 import { PROFILE_TYPE_FIELD_TO_PETITION_FIELD_TYPE } from "./dialogs/ConfigureUpdateProfileOnCloseDialog";
+import { Text } from "@parallel/components/ui";
 
 type FieldOf<T extends PetitionUpdateProfileOnCloseSourceSelect_PetitionBaseFragment> = UnwrapArray<
   Exclude<T["fields"], null | undefined>

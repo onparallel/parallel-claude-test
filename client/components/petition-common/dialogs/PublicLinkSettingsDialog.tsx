@@ -16,7 +16,6 @@ import {
   InputRightElement,
   Spinner,
   Stack,
-  Text,
   Textarea,
 } from "@chakra-ui/react";
 import { AlertCircleIcon, CheckIcon, CloseIcon } from "@parallel/chakra/icons";
@@ -43,6 +42,7 @@ import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, pick } from "remeda";
 import { assert } from "ts-essentials";
+import { Text } from "@parallel/components/ui";
 
 interface PublicLinkSettingsData {
   title: string;
@@ -283,6 +283,7 @@ export function PublicLinkSettingsDialog({
                   "Explain what the service is and what kind of information you will need",
               })}
             />
+
             <FormErrorMessage>
               <FormattedMessage
                 id="component.settings-public-link-dialog.description-error"
@@ -327,6 +328,7 @@ export function PublicLinkSettingsDialog({
                     maxLength={30}
                     {...props}
                   />
+
                   <InputRightElement>
                     {publicLink?.isActive && !dirtyFields.slug ? (
                       <CheckIcon color="green.500" />
@@ -346,6 +348,7 @@ export function PublicLinkSettingsDialog({
                 </InputGroup>
               )}
             />
+
             <FormErrorMessage>
               <Stack spacing={1}>
                 <Text>
@@ -395,6 +398,7 @@ export function PublicLinkSettingsDialog({
                 />
               )}
             />
+
             <HStack
               justify={patternIsEmpty ? "space-between" : "flex-end"}
               align="center"

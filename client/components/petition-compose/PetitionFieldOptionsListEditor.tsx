@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, List, ListItem, Text } from "@chakra-ui/react";
+import { Box, List, ListItem } from "@chakra-ui/react";
 import { SettingsIcon } from "@parallel/chakra/icons";
 import {
   PetitionFieldOptionsListEditor_PetitionFieldFragment,
@@ -35,6 +35,7 @@ import {
 } from "slate-react";
 import { EditableProps } from "slate-react/dist/components/editable";
 import { getStandardListLabel } from "../common/StandardListSelect";
+import { Text } from "@parallel/components/ui";
 
 type PetitionFieldOptionsListEditorValue = PetitionFieldOptionsListEditorBlock[];
 
@@ -205,6 +206,7 @@ export const PetitionFieldOptionsListEditor = forwardRef<
             defaultMessage='Standard options from <b>"{standardList}"</b>. Edit from the field settings.'
             values={{ standardList: getStandardListLabel(standardList, intl) }}
           />
+
           <Text as="span" marginStart={1} position="relative" top="-1px">
             (<SettingsIcon />)
           </Text>
@@ -215,6 +217,7 @@ export const PetitionFieldOptionsListEditor = forwardRef<
             id="component.petition-field-options-list-editor.settings-imported-options-description"
             defaultMessage="Options imported with internal values. To edit, import an Excel file from field settings."
           />
+
           <Text as="span" marginStart={1} position="relative" top="-1px">
             (<SettingsIcon />)
           </Text>

@@ -1,6 +1,6 @@
-import { Text } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export const DeletedContact = chakraForwardRef<"span">((props, ref) => {
   return (

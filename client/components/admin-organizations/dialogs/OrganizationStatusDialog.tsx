@@ -1,4 +1,4 @@
-import { Button, FormControl, FormLabel, Text } from "@chakra-ui/react";
+import { Button, FormControl, FormLabel } from "@chakra-ui/react";
 import { Select } from "@parallel/chakra/components";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
@@ -7,6 +7,7 @@ import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterW
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 interface OrganizationStatusDialogData {
   status: OrganizationStatus;

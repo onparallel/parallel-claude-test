@@ -9,7 +9,6 @@ import {
   PopoverCloseButton,
   PopoverContent,
   PopoverTrigger,
-  Text,
 } from "@chakra-ui/react";
 import { Popover } from "@parallel/chakra/components";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -28,6 +27,7 @@ import { FormattedMessage } from "react-intl";
 import { isNonNullish, zip } from "remeda";
 import { ProgressIndicator, ProgressTrack } from "../common/Progress";
 import { useTone } from "../common/ToneProvider";
+import { Text } from "@parallel/components/ui";
 
 type PetitionSelection =
   | RecipientViewProgressBar_PublicPetitionFragment

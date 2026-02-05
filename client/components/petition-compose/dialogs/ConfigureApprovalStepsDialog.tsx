@@ -13,7 +13,6 @@ import {
   HStack,
   Spinner,
   Stack,
-  Text,
   useEditableControls,
 } from "@chakra-ui/react";
 import {
@@ -44,6 +43,7 @@ import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, omit } from "remeda";
 import { PetitionVisibilityEditor } from "../logic/PetitionVisibilityEditor";
+import { Text } from "@parallel/components/ui";
 
 type ConfigureApprovalStepsDialogSteps = {
   LOADING: {
@@ -422,6 +422,7 @@ function ApprovalCard({ index, petition, onRemove }: ApprovalCardProps) {
           }
           onClick={() => handleAddCondition(!hasVisibility)}
         />
+
         <IconButtonWithTooltip
           size="sm"
           variant="ghost"

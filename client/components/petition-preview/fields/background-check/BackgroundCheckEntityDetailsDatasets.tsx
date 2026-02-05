@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Text } from "@chakra-ui/react";
+import { Box, Center } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { ExternalLink } from "@parallel/components/common/ExternalLink";
@@ -7,6 +7,7 @@ import { Table, TableColumn } from "@parallel/components/common/Table";
 import { BackgroundCheckEntityDetailsDatasets_BackgroundCheckEntityDetailsDatasetFragment } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export function BackgroundCheckEntityDetailsDatasets({
   datasets,
@@ -94,6 +95,7 @@ function useBackgroundCheckDatasetsColumns() {
         },
       },
     ],
+
     [intl.locale],
   );
 }

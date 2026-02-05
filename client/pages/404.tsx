@@ -1,7 +1,8 @@
-import { List, ListItem, Text } from "@chakra-ui/react";
+import { List, ListItem } from "@chakra-ui/react";
 import { NormalLink } from "@parallel/components/common/Link";
 import { ErrorPage } from "@parallel/components/public/ErrorPage";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export default function Custom404() {
   const intl = useIntl();

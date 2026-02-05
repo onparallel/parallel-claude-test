@@ -1,6 +1,6 @@
 import { CombinedGraphQLErrors, gql } from "@apollo/client";
 import { useApolloClient, useMutation } from "@apollo/client/react";
-import { Box, HStack, Stack, Text } from "@chakra-ui/react";
+import { Box, HStack, Stack } from "@chakra-ui/react";
 import { AlertCircleIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
 import { Link } from "@parallel/components/common/Link";
 import { OverflownText } from "@parallel/components/common/OverflownText";
@@ -93,6 +93,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, uniqueBy, zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
+import { Text } from "@parallel/components/ui";
 
 type PetitionComposeProps = UnwrapPromise<ReturnType<typeof PetitionCompose.getInitialProps>>;
 
@@ -465,6 +466,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             </Text>
           </Stack>
         ),
+
         message: (
           <FormattedMessage
             id="page.petition-compose.field-referenced-in-message"
@@ -493,6 +495,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             </Text>
           </Stack>
         ),
+
         message: (
           <FormattedMessage
             id="page.petition-compose.field-referenced-in-petition-attachments-visibility"
@@ -536,6 +539,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                     fieldIndex={fieldIndex}
                     marginTop={1}
                   />
+
                   <OverflownText flex="1">
                     <PetitionFieldReference field={f} fontWeight="normal" />
                   </OverflownText>
@@ -1040,6 +1044,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   defaultMessage="Fields not available"
                 />
               ),
+
               message,
               footer,
               fieldsWithIndices,
@@ -1056,6 +1061,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   <FormattedMessage id="generic.contact" defaultMessage="Contact" />
                 </SupportButton>
               ),
+
               confirmText: <FormattedMessage id="generic.continue" defaultMessage="Continue" />,
             }),
           );

@@ -1,10 +1,11 @@
-import { Button, Stack, Text } from "@chakra-ui/react";
+import { Button, Stack } from "@chakra-ui/react";
 import { UserXIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { UserSelectSelection } from "@parallel/components/common/UserSelect";
 import { OrganizationGroup_UserGroupMemberFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 function ConfirmRemoveMemberDialog({
   selected,

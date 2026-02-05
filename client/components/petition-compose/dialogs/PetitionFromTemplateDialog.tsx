@@ -1,10 +1,11 @@
-import { Box, Button, Checkbox, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Checkbox, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { useLocalStorage } from "@parallel/utils/useLocalStorage";
 import { useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 interface PetitionFromTemplateDialogData {
   dontShow: boolean;

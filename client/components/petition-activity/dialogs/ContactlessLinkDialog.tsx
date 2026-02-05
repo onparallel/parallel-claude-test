@@ -1,10 +1,11 @@
-import { Button, HStack, Input, InputGroup, InputRightAddon, Stack, Text } from "@chakra-ui/react";
+import { Button, HStack, Input, InputGroup, InputRightAddon, Stack } from "@chakra-ui/react";
 import { CircleCheckFilledIcon } from "@parallel/chakra/icons";
 import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboardButton";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { Link } from "@parallel/components/common/Link";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export interface ContactlessLinkDialogProps {
   link: string;

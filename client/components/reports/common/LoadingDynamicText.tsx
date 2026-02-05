@@ -1,7 +1,7 @@
-import { Text } from "@chakra-ui/react";
 import { useInterval } from "@parallel/utils/useInterval";
 import { useMemo, useState } from "react";
 import { useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 const SHOW_TIME = 4_000;
 
@@ -31,6 +31,7 @@ export function LoadingDynamicText() {
         defaultMessage: "Calculating average times with a calculator...",
       }),
     ],
+
     [intl.locale],
   );
   const [index, setIndex] = useState(0);

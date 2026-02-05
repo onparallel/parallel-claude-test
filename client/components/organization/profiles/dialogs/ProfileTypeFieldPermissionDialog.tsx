@@ -14,7 +14,6 @@ import {
   MenuItem,
   MenuList,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import { BusinessIcon, ChevronDownIcon, DeleteIcon, UsersIcon } from "@parallel/chakra/icons";
@@ -31,7 +30,7 @@ import { UserAvatar } from "@parallel/components/common/UserAvatar";
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
 import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
 import { UserSelect, UserSelectInstance } from "@parallel/components/common/UserSelect";
-import { Avatar } from "@parallel/components/ui";
+import { Avatar, Text } from "@parallel/components/ui";
 import {
   ProfileTypeField,
   ProfileTypeFieldPermissionType,
@@ -274,8 +273,9 @@ export function ProfileTypeFieldPermissionDialog({
                     background="gray.200"
                     color="gray.800"
                   />
+
                   <Box flex="1" minW={0}>
-                    <Text noOfLines={1} fontSize="sm">
+                    <Text lineClamp={1} fontSize="sm">
                       <FormattedMessage
                         id="component.profile-type-field-permission-dialog.all-in-organization"
                         defaultMessage="Everyone in the organization"
@@ -311,13 +311,14 @@ export function ProfileTypeFieldPermissionDialog({
                 </HStack>
               )}
             />
+
             {permissions.map(({ id, target, permission }, index) => (
               <Flex key={id} alignItems="center">
                 {target.__typename === "User" ? (
                   <HStack flex={1}>
                     <UserAvatar role="presentation" user={target} size="sm" />
                     <Box flex="1" minWidth={0} fontSize="sm">
-                      <Text noOfLines={1} wordBreak="break-all">
+                      <Text lineClamp={1} wordBreak="break-all">
                         {target.fullName}
                         {userId === target.id ? (
                           <>
@@ -327,7 +328,7 @@ export function ProfileTypeFieldPermissionDialog({
                           </>
                         ) : null}
                       </Text>
-                      <Text color="gray.500" noOfLines={1}>
+                      <Text color="gray.500" lineClamp={1}>
                         {target.email}
                       </Text>
                     </Box>
@@ -345,12 +346,12 @@ export function ProfileTypeFieldPermissionDialog({
                       <Avatar.Fallback name={target.name} />
                     </Avatar.Root>
                     <Box flex="1" minWidth={0} fontSize="sm" marginStart={2}>
-                      <Text noOfLines={1} wordBreak="break-all">
+                      <Text lineClamp={1} wordBreak="break-all">
                         <UserGroupReference userGroup={target} />
                       </Text>
                       <Flex>
                         <UserGroupMembersPopover userGroupId={target.id}>
-                          <Text color="gray.500" cursor="default" noOfLines={1}>
+                          <Text color="gray.500" cursor="default" lineClamp={1}>
                             <FormattedMessage
                               id="generic.n-group-members"
                               defaultMessage="{count, plural, =1 {1 member} other {# members}}"
@@ -364,6 +365,7 @@ export function ProfileTypeFieldPermissionDialog({
                 ) : (
                   (null as never)
                 )}
+
                 <HStack>
                   {isAtLeast(permission, defaultPermission) ? null : (
                     <AlertPopover>
@@ -375,6 +377,7 @@ export function ProfileTypeFieldPermissionDialog({
                       </Text>
                     </AlertPopover>
                   )}
+
                   <Menu placement="bottom-end">
                     <MenuButton
                       as={Button}
@@ -520,6 +523,7 @@ const ProfileTypeFieldPermissionTypeSelect = forwardRef<
         value: "READ",
       },
     ],
+
     [],
   );
 

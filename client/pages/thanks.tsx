@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import { Box, Center, Divider, Flex, Heading, Image, Stack, Text } from "@chakra-ui/react";
+import { Box, Center, Divider, Flex, Heading, Image, Stack } from "@chakra-ui/react";
 import { CheckIcon, LinkedInSimpleIcon, TwitterIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { Link, NormalLink } from "@parallel/components/common/Link";
@@ -17,6 +17,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 function ThanksForSigning() {
   const { query } = useRouter();

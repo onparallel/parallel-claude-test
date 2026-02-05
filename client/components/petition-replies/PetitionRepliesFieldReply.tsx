@@ -1,15 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  Badge,
-  Box,
-  Flex,
-  Grid,
-  GridItem,
-  HStack,
-  Stack,
-  Text,
-  VisuallyHidden,
-} from "@chakra-ui/react";
+import { Badge, Box, Flex, Grid, GridItem, HStack, Stack, VisuallyHidden } from "@chakra-ui/react";
 import {
   BusinessIcon,
   CheckIcon,
@@ -55,6 +45,7 @@ import { PetitionRepliesFieldFileSchema } from "./field-replies/PetitionRepliesF
 import { PetitionRepliesFieldFileUploadPayslipReply } from "./field-replies/PetitionRepliesFieldFileUploadPayslipReply";
 import { PetitionRepliesFieldIdVerificationReply } from "./field-replies/PetitionRepliesFieldIdVerificationReply";
 import { PetitionRepliesFieldUserAssignmentReply } from "./field-replies/PetitionRepliesFieldUserAssignmentReply";
+import { Text } from "@parallel/components/ui";
 
 export interface PetitionRepliesFieldReplyProps {
   petition: PetitionRepliesFieldReply_PetitionFragment;
@@ -255,6 +246,7 @@ export function PetitionRepliesFieldReply({
                             ) : null}
                           </>
                         )}
+
                         <Box display="inline-block" marginStart={1}>
                           <EditReplyIconButton
                             petitionFieldId={petitionField.id}
@@ -328,6 +320,7 @@ export function PetitionRepliesFieldReply({
                                     defaultMessage: "View profile",
                                   })}
                                 />
+
                                 <Text as="span">
                                   <LocalizableUserTextRender
                                     value={profile.name}
@@ -563,6 +556,7 @@ export function PetitionRepliesFieldReply({
                   userUseYou
                   contactAsLink={false}
                 />
+
                 {", "}
                 <DateTime as="span" value={reply.repliedAt!} format={FORMATS.LLL} />
               </Text>
@@ -573,12 +567,14 @@ export function PetitionRepliesFieldReply({
                   ) : (
                     <CloseIcon color="gray.600" boxSize={3} />
                   )}
+
                   <Text color="gray.500">
                     <UserOrContactReference
                       userOrAccess={reply.lastReviewedBy}
                       userUseYou
                       contactAsLink={false}
                     />
+
                     {", "}
                     <DateTime as="span" value={reply.lastReviewedAt} format={FORMATS.LLL} />
                   </Text>
@@ -610,6 +606,7 @@ export function PetitionRepliesFieldReply({
             onClick={() => onUpdateStatus(reply.status === "APPROVED" ? "PENDING" : "APPROVED")}
             isDisabled={isDisabled || reply.isAnonymized}
           />
+
           <IconButtonWithTooltip
             data-action="reject-reply"
             icon={<CloseIcon />}

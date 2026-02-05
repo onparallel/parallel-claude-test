@@ -8,7 +8,6 @@ import {
   MenuGroup,
   MenuItem,
   MenuList,
-  Text,
   useMenuContext,
 } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -25,6 +24,7 @@ import smoothScrollIntoView from "smooth-scroll-into-view-if-needed";
 import { PaidBadge } from "../common/PaidBadge";
 import { PetitionFieldTypeLabel } from "./PetitionFieldTypeLabel";
 import { PetitionFieldTypeText } from "./PetitionFieldTypeText";
+import { Text } from "@parallel/components/ui";
 
 export interface PetitionFieldTypeSelectDropdownProps {
   showHeader?: boolean;

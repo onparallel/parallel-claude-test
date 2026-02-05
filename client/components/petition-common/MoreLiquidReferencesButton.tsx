@@ -7,7 +7,6 @@ import {
   MenuList,
   Portal,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import { HelpOutlineIcon, MoreVerticalIcon } from "@parallel/chakra/icons";
@@ -24,6 +23,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { NakedHelpCenterLink } from "../common/HelpCenterLink";
 import { IconButtonWithTooltip, IconButtonWithTooltipProps } from "../common/IconButtonWithTooltip";
+import { Text } from "@parallel/components/ui";
 
 export interface MoreLiquidReferencesButtonProps extends Omit<IconButtonWithTooltipProps, "label"> {
   field: MoreLiquidReferencesButton_PetitionFieldFragment;
@@ -59,6 +59,7 @@ export const MoreLiquidReferencesButton = chakraForwardRef<
         size="xs"
         {...props}
       />
+
       <Portal>
         <MenuList width="min-content" minWidth="20rem">
           <Heading
@@ -376,6 +377,7 @@ function useLiquidReferences({
               },
             },
           ];
+
         case "CHECKBOX":
         case "SELECT":
         case "PHONE":
@@ -419,6 +421,7 @@ function useLiquidReferences({
             },
             ...commonFormulas,
           ];
+
         case "SHORT_TEXT":
         case "TEXT":
           return [
@@ -457,6 +460,7 @@ function useLiquidReferences({
             },
             ...commonFormulas,
           ];
+
         default:
           return [];
       }

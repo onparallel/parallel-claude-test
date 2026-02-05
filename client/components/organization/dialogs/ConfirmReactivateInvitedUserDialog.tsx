@@ -1,7 +1,7 @@
-import { Button, Text } from "@chakra-ui/react";
+import { Button } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Stack } from "@parallel/components/ui";
+import { Stack, Text } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
 
 interface ConfirmReactivateInvitedUserDialogProps {

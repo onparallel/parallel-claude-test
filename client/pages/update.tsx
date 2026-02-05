@@ -1,6 +1,7 @@
-import { Image, Link, Stack, Text } from "@chakra-ui/react";
+import { Image, Link, Stack } from "@chakra-ui/react";
 import { ErrorPage } from "@parallel/components/public/ErrorPage";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export default function UpdateBrowser() {
   const browsers = [
@@ -20,6 +21,7 @@ export default function UpdateBrowser() {
       url: "https://www.mozilla.org/firefox/new",
     },
   ];
+
   return (
     <ErrorPage
       header={
@@ -56,6 +58,7 @@ export default function UpdateBrowser() {
                   boxSize={10}
                   src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/browsers/${browser.code}.png`}
                 />
+
                 <Text as="span" whiteSpace="nowrap">
                   {browser.name}
                 </Text>

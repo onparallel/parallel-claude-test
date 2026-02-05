@@ -11,7 +11,6 @@ import {
   DrawerOverlay,
   ModalFooterProps,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { BellIcon, EmailOpenedIcon } from "@parallel/chakra/icons";
 import {
@@ -27,6 +26,7 @@ import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { NotificationsFilterSelect } from "./NotificationsFilterSelect";
 import { NotificationsList } from "./NotificationsList";
+import { Text } from "@parallel/components/ui";
 
 const NOTIFICATIONS_LIMIT = 16;
 const POLL_INTERVAL = 30_000;

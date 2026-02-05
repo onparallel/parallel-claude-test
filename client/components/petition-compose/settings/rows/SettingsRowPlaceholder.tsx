@@ -1,9 +1,10 @@
-import { Image, Input, Text } from "@chakra-ui/react";
+import { Image, Input } from "@chakra-ui/react";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { SettingsRow } from "./SettingsRow";
+import { Text } from "@parallel/components/ui";
 
 export function SettingsRowPlaceholder({
   field,

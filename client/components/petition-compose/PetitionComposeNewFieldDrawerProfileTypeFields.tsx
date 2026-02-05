@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Button, HStack, Heading, Image, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, HStack, Heading, Image, Stack } from "@chakra-ui/react";
 import { ProfilesIcon, SettingsIcon } from "@parallel/chakra/icons";
 import {
   PetitionComposeNewFieldDrawerProfileTypeFields_PetitionBaseFragment,
@@ -23,6 +23,7 @@ import { ProfileTypeFieldReference } from "../common/ProfileTypeFieldReference";
 import { SearchInput } from "../common/SearchInput";
 import { useCreateOrUpdateFieldGroupRelationshipsDialog } from "./dialogs/CreateOrUpdateFieldGroupRelationshipsDialog";
 import { useLinkGroupToProfileTypeDialog } from "./dialogs/LinkGroupToProfileTypeDialog";
+import { Text } from "@parallel/components/ui";
 
 export function PetitionComposeNewFieldDrawerProfileTypeFields({
   petition,
@@ -125,6 +126,7 @@ export function PetitionComposeNewFieldDrawerProfileTypeFields({
             src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/compose/group-profile-link.svg`}
             marginBottom={2}
           />
+
           <Stack>
             <Heading as="h3" size="sm">
               <FormattedMessage
@@ -161,6 +163,7 @@ export function PetitionComposeNewFieldDrawerProfileTypeFields({
               onChange={(e) => setSearch(e.target.value)}
               isDisabled={!profileType}
             />
+
             <IconButtonWithTooltip
               label={
                 !profileType
@@ -219,6 +222,7 @@ export function PetitionComposeNewFieldDrawerProfileTypeFields({
                 width="100%"
                 src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/search/empty-search.svg`}
               />
+
               <Text textAlign="center" paddingX={4}>
                 <FormattedMessage
                   id="generic.search-no-results"
@@ -227,6 +231,7 @@ export function PetitionComposeNewFieldDrawerProfileTypeFields({
               </Text>
             </Stack>
           )}
+
           <Box
             borderTop="1px solid"
             borderColor="gray.200"
@@ -281,6 +286,7 @@ function NewFieldProfileTypeFieldItem({
           minWidth={0}
           _icon={{ height: "28px", minWidth: "28px", rounded: "md", svg: { boxSize: "20px" } }}
         />
+
         {(!hasAdverseMediaSearch && field.type === "ADVERSE_MEDIA_SEARCH") ||
         (!hasBackgroundCheck && field.type === "BACKGROUND_CHECK") ? (
           <PaidBadge />

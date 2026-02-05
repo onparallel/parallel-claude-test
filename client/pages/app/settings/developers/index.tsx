@@ -21,7 +21,7 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 
 import { useMutation } from "@apollo/client/react";
-import { Badge, Box, Button, Center, HStack, List, ListItem, Switch, Text } from "@chakra-ui/react";
+import { Badge, Box, Button, Center, HStack, List, ListItem, Switch } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { AlertCircleFilledIcon, DeleteIcon, EditIcon, RepeatIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
@@ -46,6 +46,7 @@ import { Maybe } from "@parallel/utils/types";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 function Subscriptions() {
   const intl = useIntl();
@@ -384,6 +385,7 @@ function Subscriptions() {
                   defaultMessage: "Reload",
                 })}
               />
+
               <Spacer />
               <Button
                 colorScheme="primary"
@@ -443,6 +445,7 @@ function Subscriptions() {
                   defaultMessage: "Reload",
                 })}
               />
+
               <Spacer />
               <Button
                 colorScheme="primary"
@@ -492,6 +495,7 @@ interface TemplateSubscriptionsTableContext {
   showConfirmDeactivateEventSubscriptionDialog: ReturnType<
     typeof useConfirmDeactivateEventSubscriptionDialog
   >;
+
   onSignatureKeysClick: (subscriptionId: string) => Promise<void>;
 }
 
@@ -683,6 +687,7 @@ function useTemplateSubscriptionsColumns(): TableColumn<
         },
       },
     ],
+
     [intl.locale],
   );
 }
@@ -692,6 +697,7 @@ interface ProfileSubscriptionsTableContext {
   showConfirmDeactivateEventSubscriptionDialog: ReturnType<
     typeof useConfirmDeactivateEventSubscriptionDialog
   >;
+
   onSignatureKeysClick: (subscriptionId: string) => Promise<void>;
 }
 
@@ -886,6 +892,7 @@ function useProfileSubscriptionsColumns(): TableColumn<
         },
       },
     ],
+
     [intl.locale],
   );
 }
@@ -901,6 +908,7 @@ function useConfirmDeleteSubscriptionDialog() {
           values={{ count }}
         />
       ),
+
       description: (
         <Stack>
           <Text>

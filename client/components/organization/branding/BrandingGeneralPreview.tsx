@@ -7,7 +7,6 @@ import {
   ListItem,
   SkeletonText,
   Stack,
-  Text,
   UnorderedList,
 } from "@chakra-ui/react";
 import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
@@ -18,6 +17,7 @@ import {
 import { Maybe } from "@parallel/utils/types";
 import { useMemo } from "react";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 interface BrandingGeneralPreviewProps {
   user: BrandingGeneralPreview_UserFragment;

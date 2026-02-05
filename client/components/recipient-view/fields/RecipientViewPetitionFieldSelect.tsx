@@ -1,4 +1,4 @@
-import { Box, Center, FormControl, List, Stack, Text } from "@chakra-ui/react";
+import { Box, Center, FormControl, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
@@ -20,6 +20,7 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
+import { Text } from "@parallel/components/ui";
 
 export interface RecipientViewPetitionFieldSelectProps
   extends Omit<
@@ -205,6 +206,7 @@ export function RecipientViewPetitionFieldSelect({
               }}
               isInvalid={isInvalid || hasAlreadyRepliedError}
             />
+
             <Center height="100%" position="absolute" insetEnd="42px" top={0}>
               <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
             </Center>
@@ -286,6 +288,7 @@ const RecipientViewPetitionFieldReplySelect = forwardRef<
                 }),
               }}
             />
+
             <Center height="100%" position="absolute" insetEnd="42px" top={0}>
               <RecipientViewPetitionFieldReplyStatusIndicator reply={reply} isSaving={isSaving} />
             </Center>

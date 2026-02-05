@@ -9,7 +9,6 @@ import {
   ModalFooter,
   ModalHeader,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import {
   BaseDialog,
@@ -20,6 +19,7 @@ import { StepsIndicator } from "@parallel/components/common/StepsIndicator";
 import { Tone } from "@parallel/graphql/__types";
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export function RecipientViewHelpDialog({ tone, ...props }: DialogProps<{ tone: Tone }, void>) {
   const intl = useIntl();
@@ -115,6 +115,7 @@ export function RecipientViewHelpDialog({ tone, ...props }: DialogProps<{ tone: 
             defaultMessage: "Close",
           })}
         />
+
         <ModalHeader paddingBottom={6}>
           <FormattedMessage
             id="recipient-view.first-time.intro"

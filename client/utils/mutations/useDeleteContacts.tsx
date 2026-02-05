@@ -7,7 +7,6 @@ import {
   Button,
   ListItem,
   Stack,
-  Text,
   UnorderedList,
 } from "@chakra-ui/react";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
@@ -18,6 +17,7 @@ import {
 import { useCallback } from "react";
 import { FormattedMessage } from "react-intl";
 import { isApolloError } from "../apollo/isApolloError";
+import { Text } from "@parallel/components/ui";
 
 export function useDeleteContacts() {
   const [deleteContacts] = useMutation(useDeleteContacts_deleteContactsDocument);
@@ -76,6 +76,7 @@ function useConfirmDeleteContactsDialog() {
             values={{ email: contacts[0].email, count: contacts.length }}
           />
         ),
+
         description: (
           <Stack>
             <Alert status="warning" rounded="md">
@@ -147,6 +148,7 @@ function useConfirmDeleteContactsDialog() {
             </Text>
           </Stack>
         ),
+
         confirm: (
           <Button colorScheme="red" type="submit">
             <FormattedMessage

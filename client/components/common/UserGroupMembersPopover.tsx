@@ -13,9 +13,9 @@ import {
   Portal,
   Spinner,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { Popover } from "@parallel/chakra/components";
+import { Text } from "@parallel/components/ui";
 import {
   UserGroupMembersPopover_UserGroupFragment,
   UserGroupMembersPopover_getMembersDocument,
@@ -76,7 +76,7 @@ export function UserGroupMembersPopover({
                     <Flex key={user.id} as={ListItem} alignItems="center" paddingX={3}>
                       <UserAvatar size="xs" user={user} />
                       <Flex direction="row" alignItems="center" gap={1}>
-                        <Text marginStart={2} noOfLines={1} wordBreak="break-all">
+                        <Text marginStart={2} lineClamp={1} wordBreak="break-all">
                           {user.fullName}
                         </Text>
                         {userDetails?.(user.id) ?? null}

@@ -8,7 +8,6 @@ import {
   Flex,
   ListItem,
   Stack,
-  Text,
   UnorderedList,
 } from "@chakra-ui/react";
 import { ContactReference } from "@parallel/components/common/ContactReference";
@@ -26,6 +25,7 @@ import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types"
 import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/usePetitionMessagePlaceholderOptions";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export function ConfirmSendReminderDialog({
   petition,

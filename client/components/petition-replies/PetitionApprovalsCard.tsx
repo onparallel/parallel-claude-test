@@ -16,7 +16,6 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
-  Text,
   UnorderedList,
   useToast,
 } from "@chakra-ui/react";
@@ -77,6 +76,7 @@ import {
 import { useConfirmCancelPetitionApprovalFlowDialog } from "./dialogs/ConfirmCancelPetitionApprovalFlowDialog";
 import { useConfirmSendReminderPetitionApprovalFlowDialog } from "./dialogs/ConfirmSendReminderPetitionApprovalFlowDialog";
 import { useConfirmSkipPetitionApprovalFlowDialog } from "./dialogs/ConfirmSkipPetitionApprovalFlowDialog";
+import { Text } from "@parallel/components/ui";
 
 interface PetitionApprovalsCardProps {
   petition: PetitionApprovalsCard_PetitionFragment;
@@ -478,6 +478,7 @@ export const PetitionApprovalsCard = chakraForwardRef<"section", PetitionApprova
                             color={tabColor}
                           />
                         )}
+
                         <OverflownText whiteSpace="nowrap" fontWeight={500}>
                           <FormattedMessage id="generic.e-signature" defaultMessage="eSignature" />
                         </OverflownText>
@@ -505,6 +506,7 @@ export const PetitionApprovalsCard = chakraForwardRef<"section", PetitionApprova
                             color={tabColor}
                           />
                         )}
+
                         <OverflownText whiteSpace="nowrap" fontWeight={500}>
                           {step.stepName}
                         </OverflownText>
@@ -527,6 +529,7 @@ export const PetitionApprovalsCard = chakraForwardRef<"section", PetitionApprova
                   hasUnreadComments={petition.unreadGeneralCommentCount > 0}
                   onClick={onToggleGeneralComments}
                 />
+
                 {signatureIndex === tabIndex &&
                 (!petition.signatureConfig?.isEnabled ||
                   currentSignatureRequest?.status === "COMPLETED" ||
@@ -955,6 +958,7 @@ function PetitionApprovalStepStatus({
           <FormattedMessage id="component.petition-approvals-card.status" defaultMessage="Status" />
         </Heading>
       )}
+
       <Stack direction="row" display="inline-flex" alignItems="center" color={color}>
         {icon}
         <Text as="span" fontWeight={400}>
@@ -999,6 +1003,7 @@ function PetitionApprovalStepApprovers({
           />
         </Heading>
       )}
+
       <Box flex="1">
         {stepApprovers.length ? (
           <FormattedList
@@ -1016,6 +1021,7 @@ function PetitionApprovalStepApprovers({
                     color="primary.600"
                     fontWeight={400}
                   />
+
                   {hideIcon ? null : <PetitionApprovalSignerStatusIcon approver={approver} />}
                 </Fragment>
               );
@@ -1218,6 +1224,7 @@ function PetitionApprovalStepRow({
               onClick={onSendReminder}
               isDisabled={isDisabled || step.status !== "PENDING" || step.approvers.length === 0}
             />
+
             <MoreOptionsMenuButton
               isDisabled={isDisabled || step.status !== "PENDING"}
               variant="outline"

@@ -1,4 +1,4 @@
-import { Box, Center, Text, useFormControl, useMultiStyleConfig } from "@chakra-ui/react";
+import { Box, Center, useFormControl, useMultiStyleConfig } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import {
@@ -37,6 +37,7 @@ import { Editor, Transforms } from "slate";
 import { EditableProps } from "slate-react/dist/components/editable";
 import { PlateWithEditorRef } from "./PlateWithEditorRef";
 import { ToolbarPlaceholderButton } from "./ToolbarPlaceholderButton";
+import { Text } from "@parallel/components/ui";
 
 export type PlaceholderInputValue = [PlaceholderInputBlock];
 
@@ -100,6 +101,7 @@ export const PlaceholderInput = chakraForwardRef<
           createComboboxPlugin(),
           createPlaceholderPlugin({ placeholdersRef }),
         ],
+
         {
           components,
           overrideByKey: {

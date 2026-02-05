@@ -10,7 +10,6 @@ import {
   HStack,
   Stack,
   Switch,
-  Text,
 } from "@chakra-ui/react";
 import { AdminOrganizationsLayout } from "@parallel/components/admin-organizations/AdminOrganizationsLayout";
 import { Card, CardHeader } from "@parallel/components/common/Card";
@@ -34,6 +33,7 @@ import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish, omit } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 type AdminOrganizationsFeaturesProps = UnwrapPromise<
   ReturnType<typeof AdminOrganizationsFeatures.getInitialProps>

@@ -1,9 +1,10 @@
-import { Button, Checkbox, Stack, Text } from "@chakra-ui/react";
+import { Button, Checkbox, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { NetDocumentsLink } from "@parallel/components/common/NetDocumentsLink";
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 interface AlreadyExportedDialogProps {
   filename: string;

@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, BoxProps, Button, Center, Flex, Stack, Text } from "@chakra-ui/react";
+import { Box, BoxProps, Button, Center, Flex, Stack } from "@chakra-ui/react";
 import { AddIcon, CloseIconSmall } from "@parallel/chakra/icons";
 import {
   PetitionProfilesTable_PetitionFragment,
@@ -18,6 +18,7 @@ import { LocalizableUserTextRender } from "../common/LocalizableUserTextRender";
 import { ProfileReference } from "../common/ProfileReference";
 import { Table, TableColumn } from "../common/Table";
 import { UserAvatarList } from "../common/UserAvatarList";
+import { Text } from "@parallel/components/ui";
 
 type PetitionProfilesTableSelection = PetitionProfilesTable_ProfileFragment;
 export interface PetitionProfilesTable extends BoxProps {
@@ -50,6 +51,7 @@ export function PetitionProfilesTable({
           defaultMessage="Remove association"
         />
       ),
+
       colorScheme: "red",
       isDisabled:
         myEffectivePermission === "READ" ||
@@ -193,6 +195,7 @@ function usePetitionProfilesColumns(): TableColumn<
                 />
               </Text>
             );
+
           return (
             <Flex justifyContent={column.align}>
               <UserAvatarList usersOrGroups={subscribers.map((s) => s.user)} />
@@ -211,6 +214,7 @@ function usePetitionProfilesColumns(): TableColumn<
         ),
       },
     ],
+
     [intl.locale],
   );
 }

@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Center, Grid, Spinner, Stack, Text, useBreakpointValue } from "@chakra-ui/react";
+import { Center, Grid, Spinner, Stack, useBreakpointValue } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import {
   BookOpenIcon,
@@ -24,6 +24,7 @@ import { FORMATS } from "@parallel/utils/dates";
 import React, { useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 export function AdverseMediaArticleCard({
   token,
@@ -215,6 +216,7 @@ export function AdverseMediaArticleCard({
                 size="xl"
                 marginBottom={4}
               />
+
               {isNonNullish(search) && search.length > 0 ? (
                 <Text textStyle="hint" textAlign="center" as="span" verticalAlign="middle">
                   <SearchIcon boxSize={4} color="gray.400" marginEnd={2} marginBottom={1} />
@@ -295,6 +297,7 @@ export function AdverseMediaArticleCard({
                 onBackToList={isMobile ? handleBackToList : undefined}
                 isReadOnly={isReadOnly}
               />
+
               <Stack {...extendFlexColumn} overflow="auto" paddingX={6} paddingY={2}>
                 <AdverseMediaArticleDetails article={data?.adverseMediaArticleDetails} />
               </Stack>

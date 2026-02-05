@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Badge, Box, Button, Center, HStack, List, Progress, Stack, Text } from "@chakra-ui/react";
+import { Badge, Box, Button, Center, HStack, List, Progress, Stack } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import {
   CheckIcon,
@@ -27,6 +27,7 @@ import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 export interface PreviewPetitionFieldProfileSearchProps
   extends Omit<
@@ -203,6 +204,7 @@ export function PreviewPetitionFieldProfileSearch({
               borderRadius="full"
               width="100%"
             />
+
             <Button size="sm" fontWeight="normal" onClick={handleCancelClick}>
               <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
             </Button>

@@ -17,7 +17,6 @@ import {
   Portal,
   Tbody,
   Td,
-  Text,
   Th,
   Thead,
   Tr,
@@ -59,6 +58,7 @@ import { Collapsible } from "../ui";
 import { HelpPopover } from "./HelpPopover";
 import { IconButtonWithTooltip } from "./IconButtonWithTooltip";
 import { Wrap } from "./Wrap";
+import { Text } from "@parallel/components/ui";
 
 export type TableSortingDirection = "ASC" | "DESC";
 
@@ -315,6 +315,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
             </Center>
           </Th>
         ),
+
         cellProps: {
           padding: "0 !important",
         },

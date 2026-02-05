@@ -13,7 +13,6 @@ import {
   RadioProps,
   Spinner,
   Stack,
-  Text,
   useRadio,
   useRadioGroup,
 } from "@chakra-ui/react";
@@ -45,6 +44,7 @@ import {
   RecipientPortalStatusFilter,
   RecipientPortalStatusFilterValue,
 } from "@parallel/components/recipient-view/RecipientPortalStatusFilter";
+import { Text } from "@parallel/components/ui";
 import {
   RecipientPortal_accessDocument,
   RecipientPortal_accessesDocument,
@@ -192,6 +192,7 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
             contact={contact}
             keycode={keycode}
           />
+
           <Flex width="100%" justifyContent="center">
             <Stack maxWidth="container.lg" width="100%" spacing={4} paddingY={4} paddingX={4}>
               <HStack>
@@ -230,6 +231,7 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
                     })}
                     backgroundColor="white"
                   />
+
                   <SearchInput
                     value={search}
                     onChange={(event) => handleSearchChange(event?.target.value)}
@@ -270,7 +272,7 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
                     </Text>
                     <PaperPlaneIcon boxSize={6} color="gray.600" />
                   </HStack>
-                  <Text noOfLines={1} wordBreak="break-all">
+                  <Text lineClamp={1} wordBreak="break-all">
                     <FormattedMessage
                       id="page.recipient-view-client-portal.all"
                       defaultMessage="All"
@@ -284,7 +286,7 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
                     </Text>
                     <TimeIcon boxSize={6} color="yellow.600" />
                   </HStack>
-                  <Text noOfLines={1} wordBreak="break-all">
+                  <Text lineClamp={1} wordBreak="break-all">
                     <FormattedMessage
                       id="page.recipient-view-client-portal.pending"
                       defaultMessage="Pending"
@@ -298,7 +300,7 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
                     </Text>
                     <CheckIcon boxSize={6} color="green.400" />
                   </HStack>
-                  <Text noOfLines={1} wordBreak="break-all">
+                  <Text lineClamp={1} wordBreak="break-all">
                     <FormattedMessage
                       id="page.recipient-view-client-portal.completed"
                       defaultMessage="Completed"
@@ -336,6 +338,7 @@ function Petitions({
           width="100%"
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/search/empty-search.svg`}
         />
+
         <Text>
           <FormattedMessage
             id="page.recipient-view-client-portal.no-results"
@@ -438,7 +441,7 @@ function PetitionCard({ access }: { access: RecipientPortal_PublicPetitionAccess
                   })}
               </LinkOverlay>
             </NakedLink>
-            <Text fontSize="sm" color="gray.600" noOfLines={2} wordBreak="break-all">
+            <Text fontSize="sm" color="gray.600" lineClamp={2} wordBreak="break-all">
               <FormattedMessage
                 id="page.recipient-view-client-portal.requested-by"
                 defaultMessage="Requested by {name}, on {date}"

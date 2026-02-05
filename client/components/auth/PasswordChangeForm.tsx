@@ -1,18 +1,11 @@
-import {
-  Box,
-  Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Heading,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Button, FormControl, FormErrorMessage, FormLabel, Heading } from "@chakra-ui/react";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { PASSWORD_REGEX } from "@parallel/utils/validation";
 import { ReactElement } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { PasswordStrengthIndicator } from "../common/PasswordStrengthIndicator";
+import { Text } from "@parallel/components/ui";
 
 export interface PasswordChangeData {
   password: string;
@@ -60,6 +53,7 @@ export function PasswordChangeForm({ onSubmit, backLink, isSubmitting }: Passwor
               pattern: PASSWORD_REGEX,
             })}
           />
+
           <PasswordStrengthIndicator password={password} />
           <FormErrorMessage>
             <FormattedMessage

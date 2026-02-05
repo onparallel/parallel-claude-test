@@ -9,7 +9,6 @@ import {
   HStack,
   RadioProps,
   Stack,
-  Text,
   useRadioGroup,
 } from "@chakra-ui/react";
 import { DownloadIcon } from "@parallel/chakra/icons";
@@ -44,6 +43,7 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ReactNode, useMemo, useRef, useState } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { isNonNullish, sortBy, sumBy } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 interface PetitionStatusCount {
   all: number;
@@ -220,6 +220,7 @@ export function Overview() {
             onChange={handleDateRangeChange}
             isDisabled={status === "LOADING"}
           />
+
           <Button
             minWidth="fit-content"
             colorScheme="primary"
@@ -262,6 +263,7 @@ export function Overview() {
                   </Stack>
                 }
               />
+
               <StatsCard
                 title={intl.formatMessage({
                   id: "page.reports-overview.completed-parallels",
@@ -285,6 +287,7 @@ export function Overview() {
                   </Stack>
                 }
               />
+
               <StatsCard
                 title={intl.formatMessage({
                   id: "page.reports-overview.signed-parallels",
@@ -308,6 +311,7 @@ export function Overview() {
                   </Stack>
                 }
               />
+
               <StatsCard
                 title={intl.formatMessage({
                   id: "page.reports-overview.closed-parallels",
@@ -639,6 +643,7 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
                               status="PENDING"
                             />
                           ),
+
                           closedStatus: (
                             <PetitionStatusLabel
                               as="span"
@@ -660,6 +665,7 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
                     </Text>
                   </Stack>
                 ),
+
                 cellProps: {
                   width: "10%",
                   minWidth: "120px",
@@ -707,6 +713,7 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
                     </Text>
                   </Stack>
                 ),
+
                 cellProps: {
                   width: "10%",
                   minWidth: "120px",
@@ -728,6 +735,7 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
                     defaultMessage="This is the average time that takes the documents to be signed once they have been sent."
                   />
                 ),
+
                 cellProps: {
                   width: "10%",
                   minWidth: "120px",
@@ -766,6 +774,7 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
                           status="COMPLETED"
                         />
                       ),
+
                       closedStatus: (
                         <PetitionStatusLabel
                           as="span"
@@ -779,6 +788,7 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
                     }}
                   />
                 ),
+
                 cellProps: {
                   width: "10%",
                   minWidth: "120px",
@@ -892,6 +902,7 @@ function useDownloadOverviewExcel() {
             style: { numFmt: "0.00" },
           },
         ];
+
         worksheet.spliceRows(1, 0, []);
         worksheet.mergeCells("B1:E1");
         worksheet.mergeCells("F1:I1");

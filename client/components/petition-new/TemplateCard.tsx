@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client";
-import { Flex, Stack, Text } from "@chakra-ui/react";
+import { Flex, Stack } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
+import { Text } from "@parallel/components/ui";
 import { TemplateCard_PetitionTemplateFragment } from "@parallel/graphql/__types";
 import { useRoleButton } from "@parallel/utils/useRoleButton";
 import { FormattedMessage } from "react-intl";
@@ -33,14 +34,15 @@ export const TemplateCard = chakraForwardRef<"div", TemplateCardProps>(function 
       {...props}
     >
       {template.name ? (
-        <Text as="h2" fontSize="lg" noOfLines={2} fontWeight="bold">
+        <Text as="h2" fontSize="lg" lineClamp={2} fontWeight="bold">
           {template.name}
         </Text>
       ) : (
-        <Text as="h2" fontSize="lg" noOfLines={2} fontWeight="normal" fontStyle="italic">
+        <Text as="h2" fontSize="lg" lineClamp={2} fontWeight="normal" fontStyle="italic">
           <FormattedMessage id="generic.unnamed-template" defaultMessage="Unnamed template" />
         </Text>
       )}
+
       <Spacer />
       <Flex alignItems="center">
         <TemplateActiveSettingsIcons template={template} spacing={2.5} />

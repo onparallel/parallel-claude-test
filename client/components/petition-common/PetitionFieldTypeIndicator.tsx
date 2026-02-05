@@ -1,4 +1,4 @@
-import { Button, Text } from "@chakra-ui/react";
+import { Button } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";
@@ -8,6 +8,7 @@ import {
   usePetitionFieldTypeLabel,
 } from "@parallel/utils/petitionFields";
 import { PetitionFieldTypeIcon } from "./PetitionFieldTypeIcon";
+import { Text } from "@parallel/components/ui";
 
 export interface PetitionFieldTypeIndicatorProps {
   type: PetitionFieldType;

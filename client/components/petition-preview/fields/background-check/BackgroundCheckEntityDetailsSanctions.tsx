@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Link, Text } from "@chakra-ui/react";
+import { Box, Center, Link } from "@chakra-ui/react";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { Table, TableColumn } from "@parallel/components/common/Table";
 import { BackgroundCheckEntityDetailsSanctions_BackgroundCheckEntityDetailsSanctionFragment } from "@parallel/graphql/__types";
@@ -7,6 +7,7 @@ import { formatPartialDate } from "@parallel/utils/formatPartialDate";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 export function BackgroundCheckEntityDetailsSanctions({
   sanctions,
@@ -180,6 +181,7 @@ function useBackgroundCheckSanctionsColumns() {
         },
       },
     ],
+
     [intl.locale],
   );
 }

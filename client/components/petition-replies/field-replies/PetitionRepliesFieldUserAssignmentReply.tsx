@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
-import { Text } from "@chakra-ui/react";
+
 import { UserReference } from "@parallel/components/common/UserReference";
-import { HStack } from "@parallel/components/ui";
+import { HStack, Text } from "@parallel/components/ui";
 import { PetitionRepliesFieldUserAssignmentReply_PetitionFieldReplyFragment } from "@parallel/graphql/__types";
 import { isNonNullish } from "remeda";
 
@@ -27,6 +27,7 @@ export function PetitionRepliesFieldUserAssignmentReply({
         marginEnd={1}
         as="span"
       />
+
       {isNonNullish(reply.content.user) ? (
         <Text as="span" fontSize="md" textStyle="hint">
           {reply.content.user.email}

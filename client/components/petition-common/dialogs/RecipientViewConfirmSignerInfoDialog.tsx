@@ -9,7 +9,6 @@ import {
   FormLabel,
   Input,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
@@ -21,6 +20,7 @@ import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import type { SignerSelectSelection } from "./ConfirmPetitionSignersDialog";
+import { Text } from "@parallel/components/ui";
 
 interface SignerInfo {
   firstName: string;
@@ -126,6 +126,7 @@ function RecipientViewConfirmSignerInfoDialog({
                 defaultMessage: "example@company.com",
               })}
             />
+
             <FormErrorMessage>
               <FormattedMessage
                 id="generic.forms-invalid-email-error"

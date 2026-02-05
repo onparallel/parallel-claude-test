@@ -10,7 +10,6 @@ import {
   Heading,
   HStack,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { DeleteIcon, DragHandleIcon, SettingsIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader, CardProps } from "@parallel/components/common/Card";
@@ -44,6 +43,7 @@ import { sortBy } from "remeda";
 import { useAutoConfirmDiscardChangesDialog } from "../dialogs/ConfirmDiscardChangesDialog";
 import { useConfirmRemoveProfileTypeKeyProcessDialog } from "./dialogs/ConfirmRemoveProfileTypeKeyProcessDialog";
 import { useCreateOrUpdateProfileTypeKeyProcessDialog } from "./dialogs/CreateOrUpdateProfileTypeKeyProcessDialog";
+import { Text } from "@parallel/components/ui";
 
 const MAX_KEY_PROCESSES = 3;
 interface ProfileTypeSettingsProps extends CardProps {
@@ -253,6 +253,7 @@ export function ProfileTypeSettings({ profileType, onSave, ...props }: ProfileTy
                   />
                 )}
               />
+
               {errors.pattern?.type === "invalid_pattern" ? (
                 <FormErrorMessage>
                   <FormattedMessage
@@ -406,6 +407,7 @@ function ProfileTypeProccess({ process, onDragEnd, onEdit, onRemove }: ProfileTy
             })}
             onClick={onEdit}
           />
+
           <IconButtonWithTooltip
             variant="outline"
             size="sm"

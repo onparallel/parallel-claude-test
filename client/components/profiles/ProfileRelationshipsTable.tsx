@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
-import { Button, Center, HStack, Heading, Stack, Text } from "@chakra-ui/react";
+import { Button, Center, HStack, Heading, Stack } from "@chakra-ui/react";
 import { AddIcon, CloseIconSmall } from "@parallel/chakra/icons";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { TableColumn } from "@parallel/components/common/Table";
@@ -25,6 +25,7 @@ import { Spacer } from "../common/Spacer";
 import { TablePage } from "../common/TablePage";
 import { useConfirmRemoveProfileRelationshipsDialog } from "./dialogs/ConfirmRemoveProfileRelationshipsDialog";
 import { useCreateProfileRelationshipsDialog } from "./dialogs/CreateProfileRelationshipsDialog";
+import { Text } from "@parallel/components/ui";
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
@@ -261,6 +262,7 @@ function useProfileRelationshipsTableColumns({
         },
       },
     ],
+
     [intl.locale, profileId],
   );
 }
@@ -361,6 +363,7 @@ function useProfileRelationshipsActions({
           defaultMessage="Remove association"
         />
       ),
+
       colorScheme: "red",
     },
   ];

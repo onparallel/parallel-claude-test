@@ -10,7 +10,6 @@ import {
   List,
   ListItem,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { ChevronFilledIcon, ListIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -30,6 +29,7 @@ import { isNonNullish, zip } from "remeda";
 import { CloseButton } from "../common/CloseButton";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { NakedLink } from "../common/Link";
+import { Text } from "@parallel/components/ui";
 
 type PetitionSelection =
   | RecipientViewContents_PublicPetitionFragment
@@ -160,6 +160,7 @@ export const RecipientViewContents = chakraForwardRef<"section", RecipientViewCo
                           fontSize="sm"
                           transform={index + 1 === currentPage ? "rotate(90deg)" : undefined}
                         />
+
                         <Box
                           flex="1"
                           overflow="hidden"

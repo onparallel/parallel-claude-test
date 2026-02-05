@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Heading, HStack, Stack, Text, useToast } from "@chakra-ui/react";
+import { Box, Center, Heading, HStack, Stack, useToast } from "@chakra-ui/react";
 import { DeleteIcon, UsersIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -30,6 +30,7 @@ import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { MouseEvent, RefObject, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 const SORTING = ["firstName", "lastName", "fullName", "email", "createdAt"] as const;
 
 const QUERY_STATE = {
@@ -282,6 +283,7 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
         ),
       },
     ],
+
     [intl.locale],
   );
 }

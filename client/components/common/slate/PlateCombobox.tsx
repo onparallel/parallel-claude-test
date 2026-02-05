@@ -1,4 +1,4 @@
-import { Box, Center, Flex, Portal, Spinner, Text } from "@chakra-ui/react";
+import { Box, Center, Flex, Portal, Spinner } from "@chakra-ui/react";
 import { MaybePromise } from "@parallel/utils/types";
 import { useAsyncEffect } from "@parallel/utils/useAsyncEffect";
 import {
@@ -24,6 +24,7 @@ import {
 import { ComponentType, useCallback, useEffect, useState } from "react";
 import { groupBy } from "remeda";
 import { Card } from "../Card";
+import { Text } from "@parallel/components/ui";
 
 export interface ComboboxItemProps<TData> {
   item: TComboboxItem<TData>;

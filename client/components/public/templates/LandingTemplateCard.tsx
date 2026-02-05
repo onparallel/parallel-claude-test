@@ -1,9 +1,10 @@
 import { gql } from "@apollo/client";
-import { Center, Image, LinkBox, LinkOverlay, Stack, Text } from "@chakra-ui/react";
+import { Center, Image, LinkBox, LinkOverlay, Stack } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { LandingTemplateCard_LandingTemplateFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Card } from "../../common/Card";
+import { Text } from "@parallel/components/ui";
 
 export interface LandingTemplateCardProps {
   template: LandingTemplateCard_LandingTemplateFragment;

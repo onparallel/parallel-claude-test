@@ -10,7 +10,6 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
-  Text,
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
@@ -20,6 +19,7 @@ import { add } from "date-fns";
 import { ReactNode } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedDate, FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 interface UpdateOrganizationCurrentUsagePeriodDialogData {
   header: ReactNode;

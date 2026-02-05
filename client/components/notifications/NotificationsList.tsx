@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { AbsoluteCenterProps, Center, Circle, Flex, Spinner, Stack, Text } from "@chakra-ui/react";
+import { AbsoluteCenterProps, Center, Circle, Flex, Spinner, Stack } from "@chakra-ui/react";
 import { NotificationsDrawer_PetitionUserNotificationFragment } from "@parallel/graphql/__types";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
@@ -18,6 +18,7 @@ import { RemindersOptOutNotification } from "./flavor/RemindersOptOutNotificatio
 import { SignatureCancelledUserNotification } from "./flavor/SignatureCancelledUserNotification";
 import { SignatureCompletedUserNotification } from "./flavor/SignatureCompletedUserNotification";
 import { EmptyNotificationsIcon } from "./icons/EmptyNotificationsIcon";
+import { Text } from "@parallel/components/ui";
 
 interface NotificationListProps {
   notifications: NotificationsDrawer_PetitionUserNotificationFragment[];

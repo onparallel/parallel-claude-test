@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Button, Radio, RadioGroup, Stack, Text } from "@chakra-ui/react";
+import { Radio, RadioGroup } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import {
   useRecoverProfile_closeProfileDocument,
   useRecoverProfile_reopenProfileDocument,
@@ -131,7 +132,7 @@ function RecoverProfileDialog({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="primary">
+        <Button type="submit" colorPalette="primary">
           <FormattedMessage
             id="component.recover-profile-dialog.recover-button"
             defaultMessage="Recover"

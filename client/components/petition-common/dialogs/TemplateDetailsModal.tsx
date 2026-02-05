@@ -14,7 +14,6 @@ import {
   ModalOverlay,
   ModalProps,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import {
   CopyIcon,
@@ -31,7 +30,7 @@ import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMe
 import { RestrictedFeaturePopover } from "@parallel/components/common/RestrictedFeaturePopover";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { TemplateActiveSettingsIcons } from "@parallel/components/petition-new/TemplateActiveSettingsIcons";
-import { Accordion } from "@parallel/components/ui";
+import { Accordion, Text } from "@parallel/components/ui";
 import {
   PetitionFieldTitleContent_LandingTemplateFieldFragment,
   PetitionFieldTitleContent_PetitionFieldFragment,
@@ -153,7 +152,7 @@ export function TemplateDetailsModal({
               />
             </Text>
             {template.name ? (
-              <Text as="div" fontSize="lg" noOfLines={2}>
+              <Text as="div" fontSize="lg" lineClamp={2}>
                 {template.name}
               </Text>
             ) : (
@@ -169,6 +168,7 @@ export function TemplateDetailsModal({
               defaultMessage: "Close",
             })}
           />
+
           <ModalBody paddingBottom={6} paddingTop={4}>
             <Flex alignItems="center">
               <TemplateActiveSettingsIcons template={template} spacing={4} />
@@ -268,6 +268,7 @@ export function TemplateDetailsModal({
                     </Button>
                   </RestrictedFeaturePopover>
                 )}
+
                 {isFromPublicTemplates && !template.publicLink?.isActive ? null : (
                   <MoreOptionsMenuButton
                     ref={moreOptionsButtonRef}
@@ -410,6 +411,7 @@ export function TemplateDetailsModal({
                           marginStart={4}
                           marginBottom={2}
                         />
+
                         {field.type === "FIELD_GROUP" && field.children?.length
                           ? zip(field.children!, childrenFieldIndices!).map(
                               ([field, fieldIndex]) => (

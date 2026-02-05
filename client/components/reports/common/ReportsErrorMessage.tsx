@@ -1,6 +1,7 @@
-import { Image, Text } from "@chakra-ui/react";
+import { Image } from "@chakra-ui/react";
 import { SupportLink } from "@parallel/components/common/SupportLink";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export function ReportsErrorMessage() {
   const intl = useIntl();
@@ -13,6 +14,7 @@ export function ReportsErrorMessage() {
         marginBottom={6}
         src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/reports/reports-error.svg`}
       />
+
       <Text fontWeight="bold" fontSize="xl">
         <FormattedMessage
           id="component.reports-error-message.title"

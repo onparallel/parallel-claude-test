@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Button, Stack, Text } from "@chakra-ui/react";
+import { Button, Stack, Text } from "@parallel/components/ui";
+
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { useReopenProfile_reopenProfileDocument } from "@parallel/graphql/__types";
@@ -93,7 +94,7 @@ function ReopenProfileDialog({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="primary">
+        <Button type="submit" colorPalette="primary">
           {confirmText ?? (
             <FormattedMessage
               id="component.reopen-profile-dialog.reopen-button"

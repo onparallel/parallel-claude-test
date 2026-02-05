@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Stack } from "@chakra-ui/react";
 import {
   SuggestedSigners_PetitionBaseFragment,
   SuggestedSigners_PetitionSignerFragment,
@@ -14,6 +14,7 @@ import { isValidEmail } from "@parallel/utils/validation";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish, pick, uniqueBy, zip } from "remeda";
 import { useAddNewSignerDialog } from "../recipient-view/dialogs/AddNewSignerDialog";
+import { Text } from "@parallel/components/ui";
 
 type PetitionSelection =
   | SuggestedSigners_PublicPetitionFragment
@@ -197,6 +198,7 @@ export function SuggestedSigners({
               },
             ]),
       ]
+
         // remove already added signers
         .filter(
           (suggestion) =>
@@ -219,6 +221,7 @@ export function SuggestedSigners({
           // first in the list is the contact
           .sort((r) => (r.email === contact.email ? -1 : 0)),
       ],
+
       (s) => [s.email, s.firstName, s.lastName].join("|"),
     );
   }
@@ -296,10 +299,9 @@ function SuggestedSignersRow({
 
   return (
     <>
-      <Text
-        textStyle={title ? undefined : "hint"}
-        fontWeight="bold"
-      >{`${title ?? intl.formatMessage({ id: "component.suggested-signers.unnamed-group", defaultMessage: "Unnamed group" })}:`}</Text>
+      <Text textStyle={title ? undefined : "hint"} fontWeight="bold">
+        {`${title ?? intl.formatMessage({ id: "component.suggested-signers.unnamed-group", defaultMessage: "Unnamed group" })}:`}
+      </Text>
       <Stack>
         {suggestions.map((signer, i) => (
           <Flex key={i} justifyContent="space-between" alignItems="center">

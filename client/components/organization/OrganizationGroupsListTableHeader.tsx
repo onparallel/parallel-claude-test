@@ -1,10 +1,11 @@
-import { Box, Button, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Stack } from "@chakra-ui/react";
 import { RepeatIcon } from "@parallel/chakra/icons";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
 import { WhenPermission } from "../common/WhenPermission";
+import { Text } from "@parallel/components/ui";
 
 export interface OrganizationGroupsListTableHeaderProps {
   search: string | null;
@@ -32,6 +33,7 @@ export function OrganizationGroupsListTableHeader({
           defaultMessage: "Reload",
         })}
       />
+
       <Box flex="0 1 400px">
         <SearchInput value={search ?? ""} onChange={(e) => onSearchChange(e.target.value)} />
       </Box>

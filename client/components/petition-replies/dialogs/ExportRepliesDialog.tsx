@@ -13,7 +13,6 @@ import {
   RadioGroup,
   Spinner,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { ArrowForwardIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
@@ -41,6 +40,7 @@ import {
 import { useLocalStorage } from "@parallel/utils/useLocalStorage";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export interface ExportRepliesDialogProps {
   petitionId: string;
@@ -313,6 +313,7 @@ function ExportRepliesDialogContent({
                       id="component.export-replies-dialog.export-cuatrecasas-client-number"
                       defaultMessage="Client number"
                     />
+
                     <Input
                       ref={clientIdRef}
                       value={externalClientId}
@@ -362,6 +363,7 @@ function ExportRepliesDialogContent({
                     onChange={setPattern}
                     placeholders={placeholders}
                   />
+
                   <Text as="div" fontSize="xs" color="gray.500" marginTop={2}>
                     <FormattedMessage
                       id="generic.for-example"

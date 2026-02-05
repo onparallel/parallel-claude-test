@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Text } from "@chakra-ui/react";
+
 import { BellOffIcon } from "@parallel/chakra/icons";
 import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -12,6 +12,7 @@ import {
 import { FormattedMessage } from "react-intl";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
+import { Text } from "@parallel/components/ui";
 
 export interface TimelineRemindersOptOutEventProps {
   event: TimelineRemindersOptOutEvent_RemindersOptOutEventFragment;

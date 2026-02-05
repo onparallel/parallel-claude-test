@@ -1,4 +1,4 @@
-import { Box, Stack, Text } from "@chakra-ui/react";
+import { Box, Stack } from "@chakra-ui/react";
 import { forwardRef, useMemo } from "react";
 import { useIntl } from "react-intl";
 import {
@@ -9,6 +9,7 @@ import {
   components,
 } from "react-select";
 import { SimpleOption, SimpleSelect, SimpleSelectProps } from "./SimpleSelect";
+import { Text } from "@parallel/components/ui";
 
 export const DEFAULT_COLORS = [
   "#E2E8F0",
@@ -74,6 +75,7 @@ function useTagColors() {
         value: "#D5E7DE",
       },
     ],
+
     [intl.locale],
   );
 }

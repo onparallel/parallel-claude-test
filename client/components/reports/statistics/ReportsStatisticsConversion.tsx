@@ -6,7 +6,6 @@ import {
   RadioProps,
   Spinner,
   Stack,
-  Text,
   useRadioGroup,
   useTheme,
 } from "@chakra-ui/react";
@@ -36,6 +35,7 @@ import { useMemo, useState } from "react";
 import { Bar } from "react-chartjs-2";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 interface CalculatedData {
   id: string;
@@ -331,6 +331,7 @@ export function ReportsStatisticsConversion({
             colors.purple[600],
             colors.purple[700],
           ],
+
           hoverBackgroundColor: [
             colors.purple[200],
             colors.purple[300],
@@ -339,6 +340,7 @@ export function ReportsStatisticsConversion({
             colors.purple[600],
             colors.purple[700],
           ],
+
           borderColor: "transparent",
           hoverBorderColor: colors.blue[400],
           borderWidth: 1,
@@ -366,6 +368,7 @@ export function ReportsStatisticsConversion({
             `${colors.purple[500]}23`,
             `${colors.purple[600]}23`,
           ],
+
           hoverBackgroundColor: [
             `${colors.purple[200]}23`,
             `${colors.purple[200]}23`,
@@ -374,6 +377,7 @@ export function ReportsStatisticsConversion({
             `${colors.purple[500]}23`,
             `${colors.purple[600]}23`,
           ],
+
           borderColor: "transparent",
           hoverBorderColor: colors.blue[400],
           borderWidth: 1,
@@ -631,6 +635,7 @@ function useDownloadConversionReportExcel() {
             style: { numFmt: "0.00" },
           },
         ];
+
         worksheet.spliceRows(1, 0, []);
         worksheet.mergeCells("B1:F1");
         worksheet.getCell("A1").value = intl.formatMessage({

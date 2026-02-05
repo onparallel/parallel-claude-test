@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import { Center, Circle, Text } from "@chakra-ui/react";
+import { Center, Circle } from "@chakra-ui/react";
 import { BellIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { NotificationsButton_UnreadPetitionUserNotificationIdsDocument } from "@parallel/graphql/__types";
@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NavBarButton } from "../layout/NavBarButton";
+import { Text } from "@parallel/components/ui";
 
 const POLL_INTERVAL = 30_000;
 
@@ -50,6 +51,7 @@ export const NotificationsButton = chakraForwardRef<"button", { extended?: boole
         <BellIcon boxSize={5} aria-hidden="true" />
       </motion.div>
     );
+
     const badge = unreadCount ? (
       <Circle
         as={motion.div}

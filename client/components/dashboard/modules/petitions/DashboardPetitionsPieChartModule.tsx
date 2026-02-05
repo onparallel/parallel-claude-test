@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Grid, GridItem, Square, Stack, Text } from "@chakra-ui/react";
+import { Box, Center, Grid, GridItem, Square, Stack } from "@chakra-ui/react";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { ScrollShadows } from "@parallel/components/common/ScrollShadows";
 import { DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModuleFragment } from "@parallel/graphql/__types";
@@ -14,6 +14,7 @@ import { DashboardLinkToResults } from "../../shared/DashboardLinkToResults";
 import { DashboardModuleAlertIncongruent } from "../../shared/DashboardModuleAlertIncongruent";
 import { DashboardModuleCard } from "../../shared/DashboardModuleCard";
 import { DashboardModuleSpinner } from "../../shared/DashboardModuleSpinner";
+import { Text } from "@parallel/components/ui";
 
 export const DashboardPetitionsPieChartModule = forwardRef<
   HTMLDivElement,
@@ -41,6 +42,7 @@ export const DashboardPetitionsPieChartModule = forwardRef<
           hoverBorderColor: "white",
         },
       ],
+
       labels: module.petitionsPieChartResult?.items?.map(({ label }) => label) ?? [],
     }),
     [module],

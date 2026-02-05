@@ -15,12 +15,11 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
-  Text,
 } from "@chakra-ui/react";
 import { AddIcon, ArrowBackIcon, SettingsIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { ScrollShadows } from "@parallel/components/common/ScrollShadows";
-import { Button, HStack } from "@parallel/components/ui";
+import { Button, HStack, Text } from "@parallel/components/ui";
 import { DashboardModuleDrawer_DashboardModuleFragment } from "@parallel/graphql/__types";
 import { RefObject, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -107,6 +106,7 @@ export function DashboardModuleDrawer({
                   label={intl.formatMessage({ id: "generic.go-back", defaultMessage: "Go back" })}
                   onClick={() => setSelectedModuleType(null)}
                 />
+
                 <FormattedMessage id="page.home.add-module" defaultMessage="Add module" />
               </HStack>
             )

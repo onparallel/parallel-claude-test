@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Stack, Text } from "@chakra-ui/react";
+import { Box, Stack } from "@chakra-ui/react";
 import { MultiCheckboxSimpleSelect } from "@parallel/components/common/MultiCheckboxSimpleSelect";
 import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { UnwrapArray } from "@parallel/utils/types";
@@ -9,6 +9,7 @@ import { OptionProps, ValueContainerProps, components } from "react-select";
 import { omit } from "remeda";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { SettingsRow } from "../rows/SettingsRow";
+import { Text } from "@parallel/components/ui";
 
 export function PetitionComposeIdVerificationSettings({
   field,
@@ -125,6 +126,7 @@ function ValueContainer({
           )}
         </Box>
       )}
+
       {Children.toArray(children).at(-1)}
     </components.ValueContainer>
   );
@@ -163,6 +165,7 @@ function useTypesOfDocuments() {
         }),
       },
     ],
+
     [intl.locale],
   );
 }
@@ -199,6 +202,7 @@ function useTypesOfVerification() {
         }),
       },
     ],
+
     [intl.locale],
   );
 }

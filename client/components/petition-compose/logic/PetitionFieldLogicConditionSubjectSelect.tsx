@@ -1,4 +1,4 @@
-import { Badge, Box, Flex, HStack, StackProps, Text } from "@chakra-ui/react";
+import { Badge, Box, Flex, HStack, StackProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
@@ -30,6 +30,7 @@ import Select, {
 import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
 import { usePetitionFieldLogicContext } from "./PetitionFieldLogicContext";
+import { Text } from "@parallel/components/ui";
 
 export function PetitionFieldLogicConditionSubjectSelect({
   value: condition,
@@ -49,6 +50,7 @@ export function PetitionFieldLogicConditionSubjectSelect({
       const options: ConditionSubjectSelectOption[] = [
         { type: "FIELD", field, fieldIndex, isChild: field.isChild },
       ];
+
       if (field.type === "DYNAMIC_SELECT") {
         const { labels } = field.options as FieldOptions["DYNAMIC_SELECT"];
         const columns = letters();
@@ -101,6 +103,7 @@ export function PetitionFieldLogicConditionSubjectSelect({
           options: fieldOptions,
         },
       ],
+
       value,
     };
   }, [fieldsWithIndices, condition]);
@@ -223,6 +226,7 @@ const ConditionSubjectItem = chakraForwardRef<
           marginStart={indent && option.isChild ? 2 : 0}
           isFixedWidth={false}
         />
+
         <Box
           fontSize="sm"
           flex="1"
@@ -256,6 +260,7 @@ const ConditionSubjectItem = chakraForwardRef<
           marginStart={indent ? (isChild ? 4 : 2) : 0}
           isFixedWidth={false}
         />
+
         <HighlightText
           as="div"
           search={highlight}

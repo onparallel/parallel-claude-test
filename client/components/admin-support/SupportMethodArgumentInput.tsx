@@ -5,7 +5,6 @@ import {
   NumberInput,
   NumberInputField,
   Switch,
-  Text,
   Textarea,
 } from "@chakra-ui/react";
 import { Select } from "@parallel/chakra/components";
@@ -18,6 +17,7 @@ import {
   IntrospectionType,
 } from "graphql";
 import { findNamedTypeRef } from "./helpers";
+import { Text } from "@parallel/components/ui";
 
 interface SupportMethodArgumentInputProps {
   arg: IntrospectionInputValue;
@@ -80,6 +80,7 @@ export function SupportMethodArgumentInput(props: SupportMethodArgumentInputProp
           <ScalarInput {...props} />
         </>
       );
+
     case "ENUM":
       return (
         <>
@@ -89,6 +90,7 @@ export function SupportMethodArgumentInput(props: SupportMethodArgumentInputProp
           <EnumInput {...props} />
         </>
       );
+
     case "INPUT_OBJECT":
       return (
         <>
@@ -98,6 +100,7 @@ export function SupportMethodArgumentInput(props: SupportMethodArgumentInputProp
           <ObjectInput {...props} />
         </>
       );
+
     default:
       console.error(`Can't build input of type ${type.kind}:`, props.arg);
       return <Input disabled isInvalid />;
@@ -120,6 +123,7 @@ function ScalarInput({ arg, value, isInvalid, onValue }: SupportMethodArgumentIn
           onChange={(e) => e.target.files && onValue(e.target.files[0])}
         />
       );
+
     case "Boolean":
       return (
         <Flex alignItems="center">
@@ -128,9 +132,11 @@ function ScalarInput({ arg, value, isInvalid, onValue }: SupportMethodArgumentIn
             isChecked={value}
             onChange={(event) => onValue(event.target.checked)}
           />
+
           <Text marginStart={2}>{arg.description}</Text>
         </Flex>
       );
+
     case "Int":
     case "Float":
       return (
@@ -143,6 +149,7 @@ function ScalarInput({ arg, value, isInvalid, onValue }: SupportMethodArgumentIn
           <NumberInputField placeholder={arg.description ?? ""} />
         </NumberInput>
       );
+
     default:
       return (
         <Input

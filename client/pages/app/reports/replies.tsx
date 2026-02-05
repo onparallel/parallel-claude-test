@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Center, Heading, HStack, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Center, Heading, HStack, Stack } from "@chakra-ui/react";
 import { CheckIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { NakedHelpCenterLink } from "@parallel/components/common/HelpCenterLink";
@@ -18,6 +18,7 @@ import { date, string, useQueryState } from "@parallel/utils/queryState";
 import { useTemplateRepliesReportTask } from "@parallel/utils/tasks/useTemplateRepliesReportTask";
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 const QUERY_STATE = {
   range: date().list({ maxItems: 2 }),
@@ -116,6 +117,7 @@ export function ReportsReplies() {
               setState((state) => ({ ...state, showDownload: false }));
             }}
           />
+
           <Button
             minWidth="fit-content"
             colorScheme="primary"

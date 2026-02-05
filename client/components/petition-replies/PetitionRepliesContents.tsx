@@ -1,15 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  BoxProps,
-  Button,
-  Center,
-  Flex,
-  LinkBox,
-  LinkOverlay,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Box, BoxProps, Button, Center, Flex, LinkBox, LinkOverlay, Stack } from "@chakra-ui/react";
 import { CommentIcon, EyeOffIcon } from "@parallel/chakra/icons";
 import {
   PetitionRepliesContents_PetitionFieldFragment,
@@ -28,6 +18,7 @@ import { Divider } from "../common/Divider";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { PetitionSignatureStatusIcon } from "../common/PetitionSignatureStatusIcon";
 import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
+import { Text } from "@parallel/components/ui";
 
 export interface PetitionRepliesContentsProps<
   T extends PetitionRepliesContents_PetitionFieldFragment,
@@ -296,6 +287,7 @@ export function PetitionRepliesContentsDivider({
         width="100%"
         borderStyle={isDashed ? "dashed" : "solid"}
       />
+
       <Text as="div" backgroundColor="white" paddingX={1} fontSize="xs" color="gray.500" zIndex="1">
         {children}
       </Text>

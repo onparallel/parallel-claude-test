@@ -9,7 +9,6 @@ import {
   HStack,
   IconButton,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { CloseIcon, PlusCircleFilledIcon } from "@parallel/chakra/icons";
 import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
@@ -26,6 +25,7 @@ import { useMemo } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 export function PetitionListTagFilter() {
   const { control, setValue, watch } = useFormContext<{
@@ -62,6 +62,7 @@ export function PetitionListTagFilter() {
           />
         </Text>
       )}
+
       {filters.length > 1 ? (
         <Flex justifyContent="flex-start">
           <Button
@@ -99,6 +100,7 @@ export function PetitionListTagFilter() {
             <FormattedMessage id="generic.add-filter" defaultMessage="Add filter" />
           </Button>
         )}
+
         <Spacer />
         <ButtonGroup spacing={2}>
           <Button size="sm" onClick={() => setValue("filter.filters", [])}>
@@ -178,6 +180,7 @@ export function PetitionListTagFilterLine({
         size="sm"
         onClick={onRemove}
       />
+
       <Controller
         control={control}
         name={`${path}.operator`}
@@ -197,6 +200,7 @@ export function PetitionListTagFilterLine({
           />
         )}
       />
+
       {operator !== "IS_EMPTY" ? (
         <Controller
           control={control}
@@ -211,6 +215,7 @@ export function PetitionListTagFilterLine({
                 maxItems={10}
                 onChange={(tags) => onChange(tags.map((tag) => tag.id))}
               />
+
               <FormErrorMessage>
                 {error?.type === "required" ? (
                   <FormattedMessage

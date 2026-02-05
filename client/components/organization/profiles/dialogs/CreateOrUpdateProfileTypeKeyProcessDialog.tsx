@@ -1,4 +1,4 @@
-import { Button, FormControl, FormErrorMessage, FormLabel, Stack, Text } from "@chakra-ui/react";
+import { Button, FormControl, FormErrorMessage, FormLabel, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { LocalizableUserTextInput } from "@parallel/components/common/LocalizableUserTextInput";
@@ -8,6 +8,7 @@ import { UserLocale } from "@parallel/graphql/__types";
 import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 interface CreateOrUpdateProfileTypeKeyProcessDialogProps {
   processName?: LocalizableUserText;
@@ -99,6 +100,7 @@ function CreateOrUpdateProfileTypeKeyProcessDialog({
                 />
               )}
             />
+
             <FormErrorMessage>
               <FormattedMessage
                 id="generic.field-required-error"
@@ -131,6 +133,7 @@ function CreateOrUpdateProfileTypeKeyProcessDialog({
                 />
               )}
             />
+
             <FormErrorMessage>
               <FormattedMessage
                 id="component.create-or-update-profile-type-key-process-dialog.templates-error-message"

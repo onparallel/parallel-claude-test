@@ -1,9 +1,10 @@
 import { gql } from "@apollo/client";
-import { Text } from "@chakra-ui/react";
+
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldReference_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 interface PetitionFieldReferenceProps {
   field: Maybe<PetitionFieldReference_PetitionFieldFragment> | undefined;

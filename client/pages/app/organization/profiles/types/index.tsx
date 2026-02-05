@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Center, Flex, Text } from "@chakra-ui/react";
+import { Center, Flex } from "@chakra-ui/react";
 import { ArchiveIcon, CopyIcon, DeleteIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
@@ -47,6 +47,7 @@ import {
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { MouseEvent, PropsWithChildren, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 const SORTING = ["name", "createdAt"] as const;
 
@@ -279,6 +280,7 @@ function CustomFooter({
         value: "true",
       },
     ],
+
     [],
   );
   return (
@@ -290,6 +292,7 @@ function CustomFooter({
         size="sm"
         variant="ghost"
       />
+
       {children}
     </>
   );
@@ -341,6 +344,7 @@ function useProfileTypesTableColumns(): TableColumn<
         ),
       },
     ],
+
     [intl.locale],
   );
 }
@@ -391,6 +395,7 @@ function useProfileTypesListActions({
           children: (
             <FormattedMessage id="component.profile-types-table.archive" defaultMessage="Archive" />
           ),
+
           colorScheme: "red",
         },
       ];

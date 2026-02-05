@@ -1,4 +1,4 @@
-import { Button, FormControl, FormErrorMessage, FormLabel, Stack, Text } from "@chakra-ui/react";
+import { Button, FormControl, FormErrorMessage, FormLabel, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
@@ -7,6 +7,7 @@ import { Maybe } from "@parallel/utils/types";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export interface RestrictPetitionDialogData {
   password: Maybe<string>;
@@ -71,6 +72,7 @@ export function RestrictPetitionDialog({ ...props }: DialogProps<{}, RestrictPet
                 validate: (value) => value === getValues().password,
               })}
             />
+
             <FormErrorMessage>
               <FormattedMessage
                 id="generic.passwords-must-match-error"

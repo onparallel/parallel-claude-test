@@ -16,7 +16,6 @@ import {
   Radio,
   RadioGroup,
   Stack,
-  Text,
   useCounter,
 } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
@@ -46,6 +45,7 @@ import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
 import { useDeleteWebhookSignatureKeysDialog } from "./ConfirmDeleteWebhookSignatureKeysDialog";
+import { Text } from "@parallel/components/ui";
 interface CreateOrUpdateProfileEventSubscriptionDialogProps {
   eventSubscription?: CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscriptionFragment;
   initialStep?: number;
@@ -260,6 +260,7 @@ export function CreateOrUpdateProfileEventSubscriptionDialog({
               defaultMessage="Signature keys"
             />
           )}
+
           <Text marginStart={2} color="gray.600" fontSize="md" fontWeight="400">
             {currentStep + 1}/2
           </Text>
@@ -291,6 +292,7 @@ export function CreateOrUpdateProfileEventSubscriptionDialog({
                   defaultMessage: "https://www.example.com",
                 })}
               />
+
               <FormErrorMessage>
                 {errors.eventsUrl?.type === "validate" || errors.eventsUrl?.type === "required" ? (
                   <FormattedMessage
@@ -396,6 +398,7 @@ export function CreateOrUpdateProfileEventSubscriptionDialog({
                             defaultMessage: "Search events...",
                           })}
                         />
+
                         <FormErrorMessage>
                           <FormattedMessage
                             id="component.create-event-subscription-dialog.invalid-event-types"
@@ -449,6 +452,7 @@ export function CreateOrUpdateProfileEventSubscriptionDialog({
                   id="component.create-event-subscription-dialog.ignore-owner-events"
                   defaultMessage="Ignore events produced by this user"
                 />
+
                 <HelpPopover>
                   <Text fontSize="sm">
                     <FormattedMessage
@@ -466,6 +470,7 @@ export function CreateOrUpdateProfileEventSubscriptionDialog({
                 id="component.create-event-subscription-dialog.signature-keys-explanation"
                 defaultMessage="You can validate the integrity and authenticity of the events you receive in your subscription by creating a signature key."
               />
+
               <HelpCenterLink marginStart={1} articleId={7035199}>
                 <FormattedMessage id="generic.learn-more" defaultMessage="Learn more" />
               </HelpCenterLink>

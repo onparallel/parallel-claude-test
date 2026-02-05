@@ -9,7 +9,6 @@ import {
   MenuItem,
   MenuList,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { BusinessIcon, SearchIcon, ShortSearchIcon, UserIcon } from "@parallel/chakra/icons";
 import {
@@ -52,6 +51,7 @@ import {
   ProfileFormFieldInputGroup,
   ProfileFormFieldInputGroupProps,
 } from "./ProfileFormFieldInputGroup";
+import { Text } from "@parallel/components/ui";
 
 interface ProfileFormFieldBackgroundCheckProps
   extends ProfileFormFieldProps,
@@ -455,6 +455,7 @@ export function ProfileFormFieldBackgroundCheck({
                           />
                         </MenuItem>
                       )}
+
                       {!isDisabled ? (
                         <>
                           <MenuDivider />
@@ -516,6 +517,7 @@ export function ProfileFormFieldBackgroundCheck({
             ) : null}
           </Stack>
         )}
+
         {showSuggestions && suggestions.length && !isDisabled ? (
           <HStack wrap="wrap" paddingX={2} width="100%">
             {suggestions}

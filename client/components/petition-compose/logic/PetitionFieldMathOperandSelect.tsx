@@ -1,4 +1,4 @@
-import { Badge, Box, Flex, HStack, StackProps, Text } from "@chakra-ui/react";
+import { Badge, Box, Flex, HStack, StackProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
@@ -21,14 +21,13 @@ import Select, {
 import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
 import { usePetitionFieldLogicContext } from "./PetitionFieldLogicContext";
+import { Text } from "@parallel/components/ui";
 
 export function PetitionFieldMathOperandSelect({
   value: operand,
   onChange,
   isReadOnly,
-}: ValueProps<PetitionFieldMathOperand, false> & {
-  isReadOnly?: boolean;
-}) {
+}: ValueProps<PetitionFieldMathOperand, false> & { isReadOnly?: boolean }) {
   const { fieldWithIndex } = usePetitionFieldLogicContext();
   const field = fieldWithIndex?.[0];
   const intl = useIntl();
@@ -106,6 +105,7 @@ export function PetitionFieldMathOperandSelect({
           options: fieldOptions,
         },
       ],
+
       value,
     };
   }, [fieldsWithIndices, operand]);
@@ -135,6 +135,7 @@ export function PetitionFieldMathOperandSelect({
       {...rsProps}
     />
   );
+
   const [numberValue, setNumberValue] = useState(value?.type === "NUMBER" ? value.value : 0);
 
   // If operand is ENUM, this component shouldn't be used (PetitionFieldMathEnumSelect should be used instead)
@@ -226,6 +227,7 @@ const MathOperandItem = chakraForwardRef<
           marginStart={indent && option.isChild ? 2 : 0}
           isFixedWidth={false}
         />
+
         <Box
           fontSize="sm"
           paddingEnd={0.5}

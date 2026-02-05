@@ -1,10 +1,11 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Alert, AlertDescription, AlertIcon, Button, Stack, Text } from "@chakra-ui/react";
+import { Alert, AlertDescription, AlertIcon, Button, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { useCloseProfile_closeProfileDocument } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export function useCloseProfile() {
   const showCloseProfileDialog = useCloseProfileDialog();
@@ -95,6 +96,7 @@ function CloseProfileDialog({
                     {profileName}
                   </Text>
                 ),
+
                 count: profileCount,
               }}
             />

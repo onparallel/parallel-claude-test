@@ -11,7 +11,6 @@ import {
   Heading,
   IconButton,
   Stack,
-  Text,
   ThemingProps,
 } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
@@ -52,6 +51,7 @@ import { Accordion } from "../ui";
 import { NoRepliesHintWithButton } from "./NoRepliesHintWithButton";
 import { PetitionRepliesFieldAction, PetitionRepliesFieldReply } from "./PetitionRepliesFieldReply";
 import { PetitionRepliesFilteredFields } from "./PetitionRepliesFilteredFields";
+import { Text } from "@parallel/components/ui";
 
 export interface PetitionRepliesFieldProps extends Omit<BoxProps, "filter"> {
   petition: PetitionRepliesField_PetitionFragment;
@@ -394,6 +394,7 @@ export const PetitionRepliesField = forwardRef<HTMLElement, PetitionRepliesField
                                     </Box>
                                   </Tooltip>
                                 )}
+
                                 <Heading
                                   fontSize="md"
                                   as="h4"

@@ -10,7 +10,6 @@ import {
   RadioGroup,
   RadioProps,
   Stack,
-  Text,
   useRadio,
   useRadioGroup,
 } from "@chakra-ui/react";
@@ -28,6 +27,7 @@ import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, pick } from "remeda";
 import { assert } from "ts-essentials";
+import { Text } from "@parallel/components/ui";
 
 export type ApproveOrRejectAction = "APPROVE" | "REJECT";
 
@@ -198,6 +198,7 @@ export function ApproveOrRejectPetitionApprovalFlowDialog({
                         }
                       }}
                     />
+
                     <Button
                       size="sm"
                       fontSize="md"

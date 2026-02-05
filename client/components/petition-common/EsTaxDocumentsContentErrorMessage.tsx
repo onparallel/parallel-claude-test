@@ -1,6 +1,6 @@
-import { Text } from "@chakra-ui/react";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 type ErrorReason =
   | "user_aborted"

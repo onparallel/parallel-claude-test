@@ -1,4 +1,4 @@
-import { HStack, IconProps, Image, Stack, Text } from "@chakra-ui/react";
+import { HStack, IconProps, Image, Stack } from "@chakra-ui/react";
 import { AlertCircleFilledIcon, CircleCheckFilledIcon } from "@parallel/chakra/icons";
 import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboardButton";
 import { FORMATS } from "@parallel/utils/dates";
@@ -8,6 +8,7 @@ import { isValid } from "date-fns";
 import { ReactNode, forwardRef } from "react";
 import { FormattedDate, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 export function PetitionRepliesMetadataDate({
   label,

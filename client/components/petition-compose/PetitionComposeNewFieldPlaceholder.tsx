@@ -1,9 +1,10 @@
-import { Center, HStack, Text } from "@chakra-ui/react";
+import { Center, HStack } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { generateCssStripe } from "@parallel/utils/css";
 import { AnimatePresence } from "framer-motion";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 interface PetitionComposeNewFieldPlaceholderProps {
   isGroupChild?: boolean;
   isTemplate?: boolean;

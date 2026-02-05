@@ -10,7 +10,6 @@ import {
   FormLabel,
   Input,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import {
   MapFieldsTable,
@@ -35,6 +34,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { groupBy, isNonNullish, isNullish, pick } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 type ImportRepliesDialogSteps = {
   LOADING: {
@@ -90,6 +90,7 @@ function ImportRepliesLoadingDialog({
             id="component.import-replies-dialog.title"
             defaultMessage="Import replies"
           />
+
           <Text marginStart={2} color="gray.600" fontSize="md" fontWeight="400">
             1/2
           </Text>
@@ -207,6 +208,7 @@ function ImportRepliesSelectSourceDialog({
             id="component.import-replies-dialog.title"
             defaultMessage="Import replies"
           />
+
           <Text marginStart={2} color="gray.600" fontSize="md" fontWeight="400">
             1/2
           </Text>
@@ -489,6 +491,7 @@ function ImportRepliesMappingDialog({
             id="component.import-replies-dialog.title"
             defaultMessage="Import replies"
           />
+
           <Text marginStart={2} color="gray.600" fontSize="md" fontWeight="400">
             2/2
           </Text>

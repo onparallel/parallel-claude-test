@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, GridItem, Heading, HStack, MenuItem, MenuList, Text } from "@chakra-ui/react";
+import { Box, Button, GridItem, Heading, HStack, MenuItem, MenuList } from "@chakra-ui/react";
 import { BellIcon, DocumentIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { CurrentSignatureRequestRow_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
 import { useSignatureCancelledRequestErrorMessage } from "@parallel/utils/useSignatureCancelledRequestErrorMessage";
@@ -17,6 +17,7 @@ import { useConfirmSendSignatureReminderDialog } from "./dialogs/ConfirmSendSign
 import { useSignatureReminderAlreadySentDialog } from "./dialogs/SignatureReminderAlreadySentDialog";
 import { PetitionSignatureRequestSignerStatusIcon } from "./PetitionSignatureRequestSignerStatusIcon";
 import { PetitionSignatureRequestStatusText } from "./PetitionSignatureRequestStatusText";
+import { Text } from "@parallel/components/ui";
 
 interface CurrentSignatureRequestRowProps {
   signatureRequest: CurrentSignatureRequestRow_PetitionSignatureRequestFragment;
@@ -153,6 +154,7 @@ export function CurrentSignatureRequestRow({
               onClick={handleConfirmSendSignatureReminders}
               isDisabled={isDisabled || status === "ENQUEUED"}
             />
+
             <Button
               width="24"
               colorScheme="red"

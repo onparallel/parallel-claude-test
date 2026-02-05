@@ -1,4 +1,4 @@
-import { Button, FormControl, Grid, HStack, Stack, Text } from "@chakra-ui/react";
+import { Button, FormControl, Grid, HStack, Stack } from "@chakra-ui/react";
 import { AssignIcon } from "@parallel/chakra/icons";
 import {
   localizableUserTextRender,
@@ -15,6 +15,7 @@ import { UnwrapArray } from "@parallel/utils/types";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, { components, OptionProps, SingleValueProps } from "react-select";
+import { Text } from "@parallel/components/ui";
 
 type SelectOptionValue = UnwrapArray<ProfileTypeFieldOptions<"SELECT">["values"]>;
 

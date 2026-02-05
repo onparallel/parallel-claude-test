@@ -1,5 +1,5 @@
-import { Link, Stack, Text } from "@chakra-ui/react";
-import { Input } from "@parallel/components/ui";
+import { Link, Stack } from "@chakra-ui/react";
+import { Input, Text } from "@parallel/components/ui";
 import { untranslated } from "@parallel/utils/untranslated";
 import { Meta, StoryObj } from "@storybook/react";
 
@@ -87,6 +87,7 @@ export const Basic: Story = {
               boxShadow: "0 0 0 1px pink.400",
             }}
           />
+
           <Input
             placeholder={untranslated("Green focus")}
             focusBorderColor="green.400"

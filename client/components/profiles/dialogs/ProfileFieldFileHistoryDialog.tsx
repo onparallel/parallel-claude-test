@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import { Badge, Center, Stack, Text } from "@chakra-ui/react";
+import { Badge, Center, Stack } from "@chakra-ui/react";
 import { HistoryIcon, RepeatIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
@@ -10,7 +10,7 @@ import { ProfilePropertyContent } from "@parallel/components/common/ProfilePrope
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { UserReference } from "@parallel/components/common/UserReference";
-import { HStack } from "@parallel/components/ui";
+import { HStack, Text } from "@parallel/components/ui";
 import {
   useProfileFieldFileHistoryDialog_profileTypeFieldFileHistoryDocument,
   useProfileFieldFileHistoryDialog_ProfileTypeFieldFileHistoryFragment,
@@ -218,6 +218,7 @@ function useProfileFieldFileHistoryDialogColumns({
         },
       },
     ],
+
     [intl.locale],
   );
 }

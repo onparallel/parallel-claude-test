@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Heading, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Heading, Stack } from "@chakra-ui/react";
 import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
@@ -7,6 +7,7 @@ import { DialogProps, useDialog } from "@parallel/components/common/dialogs/Dial
 import { SentReminderMessageDialog_PetitionReminderFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export interface SentReminderMessageDialogProps {
   reminder: SentReminderMessageDialog_PetitionReminderFragment;

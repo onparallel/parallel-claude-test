@@ -10,7 +10,6 @@ import {
   Flex,
   SimpleGrid,
   Spacer,
-  Text,
   useToast,
 } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
@@ -41,6 +40,7 @@ import Head from "next/head";
 import { useState } from "react";
 import { SubmitHandler } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 export type PublicPetitionLinkSteps = "INITIAL" | "EMAIL_SENT" | "EMAIL_EXISTS" | "REMINDER_SENT";
 
 interface HandleNewPublicPetitionProps {

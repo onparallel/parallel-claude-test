@@ -14,7 +14,6 @@ import {
   MenuItem,
   MenuList,
   Stack,
-  Text,
   useToast,
 } from "@chakra-ui/react";
 import {
@@ -117,6 +116,7 @@ import {
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDeepEqual, isNonNullish, isNullish, omit, pick, pickBy, unique } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 interface ProfilesTableContext {
   status: ProfileStatus[];
@@ -700,6 +700,7 @@ function CustomFooter({ status, setStatus, children }: PropsWithChildren<Profile
         value: "DELETION_SCHEDULED" as const,
       },
     ],
+
     [intl.locale],
   );
   const handleChange = useCallback(
@@ -724,6 +725,7 @@ function CustomFooter({ status, setStatus, children }: PropsWithChildren<Profile
         size="sm"
         variant="ghost"
       />
+
       {children}
     </>
   );
@@ -775,6 +777,7 @@ function useProfileListActions({
                 values={{ count: selectedCount }}
               />
             ),
+
             isDisabled: !canCloseOpen,
           },
           {
@@ -800,6 +803,7 @@ function useProfileListActions({
                 values={{ count: selectedCount }}
               />
             ),
+
             isDisabled: !canCloseOpen,
           },
           {
@@ -825,6 +829,7 @@ function useProfileListActions({
                 values={{ count: selectedCount }}
               />
             ),
+
             isDisabled: !canCloseOpen,
           },
           {
@@ -837,6 +842,7 @@ function useProfileListActions({
                 defaultMessage="Delete permanently"
               />
             ),
+
             colorScheme: "red",
             isDisabled: !canDeletePermanently,
           },
@@ -911,6 +917,7 @@ function ProfilesListHeader({
       // sort
       [removeTypenames(currentView.data.sort ?? DEFAULT_SORT), state.sort ?? DEFAULT_SORT],
     ];
+
     if (currentView.type !== "ALL") {
       // "ALL" view can only update columns and sort
       toCompare.push(
@@ -919,6 +926,7 @@ function ProfilesListHeader({
           pickBy(currentView.data.values ?? null, isNonNullish),
           pickBy(state.values ?? null, isNonNullish),
         ],
+
         [currentView.data.search ?? null, state.search ?? null],
       );
     }
@@ -980,12 +988,14 @@ function ProfilesListHeader({
             defaultMessage="Create new view"
           />
         ),
+
         confirm: (
           <FormattedMessage
             id="component.petition-list-header.save-as-new-view-confirm-button"
             defaultMessage="Create view"
           />
         ),
+
         modalProps: { finalFocusRef: saveViewRef },
       });
       const { data } = await createProfileListView({
@@ -1036,6 +1046,7 @@ function ProfilesListHeader({
           defaultMessage: "Reload",
         })}
       />
+
       <Box flex="0 1 400px">
         <SearchInput value={search ?? ""} onChange={handleSearchChange} />
       </Box>
@@ -1057,6 +1068,7 @@ function ProfilesListHeader({
           }));
         }}
       />
+
       {isAdvancedFilter ? (
         <>
           <Alert flex={0} rounded="md" status="info" paddingX={2} height="40px" paddingY={1}>
@@ -1091,6 +1103,7 @@ function ProfilesListHeader({
             defaultMessage: "Edit columns",
           })}
         />
+
         <SaveViewTabsMenu
           ref={saveViewRef}
           isViewDirty={isViewDirty}

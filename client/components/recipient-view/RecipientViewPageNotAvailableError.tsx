@@ -1,6 +1,6 @@
-import { Text } from "@chakra-ui/react";
 import { FormattedMessage } from "react-intl";
 import { ErrorPage } from "../public/ErrorPage";
+import { Text } from "@parallel/components/ui";
 
 export function RecipientViewPageNotAvailableError() {
   return (

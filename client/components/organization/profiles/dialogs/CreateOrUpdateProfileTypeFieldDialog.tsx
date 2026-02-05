@@ -19,7 +19,6 @@ import {
   Spinner,
   Stack,
   Switch,
-  Text,
 } from "@chakra-ui/react";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { LocalizableUserTextInput } from "@parallel/components/common/LocalizableUserTextInput";
@@ -76,6 +75,7 @@ import {
 import { ProfileFieldShortTextSettings } from "../settings/ProfileFieldShortTextSettings";
 import { ProfileFieldUserAssignmentSettings } from "../settings/ProfileFieldUserAssignmentSettings";
 import { useConfirmRemovedSelectOptionsReplacementDialog } from "./ConfirmRemovedSelectOptionsReplacementDialog";
+import { Text } from "@parallel/components/ui";
 
 export interface CreateOrUpdateProfileTypeFieldDialogProps {
   profileType: useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFragment;
@@ -342,6 +342,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
                             defaultMessage="There are some properties with expiration dates set. If you remove the expiration from this field, these dates will be removed. Would you like to continue?"
                           />
                         ),
+
                         confirmation: intl
                           .formatMessage({
                             id: "generic.confirm",
@@ -356,6 +357,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
                             />
                           </Button>
                         ),
+
                         confirm: (
                           <Button colorScheme="red" type="submit">
                             <FormattedMessage
@@ -397,6 +399,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
                             defaultMessage="Deactivate ongoing monitoring"
                           />
                         ),
+
                         description: (
                           <Text>
                             <FormattedMessage
@@ -408,6 +411,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
                             />
                           </Text>
                         ),
+
                         confirmation: intl.formatMessage({
                           id: "component.use-confirm-disable-monitoring-dialog.confirm",
                           defaultMessage: "confirm",
@@ -558,6 +562,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
                 />
               )}
             />
+
             <FormErrorMessage>
               <FormattedMessage
                 id="generic.field-required-error"
@@ -599,6 +604,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
                 />
               )}
             />
+
             <FormErrorMessage>
               <FormattedMessage
                 id="generic.field-required-error"
@@ -612,6 +618,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
                 id="component.create-or-update-property-dialog.unique-identifier"
                 defaultMessage="Unique identifier"
               />
+
               <HelpPopover>
                 <Text>
                   <FormattedMessage
@@ -634,6 +641,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
               })}
               maxLength={50}
             />
+
             <FormErrorMessage>
               {errors.alias?.type === "unavailable" ? (
                 <FormattedMessage
@@ -831,10 +839,7 @@ function ProfilesWithSameContentDialog({
   profileTypeId,
   profileTypeFieldId,
   ...props
-}: DialogProps<{
-  profileTypeId: string;
-  profileTypeFieldId: string;
-}>) {
+}: DialogProps<{ profileTypeId: string; profileTypeFieldId: string }>) {
   const intl = useIntl();
 
   const { data, loading } = useQuery(

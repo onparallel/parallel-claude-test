@@ -19,7 +19,6 @@ import {
   Table,
   Tbody,
   Td,
-  Text,
   Th,
   Thead,
   Tr,
@@ -63,6 +62,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { isNonNullish, times, zip } from "remeda";
 import { CreateOrUpdateProfileTypeFieldDialogFormData } from "../dialogs/CreateOrUpdateProfileTypeFieldDialog";
+import { Text } from "@parallel/components/ui";
 
 const DEFAULT_TAG_COLOR = "#E2E8F0";
 
@@ -215,6 +215,7 @@ export function ProfileFieldSelectSettings({
                   defaultMessage="This options of this property cannot be changed as it is currently referenced by the monitoring configuration of the following {count, plural, =1{property} other {properties}}:"
                   values={{ count: fields.length }}
                 />
+
                 <List paddingInlineStart={5} listStyleType="disc">
                   {referencedByFields.map((field) => (
                     <ListItem key={field.id} fontWeight="bold">
@@ -240,6 +241,7 @@ export function ProfileFieldSelectSettings({
                   defaultMessage="This options of this property cannot be changed as it is currently referenced by the auto search configuration of the following {count, plural, =1{property} other {properties}}:"
                   values={{ count: fields.length }}
                 />
+
                 <List paddingInlineStart={5} listStyleType="disc">
                   {referencedInAutoSearchConfig.map((field) => (
                     <ListItem key={field.id} fontWeight="bold">
@@ -335,6 +337,7 @@ export function ProfileFieldSelectSettings({
                       id="component.create-or-update-property-dialog.options-value-label"
                       defaultMessage="Internal value"
                     />
+
                     <HelpPopover position="relative" top="-1px">
                       <Text>
                         <FormattedMessage
@@ -627,6 +630,7 @@ function ProfileFieldSelectOption({
             />
           )}
         />
+
         <FormErrorMessage>
           <FormattedMessage
             id="generic.required-field-error"
@@ -657,6 +661,7 @@ function ProfileFieldSelectOption({
           onKeyDown={onKeyDownHandler("value")}
           maxLength={50}
         />
+
         <FormErrorMessage>
           {errors?.options?.values?.[index]?.value?.type === "isAvailable" ? (
             <FormattedMessage
@@ -780,6 +785,7 @@ async function generateValueLabelExcel(
         },
       },
     ],
+
     rows: zip(values, labels ?? times(values.length, () => null)).map(([value, label]) => ({
       value,
       label_es: label?.es ?? null,

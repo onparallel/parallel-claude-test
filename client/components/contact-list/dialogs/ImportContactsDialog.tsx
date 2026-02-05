@@ -10,7 +10,6 @@ import {
   ModalHeader,
   Spinner,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { AlertCircleIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
@@ -25,6 +24,7 @@ import { BaseDialog, DialogProps, useDialog } from "../../common/dialogs/DialogP
 import { Dropzone } from "../../common/Dropzone";
 import { FileSize } from "../../common/FileSize";
 import { NormalLink } from "../../common/Link";
+import { Text } from "@parallel/components/ui";
 
 const MAX_FILESIZE = 1024 * 1024 * 10;
 
@@ -47,6 +47,7 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
                   id="contacts.import-from-excel.import-error.details"
                   defaultMessage="We have detected an error in the following file rows:"
                 />
+
                 <Text as="b" marginStart={1.5}>
                   <FormattedList value={rows} />
                 </Text>
@@ -126,6 +127,7 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
             defaultMessage: "Close",
           })}
         />
+
         <ModalBody>
           <Text fontSize="sm" color="gray.600">
             <FormattedMessage
@@ -173,6 +175,7 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
               ) : null}
             </Text>
           )}
+
           <Box marginTop={4} marginBottom={2}>
             <NormalLink
               fontWeight="bold"
@@ -184,6 +187,7 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
                 id="contacts.import-from-excel.download-model"
                 defaultMessage="Download contact loading model"
               />
+
               <DownloadIcon marginStart={2} />
             </NormalLink>
           </Box>
@@ -213,6 +217,7 @@ function ImportErrorResolveDomainDialog({ emails, ...props }: DialogProps<{ emai
                 id="contacts.import-from-excel.import-error.details-domain"
                 defaultMessage="The following emails could not be validated:"
               />
+
               <Text as="b" marginStart={1.5}>
                 <FormattedList value={emails} />
               </Text>
@@ -225,6 +230,7 @@ function ImportErrorResolveDomainDialog({ emails, ...props }: DialogProps<{ emai
               />
             </Text>
           )}
+
           <Text>
             <FormattedMessage
               id="contacts.import-from-excel.import-error.body-domain"

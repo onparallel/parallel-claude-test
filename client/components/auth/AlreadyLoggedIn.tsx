@@ -1,9 +1,10 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Text } from "@chakra-ui/react";
+import { Box, Button } from "@chakra-ui/react";
 import { NormalLink } from "@parallel/components/common/Link";
 import { AlreadyLoggedIn_UserFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { UserAvatar } from "../common/UserAvatar";
+import { Text } from "@parallel/components/ui";
 
 interface AlreadyLoggedInProps {
   me: AlreadyLoggedIn_UserFragment;

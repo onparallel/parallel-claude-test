@@ -1,11 +1,12 @@
 import { gql } from "@apollo/client";
-import { Box, Button, GridItem, Heading, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, GridItem, Heading, Stack } from "@chakra-ui/react";
 import { TimeIcon } from "@parallel/chakra/icons";
 import { NewSignatureRequestRow_PetitionFragment } from "@parallel/graphql/__types";
 import { useStartSignatureRequest } from "@parallel/utils/useStartSignatureRequest";
 import { FormattedList, FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";
 import { SignerReference } from "../common/SignerReference";
+import { Text } from "@parallel/components/ui";
 
 interface NewSignatureRequestRowProps {
   petition: NewSignatureRequestRow_PetitionFragment;

@@ -1,8 +1,9 @@
-import { Center, HStack, Stack, Switch, Text } from "@chakra-ui/react";
+import { Center, HStack, Stack, Switch } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { ReactNode } from "react";
 import { Card } from "../common/Card";
 import { RestrictedFeaturePopover } from "../common/RestrictedFeaturePopover";
+import { Text } from "@parallel/components/ui";
 
 export interface IntegrationSwitchCardProps {
   logo: ReactNode | null;

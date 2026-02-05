@@ -10,7 +10,6 @@ import {
   HStack,
   Stack,
   Switch,
-  Text,
 } from "@chakra-ui/react";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import {
@@ -39,6 +38,7 @@ import {
   CreateOrUpdateProfileTypeFieldDialogFormData,
   useCreateOrUpdateProfileTypeFieldDialog,
 } from "../dialogs/CreateOrUpdateProfileTypeFieldDialog";
+import { Text } from "@parallel/components/ui";
 
 type FrequencyFixedOption =
   | "5_YEARS"
@@ -236,6 +236,7 @@ export function ProfileFieldMonitoringSettings({
         value: "VARIABLE",
       },
     ],
+
     [],
   );
 
@@ -272,6 +273,7 @@ export function ProfileFieldMonitoringSettings({
         ),
       })),
     ],
+
     [],
   );
 
@@ -323,6 +325,7 @@ export function ProfileFieldMonitoringSettings({
                     id="component.profile-field-monitoring-settings.activation-conditions-label"
                     defaultMessage="Add activation conditions"
                   />
+
                   <HelpPopover>
                     <FormattedMessage
                       id="component.profile-field-monitoring-settings.activation-conditions-help"

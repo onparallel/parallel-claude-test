@@ -1,8 +1,9 @@
 /** no-recipient */
-import { Badge, BoxProps, Placement, Text, TextProps, ThemingProps } from "@chakra-ui/react";
+import { Badge, BoxProps, Placement, TextProps, ThemingProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { FormattedMessage } from "react-intl";
 import { SmallPopover } from "./SmallPopover";
+import { Text } from "@parallel/components/ui";
 
 export interface NumberingBadgeProps extends ThemingProps<"Badge"> {
   placement?: Placement;

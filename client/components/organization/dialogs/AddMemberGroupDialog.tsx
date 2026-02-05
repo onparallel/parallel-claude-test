@@ -1,4 +1,4 @@
-import { Button, FormControl, FormLabel, Stack, Text } from "@chakra-ui/react";
+import { Button, FormControl, FormLabel, Stack } from "@chakra-ui/react";
 import { UserPlusIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
@@ -7,6 +7,7 @@ import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { useSearchUsers } from "../../../utils/useSearchUsers";
 import { UserSelect, UserSelectInstance, UserSelectSelection } from "../../common/UserSelect";
+import { Text } from "@parallel/components/ui";
 
 interface AddMemberGroupDialogData {
   users: UserSelectSelection[];

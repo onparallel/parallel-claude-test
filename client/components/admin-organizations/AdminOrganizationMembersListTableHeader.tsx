@@ -1,9 +1,10 @@
-import { Badge, Box, Button, HStack, Stack, Text } from "@chakra-ui/react";
+import { Badge, Box, Button, HStack, Stack } from "@chakra-ui/react";
 import { RepeatIcon } from "@parallel/chakra/icons";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
+import { Text } from "@parallel/components/ui";
 
 export interface AdminOrganizationMembersListTableHeaderProps {
   search: string | null;
@@ -42,6 +43,7 @@ export function AdminOrganizationMembersListTableHeader({
           defaultMessage: "Reload",
         })}
       />
+
       <Box flex="0 1 400px">
         <SearchInput value={search ?? ""} onChange={(e) => onSearchChange(e.target.value)} />
       </Box>

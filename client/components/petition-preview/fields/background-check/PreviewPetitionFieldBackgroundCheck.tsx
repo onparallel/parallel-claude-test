@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Center, Flex, HStack, List, Progress, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Center, Flex, HStack, List, Progress, Stack } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import {
   BusinessIcon,
@@ -36,6 +36,7 @@ import {
   RecipientViewPetitionFieldLayoutProps,
   RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
 } from "../../../recipient-view/fields/RecipientViewPetitionFieldLayout";
+import { Text } from "@parallel/components/ui";
 
 export interface PreviewPetitionFieldBackgroundCheckProps
   extends Omit<
@@ -336,6 +337,7 @@ export function PreviewPetitionFieldBackgroundCheck({
               borderRadius="full"
               width="100%"
             />
+
             <Button size="sm" fontWeight="normal" onClick={handleCancelClick}>
               <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
             </Button>
@@ -499,6 +501,7 @@ export function KYCResearchFieldReplyProfile({
               })
         }
       />
+
       {onRemove !== undefined ? (
         <IconButtonWithTooltip
           isDisabled={isDisabled || reply.status === "APPROVED"}

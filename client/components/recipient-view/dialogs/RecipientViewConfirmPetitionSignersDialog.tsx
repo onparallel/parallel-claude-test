@@ -9,7 +9,6 @@ import {
   HStack,
   OrderedList,
   Stack,
-  Text,
   UnorderedList,
 } from "@chakra-ui/react";
 import { PlusCircleFilledIcon, SignatureIcon } from "@parallel/chakra/icons";
@@ -35,6 +34,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
 import { useAddNewSignerDialog } from "./AddNewSignerDialog";
+import { Text } from "@parallel/components/ui";
 
 interface RecipientViewConfirmPetitionSignersDialogProps {
   keycode: string;
@@ -193,6 +193,7 @@ function RecipientViewConfirmPetitionSignersDialog({
                 )}
               </Text>
             )}
+
             {instructions ? (
               <Alert status="info" rounded="md" backgroundColor="gray.100">
                 <AlertIcon />
@@ -210,6 +211,7 @@ function RecipientViewConfirmPetitionSignersDialog({
                   />
                 </Text>
               )}
+
               <Controller
                 name="additionalSigners"
                 control={control}
@@ -270,6 +272,7 @@ function RecipientViewConfirmPetitionSignersDialog({
                                 defaultMessage="Add at least {count, plural, =1{# signer} other{# signers}}"
                                 values={{ count: minSigners - allSigners.length }}
                               />
+
                               {")"}
                             </Text>
                           ) : null}
@@ -339,6 +342,7 @@ function RecipientViewConfirmPetitionSignersDialog({
                 defaultMessage="We will send the document to the following contacts:"
               />
             )}
+
             <ListElement
               spacing={0}
               paddingY={1}

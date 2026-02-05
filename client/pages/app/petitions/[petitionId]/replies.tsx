@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Button, Flex, HStack, Stack, Text, useToast } from "@chakra-ui/react";
+import { Box, Button, Flex, HStack, Stack, useToast } from "@chakra-ui/react";
 import { VariablesOf } from "@graphql-typed-document-node/core";
 import {
   CheckIcon,
@@ -88,6 +88,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
+import { Text } from "@parallel/components/ui";
 type PetitionRepliesProps = UnwrapPromise<ReturnType<typeof PetitionReplies.getInitialProps>>;
 
 const GENERAL_COMMENTS_FIELD_ID = "general";
@@ -632,6 +633,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           })}
           isDisabled={isAnonymizedOrDeletionScheduled}
         />
+
         {petition.status === "CLOSED" ||
         myEffectivePermission === "READ" ||
         isAnonymizedOrDeletionScheduled ? null : (
@@ -646,6 +648,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             </Text>
           </Button>
         )}
+
         {me.hasProfilesAccess &&
         petition.status === "CLOSED" &&
         ((!petition.isAnonymized && myEffectivePermission !== "READ") ||

@@ -10,7 +10,6 @@ import {
   Image,
   Spinner,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { RepeatIcon, SparklesIcon } from "@parallel/chakra/icons";
 import {
@@ -28,6 +27,7 @@ import { MarkdownRender } from "../common/MarkdownRender";
 import { ScrollShadows } from "../common/ScrollShadows";
 import { SupportButton } from "../common/SupportButton";
 import { SupportLink } from "../common/SupportLink";
+import { Text } from "@parallel/components/ui";
 
 interface PetitionRepliesSummaryProps {
   petition: PetitionRepliesSummary_PetitionFragment;
@@ -99,6 +99,7 @@ export function PetitionRepliesSummary({ petition, user, onRefetch }: PetitionRe
             width="125px"
             src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/summary-ai.svg`}
           />
+
           <Heading size="md" textAlign="center">
             <FormattedMessage
               id="component.petition-replies-summary.no-summary-feature-heading"
@@ -147,6 +148,7 @@ export function PetitionRepliesSummary({ petition, user, onRefetch }: PetitionRe
               onClick={handleCopySummary}
               isDisabled={petition.isAnonymized}
             />
+
             <IconButtonWithTooltip
               size="sm"
               label={intl.formatMessage({

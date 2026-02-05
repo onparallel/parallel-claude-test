@@ -1,7 +1,8 @@
-import { Button, Image, Stack, Text } from "@chakra-ui/react";
+import { Button, Image, Stack } from "@chakra-ui/react";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { FormattedMessage } from "react-intl";
 import { Link, NakedLink } from "./Link";
+import { Text } from "@parallel/components/ui";
 
 interface UserDropdownEmptyProps {
   search: string;
@@ -25,6 +26,7 @@ export function UserDropdownEmpty({
             width="100%"
             src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/search/empty-search.svg`}
           />
+
           <Text as="strong">
             <FormattedMessage
               id="component.user-dropdown-empty.no-options"

@@ -7,7 +7,6 @@ import {
   PopoverTrigger,
   Portal,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { Popover } from "@parallel/chakra/components";
 import {
@@ -19,6 +18,7 @@ import {
   useRef,
 } from "react";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 interface ConfirmPopoverProps {
   description: ReactNode;
@@ -49,6 +49,7 @@ export function ConfimationPopover({
                         <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
                       </Button>
                     )}
+
                     {cloneElement(confirm, {
                       ...confirm.props,
                       onClick: (e: MouseEvent) => {

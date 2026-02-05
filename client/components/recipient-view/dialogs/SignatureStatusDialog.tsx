@@ -1,10 +1,11 @@
 import { gql } from "@apollo/client";
-import { Badge, Button, HStack, Stack, Text } from "@chakra-ui/react";
+import { Badge, Button, HStack, Stack } from "@chakra-ui/react";
 import { CircleCheckFilledIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { RecipientViewSignatureStatusDialog_PublicPetitionFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 function SignatureStatusDialog({
   petition,

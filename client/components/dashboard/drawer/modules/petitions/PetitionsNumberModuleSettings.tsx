@@ -1,6 +1,6 @@
-import { Text } from "@chakra-ui/react";
 import { FormattedMessage } from "react-intl";
 import { PetitionsModuleFilterEditor } from "../../components/PetitionsModuleFilterEditor";
+import { Text } from "@parallel/components/ui";
 
 export function PetitionsNumberModuleSettings({ isUpdating }: { isUpdating?: boolean }) {
   return (

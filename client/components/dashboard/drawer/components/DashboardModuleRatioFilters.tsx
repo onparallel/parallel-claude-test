@@ -1,6 +1,7 @@
-import { HStack, RadioProps, Text, useRadioGroup } from "@chakra-ui/react";
+import { HStack, RadioProps, useRadioGroup } from "@chakra-ui/react";
 import { FormattedMessage } from "react-intl";
 import { ModuleSettingsRadioButton } from "./ModuleSettingsRadioButton";
+import { Text } from "@parallel/components/ui";
 
 interface DashboardModuleRatioFiltersProps {
   value: "NUMERATOR" | "DENOMINATOR";

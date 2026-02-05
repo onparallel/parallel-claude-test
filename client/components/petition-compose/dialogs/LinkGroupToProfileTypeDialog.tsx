@@ -8,7 +8,6 @@ import {
   FormLabel,
   Input,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
@@ -20,6 +19,7 @@ import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { SelectInstance } from "react-select";
 import { isNonNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 function LinkGroupToProfileTypeDialog({
   defaultProfileTypeId,
@@ -104,6 +104,7 @@ function LinkGroupToProfileTypeDialog({
                 />
               )}
             />
+
             {hasLinkedFields ? (
               <Alert status="warning" marginTop={4} rounded="md">
                 <AlertIcon />
@@ -129,6 +130,7 @@ function LinkGroupToProfileTypeDialog({
                 id="component.link-group-to-profile-type-dialog.group-name"
                 defaultMessage="Group name"
               />
+
               <HelpPopover>
                 <Text fontSize="sm" marginBottom={2}>
                   <FormattedMessage
@@ -151,6 +153,7 @@ function LinkGroupToProfileTypeDialog({
                 defaultMessage: "E.g., Client",
               })}
             />
+
             <FormErrorMessage>
               <FormattedMessage
                 id="generic.field-required-error"

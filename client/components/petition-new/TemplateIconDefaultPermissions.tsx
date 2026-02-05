@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
-import { Flex, List, ListItem, PopoverProps, Stack, Text } from "@chakra-ui/react";
+import { Flex, List, ListItem, PopoverProps, Stack } from "@chakra-ui/react";
 import { ArrowShortRightIcon, UsersIcon } from "@parallel/chakra/icons";
+import { Text } from "@parallel/components/ui";
 import { TemplateIconDefaultPermissions_PetitionTemplateFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { SmallPopover } from "../common/SmallPopover";
@@ -56,7 +57,7 @@ export function TemplateIconDefaultPermissions({
                   <Flex key={p.id} as={ListItem} alignItems="center">
                     <UserAvatar size="xs" user={p.user} />
                     <Flex marginStart={2} direction="row" alignItems="center" gap={1}>
-                      <Text noOfLines={1} wordBreak="break-all">
+                      <Text lineClamp={1} wordBreak="break-all">
                         {p.user.fullName}
                       </Text>
                       <Text as="span" fontSize="xs" color="gray.600">
@@ -92,8 +93,9 @@ export function TemplateIconDefaultPermissions({
                       icon={<UsersIcon boxSize={3.5} />}
                       color="gray.800"
                     />
+
                     <Flex marginStart={2} direction="row" alignItems="center" gap={1}>
-                      <Text noOfLines={1} wordBreak="break-all">
+                      <Text lineClamp={1} wordBreak="break-all">
                         <UserGroupReference userGroup={p.group} />
                       </Text>
                       <Text as="span" fontSize="xs" color="gray.600">

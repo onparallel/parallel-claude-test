@@ -9,7 +9,6 @@ import {
   MenuList,
   Portal,
   Stack,
-  Text,
   useBreakpointValue,
   UsePopperProps,
 } from "@chakra-ui/react";
@@ -32,6 +31,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
 import { UserAvatar } from "../common/UserAvatar";
 import { Avatar } from "../ui";
+import { Text } from "@parallel/components/ui";
 
 export interface UserMenuProps extends UserMenu_QueryFragment {
   placement?: UsePopperProps["placement"];

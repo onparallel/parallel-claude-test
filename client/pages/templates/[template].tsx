@@ -10,7 +10,6 @@ import {
   ListItem,
   OrderedList,
   Stack,
-  Text,
   UnorderedList,
 } from "@chakra-ui/react";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -40,6 +39,7 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, zip } from "remeda";
 import { assert } from "ts-essentials";
+import { Text } from "@parallel/components/ui";
 
 function LandingTemplateDetails({
   template,
@@ -158,13 +158,13 @@ function LandingTemplateDetails({
                 </Text>
                 <HStack paddingTop={4}>
                   {/* <NakedLink href="/signup">
-                    <Button as="a" colorScheme="primary">
-                      <FormattedMessage
-                        id="public.try-for-free-button"
-                        defaultMessage="Try for free"
-                      />
-                    </Button>
-                  </NakedLink> */}
+                     <Button as="a" colorScheme="primary">
+                       <FormattedMessage
+                         id="public.try-for-free-button"
+                         defaultMessage="Try for free"
+                       />
+                     </Button>
+                    </NakedLink> */}
                   {template.publicLinkUrl ? (
                     <NakedLink href={template.publicLinkUrl}>
                       <Button as="a" variant="outline" target="_blank" onClick={handleClickPreview}>
@@ -272,6 +272,7 @@ function LandingTemplateDetails({
                   />
                 </Text>
               )}
+
               <Heading size="md" paddingTop={8} paddingBottom={4}>
                 <FormattedMessage
                   id="component.template-details-modal.fields-list"
@@ -306,6 +307,7 @@ function LandingTemplateDetails({
                           marginStart={4}
                           marginBottom={2}
                         />
+
                         {field.type === "FIELD_GROUP" && field.children?.length
                           ? zip(field.children!, childrenFieldIndices!).map(
                               ([field, fieldIndex]) => (

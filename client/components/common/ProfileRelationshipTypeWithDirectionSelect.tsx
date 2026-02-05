@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, IconButton, Text } from "@chakra-ui/react";
+import { Box, IconButton } from "@chakra-ui/react";
 import { RelationshipIcon } from "@parallel/chakra/icons";
 import { ProfileRelationshipTypeWithDirectionSelect_ProfileRelationshipTypeWithDirectionFragment } from "@parallel/graphql/__types";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
@@ -17,6 +17,7 @@ import { isNonNullish } from "remeda";
 import { HighlightText } from "./HighlightText";
 import { LocalizableUserTextRender, localizableUserTextRender } from "./LocalizableUserTextRender";
 import { OverflownText } from "./OverflownText";
+import { Text } from "@parallel/components/ui";
 
 export type ProfileRelationshipTypeWithDirectionSelectSelection =
   ProfileRelationshipTypeWithDirectionSelect_ProfileRelationshipTypeWithDirectionFragment;
@@ -132,6 +133,7 @@ function SingleValue(props: SingleValueProps<ProfileRelationshipTypeWithDirectio
             default={<></>}
           />
         )}
+
         {props.data.profileRelationshipType.isReciprocal ? null : (
           <>
             <Text as="span" display="inline-block" width={1} />

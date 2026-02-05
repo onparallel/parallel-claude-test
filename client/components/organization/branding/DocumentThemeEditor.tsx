@@ -14,7 +14,6 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
-  Text,
 } from "@chakra-ui/react";
 import { Select } from "@parallel/chakra/components";
 import { Card } from "@parallel/components/common/Card";
@@ -30,6 +29,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { isNonNullish, sort, zip } from "remeda";
 import fonts from "../../../utils/fonts.json";
+import { Text } from "@parallel/components/ui";
 
 interface DocumentThemeEditorProps {
   user: DocumentThemeEditor_UserFragment;

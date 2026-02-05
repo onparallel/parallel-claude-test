@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Text } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import { CircleCheckIcon } from "@parallel/chakra/icons";
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import {
@@ -25,6 +25,7 @@ import { isNonNullish } from "remeda";
 import { ProfileTypeFieldTypeIndicator } from "../organization/profiles/ProfileTypeFieldTypeIndicator";
 import { HStack } from "../ui";
 import { localizableUserTextRender } from "./LocalizableUserTextRender";
+import { Text } from "@parallel/components/ui";
 
 type ProfileTypeFieldSelection = ProfileTypeFieldSelect_ProfileTypeFieldFragment;
 

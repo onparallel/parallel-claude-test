@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { HStack, Stack, Text } from "@chakra-ui/react";
+import { HStack, Stack } from "@chakra-ui/react";
 import { CameraIcon } from "@parallel/chakra/icons";
 import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboardButton";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
@@ -16,6 +16,7 @@ import {
   PetitionRepliesMetadataText,
   ValidIcon,
 } from "./PetitionRepliesMetadata";
+import { Text } from "@parallel/components/ui";
 
 interface PetitionRepliesFieldIdVerificationReplyProps {
   reply: PetitionRepliesFieldIdVerificationReply_PetitionFieldReplyFragment;
@@ -128,6 +129,7 @@ function IDCardView({
           })}
           content={nationality ? (getCountryName(nationality) ?? nationality) : null}
         />
+
         <PetitionRepliesMetadataDate
           label={intl.formatMessage({
             id: "component.petition-replies-field-id-verification-reply.date-of-birth",
@@ -135,6 +137,7 @@ function IDCardView({
           })}
           date={metadata.inferred_data.birthDate}
         />
+
         <PetitionRepliesMetadataText
           label={intl.formatMessage({
             id: "component.petition-replies-field-id-verification-reply.birth-place",
@@ -206,6 +209,7 @@ function IDCardView({
           })}
           content={issuingCountry ? (getCountryName(issuingCountry) ?? issuingCountry) : null}
         />
+
         <PetitionRepliesMetadataDate
           label={intl.formatMessage({
             id: "component.petition-replies-field-id-verification-reply.date-of-issue",
@@ -213,6 +217,7 @@ function IDCardView({
           })}
           date={metadata.inferred_data.issueDate}
         />
+
         <PetitionRepliesMetadataDate
           label={intl.formatMessage({
             id: "component.petition-replies-field-id-verification-reply.expiry-date",

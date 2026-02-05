@@ -13,7 +13,6 @@ import {
   Input,
   RadioProps,
   Stack,
-  Text,
   useRadioGroup,
 } from "@chakra-ui/react";
 import { ScrollShadows } from "@parallel/components/common/ScrollShadows";
@@ -55,6 +54,7 @@ import {
   defaultDashboardModulePetitionFilter,
   defaultDashboardModuleProfileFilter,
 } from "./utils/moduleUtils";
+import { Text } from "@parallel/components/ui";
 
 export interface DashboardModuleFormData {
   name: string | null;
@@ -275,6 +275,7 @@ export function DashboardModuleForm({
                   defaultMessage: "Module name",
                 })}
               />
+
               <FormErrorMessage>
                 <FormattedMessage
                   id="generic.required-field-error"

@@ -1,7 +1,7 @@
-import { Text } from "@chakra-ui/react";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export function useConfirmModifyBackgroundCheckSearch() {
   const showDialog = useConfirmDeleteDialog();
@@ -16,6 +16,7 @@ export function useConfirmModifyBackgroundCheckSearch() {
           defaultMessage="Modify search"
         />
       ),
+
       description: (
         <Text>
           {hasMonitoring ? (
@@ -31,6 +32,7 @@ export function useConfirmModifyBackgroundCheckSearch() {
           )}
         </Text>
       ),
+
       confirmation: intl.formatMessage({
         id: "component.confirm-modify-search-dialog.confirm",
         defaultMessage: "continue",

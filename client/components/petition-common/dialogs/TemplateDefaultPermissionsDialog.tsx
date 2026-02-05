@@ -1,15 +1,6 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import {
-  Button,
-  Center,
-  Checkbox,
-  Flex,
-  FormControl,
-  Spinner,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Button, Center, Checkbox, Flex, FormControl, Spinner, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
@@ -35,6 +26,7 @@ import { FormattedMessage } from "react-intl";
 import { PetitionPermissionTypeSelect } from "../PetitionPermissionTypeSelect";
 import { TemplateDefaultUserGroupPermissionRow } from "./TemplateDefaultUserGroupPermissionRow";
 import { TemplateDefaultUserPermissionRow } from "./TemplateDefaultUserPermissionRow";
+import { Text } from "@parallel/components/ui";
 
 export interface TemplateDefaultPermissionsDialogProps {
   petitionId: string;
@@ -295,6 +287,7 @@ export function TemplateDefaultPermissionsDialog({
                 onRemove={() => ownerPermission && handleRemovePermission(ownerPermission.id)}
                 onChange={handleChangePermission}
               />
+
               {nonOwnerUserPermissions.map((permission, index) => (
                 <TemplateDefaultUserPermissionRow
                   key={index}

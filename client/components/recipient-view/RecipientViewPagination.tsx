@@ -1,4 +1,4 @@
-import { Box, BoxProps, IconButton, IconButtonProps, List, ListItem, Text } from "@chakra-ui/react";
+import { Box, BoxProps, IconButton, IconButtonProps, List, ListItem } from "@chakra-ui/react";
 import { ArrowBackIcon, ArrowForwardIcon, MoreIcon } from "@parallel/chakra/icons";
 import { useRouter } from "next/router";
 import { useMemo, useRef } from "react";
@@ -6,6 +6,7 @@ import { useIntl } from "react-intl";
 import { range } from "remeda";
 import { NakedLink } from "../common/Link";
 import { Spacer } from "../common/Spacer";
+import { Text } from "@parallel/components/ui";
 
 export interface RecipientViewPaginationProps extends BoxProps {
   currentPage: number;

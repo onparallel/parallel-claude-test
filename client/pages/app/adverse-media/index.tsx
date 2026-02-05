@@ -13,7 +13,6 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
-  Text,
   useToast,
 } from "@chakra-ui/react";
 import { SaveIcon, SparklesIcon, UserIcon } from "@parallel/chakra/icons";
@@ -42,6 +41,7 @@ import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "re
 import { Controller, FormProvider, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish, omitBy, uniqueBy } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 type AdverseMediaSearchProps = UnwrapPromise<ReturnType<typeof AdverseMediaSearch.getInitialProps>>;
 
@@ -429,6 +429,7 @@ function SearchInputWithSuggestions({
             ...defaultSuggestions,
             ...(alternativeSearchSuggestions?.adverseMediaAlternativeSearchSuggestions ?? []),
           ],
+
           (s) => s.term || s.wikiDataId || s.entityId,
         ),
       );

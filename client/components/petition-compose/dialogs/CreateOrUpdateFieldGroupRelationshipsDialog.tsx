@@ -1,15 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
-import {
-  Box,
-  Button,
-  FormControl,
-  FormErrorMessage,
-  Grid,
-  Heading,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Button, FormControl, FormErrorMessage, Grid, Heading, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { NoElement } from "@parallel/components/common/NoElement";
@@ -32,6 +23,7 @@ import { useCallback, useEffect } from "react";
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish, unique } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 export interface CreateOrUpdateFieldGroupRelationshipsDialogProps {
   isTemplate: boolean;
@@ -46,6 +38,7 @@ type PetitionFieldSelection = UnwrapArray<
     null | undefined
   >
 >;
+
 export interface PetitionFieldGroupRelationship {
   relationshipId: string | null;
   leftFieldGroup: PetitionFieldSelection | null;

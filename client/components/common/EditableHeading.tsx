@@ -3,7 +3,6 @@ import {
   EditableInput,
   EditablePreview,
   Heading,
-  Text,
   useEditableControls,
 } from "@chakra-ui/react";
 import { EditSimpleIcon } from "@parallel/chakra/icons";
@@ -11,6 +10,7 @@ import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWit
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 const EditableControls = ({ ...props }) => {
   const { isEditing, getEditButtonProps } = useEditableControls();
@@ -81,6 +81,7 @@ export function EditableHeading({ isDisabled, value, maxLength, onChange }: Edit
             width={inputWidth}
             maxLength={maxLength}
           />
+
           <EditableControls
             marginStart={1}
             background={"white"}

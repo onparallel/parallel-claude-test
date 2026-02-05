@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Button, Stack, Text } from "@chakra-ui/react";
+import { Button, Stack } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { useAskContactDetailsDialog } from "@parallel/components/common/dialogs/AskContactDetailsDialog";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
@@ -15,6 +15,7 @@ import { useCallback } from "react";
 import { FormattedMessage } from "react-intl";
 import { isApolloError } from "../apollo/isApolloError";
 import { useGenericErrorToast } from "../useGenericErrorToast";
+import { Text } from "@parallel/components/ui";
 
 export function useCreateContact() {
   const [createContact] = useMutation(useCreateContact_createContactDocument);

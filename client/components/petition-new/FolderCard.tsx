@@ -1,9 +1,10 @@
 import { gql } from "@apollo/client";
-import { Flex, HStack, Stack, Text, VisuallyHidden } from "@chakra-ui/react";
+import { Flex, HStack, Stack, VisuallyHidden } from "@chakra-ui/react";
 import { FolderIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
+import { Text } from "@parallel/components/ui";
 import { FolderCard_PetitionFolderFragment } from "@parallel/graphql/__types";
 import { useRoleButton } from "@parallel/utils/useRoleButton";
 import { FormattedMessage } from "react-intl";
@@ -38,7 +39,7 @@ export const FolderCard = chakraForwardRef<"div", FolderCardProps>(function Fold
           </VisuallyHidden>
           <FolderIcon fontSize="lg" role="presentation" marginTop={1} />
         </Flex>
-        <Text as="h2" fontSize="lg" noOfLines={2} fontWeight="bold">
+        <Text as="h2" fontSize="lg" lineClamp={2} fontWeight="bold">
           {folder.folderName}
         </Text>
       </HStack>

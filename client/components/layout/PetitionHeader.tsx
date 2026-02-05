@@ -17,7 +17,6 @@ import {
   MenuList,
   MenuOptionGroup,
   Stack,
-  Text,
   useToast,
 } from "@chakra-ui/react";
 import {
@@ -83,6 +82,7 @@ import { useConfirmReopenPetitionDialog } from "../petition-replies/dialogs/Conf
 import { HeaderNameEditable, HeaderNameEditableInstance } from "./HeaderNameEditable";
 import { PetitionHeaderTab } from "./PetitionHeaderTab";
 import { PetitionSection } from "./PetitionLayout";
+import { Text } from "@parallel/components/ui";
 
 export interface PetitionHeaderProps extends PetitionHeader_QueryFragment {
   petition: PetitionHeader_PetitionBaseFragment;
@@ -486,6 +486,7 @@ export const PetitionHeader = chakraForwardRef<"div", PetitionHeaderProps, Petit
                 <FormattedMessage id="generic.template" defaultMessage="Template" />
               </Badge>
             )}
+
             <Divider isVertical height={3.5} color="gray.500" />
             <PathName
               type={isPetition ? "PETITION" : "TEMPLATE"}
@@ -523,6 +524,7 @@ export const PetitionHeader = chakraForwardRef<"div", PetitionHeaderProps, Petit
                 </>
               )}
             />
+
             {me.hasProfilesAccess &&
             petition.__typename === "Petition" &&
             ((!petition.isAnonymized && myEffectivePermission.permissionType !== "READ") ||
@@ -645,6 +647,7 @@ export const PetitionHeader = chakraForwardRef<"div", PetitionHeaderProps, Petit
               ) : (
                 (actions ?? null)
               )}
+
               <Box>
                 <MoreOptionsMenuButton
                   ref={moreOptionsRef}
@@ -741,6 +744,7 @@ export const PetitionHeader = chakraForwardRef<"div", PetitionHeaderProps, Petit
                             />
                           </MenuItem>
                         )}
+
                         {isPetition ? (
                           <MenuItem
                             onClick={handleSaveAsTemplate}

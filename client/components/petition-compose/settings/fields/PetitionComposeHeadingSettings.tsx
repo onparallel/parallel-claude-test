@@ -1,10 +1,11 @@
 import { gql } from "@apollo/client";
-import { Text } from "@chakra-ui/react";
+
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { SettingsRowSwitch } from "../rows/SettingsRowSwitch";
+import { Text } from "@parallel/components/ui";
 
 export function PetitionComposeHeadingSettings({
   field,

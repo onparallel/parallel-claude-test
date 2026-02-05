@@ -1,4 +1,4 @@
-import { Box, Button, MenuItem, MenuList, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, MenuItem, MenuList, Stack } from "@chakra-ui/react";
 import { RepeatIcon, UploadIcon, UserPlusIcon } from "@parallel/chakra/icons";
 import { Focusable } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
@@ -9,6 +9,7 @@ import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
 import { ResponsiveButtonIcon } from "../common/ResponsiveButtonIcon";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
+import { Text } from "@parallel/components/ui";
 
 export interface ContactListHeaderProps {
   search: string | null;
@@ -53,6 +54,7 @@ export function ContactListHeader({
           defaultMessage: "Reload",
         })}
       />
+
       <Spacer />
       <Button
         data-action="import-contacts"
@@ -79,6 +81,7 @@ export function ContactListHeader({
           defaultMessage: "Create contact",
         })}
       />
+
       <MoreOptionsMenuButton
         ref={moreOptionsButtonRef}
         display={{ base: "block", md: "none" }}

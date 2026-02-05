@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Button, FormControl, FormErrorMessage, Input, Stack, Text } from "@chakra-ui/react";
+import { Button, FormControl, FormErrorMessage, Input, Stack } from "@chakra-ui/react";
 import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboardButton";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
@@ -9,6 +9,7 @@ import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterW
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export function GenerateNewTokenDialog(props: DialogProps) {
   const intl = useIntl();
@@ -85,6 +86,7 @@ export function GenerateNewTokenDialog(props: DialogProps) {
                   defaultMessage: "API token",
                 })}
               />
+
               <CopyToClipboardButton size="md" text={apiKey} />
             </Stack>
           </Stack>
@@ -114,6 +116,7 @@ export function GenerateNewTokenDialog(props: DialogProps) {
                   defaultMessage: "Token name",
                 })}
               />
+
               <FormErrorMessage>
                 {errors.tokenName?.type === "unavailable" ? (
                   <Text color="red.500" fontSize="sm">

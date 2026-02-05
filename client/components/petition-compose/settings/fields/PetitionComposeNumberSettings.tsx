@@ -13,7 +13,6 @@ import {
   NumberInputField,
   NumberInputStepper,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { Select } from "@parallel/chakra/components";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
@@ -25,6 +24,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { SettingsRowSwitch } from "../rows/SettingsRowSwitch";
+import { Text } from "@parallel/components/ui";
 
 export function PetitionComposeNumberSettings({
   field,
@@ -149,6 +149,7 @@ export function PetitionComposeNumberSettings({
             id="component.field-settings-number.limit-range"
             defaultMessage="Limit value range"
           />
+
           <HelpPopover>
             {
               <FormattedMessage

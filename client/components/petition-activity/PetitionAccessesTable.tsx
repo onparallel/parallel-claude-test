@@ -11,7 +11,6 @@ import {
   MenuList,
   Portal,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { Menu, Tooltip } from "@parallel/chakra/components";
 import {
@@ -40,6 +39,7 @@ import { DateTime } from "../common/DateTime";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NormalLink } from "../common/Link";
 import { Table, TableColumn } from "../common/Table";
+import { Text } from "@parallel/components/ui";
 
 export interface PetitionAccessesTable extends BoxProps {
   petition: PetitionAccessTable_PetitionFragment;
@@ -236,6 +236,7 @@ function usePetitionAccessesColumns(): TableColumn<
             ) : (
               <ContactReference contact={contact} />
             )}
+
             {remindersOptOut ? (
               <Tooltip
                 label={intl.formatMessage({
@@ -412,6 +413,7 @@ function usePetitionAccessesColumns(): TableColumn<
                     icon={<BellIcon fontSize="16px" />}
                     size="sm"
                   />
+
                   <IconButtonWithTooltip
                     isDisabled={
                       petition.status !== "PENDING" ||
@@ -430,6 +432,7 @@ function usePetitionAccessesColumns(): TableColumn<
                   />
                 </>
               )}
+
               <IconButtonWithTooltip
                 label={intl.formatMessage({
                   id: "component.petition-accesses-table.deactivate-access",
@@ -446,6 +449,7 @@ function usePetitionAccessesColumns(): TableColumn<
         },
       },
     ],
+
     [intl.locale],
   );
 }

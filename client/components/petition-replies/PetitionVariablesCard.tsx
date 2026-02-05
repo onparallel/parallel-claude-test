@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { HStack, Stack, Text } from "@chakra-ui/react";
+import { HStack, Stack } from "@chakra-ui/react";
 import { CalculatorIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
@@ -11,6 +11,7 @@ import { Card, CardHeader } from "../common/Card";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { VariableReference } from "../common/VariableReference";
 import { usePetitionComposeCalculationRulesDialog } from "../petition-compose/dialogs/PetitionComposeCalculationRulesDialog";
+import { Text } from "@parallel/components/ui";
 
 export interface PetitionSignaturesCardProps {
   petition: PetitionVariablesCard_PetitionBaseFragment;
@@ -72,6 +73,7 @@ export const PetitionVariablesCard = chakraForwardRef<"section", PetitionSignatu
                     size="xs"
                     onClick={() => handleViewCalculationRules({ name, type: variable.type })}
                   />
+
                   <VariableReference variable={variable} />
                   <Text as="span">=</Text>
                   <Text>

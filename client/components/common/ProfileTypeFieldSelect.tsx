@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Text } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import { ProfileTypeFieldSelect_ProfileTypeFieldFragment } from "@parallel/graphql/__types";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
@@ -29,6 +29,7 @@ import CreatableSelect from "react-select/creatable";
 import { isNonNullish } from "remeda";
 import { ProfileTypeFieldTypeIndicator } from "../organization/profiles/ProfileTypeFieldTypeIndicator";
 import { localizableUserTextRender } from "./LocalizableUserTextRender";
+import { Text } from "@parallel/components/ui";
 
 type ProfileTypeFieldSelection = ProfileTypeFieldSelect_ProfileTypeFieldFragment;
 
@@ -242,6 +243,7 @@ const ProfileTypeFieldSelectItem = memo(function ProfileTypeFieldSelectItem<
         fieldIndex={fieldIndex}
         isTooltipDisabled={isTooltipDisabled}
       />
+
       <Box
         fontSize={fontSize}
         marginStart={2}

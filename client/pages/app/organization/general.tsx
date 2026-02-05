@@ -12,7 +12,6 @@ import {
   Input,
   Spinner,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
 import { ContactSupportAlert } from "@parallel/components/common/ContactSupportAlert";
@@ -35,6 +34,7 @@ import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useRef } from "react";
 import { DropzoneRef, FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 const MAX_FILE_SIZE = 1024 * 1024;
 
 function OrganizationGeneral() {

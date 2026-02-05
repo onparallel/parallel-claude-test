@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Button, Stack, Text } from "@chakra-ui/react";
+import { Button, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { usePetitionShouldConfirmNavigation } from "@parallel/components/layout/PetitionLayout";
@@ -10,6 +10,7 @@ import { usePreventNavigation } from "@parallel/utils/usePreventNavigation";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { useCallback, useEffect, useRef } from "react";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export function ConfirmDiscardDraftDialog({ ...props }: DialogProps<{}, "KEEP" | "DISCARD">) {
   const keepRef = useRef<HTMLButtonElement>(null);

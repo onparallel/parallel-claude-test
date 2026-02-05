@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Text } from "@chakra-ui/react";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
+import { Text } from "@parallel/components/ui";
 import { usePermanentlyDeleteProfile_deleteProfileDocument } from "@parallel/graphql/__types";
 import { useCallback } from "react";
 import { FormattedMessage } from "react-intl";

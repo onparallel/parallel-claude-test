@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client";
-import { Alert, AlertDescription, AlertIcon, Button, HStack, Stack, Text } from "@chakra-ui/react";
+import { Alert, AlertDescription, AlertIcon, Button, HStack, Stack } from "@chakra-ui/react";
 import { AppSumoLicenseAlert_OrgLicenseFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { SupportButton } from "./SupportButton";
+import { Text } from "@parallel/components/ui";
 
 interface AppSumoLicenseAlertProps {
   license: AppSumoLicenseAlert_OrgLicenseFragment;

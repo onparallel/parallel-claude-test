@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Alert, AlertDescription, AlertIcon, Box, Button, Flex, Text } from "@chakra-ui/react";
+import { Alert, AlertDescription, AlertIcon, Box, Button, Flex } from "@chakra-ui/react";
 import { TimeIcon } from "@parallel/chakra/icons";
 import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
 import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
@@ -14,6 +14,7 @@ import {
 import { Maybe } from "@parallel/utils/types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 interface RecipientViewPetitionAlertsProps {
   tone: Tone;
@@ -269,6 +270,7 @@ function RecipientViewSignatureSentAlert({
                             </Text>
                           </ContactListPopover>
                         ),
+
                         name: totalSigners[0]!.fullName,
                         email: totalSigners[0]!.email,
                         count: totalSigners.length - 1,
@@ -292,6 +294,7 @@ function RecipientViewSignatureSentAlert({
                             </Text>
                           </ContactListPopover>
                         ),
+
                         name: totalSigners[0]!.fullName,
                         email: totalSigners[0]!.email,
                         count: totalSigners.length - 1,

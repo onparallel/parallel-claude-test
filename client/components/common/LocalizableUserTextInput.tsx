@@ -12,7 +12,6 @@ import {
   MenuList,
   Portal,
   Spacer,
-  Text,
   useFormControl,
   useTheme,
 } from "@chakra-ui/react";
@@ -28,6 +27,7 @@ import { ChangeEvent, Ref, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { LocalizableUserText } from "./LocalizableUserTextRender";
+import { Text } from "@parallel/components/ui";
 
 interface LocalizableUserTextInputProps extends ValueProps<LocalizableUserText, false> {
   inputRef?: Ref<HTMLInputElement>;
@@ -100,6 +100,7 @@ export const LocalizableUserTextInput = chakraForwardRef<"div", LocalizableUserT
           onChange={handleValueChange}
           {...(inputProps as any)}
         />
+
         <InputRightAddon
           as={LocaleSelect}
           paddingInline={3}
@@ -158,6 +159,7 @@ function LocaleSelect({ value, onChange, localizableUserText, ...props }: Locale
                 boxSize={6}
                 src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/countries/flags/${locale.flag}.png`}
               />
+
               <Text as="span">{locale.localizedLabel}</Text>
               <Spacer />
               {isNonNullish(localizableUserText[locale.key]) &&

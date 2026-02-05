@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import { Button, FormControl, FormHelperText, FormLabel, Stack, Text } from "@chakra-ui/react";
+import { Button, FormControl, FormHelperText, FormLabel, Stack } from "@chakra-ui/react";
 import { PetitionFieldSelect } from "@parallel/components/common/PetitionFieldSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
@@ -14,6 +14,7 @@ import { useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 interface ConfigureBackgroundCheckAutomateSearchDialogInput {
   petitionId: string;
@@ -136,6 +137,7 @@ export function ConfigureBackgroundCheckAutomateSearchDialog({
                 id="component.configure-automate-search-dialog.name-label"
                 defaultMessage="Name of person / entity"
               />
+
               <Text as="span" marginStart={1}>
                 *
               </Text>
@@ -161,6 +163,7 @@ export function ConfigureBackgroundCheckAutomateSearchDialog({
                 />
               )}
             />
+
             {!textFields.length ? (
               <FormHelperText>
                 <FormattedMessage
@@ -203,6 +206,7 @@ export function ConfigureBackgroundCheckAutomateSearchDialog({
                 />
               )}
             />
+
             {!dateFields.length ? (
               <FormHelperText>
                 <FormattedMessage
@@ -250,6 +254,7 @@ export function ConfigureBackgroundCheckAutomateSearchDialog({
                 />
               )}
             />
+
             {!countryFields.length ? (
               <FormHelperText>
                 <FormattedMessage
@@ -290,6 +295,7 @@ export function ConfigureBackgroundCheckAutomateSearchDialog({
                   />
                 )}
               />
+
               {!countryFields.length ? (
                 <FormHelperText>
                   <FormattedMessage

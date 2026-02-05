@@ -1,4 +1,4 @@
-import { Box, Text, useFormControl, useMultiStyleConfig } from "@chakra-ui/react";
+import { Box, useFormControl, useMultiStyleConfig } from "@chakra-ui/react";
 import { UserLocale } from "@parallel/graphql/__types";
 import {
   createMentionPlugin,
@@ -33,6 +33,7 @@ import { isNonNullish, omit, pick } from "remeda";
 import { Editor, Transforms } from "slate";
 import { EditableProps } from "slate-react/dist/components/editable";
 import { PlateWithEditorRef } from "./PlateWithEditorRef";
+import { Text } from "@parallel/components/ui";
 
 const components = {
   [ELEMENT_PARAGRAPH]: withProps(RenderElement, { as: "p" }),
@@ -135,6 +136,7 @@ export const CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProp
               ? [createMentionPlugin<CommentEditorValue, CommentPEditor>(intl.locale as UserLocale)]
               : []),
           ],
+
           {
             components,
             overrideByKey: {

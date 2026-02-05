@@ -13,7 +13,6 @@ import {
   Table,
   Tbody,
   Td,
-  Text,
   Th,
   Thead,
   Tr,
@@ -48,6 +47,7 @@ import { Controller, useForm } from "react-hook-form";
 import { FormattedDate, FormattedMessage } from "react-intl";
 import { entries, filter, flatMap, fromEntries, isNonNullish, isNullish, map, pipe } from "remeda";
 import { assert } from "ts-essentials";
+import { Text } from "@parallel/components/ui";
 
 type ResolveProfilePropertiesConflictsDialogSteps = {
   LOADING: {

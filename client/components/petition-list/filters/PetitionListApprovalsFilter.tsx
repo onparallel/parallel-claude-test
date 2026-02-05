@@ -8,7 +8,6 @@ import {
   HStack,
   IconButton,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { CloseIcon, PlusCircleFilledIcon } from "@parallel/chakra/icons";
 import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
@@ -26,6 +25,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
 import { useSearchUsers } from "../../../utils/useSearchUsers";
 import { UserSelect } from "../../common/UserSelect";
+import { Text } from "@parallel/components/ui";
 
 export function PetitionListApprovalsFilter() {
   const { control, setValue, watch } = useFormContext<{
@@ -71,6 +71,7 @@ export function PetitionListApprovalsFilter() {
           />
         </Text>
       )}
+
       {filters.length > 1 ? (
         <Flex justifyContent="flex-start">
           <Button
@@ -108,6 +109,7 @@ export function PetitionListApprovalsFilter() {
             <FormattedMessage id="generic.add-filter" defaultMessage="Add filter" />
           </Button>
         )}
+
         <Spacer />
         <ButtonGroup spacing={2}>
           <Button size="sm" onClick={() => setValue("filter.filters", [])}>
@@ -224,6 +226,7 @@ export function PetitionListApprovalsFilterLine({
         size="sm"
         onClick={onRemove}
       />
+
       <Controller
         control={control}
         name={`${path}.operator`}
@@ -259,6 +262,7 @@ export function PetitionListApprovalsFilterLine({
                   defaultMessage: "Select a status",
                 })}
               />
+
               <FormErrorMessage>
                 {error?.type === "required" ? (
                   <FormattedMessage
@@ -285,6 +289,7 @@ export function PetitionListApprovalsFilterLine({
                 onChange={(user) => onChange(user?.id ?? (null as any))}
                 onSearch={handleSearchUsers}
               />
+
               <FormErrorMessage>
                 {error?.type === "required" ? (
                   <FormattedMessage

@@ -1,9 +1,9 @@
-import { Text } from "@chakra-ui/react";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { DashboardModuleRatioFilters } from "../../components/DashboardModuleRatioFilters";
 import { PetitionsModuleFilterEditor } from "../../components/PetitionsModuleFilterEditor";
+import { Text } from "@parallel/components/ui";
 
 export function PetitionsRatioModuleSettings({ isUpdating }: { isUpdating?: boolean }) {
   const [selectedFilter, setSelectedFilter] = useState<"NUMERATOR" | "DENOMINATOR">("NUMERATOR");
@@ -22,6 +22,7 @@ export function PetitionsRatioModuleSettings({ isUpdating }: { isUpdating?: bool
           }
         }}
       />
+
       <PetitionsModuleFilterEditor
         key={selectedFilter}
         field={`settings.filters.${["NUMERATOR", "DENOMINATOR"].indexOf(selectedFilter)}`}

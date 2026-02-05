@@ -10,7 +10,6 @@ import {
   Image,
   Input,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { CloseIcon } from "@parallel/chakra/icons";
 import { fileSize } from "@parallel/components/common/FileSize";
@@ -18,6 +17,7 @@ import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { Maybe } from "@parallel/utils/types";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export interface PublicSignupFormOrganizationProps {
   onBack: () => void;
@@ -75,6 +75,7 @@ export function PublicSignupFormOrganization({
               id="component.public-signup-form-organization.company-name-label"
               defaultMessage="Company name*"
             />
+
             <HelpPopover>
               <FormattedMessage
                 id="component.public-signup-form-organization.company-name-description"
@@ -89,6 +90,7 @@ export function PublicSignupFormOrganization({
             value={organizationName}
             onChange={(e) => setOrganizationName(e.target.value)}
           />
+
           <FormErrorMessage>
             <FormattedMessage
               id="component.public-signup-form-organization.invalid-company-name-error"
@@ -147,6 +149,7 @@ function SelectLogoInput({
           id="component.public-signup-form-organization.organization-logo-label"
           defaultMessage="Logo"
         />
+
         <Text fontSize="sm" color="gray.600" fontWeight="normal">
           <FormattedMessage
             id="component.public-signup-form-organization.organization-logo-label-help"
@@ -167,6 +170,7 @@ function SelectLogoInput({
           onChange={(e) => handleFileChange(e.target.files)}
           accept=".png"
         />
+
         <Button
           size="sm"
           fontSize="md"
@@ -210,6 +214,7 @@ function SelectLogoInput({
           />
         </Text>
       )}
+
       {logo && (
         <Center
           paddingX={6}

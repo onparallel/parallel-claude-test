@@ -1,5 +1,6 @@
-import { Flex, HStack, Progress, Stack, Text, VisuallyHidden } from "@chakra-ui/react";
+import { Flex, HStack, Progress, Stack, VisuallyHidden } from "@chakra-ui/react";
 import { FormattedMessage, FormattedNumber } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export function UsageCard({
   title,

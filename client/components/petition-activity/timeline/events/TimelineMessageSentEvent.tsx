@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, Text } from "@chakra-ui/react";
+import { Box, Button, Flex } from "@chakra-ui/react";
 import { EmailSentIcon } from "@parallel/chakra/icons";
 import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -11,6 +11,7 @@ import { UserReference } from "../../../common/UserReference";
 import { useSentPetitionMessageDialog } from "../../dialogs/SentPetitionMessageDialog";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
+import { Text } from "@parallel/components/ui";
 
 export interface TimelineMessageSentEventProps {
   event: TimelineMessageSentEvent_MessageSentEventFragment;
@@ -77,6 +78,7 @@ export function TimelineMessageSentEvent({
                 ) : (
                   message.emailSubject
                 ),
+
                 contact: <ContactReference contact={message.access.contact} />,
                 timeAgo: (
                   <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />
@@ -99,6 +101,7 @@ export function TimelineMessageSentEvent({
                 ) : (
                   message.emailSubject
                 ),
+
                 contact: <ContactReference contact={message.access.contact} />,
                 timeAgo: (
                   <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />
@@ -106,6 +109,7 @@ export function TimelineMessageSentEvent({
               }}
             />
           )}
+
           <EmailEventsIndicator
             openedAt={message.openedAt}
             deliveredAt={message.deliveredAt}

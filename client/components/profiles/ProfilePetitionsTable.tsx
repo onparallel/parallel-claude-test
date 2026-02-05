@@ -10,7 +10,6 @@ import {
   MenuItem,
   MenuList,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { ChevronDownIcon, CloseIconSmall, LockClosedIcon } from "@parallel/chakra/icons";
 import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
@@ -51,6 +50,7 @@ import { useConfirmDisassociateProfileDialog } from "../petition-activity/dialog
 import { PetitionTemplateFilter } from "../petition-list/filters/PetitionTemplateFilter";
 import { useAssociateNewPetitionToProfileDialog } from "./dialogs/AssociateNewPetitionToProfileDialog";
 import { useAssociatePetitionToProfileDialog } from "./dialogs/AssociatePetitionToProfileDialog";
+import { Text } from "@parallel/components/ui";
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
@@ -302,6 +302,7 @@ function useProfilePetitionsActions({
           defaultMessage="Remove association"
         />
       ),
+
       colorScheme: "red",
     },
   ];
@@ -508,6 +509,7 @@ function useProfilePetitionsTableColumns(): TableColumn<
         },
       },
     ],
+
     [intl.locale],
   );
 }

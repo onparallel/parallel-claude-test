@@ -10,7 +10,6 @@ import {
   Grid,
   Input,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { EditIcon } from "@parallel/chakra/icons";
 import {
@@ -66,6 +65,7 @@ import { DialogProps, useDialog } from "./dialogs/DialogProvider";
 import { NoElement } from "./NoElement";
 import { Tag } from "./Tag";
 import { DEFAULT_COLORS, TagColorSelect } from "./TagColorSelect";
+import { Text } from "@parallel/components/ui";
 
 type TagSelection = TagSelect_TagFragment;
 
@@ -482,6 +482,7 @@ function useGetTagValues<IsMulti extends boolean = false>(
               .join(","),
       ...deps,
     ],
+
     isMulti ? [] : null,
   );
 }

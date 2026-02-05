@@ -1,11 +1,12 @@
 import { gql } from "@apollo/client";
-import { Text } from "@chakra-ui/react";
+
 import { Tooltip } from "@parallel/chakra/components";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { UserReference_UserFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 export const UserReference = chakraForwardRef<
   "span",

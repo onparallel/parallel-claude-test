@@ -1,9 +1,10 @@
-import { Button, Stack, Text } from "@chakra-ui/react";
+import { Button, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { usePreventNavigation } from "@parallel/utils/usePreventNavigation";
 import { useCallback, useRef } from "react";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export function ConfirmDiscardChangesDialog({ ...props }: DialogProps) {
   const cancelRef = useRef<HTMLButtonElement>(null);

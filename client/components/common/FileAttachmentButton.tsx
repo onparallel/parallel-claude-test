@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Button, Flex, Text } from "@chakra-ui/react";
+import { Button, Flex } from "@chakra-ui/react";
 import { DownloadIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { FileAttachmentButton_FileUploadFragment } from "@parallel/graphql/__types";
@@ -8,6 +8,7 @@ import { useIntl } from "react-intl";
 import { FileIcon } from "./FileIcon";
 import { FileName } from "./FileName";
 import { FileSize } from "./FileSize";
+import { Text } from "@parallel/components/ui";
 
 interface FileAttachmentButtonProps {
   file: FileAttachmentButton_FileUploadFragment;
@@ -43,6 +44,7 @@ export const FileAttachmentButton = chakraForwardRef<"button", FileAttachmentBut
             fontWeight="500"
             maxWidth="200px"
           />
+
           <Text as="span" fontSize="sm" color="gray.500" marginStart={1} whiteSpace="nowrap">
             (<FileSize value={file.size} />)
           </Text>

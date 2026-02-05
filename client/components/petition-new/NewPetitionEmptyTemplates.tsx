@@ -1,7 +1,8 @@
-import { Center, Stack, Text } from "@chakra-ui/react";
+import { Center, Stack } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { FormattedMessage } from "react-intl";
 import { EmptyTemplatesIcon } from "./icons/EmptyTemplatesIcon";
+import { Text } from "@parallel/components/ui";
 
 interface NewPetitionEmptyTemplatesProps {
   onClickPublicTemplates: () => void;
@@ -35,6 +36,7 @@ export const NewPetitionEmptyTemplates = chakraForwardRef<"div", NewPetitionEmpt
                     {chunks}
                   </Text>
                 ),
+
                 LinkPublic: (chunks: any) => (
                   <Text
                     as="strong"

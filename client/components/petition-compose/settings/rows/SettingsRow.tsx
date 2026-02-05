@@ -1,17 +1,10 @@
-import {
-  Center,
-  Flex,
-  FormControl,
-  FormControlProps,
-  FormLabel,
-  HStack,
-  Text,
-} from "@chakra-ui/react";
+import { Center, Flex, FormControl, FormControlProps, FormLabel, HStack } from "@chakra-ui/react";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { PaidBadge } from "@parallel/components/common/PaidBadge";
 import { PaidPopover } from "@parallel/components/common/PaidPopover";
 import { ReactNode } from "react";
 import { isNonNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 export interface SettingsRowProps extends Omit<FormControlProps, "label"> {
   label: ReactNode;

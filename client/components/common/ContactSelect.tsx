@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Text } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { AlertCircleFilledIcon, UserPlusIcon } from "@parallel/chakra/icons";
 import { ContactSelect_ContactFragment } from "@parallel/graphql/__types";
@@ -33,6 +33,7 @@ import AsyncCreatableSelect, { AsyncCreatableProps } from "react-select/async-cr
 import { isNonNullish, isNullish, pick, range, zip } from "remeda";
 import { DeletedContact } from "./DeletedContact";
 import { useErrorDialog } from "./dialogs/ErrorDialog";
+import { Text } from "@parallel/components/ui";
 
 export type ContactSelectSelection = ContactSelect_ContactFragment & {
   isInvalid?: boolean;

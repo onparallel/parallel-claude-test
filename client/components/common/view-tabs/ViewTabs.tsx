@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, MenuDivider, MenuItem, MenuList, Square, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, MenuDivider, MenuItem, MenuList, Square } from "@chakra-ui/react";
 import { CopyIcon, DeleteIcon, EditIcon, StarEmptyIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
@@ -13,6 +13,7 @@ import { isNonNullish } from "remeda";
 import { ConfirmDialog } from "../dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "../dialogs/DialogProvider";
 import { RadioTab, RadioTabList } from "../RadioTab";
+import { Text } from "@parallel/components/ui";
 
 const MIN_TAB_WIDTH = 96;
 
@@ -191,6 +192,7 @@ export function ViewTab({
             defaultMessage="Rename view"
           />
         ),
+
         confirm: <FormattedMessage id="generic.rename" defaultMessage="Rename" />,
         modalProps: { finalFocusRef: moreOptionsButtonRef },
       });
@@ -207,9 +209,11 @@ export function ViewTab({
         header: (
           <FormattedMessage id="component.view-tabs.clone-view" defaultMessage="Clone view" />
         ),
+
         confirm: (
           <FormattedMessage id="component.view-tabs.clone-view" defaultMessage="Clone view" />
         ),
+
         modalProps: { finalFocusRef: moreOptionsButtonRef },
       });
       onCloneView(view.id, name);

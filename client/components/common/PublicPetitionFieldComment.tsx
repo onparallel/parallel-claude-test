@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Circle, MenuItem, MenuList, Spacer, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Circle, MenuItem, MenuList, Spacer, Stack } from "@chakra-ui/react";
 import { PublicPetitionFieldComment_PublicPetitionFieldCommentFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { isMetaReturn } from "@parallel/utils/keys";
@@ -10,6 +10,7 @@ import { DateTime } from "./DateTime";
 import { GrowingTextarea } from "./GrowingTextarea";
 import { MoreOptionsMenuButton } from "./MoreOptionsMenuButton";
 import { PublicPetitionFieldCommentContent } from "./PublicPetitionFieldCommentContent";
+import { Text } from "@parallel/components/ui";
 
 export function PublicPetitionFieldComment({
   comment,
@@ -123,6 +124,7 @@ export function PublicPetitionFieldComment({
             onKeyDown={handleKeyDown as any}
             onChange={(e) => setContent(e.target.value)}
           />
+
           <Stack direction="row" justifyContent="flex-end" marginTop={2}>
             <Button size="sm" onClick={handleCancelClick}>
               <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />

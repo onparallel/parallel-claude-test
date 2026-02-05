@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Button, Stack, Text } from "@chakra-ui/react";
+import { Button, Stack } from "@chakra-ui/react";
 import {
   LocalizableUserText,
   LocalizableUserTextRender,
@@ -12,6 +12,7 @@ import {
   useArchiveProfileType_archiveProfileTypeDocument,
 } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export function useArchiveProfileType() {
   const [archiveProfileType] = useMutation(useArchiveProfileType_archiveProfileTypeDocument);

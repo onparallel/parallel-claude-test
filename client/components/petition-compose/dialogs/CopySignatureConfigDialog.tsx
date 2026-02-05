@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Button, Radio, RadioGroup, Stack, Text } from "@chakra-ui/react";
+import { Button, Radio, RadioGroup, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
@@ -8,6 +8,7 @@ import {
 } from "@parallel/graphql/__types";
 import { useState } from "react";
 import { FormattedList, FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export function CopySignatureConfigDialog({
   signers,
@@ -41,6 +42,7 @@ export function CopySignatureConfigDialog({
               ),
             }}
           />
+
           <Text>
             <FormattedMessage
               id="component.copy-signature-config-dialog.body-2"

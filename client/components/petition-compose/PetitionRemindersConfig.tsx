@@ -10,7 +10,6 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
-  Text,
 } from "@chakra-ui/react";
 import { RemindersConfig } from "@parallel/graphql/__types";
 import { assignRef } from "@parallel/utils/assignRef";
@@ -21,6 +20,7 @@ import { addDays, addWeeks, isWeekend, parse, startOfToday, startOfWeek } from "
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { DateTime } from "../common/DateTime";
+import { Text } from "@parallel/components/ui";
 
 export function PetitionRemindersConfig({
   value,
@@ -50,6 +50,7 @@ export function PetitionRemindersConfig({
     "11:30",
     "12:00",
   ];
+
   const randomIndex = Math.floor(Math.random() * possibleSendTimes.length);
   const sendTime = value?.time ?? possibleSendTimes[randomIndex];
 
@@ -108,6 +109,7 @@ export function PetitionRemindersConfig({
           </Checkbox>
         </Flex>
       )}
+
       {value && isActive ? (
         <Box
           as="form"
@@ -150,6 +152,7 @@ export function PetitionRemindersConfig({
                     </NumberInputStepper>
                   </NumberInput>
                 ),
+
                 "time-input": () => (
                   <Input
                     lineHeight="1"
@@ -162,6 +165,7 @@ export function PetitionRemindersConfig({
                     {...timeInput}
                   />
                 ),
+
                 "limit-input": () => (
                   <NumberInput
                     lineHeight="1"

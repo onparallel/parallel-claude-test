@@ -1,11 +1,12 @@
 import { gql } from "@apollo/client";
-import { Text } from "@chakra-ui/react";
+
 import { ProfilesRatioModuleSettings_ProfileTypeFragment } from "@parallel/graphql/__types";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { DashboardModuleRatioFilters } from "../../components/DashboardModuleRatioFilters";
 import { ProfilesModuleFilterEditor } from "../../components/ProfilesModuleFilterEditor";
+import { Text } from "@parallel/components/ui";
 
 export function ProfilesRatioModuleSettings({
   profileType,
@@ -34,6 +35,7 @@ export function ProfilesRatioModuleSettings({
           }
         }}
       />
+
       <ProfilesModuleFilterEditor
         key={selectedFilter}
         field={`settings.filters.${["NUMERATOR", "DENOMINATOR"].indexOf(selectedFilter)}`}

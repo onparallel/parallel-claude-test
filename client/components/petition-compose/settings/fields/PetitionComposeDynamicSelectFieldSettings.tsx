@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Center, Flex, List, ListItem, Progress, Stack, Text } from "@chakra-ui/react";
+import { Box, Center, Flex, List, ListItem, Progress, Stack } from "@chakra-ui/react";
 import { DeleteIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { Dropzone } from "@parallel/components/common/Dropzone";
@@ -23,6 +23,7 @@ import { FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { SettingsRow } from "../rows/SettingsRow";
+import { Text } from "@parallel/components/ui";
 
 export function PetitionComposeDynamicSelectFieldSettings({
   petition,
@@ -95,6 +96,7 @@ export function PetitionComposeDynamicSelectFieldSettings({
               isReadOnly={isReadOnly}
             />
           )}
+
           <NormalLink
             fontWeight="bold"
             href={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/documents/import_model_${
@@ -105,6 +107,7 @@ export function PetitionComposeDynamicSelectFieldSettings({
               id="component.petition-compose-dynamic-select-field-settings.import-from-excel-download-model"
               defaultMessage="Download option loading model"
             />
+
             <DownloadIcon marginStart={2} />
           </NormalLink>
         </Stack>
@@ -161,6 +164,7 @@ function UploadedFileData({
             />
           </Center>
         )}
+
         {file && (
           <Text fontSize="xs">
             <DateTime value={file.updatedAt} format={FORMATS.LLL} useRelativeTime />
@@ -178,6 +182,7 @@ function UploadedFileData({
         })}
         onClick={onDownload}
       />
+
       <IconButtonWithTooltip
         variant="ghost"
         isDisabled={!file || isReadOnly}
@@ -230,6 +235,7 @@ function DynamicSelectLoadedOptions({
           id="component.petition-compose-dynamic-select-field-settings.example"
           defaultMessage="For example:"
         />
+
         <List as="ol" listStyleType="upper-alpha" listStylePos="inside">
           {options.labels.map((label, index) => (
             <ListItem key={index}>
@@ -274,6 +280,7 @@ function DynamicSelectOptionsDropzone({
               defaultMessage="Import error"
             />
           ),
+
           message: (
             <FormattedMessage
               id="component.petition-compose-dynamic-select-field-settings.import-from-excel-error-dialog-body"

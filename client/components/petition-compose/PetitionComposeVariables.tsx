@@ -12,7 +12,6 @@ import {
   MenuList,
   Portal,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import {
@@ -55,12 +54,14 @@ import {
 } from "./dialogs/CreateOrUpdatePetitionVariableDialog";
 import { usePetitionComposeCalculationRulesDialog } from "./dialogs/PetitionComposeCalculationRulesDialog";
 import { useReferencedCalculationsDialog } from "./dialogs/ReferencedCalculationsDialog";
+import { Text } from "@parallel/components/ui";
 
 export interface PetitionComposeVariablesProps {
   allFieldsWithIndices: [
     field: PetitionComposeVariables_PetitionFieldFragment,
     fieldIndex: PetitionFieldIndex,
   ][];
+
   petition: PetitionComposeVariables_PetitionBaseFragment;
   isReadOnly: boolean;
 }
@@ -138,6 +139,7 @@ export function PetitionComposeVariables({
               </Text>
             </Stack>
           ),
+
           message: (
             <FormattedMessage
               id="page.petition-compose.variable-referenced-in-petition-attachments-visibility"
@@ -159,6 +161,7 @@ export function PetitionComposeVariables({
               </Text>
             </Stack>
           ),
+
           message: (
             <FormattedMessage
               id="page.petition-compose.variable-referenced-in-message"
@@ -209,6 +212,7 @@ export function PetitionComposeVariables({
                       fieldIndex={fieldIndex}
                       marginTop={1}
                     />
+
                     <OverflownText flex="1">
                       <PetitionFieldReference field={f} fontWeight="normal" />
                     </OverflownText>
@@ -246,6 +250,7 @@ export function PetitionComposeVariables({
       field: PetitionComposeVariables_PetitionFieldFragment,
       fieldIndex: string,
     ][],
+
     name: string,
   ) {
     await showReferencedCalculationsDialog({
@@ -387,6 +392,7 @@ export function PetitionComposeVariables({
                 })}
                 isDisabled={isReadOnly}
               />
+
               <Flex flex="1" alignContent="center" minWidth="0">
                 <VariableReference variable={variable} />
               </Flex>
@@ -403,6 +409,7 @@ export function PetitionComposeVariables({
                     handleViewCalculationRules({ name: variable.name, type: variable.type })
                   }
                 />
+
                 <IconButtonWithTooltip
                   variant="outline"
                   label={intl.formatMessage({
@@ -414,12 +421,14 @@ export function PetitionComposeVariables({
                   onClick={() => handleEditVariable(variable)}
                   isDisabled={isReadOnly}
                 />
+
                 <MoreLiquidVariablesButton name={variable.name} isDisabled={isReadOnly} />
               </HStack>
             </HStack>
           );
         })
       )}
+
       {isReadOnly ? null : (
         <Box paddingY={2}>
           <Button
@@ -552,6 +561,7 @@ const MoreLiquidVariablesButton = chakraForwardRef<"button", MoreLiquidVariables
           variant="outline"
           {...props}
         />
+
         <Portal>
           <MenuList width="min-content" minWidth="20rem">
             <Heading

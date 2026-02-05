@@ -11,7 +11,6 @@ import {
   IconButton,
   Input,
   Stack,
-  Text,
   ThemingProps,
 } from "@chakra-ui/react";
 import { CloseIcon, PlusCircleFilledIcon } from "@parallel/chakra/icons";
@@ -32,6 +31,7 @@ import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { UserSelect } from "@parallel/components/common/UserSelect";
 import { ProfileFormFieldCheckboxInner } from "@parallel/components/profiles/form-fields/ProfileFormFieldCheckbox";
 import { ProfileFormFieldSelectInner } from "@parallel/components/profiles/form-fields/ProfileFormFieldSelect";
+import { Text } from "@parallel/components/ui";
 import {
   FilterSharedWithLogicalOperator,
   ProfileValueFilterLine_ProfileTypeFieldFragment,

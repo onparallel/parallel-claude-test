@@ -1,4 +1,4 @@
-import { CircularProgress, Flex, IconButton, Text } from "@chakra-ui/react";
+import { CircularProgress, Flex, IconButton } from "@chakra-ui/react";
 import { CloseIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFiles";
@@ -10,6 +10,7 @@ import { isNonNullish } from "remeda";
 import { FileIcon } from "./FileIcon";
 import { FileName } from "./FileName";
 import { FileSize } from "./FileSize";
+import { Text } from "@parallel/components/ui";
 
 interface FileAttachmentProps {
   filename: string;
@@ -112,6 +113,7 @@ export const FileAttachment = chakraForwardRef<"div", FileAttachmentProps>(funct
                   )
           }
         />
+
         <Text as="span" fontSize="sm" color="gray.500" marginStart={1} whiteSpace="nowrap">
           (<FileSize value={size} />)
         </Text>

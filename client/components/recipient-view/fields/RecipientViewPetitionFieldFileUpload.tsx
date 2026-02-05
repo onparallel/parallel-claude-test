@@ -1,15 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  BoxProps,
-  Center,
-  Flex,
-  List,
-  ListItem,
-  Progress,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Box, BoxProps, Center, Flex, List, ListItem, Progress, Stack } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { CheckIcon, CloseIcon, DeleteIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -39,6 +29,7 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
+import { Text } from "@parallel/components/ui";
 
 export interface RecipientViewPetitionFieldFileUploadProps
   extends Omit<
@@ -444,6 +435,7 @@ function PetitionFieldFileUploadDropzone({
                   id="generic.dropzone-allowed-types"
                   defaultMessage="Only the following file types are allowed:"
                 />
+
                 <List paddingStart={4} textAlign="start">
                   {accepts?.map((type) => {
                     const option = fileUploadFormats.find((f) => f.value === type);

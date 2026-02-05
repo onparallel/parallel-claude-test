@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client";
-import { Text } from "@chakra-ui/react";
+
 import { SimpleSelect, useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { PetitionFieldMathEnumSelect_PetitionVariableEnumFragment } from "@parallel/graphql/__types";
 import { isNonNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 interface PetitionFieldMathEnumSelectProps {
   value: string;

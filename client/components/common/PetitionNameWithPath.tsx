@@ -1,9 +1,10 @@
 import { gql } from "@apollo/client";
-import { Text } from "@chakra-ui/react";
+
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionName_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 interface PetitionNameWithPathProps {
   petition: PetitionName_PetitionBaseFragment;

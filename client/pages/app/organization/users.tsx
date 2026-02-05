@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Badge, Center, Heading, Stack, Text, useToast } from "@chakra-ui/react";
+import { Badge, Center, Heading, Stack, useToast } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import {
   AlertCircleFilledIcon,
@@ -69,6 +69,7 @@ import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, sort } from "remeda";
+import { Text } from "@parallel/components/ui";
 const SORTING = ["fullName", "email", "createdAt", "lastActiveAt"] as const;
 
 const QUERY_STATE = {
@@ -708,6 +709,7 @@ function CustomFooter({
           ]
         : []),
     ],
+
     [hasUserProvisioning],
   );
   return (
@@ -720,6 +722,7 @@ function CustomFooter({
         variant="ghost"
         data-action="user-status-filter"
       />
+
       {children}
     </>
   );
@@ -839,6 +842,7 @@ function useOrganizationUsersTableColumns() {
                                 ) : (
                                   <UsersIcon marginEnd={1} marginBottom={0.5} />
                                 )}
+
                                 <LocalizableUserTextRender
                                   value={userGroup.localizableName}
                                   default={userGroup.name}
@@ -905,6 +909,7 @@ function useOrganizationUsersTableColumns() {
         ),
       },
     ],
+
     [intl.locale],
   );
 }

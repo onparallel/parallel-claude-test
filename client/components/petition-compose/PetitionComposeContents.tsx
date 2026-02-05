@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, LinkBox, LinkOverlay, Stack, Text } from "@chakra-ui/react";
+import { Box, Center, LinkBox, LinkOverlay, Stack } from "@chakra-ui/react";
 import { ProfilesIcon } from "@parallel/chakra/icons";
 import {
   PetitionComposeContents_PetitionFieldFragment,
@@ -17,6 +17,7 @@ import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { CopyLiquidReferenceButton } from "../petition-common/CopyLiquidReferenceButton";
 import { MoreLiquidReferencesButton } from "../petition-common/MoreLiquidReferencesButton";
 import { useAddAliasToFieldDialog } from "../petition-common/dialogs/AddAliasToFieldDialog";
+import { Text } from "@parallel/components/ui";
 
 export interface PetitionComposeContentsProps<
   T extends PetitionComposeContents_PetitionFieldFragment,
@@ -181,6 +182,7 @@ function _PetitionComposeContentsItem<T extends PetitionComposeContents_Petition
                 isDisabled={!field.alias && isReadOnly}
                 onAddAliasToField={handleAddAliasToField}
               />
+
               <MoreLiquidReferencesButton
                 className="alias-button"
                 field={field}
@@ -219,6 +221,7 @@ function PetitionComposeContentsDivider({
         width="100%"
         borderStyle={isDashed ? "dashed" : "solid"}
       />
+
       <Text as="div" backgroundColor="white" paddingX={1} fontSize="xs" color="gray.500" zIndex="1">
         {children}
       </Text>

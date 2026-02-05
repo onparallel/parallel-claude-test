@@ -13,7 +13,6 @@ import {
   InputRightAddon,
   InputRightElement,
   Stack,
-  Text,
   useToast,
 } from "@chakra-ui/react";
 import { Select } from "@parallel/chakra/components";
@@ -85,6 +84,7 @@ import { usePasswordRestrictPetitionDialog } from "./dialogs/UnrestrictPetitionD
 import { SettingsRow } from "./settings/rows/SettingsRow";
 import { SettingsRowButton } from "./settings/rows/SettingsRowButton";
 import { SettingsRowSwitch } from "./settings/rows/SettingsRowSwitch";
+import { Text } from "@parallel/components/ui";
 
 export interface PetitionSettingsProps {
   user: PetitionSettings_UserFragment;
@@ -505,6 +505,7 @@ function _PetitionSettings({
         controlId="restrict-editing"
         data-section="restrict-editing"
       />
+
       {petition.__typename === "PetitionTemplate" ? (
         <SettingsRowSwitch
           isDisabled={isDisabled}
@@ -620,6 +621,7 @@ function _PetitionSettings({
               path={petition.defaultPath}
               tooltipPlacement="bottom-start"
             />
+
             <IconButtonWithTooltip
               size="xs"
               fontSize="md"
@@ -670,6 +672,7 @@ function _PetitionSettings({
           </Box>
         </SettingsRow>
       )}
+
       <Divider />
       <SettingsRowSwitch
         isDisabled={isDisabled || petition.__typename === "Petition"}
@@ -876,6 +879,7 @@ function _PetitionSettings({
         }
         controlId="interaction-with-recipients"
       />
+
       {petition.isDocumentGenerationEnabled ? (
         <>
           {petition.__typename === "PetitionTemplate" ? (
@@ -1378,6 +1382,7 @@ function DeadlineInput({
         }}
         onClick={handleOpenDeadlineDialog}
       />
+
       {value ? (
         <InputRightElement>
           <CloseButton isClear onClick={() => onChange(null)} isDisabled={isDisabled} />

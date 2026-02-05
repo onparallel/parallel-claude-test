@@ -9,7 +9,6 @@ import {
   MenuItem,
   MenuList,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import {
   MediaIcon,
@@ -52,6 +51,7 @@ import {
   ProfileFormFieldInputGroup,
   ProfileFormFieldInputGroupProps,
 } from "./ProfileFormFieldInputGroup";
+import { Text } from "@parallel/components/ui";
 
 interface ProfileFormFieldAdverseMediaSearchProps
   extends ProfileFormFieldProps,
@@ -333,6 +333,7 @@ export function ProfileFormFieldAdverseMediaSearch({
                                   />
                                 </MenuItem>
                               )}
+
                               <MenuDivider />
                             </>
                           ) : null}
@@ -442,6 +443,7 @@ export function ProfileFormFieldAdverseMediaSearch({
             ) : null}
           </Stack>
         )}
+
         {showSuggestions && suggestions.length && !isDisabled ? (
           <HStack wrap="wrap" paddingX={2} width="100%">
             {suggestions}

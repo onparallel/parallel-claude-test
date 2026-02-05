@@ -1,9 +1,10 @@
-import { Badge, Button, HStack, Stack, Text } from "@chakra-ui/react";
+import { Badge, Button, HStack, Stack } from "@chakra-ui/react";
 import { TimeAlarmIcon } from "@parallel/chakra/icons";
 import { FormattedMessage, useIntl } from "react-intl";
 import { SupportButton } from "../SupportButton";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { DialogProps, useDialog } from "./DialogProvider";
+import { Text } from "@parallel/components/ui";
 
 function AlertsContactUsDialog({ ...props }: DialogProps<{}>) {
   const intl = useIntl();

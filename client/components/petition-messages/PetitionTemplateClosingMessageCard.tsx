@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Text } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { EmailIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
@@ -16,6 +16,7 @@ import { useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { Card, CardHeader } from "../common/Card";
 import { MessageClosingEmailEditor } from "../petition-common/MessageClosingEmailEditor";
+import { Text } from "@parallel/components/ui";
 
 interface PetitionTemplateClosingMessageCardProps {
   petition: PetitionTemplateClosingMessageCard_PetitionTemplateFragment;

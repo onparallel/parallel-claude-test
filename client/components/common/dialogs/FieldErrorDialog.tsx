@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, HStack, List, ListItem, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, HStack, List, ListItem, Stack } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import {
   ConfirmDialog,
@@ -13,6 +13,7 @@ import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { ReactNode, useRef } from "react";
 import { FormattedMessage } from "react-intl";
 import { OverflownText } from "../OverflownText";
+import { Text } from "@parallel/components/ui";
 
 export interface FieldErrorDialogProps
   extends Omit<ConfirmDialogProps<void>, "body" | "header" | "confirm">,
@@ -73,6 +74,7 @@ export function FieldErrorDialog({
                     isTooltipDisabled
                     flexShrink={0}
                   />
+
                   <OverflownText>
                     <PetitionFieldReference field={field} as="span" />
                   </OverflownText>

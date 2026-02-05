@@ -19,7 +19,6 @@ import {
   Table,
   Tbody,
   Td,
-  Text,
   Th,
   Thead,
   Tr,
@@ -68,6 +67,7 @@ import { PropsWithChildren, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { entries, fromEntries, isNonNullish, isTruthy, map, pipe } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 type ImportFromExternalSourceDialogResult = {
   profileId: string;

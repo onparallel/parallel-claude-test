@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client";
-import { Box, Heading, Stack, Text } from "@chakra-ui/react";
+import { Box, Heading, Stack } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { CloseableCardHeader } from "@parallel/components/common/Card";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
+import { Text } from "@parallel/components/ui";
 import {
   PetitionComposeFieldSettings_PetitionBaseFragment,
   PetitionComposeFieldSettings_PetitionFieldFragment,
@@ -153,7 +154,7 @@ export const PetitionComposeFieldSettings = chakraForwardRef<
   return (
     <Box ref={ref} display="flex" flexDirection="column" {...props}>
       <CloseableCardHeader onClose={onClose}>
-        <Text as="span" noOfLines={1} wordBreak="break-all">
+        <Text as="span" lineClamp={1} wordBreak="break-all">
           <Text as="span">{`${fieldIndex}. `}</Text>
           {field.title ? (
             <Text as="span">{field.title}</Text>
@@ -216,6 +217,7 @@ export const PetitionComposeFieldSettings = chakraForwardRef<
             isReadOnly={isReadOnly}
             user={user}
           />
+
           {canChangeMultiple ? (
             field.type === "FILE_UPLOAD" ? (
               <AllowMultipleFilesSettingsRow
@@ -302,6 +304,7 @@ export const PetitionComposeFieldSettings = chakraForwardRef<
               isRestricted={canOnlyBeInternal}
               onChange={handleFieldEdit}
             />
+
             {isFieldGroupChild || canOnlyBeInternal ? null : (
               <AllowCommentSettingsRow
                 isDisabled={isReadOnly || field.isInternal}
@@ -391,6 +394,7 @@ export const PetitionComposeFieldSettings = chakraForwardRef<
                   }
                   controlId="heading-show-numbering"
                 />
+
                 {field.options.showNumbering ? (
                   <SettingsRowAlias
                     field={field}

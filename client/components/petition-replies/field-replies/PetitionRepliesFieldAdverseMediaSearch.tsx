@@ -1,4 +1,4 @@
-import { Box, Center, Flex, HStack, Stack, Text } from "@chakra-ui/react";
+import { Box, Center, Flex, HStack, Stack } from "@chakra-ui/react";
 import { BookOpenIcon, ShortSearchIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import {
@@ -11,6 +11,7 @@ import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { EditReplyIconButton } from "../EditReplyIconButton";
+import { Text } from "@parallel/components/ui";
 
 interface AdverseMediaSearchArticle {
   id: string;

@@ -1,9 +1,10 @@
-import { Text, ThemingProps } from "@chakra-ui/react";
+import { ThemingProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { DateTimeFormatOptions } from "@parallel/utils/dates";
 import { useForceUpdate } from "@parallel/utils/useForceUpdate";
 import { useEffect } from "react";
 import { FormattedDate, FormattedMessage, FormattedRelativeTime, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export interface DateTimeProps extends ThemingProps<"Text"> {
   value: Date | string | number;

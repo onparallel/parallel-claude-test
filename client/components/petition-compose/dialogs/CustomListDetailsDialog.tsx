@@ -1,19 +1,15 @@
-import { Button, ListItem, Stack, Text, UnorderedList } from "@chakra-ui/react";
+import { Button, ListItem, Stack, UnorderedList } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { ScrollShadows } from "@parallel/components/common/ScrollShadows";
 import { useRef } from "react";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 function CustomListDetailsDialog({
   customList,
   ...props
-}: DialogProps<{
-  customList: {
-    name: string;
-    values: string[];
-  };
-}>) {
+}: DialogProps<{ customList: { name: string; values: string[] } }>) {
   const { name, values } = customList;
   const focusRef = useRef<HTMLButtonElement>(null);
   return (

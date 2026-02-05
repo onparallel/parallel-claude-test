@@ -7,13 +7,13 @@ import {
   FormLabel,
   Input,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { Select } from "@parallel/chakra/components";
 import { useMemo } from "react";
 import ReCaptcha from "react-google-recaptcha";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 interface PublicSignupFormExperienceData {
   industry: string | undefined;
@@ -144,6 +144,7 @@ export function PublicSignupFormExperience({
         value: "other",
       },
     ],
+
     [intl.locale],
   );
 
@@ -262,6 +263,7 @@ export function PublicSignupFormExperience({
         value: "other",
       },
     ],
+
     [intl.locale],
   );
 
@@ -376,6 +378,7 @@ export function PublicSignupFormExperience({
               />
             )}
           />
+
           <FormErrorMessage>
             <FormattedMessage
               id="component.public-signup-form-experience.captcha-error"

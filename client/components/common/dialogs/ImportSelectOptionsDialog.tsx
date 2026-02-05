@@ -7,7 +7,6 @@ import {
   ModalContent,
   ModalHeader,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { DownloadIcon } from "@parallel/chakra/icons";
 import { Dropzone } from "@parallel/components/common/Dropzone";
@@ -21,6 +20,7 @@ import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog"
 import { useState } from "react";
 import { FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 const MAX_FILESIZE = 1024 * 1024 * 10;
 
@@ -58,6 +58,7 @@ function ImportSelectOptionsDialog({
               defaultMessage="Import error"
             />
           ),
+
           message: (
             <Stack>
               <Text>
@@ -94,6 +95,7 @@ function ImportSelectOptionsDialog({
             defaultMessage: "Close",
           })}
         />
+
         <ModalBody>
           <Text fontSize="sm" color="gray.600">
             <FormattedMessage

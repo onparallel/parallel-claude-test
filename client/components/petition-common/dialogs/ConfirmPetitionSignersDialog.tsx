@@ -13,7 +13,6 @@ import {
   OrderedList,
   Progress,
   Stack,
-  Text,
   UnorderedList,
 } from "@chakra-ui/react";
 import { DeleteIcon, DownloadIcon, SignatureIcon } from "@parallel/chakra/icons";
@@ -57,6 +56,7 @@ import { isNonNullish, partition } from "remeda";
 import { SelectedSignerRow } from "../SelectedSignerRow";
 import { SuggestedSigners } from "../SuggestedSigners";
 import { useConfirmSignerInfoDialog } from "./ConfirmSignerInfoDialog";
+import { Text } from "@parallel/components/ui";
 
 interface ConfirmPetitionSignersDialogProps {
   signatureConfig: ConfirmPetitionSignersDialog_SignatureConfigFragment;
@@ -300,6 +300,7 @@ export function ConfirmPetitionSignersDialog(
                     signWithEmbeddedImageFileUploadId: s.signWithEmbeddedImageFileUploadId,
                   })),
                 ],
+
                 allowAdditionalSigners: props.isInteractionWithRecipientsEnabled
                   ? !isMaxSignersReached && allowAdditionalSigners
                   : false,
@@ -386,6 +387,7 @@ export function ConfirmPetitionSignersDialog(
                         defaultMessage: "Download file",
                       })}
                     />
+
                     <IconButtonWithTooltip
                       onClick={onRemoveCustomFile}
                       variant="ghost"
@@ -443,6 +445,7 @@ export function ConfirmPetitionSignersDialog(
                   ) : null}
                 </Text>
               )}
+
               <Text>{`2. ${intl.formatMessage({
                 id: "component.confirm-petition-signers-dialog.add-contacts-sign-document",
                 defaultMessage: "Add the contacts who need to sign the document",
@@ -522,6 +525,7 @@ export function ConfirmPetitionSignersDialog(
                         </Text>
                       </ListItem>
                     )}
+
                     {signers.map((signer, index) => (
                       <SelectedSignerRow
                         key={index}
@@ -564,6 +568,7 @@ export function ConfirmPetitionSignersDialog(
                         defaultMessage: "Add a contact to sign",
                       })}
                     />
+
                     {allSigners.length < minSigners ? (
                       <Text color={!!errors.signers ? "red.500" : undefined}>
                         <FormattedMessage
@@ -604,6 +609,7 @@ export function ConfirmPetitionSignersDialog(
                     id="component.confirm-petition-signers-dialog.allow-additional-signers-label"
                     defaultMessage="Allow recipients to add additional signers"
                   />
+
                   <HelpPopover>
                     <FormattedMessage
                       id="component.confirm-petition-signers-dialog.allow-additional-signers-help"

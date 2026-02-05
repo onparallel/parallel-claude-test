@@ -1,4 +1,4 @@
-import { Button, Checkbox, FormControl, FormLabel, Stack, Text } from "@chakra-ui/react";
+import { Button, Checkbox, FormControl, FormLabel, Stack } from "@chakra-ui/react";
 import { SimpleSelect, useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
@@ -6,6 +6,7 @@ import { AutomaticNumberingType } from "@parallel/graphql/__types";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 interface ConfigureAutomaticNumberingDialogProps {
   numberingType?: AutomaticNumberingType;
@@ -90,10 +91,10 @@ export function ConfigureAutomaticNumberingDialog({
             />
           </Text>
           {/* <HelpCenterLink articleId={ARTICLE_ID}>
-            <FormattedMessage
-              id="component.configure-automatic-numbering-dialog.more-about-numbering"
-              defaultMessage="More about numbering"
-            />
+           <FormattedMessage
+             id="component.configure-automatic-numbering-dialog.more-about-numbering"
+             defaultMessage="More about numbering"
+           />
           </HelpCenterLink> */}
           <FormControl>
             <FormLabel fontWeight={400}>

@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, HStack, Square, Stack, Text } from "@chakra-ui/react";
+import { Box, HStack, Square, Stack } from "@chakra-ui/react";
 import { CheckIcon, QuestionIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionProgressBar_PetitionFragment } from "@parallel/graphql/__types";
@@ -7,6 +7,7 @@ import { generateCssStripe } from "@parallel/utils/css";
 import { FormattedMessage } from "react-intl";
 import { ProgressIndicator, ProgressTrack } from "./Progress";
 import { SmallPopover } from "./SmallPopover";
+import { Text } from "@parallel/components/ui";
 
 interface PetitionProgressBarProps {
   petition: PetitionProgressBar_PetitionFragment;
@@ -106,6 +107,7 @@ export const PetitionProgressBar = chakraForwardRef<"div", PetitionProgressBarPr
               backgroundColor="green.400"
               {...STYLES["APPROVED"]}
             />
+
             <ProgressIndicator min={0} max={total!} value={replied!} {...STYLES["REPLIED"]} />
             <ProgressIndicator min={0} max={total!} value={optional!} {...STYLES["OPTIONAL"]} />
           </ProgressTrack>

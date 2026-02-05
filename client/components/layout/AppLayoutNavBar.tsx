@@ -21,7 +21,6 @@ import {
   Portal,
   Stack,
   StackProps,
-  Text,
   useBreakpointValue,
   useMenuItem,
 } from "@chakra-ui/react";
@@ -43,6 +42,7 @@ import {
   UserIcon,
   UsersIcon,
 } from "@parallel/chakra/icons";
+import { Text } from "@parallel/components/ui";
 import {
   AppLayoutNavBar_ProfileTypeFragment,
   AppLayoutNavBar_QueryFragment,
@@ -204,6 +204,7 @@ export function AppLayoutNavBar({ queryObject, onHelpCenterClick }: AppLayoutNav
           })}
           onClick={() => setIsOpenMobile(true)}
         />
+
         <Spacer />
         <NotificationsSectionMobile onHelpCenterClick={onHelpCenterClick} />
         <UserMenu placement={isMobile ? "bottom-end" : "right-end"} me={me} realMe={realMe} />
@@ -357,6 +358,7 @@ export function AppLayoutNavBar({ queryObject, onHelpCenterClick }: AppLayoutNav
                   me={me}
                   profileTypes={profileTypes}
                 />
+
                 <Spacer />
                 <NotificationsSection
                   display={{ base: "none", sm: "flex" }}
@@ -573,6 +575,7 @@ function SectionsAndProfilesList({
           ]
         : []),
     ],
+
     [intl.locale, pathname, query],
   );
 
@@ -686,6 +689,7 @@ function SectionsAndProfilesList({
                     defaultMessage: "View all profiles",
                   })}
                 />
+
                 <Portal>
                   <MenuList padding={0}>
                     <ScrollShadows
@@ -745,7 +749,7 @@ function SectionsAndProfilesList({
                 })
               ) : (
                 <ListItem className="show-on-expand">
-                  <Text textStyle="muted" fontSize="sm" noOfLines={1}>
+                  <Text textStyle="muted" fontSize="sm" lineClamp={1}>
                     <FormattedMessage
                       id="component.app-layout-nav-bar.no-profiles"
                       defaultMessage="No profiles"
@@ -1098,6 +1102,7 @@ function NotificationsSectionMobile({ onHelpCenterClick }: { onHelpCenterClick: 
         icon={<NewsIcon boxSize={5} />}
         data-canny-changelog
       />
+
       <IconButtonWithTooltip
         label={intl.formatMessage({
           id: "generic.help-center",

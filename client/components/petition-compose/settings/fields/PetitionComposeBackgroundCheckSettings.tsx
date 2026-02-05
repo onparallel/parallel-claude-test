@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, HStack, Text } from "@chakra-ui/react";
+import { Box, HStack } from "@chakra-ui/react";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { isDialogError } from "@parallel/components/common/dialogs/DialogProvider";
@@ -9,6 +9,7 @@ import { isNonNullish } from "remeda";
 import { useConfigureBackgroundCheckAutomateSearchDialog } from "../../dialogs/ConfigureBackgroundCheckAutomateSearchDialog";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { SettingsRowButton } from "../rows/SettingsRowButton";
+import { Text } from "@parallel/components/ui";
 
 export function PetitionComposeBackgroundCheckSettings({
   petition,

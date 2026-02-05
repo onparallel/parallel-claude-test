@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client";
-import { Text } from "@chakra-ui/react";
+
 import { ProfileSubscribers_UserFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { UserAvatarList } from "../common/UserAvatarList";
+import { Text } from "@parallel/components/ui";
 
 export function ProfileSubscribers({ users }: { users: ProfileSubscribers_UserFragment[] }) {
   if (!users?.length) {

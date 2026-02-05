@@ -8,7 +8,6 @@ import {
   FormLabel,
   Input,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
@@ -26,6 +25,7 @@ import { components, MultiValueGenericProps, NoticeProps, OptionProps } from "re
 import AsyncSelect from "react-select/async";
 import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
+import { Text } from "@parallel/components/ui";
 
 interface CreateFolderDialogProps {
   isTemplate: boolean;
@@ -188,6 +188,7 @@ function CreateFolderDialog({
                 />
               )}
             />
+
             <FormErrorMessage>
               <FormattedMessage
                 id="component.create-folder-dialog.no-petitions-selected-error"
@@ -290,9 +291,7 @@ function MultiValueLabel({
   children,
   ...props
 }: MultiValueGenericProps<CreateFolderDialog_PetitionBaseFragment> & {
-  selectProps: {
-    isTemplate: boolean;
-  };
+  selectProps: { isTemplate: boolean };
 }) {
   return (
     <components.MultiValueLabel {...props}>

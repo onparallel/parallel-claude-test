@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Divider, Flex, HStack, Heading, Stack, Text } from "@chakra-ui/react";
+import { Divider, Flex, HStack, Heading, Stack } from "@chakra-ui/react";
 import { EyeOffIcon, LockClosedIcon } from "@parallel/chakra/icons";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
@@ -32,6 +32,7 @@ import { UseFormReturn } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { filter, fromEntries, isNonNullish, map, partition, pipe } from "remeda";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
+import { Text } from "@parallel/components/ui";
 
 export interface ProfileFormInnerInstance {
   handleSubmit: (

@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Center, Flex, HStack, List, Progress, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Center, Flex, HStack, List, Progress, Stack } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import {
   BookOpenIcon,
@@ -34,6 +34,7 @@ import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, zip } from "remeda";
 import { useConfirmDeleteAdverseMediaSearchDialog } from "../../dialogs/ConfirmDeleteAdverseMediaSearchDialog";
+import { Text } from "@parallel/components/ui";
 
 export interface PreviewPetitionFieldAdverseMediaSearchProps
   extends Omit<
@@ -330,6 +331,7 @@ export function PreviewPetitionFieldAdverseMediaSearch({
               borderRadius="full"
               width="100%"
             />
+
             <Button size="sm" fontWeight="normal" onClick={handleCancelClick}>
               <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
             </Button>
@@ -468,6 +470,7 @@ export function AdverseMediaSearchReply({
           defaultMessage: "View details",
         })}
       />
+
       {onRemove !== undefined ? (
         <IconButtonWithTooltip
           isDisabled={isDisabled || reply.status === "APPROVED"}

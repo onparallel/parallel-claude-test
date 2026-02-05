@@ -1,4 +1,4 @@
-import { Box, Button, HStack, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, HStack, Stack } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { KeyboardEvent, useImperativeHandle, useRef, useState } from "react";
@@ -13,6 +13,7 @@ import {
   emptyCommentEditorValue,
   isEmptyCommentEditorValue,
 } from "../common/slate/CommentEditor";
+import { Text } from "@parallel/components/ui";
 
 interface PetitionCommentsAndNotesEditorProps
   extends Pick<CommentEditorProps, "defaultMentionables" | "onSearchMentionables"> {
@@ -121,6 +122,7 @@ export const PetitionCommentsAndNotesEditor = chakraForwardRef<
             id="component.petition-comments-and-notes-editor.notes"
             defaultMessage="Internal notes"
           />
+
           <HelpPopover>
             <FormattedMessage
               id="component.petition-comments-and-notes-editor.notes-description"
@@ -156,6 +158,7 @@ export const PetitionCommentsAndNotesEditor = chakraForwardRef<
             defaultMentionables={defaultMentionables}
             onSearchMentionables={onSearchMentionables}
           />
+
           <Text fontSize="sm" color="gray.600">
             <FormattedMessage
               id="component.petition-comments-and-notes-editor.ctrl-enter-help"

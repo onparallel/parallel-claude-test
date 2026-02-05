@@ -12,7 +12,6 @@ import {
   FormLabel,
   Spinner,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { FieldDateIcon } from "@parallel/chakra/icons";
 import { DateInput } from "@parallel/components/common/DateInput";
@@ -41,6 +40,7 @@ import { useEffect, useState } from "react";
 import { FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 type ConfigureExpirationsDateDialogSteps = {
   LOADING: {

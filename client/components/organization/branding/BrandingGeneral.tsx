@@ -17,7 +17,6 @@ import {
   Spinner,
   Stack,
   Switch,
-  Text,
 } from "@chakra-ui/react";
 import { Select } from "@parallel/chakra/components";
 import { Card } from "@parallel/components/common/Card";
@@ -49,6 +48,7 @@ import { sort } from "remeda";
 import fonts from "../../../utils/webSafeFonts.json";
 import { useAutoConfirmDiscardChangesDialog } from "../dialogs/ConfirmDiscardChangesDialog";
 import { BrandingGeneralPreview } from "./BrandingGeneralPreview";
+import { Text } from "@parallel/components/ui";
 
 interface BrandingGeneralProps {
   user: BrandingGeneral_UserFragment;
@@ -250,6 +250,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
                   id="component.branding-general.primary-color"
                   defaultMessage="Primary color"
                 />
+
                 <HelpPopover>
                   <FormattedMessage
                     id="component.branding-general.primary-color-help"
@@ -293,6 +294,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
                   id="component.branding-general.main-font"
                   defaultMessage="Main font"
                 />
+
                 <HelpPopover>
                   <FormattedMessage
                     id="component.branding-general.main-font-help"

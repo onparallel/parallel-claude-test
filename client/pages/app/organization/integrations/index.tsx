@@ -13,7 +13,6 @@ import {
   Image,
   Stack,
   Switch,
-  Text,
 } from "@chakra-ui/react";
 import { AlertCircleFilledIcon } from "@parallel/chakra/icons";
 import { RestrictedFeatureAlert } from "@parallel/components/common/RestrictedFeatureAlert";
@@ -44,6 +43,7 @@ import { isNonNullish } from "remeda";
 import { noop } from "ts-essentials";
 import { useDeactivateDowJonesIntegrationDialog } from "../../../../components/organization/integrations/dialogs/DeactivateDowJonesIntegrationDialog";
 import { useDowJonesIntegrationDialog } from "../../../../components/organization/integrations/dialogs/DowJonesIntegrationDialog";
+import { Text } from "@parallel/components/ui";
 
 function OrganizationIntegrations() {
   const intl = useIntl();
@@ -88,6 +88,7 @@ function OrganizationIntegrations() {
           maxWidth="124px"
         />
       ),
+
       badge: me.organization.signatureIntegrations.items.some(
         (i) => i.__typename === "SignatureOrgIntegration" && i.environment === "PRODUCTION",
       ) ? (
@@ -99,6 +100,7 @@ function OrganizationIntegrations() {
           <FormattedMessage id="generic.test-mode" defaultMessage="Test mode" />
         </Badge>
       ),
+
       title: "Signaturit",
       body: intl.formatMessage({
         id: "page.organization-integrations.signaturit-description",
@@ -115,6 +117,7 @@ function OrganizationIntegrations() {
           maxWidth="124px"
         />
       ),
+
       badge: me.organization.hasDocuSign ? (
         <Badge colorScheme="green">
           <FormattedMessage id="generic.activated" defaultMessage="Activated" />
@@ -136,6 +139,7 @@ function OrganizationIntegrations() {
           maxWidth="100px"
         />
       ),
+
       title: "Zapier",
       body: intl.formatMessage({
         id: "page.organization-integrations.zapier-description",
@@ -153,6 +157,7 @@ function OrganizationIntegrations() {
           maxWidth="124px"
         />
       ),
+
       title: intl.formatMessage({
         id: "page.organization-integrations.open-sanctions-title",
         defaultMessage: "OpenSanctions",
@@ -219,6 +224,7 @@ function OrganizationIntegrations() {
           />
         </Text>
       ),
+
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/logos/dow-jones.png`}
@@ -226,6 +232,7 @@ function OrganizationIntegrations() {
           maxWidth="124px"
         />
       ),
+
       badge: hasDownJones ? (
         hasErrorDownJones ? (
           <SmallPopover
@@ -284,6 +291,7 @@ function OrganizationIntegrations() {
           />
         </Text>
       ),
+
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/logos/einforma.png`}
@@ -291,6 +299,7 @@ function OrganizationIntegrations() {
           maxWidth="124px"
         />
       ),
+
       title: untranslated("eInforma"),
       body: intl.formatMessage({
         id: "page.organization-integrations.einforma-description",
@@ -325,6 +334,7 @@ function OrganizationIntegrations() {
           />
         </Text>
       ),
+
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/logos/bankflip.png`}
@@ -332,6 +342,7 @@ function OrganizationIntegrations() {
           maxWidth="124px"
         />
       ),
+
       title: intl.formatMessage({
         id: "generic.petition-field-type-id-verification",
         defaultMessage: "ID Verification",
@@ -356,6 +367,7 @@ function OrganizationIntegrations() {
           maxWidth="124px"
         />
       ),
+
       title: intl.formatMessage({
         id: "page.organization-integrations.parallel-api-title",
         defaultMessage: "Parallel API",

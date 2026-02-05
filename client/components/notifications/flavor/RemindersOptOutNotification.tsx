@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Circle, Text } from "@chakra-ui/react";
+import { Circle } from "@chakra-ui/react";
 import { BellOffIcon } from "@parallel/chakra/icons";
 import { ContactReference } from "@parallel/components/common/ContactReference";
 import { RemindersOptOutNotification_RemindersOptOutNotificationFragment } from "@parallel/graphql/__types";
@@ -10,6 +10,7 @@ import {
 import { forwardRef } from "react";
 import { FormattedMessage } from "react-intl";
 import { PetitionUserNotification } from "./PetitionUserNotification";
+import { Text } from "@parallel/components/ui";
 
 export interface RemindersOptOutNotificationProps {
   isFirst?: boolean;

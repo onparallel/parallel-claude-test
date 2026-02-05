@@ -7,7 +7,6 @@ import {
   Flex,
   ListItem,
   Stack,
-  Text,
   UnorderedList,
 } from "@chakra-ui/react";
 import { ContactReference } from "@parallel/components/common/ContactReference";
@@ -21,6 +20,7 @@ import {
 import { Maybe } from "@parallel/utils/types";
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export interface ConfigureRemindersDialogProps {
   accesses: useConfigureRemindersDialog_PetitionAccessFragment[];

@@ -11,7 +11,6 @@ import {
   Image,
   Spinner,
   Stack,
-  Text,
   useDisclosure,
 } from "@chakra-ui/react";
 import {
@@ -77,6 +76,7 @@ import { memo, RefObject, useCallback, useEffect, useMemo, useRef, useState } fr
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { noop } from "ts-essentials";
+import { Text } from "@parallel/components/ui";
 
 const POLL_INTERVAL_REFRESHING = 1_500;
 const POLL_INTERVAL = 30_000;
@@ -394,6 +394,7 @@ function Home() {
                 onDeleteModule={handleDeleteModule}
                 isReadOnly={dashboard.myEffectivePermission === "READ"}
               />
+
               {isEditing && isNonNullish(dashboard) ? (
                 <Box>
                   <Button
@@ -418,6 +419,7 @@ function Home() {
                 width="100%"
                 src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/dashboard/dashboard-empty-state.svg`}
               />
+
               <Text>
                 <FormattedMessage
                   id="page.home.dashboard-empty-state-description"

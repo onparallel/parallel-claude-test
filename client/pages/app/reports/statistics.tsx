@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Heading, HStack, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Heading, HStack, Stack } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { NakedHelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { PetitionSelect } from "@parallel/components/common/PetitionSelect";
@@ -23,6 +23,7 @@ import { Maybe } from "@parallel/utils/types";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
+import { Text } from "@parallel/components/ui";
 
 export interface ReportTypeStatistics {
   from_template_id: string;
@@ -207,6 +208,7 @@ export function ReportsTemplates() {
             onChange={handleDateRangeChange}
             isDisabled={status === "LOADING"}
           />
+
           <Button
             minWidth="fit-content"
             colorScheme="primary"
@@ -225,12 +227,14 @@ export function ReportsTemplates() {
               templateId={activeTemplateId!}
               templateName={templateName}
             />
+
             <ReportsStatisticsConversion
               report={report}
               range={activeRange}
               templateId={activeTemplateId!}
               templateName={templateName}
             />
+
             <ReportsStatisticsTime
               report={report}
               range={activeRange}

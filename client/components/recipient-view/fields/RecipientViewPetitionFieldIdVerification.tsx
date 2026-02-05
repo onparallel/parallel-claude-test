@@ -1,4 +1,4 @@
-import { Box, Button, Center, Flex, HStack, Progress, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Center, Flex, HStack, Progress, Stack } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import {
   AlertCircleIcon,
@@ -25,6 +25,7 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
   RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
+import { Text } from "@parallel/components/ui";
 
 export interface RecipientViewPetitionFieldIdVerificationProps
   extends Omit<
@@ -190,6 +191,7 @@ export function RecipientViewPetitionFieldIdVerification({
                 borderRadius="full"
                 width="100%"
               />
+
               <Button size="sm" fontWeight="normal" onClick={handleCancelClick}>
                 <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
               </Button>

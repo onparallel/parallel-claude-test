@@ -9,7 +9,6 @@ import {
   HStack,
   Input,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { UserArrowIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
@@ -26,6 +25,7 @@ import { isValidEmail } from "@parallel/utils/validation";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 interface DelegateAccessDialogData {
   email: string;
@@ -41,12 +41,7 @@ function DelegateAccessDialog({
   tone,
   ...props
 }: DialogProps<
-  {
-    keycode: string;
-    contactName: string;
-    organizationName: string;
-    tone: Tone;
-  },
+  { keycode: string; contactName: string; organizationName: string; tone: Tone },
   DelegateAccessDialogData
 >) {
   const intl = useIntl();
@@ -148,6 +143,7 @@ function DelegateAccessDialog({
                 defaultMessage: "name@example.com",
               })}
             />
+
             {errors.email && (
               <FormErrorMessage>
                 <FormattedMessage
@@ -200,6 +196,7 @@ function DelegateAccessDialog({
               })}
               maxLength={1_000}
             />
+
             <FormErrorMessage>
               <FormattedMessage
                 id="component.message-email-body-form-control.required-error"

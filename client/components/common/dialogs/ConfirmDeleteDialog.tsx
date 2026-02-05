@@ -1,4 +1,4 @@
-import { Button, FormControl, FormLabel, Input, Stack, Text } from "@chakra-ui/react";
+import { Button, FormControl, FormLabel, Input, Stack } from "@chakra-ui/react";
 import {
   ConfirmDialog,
   ConfirmDialogProps,
@@ -8,6 +8,7 @@ import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterW
 import { ReactNode, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Text } from "@parallel/components/ui";
 
 export interface ConfirmDeleteDialogProps
   extends Omit<ConfirmDialogProps<void>, "body" | "confirm"> {
