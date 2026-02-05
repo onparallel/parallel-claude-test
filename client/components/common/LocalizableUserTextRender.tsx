@@ -22,8 +22,8 @@ export function LocalizableUserTextRender({
     _locale,
     asSupportedUserLocale(intl.locale),
     "en" as UserLocale,
-    Object.keys(value)[0] as UserLocale,
-  ].find((l) => isNonNullish(l) && isNonNullish(value[l]));
+    ...(Object.keys(value) as UserLocale[]),
+  ].find((l) => isNonNullish(l) && isNonNullish(value[l]) && value[l]!.trim().length > 0);
 
   const val = isNonNullish(locale)
     ? Array.isArray(value[locale])
@@ -51,7 +51,7 @@ export function localizableUserTextRender({
     intl ? asSupportedUserLocale(intl.locale) : null,
     "en" as UserLocale,
     ...(Object.keys(value) as UserLocale[]),
-  ].find((l) => isNonNullish(l) && isNonNullish(value[l]) && value[l]!.length > 0);
+  ].find((l) => isNonNullish(l) && isNonNullish(value[l]) && value[l]!.trim().length > 0);
   return isNonNullish(locale) ? value[locale]?.trim() || _default : _default;
 }
 

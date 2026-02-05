@@ -28,7 +28,11 @@ import { ProfileReference } from "@parallel/components/common/ProfileReference";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
-import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import {
+  DialogProps,
+  isDialogError,
+  useDialog,
+} from "@parallel/components/common/dialogs/DialogProvider";
 import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-common/alerts/RestrictedPetitionFieldAlert";
 import {
   CreateProfileTypeFieldInput,
@@ -367,13 +371,19 @@ function CreateOrUpdateProfileTypeFieldDialog({
                       return;
                     }
                   } else if (isApolloError(e, "REMOVE_PROFILE_TYPE_FIELD_SELECT_OPTIONS_ERROR")) {
-                    data.substitutions = await showConfirmRemovedSelectOptionsReplacementDialog({
-                      ...(e.errors[0].extensions as {
-                        removedOptions: (SelectOptionValue & { count: number })[];
-                        currentOptions: SelectOptionValue[];
-                      }),
-                      showOptionsWithColors: data.options!.showOptionsWithColors,
-                    });
+                    try {
+                      data.substitutions = await showConfirmRemovedSelectOptionsReplacementDialog({
+                        ...(e.errors[0].extensions as {
+                          removedOptions: (SelectOptionValue & { count: number })[];
+                          currentOptions: SelectOptionValue[];
+                        }),
+                        showOptionsWithColors: data.options!.showOptionsWithColors,
+                      });
+                    } catch (error) {
+                      if (isDialogError(error) && error.message === "CANCEL") {
+                        return;
+                      }
+                    }
                   } else if (isApolloError(e, "REMOVE_PROFILE_TYPE_FIELD_MONITORING_ERROR")) {
                     const { profileIds } = e.errors[0]?.extensions as {
                       profileIds: string[];

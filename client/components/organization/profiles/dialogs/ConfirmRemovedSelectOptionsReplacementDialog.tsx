@@ -1,19 +1,20 @@
-import { Button, FormControl, HStack, Stack, Text } from "@chakra-ui/react";
+import { Button, FormControl, Grid, HStack, Stack, Text } from "@chakra-ui/react";
 import { AssignIcon } from "@parallel/chakra/icons";
-import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
+import {
+  localizableUserTextRender,
+  LocalizableUserTextRender,
+} from "@parallel/components/common/LocalizableUserTextRender";
+import { OverflownText } from "@parallel/components/common/OverflownText";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { ProfileFormFieldSelectOptionItem } from "@parallel/components/profiles/form-fields/ProfileFormFieldSelect";
-import {
-  UpdateProfileTypeFieldSelectOptionsSubstitution,
-  UserLocale,
-} from "@parallel/graphql/__types";
+import { UpdateProfileTypeFieldSelectOptionsSubstitution } from "@parallel/graphql/__types";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { UnwrapArray } from "@parallel/utils/types";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import Select, { OptionProps, SingleValueProps, components } from "react-select";
+import Select, { components, OptionProps, SingleValueProps } from "react-select";
 
 type SelectOptionValue = UnwrapArray<ProfileTypeFieldOptions<"SELECT">["values"]>;
 
@@ -54,7 +55,7 @@ function ConfirmRemovedSelectOptionsReplacementDialog({
   });
 
   const getOptionLabel = (option: SelectOptionValue) => {
-    return option.label[intl.locale as UserLocale] ?? "";
+    return localizableUserTextRender({ intl, value: option.label, default: "" });
   };
 
   const getOptionValue = (option: SelectOptionValue) => option.value;
@@ -64,7 +65,7 @@ function ConfirmRemovedSelectOptionsReplacementDialog({
       {...props}
       closeOnEsc
       closeOnOverlayClick={false}
-      size="xl"
+      size="3xl"
       content={{
         containerProps: {
           as: "form",
@@ -91,21 +92,23 @@ function ConfirmRemovedSelectOptionsReplacementDialog({
           </Text>
           {fields.map((field, index) => {
             const option = field[0];
+
             return (
-              <HStack key={field.id} spacing={4}>
-                <Text flex="1" noOfLines={2} wordBreak="break-all">
-                  <LocalizableUserTextRender value={option.label} default="" />
-                  &nbsp;
-                  <Text as="span" textStyle="hint" fontSize="sm">
+              <Grid key={field.id} gap={4} templateColumns="2fr auto 3fr">
+                <HStack minWidth={0}>
+                  <OverflownText>
+                    <LocalizableUserTextRender value={option.label} default="" />
+                  </OverflownText>
+                  <Text whiteSpace="nowrap" textStyle="hint" fontSize="sm" color="gray.500">
                     <FormattedMessage
                       id="generic.n-profiles"
                       defaultMessage="{count, plural, one {# profile} other {# profiles}}"
                       values={{ count: option.count }}
                     />
                   </Text>
-                </Text>
-                <AssignIcon />
-                <FormControl flex="2">
+                </HStack>
+                <AssignIcon alignSelf="center" />
+                <FormControl minWidth={0}>
                   <Controller
                     name={`values.${index}` as const}
                     control={control}
@@ -137,7 +140,7 @@ function ConfirmRemovedSelectOptionsReplacementDialog({
                     )}
                   />
                 </FormControl>
-              </HStack>
+              </Grid>
             );
           })}
         </Stack>
@@ -161,7 +164,7 @@ function SingleValue(props: SingleValueProps<SelectOptionValue>) {
       <ProfileFormFieldSelectOptionItem
         color={(props.selectProps as any).showOptionsWithColors ? props.data.color : undefined}
       >
-        <LocalizableUserTextRender value={props.data.label} default={<></>} />
+        <LocalizableUserTextRender value={props.data.label} default="" />
       </ProfileFormFieldSelectOptionItem>
     </components.SingleValue>
   );
@@ -173,7 +176,7 @@ function Option({ children, ...props }: OptionProps<SelectOptionValue>) {
       <ProfileFormFieldSelectOptionItem
         color={(props.selectProps as any).showOptionsWithColors ? props.data.color : undefined}
       >
-        <LocalizableUserTextRender value={props.data.label} default={<></>} />
+        <LocalizableUserTextRender value={props.data.label} default="" />
       </ProfileFormFieldSelectOptionItem>
     </components.Option>
   );

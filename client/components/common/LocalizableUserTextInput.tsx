@@ -56,15 +56,24 @@ export const LocalizableUserTextInput = chakraForwardRef<"div", LocalizableUserT
     const intl = useIntl();
     const inputRef = useRef<HTMLInputElement>(null);
     const mergedInputRef = useMergedRef(inputRef, ...(_inputRef ? [_inputRef] : []));
-    const [_selectedLocale, setSelectedLocale] = useState(
-      () =>
-        // initial state, by priority get the first that is defined
+
+    // Helper to check if a locale has a non-empty translation
+    const hasTranslation = (loc: UserLocale | undefined): loc is UserLocale =>
+      isNonNullish(loc) && isNonNullish(value[loc]) && value[loc]!.trim().length > 0;
+
+    const [_selectedLocale, setSelectedLocale] = useState(() => {
+      // Find the first locale with a non-empty translation
+      // Priority: intl.locale > "en" > any other locale with a value > locale param > intl.locale
+      return (
         [
           asSupportedUserLocale(intl.locale),
           "en" as UserLocale,
-          Object.keys(value)[0] as UserLocale,
-        ].find((locale) => isNonNullish(value[locale])) || (intl.locale as UserLocale),
-    );
+          ...(Object.keys(value) as UserLocale[]),
+        ].find(hasTranslation) ||
+        locale ||
+        (intl.locale as UserLocale)
+      );
+    });
     const selectedLocale = locale ?? _selectedLocale;
     const [inputValue, setInputValue] = useState(() => value[selectedLocale] ?? "");
     function handleChangeLocale(locale: UserLocale) {
