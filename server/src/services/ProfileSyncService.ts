@@ -344,7 +344,7 @@ export class ProfileSyncService {
 
                     if (error instanceof Error) {
                       this.logger.warn(
-                        `Error validating profile field value: ${error.message}. field: ${field.id}; alias: ${field.alias}; type: ${field.type}; value: ${JSON.stringify(value)}`,
+                        `${error.message}. field: ${field.id}; alias: ${field.alias}; type: ${field.type}; value: ${JSON.stringify(value)}; matchBy: ${JSON.stringify(matchBy)}`,
                       );
                     } else {
                       this.logger.error(error);
@@ -387,7 +387,7 @@ export class ProfileSyncService {
       profiles,
       async (profilesChunk, chunkIndex) => {
         this.logger.info(
-          `Building ${chunkIndex * CHUNK_SIZE}-${Math.min((chunkIndex + 1) * CHUNK_SIZE, profiles.length)}/${profiles.length} profiles for profile sync...`,
+          `Building ${chunkIndex * CHUNK_SIZE}-${Math.min((chunkIndex + 1) * CHUNK_SIZE - 1, profiles.length)}/${profiles.length} profiles for profile sync...`,
         );
         const [found, missing] = partition(profilesChunk, (p) => isNonNullish(p.id));
 

@@ -195,13 +195,14 @@ export class SapOdataClient implements ISapOdataClient {
         { maxRetries: 2, delay: 1000 },
       );
     } catch (error) {
-      this.logger.error(
-        `Failed to update entity ${this.buildEntityUrl(entityDefinition, entityKey)} with values: ${JSON.stringify(values)}`,
+      const errorMessage =
         error instanceof Response
           ? await error.text()
           : error instanceof Error
             ? error.message
-            : error,
+            : error;
+      this.logger.warn(
+        `Failed to update entity ${this.buildEntityUrl(entityDefinition, entityKey)} with values: ${JSON.stringify(values)}. Error: ${errorMessage}`,
       );
     }
     return null;
