@@ -46,26 +46,18 @@ Determine if the code changes affect documented functionality:
 - **New API endpoints** or GraphQL resolvers
 - **New database tables** or significant schema changes
 - **New user roles or permissions**
+- **New classes, services, or modules** that users/developers interact with
 
-### Step 6: Provide recommendations
+**IMPORTANT:** Err on the side of suggesting documentation. If there's ANY new code that could benefit from documentation, create a suggestion. Let the USER decide if it's needed, not you.
 
-**Format your response as:**
+### Step 6: Create suggested changes and open in VS Code
 
+**THIS STEP IS MANDATORY.** You MUST always create documentation suggestions and open them in VS Code. Do NOT skip this step. The user must see the suggested changes visually to accept or reject them.
+
+**Always create the temp directory first:**
+```bash
+mkdir -p /tmp/docs-suggestions
 ```
-## PR Documentation Check: #<NUMBER> - <TITLE>
-
-### Status: [UPDATES NEEDED / OK]
-
-### Changes That Need Documentation
-(List each change and why it needs docs)
-
-### Files to update
-- docs/core/[filename].md
-```
-
-### Step 7: Create suggested changes and open in VS Code
-
-If documentation updates are needed:
 
 1. **For existing files that need updates:**
    - Read the current file content
@@ -82,9 +74,18 @@ If documentation updates are needed:
    code /tmp/docs-suggestions/[filename].new.md
    ```
 
-**Always create the temp directory first:**
-```bash
-mkdir -p /tmp/docs-suggestions
+### Step 7: Provide summary
+
+**After opening VS Code**, provide a brief summary:
+
+```
+## PR Documentation Check: #<NUMBER> - <TITLE>
+
+### Files opened in VS Code
+- [List of files opened for review]
+
+### Summary of suggested changes
+- [Brief description of what was suggested]
 ```
 
 ### Step 8: Ask user what to do

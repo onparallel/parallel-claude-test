@@ -5,7 +5,7 @@ description: Review local code changes before creating a PR
 
 # Local Code Review
 
-Review local code changes (staged, unstaged, and commits) before creating a PR.
+Review local code changes and show suggested fixes in VS Code.
 
 ## Instructions
 
@@ -40,9 +40,26 @@ Review for these issues:
 - Unused variables or imports
 - Missing error handling in critical paths
 
-### Step 3: Provide feedback
+### Step 3: Create suggested fixes and open in VS Code
 
-**Format your review as:**
+**THIS STEP IS MANDATORY.** You MUST always create fix suggestions and open them in VS Code when ANY issues are found (critical or suggestions). Do NOT skip this step. The user must see the suggested fixes visually to accept or reject them.
+
+**Always create the temp directory first:**
+```bash
+mkdir -p /tmp/code-suggestions
+```
+
+1. **For each file with issues:**
+   - Read the current file content
+   - Create a fixed version at `/tmp/code-suggestions/[filename].suggested.[ext]`
+   - Open VS Code diff view:
+   ```bash
+   code --diff path/to/file.ts /tmp/code-suggestions/[filename].suggested.ts
+   ```
+
+### Step 4: Provide summary
+
+**After opening VS Code**, provide a brief summary:
 
 ```
 ## Local Code Review Summary
@@ -53,14 +70,25 @@ Review for these issues:
 ### Suggestions
 (List code quality improvements)
 
-### Files Reviewed
-- path/to/file.ts
+### Files opened in VS Code
+- [List of files opened for review]
 ```
 
 **For each issue, include:**
 1. File and line number
 2. What the problem is
-3. Suggested fix (with code snippet)
+3. Brief description of the fix
+
+### Step 5: Ask user what to do
+
+Use AskUserQuestion to ask the user:
+- "Apply fixes" - Copy the suggested files to their original locations
+- "Skip" - Do nothing
+
+**If user chooses "Apply fixes":**
+```bash
+cp /tmp/code-suggestions/[filename].suggested.ts path/to/file.ts
+```
 
 ## What NOT to flag
 

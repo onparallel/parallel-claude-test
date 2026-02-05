@@ -5,7 +5,7 @@ description: Check if local code changes require documentation updates
 
 # Local Documentation Check
 
-Check if local code changes require documentation updates.
+Check if local code changes require documentation updates and show suggested changes in VS Code.
 
 ## Instructions
 
@@ -36,26 +36,57 @@ Determine if the code changes affect documented functionality:
 - **New API endpoints** or GraphQL resolvers
 - **New database tables** or significant schema changes
 - **New user roles or permissions**
+- **New classes, services, or modules** that users/developers interact with
 
-### Step 4: Provide recommendations
+**IMPORTANT:** Err on the side of suggesting documentation. If there's ANY new code that could benefit from documentation, create a suggestion. Let the USER decide if it's needed, not you.
 
-**Format your response as:**
+### Step 4: Create suggested changes and open in VS Code
+
+**THIS STEP IS MANDATORY.** You MUST always create documentation suggestions and open them in VS Code. Do NOT skip this step. The user must see the suggested changes visually to accept or reject them.
+
+**Always create the temp directory first:**
+```bash
+mkdir -p /tmp/docs-suggestions
+```
+
+1. **For existing files that need updates:**
+   - Read the current file content
+   - Create a modified version with the suggested changes at `/tmp/docs-suggestions/[filename].suggested.md`
+   - Open VS Code diff view:
+   ```bash
+   code --diff docs/core/[filename].md /tmp/docs-suggestions/[filename].suggested.md
+   ```
+
+2. **For new files that should be created:**
+   - Create the new file content at `/tmp/docs-suggestions/[filename].new.md`
+   - Open it in VS Code:
+   ```bash
+   code /tmp/docs-suggestions/[filename].new.md
+   ```
+
+### Step 5: Provide summary
+
+**After opening VS Code**, provide a brief summary:
 
 ```
 ## Local Documentation Check
 
-### Status: [UPDATES NEEDED / OK]
+### Files opened in VS Code
+- [List of files opened for review]
 
-### Changes That Need Documentation
-(List each change and why it needs docs)
+### Summary of suggested changes
+- [Brief description of what was suggested]
+```
 
-### Suggested Documentation Updates
+### Step 6: Ask user what to do
 
-#### File: `docs/core/[filename].md`
+Use AskUserQuestion to ask the user:
+- "Apply changes" - Copy the suggested files to their final locations
+- "Skip" - Do nothing
 
-Add/update the following:
-
-[Exact content to add or change]
+**If user chooses "Apply changes":**
+```bash
+cp /tmp/docs-suggestions/[filename].suggested.md docs/core/[filename].md
 ```
 
 ## Documentation Style Rules

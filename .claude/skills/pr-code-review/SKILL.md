@@ -5,7 +5,7 @@ description: Review an open PR from the repository
 
 # PR Code Review
 
-Review an open Pull Request from the repository.
+Review an open Pull Request and show suggested fixes in VS Code.
 
 ## Instructions
 
@@ -25,7 +25,7 @@ Use AskUserQuestion to present the list of open PRs and let the user select whic
 - Author
 - Branch name
 
-### Step 3: Get the PR diff
+### Step 3: Get the PR diff and files
 
 Once the user selects a PR, get its diff:
 
@@ -55,9 +55,31 @@ Review for these issues:
 - Unused variables or imports
 - Missing error handling in critical paths
 
-### Step 5: Provide feedback
+### Step 5: Create suggested fixes and open in VS Code
 
-**Format your review as:**
+**THIS STEP IS MANDATORY.** You MUST always create fix suggestions and open them in VS Code when ANY issues are found (critical or suggestions). Do NOT skip this step. The user must see the suggested fixes visually to accept or reject them.
+
+1. **Checkout the PR branch locally:**
+   ```bash
+   gh pr checkout <PR_NUMBER>
+   ```
+
+**Always create the temp directory first:**
+```bash
+mkdir -p /tmp/code-suggestions
+```
+
+2. **For each file with issues:**
+   - Read the current file content
+   - Create a fixed version at `/tmp/code-suggestions/[filename].suggested.[ext]`
+   - Open VS Code diff view:
+   ```bash
+   code --diff path/to/file.ts /tmp/code-suggestions/[filename].suggested.ts
+   ```
+
+### Step 6: Provide summary
+
+**After opening VS Code**, provide a brief summary:
 
 ```
 ## PR Code Review: #<NUMBER> - <TITLE>
@@ -68,25 +90,34 @@ Review for these issues:
 ### Suggestions
 (List code quality improvements)
 
-### Files Reviewed
-- path/to/file.ts
+### Files opened in VS Code
+- [List of files opened for review]
 ```
 
 **For each issue, include:**
 1. File and line number
 2. What the problem is
-3. Suggested fix (with code snippet)
+3. Brief description of the fix
 
-### Step 6: Offer to post review
+### Step 7: Ask user what to do
 
-Ask if you should post the review as a PR comment:
+Use AskUserQuestion to ask the user:
+- "Apply fixes" - Copy the suggested files to their original locations (on the PR branch)
+- "Post as PR comment" - Post the review as a comment on the PR
+- "Request changes" - Post review requesting changes
+- "Skip" - Do nothing
 
+**If user chooses "Apply fixes":**
+```bash
+cp /tmp/code-suggestions/[filename].suggested.ts path/to/file.ts
+```
+
+**If user chooses "Post as PR comment":**
 ```bash
 gh pr review <PR_NUMBER> --comment --body "review content here"
 ```
 
-Or for critical issues, request changes:
-
+**If user chooses "Request changes":**
 ```bash
 gh pr review <PR_NUMBER> --request-changes --body "review content here"
 ```
