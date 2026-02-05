@@ -82,7 +82,7 @@ export const GENERIC_FIELD_TRANSFORMS = {
     handler: (v: any[], options: { pattern: string; replacement: string }) =>
       v.map((v) =>
         typeof v === "string"
-          ? v.replace(new RegExp(options.pattern), options.replacement)
+          ? v.replace(new RegExp(options.pattern, "g"), options.replacement)
           : undefined,
       ),
     options: {

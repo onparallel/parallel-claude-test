@@ -285,6 +285,10 @@ export function getOsborneSapSettings({
                     {
                       remoteEntityFields: ["StreetName"],
                       profileTypeFieldIds: [profileTypeFieldIds.addressId],
+                      toLocalTransforms: [
+                        { type: "REGEX_REPLACE", pattern: "^\\W(.*)\\W$", replacement: "$1" },
+                        { type: "REGEX_REPLACE", pattern: "\r?\n", replacement: " " },
+                      ],
                       direction: "BOTH",
                     },
                     {
