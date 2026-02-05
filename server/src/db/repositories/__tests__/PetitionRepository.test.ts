@@ -77,7 +77,7 @@ describe("repositories/PetitionRepository", () => {
 
     beforeAll(async () => {
       _petitions = await mocks.createRandomPetitions(organization.id, user.id, 15, (i) => ({
-        name: i % 3 === 0 ? "good petition" : "bad petition",
+        name: i % 3 === 0 ? `good petition ${i}` : `bad petition ${i}`,
       }));
       await mocks.createPetitionAccess(_petitions[0].id, user.id, [contact.id], user.id);
     });
@@ -147,6 +147,42 @@ describe("repositories/PetitionRepository", () => {
       });
       expect(await result.totalCount).toBe(1);
       expect(await result.items).toMatchObject([_petitions[0]]);
+    });
+
+    describe("sorting by name", () => {
+      test("sorts petitions by name in ascending order", async () => {
+        const result = petitions.getPaginatedPetitionsForUser({
+          orgId: user.org_id,
+          userId: user.id,
+          opts: {
+            offset: 0,
+            limit: 10,
+            sortBy: [{ field: "name", order: "asc" }],
+            search: "bad",
+          },
+        });
+
+        const items = await result.items;
+        const names = items.map((p) => p.name);
+        expect(names).toEqual([...names].sort((a, b) => (a ?? "").localeCompare(b ?? "")));
+      });
+
+      test("sorts petitions by name in descending order", async () => {
+        const result = petitions.getPaginatedPetitionsForUser({
+          orgId: user.org_id,
+          userId: user.id,
+          opts: {
+            offset: 0,
+            limit: 10,
+            sortBy: [{ field: "name", order: "desc" }],
+            search: "bad",
+          },
+        });
+
+        const items = await result.items;
+        const names = items.map((p) => p.name);
+        expect(names).toEqual([...names].sort((a, b) => (b ?? "").localeCompare(a ?? "")));
+      });
     });
   });
 

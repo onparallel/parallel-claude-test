@@ -785,7 +785,8 @@ export class PetitionRepository extends BaseRepository {
         } else if (column === "createdAt") {
           q.orderByRaw(`is_folder ${order}, created_at ${order}`);
         } else if (column === "name") {
-          q.orderBy(`_name`, order);
+          // q.orderBy(`_name`, order);
+          q.orderByRaw(`is_folder ${order}, _name ${order}`);
         } else if (column === "lastActivityAt") {
           q.orderBy("last_activity_at", order);
         } else if (column === "lastRecipientActivityAt") {
@@ -804,7 +805,7 @@ export class PetitionRepository extends BaseRepository {
           .select(
             this.knex.raw(/* sql */ `false as is_folder`),
             "ps.*", // petition.*, effective_permission, sent_at, last_used_at
-            this.knex.raw(/* sql */ `null::varchar(255) as _name`),
+            this.knex.raw(/* sql */ `ps.name as _name`),
             this.knex.raw(/* sql */ `null::int as petition_count`),
             this.knex.raw(/* sql */ `null::petition_permission_type as min_permission`),
           )
