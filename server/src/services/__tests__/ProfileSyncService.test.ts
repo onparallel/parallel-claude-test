@@ -1117,7 +1117,7 @@ describe("ProfileSyncService", () => {
         ).resolves.not.toThrow();
 
         expect(logger).toHaveBeenLastCalledWith(
-          `Error validating profile field value: Value is not a valid option. field: ${legalEntityFields["p_entity_type"].id}; alias: p_entity_type; type: SELECT; value: "INVALID_ENTITY_TYPE"`,
+          `Value is not a valid option. field: ${legalEntityFields["p_entity_type"].id}; alias: p_entity_type; type: SELECT; value: "INVALID_ENTITY_TYPE"; matchBy: [[${legalEntityFields["p_entity_name"].id},"John Doe Inc."],[${legalEntityFields["p_entity_type"].id},"INCORPORATED"]]`,
         );
 
         await expect(
@@ -1139,7 +1139,7 @@ describe("ProfileSyncService", () => {
         ).resolves.not.toThrow();
 
         expect(logger).toHaveBeenLastCalledWith(
-          `Error validating profile field value: Value is not a valid option. field: ${individualFields["p_country_of_residence"].id}; alias: p_country_of_residence; type: SELECT; value: "UNKNOWN"`,
+          `Value is not a valid option. field: ${individualFields["p_country_of_residence"].id}; alias: p_country_of_residence; type: SELECT; value: "UNKNOWN"; matchBy: [[${individualFields["p_tax_id"].id},"1234567890"]]`,
         );
 
         await expect(
@@ -1164,7 +1164,7 @@ describe("ProfileSyncService", () => {
         ).resolves.not.toThrow();
 
         expect(logger).toHaveBeenLastCalledWith(
-          `Error validating profile field value: Value is not a valid date. field: ${individualFields["p_birth_date"].id}; alias: p_birth_date; type: DATE; value: "ABC123"`,
+          `Value is not a valid date. field: ${individualFields["p_birth_date"].id}; alias: p_birth_date; type: DATE; value: "ABC123"; matchBy: [[${individualFields["p_tax_id"].id},"1234567890"]]`,
         );
 
         const dbProfiles = await mocks.knex
