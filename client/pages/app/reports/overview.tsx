@@ -7,6 +7,7 @@ import {
   Grid,
   Heading,
   HStack,
+  RadioProps,
   Stack,
   Text,
   useRadioGroup,
@@ -490,13 +491,13 @@ function OverviewReportsListTableHeader({
       </Box>
       <Spacer />
       <ButtonGroup isAttached variant="outline" {...getRootProps()}>
-        <RadioButton {...getRadioProps({ value: "STATUS" })} minWidth="fit-content">
+        <RadioButton {...(getRadioProps({ value: "STATUS" }) as RadioProps)} minWidth="fit-content">
           <FormattedMessage
             id="component.overview-reports-list-table-header.status"
             defaultMessage="Status"
           />
         </RadioButton>
-        <RadioButton {...getRadioProps({ value: "TIME" })}>
+        <RadioButton {...(getRadioProps({ value: "TIME" }) as RadioProps)}>
           <FormattedMessage
             id="component.overview-reports-list-table-header.time"
             defaultMessage="Time"

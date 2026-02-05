@@ -1,4 +1,4 @@
-import { Box, ButtonGroup, HStack, useRadioGroup } from "@chakra-ui/react";
+import { Box, ButtonGroup, HStack, RadioProps, useRadioGroup } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionBaseType } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
@@ -39,10 +39,13 @@ export const SearchAllOrCurrentFolder = chakraForwardRef<"div", SearchAllOrCurre
           minWidth={0}
           {...getRootProps()}
         >
-          <RadioButton {...getRadioProps({ value: "EVERYWHERE" })} minWidth="fit-content">
+          <RadioButton
+            {...(getRadioProps({ value: "EVERYWHERE" }) as RadioProps)}
+            minWidth="fit-content"
+          >
             <FormattedMessage id="generic.everywhere" defaultMessage="Everywhere" />
           </RadioButton>
-          <RadioButton {...getRadioProps({ value: "CURRENT_FOLDER" })}>
+          <RadioButton {...(getRadioProps({ value: "CURRENT_FOLDER" }) as RadioProps)}>
             {'"'}
             <OverflownText flex={1} minWidth={0}>
               <PathName type={type} path={path} disableTooltip />

@@ -11,6 +11,7 @@ import {
   GridItem,
   HStack,
   Input,
+  RadioProps,
   Stack,
   Text,
   useRadioGroup,
@@ -517,7 +518,7 @@ function DashboardModuleSizes({ moduleType, value, onChange }: DashboardModuleSi
   return (
     <HStack {...getRootProps()}>
       <ModuleSettingsRadioButton
-        {...getRadioProps({ value: "SMALL" })}
+        {...(getRadioProps({ value: "SMALL" }) as RadioProps)}
         isDisabled={minSize === "MEDIUM" || minSize === "LARGE"}
       >
         <Text>
@@ -534,7 +535,7 @@ function DashboardModuleSizes({ moduleType, value, onChange }: DashboardModuleSi
         </Grid>
       </ModuleSettingsRadioButton>
       <ModuleSettingsRadioButton
-        {...getRadioProps({ value: "MEDIUM" })}
+        {...(getRadioProps({ value: "MEDIUM" }) as RadioProps)}
         isDisabled={minSize === "LARGE" || maxSize === "SMALL"}
       >
         <Text>
@@ -550,7 +551,7 @@ function DashboardModuleSizes({ moduleType, value, onChange }: DashboardModuleSi
         </Grid>
       </ModuleSettingsRadioButton>
       <ModuleSettingsRadioButton
-        {...getRadioProps({ value: "LARGE" })}
+        {...(getRadioProps({ value: "LARGE" }) as RadioProps)}
         isDisabled={maxSize === "SMALL" || maxSize === "MEDIUM"}
       >
         <Text>
@@ -580,7 +581,7 @@ function DashboardModuleRatioType({ value, onChange }: DashboardModuleRatioTypeP
 
   return (
     <HStack {...getRootProps()}>
-      <ModuleSettingsRadioButton {...getRadioProps({ value: "RATIO" })}>
+      <ModuleSettingsRadioButton {...(getRadioProps({ value: "RATIO" }) as RadioProps)}>
         <Text>
           <FormattedMessage
             id="component.dashboard-module-form.ratio-type-ratio"
@@ -588,7 +589,7 @@ function DashboardModuleRatioType({ value, onChange }: DashboardModuleRatioTypeP
           />
         </Text>
       </ModuleSettingsRadioButton>
-      <ModuleSettingsRadioButton {...getRadioProps({ value: "PERCENTAGE" })}>
+      <ModuleSettingsRadioButton {...(getRadioProps({ value: "PERCENTAGE" }) as RadioProps)}>
         <Text>
           <FormattedMessage
             id="component.dashboard-module-form.ratio-type-percentage"

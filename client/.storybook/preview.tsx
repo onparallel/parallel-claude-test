@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 import { ChakraProvider } from "@chakra-ui/react";
 import { Preview } from "@storybook/react";
-import { PropsWithChildren, useMemo } from "react";
+import React, { PropsWithChildren, useMemo } from "react";
 import { IntlProvider } from "react-intl";
 import { Fonts } from "../chakra/fonts";
 import { theme } from "../chakra/theme/theme";
@@ -48,8 +49,15 @@ const preview: Preview = {
 function WithDecorators({ locale, children }: PropsWithChildren<{ locale: string }>) {
   const messages = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const data = require(`../lang/${locale}.json`);
-    return Object.fromEntries<string>(data.map((t: any) => [t.term, t.definition]));
+    const nonRecipientLocales = ["en", "es"];
+
+    const data = nonRecipientLocales.includes(locale)
+      ? require(`../lang/${locale}.json`)
+      : require(`../lang/recipient/${locale}.json`);
+
+    return {
+      ...Object.fromEntries<string>(data.map((t: any) => [t.term, t.definition])),
+    };
   }, [locale]);
   return (
     <LiquidProvider>

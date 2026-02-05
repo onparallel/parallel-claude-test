@@ -1,9 +1,0 @@
-{
-  "presets": ["next/babel"],
-  "plugins": [
-    "./build/clean-react-intl-plugin/index.js",
-    ["@emotion"],
-    // this is needed to transpile pdfjs-dist, which contains private class methods
-    "@babel/plugin-transform-private-methods"
-  ]
-}

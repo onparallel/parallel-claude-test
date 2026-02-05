@@ -1,11 +1,14 @@
 import type { StorybookConfig } from "@storybook/nextjs";
-import { resolve } from "path";
+import { dirname, resolve } from "path";
+import { fileURLToPath } from "url";
 import { merge } from "webpack-merge";
+
+const currentFilename = fileURLToPath(import.meta.url);
+const currentDirname = dirname(currentFilename);
 
 const config: StorybookConfig = {
   stories: ["../stories/**/*.stories.tsx"],
   framework: "@storybook/nextjs",
-  addons: ["@storybook/addon-docs", "@storybook/addon-controls", "@storybook/addon-toolbars"],
   refs: {
     "@chakra-ui/react": {
       disable: true,
@@ -16,7 +19,7 @@ const config: StorybookConfig = {
   },
   webpackFinal: (config) => {
     const alias = {
-      "@parallel": resolve(__dirname, ".."),
+      "@parallel": resolve(currentDirname, ".."),
       "@emotion/core": "@emotion/core",
       "@emotion/styled": "@emotion/styled",
       "emotion-theming": "@emotion/react",

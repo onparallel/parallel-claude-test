@@ -263,7 +263,7 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
                 paddingBottom={{ base: 2, md: 4 }}
                 {...getRootProps()}
               >
-                <RadioCard {...getRadioProps({ value: "ALL" })}>
+                <RadioCard {...(getRadioProps({ value: "ALL" }) as RadioProps)}>
                   <HStack>
                     <Text as="span" fontSize="3xl" fontWeight={600}>
                       {total}
@@ -277,7 +277,7 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
                     />
                   </Text>
                 </RadioCard>
-                <RadioCard {...getRadioProps({ value: "PENDING" })}>
+                <RadioCard {...(getRadioProps({ value: "PENDING" }) as RadioProps)}>
                   <HStack>
                     <Text as="span" fontSize="3xl" fontWeight={600}>
                       {pending}
@@ -291,7 +291,7 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
                     />
                   </Text>
                 </RadioCard>
-                <RadioCard {...getRadioProps({ value: "COMPLETED" })}>
+                <RadioCard {...(getRadioProps({ value: "COMPLETED" }) as RadioProps)}>
                   <HStack>
                     <Text as="span" fontSize="3xl" fontWeight={600}>
                       {completed}

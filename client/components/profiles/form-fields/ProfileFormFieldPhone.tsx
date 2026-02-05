@@ -43,7 +43,7 @@ export function ProfileFormFieldPhone({
           <PhoneInputLazy
             borderColor={showBaseStyles ? undefined : "transparent"}
             value={value ?? ""}
-            onChange={(value: string, { isValid }) => {
+            onChange={(value, { isValid }) => {
               onChange(value ?? "");
               if (isNonNullish(value) && !isValid && !fieldState.error) {
                 setError(`fields.${field.id}.content.value`, { type: "validate" });

@@ -250,10 +250,16 @@ export const ApproveOrRejectRadio = chakraForwardRef<"div", ApproveOrRejectRadio
     return (
       <HStack ref={ref} {...props} paddingBottom={2}>
         <ButtonGroup variant="outline" {...getRootProps()}>
-          <ApprovalRadioButton isReject={false} {...getRadioProps({ value: "APPROVE" })}>
+          <ApprovalRadioButton
+            isReject={false}
+            {...(getRadioProps({ value: "APPROVE" }) as RadioProps)}
+          >
             <FormattedMessage id="generic.approve" defaultMessage="Approve" />
           </ApprovalRadioButton>
-          <ApprovalRadioButton isReject={true} {...getRadioProps({ value: "REJECT" })}>
+          <ApprovalRadioButton
+            isReject={true}
+            {...(getRadioProps({ value: "REJECT" }) as RadioProps)}
+          >
             <FormattedMessage id="generic.reject" defaultMessage="Reject" />
           </ApprovalRadioButton>
         </ButtonGroup>

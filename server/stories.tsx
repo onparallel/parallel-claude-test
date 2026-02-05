@@ -17,6 +17,7 @@ config({ path: path.resolve(process.cwd(), ".development.env") });
 const app = express();
 app.use(cors());
 
+const port = process.env.SERVER_STORIES_PORT || 5001;
 const LR_SCRIPT = `<script src="http://localhost:35729/livereload.js?snipver=1"></script>`;
 
 async function parseArgs(req: Request, storyPath: string) {
@@ -52,11 +53,13 @@ app
   .get("/documents/*", async (req, res, next) => {
     const document = (req.params as any)[0] as string;
     const query = new URLSearchParams(req.query as any);
-    const url = encodeURIComponent(`http://localhost:5001/pdf/${document}?${query}`);
+    const pdfUrl = `http://localhost:${port}/pdf/${document}?${query}`;
+    // Use browser's native PDF viewer instead of external mozilla.github.io viewer
+    // This avoids CORS issues and mixed content (HTTPS -> HTTP) problems
     res.send(/* html */ `
       <html>
-      <body>
-        <iframe id="pdf-js-viewer" src="https://mozilla.github.io/pdf.js/web/viewer.html?file=${url}" style="position:fixed; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;"></iframe>
+      <body style="margin: 0; padding: 0;">
+        <iframe src="${pdfUrl}" style="position:fixed; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;"></iframe>
         ${LR_SCRIPT}
       </body>
       </html>
@@ -85,6 +88,7 @@ app
         client,
         locale,
       });
+      res.setHeader("Content-Type", "application/pdf");
       stream.pipe(res);
     } catch (error) {
       console.error("Error rendering PDF:", error);
@@ -170,8 +174,6 @@ function header({ subject, from }: { subject: string; from: string }) {
   </div>
   `;
 }
-
-const port = process.env.SERVER_STORIES_PORT || 5001;
 
 app.listen(port, () => {
   console.log(`ready on http://localhost:${port}`);

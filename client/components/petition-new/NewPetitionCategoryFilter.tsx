@@ -41,7 +41,7 @@ export const NewPetitionCategoryFilter = chakraForwardRef<"div", NewPetitionCate
         {options.map(({ slug, label }) => {
           const radio = getRadioProps({ value: slug });
           return (
-            <CategoryRadio key={slug} {...radio}>
+            <CategoryRadio key={slug} {...(radio as RadioProps)}>
               {label}
             </CategoryRadio>
           );

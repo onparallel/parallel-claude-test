@@ -3,6 +3,7 @@ import {
   ButtonGroup,
   Center,
   HStack,
+  RadioProps,
   Spinner,
   Stack,
   Text,
@@ -422,13 +423,16 @@ export function ReportsStatisticsConversion({
         <Spacer />
         <HStack>
           <ButtonGroup isAttached variant="outline" size="sm" {...getRootProps()}>
-            <RadioButton {...getRadioProps({ value: "ABSOLUTE" })}>
+            <RadioButton {...(getRadioProps({ value: "ABSOLUTE" }) as RadioProps)}>
               <FormattedMessage
                 id="component.reports-statistics-conversion.absolute"
                 defaultMessage="Absolute"
               />
             </RadioButton>
-            <RadioButton {...getRadioProps({ value: "RELATIVE" })} minWidth="fit-content">
+            <RadioButton
+              {...(getRadioProps({ value: "RELATIVE" }) as RadioProps)}
+              minWidth="fit-content"
+            >
               <FormattedMessage
                 id="component.reports-statistics-conversion.relative"
                 defaultMessage="Relative"

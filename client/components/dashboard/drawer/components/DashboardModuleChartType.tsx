@@ -17,7 +17,7 @@ export function DashboardModuleChartType({ value, onChange }: DashboardModuleCha
 
   return (
     <HStack {...getRootProps()}>
-      <ModuleSizeRadioButton {...getRadioProps({ value: "PIE" })}>
+      <ModuleSizeRadioButton {...(getRadioProps({ value: "PIE" }) as RadioProps)}>
         <Text>
           <FormattedMessage id="component.dashborad-module-chart-type.pie" defaultMessage="Pie" />
         </Text>
@@ -25,7 +25,7 @@ export function DashboardModuleChartType({ value, onChange }: DashboardModuleCha
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/modules/CHART_PIE.svg`}
         />
       </ModuleSizeRadioButton>
-      <ModuleSizeRadioButton {...getRadioProps({ value: "DOUGHNUT" })}>
+      <ModuleSizeRadioButton {...(getRadioProps({ value: "DOUGHNUT" }) as RadioProps)}>
         <Text>
           <FormattedMessage
             id="component.dashborad-module-chart-type.doughnut"

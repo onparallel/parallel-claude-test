@@ -1193,7 +1193,7 @@ const PetitionVariableTypeRadio = forwardRef<HTMLInputElement, PetitionVariableT
           <PetitionVariableTypeRadioButton
             key={key}
             inputRef={key === value ? ref : undefined}
-            {...getRadioProps({ value: key })}
+            {...(getRadioProps({ value: key }) as RadioProps)}
           >
             <Center padding={2} borderRadius="md" backgroundColor={background}>
               {icon}

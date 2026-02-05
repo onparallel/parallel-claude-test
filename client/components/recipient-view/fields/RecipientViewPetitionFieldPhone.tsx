@@ -251,7 +251,7 @@ export function RecipientViewPetitionFieldPhone({
         <Flex flex="1" position="relative" marginTop={2}>
           <PhoneInputLazy
             value={value}
-            onChange={(value: string, { isValid }) => {
+            onChange={(value, { isValid }) => {
               if (isSaving) {
                 // prevent creating 2 replies
                 return;
@@ -262,9 +262,9 @@ export function RecipientViewPetitionFieldPhone({
                 handleCreate.clear();
               }
               setIsInvalidValue(!isValid && isNonNullish(value));
-              setValue(value);
+              setValue(value ?? "");
             }}
-            onBlur={async (value: string, { isValid }) => {
+            onBlur={async (value, { isValid }) => {
               if (value && isValid) {
                 await handleCreate.immediateIfPending(value, false);
                 setShowNewReply(false);
@@ -346,11 +346,11 @@ export const RecipientViewPetitionFieldReplyPhone = forwardRef<
       <Flex flex="1" position="relative">
         <PhoneInputLazy
           value={value}
-          onChange={(value: string, { isValid }) => {
+          onChange={(value, { isValid }) => {
             setIsInvalidValue(!isValid && isNonNullish(value));
             setValue(value);
           }}
-          onBlur={async (value: string, { isValid }) => {
+          onBlur={async (value, { isValid }) => {
             if (isValid && isNonNullish(value) && value !== reply.content.value) {
               await debouncedUpdateReply.immediate(value);
             } else if (isNullish(value)) {

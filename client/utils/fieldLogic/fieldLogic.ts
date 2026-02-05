@@ -475,32 +475,34 @@ function evaluateValuePredicate(
 
     // CHECKBOX
     if (fieldType === "CHECKBOX" && Array.isArray(reply)) {
+      // Cast reply to string[] since CHECKBOX fields always have string values
+      const checkboxReply = reply as string[];
       switch (operator) {
         case "CONTAIN":
           assert(typeof value === "string");
-          return reply.includes(value);
+          return checkboxReply.includes(value);
         case "NOT_CONTAIN":
           assert(typeof value === "string");
-          return !reply.includes(value);
+          return !checkboxReply.includes(value);
         case "IS_ONE_OF":
         case "NOT_IS_ONE_OF": {
           assert(Array.isArray(value));
-          const selectedValues = reply.filter((r) => typeof r === "string");
+          const selectedValues = checkboxReply.filter((r) => typeof r === "string");
           const result = selectedValues.some((r) => value.includes(r));
           return operator.startsWith("NOT_") ? !result : result;
         }
         case "NUMBER_OF_SUBREPLIES":
           assert(typeof value === "number");
-          return reply.length === value;
+          return checkboxReply.length === value;
         case "ALL_IS_IN_LIST":
           assert(typeof value === "string");
-          return reply.every((r) => isInList(value, r));
+          return checkboxReply.every((r) => isInList(value, r));
         case "ANY_IS_IN_LIST":
           assert(typeof value === "string");
-          return reply.some((r) => isInList(value, r));
+          return checkboxReply.some((r) => isInList(value, r));
         case "NONE_IS_IN_LIST":
           assert(typeof value === "string");
-          return !reply.some((r) => isInList(value, r));
+          return !checkboxReply.some((r) => isInList(value, r));
         default:
           return false;
       }
