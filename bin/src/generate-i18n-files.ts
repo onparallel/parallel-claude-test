@@ -27,7 +27,7 @@ async function generate(
       try {
         const extended = await readJson<Term[]>(path.join(pickMissingFrom, `${locale}.json`));
         extendedTranslations = Object.fromEntries(extended.map((t) => [t.term, t.definition]));
-      } catch (e) {
+      } catch {
         extendedTranslations = {};
       }
     }

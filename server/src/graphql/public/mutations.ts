@@ -979,7 +979,7 @@ export const publicSendReminder = mutationField("publicSendReminder", {
       ]);
 
       return RESULT.SUCCESS;
-    } catch (error) {
+    } catch {
       return RESULT.FAILURE;
     }
   },

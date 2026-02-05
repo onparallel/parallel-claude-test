@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 import { randomUUID } from "crypto";
 import stringify from "fast-safe-stringify";
 import { createReadStream } from "fs";

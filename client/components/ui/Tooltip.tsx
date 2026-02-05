@@ -1,4 +1,8 @@
-import { Tooltip as ChakraTooltip, TooltipProps } from "@chakra-ui/react";
+import {
+  // eslint-disable-next-line no-restricted-imports
+  Tooltip as ChakraTooltip,
+  TooltipProps,
+} from "@chakra-ui/react";
 import { forwardRef } from "react";
 
 // Docs: https://chakra-ui.com/docs/components/tooltip

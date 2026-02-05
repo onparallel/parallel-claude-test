@@ -1151,29 +1151,32 @@ export class PetitionRepository extends BaseRepository {
             })),
             t,
           );
-    fromPublicPetitionLink
-      ? await this.createEvent(
-          rows.map((access) => ({
-            type: "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK" as const,
-            petition_id: petitionId,
-            data: {
-              petition_access_id: access.id,
-            },
-          })),
-          t,
-        )
-      : await this.createEvent(
-          rows.map((access) => ({
-            type: "ACCESS_ACTIVATED",
-            petition_id: petitionId,
-            data: {
-              petition_access_id: access.id,
-              user_id: user.id,
-            },
-          })),
 
-          t,
-        );
+    if (fromPublicPetitionLink) {
+      await this.createEvent(
+        rows.map((access) => ({
+          type: "ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK" as const,
+          petition_id: petitionId,
+          data: {
+            petition_access_id: access.id,
+          },
+        })),
+        t,
+      );
+    } else {
+      await this.createEvent(
+        rows.map((access) => ({
+          type: "ACCESS_ACTIVATED",
+          petition_id: petitionId,
+          data: {
+            petition_access_id: access.id,
+            user_id: user.id,
+          },
+        })),
+
+        t,
+      );
+    }
 
     return rows;
   }

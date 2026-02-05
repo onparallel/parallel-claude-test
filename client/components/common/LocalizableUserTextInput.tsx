@@ -68,7 +68,8 @@ export const LocalizableUserTextInput = chakraForwardRef<"div", LocalizableUserT
     const selectedLocale = locale ?? _selectedLocale;
     const [inputValue, setInputValue] = useState(() => value[selectedLocale] ?? "");
     function handleChangeLocale(locale: UserLocale) {
-      onChangeLocale?.(locale) ?? setSelectedLocale(locale);
+      const onChangeLocaleFn = onChangeLocale ?? setSelectedLocale;
+      onChangeLocaleFn(locale);
       setInputValue(value[locale] ?? "");
       inputRef.current?.focus();
     }

@@ -31,7 +31,7 @@ async function parseArgs(req: Request, storyPath: string) {
             return story.args?.[key] || {};
           }
           return JSON.parse(jsonString);
-        } catch (error) {
+        } catch {
           console.error(`Error parsing JSON for key "${key}":`, req.query[key as string]);
           console.error("Falling back to default args for key:", key);
           return story.args?.[key] || {};

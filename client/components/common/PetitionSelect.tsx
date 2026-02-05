@@ -245,7 +245,7 @@ function useGetPetitions() {
               fetchPolicy: "network-only",
             });
             return fromServer.data?.petition;
-          } catch (e) {}
+          } catch {}
         },
         {
           concurrency: 1,

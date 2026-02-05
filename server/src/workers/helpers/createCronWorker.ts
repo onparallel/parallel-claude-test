@@ -108,5 +108,6 @@ export async function createCronWorker<Q extends keyof Config["cronWorkers"]>(
         const nextExecution = job.nextDate().toISO();
         logger.info(`Cron ${name}: Cron worker running. Next execution on ${nextExecution}`);
       },
-    ).argv;
+    )
+    .parse();
 }

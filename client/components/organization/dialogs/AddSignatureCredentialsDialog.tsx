@@ -134,7 +134,7 @@ function AddSignatureCredentialsDialog({
                     { provider: "Docusign" },
                   ),
                 });
-              } catch (e) {
+              } catch {
                 return;
               }
             }

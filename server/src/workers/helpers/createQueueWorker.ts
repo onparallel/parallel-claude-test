@@ -307,5 +307,6 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
       },
     )
     .demandCommand()
-    .recommendCommands().argv;
+    .recommendCommands()
+    .parse();
 }

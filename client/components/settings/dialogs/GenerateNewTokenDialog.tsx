@@ -39,7 +39,7 @@ export function GenerateNewTokenDialog(props: DialogProps) {
       if (data) {
         setApiKey(data.generateUserAuthToken.apiKey);
       }
-    } catch (e: any) {
+    } catch {
       setError("tokenName", { type: "unavailable" });
     }
   }

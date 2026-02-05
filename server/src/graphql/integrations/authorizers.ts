@@ -91,7 +91,7 @@ export function authenticatePetitionOrProfileReplyToken<
       } else {
         return false;
       }
-    } catch (e) {
+    } catch {
       return false;
     }
   };

@@ -561,7 +561,7 @@ function evaluateValuePredicate(
       default:
         return false;
     }
-  } catch (e) {
+  } catch {
     return false;
   }
 }

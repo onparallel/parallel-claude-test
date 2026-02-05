@@ -60,7 +60,7 @@ export function PetitionRepliesSummary({ petition, user, onRefetch }: PetitionRe
         { timeout: 120_000 },
       );
       onRefetch();
-    } catch (e) {
+    } catch {
     } finally {
       setIsLoading(false);
     }
@@ -78,7 +78,7 @@ export function PetitionRepliesSummary({ petition, user, onRefetch }: PetitionRe
         { timeout: 120_000 },
       );
       onRefetch();
-    } catch (e) {
+    } catch {
     } finally {
       setIsLoading(false);
     }

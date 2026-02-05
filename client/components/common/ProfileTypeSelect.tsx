@@ -230,7 +230,7 @@ function useGetProfileTypes() {
               fetchPolicy: "network-only",
             });
             return fromServer.data?.profileType;
-          } catch (e) {}
+          } catch {}
         },
         {
           concurrency: 1,

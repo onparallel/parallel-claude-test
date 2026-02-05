@@ -1010,7 +1010,7 @@ describe("GraphQL/Profile Type Processes", () => {
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull;
+      expect(data).toBeNull();
     });
   });
 });

@@ -1,4 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 require("dotenv").config();
 import camelCase from "camelcase";
 import { promises as fs } from "fs";
@@ -120,7 +120,7 @@ export type Create${table.name} = PartialProps<
     )
     .join("\n")}
   `;
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const prettierOptions = await fs.readFile(path.join(__dirname, "../../.prettierrc"), "utf-8");
   await fs.writeFile(
     dist,

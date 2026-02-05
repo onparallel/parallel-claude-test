@@ -196,7 +196,7 @@ export function CreateOrUpdateFieldGroupRelationshipsDialog({
               });
 
               props.onResolve();
-            } catch (e) {}
+            } catch {}
           }),
         },
       }}

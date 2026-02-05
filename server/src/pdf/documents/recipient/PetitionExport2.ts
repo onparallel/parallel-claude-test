@@ -670,7 +670,7 @@ function fieldDescription(
   if (description.includes("{{") || description.includes("{%")) {
     try {
       description = liquid.parseAndRenderSync(description, scope, { globals: { intl } });
-    } catch (e) {
+    } catch {
       description = "";
     }
     assert(isNonNullish(description));

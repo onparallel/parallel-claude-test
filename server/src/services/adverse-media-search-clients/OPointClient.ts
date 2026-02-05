@@ -116,7 +116,7 @@ export class OPointClient implements IAdverseMediaSearchClient {
         .map(pick(["id", "name"]))
         .filter((r) => !opts?.excludeEntityIds?.includes(r.id))
         .slice(0, 5);
-    } catch (error) {
+    } catch {
       return [];
     }
   }

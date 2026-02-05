@@ -1,4 +1,8 @@
-import { Select as ChakraSelect, SelectProps } from "@chakra-ui/react";
+import {
+  // eslint-disable-next-line no-restricted-imports
+  Select as ChakraSelect,
+  SelectProps,
+} from "@chakra-ui/react";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
 import { forwardRef } from "react";
 

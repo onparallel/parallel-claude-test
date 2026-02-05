@@ -63,7 +63,7 @@ export const createContact = mutationField("createContact", {
       );
 
       return contact;
-    } catch (error: any) {
+    } catch {
       throw new Error("INTERNAL_ERROR");
     }
   },

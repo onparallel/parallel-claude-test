@@ -105,7 +105,7 @@ export function useProfilesExcelImportTask() {
                 throw new Error();
               }
               return data.createProfilesExcelImportTask;
-            } catch (error) {
+            } catch {
               throw new Error("SERVER_ERROR");
             }
           },

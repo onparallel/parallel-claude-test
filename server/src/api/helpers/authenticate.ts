@@ -8,7 +8,7 @@ export function authenticate(): Handler {
         throw new Error();
       }
       next();
-    } catch (error: any) {
+    } catch {
       next(new Error("Invalid session"));
     }
   };

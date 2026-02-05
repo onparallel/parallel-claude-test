@@ -394,7 +394,7 @@ export async function getServerSideProps({
     } else {
       return { notFound: true };
     }
-  } catch (err) {
+  } catch {
     return {
       notFound: true,
     };

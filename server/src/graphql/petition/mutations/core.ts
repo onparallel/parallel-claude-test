@@ -1151,7 +1151,7 @@ export const updatePetition = mutationField("updatePetition", {
                   },
                 ),
               };
-      } catch (e) {
+      } catch {
         throw new ForbiddenError("Invalid signatureConfig");
       }
     }

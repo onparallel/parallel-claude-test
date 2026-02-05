@@ -480,7 +480,7 @@ export const getServerSideProps: GetServerSideProps<{
         relatedTemplates: data.landingTemplates.items,
       },
     };
-  } catch (err) {
+  } catch {
     return { notFound: true };
   }
 };

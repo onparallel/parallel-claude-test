@@ -34,7 +34,7 @@ export const scim = Router().use(
       req.context.organization = organization;
       req.context.trails["orgId"] = organization?.id;
       next();
-    } catch (error) {
+    } catch {
       return res.sendStatus(401);
     }
   },

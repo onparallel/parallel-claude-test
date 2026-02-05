@@ -161,7 +161,7 @@ function IntegrationsSignature() {
         try {
           await markIntegrationAsDefault({ variables: { id } });
           refetch();
-        } catch (error) {}
+        } catch {}
       },
       async onDocusignReauthorize(integration) {
         const [error] = await withError(

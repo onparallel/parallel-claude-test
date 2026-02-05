@@ -377,7 +377,7 @@ function useGetProfiles() {
               fetchPolicy: "network-only",
             });
             return fromServer.data?.profile;
-          } catch (e) {}
+          } catch {}
         },
         {
           concurrency: 1,

@@ -27,7 +27,7 @@ export function authenticate<
         throw new Error();
       }
       return true;
-    } catch (e) {
+    } catch {
       throw new AuthenticationError("Invalid session");
     }
   };

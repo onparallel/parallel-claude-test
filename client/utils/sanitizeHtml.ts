@@ -3,7 +3,7 @@ import createDOMPurify, { Config } from "dompurify";
 export const sanitizeHtml = (function init() {
   // cache instance of DOMPurify
   const DOMPurify = createDOMPurify(
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     typeof window === "undefined" ? (new (require("jsdom").JSDOM)("").window as any) : window,
   );
   return function (source: string, config: Config = {}) {

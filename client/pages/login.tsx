@@ -200,7 +200,7 @@ function Login() {
         },
       });
       return data?.resendVerificationEmail === "SUCCESS";
-    } catch (error) {}
+    } catch {}
     return false;
   };
 
@@ -341,7 +341,7 @@ const _queries = [
 Login.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
   try {
     await fetchQuery(Login_currentUserDocument, { fetchPolicy: "network-only" });
-  } catch (error: any) {
+  } catch {
     return {};
   }
 };

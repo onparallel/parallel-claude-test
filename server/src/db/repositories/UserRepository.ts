@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { DatabaseError } from "pg";
-import { groupBy, indexBy, omit, unique } from "remeda";
+import { groupBy, indexBy, isNonNullish, omit, unique } from "remeda";
 import { keyBuilder } from "../../util/keyBuilder";
 import { pMapChunk } from "../../util/promises/pMapChunk";
 import { Maybe, MaybeArray, unMaybeArray } from "../../util/types";
@@ -363,7 +363,10 @@ export class UserRepository extends BaseRepository {
         "*",
       );
 
-    userData ? this.loadUserData.dataloader.clear(userData.id) : null;
+    if (isNonNullish(userData)) {
+      this.loadUserData.dataloader.clear(userData.id);
+    }
+
     this.loadUserByExternalId.dataloader.clear({ externalId, orgId });
     return userData;
   }

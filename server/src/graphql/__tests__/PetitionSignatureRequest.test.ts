@@ -240,7 +240,7 @@ describe("GraphQL/PetitionSignatureRequest", () => {
       await mocks.knex.from("petition_approval_request_step").delete();
 
       expect(errors).toContainGraphQLError("APPROVAL_REQUEST_STEP_NOT_COMPLETED");
-      expect(data).toBeNull;
+      expect(data).toBeNull();
     });
 
     it("starts the signature if reviewAfterApproval and approval steps are completed", async () => {

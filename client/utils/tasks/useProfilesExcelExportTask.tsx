@@ -44,7 +44,7 @@ export function useProfilesExcelExportTask() {
                 throw new Error();
               }
               return data.createProfilesExcelExportTask;
-            } catch (error) {
+            } catch {
               throw new Error("SERVER_ERROR");
             }
           },
