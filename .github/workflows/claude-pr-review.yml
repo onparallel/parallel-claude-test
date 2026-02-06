@@ -24,11 +24,9 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           claude_args: |
-            --allowedTools "Bash(git *),Bash(gh pr *),Bash(gh api *)"
+            --allowedTools "Bash(git diff *),Bash(git log *),Bash(git show *),Bash(gh pr diff *),Bash(gh pr view *),Bash(gh pr comment *),Bash(cat *),Bash(echo *)"
           prompt: |
-            IMPORTANT CONTEXT: You are running in GitHub Actions CI environment.
-            The PR number is ${{ github.event.pull_request.number }}.
-            Do NOT try to check environment variables - you are confirmed to be in CI.
+            You are running in GitHub Actions CI. PR number is ${{ github.event.pull_request.number }}.
 
             Run the /code-review skill to analyze this PR for security vulnerabilities and code quality issues.
             Use `git diff origin/${{ github.base_ref }}...HEAD` to get the changes.
@@ -52,11 +50,9 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           claude_args: |
-            --allowedTools "Bash(git *),Bash(gh pr *),Bash(gh api *)"
+            --allowedTools "Bash(git diff *),Bash(git log *),Bash(git show *),Bash(gh pr diff *),Bash(gh pr view *),Bash(gh pr comment *),Bash(cat *),Bash(echo *)"
           prompt: |
-            IMPORTANT CONTEXT: You are running in GitHub Actions CI environment.
-            The PR number is ${{ github.event.pull_request.number }}.
-            Do NOT try to check environment variables - you are confirmed to be in CI.
+            You are running in GitHub Actions CI. PR number is ${{ github.event.pull_request.number }}.
 
             Run the /check-if-documentation-needs-update skill to analyze if this PR requires documentation updates.
             Use `git diff origin/${{ github.base_ref }}...HEAD` to get the changes.
