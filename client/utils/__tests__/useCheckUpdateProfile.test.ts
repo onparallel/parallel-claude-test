@@ -6,6 +6,8 @@ import type {
 import { renderHook } from "@testing-library/react";
 import { useCheckUpdateProfile } from "../useCheckUpdateProfile";
 
+// Test cases for useCheckUpdateProfile hook
+
 describe("useCheckUpdateProfile", () => {
   const createMockProfile = (
     overrides?: Partial<useCheckUpdateProfile_ProfileFragment>,
