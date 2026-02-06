@@ -30,9 +30,12 @@ jobs:
             - "Bash(gh pr diff:*)"
             - "Bash(gh pr view:*)"
           prompt: |
-            Run the /code-review skill to analyze this PR for security vulnerabilities and code quality issues.
+            IMPORTANT CONTEXT: You are running in GitHub Actions CI environment.
+            The PR number is ${{ github.event.pull_request.number }}.
+            Do NOT try to check environment variables - you are confirmed to be in CI.
 
-            Environment variable PR_NUMBER is set to the current PR number.
+            Run the /code-review skill to analyze this PR for security vulnerabilities and code quality issues.
+            Use `git diff origin/${{ github.base_ref }}...HEAD` to get the changes.
 
   docs-check:
     name: Documentation Check
@@ -59,9 +62,12 @@ jobs:
             - "Bash(gh pr diff:*)"
             - "Bash(gh pr view:*)"
           prompt: |
-            Run the /check-if-documentation-needs-update skill to analyze if this PR requires documentation updates.
+            IMPORTANT CONTEXT: You are running in GitHub Actions CI environment.
+            The PR number is ${{ github.event.pull_request.number }}.
+            Do NOT try to check environment variables - you are confirmed to be in CI.
 
-            Environment variable PR_NUMBER is set to the current PR number.
+            Run the /check-if-documentation-needs-update skill to analyze if this PR requires documentation updates.
+            Use `git diff origin/${{ github.base_ref }}...HEAD` to get the changes.
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
