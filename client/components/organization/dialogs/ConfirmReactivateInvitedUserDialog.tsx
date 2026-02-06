@@ -1,7 +1,6 @@
-import { Button } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Stack, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
 
 interface ConfirmReactivateInvitedUserDialogProps {
@@ -40,7 +39,7 @@ function ConfirmReactivateInvitedUserDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="primary" onClick={() => props.onResolve()}>
+        <Button colorPalette="primary" onClick={() => props.onResolve()}>
           <FormattedMessage
             id="component.confirm-reactivate-invited-user-dialog.confirm"
             defaultMessage="Yes, reactivate"

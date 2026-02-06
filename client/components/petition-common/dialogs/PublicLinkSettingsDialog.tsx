@@ -4,7 +4,6 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Button,
   Checkbox,
   FormControl,
   FormErrorMessage,
@@ -24,6 +23,7 @@ import { DialogProps, useDialog } from "@parallel/components/common/dialogs/Dial
 import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { PlaceholderInput } from "@parallel/components/common/slate/PlaceholderInput";
+import { Button, Text } from "@parallel/components/ui";
 import {
   PublicLinkSettingsDialog_getSlugDocument,
   PublicLinkSettingsDialog_isValidSlugDocument,
@@ -42,7 +42,6 @@ import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, pick } from "remeda";
 import { assert } from "ts-essentials";
-import { Text } from "@parallel/components/ui";
 
 interface PublicLinkSettingsData {
   title: string;
@@ -424,7 +423,7 @@ export function PublicLinkSettingsDialog({
                 variant="link"
                 size="sm"
                 onClick={handleRestorePetitionNamePattern}
-                isDisabled={(pattern?.trim() ?? "") === defaultPetitionNamePattern}
+                disabled={(pattern?.trim() ?? "") === defaultPetitionNamePattern}
               >
                 <FormattedMessage
                   id="component.settings-public-link-dialog.petition-name-restore-defaults"
@@ -458,7 +457,7 @@ export function PublicLinkSettingsDialog({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="primary" variant="solid">
+        <Button type="submit" colorPalette="primary" variant="solid">
           {publicLink ? (
             <FormattedMessage id="generic.save" defaultMessage="Save" />
           ) : (

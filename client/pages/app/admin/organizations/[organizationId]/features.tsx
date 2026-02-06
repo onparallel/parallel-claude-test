@@ -1,16 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import {
-  Badge,
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  FormLabel,
-  HStack,
-  Stack,
-  Switch,
-} from "@chakra-ui/react";
+import { Badge, Box, Flex, FormControl, FormLabel, HStack, Stack, Switch } from "@chakra-ui/react";
 import { AdminOrganizationsLayout } from "@parallel/components/admin-organizations/AdminOrganizationsLayout";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -20,6 +10,7 @@ import { HighlightText } from "@parallel/components/common/HighlightText";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdminAccess";
+import { Button, Text } from "@parallel/components/ui";
 import {
   AdminOrganizationsFeatures_queryDocument,
   AdminOrganizationsFeatures_updateFeatureFlagsDocument,
@@ -33,7 +24,6 @@ import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish, omit } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 type AdminOrganizationsFeaturesProps = UnwrapPromise<
   ReturnType<typeof AdminOrganizationsFeatures.getInitialProps>
@@ -150,11 +140,11 @@ function AdminOrganizationsFeatures({ organizationId }: AdminOrganizationsFeatur
             <HStack paddingTop={6} alignSelf="flex-end">
               <Button
                 onClick={() => reset({ features: organization.features })}
-                isDisabled={!formState.isDirty}
+                disabled={!formState.isDirty}
               >
                 <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
               </Button>
-              <Button colorScheme="primary" type="submit" isDisabled={!formState.isDirty}>
+              <Button colorPalette="primary" type="submit" disabled={!formState.isDirty}>
                 <FormattedMessage id="generic.save-changes" defaultMessage="Save changes" />
               </Button>
             </HStack>

@@ -1,9 +1,8 @@
-import { Button } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import { Maybe } from "@parallel/utils/types";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 interface ExportFailedDialogProps extends DialogProps {
   fileName: string;
@@ -48,7 +47,7 @@ function ExportFailedDialog({ fileName, fieldName, ...props }: ExportFailedDialo
         </Button>
       }
       cancel={
-        <Button colorScheme="red" onClick={() => props.onReject()}>
+        <Button colorPalette="red" onClick={() => props.onReject()}>
           <FormattedMessage
             id="component.export-failed-dialog.cancel"
             defaultMessage="Stop export"

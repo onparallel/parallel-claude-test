@@ -1,5 +1,6 @@
-import { Box, Button, Stack } from "@chakra-ui/react";
+import { Box, Stack } from "@chakra-ui/react";
 import { RepeatIcon, UserPlusIcon } from "@parallel/chakra/icons";
+import { Button } from "@parallel/components/ui";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";
@@ -46,8 +47,8 @@ export function OrganizationUsersListTableHeader({
         <Spacer />
         {hasSsoProvider ? null : (
           <Button
-            isDisabled={isCreateUserButtonDisabled}
-            colorScheme="primary"
+            disabled={isCreateUserButtonDisabled}
+            colorPalette="primary"
             leftIcon={<UserPlusIcon fontSize="18px" />}
             onClick={onCreateUser}
           >

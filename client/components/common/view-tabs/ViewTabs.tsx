@@ -1,9 +1,10 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, MenuDivider, MenuItem, MenuList, Square } from "@chakra-ui/react";
+import { Box, Flex, MenuDivider, MenuItem, MenuList, Square } from "@chakra-ui/react";
 import { CopyIcon, DeleteIcon, EditIcon, StarEmptyIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
 import { useAskNameDialog } from "@parallel/components/petition-list/AskNameDialog";
+import { Button, Text } from "@parallel/components/ui";
 import { ViewTabs_ListViewFragment } from "@parallel/graphql/__types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { Reorder } from "framer-motion";
@@ -13,7 +14,6 @@ import { isNonNullish } from "remeda";
 import { ConfirmDialog } from "../dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "../dialogs/DialogProvider";
 import { RadioTab, RadioTabList } from "../RadioTab";
-import { Text } from "@parallel/components/ui";
 
 const MIN_TAB_WIDTH = 96;
 
@@ -344,7 +344,7 @@ function ConfirmDeleteViewDialog({ name, ...props }: DialogProps<{ name: string 
         </Text>
       }
       confirm={
-        <Button colorScheme="red" onClick={() => props.onResolve()}>
+        <Button colorPalette="red" onClick={() => props.onResolve()}>
           <FormattedMessage id="generic.confirm-delete-button" defaultMessage="Yes, delete" />
         </Button>
       }

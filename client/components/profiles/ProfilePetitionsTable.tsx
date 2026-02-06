@@ -1,12 +1,11 @@
 import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
 import {
-  Button,
   ButtonGroup,
   Center,
   Flex,
-  HStack,
   Heading,
+  HStack,
   MenuItem,
   MenuList,
   Stack,
@@ -17,12 +16,13 @@ import { DateTime } from "@parallel/components/common/DateTime";
 import { Link, NormalLink } from "@parallel/components/common/Link";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { TableColumn } from "@parallel/components/common/Table";
+import { Button, Text } from "@parallel/components/ui";
 import {
-  ProfilePetitionsTable_PetitionFragment,
-  ProfilePetitionsTable_ProfileFragment,
   ProfilePetitionsTable_associateProfileToPetitionDocument,
   ProfilePetitionsTable_disassociateProfilesFromPetitionsDocument,
+  ProfilePetitionsTable_PetitionFragment,
   ProfilePetitionsTable_petitionsDocument,
+  ProfilePetitionsTable_ProfileFragment,
 } from "@parallel/graphql/__types";
 import { EnumerateList } from "@parallel/utils/EnumerateList";
 import { FORMATS } from "@parallel/utils/dates";
@@ -50,7 +50,6 @@ import { useConfirmDisassociateProfileDialog } from "../petition-activity/dialog
 import { PetitionTemplateFilter } from "../petition-list/filters/PetitionTemplateFilter";
 import { useAssociateNewPetitionToProfileDialog } from "./dialogs/AssociateNewPetitionToProfileDialog";
 import { useAssociatePetitionToProfileDialog } from "./dialogs/AssociatePetitionToProfileDialog";
-import { Text } from "@parallel/components/ui";
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
@@ -208,7 +207,7 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
               <Button
                 flex="1"
                 onClick={handleCreateNewPetition}
-                isDisabled={!userCanCreatePetition || profileIsDeleted}
+                disabled={!userCanCreatePetition || profileIsDeleted}
                 borderEndRadius={0}
               >
                 <FormattedMessage

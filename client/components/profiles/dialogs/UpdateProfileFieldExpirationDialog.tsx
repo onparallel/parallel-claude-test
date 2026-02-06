@@ -2,7 +2,6 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Button,
   Center,
   Flex,
   FormControl,
@@ -18,6 +17,7 @@ import {
 } from "@parallel/components/common/LocalizableUserTextRender";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import { FORMATS } from "@parallel/utils/dates";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
@@ -26,7 +26,6 @@ import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 interface UpdateProfileFieldExpirationDialogResult {
   expiryDate: string | null;
@@ -179,7 +178,7 @@ function UpdateProfileFieldExpirationDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="primary" type="submit">
+        <Button colorPalette="primary" type="submit">
           <FormattedMessage id="generic.accept" defaultMessage="Accept" />
         </Button>
       }

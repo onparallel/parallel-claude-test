@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
   Box,
-  Button,
   Grid,
   GridItem,
   Heading,
@@ -31,6 +30,7 @@ import {
   TimeIcon,
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Button, Text } from "@parallel/components/ui";
 import {
   PetitionApprovalRequestStep,
   PetitionApprovalRequestStepStatus,
@@ -76,7 +76,6 @@ import {
 import { useConfirmCancelPetitionApprovalFlowDialog } from "./dialogs/ConfirmCancelPetitionApprovalFlowDialog";
 import { useConfirmSendReminderPetitionApprovalFlowDialog } from "./dialogs/ConfirmSendReminderPetitionApprovalFlowDialog";
 import { useConfirmSkipPetitionApprovalFlowDialog } from "./dialogs/ConfirmSkipPetitionApprovalFlowDialog";
-import { Text } from "@parallel/components/ui";
 
 interface PetitionApprovalsCardProps {
   petition: PetitionApprovalsCard_PetitionFragment;
@@ -1170,7 +1169,7 @@ function PetitionApprovalStepRow({
                 />
               }
             >
-              <Button colorScheme="primary" onClick={onStart} isDisabled={isDisabled}>
+              <Button colorPalette="primary" onClick={onStart} disabled={isDisabled}>
                 <FormattedMessage
                   id="component.petition-approvals-card.request-approval"
                   defaultMessage="Request approval"
@@ -1199,16 +1198,16 @@ function PetitionApprovalStepRow({
             <Button
               leftIcon={<ThumbsUpIcon />}
               onClick={onApprove}
-              isDisabled={isApproved || isSkipped || isRejected || isDisabled}
-              colorScheme={isApproved || isSkipped ? "green" : undefined}
+              disabled={isApproved || isSkipped || isRejected || isDisabled}
+              colorPalette={isApproved || isSkipped ? "green" : undefined}
             >
               <FormattedMessage id="generic.approve" defaultMessage="Approve" />
             </Button>
             <Button
               leftIcon={<ThumbsDownIcon />}
               onClick={onReject}
-              isDisabled={isApproved || isSkipped || isRejected || isDisabled}
-              colorScheme={isRejected ? "red" : undefined}
+              disabled={isApproved || isSkipped || isRejected || isDisabled}
+              colorPalette={isRejected ? "red" : undefined}
             >
               <FormattedMessage id="generic.reject" defaultMessage="Reject" />
             </Button>

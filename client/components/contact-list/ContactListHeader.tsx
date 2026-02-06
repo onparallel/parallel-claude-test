@@ -1,5 +1,6 @@
-import { Box, Button, MenuItem, MenuList, Stack } from "@chakra-ui/react";
+import { Box, MenuItem, MenuList, Stack } from "@chakra-ui/react";
 import { RepeatIcon, UploadIcon, UserPlusIcon } from "@parallel/chakra/icons";
+import { Button, Text } from "@parallel/components/ui";
 import { Focusable } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, RefObject, useCallback, useRef, useState } from "react";
@@ -9,7 +10,6 @@ import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
 import { ResponsiveButtonIcon } from "../common/ResponsiveButtonIcon";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
-import { Text } from "@parallel/components/ui";
 
 export interface ContactListHeaderProps {
   search: string | null;

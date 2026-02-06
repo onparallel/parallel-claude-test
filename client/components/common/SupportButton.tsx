@@ -1,5 +1,6 @@
-import { Button, ButtonOptions, ThemingProps } from "@chakra-ui/react";
+import { ButtonOptions, ThemingProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Button } from "@parallel/components/ui";
 import { isNonNullish } from "remeda";
 import { NakedLink } from "./Link";
 
@@ -13,7 +14,7 @@ export const SupportButton = chakraForwardRef<"a", SupportButton>(function Suppo
 ) {
   if (isDisabled) {
     return (
-      <Button ref={ref as any} as="a" {...(props as any)} isDisabled={isDisabled}>
+      <Button ref={ref as any} as="a" {...(props as any)} disabled={isDisabled}>
         {children}
       </Button>
     );

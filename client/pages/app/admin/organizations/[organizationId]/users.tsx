@@ -15,6 +15,7 @@ import { TablePage } from "@parallel/components/common/TablePage";
 import { UserReference } from "@parallel/components/common/UserReference";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdminAccess";
+import { Text } from "@parallel/components/ui";
 import {
   AdminOrganizationsMembers_inviteUserToOrganizationDocument,
   AdminOrganizationsMembers_organizationDocument,
@@ -38,7 +39,6 @@ import { useSelection } from "@parallel/utils/useSelectionState";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { sort } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 const SORTING = ["fullName", "email", "createdAt", "lastActiveAt"] as const;
 

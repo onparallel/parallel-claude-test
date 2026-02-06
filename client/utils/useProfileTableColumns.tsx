@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import {
   Box,
-  Button,
   ButtonGroup,
   Flex,
   FormControl,
@@ -31,7 +30,7 @@ import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { UserSelect } from "@parallel/components/common/UserSelect";
 import { ProfileFormFieldCheckboxInner } from "@parallel/components/profiles/form-fields/ProfileFormFieldCheckbox";
 import { ProfileFormFieldSelectInner } from "@parallel/components/profiles/form-fields/ProfileFormFieldSelect";
-import { Text } from "@parallel/components/ui";
+import { Button, Text } from "@parallel/components/ui";
 import {
   FilterSharedWithLogicalOperator,
   ProfileValueFilterLine_ProfileTypeFieldFragment,
@@ -325,7 +324,7 @@ function ProfileValueFilter({
             fontWeight="normal"
             leftIcon={<PlusCircleFilledIcon color="primary.500" position="relative" boxSize={5} />}
             onClick={handleAddFilter}
-            isDisabled={conditions.length >= 5}
+            disabled={conditions.length >= 5}
           >
             <FormattedMessage id="generic.add-filter" defaultMessage="Add filter" />
           </Button>
@@ -348,7 +347,7 @@ function ProfileValueFilter({
             fontWeight="normal"
             leftIcon={<PlusCircleFilledIcon color="primary.500" position="relative" boxSize={5} />}
             onClick={handleAddFilter}
-            isDisabled={conditions.length >= 5}
+            disabled={conditions.length >= 5}
           >
             <FormattedMessage id="generic.add-filter" defaultMessage="Add filter" />
           </Button>
@@ -358,7 +357,7 @@ function ProfileValueFilter({
           <Button size="sm" onClick={() => setValue("filter.conditions", [])}>
             <FormattedMessage id="generic.clear" defaultMessage="Clear" />
           </Button>
-          <Button type="submit" colorScheme="primary" size="sm">
+          <Button type="submit" colorPalette="primary" size="sm">
             <FormattedMessage id="generic.apply" defaultMessage="Apply" />
           </Button>
         </ButtonGroup>

@@ -1,4 +1,5 @@
-import { Button, Flex, Grid, GridItem, Heading } from "@chakra-ui/react";
+import { Flex, Grid, GridItem, Heading } from "@chakra-ui/react";
+import { Button } from "@parallel/components/ui";
 import { NakedLink } from "@parallel/components/common/Link";
 import { LandingTemplateCard_LandingTemplateFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";

@@ -2,8 +2,8 @@ import { Badge, HStack } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { BusinessIcon, UserIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { isNullish } from "remeda";
 import { Text } from "@parallel/components/ui";
+import { isNullish } from "remeda";
 
 const LABELS = {
   "SI-PERSON": "Special Interest - Person",

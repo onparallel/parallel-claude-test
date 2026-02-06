@@ -1,5 +1,4 @@
 import {
-  Button,
   ButtonProps,
   MenuButton,
   MenuDivider,
@@ -8,6 +7,7 @@ import {
   MenuOptionGroup,
   Portal,
 } from "@chakra-ui/react";
+import { Button } from "@parallel/components/ui";
 import { Menu } from "@parallel/chakra/components";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
 import { unMaybeArray } from "@parallel/utils/types";

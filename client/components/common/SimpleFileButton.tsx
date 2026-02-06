@@ -1,4 +1,5 @@
-import { Button, ButtonProps } from "@chakra-ui/react";
+import { ButtonProps } from "@chakra-ui/react";
+import { Button } from "@parallel/components/ui";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { FileIcon } from "./FileIcon";
 import { FileName } from "./FileName";

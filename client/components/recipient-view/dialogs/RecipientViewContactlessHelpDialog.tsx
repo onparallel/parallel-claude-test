@@ -1,11 +1,11 @@
-import { Button, Heading, HStack, Stack } from "@chakra-ui/react";
+import { Heading, HStack, Stack } from "@chakra-ui/react";
 import { QuestionOutlineIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
+import { Button, Text } from "@parallel/components/ui";
 import { Tone } from "@parallel/graphql/__types";
 import { useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { DialogProps, useDialog } from "../../common/dialogs/DialogProvider";
-import { Text } from "@parallel/components/ui";
 
 function RecipientViewContactlessHelpDialog({ tone, ...props }: DialogProps<{ tone: Tone }>) {
   const intl = useIntl();
@@ -63,7 +63,7 @@ function RecipientViewContactlessHelpDialog({ tone, ...props }: DialogProps<{ to
           </Button>
           <Button
             ref={focusRef}
-            colorScheme="primary"
+            colorPalette="primary"
             onClick={() => props.onResolve()}
             width={{ base: "full", sm: "fit-content" }}
           >

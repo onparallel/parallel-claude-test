@@ -1,9 +1,9 @@
-import { Button, Code, Heading, Stack } from "@chakra-ui/react";
+import { Code, Heading, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export interface SignatureCancelledRequestErrorDialogProps {
   message: ReactNode;
@@ -36,7 +36,7 @@ export function SignatureCancelledRequestErrorDialog({
         </Stack>
       }
       cancel={
-        <Button colorScheme="primary" onClick={() => props.onReject()}>
+        <Button colorPalette="primary" onClick={() => props.onReject()}>
           <FormattedMessage id="generic.ok" defaultMessage="OK" />
         </Button>
       }

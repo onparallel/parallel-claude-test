@@ -1,10 +1,10 @@
-import { Button, Stack } from "@chakra-ui/react";
+import { Stack } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import { ReactNode, useRef } from "react";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export interface ErrorDialogProps {
   message: ReactNode;
@@ -32,7 +32,7 @@ export function ErrorDialog({ message, header, ...props }: DialogProps<ErrorDial
       confirm={
         <Button
           ref={focusRef}
-          colorScheme="primary"
+          colorPalette="primary"
           minWidth={24}
           onClick={() => props.onResolve()}
         >

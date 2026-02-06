@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Center, Flex, HStack, Heading, Stack } from "@chakra-ui/react";
+import { Box, Center, Flex, Heading, HStack, Stack } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { AddIcon, DeleteIcon, EditSimpleIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
@@ -23,13 +23,14 @@ import { RecipientViewPetitionFieldSelect } from "@parallel/components/recipient
 import { RecipientViewPetitionFieldShortText } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldShortText";
 import { RecipientViewPetitionFieldTaxDocuments } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldTaxDocuments";
 import { RecipientViewPetitionFieldText } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldText";
+import { Button, Text } from "@parallel/components/ui";
 import {
+  RecipientViewPetitionFieldGroup_PublicPetitionFieldFragment,
+  RecipientViewPetitionFieldGroup_PublicPetitionFragment,
   RecipientViewPetitionFieldGroupCard_PetitionFieldFragment,
   RecipientViewPetitionFieldGroupCard_PublicPetitionFieldFragment,
   RecipientViewPetitionFieldGroupLayout_PetitionFieldFragment,
   RecipientViewPetitionFieldGroupLayout_PublicPetitionFieldFragment,
-  RecipientViewPetitionFieldGroup_PublicPetitionFieldFragment,
-  RecipientViewPetitionFieldGroup_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
 import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
 import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
@@ -39,7 +40,6 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish, zip } from "remeda";
 import { RecipientViewPetitionFieldIdVerification } from "./RecipientViewPetitionFieldIdVerification";
 import { RecipientViewPetitionFieldLayoutProps } from "./RecipientViewPetitionFieldLayout";
-import { Text } from "@parallel/components/ui";
 
 export interface RecipientViewPetitionFieldGroupProps
   extends Omit<
@@ -493,7 +493,7 @@ export function RecipientViewPetitionFieldGroupCard({
                 />
               }
               confirm={
-                <Button onClick={onRemoveReply} size="sm" colorScheme="red">
+                <Button onClick={onRemoveReply} size="sm" colorPalette="red">
                   <FormattedMessage
                     id="component.recipient-view-petition-field-group.remove-confirmation-button"
                     defaultMessage="Remove"
@@ -517,7 +517,7 @@ export function RecipientViewPetitionFieldGroupCard({
                       groupName === groupName.toUpperCase() ? groupName : groupName.toLowerCase(),
                   },
                 )}
-                isDisabled={isDisabled}
+                disabled={isDisabled}
               />
             </ConfimationPopover>
           ) : null}

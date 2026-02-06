@@ -2,6 +2,7 @@ import { Box, Center, FormControl, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
+import { Text } from "@parallel/components/ui";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
@@ -20,7 +21,6 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
-import { Text } from "@parallel/components/ui";
 
 export interface RecipientViewPetitionFieldSelectProps
   extends Omit<
@@ -296,7 +296,7 @@ const RecipientViewPetitionFieldReplySelect = forwardRef<
         </Box>
       </FormControl>
       <IconButtonWithTooltip
-        isDisabled={isDisabled || reply.status === "APPROVED"}
+        disabled={isDisabled || reply.status === "APPROVED"}
         onClick={() => onDelete()}
         variant="ghost"
         icon={<DeleteIcon />}

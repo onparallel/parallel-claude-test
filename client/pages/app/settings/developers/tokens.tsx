@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Button, Center, Stack } from "@chakra-ui/react";
+import { Box, Center, Stack } from "@chakra-ui/react";
 import { DeleteIcon, RepeatIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -15,6 +15,7 @@ import { WithApolloDataContext, withApolloData } from "@parallel/components/comm
 import { withPermission } from "@parallel/components/common/withPermission";
 import { DevelopersLayout } from "@parallel/components/layout/DevelopersLayout";
 import { useGenerateNewTokenDialog } from "@parallel/components/settings/dialogs/GenerateNewTokenDialog";
+import { Button, Text } from "@parallel/components/ui";
 import {
   Tokens_UserAuthenticationTokenFragment,
   Tokens_revokeUserAuthTokenDocument,
@@ -26,7 +27,6 @@ import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 function Tokens() {
   const intl = useIntl();
@@ -100,7 +100,7 @@ function Tokens() {
             />
 
             <Spacer />
-            <Button colorScheme="primary" onClick={handleGenerateNewToken}>
+            <Button colorPalette="primary" onClick={handleGenerateNewToken}>
               <FormattedMessage id="page.tokens.create-token" defaultMessage="Create token" />
             </Button>
           </Stack>

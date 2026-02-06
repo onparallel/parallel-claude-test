@@ -290,7 +290,7 @@ export function ProfileLayout({
                         })
                   }
                   onClick={handleMySubscription}
-                  isDisabled={status !== "OPEN"}
+                  disabled={status !== "OPEN"}
                 />
                 <WhenPermission
                   permission={[

@@ -4,7 +4,6 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Button,
   Center,
   Checkbox,
   FormControl,
@@ -33,6 +32,7 @@ import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWit
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import {
   ConfirmPetitionSignersDialog_PetitionSignerFragment,
   ConfirmPetitionSignersDialog_SignatureConfigFragment,
@@ -56,7 +56,6 @@ import { isNonNullish, partition } from "remeda";
 import { SelectedSignerRow } from "../SelectedSignerRow";
 import { SuggestedSigners } from "../SuggestedSigners";
 import { useConfirmSignerInfoDialog } from "./ConfirmSignerInfoDialog";
-import { Text } from "@parallel/components/ui";
 
 interface ConfirmPetitionSignersDialogProps {
   signatureConfig: ConfirmPetitionSignersDialog_SignatureConfigFragment;
@@ -653,9 +652,9 @@ export function ConfirmPetitionSignersDialog(
       confirm={
         <Button
           data-action="start-signature"
-          colorScheme="primary"
+          colorPalette="primary"
           type="submit"
-          isDisabled={
+          disabled={
             props.isUpdate
               ? false
               : allSigners.length === 0 ||

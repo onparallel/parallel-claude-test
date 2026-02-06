@@ -1,10 +1,10 @@
-import { Button, HStack } from "@chakra-ui/react";
+import { HStack } from "@chakra-ui/react";
 import { ExclamationOutlineIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { Link } from "@parallel/components/common/Link";
+import { Button, Text } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export function PreviewDowJonesPermissionDeniedDialog({ ...props }: DialogProps<{}>) {
   return (
@@ -42,7 +42,7 @@ export function PreviewDowJonesPermissionDeniedDialog({ ...props }: DialogProps<
       }
       cancel={<></>}
       confirm={
-        <Button onClick={() => props.onResolve()} colorScheme="primary" variant="solid">
+        <Button onClick={() => props.onResolve()} colorPalette="primary" variant="solid">
           <FormattedMessage id="generic.accept" defaultMessage="Accept" />
         </Button>
       }

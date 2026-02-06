@@ -1,7 +1,7 @@
-import { Alert, AlertDescription, AlertIcon, Box, Button, Flex } from "@chakra-ui/react";
+import { Alert, AlertDescription, AlertIcon, Box, Flex } from "@chakra-ui/react";
 import { Tone } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
+import { Button, Text } from "@parallel/components/ui";
 
 interface RecipientViewRefreshRepliesAlertProps {
   tone?: Tone;

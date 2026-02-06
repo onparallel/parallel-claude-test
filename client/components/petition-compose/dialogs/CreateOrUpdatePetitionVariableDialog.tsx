@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
   Box,
-  Button,
   Center,
   FormControl,
   FormErrorMessage,
@@ -38,7 +37,7 @@ import {
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
-import { HStack, Input, Stack, Text } from "@parallel/components/ui";
+import { Button, HStack, Input, Stack, Text } from "@parallel/components/ui";
 import {
   CreatePetitionVariableInput,
   PetitionVariableType,
@@ -177,7 +176,7 @@ function SelectVariableTypeDialog({
         </FormControl>
       }
       confirm={
-        <Button type="submit" colorScheme="primary">
+        <Button type="submit" colorPalette="primary">
           <FormattedMessage id="generic.next-button" defaultMessage="Next" />
         </Button>
       }
@@ -543,7 +542,7 @@ function CreateOrUpdateNumericVariableDialog({
       }
       alternative={
         isUpdating ? (
-          <Button variant="outline" colorScheme="red" onClick={handleDelete}>
+          <Button variant="outline" colorPalette="red" onClick={handleDelete}>
             <FormattedMessage id="generic.delete" defaultMessage="Delete" />
           </Button>
         ) : undefined
@@ -556,7 +555,7 @@ function CreateOrUpdateNumericVariableDialog({
         )
       }
       confirm={
-        <Button colorScheme="primary" type="submit">
+        <Button colorPalette="primary" type="submit">
           {isUpdating ? (
             <FormattedMessage id="generic.save" defaultMessage="Save" />
           ) : (
@@ -882,7 +881,7 @@ function CreateOrUpdateEnumVariableDialog({
       }
       alternative={
         isUpdating ? (
-          <Button variant="outline" colorScheme="red" onClick={handleDelete}>
+          <Button variant="outline" colorPalette="red" onClick={handleDelete}>
             <FormattedMessage id="generic.delete" defaultMessage="Delete" />
           </Button>
         ) : undefined
@@ -895,7 +894,7 @@ function CreateOrUpdateEnumVariableDialog({
         )
       }
       confirm={
-        <Button colorScheme="primary" type="submit">
+        <Button colorPalette="primary" type="submit">
           {isUpdating ? (
             <FormattedMessage id="generic.save" defaultMessage="Save" />
           ) : (
@@ -1088,7 +1087,7 @@ function EnumVariableOption({
           control={control}
           render={({ field: { value, onChange } }) => (
             <IconButtonWithTooltip
-              isDisabled={fields.length === 1}
+              disabled={fields.length === 1}
               variant="outline"
               onClick={() => {
                 const defaultOptionIndex = fields.findIndex((f) => f.isDefault);
@@ -1114,7 +1113,7 @@ function EnumVariableOption({
 
       <Td verticalAlign="top" paddingInline={1} paddingBlock={1}>
         <IconButtonWithTooltip
-          isDisabled={fields.length === 1 || isUpdating}
+          disabled={fields.length === 1 || isUpdating}
           onClick={() => onRemove(index)}
           icon={<DeleteIcon />}
           variant="outline"

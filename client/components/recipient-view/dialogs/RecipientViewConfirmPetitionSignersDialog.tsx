@@ -3,7 +3,6 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Button,
   Checkbox,
   FormControl,
   HStack,
@@ -21,6 +20,7 @@ import { SelectedSignerRow } from "@parallel/components/petition-common/Selected
 import { SuggestedSigners } from "@parallel/components/petition-common/SuggestedSigners";
 import type { SignerSelectSelection } from "@parallel/components/petition-common/dialogs/ConfirmPetitionSignersDialog";
 import { useRecipientViewConfirmSignerInfoDialog } from "@parallel/components/petition-common/dialogs/RecipientViewConfirmSignerInfoDialog";
+import { Button, Text } from "@parallel/components/ui";
 import {
   PublicPetitionSignerDataInput,
   Tone,
@@ -34,7 +34,6 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
 import { useAddNewSignerDialog } from "./AddNewSignerDialog";
-import { Text } from "@parallel/components/ui";
 
 interface RecipientViewConfirmPetitionSignersDialogProps {
   keycode: string;
@@ -363,9 +362,9 @@ function RecipientViewConfirmPetitionSignersDialog({
       confirm={
         <Button
           data-action="start-signature"
-          colorScheme="primary"
+          colorPalette="primary"
           type="submit"
-          isDisabled={allSigners.length === 0}
+          disabled={allSigners.length === 0}
         >
           <FormattedMessage id="generic.start-signature" defaultMessage="Start signature" />
         </Button>

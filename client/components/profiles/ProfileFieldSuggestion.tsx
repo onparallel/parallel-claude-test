@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
-import { Button, HStack, Stack } from "@chakra-ui/react";
+import { HStack, Stack } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { Text } from "@parallel/components/ui";
+import { Button, Text } from "@parallel/components/ui";
 import { ProfileFieldSuggestion_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { PropsWithChildren } from "react";
@@ -56,7 +56,7 @@ export const ProfileFieldSuggestion = chakraForwardRef<
         ref={ref}
         variant="outline"
         size="xs"
-        colorScheme="purple"
+        colorPalette="purple"
         fontWeight={400}
         fontSize="sm"
         maxWidth="218px"

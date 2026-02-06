@@ -1,7 +1,7 @@
-import { Button, HStack, Image, RadioProps, useRadio, useRadioGroup } from "@chakra-ui/react";
+import { HStack, Image, RadioProps, useRadio, useRadioGroup } from "@chakra-ui/react";
 import { DashboardPieChartModuleSettingsType } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
+import { Button, Text } from "@parallel/components/ui";
 
 interface DashboardModuleChartTypeProps {
   value?: DashboardPieChartModuleSettingsType;

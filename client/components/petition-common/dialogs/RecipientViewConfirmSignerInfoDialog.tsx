@@ -3,7 +3,6 @@ import {
   AlertDescription,
   AlertIcon,
   AlertTitle,
-  Button,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -12,6 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import { Tone } from "@parallel/graphql/__types";
 import { fullName } from "@parallel/utils/fullName";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
@@ -20,7 +20,6 @@ import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import type { SignerSelectSelection } from "./ConfirmPetitionSignersDialog";
-import { Text } from "@parallel/components/ui";
 
 interface SignerInfo {
   firstName: string;
@@ -162,7 +161,7 @@ function RecipientViewConfirmSignerInfoDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="primary" type="submit">
+        <Button colorPalette="primary" type="submit">
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }

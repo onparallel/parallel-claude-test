@@ -7,6 +7,7 @@ import {
   LocalizableUserTextRender,
   localizableUserTextRender,
 } from "@parallel/components/common/LocalizableUserTextRender";
+import { Text } from "@parallel/components/ui";
 import {
   ProfileFormField_PetitionFieldFragment,
   ProfileFormField_ProfileFieldFileFragment,
@@ -50,7 +51,6 @@ import { ProfileFormFieldSelect } from "./ProfileFormFieldSelect";
 import { ProfileFormFieldShortText } from "./ProfileFormFieldShortText";
 import { ProfileFormFieldText } from "./ProfileFormFieldText";
 import { ProfileFormFieldUserAssignment } from "./ProfileFormFieldUserAssignment";
-import { Text } from "@parallel/components/ui";
 
 export interface ProfileFormFieldProps {
   onRefetch?: () => void;

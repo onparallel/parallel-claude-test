@@ -1,7 +1,8 @@
 import { gql } from "@apollo/client";
-import { Button, Stack } from "@chakra-ui/react";
+import { Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button } from "@parallel/components/ui";
 import {
   HiddenFieldDialog_PetitionBaseFragment,
   HiddenFieldDialog_PetitionFieldFragment,
@@ -49,7 +50,7 @@ export function HiddenFieldDialog({
         </Stack>
       }
       confirm={
-        <Button ref={focusRef} colorScheme="primary" onClick={() => props.onResolve()}>
+        <Button ref={focusRef} colorPalette="primary" onClick={() => props.onResolve()}>
           <FormattedMessage id="generic.accept" defaultMessage="Accept" />
         </Button>
       }

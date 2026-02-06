@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import {
   Box,
-  Button,
   Checkbox,
   FormControl,
   HStack,
@@ -15,11 +14,11 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
 import { LocalFileAttachments } from "@parallel/components/common/LocalFileAttachments";
+import { Button, Text } from "@parallel/components/ui";
 import { useStartPetitionApprovalFlowDialog_PetitionApprovalRequestStepFragment } from "@parallel/graphql/__types";
 import { useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 interface StartPetitionApprovalFlowDialogProps {
   step: useStartPetitionApprovalFlowDialog_PetitionApprovalRequestStepFragment;
@@ -179,11 +178,11 @@ export function StartPetitionApprovalFlowDialog({
       }
       confirm={
         step.approvers.length === 0 ? (
-          <Button type="submit" colorScheme="primary">
+          <Button type="submit" colorPalette="primary">
             <FormattedMessage id="generic.send-anyway" defaultMessage="Send anyway" />
           </Button>
         ) : (
-          <Button type="submit" colorScheme="primary">
+          <Button type="submit" colorPalette="primary">
             <FormattedMessage id="generic.send" defaultMessage="Send" />
           </Button>
         )

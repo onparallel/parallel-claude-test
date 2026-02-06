@@ -21,7 +21,7 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 
 import { useMutation } from "@apollo/client/react";
-import { Badge, Box, Button, Center, HStack, List, ListItem, Switch } from "@chakra-ui/react";
+import { Badge, Box, Center, HStack, List, ListItem, Switch } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { AlertCircleFilledIcon, DeleteIcon, EditIcon, RepeatIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
@@ -37,6 +37,7 @@ import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/Conf
 import { useConfirmDeactivateEventSubscriptionDialog } from "@parallel/components/settings/dialogs/ConfirmDeactivateEventSubscriptionDialog";
 import { useCreateOrUpdatePetitionEventSubscriptionDialog } from "@parallel/components/settings/dialogs/CreateOrUpdatePetitionEventSubscriptionDialog";
 import { useCreateOrUpdateProfileEventSubscriptionDialog } from "@parallel/components/settings/dialogs/CreateOrUpdateProfileEventSubscriptionDialog";
+import { Button, Text } from "@parallel/components/ui";
 import {
   PetitionEventType,
   Subscriptions_deleteEventSubscriptionSignatureKeysDocument,
@@ -46,7 +47,6 @@ import { Maybe } from "@parallel/utils/types";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 function Subscriptions() {
   const intl = useIntl();
@@ -388,7 +388,7 @@ function Subscriptions() {
 
               <Spacer />
               <Button
-                colorScheme="primary"
+                colorPalette="primary"
                 onClick={() => handleCreateEventSubscription("TEMPLATE")}
               >
                 <FormattedMessage
@@ -448,7 +448,7 @@ function Subscriptions() {
 
               <Spacer />
               <Button
-                colorScheme="primary"
+                colorPalette="primary"
                 onClick={() => handleCreateEventSubscription("PROFILE")}
               >
                 <FormattedMessage

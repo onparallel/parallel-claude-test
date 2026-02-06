@@ -1,9 +1,9 @@
-import { Box, Button, FormControl, FormErrorMessage, FormLabel, Input } from "@chakra-ui/react";
+import { Box, FormControl, FormErrorMessage, FormLabel, Input } from "@chakra-ui/react";
 import { Link } from "@parallel/components/common/Link";
+import { Button, Text } from "@parallel/components/ui";
 import { isValidEmail } from "@parallel/utils/validation";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export interface ForgotPasswordData {
   email: string;
@@ -72,8 +72,8 @@ export function ForgotPasswordForm({
         <Button
           marginTop={6}
           width="100%"
-          colorScheme="primary"
-          isLoading={isSubmitting}
+          colorPalette="primary"
+          loading={isSubmitting}
           type="submit"
         >
           <FormattedMessage

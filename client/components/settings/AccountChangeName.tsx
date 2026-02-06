@@ -3,7 +3,6 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Button,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -12,6 +11,7 @@ import {
   Stack,
   StackProps,
 } from "@chakra-ui/react";
+import { Button } from "@parallel/components/ui";
 import { AccountChangeName_UserFragment } from "@parallel/graphql/__types";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
@@ -97,8 +97,8 @@ export function AccountChangeName({ user, onSubmit, ...props }: AccountChangeNam
         </FormControl>
         <Button
           type="submit"
-          colorScheme="primary"
-          isDisabled={user.isSsoUser || !isDirty}
+          colorPalette="primary"
+          disabled={user.isSsoUser || !isDirty}
           width="min-content"
           data-testid="change-name-submit"
         >

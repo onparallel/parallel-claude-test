@@ -823,7 +823,7 @@ function ArchiveRepliesIntoProfileRow({
                   isEditing: false,
                 }));
               }}
-              isDisabled={isDisabled}
+              disabled={isDisabled}
             />
           ) : (
             <IconButtonWithTooltip
@@ -835,7 +835,7 @@ function ArchiveRepliesIntoProfileRow({
                 e.stopPropagation();
                 setState({ ...state, isEditing: true });
               }}
-              isDisabled={isDisabled}
+              disabled={isDisabled}
             />
           )
         ) : null}

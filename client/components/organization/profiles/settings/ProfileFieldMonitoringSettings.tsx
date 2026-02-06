@@ -22,6 +22,7 @@ import {
   SimpleSelect,
   useSimpleSelectOptions,
 } from "@parallel/components/common/SimpleSelect";
+import { Text } from "@parallel/components/ui";
 import {
   CreateProfileTypeFieldInput,
   ProfileFieldMonitoringSettings_ProfileTypeFieldFragment,
@@ -38,7 +39,6 @@ import {
   CreateOrUpdateProfileTypeFieldDialogFormData,
   useCreateOrUpdateProfileTypeFieldDialog,
 } from "../dialogs/CreateOrUpdateProfileTypeFieldDialog";
-import { Text } from "@parallel/components/ui";
 
 type FrequencyFixedOption =
   | "5_YEARS"

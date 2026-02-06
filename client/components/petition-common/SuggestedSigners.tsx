@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, Stack } from "@chakra-ui/react";
+import { Box, Flex, Stack } from "@chakra-ui/react";
+import { Button, Text } from "@parallel/components/ui";
 import {
   SuggestedSigners_PetitionBaseFragment,
   SuggestedSigners_PetitionSignerFragment,
@@ -14,7 +15,6 @@ import { isValidEmail } from "@parallel/utils/validation";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish, pick, uniqueBy, zip } from "remeda";
 import { useAddNewSignerDialog } from "../recipient-view/dialogs/AddNewSignerDialog";
-import { Text } from "@parallel/components/ui";
 
 type PetitionSelection =
   | SuggestedSigners_PublicPetitionFragment
@@ -317,7 +317,7 @@ function SuggestedSignersRow({
                 </Text>
               ) : null}
             </Box>
-            <Button onClick={() => handleAddSigner(signer)} size="sm" isDisabled={isDisabled}>
+            <Button onClick={() => handleAddSigner(signer)} size="sm" disabled={isDisabled}>
               <FormattedMessage id="generic.add" defaultMessage="Add" />
             </Button>
           </Flex>

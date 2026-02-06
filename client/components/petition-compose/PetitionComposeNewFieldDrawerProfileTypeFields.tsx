@@ -1,12 +1,13 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Button, HStack, Heading, Image, Stack } from "@chakra-ui/react";
+import { Box, Heading, HStack, Image, Stack } from "@chakra-ui/react";
 import { ProfilesIcon, SettingsIcon } from "@parallel/chakra/icons";
+import { Button, Text } from "@parallel/components/ui";
 import {
+  PetitionComposeNewFieldDrawerProfileTypeFields_linkFieldGroupToProfileTypeDocument,
   PetitionComposeNewFieldDrawerProfileTypeFields_PetitionBaseFragment,
   PetitionComposeNewFieldDrawerProfileTypeFields_PetitionFieldFragment,
   PetitionComposeNewFieldDrawerProfileTypeFields_ProfileTypeFieldFragment,
-  PetitionComposeNewFieldDrawerProfileTypeFields_linkFieldGroupToProfileTypeDocument,
   PetitionFieldType,
   ProfileTypeFieldType,
   UpdatePetitionFieldInput,
@@ -23,7 +24,6 @@ import { ProfileTypeFieldReference } from "../common/ProfileTypeFieldReference";
 import { SearchInput } from "../common/SearchInput";
 import { useCreateOrUpdateFieldGroupRelationshipsDialog } from "./dialogs/CreateOrUpdateFieldGroupRelationshipsDialog";
 import { useLinkGroupToProfileTypeDialog } from "./dialogs/LinkGroupToProfileTypeDialog";
-import { Text } from "@parallel/components/ui";
 
 export function PetitionComposeNewFieldDrawerProfileTypeFields({
   petition,
@@ -265,7 +265,7 @@ function NewFieldProfileTypeFieldItem({
   const hasAdverseMediaSearch = useHasAdverseMediaSearch();
   return (
     <Button
-      isDisabled={isDisabled}
+      disabled={isDisabled}
       variant="ghost"
       fontWeight="400"
       width="100%"

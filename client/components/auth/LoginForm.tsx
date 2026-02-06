@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Center,
   Flex,
   FormControl,
@@ -12,6 +11,7 @@ import {
 import { LockClosedIcon } from "@parallel/chakra/icons";
 import { Link } from "@parallel/components/common/Link";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
+import { Button, Text } from "@parallel/components/ui";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { postJSON } from "@parallel/utils/rest";
 import { isValidEmail } from "@parallel/utils/validation";
@@ -19,7 +19,6 @@ import router, { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export interface LoginData {
   email: string;
@@ -139,8 +138,8 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
           ref={buttonRef}
           marginTop={6}
           width="100%"
-          colorScheme="primary"
-          isLoading={isSubmitting}
+          colorPalette="primary"
+          loading={isSubmitting}
           type="submit"
           data-testid="login-submit"
         >

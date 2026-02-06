@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import { useApolloClient } from "@apollo/client/react";
 import { Center } from "@chakra-ui/react";
 import { SearchIcon } from "@parallel/chakra/icons";
+import { Text } from "@parallel/components/ui";
 import {
   PetitionPermissionType,
   PetitionSelect_PetitionBaseFragmentDoc,
@@ -31,7 +32,6 @@ import { assert } from "ts-essentials";
 import { PetitionSelect_PetitionBaseFragment } from "../../graphql/__types";
 import { OverflownText } from "./OverflownText";
 import { PetitionSelectOption } from "./PetitionSelectOption";
-import { Text } from "@parallel/components/ui";
 
 export type PetitionSelectSelection = PetitionSelect_PetitionBaseFragment;
 

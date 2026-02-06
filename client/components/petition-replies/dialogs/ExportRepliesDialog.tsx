@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 import {
   Box,
-  Button,
   Center,
   Checkbox,
   FormControl,
@@ -25,6 +24,7 @@ import {
   PlaceholderInput,
   PlaceholderInputInstance,
 } from "@parallel/components/common/slate/PlaceholderInput";
+import { Button, Text } from "@parallel/components/ui";
 import {
   ExportRepliesDialog_meDocument,
   ExportRepliesDialog_petitionDocument,
@@ -40,7 +40,6 @@ import {
 import { useLocalStorage } from "@parallel/utils/useLocalStorage";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export interface ExportRepliesDialogProps {
   petitionId: string;
@@ -115,7 +114,7 @@ function ExportRepliesDialogLoading({
         </Center>
       }
       confirm={
-        <Button colorScheme="primary" isDisabled>
+        <Button colorPalette="primary" disabled>
           <FormattedMessage id="generic.download" defaultMessage="Download" />
         </Button>
       }
@@ -384,7 +383,7 @@ function ExportRepliesDialogContent({
         </Stack>
       }
       confirm={
-        <Button colorScheme="primary" onClick={handleConfirmClick} isDisabled={rename && !pattern}>
+        <Button colorPalette="primary" onClick={handleConfirmClick} disabled={rename && !pattern}>
           {selectedOption.startsWith("DOWNLOAD") ? (
             <FormattedMessage id="generic.download" defaultMessage="Download" />
           ) : (

@@ -1,6 +1,7 @@
-import { Button, FormControl, FormLabel, Radio, RadioGroup, Stack } from "@chakra-ui/react";
+import { FormControl, FormLabel, Radio, RadioGroup, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button } from "@parallel/components/ui";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 
@@ -67,7 +68,7 @@ export function ConfirmChangeViewAllDialog({
         </FormControl>
       }
       confirm={
-        <Button colorScheme="primary" type="submit">
+        <Button colorPalette="primary" type="submit">
           <FormattedMessage id="generic.accept" defaultMessage="Accept" />
         </Button>
       }

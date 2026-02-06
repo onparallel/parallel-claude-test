@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client";
 import { TextProps } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
+import { Text } from "@parallel/components/ui";
 import { SignerReference_PetitionSignerFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { DeletedContact } from "./DeletedContact";
-import { Text } from "@parallel/components/ui";
 
 export function SignerReference({
   signer,

@@ -1,9 +1,9 @@
-import { Button, FormControl, FormErrorMessage, FormLabel, HStack, Stack } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel, HStack, Stack } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
-import { Box, Text } from "@parallel/components/ui";
+import { Box, Button, Text } from "@parallel/components/ui";
 import * as Sentry from "@sentry/nextjs";
 import { useCallback, useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -123,7 +123,7 @@ function EnterFilePasswordDialog({
         </FormControl>
       }
       confirm={
-        <Button type="submit" colorScheme="primary">
+        <Button type="submit" colorPalette="primary">
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }
@@ -157,7 +157,7 @@ function ConfirmUploadAnywaysDialog(props: DialogProps) {
         </Stack>
       }
       confirm={
-        <Button onClick={() => props.onResolve()} colorScheme="primary">
+        <Button onClick={() => props.onResolve()} colorPalette="primary">
           <FormattedMessage
             id="component.enter-file-password-dialog.error-confirm"
             defaultMessage="Proceed with upload"

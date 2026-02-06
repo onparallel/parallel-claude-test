@@ -1,5 +1,4 @@
 import {
-  Button,
   ButtonGroup,
   FocusLock,
   HStack,
@@ -23,6 +22,7 @@ import {
 } from "@chakra-ui/react";
 import { Popover } from "@parallel/chakra/components";
 import { CloseIcon, FieldDateIcon } from "@parallel/chakra/icons";
+import { Button } from "@parallel/components/ui";
 import { FORMATS } from "@parallel/utils/dates";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { endOfDay, startOfDay } from "date-fns";
@@ -89,7 +89,7 @@ export function DateRangePickerButton({
       fontWeight={isNonNullish(_value) ? "600" : "500"}
       onClick={onOpen}
       width="100%"
-      isDisabled={isDisabled}
+      disabled={isDisabled}
     >
       {isNonNullish(currentActiveRange)
         ? currentActiveRange.text
@@ -110,7 +110,7 @@ export function DateRangePickerButton({
         id: "component.date-range-picker-button.clear-range",
         defaultMessage: "Clear date range",
       })}
-      isDisabled={isDisabled}
+      disabled={isDisabled}
     />
   ) : null;
 
@@ -155,8 +155,8 @@ export function DateRangePickerButton({
                 <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
               </Button>
               <Button
-                isDisabled={!isDateRangeDefined(value)}
-                colorScheme="primary"
+                disabled={!isDateRangeDefined(value)}
+                colorPalette="primary"
                 onClick={() => {
                   onChange(value as DateRange);
                   onClose();
@@ -203,8 +203,8 @@ export function DateRangePickerButton({
                   <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
                 </Button>
                 <Button
-                  isDisabled={!isDateRangeDefined(value)}
-                  colorScheme="primary"
+                  disabled={!isDateRangeDefined(value)}
+                  colorPalette="primary"
                   onClick={() => {
                     onChange(value as DateRange);
                     onClose();

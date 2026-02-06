@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, BoxProps, Button, Flex, HTMLChakraProps, IconButton } from "@chakra-ui/react";
+import { Box, BoxProps, Flex, HTMLChakraProps, IconButton } from "@chakra-ui/react";
 import { AddIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import {
@@ -7,6 +7,7 @@ import {
   PetitionComposeFieldProps,
   PetitionComposeFieldRef,
 } from "@parallel/components/petition-compose/PetitionComposeField";
+import { Button } from "@parallel/components/ui";
 import {
   PetitionComposeFieldList_PetitionBaseFragment,
   UpdatePetitionFieldInput,
@@ -454,7 +455,7 @@ export const PetitionComposeFieldList = memo(function PetitionComposeFieldList({
             data-action="big-add-field"
             data-testid="big-add-field-button"
             onClick={() => showAddField(fieldsWithIndices[fieldsWithIndices.length - 1][0].id)}
-            colorScheme="primary"
+            colorPalette="primary"
           >
             <FormattedMessage
               id="component.petition-compose-field-list.add-field"

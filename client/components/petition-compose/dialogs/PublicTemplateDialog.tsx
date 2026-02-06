@@ -1,6 +1,6 @@
-import { Button } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button } from "@parallel/components/ui";
 import { useRef } from "react";
 import { FormattedMessage } from "react-intl";
 
@@ -25,7 +25,7 @@ export function PublicTemplateDialog({ ...props }: DialogProps) {
         />
       }
       confirm={
-        <Button colorScheme="primary" onClick={() => props.onResolve()}>
+        <Button colorPalette="primary" onClick={() => props.onResolve()}>
           <FormattedMessage id="generic.i-understand" defaultMessage="I understand" />
         </Button>
       }

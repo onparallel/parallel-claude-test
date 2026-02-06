@@ -6,7 +6,6 @@ import {
   AlertIcon,
   Box,
   BoxProps,
-  Button,
   ButtonProps,
   Center,
   Checkbox,
@@ -59,7 +58,7 @@ import { useProfileTypeFieldsInPatternDialog } from "@parallel/components/organi
 import { useUpdateProfileTypeFieldDialog } from "@parallel/components/organization/profiles/dialogs/UpdateProfileTypeFieldDialog";
 import { useProfileTypeFieldReferencedAutoSearchConfigDialog } from "@parallel/components/profiles/dialogs/ProfileTypeFieldReferencedAutoSearchConfigDialog";
 import { useProfileTypeFieldReferencedMonitoringDialog } from "@parallel/components/profiles/dialogs/ProfileTypeFieldReferencedMonitoringDialog";
-import { Text } from "@parallel/components/ui";
+import { Button, Text } from "@parallel/components/ui";
 import {
   OrganizationProfileType_ProfileTypeFieldFragment,
   OrganizationProfileType_cloneProfileTypeDocument,
@@ -458,7 +457,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
                   a: (chunks: ReactNode) => (
                     <Button
                       variant="link"
-                      colorScheme="primary"
+                      colorPalette="primary"
                       onClick={handleUnarchiveProfileType}
                     >
                       {chunks}
@@ -612,7 +611,11 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
               />
 
               <Center>
-                <Button colorScheme="primary" leftIcon={<AddIcon />} onClick={handleAddNewProperty}>
+                <Button
+                  colorPalette="primary"
+                  leftIcon={<AddIcon />}
+                  onClick={handleAddNewProperty}
+                >
                   <FormattedMessage
                     id="page.organization-profile-type.add-profile-type-field"
                     defaultMessage="Add property"

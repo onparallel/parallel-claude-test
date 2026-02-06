@@ -12,6 +12,7 @@ import { UserGroupLayout } from "@parallel/components/layout/UserGroupLayout";
 import { OrganizationGroupListTableHeader } from "@parallel/components/organization/OrganizationGroupListTableHeader";
 import { useAddMemberGroupDialog } from "@parallel/components/organization/dialogs/AddMemberGroupDialog";
 import { useConfirmRemoveMemberDialog } from "@parallel/components/organization/dialogs/ConfirmRemoveMemberDialog";
+import { Text } from "@parallel/components/ui";
 import {
   OrganizationGroup_UserGroupMemberFragment,
   OrganizationGroup_addUsersToUserGroupDocument,
@@ -30,7 +31,6 @@ import { useSelection } from "@parallel/utils/useSelectionState";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { sort, sortBy } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 const SORTING = ["fullName", "email", "addedAt"] as const;
 

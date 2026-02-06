@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
-import { Button } from "@chakra-ui/react";
 import { OverflownText } from "@parallel/components/common/OverflownText";
+import { Button } from "@parallel/components/ui";
 import { DashboardCreatePetitionButtonModule_DashboardCreatePetitionButtonModuleFragment } from "@parallel/graphql/__types";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
@@ -34,8 +34,8 @@ export const DashboardCreatePetitionButtonModule = forwardRef<
   return (
     <DashboardSimpleModuleCard ref={ref} module={module} {...rest} alignment="center">
       <Button
-        colorScheme="primary"
-        isDisabled={isNullish(template?.myEffectivePermission)}
+        colorPalette="primary"
+        disabled={isNullish(template?.myEffectivePermission)}
         onClick={handleCreatePetition}
       >
         <OverflownText placement="bottom">{module.petitionButtonSettings.label}</OverflownText>

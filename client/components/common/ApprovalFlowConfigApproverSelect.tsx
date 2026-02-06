@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import { useApolloClient, useQuery } from "@apollo/client/react";
 import { Box, HStack } from "@chakra-ui/react";
 import { UsersIcon } from "@parallel/chakra/icons";
+import { Text } from "@parallel/components/ui";
 import {
   ApprovalFlowConfigApproverSelect_PetitionBaseFragment,
   UserLocale,
@@ -45,7 +46,6 @@ import { UserDropdownEmpty } from "./UserDropdownEmpty";
 import { UserGroupMembersPopover } from "./UserGroupMembersPopover";
 import { userGroupReferenceText } from "./UserGroupReference";
 import { UserSelectOption } from "./UserSelectOption";
-import { Text } from "@parallel/components/ui";
 
 type FieldOf<T extends ApprovalFlowConfigApproverSelect_PetitionBaseFragment> = UnwrapArray<
   Exclude<T["fields"], null | undefined>

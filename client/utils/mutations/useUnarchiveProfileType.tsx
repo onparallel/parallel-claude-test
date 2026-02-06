@@ -1,14 +1,14 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Button } from "@chakra-ui/react";
+
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import {
   useUnarchiveProfileType_ProfileTypeFragment,
   useUnarchiveProfileType_unarchiveProfileTypeDocument,
 } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export function useUnarchiveProfileType() {
   const [unarchiveProfileType] = useMutation(useUnarchiveProfileType_unarchiveProfileTypeDocument);
@@ -80,7 +80,7 @@ function UnarchiveProfileTypeDialog({
         </Text>
       }
       confirm={
-        <Button colorScheme="primary" onClick={() => props.onResolve()}>
+        <Button colorPalette="primary" onClick={() => props.onResolve()}>
           <FormattedMessage id="generic.unarchive" defaultMessage="Unarchive" />
         </Button>
       }

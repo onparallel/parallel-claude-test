@@ -1,4 +1,5 @@
-import { Button, layoutPropNames, RadioProps, useRadio } from "@chakra-ui/react";
+import { layoutPropNames, RadioProps, useRadio } from "@chakra-ui/react";
+import { Button } from "@parallel/components/ui";
 import { pick } from "remeda";
 
 export function RadioButton(props: RadioProps) {

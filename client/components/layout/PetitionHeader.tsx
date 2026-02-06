@@ -4,7 +4,6 @@ import { getOperationName } from "@apollo/client/utilities/internal";
 import {
   Badge,
   Box,
-  Button,
   Center,
   Flex,
   Grid,
@@ -39,6 +38,7 @@ import {
   usePetitionShouldConfirmNavigation,
   usePetitionState,
 } from "@parallel/components/layout/PetitionLayout";
+import { Button, Text } from "@parallel/components/ui";
 import {
   PetitionActivity_petitionDocument,
   PetitionHeader_PetitionBaseFragment,
@@ -82,7 +82,6 @@ import { useConfirmReopenPetitionDialog } from "../petition-replies/dialogs/Conf
 import { HeaderNameEditable, HeaderNameEditableInstance } from "./HeaderNameEditable";
 import { PetitionHeaderTab } from "./PetitionHeaderTab";
 import { PetitionSection } from "./PetitionLayout";
-import { Text } from "@parallel/components/ui";
 
 export interface PetitionHeaderProps extends PetitionHeader_QueryFragment {
   petition: PetitionHeader_PetitionBaseFragment;
@@ -545,7 +544,7 @@ export const PetitionHeader = chakraForwardRef<"div", PetitionHeaderProps, Petit
                         myEffectivePermission.permissionType !== "READ",
                     )
                   }
-                  isDisabled={isAnonymized || isNonNullish(petition.permanentDeletionAt)}
+                  disabled={isAnonymized || isNonNullish(petition.permanentDeletionAt)}
                 >
                   <Box whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden">
                     <FormattedMessage
@@ -588,7 +587,7 @@ export const PetitionHeader = chakraForwardRef<"div", PetitionHeaderProps, Petit
                 fontSize="sm"
                 fontWeight="normal"
                 onClick={handleEditTags}
-                isDisabled={isAnonymized || isNonNullish(petition.permanentDeletionAt)}
+                disabled={isAnonymized || isNonNullish(petition.permanentDeletionAt)}
               >
                 <Box whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden">
                   <FormattedMessage
@@ -636,7 +635,7 @@ export const PetitionHeader = chakraForwardRef<"div", PetitionHeaderProps, Petit
                     flexShrink={0}
                     onClick={handleUseTemplate}
                     data-action="use-template"
-                    isDisabled={!userCanCreatePetition}
+                    disabled={!userCanCreatePetition}
                   >
                     <FormattedMessage
                       id="generic.create-petition"

@@ -1,9 +1,10 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Button, Flex } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import { TimeIcon } from "@parallel/chakra/icons";
 import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
+import { Button } from "@parallel/components/ui";
 import {
   PetitionActivity_petitionDocument,
   TimelineMessageScheduledEvent_MessageScheduledEventFragment,
@@ -102,7 +103,7 @@ export function TimelineMessageScheduledEvent({
           <Button
             size="sm"
             variant="outline"
-            colorScheme="red"
+            colorPalette="red"
             marginStart={4}
             onClick={handleCancelScheduledMessage}
           >

@@ -1,11 +1,11 @@
 import { gql } from "@apollo/client";
-import { Badge, Button, HStack, Stack } from "@chakra-ui/react";
+import { Badge, HStack, Stack } from "@chakra-ui/react";
 import { CircleCheckFilledIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import { RecipientViewSignatureStatusDialog_PublicPetitionFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 function SignatureStatusDialog({
   petition,
@@ -52,7 +52,7 @@ function SignatureStatusDialog({
         </Stack>
       }
       confirm={
-        <Button onClick={() => props.onResolve()} colorScheme="primary" variant="solid">
+        <Button onClick={() => props.onResolve()} colorPalette="primary" variant="solid">
           <FormattedMessage id="generic.close" defaultMessage="Close" />
         </Button>
       }

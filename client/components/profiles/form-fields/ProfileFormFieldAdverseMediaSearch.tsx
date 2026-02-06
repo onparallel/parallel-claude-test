@@ -1,15 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import {
-  Badge,
-  Box,
-  Button,
-  HStack,
-  MenuDivider,
-  MenuItem,
-  MenuList,
-  Stack,
-} from "@chakra-ui/react";
+import { Badge, Box, HStack, MenuDivider, MenuItem, MenuList, Stack } from "@chakra-ui/react";
 import {
   MediaIcon,
   RepeatIcon,
@@ -21,6 +12,7 @@ import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMe
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-common/alerts/RestrictedPetitionFieldAlert";
 import { useConfirmDeleteAdverseMediaSearchDialog } from "@parallel/components/petition-preview/dialogs/ConfirmDeleteAdverseMediaSearchDialog";
+import { Button, Text } from "@parallel/components/ui";
 import {
   AdverseMediaArticle,
   AdverseMediaSearchTermInput,
@@ -51,7 +43,6 @@ import {
   ProfileFormFieldInputGroup,
   ProfileFormFieldInputGroupProps,
 } from "./ProfileFormFieldInputGroup";
-import { Text } from "@parallel/components/ui";
 
 interface ProfileFormFieldAdverseMediaSearchProps
   extends ProfileFormFieldProps,
@@ -293,7 +284,7 @@ export function ProfileFormFieldAdverseMediaSearch({
                     whiteSpace="pre-wrap"
                     textAlign="left"
                     onClick={handleOpenContent}
-                    isDisabled={!hasAdverseMediaSearchFeatureFlag}
+                    disabled={!hasAdverseMediaSearchFeatureFlag}
                   >
                     {intl.formatList(
                       content?.search
@@ -418,7 +409,7 @@ export function ProfileFormFieldAdverseMediaSearch({
               <Button
                 size="sm"
                 fontSize="md"
-                isDisabled={isDisabled || !hasAdverseMediaSearchFeatureFlag || state === "FETCHING"}
+                disabled={isDisabled || !hasAdverseMediaSearchFeatureFlag || state === "FETCHING"}
                 onClick={() => handleStart()}
                 leftIcon={<ShortSearchIcon />}
                 fontWeight={500}

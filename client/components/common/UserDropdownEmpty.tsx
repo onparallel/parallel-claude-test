@@ -1,8 +1,8 @@
-import { Button, Image, Stack } from "@chakra-ui/react";
+import { Image, Stack } from "@chakra-ui/react";
+import { Button, Text } from "@parallel/components/ui";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { FormattedMessage } from "react-intl";
 import { Link, NakedLink } from "./Link";
-import { Text } from "@parallel/components/ui";
 
 interface UserDropdownEmptyProps {
   search: string;
@@ -35,7 +35,7 @@ export function UserDropdownEmpty({
           </Text>
           {canCreateUsers ? (
             <NakedLink href="/app/organization/users?dialog=true">
-              <Button colorScheme="primary">
+              <Button colorPalette="primary">
                 <FormattedMessage
                   id="component.user-dropdown-empty.invite-button"
                   defaultMessage="Invite people"

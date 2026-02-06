@@ -1,5 +1,4 @@
 import {
-  Button,
   HStack,
   PopoverArrow,
   PopoverBody,
@@ -18,7 +17,7 @@ import {
   useRef,
 } from "react";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
+import { Button, Text } from "@parallel/components/ui";
 
 interface ConfirmPopoverProps {
   description: ReactNode;

@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Button,
   Flex,
   HStack,
   Img,
@@ -22,9 +21,9 @@ import { Divider } from "@parallel/components/common/Divider";
 import { HtmlBlock } from "@parallel/components/common/HtmlBlock";
 import { Link, NakedLink, NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
+import { Button, Text } from "@parallel/components/ui";
 import { Tone, useCompletingMessageDialog_PublicPetitionFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 function CompletingMessageDialog({
   petition,
@@ -127,7 +126,7 @@ function CompletingMessageDialog({
                 <NakedLink
                   href={`/petition/${keycode}/home${pendingPetitions ? "?status=PENDING" : ""}`}
                 >
-                  <Button colorScheme="primary">
+                  <Button colorPalette="primary">
                     {pendingPetitions > 0 ? (
                       <FormattedMessage
                         id="component.completing-message-dialog.go-to-pending-processes-button"

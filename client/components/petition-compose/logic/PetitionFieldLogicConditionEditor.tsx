@@ -17,6 +17,7 @@ import {
   toSimpleSelectOption,
   useSimpleSelectOptions,
 } from "@parallel/components/common/SimpleSelect";
+import { Text } from "@parallel/components/ui";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { BACKGROUND_CHECK_TOPICS } from "@parallel/utils/backgroundCheckTopics";
 import { FORMATS, dateToDatetimeLocal, prettifyTimezone } from "@parallel/utils/dates";
@@ -52,7 +53,6 @@ import { useStandardListDetailsDialog } from "../dialogs/StandardListDetailsDial
 import { PetitionFieldLogicConditionSubjectSelect } from "./PetitionFieldLogicConditionSubjectSelect";
 import { PetitionFieldSelection, usePetitionFieldLogicContext } from "./PetitionFieldLogicContext";
 import { PetitionFieldMathEnumSelect } from "./PetitionFieldMathEnumSelect";
-import { Text } from "@parallel/components/ui";
 
 export function PetitionFieldLogicConditionEditor({
   condition,

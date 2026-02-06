@@ -4,7 +4,6 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Button,
   Center,
   Checkbox,
   Flex,
@@ -28,6 +27,7 @@ import { useConfirmPetitionSignersDialog } from "@parallel/components/petition-c
 import { PetitionRemindersConfig } from "@parallel/components/petition-compose/PetitionRemindersConfig";
 import { useCopySignatureConfigDialog } from "@parallel/components/petition-compose/dialogs/CopySignatureConfigDialog";
 import { useScheduleMessageDialog } from "@parallel/components/petition-compose/dialogs/ScheduleMessageDialog";
+import { Button, Text } from "@parallel/components/ui";
 import {
   AddPetitionAccessDialog_DelegateUserFragment,
   AddPetitionAccessDialog_PetitionFragment,
@@ -56,7 +56,6 @@ import { HelpPopover } from "../../common/HelpPopover";
 import { RecipientSelectGroups } from "../../common/RecipientSelectGroups";
 import { SendButton } from "../../petition-common/SendButton";
 import { useContactlessLinkDialog } from "./ContactlessLinkDialog";
-import { Text } from "@parallel/components/ui";
 
 export interface AddPetitionAccessDialogProps {
   onSearchContacts?: ContactSelectProps["onSearchContacts"];
@@ -372,7 +371,7 @@ export function AddPetitionAccessDialog({
                             <Button
                               variant="outline"
                               backgroundColor="white"
-                              colorScheme="blue"
+                              colorPalette="blue"
                               borderColor={error ? "red.500" : undefined}
                               borderWidth={error ? 2 : undefined}
                               onClick={() => handleEditSignatureConfig(value!, onChange)}
@@ -556,7 +555,7 @@ export function AddPetitionAccessDialog({
           variant="outline"
           leftIcon={<LinkIcon />}
           onClick={handleShareByLinkClick}
-          isDisabled={
+          disabled={
             recipientGroups.some((g) => g.length > 0) ||
             !petitionsPeriod ||
             petitionsPeriod.used >= petitionsPeriod.limit

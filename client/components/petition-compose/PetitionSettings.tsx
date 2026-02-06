@@ -5,9 +5,8 @@ import {
   AlertDescription,
   AlertIcon,
   Box,
-  Button,
-  HStack,
   Heading,
+  HStack,
   Input,
   InputGroup,
   InputRightAddon,
@@ -36,17 +35,18 @@ import {
   TimeIcon,
   UserPlusIcon,
 } from "@parallel/chakra/icons";
+import { Button, Text } from "@parallel/components/ui";
 import {
-  PetitionSettings_PetitionBaseFragment,
-  PetitionSettings_PetitionBaseFragmentDoc,
-  PetitionSettings_UserFragment,
-  PetitionSettings_UserFragmentDoc,
   PetitionSettings_createPublicPetitionLinkDocument,
   PetitionSettings_enableAutomaticNumberingOnPetitionFieldsDocument,
+  PetitionSettings_PetitionBaseFragment,
+  PetitionSettings_PetitionBaseFragmentDoc,
   PetitionSettings_updatePetitionRestrictionDocument,
   PetitionSettings_updatePublicPetitionLinkDocument,
   PetitionSettings_updateTemplateDefaultPermissionsDocument,
   PetitionSettings_updateTemplateDocumentThemeDocument,
+  PetitionSettings_UserFragment,
+  PetitionSettings_UserFragmentDoc,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
@@ -84,7 +84,6 @@ import { usePasswordRestrictPetitionDialog } from "./dialogs/UnrestrictPetitionD
 import { SettingsRow } from "./settings/rows/SettingsRow";
 import { SettingsRowButton } from "./settings/rows/SettingsRowButton";
 import { SettingsRowSwitch } from "./settings/rows/SettingsRowSwitch";
-import { Text } from "@parallel/components/ui";
 
 export interface PetitionSettingsProps {
   user: PetitionSettings_UserFragment;
@@ -1422,7 +1421,7 @@ function ConfirmSkipForwardSecurity(props: DialogProps<{}, void>) {
         </Stack>
       }
       confirm={
-        <Button colorScheme="red" onClick={() => props.onResolve()}>
+        <Button colorPalette="red" onClick={() => props.onResolve()}>
           <FormattedMessage
             id="component.confirm-skip-forward-security.confirm"
             defaultMessage="Disable Forward Security"

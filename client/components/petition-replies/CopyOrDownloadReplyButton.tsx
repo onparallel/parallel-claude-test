@@ -51,7 +51,7 @@ export function CopyOrDownloadReplyButton({
     <Stack spacing={1}>
       {petitionFieldType === "BACKGROUND_CHECK" ? (
         <IconButtonWithTooltip
-          isDisabled={isDisabled}
+          disabled={isDisabled}
           onClick={() => onAction(isNonNullish(content?.entity) ? "VIEW_DETAILS" : "VIEW_RESULTS")}
           icon={<EyeIcon />}
           size="xs"
@@ -69,7 +69,7 @@ export function CopyOrDownloadReplyButton({
         />
       ) : petitionFieldType === "ADVERSE_MEDIA_SEARCH" ? (
         <IconButtonWithTooltip
-          isDisabled={isDisabled}
+          disabled={isDisabled}
           onClick={() => onAction("VIEW_ARTICLES")}
           icon={<EyeIcon />}
           size="xs"

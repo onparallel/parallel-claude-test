@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, HStack, List, ListItem, Stack } from "@chakra-ui/react";
+import { Box, HStack, List, ListItem, Stack } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import {
   ConfirmDialog,
@@ -8,12 +8,12 @@ import {
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { PetitionFieldReference } from "@parallel/components/common/PetitionFieldReference";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
+import { Button, Text } from "@parallel/components/ui";
 import { FieldErrorDialog_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { ReactNode, useRef } from "react";
 import { FormattedMessage } from "react-intl";
 import { OverflownText } from "../OverflownText";
-import { Text } from "@parallel/components/ui";
 
 export interface FieldErrorDialogProps
   extends Omit<ConfirmDialogProps<void>, "body" | "header" | "confirm">,
@@ -98,7 +98,7 @@ export function FieldErrorDialog({
       confirm={
         <Button
           ref={focusRef}
-          colorScheme="primary"
+          colorPalette="primary"
           minWidth={24}
           onClick={() => props.onResolve()}
         >

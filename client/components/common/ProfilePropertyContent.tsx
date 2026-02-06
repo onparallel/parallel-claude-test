@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, HStack, List, ListItem, Stack } from "@chakra-ui/react";
+import { Box, Flex, HStack, List, ListItem, Stack } from "@chakra-ui/react";
 import { BusinessIcon, SearchIcon, ShortSearchIcon, UserIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Link } from "@parallel/components/common/Link";
-import { Text } from "@parallel/components/ui";
+import { Button, Text } from "@parallel/components/ui";
 import {
   AdverseMediaArticle,
   AdverseMediaSearchTermInput,

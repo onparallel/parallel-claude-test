@@ -3,7 +3,6 @@ import {
   AlertDescription,
   AlertIcon,
   Box,
-  Button,
   Circle,
   Flex,
   FormControl,
@@ -19,6 +18,7 @@ import {
   UnorderedList,
 } from "@chakra-ui/react";
 import { AddIcon, DeleteIcon } from "@parallel/chakra/icons";
+import { Button, Text } from "@parallel/components/ui";
 import { RecipientSelectGroups_PetitionFragment } from "@parallel/graphql/__types";
 import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
@@ -49,7 +49,6 @@ import { SuggestionsButton } from "./SuggestionsButton";
 import { ConfirmDialog } from "./dialogs/ConfirmDialog";
 import { DialogProps, isDialogError, useDialog } from "./dialogs/DialogProvider";
 import { useErrorDialog } from "./dialogs/ErrorDialog";
-import { Text } from "@parallel/components/ui";
 
 interface RecipientSelectGroupsProps {
   showErrors?: boolean;
@@ -561,7 +560,7 @@ export function RecipientSelectGroups({
             fontWeight={500}
             size="sm"
             fontSize="md"
-            isDisabled={maxGroups <= recipientGroups.length}
+            disabled={maxGroups <= recipientGroups.length}
             leftIcon={
               <Circle backgroundColor="primary.500" size={4}>
                 <AddIcon color="white" fontSize="2xs" aria-hidden="true" />
@@ -663,7 +662,7 @@ function MultipleEmailsPastedDialog(props: DialogProps<{}, MultipleEmailsPastedA
         </>
       }
       confirm={
-        <Button colorScheme="primary" type="submit">
+        <Button colorPalette="primary" type="submit">
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }

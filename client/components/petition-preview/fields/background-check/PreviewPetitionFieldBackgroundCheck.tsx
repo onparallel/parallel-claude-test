@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Center, Flex, HStack, List, Progress, Stack } from "@chakra-ui/react";
+import { Box, Center, Flex, HStack, List, Progress, Stack } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import {
   BusinessIcon,
@@ -16,6 +16,7 @@ import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { BackgroundCheckRiskLabel } from "@parallel/components/petition-common/BackgroundCheckRiskLabel";
 import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-common/alerts/RestrictedPetitionFieldAlert";
+import { Button, Text } from "@parallel/components/ui";
 import {
   PreviewPetitionFieldBackgroundCheck_PetitionBaseFragment,
   PreviewPetitionFieldBackgroundCheck_UserFragment,
@@ -36,7 +37,6 @@ import {
   RecipientViewPetitionFieldLayoutProps,
   RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
 } from "../../../recipient-view/fields/RecipientViewPetitionFieldLayout";
-import { Text } from "@parallel/components/ui";
 
 export interface PreviewPetitionFieldBackgroundCheckProps
   extends Omit<
@@ -299,7 +299,7 @@ export function PreviewPetitionFieldBackgroundCheck({
       <Button
         variant="outline"
         onClick={handleStart}
-        isDisabled={
+        disabled={
           isDisabled ||
           state === "FETCHING" ||
           showRestrictedPetitionFieldAlert ||
@@ -481,7 +481,7 @@ export function KYCResearchFieldReplyProfile({
       ) : null}
 
       <IconButtonWithTooltip
-        isDisabled={isViewDisabled}
+        disabled={isViewDisabled}
         onClick={() => {
           onViewReply?.(reply);
         }}
@@ -504,7 +504,7 @@ export function KYCResearchFieldReplyProfile({
 
       {onRemove !== undefined ? (
         <IconButtonWithTooltip
-          isDisabled={isDisabled || reply.status === "APPROVED"}
+          disabled={isDisabled || reply.status === "APPROVED"}
           onClick={onRemove}
           variant="ghost"
           icon={<DeleteIcon />}

@@ -2,7 +2,6 @@ import { ApolloCache, gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
   Box,
-  Button,
   Center,
   Flex,
   FormControl,
@@ -95,9 +94,9 @@ import {
 } from "./PetitionFieldOptionsListEditor";
 import { PetitionFieldMathEditor } from "./logic/PetitionFieldMathEditor";
 
+import { Button, Text } from "@parallel/components/ui";
 import { PetitionComposeVisibilityAccordion } from "../petition-common/PetitionComposeVisibilityAccordion";
 import { PetitionVisibilityEditor } from "./logic/PetitionVisibilityEditor";
-import { Text } from "@parallel/components/ui";
 
 export type PetitionComposeFieldSelection =
   | PetitionComposeField_PetitionFieldFragment
@@ -1223,7 +1222,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
           <IconButtonWithTooltip
             data-action="add-field-condition"
             icon={<ConditionIcon />}
-            isDisabled={
+            disabled={
               (field.type === "HEADING" && (field.isFixed || field.options.hasPageBreak)) ||
               isReadOnly
             }
@@ -1291,13 +1290,13 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
               />
             }
             confirm={
-              <Button onClick={() => onFieldCalculationsClick(true)} size="sm" colorScheme="red">
+              <Button onClick={() => onFieldCalculationsClick(true)} size="sm" colorPalette="red">
                 <FormattedMessage id="generic.remove" defaultMessage="Remove" />
               </Button>
             }
           >
             <IconButtonWithTooltip
-              isDisabled={isReadOnly}
+              disabled={isReadOnly}
               icon={<CalculatorIcon />}
               size="sm"
               variant="ghost"
@@ -1312,7 +1311,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
           </ConfimationPopover>
         ) : (
           <IconButtonWithTooltip
-            isDisabled={isReadOnly}
+            disabled={isReadOnly}
             icon={<CalculatorIcon />}
             size="sm"
             variant="ghost"
@@ -1327,7 +1326,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
         )}
 
         <IconButtonWithTooltip
-          isDisabled={isReadOnly}
+          disabled={isReadOnly}
           icon={<PaperclipIcon />}
           size="sm"
           variant="ghost"
@@ -1351,7 +1350,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
             defaultMessage: "Clone field",
           })}
           onClick={onCloneField}
-          isDisabled={isReadOnly || field.isLinkedToProfileTypeField}
+          disabled={isReadOnly || field.isLinkedToProfileTypeField}
         />
 
         <IconButtonWithTooltip
@@ -1380,7 +1379,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
             />
           }
           confirm={
-            <Button onClick={onDeleteClick} size="sm" colorScheme="red">
+            <Button onClick={onDeleteClick} size="sm" colorPalette="red">
               <FormattedMessage id="generic.delete" defaultMessage="Delete" />
             </Button>
           }
@@ -1388,7 +1387,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
           <IconButtonWithTooltip
             icon={<DeleteIcon />}
             onClick={onSettingsClick}
-            isDisabled={field.isFixed || isReadOnly}
+            disabled={field.isFixed || isReadOnly}
             size="sm"
             variant="ghost"
             placement="bottom"
@@ -1411,7 +1410,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
               <Button
                 onClick={() => onUnlinkField((field as any).parent!.id, [field.id])}
                 size="sm"
-                colorScheme="red"
+                colorPalette="red"
               >
                 <FormattedMessage
                   id="component.petition-compose-field.unlink-button"
@@ -1423,7 +1422,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
             <IconButtonWithTooltip
               icon={<UnlinkIcon boxSize={4} />}
               onClick={onSettingsClick}
-              isDisabled={isReadOnly || field.isLinkedToProfileTypeField}
+              disabled={isReadOnly || field.isLinkedToProfileTypeField}
               size="sm"
               variant="ghost"
               placement="bottom"

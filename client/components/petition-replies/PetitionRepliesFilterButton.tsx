@@ -1,7 +1,8 @@
-import { Button, MenuButton, MenuList, Portal } from "@chakra-ui/react";
+import { MenuButton, MenuList, Portal } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import { FilterIcon } from "@parallel/chakra/icons";
 import { CheckboxMenuItemOption } from "@parallel/components/common/CheckboxMenuItemOptionProps";
+import { Button } from "@parallel/components/ui";
 import {
   defaultFieldsFilter,
   PetitionFieldFilter,
@@ -27,7 +28,7 @@ export function PetitionRepliesFilterButton({ value, onChange }: PetitionReplies
         as={Button}
         size="sm"
         variant="outline"
-        colorScheme={isActive ? "primary" : undefined}
+        colorPalette={isActive ? "primary" : undefined}
         leftIcon={<FilterIcon />}
       >
         <FormattedMessage

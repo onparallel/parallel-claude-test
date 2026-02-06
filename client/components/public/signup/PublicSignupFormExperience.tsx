@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Center,
   FormControl,
   FormErrorMessage,
@@ -9,11 +8,11 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { Select } from "@parallel/chakra/components";
+import { Button, Text } from "@parallel/components/ui";
 import { useMemo } from "react";
 import ReCaptcha from "react-google-recaptcha";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 interface PublicSignupFormExperienceData {
   industry: string | undefined;
@@ -391,7 +390,7 @@ export function PublicSignupFormExperience({
         <Button width="100%" variant="outline" onClick={onBack}>
           <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
         </Button>
-        <Button width="100%" colorScheme="primary" type="submit" isLoading={isLoading}>
+        <Button width="100%" colorPalette="primary" type="submit" loading={isLoading}>
           <FormattedMessage
             id="component.public-signup-form-experience.complete-button"
             defaultMessage="Complete registration"

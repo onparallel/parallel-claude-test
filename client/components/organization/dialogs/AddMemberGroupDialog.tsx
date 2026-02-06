@@ -1,13 +1,13 @@
-import { Button, FormControl, FormLabel, Stack } from "@chakra-ui/react";
+import { FormControl, FormLabel, Stack } from "@chakra-ui/react";
 import { UserPlusIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { useSearchUsers } from "../../../utils/useSearchUsers";
 import { UserSelect, UserSelectInstance, UserSelectSelection } from "../../common/UserSelect";
-import { Text } from "@parallel/components/ui";
 
 interface AddMemberGroupDialogData {
   users: UserSelectSelection[];
@@ -93,7 +93,7 @@ export function AddMemberGroupDialog({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="primary" variant="solid">
+        <Button type="submit" colorPalette="primary" variant="solid">
           <FormattedMessage id="generic.done" defaultMessage="Done" />
         </Button>
       }

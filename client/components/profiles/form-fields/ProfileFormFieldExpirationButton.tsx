@@ -51,7 +51,7 @@ export function ProfileFormFieldExpirationButton({
             <Circle background="primary.500" size={2} marginStart={1.5} marginEnd={-0.5} />
           ) : undefined
         }
-        isDisabled={isDisabled}
+        disabled={isDisabled}
         size="xs"
         minHeight={7}
         minWidth={7}

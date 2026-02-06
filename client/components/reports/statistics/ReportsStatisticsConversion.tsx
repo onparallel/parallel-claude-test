@@ -16,6 +16,7 @@ import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { RadioButton } from "@parallel/components/common/RadioButton";
 import { Spacer } from "@parallel/components/common/Spacer";
+import { Text } from "@parallel/components/ui";
 import { ReportTypeStatistics } from "@parallel/pages/app/reports/statistics";
 import { dateToFilenameFormat } from "@parallel/utils/dates";
 import { downloadSpreadsheet } from "@parallel/utils/downloadSpreadsheet";
@@ -35,7 +36,6 @@ import { useMemo, useState } from "react";
 import { Bar } from "react-chartjs-2";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 interface CalculatedData {
   id: string;
@@ -452,7 +452,7 @@ export function ReportsStatisticsConversion({
               id: "generic.download-report",
               defaultMessage: "Download report",
             })}
-            isDisabled={!hasEnoughData}
+            disabled={!hasEnoughData}
           />
         </HStack>
       </HStack>

@@ -1,5 +1,4 @@
 import {
-  Button,
   ButtonGroup,
   ButtonOptions,
   ButtonProps,
@@ -10,6 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Button } from "@parallel/components/ui";
 import { ReactNode } from "react";
 import { omit, pick } from "remeda";
 import { Divider } from "../common/Divider";

@@ -1,8 +1,7 @@
-import { Button } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export function ConfirmSendReminderPetitionApprovalFlowDialog(props: DialogProps) {
   return (
@@ -24,7 +23,7 @@ export function ConfirmSendReminderPetitionApprovalFlowDialog(props: DialogProps
         </Text>
       }
       confirm={
-        <Button colorScheme="primary" onClick={() => props.onResolve()}>
+        <Button colorPalette="primary" onClick={() => props.onResolve()}>
           <FormattedMessage id="generic.confirm-send" defaultMessage="Yes, send" />
         </Button>
       }

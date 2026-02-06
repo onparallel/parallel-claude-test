@@ -4,7 +4,6 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Button,
   Divider,
   FormControl,
   FormErrorMessage,
@@ -17,6 +16,7 @@ import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider"
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { UserSettingsLayout } from "@parallel/components/layout/UserSettingsLayout";
+import { Button } from "@parallel/components/ui";
 import { Security_updatePasswordDocument, Security_userDocument } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
@@ -184,7 +184,7 @@ function Security() {
                 />
               </FormErrorMessage>
             </FormControl>
-            <Button type="submit" colorScheme="primary" isDisabled={me.isSsoUser}>
+            <Button type="submit" colorPalette="primary" disabled={me.isSsoUser}>
               <FormattedMessage
                 id="page.account.change-password-button"
                 defaultMessage="Change password"

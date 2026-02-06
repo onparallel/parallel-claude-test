@@ -1,11 +1,11 @@
 import { Box, BoxProps, Placement, PopoverProps, TextProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Text } from "@parallel/components/ui";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { Link } from "./Link";
 import { SmallPopover } from "./SmallPopover";
-import { Text } from "@parallel/components/ui";
 
 export type RestrictedFeaturePopoverProps = {
   children: ReactNode;

@@ -1,5 +1,6 @@
-import { Box, Button, Center, IconButton, Stack } from "@chakra-ui/react";
+import { Box, Center, IconButton, Stack } from "@chakra-ui/react";
 import { AddIcon, PlusCircleIcon } from "@parallel/chakra/icons";
+import { Button, Text } from "@parallel/components/ui";
 import {
   PetitionComposeField_PetitionFieldFragment,
   PetitionFieldType,
@@ -14,7 +15,6 @@ import { PetitionComposeDragActiveIndicator } from "./PetitionComposeDragActiveI
 import type { PetitionComposeFieldProps, PetitionComposeFieldRef } from "./PetitionComposeField";
 import { PetitionComposeField } from "./PetitionComposeField";
 import { PetitionComposeNewFieldPlaceholder } from "./PetitionComposeNewFieldPlaceholder";
-import { Text } from "@parallel/components/ui";
 
 interface PetitionComposeFieldGroupChildrenProps
   extends Pick<
@@ -238,9 +238,9 @@ export function PetitionComposeFieldGroupChildren({
       {!hasChildren && inParentFieldId !== parentFieldId ? (
         <Button
           leftIcon={<PlusCircleIcon />}
-          isDisabled={isReadOnly}
+          disabled={isReadOnly}
           variant="outline"
-          colorScheme="primary"
+          colorPalette="primary"
           size="sm"
           fontSize="md"
           alignSelf="center"

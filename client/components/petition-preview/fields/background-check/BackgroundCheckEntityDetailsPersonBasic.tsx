@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, HStack, Image, Stack } from "@chakra-ui/react";
+import { Box, Flex, HStack, Image, Stack } from "@chakra-ui/react";
 import {
   CheckIcon,
   DeleteIcon,
@@ -11,6 +11,7 @@ import {
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { BackgroundCheckRiskLabel } from "@parallel/components/petition-common/BackgroundCheckRiskLabel";
+import { Button, Text } from "@parallel/components/ui";
 import { BackgroundCheckEntityDetailsPersonBasic_BackgroundCheckEntityDetailsPersonFragment } from "@parallel/graphql/__types";
 import { formatPartialDate } from "@parallel/utils/formatPartialDate";
 import {
@@ -19,7 +20,6 @@ import {
 } from "@parallel/utils/useLoadOpenSanctionsCountryNames";
 import { Fragment } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export function BackgroundCheckEntityDetailsPersonBasic({
   isDisabled,
@@ -79,9 +79,9 @@ export function BackgroundCheckEntityDetailsPersonBasic({
           <HStack alignSelf="end" flexWrap="wrap">
             <Button
               variant="ghost"
-              colorScheme="primary"
+              colorPalette="primary"
               leftIcon={<EyeIcon />}
-              isDisabled={isDisabled}
+              disabled={isDisabled}
               onClick={() => onDownloadPDF()}
               width={{ base: "100%", sm: "auto" }}
             >
@@ -112,11 +112,11 @@ export function BackgroundCheckEntityDetailsPersonBasic({
             ) : (
               <Button
                 variant="solid"
-                colorScheme="primary"
+                colorPalette="primary"
                 leftIcon={<StarEmptyIcon />}
                 onClick={onSave}
-                isLoading={isSaving}
-                isDisabled={isReadOnly || isDisabled}
+                loading={isSaving}
+                disabled={isReadOnly || isDisabled}
                 width={{ base: "100%", sm: "auto" }}
               >
                 <FormattedMessage

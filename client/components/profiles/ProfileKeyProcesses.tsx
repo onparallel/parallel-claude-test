@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Button, Center, Flex, HStack, Image, Stack } from "@chakra-ui/react";
+import { Center, Flex, HStack, Image, Stack } from "@chakra-ui/react";
 import { AddIcon, LockClosedIcon, PlusCircleIcon } from "@parallel/chakra/icons";
-import { Text } from "@parallel/components/ui";
+import { Button, Text } from "@parallel/components/ui";
 import {
   ProfileKeyProcesses_associateProfileToPetitionDocument,
   ProfileKeyProcesses_createPetitionFromProfileDocument,
@@ -317,7 +317,7 @@ function KeyProcessCard({
                   },
                 )}
                 onClick={onCreate}
-                isDisabled={!userCanCreatePetition}
+                disabled={!userCanCreatePetition}
               />
             </HStack>
           ) : null
@@ -410,13 +410,13 @@ function KeyProcessCard({
             minWidth={0}
           >
             <Button
-              colorScheme="primary"
+              colorPalette="primary"
               size="sm"
               fontSize="md"
               fontWeight={500}
               display="grid"
               onClick={onCreate}
-              isDisabled={!userCanCreatePetition}
+              disabled={!userCanCreatePetition}
             >
               <OverflownText>
                 <FormattedMessage
@@ -449,7 +449,7 @@ function PlaceholderEmpty({ profileTypeId }: { profileTypeId: string }) {
   const userCanAccessProfileTypes = useHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES");
 
   const addProcessButton = (
-    <Button as="a" variant="link" isDisabled={!userCanAccessProfileTypes}>
+    <Button as="a" variant="link" disabled={!userCanAccessProfileTypes}>
       <FormattedMessage
         id="component.profile-key-processes.add-process-button"
         defaultMessage="Add process"
@@ -508,7 +508,7 @@ function PlaceholderAddNewProcess({
       fontSize="md"
       size="sm"
       fontWeight={500}
-      isDisabled={!userCanAccessProfileTypes}
+      disabled={!userCanAccessProfileTypes}
     >
       <FormattedMessage
         id="component.profile-key-processes.add-process-button"

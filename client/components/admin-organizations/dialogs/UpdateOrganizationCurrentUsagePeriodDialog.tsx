@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Button,
   FormLabel,
   Grid,
   GridItem,
@@ -13,13 +12,13 @@ import {
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import { UpdateOrganizationCurrentUsagePeriodDialog_OrganizationUsageLimitFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { add } from "date-fns";
 import { ReactNode } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedDate, FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 interface UpdateOrganizationCurrentUsagePeriodDialogData {
   header: ReactNode;
@@ -107,7 +106,7 @@ export function UpdateOrganizationCurrentUsagePeriodDialog({
         </Grid>
       }
       confirm={
-        <Button colorScheme="primary" type="submit" isDisabled={!isDirty && !!usagePeriod}>
+        <Button colorPalette="primary" type="submit" disabled={!isDirty && !!usagePeriod}>
           <FormattedMessage id="generic.update" defaultMessage="Update" />
         </Button>
       }

@@ -1,5 +1,4 @@
 import {
-  Button,
   Center,
   HStack,
   Image,
@@ -16,10 +15,10 @@ import {
   useDialog,
 } from "@parallel/components/common/dialogs/DialogProvider";
 import { StepsIndicator } from "@parallel/components/common/StepsIndicator";
+import { Button, Text } from "@parallel/components/ui";
 import { Tone } from "@parallel/graphql/__types";
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export function RecipientViewHelpDialog({ tone, ...props }: DialogProps<{ tone: Tone }, void>) {
   const intl = useIntl();
@@ -141,7 +140,7 @@ export function RecipientViewHelpDialog({ tone, ...props }: DialogProps<{ tone: 
           ) : null}
           {page < 2 ? (
             <Button
-              colorScheme="primary"
+              colorPalette="primary"
               onClick={() => paginate(1)}
               data-testid="help-dialog-continue-button"
             >
@@ -149,7 +148,7 @@ export function RecipientViewHelpDialog({ tone, ...props }: DialogProps<{ tone: 
             </Button>
           ) : (
             <Button
-              colorScheme="primary"
+              colorPalette="primary"
               onClick={() => props.onResolve()}
               data-testid="help-dialog-continue-button"
             >

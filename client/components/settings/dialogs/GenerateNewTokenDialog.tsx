@@ -1,15 +1,15 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Button, FormControl, FormErrorMessage, Input, Stack } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, Input, Stack } from "@chakra-ui/react";
 import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboardButton";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import { GenerateNewTokenDialog_generateUserAuthTokenDocument } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export function GenerateNewTokenDialog(props: DialogProps) {
   const intl = useIntl();
@@ -138,11 +138,11 @@ export function GenerateNewTokenDialog(props: DialogProps) {
       }
       confirm={
         apiKey ? (
-          <Button colorScheme="primary" onClick={() => props.onResolve()}>
+          <Button colorPalette="primary" onClick={() => props.onResolve()}>
             <FormattedMessage id="generic.continue" defaultMessage="Continue" />
           </Button>
         ) : (
-          <Button colorScheme="primary" type="submit" isLoading={loading}>
+          <Button colorPalette="primary" type="submit" loading={loading}>
             <FormattedMessage
               id="settings.api-tokens.generate-new-token"
               defaultMessage="Create token"

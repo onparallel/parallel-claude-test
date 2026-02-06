@@ -1,7 +1,8 @@
 import { gql } from "@apollo/client";
 import { useApolloClient } from "@apollo/client/react";
-import { Button, Progress } from "@chakra-ui/react";
+import { Progress } from "@chakra-ui/react";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button } from "@parallel/components/ui";
 import {
   TaskProgressDialog_publicTaskDocument,
   TaskProgressDialog_taskDocument,
@@ -115,8 +116,8 @@ export function TaskProgressDialog({
       confirm={
         <Button
           ref={confirmRef}
-          colorScheme="primary"
-          isDisabled={task?.status !== "COMPLETED"}
+          colorPalette="primary"
+          disabled={task?.status !== "COMPLETED"}
           onClick={() => props.onResolve(task!)}
         >
           {confirmText ?? (

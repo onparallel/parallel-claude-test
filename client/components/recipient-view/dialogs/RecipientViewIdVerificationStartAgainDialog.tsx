@@ -1,10 +1,9 @@
-import { Button } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
+import { Button, Text } from "@parallel/components/ui";
 import { Tone } from "@parallel/graphql/__types";
 import { useRef } from "react";
 import { FormattedMessage } from "react-intl";
 import { DialogProps, useDialog } from "../../common/dialogs/DialogProvider";
-import { Text } from "@parallel/components/ui";
 
 function RecipientViewIdVerificationStartAgainDialog({
   tone,
@@ -40,7 +39,7 @@ function RecipientViewIdVerificationStartAgainDialog({
         </>
       }
       confirm={
-        <Button ref={focusRef} colorScheme="red" onClick={() => props.onResolve()}>
+        <Button ref={focusRef} colorPalette="red" onClick={() => props.onResolve()}>
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }

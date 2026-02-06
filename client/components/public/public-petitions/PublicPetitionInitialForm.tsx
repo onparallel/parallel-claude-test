@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -20,7 +19,7 @@ import {
 import { QuestionOutlineIcon } from "@parallel/chakra/icons";
 import { NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
-import { Collapsible, Text } from "@parallel/components/ui";
+import { Button, Collapsible, Text } from "@parallel/components/ui";
 import { isValidEmail } from "@parallel/utils/validation";
 import useResizeObserver from "@react-hook/resize-observer";
 import { useRef, useState } from "react";
@@ -229,10 +228,10 @@ export function PublicPetitionInitialForm({
           </FormControl>
           <Button
             type="submit"
-            colorScheme="primary"
+            colorPalette="primary"
             size="md"
-            isLoading={isLoading}
-            isDisabled={isDisabled}
+            loading={isLoading}
+            disabled={isDisabled}
           >
             <FormattedMessage
               id="public-petition.help.request-access-button"
@@ -294,7 +293,7 @@ export function PublicPetitionInitialForm({
               <Button
                 marginStart={4}
                 ref={closeDialogRef}
-                colorScheme="primary"
+                colorPalette="primary"
                 onClick={onCloseDialog}
               >
                 <FormattedMessage id="generic.close" defaultMessage="Close" />

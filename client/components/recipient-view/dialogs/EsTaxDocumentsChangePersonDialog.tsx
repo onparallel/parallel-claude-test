@@ -1,5 +1,5 @@
-import { Button } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
+import { Button } from "@parallel/components/ui";
 import { Tone } from "@parallel/graphql/__types";
 import { useRef } from "react";
 import { FormattedMessage } from "react-intl";
@@ -26,7 +26,7 @@ function EsTaxDocumentsChangePersonDialog({ tone, ...props }: DialogProps<{ tone
         />
       }
       confirm={
-        <Button ref={focusRef} colorScheme="red" onClick={() => props.onResolve()}>
+        <Button ref={focusRef} colorPalette="red" onClick={() => props.onResolve()}>
           <FormattedMessage
             id="component.es-tax-documents-change-person-dialog.confirm-button"
             defaultMessage="Delete and start again"

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
-import { Box, Button, FormControl, FormErrorMessage, Grid, Heading, Stack } from "@chakra-ui/react";
+import { Box, FormControl, FormErrorMessage, Grid, Heading, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { NoElement } from "@parallel/components/common/NoElement";
@@ -9,6 +9,7 @@ import { ProfileRelationshipTypeWithDirectionSelect } from "@parallel/components
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { MaybeWizardStepDialogProps } from "@parallel/components/common/dialogs/WizardDialog";
+import { Button, Text } from "@parallel/components/ui";
 import {
   UpdatePetitionFieldGroupRelationshipInput,
   useCreateOrUpdateFieldGroupRelationshipsDialog_PetitionBaseFragment,
@@ -23,7 +24,6 @@ import { useCallback, useEffect } from "react";
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish, unique } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 export interface CreateOrUpdateFieldGroupRelationshipsDialogProps {
   isTemplate: boolean;
@@ -274,7 +274,7 @@ export function CreateOrUpdateFieldGroupRelationshipsDialog({
           </Grid>
           {fields.length >= 100 || isSuggestingRelationships ? null : (
             <Box marginTop={2} paddingX={1}>
-              <Button onClick={handleCreateRelationship} isLoading={isPetitionLoading}>
+              <Button onClick={handleCreateRelationship} loading={isPetitionLoading}>
                 <FormattedMessage
                   id="component.create-or-update-field-group-relationships-dialog.add-group"
                   defaultMessage="Add group"
@@ -299,7 +299,7 @@ export function CreateOrUpdateFieldGroupRelationshipsDialog({
         )
       }
       confirm={
-        <Button colorScheme="primary" type="submit" isDisabled={isPetitionLoading}>
+        <Button colorPalette="primary" type="submit" disabled={isPetitionLoading}>
           {isSuggestingRelationships ? (
             <FormattedMessage
               id="component.create-or-update-field-group-relationships-dialog.add-relationships"
@@ -722,7 +722,7 @@ function FieldGroupRelationship({
           id: "generic.remove",
           defaultMessage: "Remove",
         })}
-        isDisabled={isSuggestedRelationship && index === 0}
+        disabled={isSuggestedRelationship && index === 0}
       />
 
       {isNonNullish(errors.relationships?.[index]?.leftFieldGroup?.type) &&

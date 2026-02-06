@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import {
   Box,
-  Button,
   ButtonGroup,
   Center,
   Grid,
@@ -31,6 +30,7 @@ import { ReportsErrorMessage } from "@parallel/components/reports/common/Reports
 import { ReportsLoadingMessage } from "@parallel/components/reports/common/ReportsLoadingMessage";
 import { ReportsReadyMessage } from "@parallel/components/reports/common/ReportsReadyMessage";
 import { TimeSpan } from "@parallel/components/reports/common/TimeSpan";
+import { Button, Text } from "@parallel/components/ui";
 import { Maybe, Overview_userDocument } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
@@ -43,7 +43,6 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ReactNode, useMemo, useRef, useState } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { isNonNullish, sortBy, sumBy } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 interface PetitionStatusCount {
   all: number;
@@ -223,10 +222,10 @@ export function Overview() {
 
           <Button
             minWidth="fit-content"
-            colorScheme="primary"
+            colorPalette="primary"
             onClick={handleGenerateReportClick}
             fontWeight="500"
-            isDisabled={status === "LOADED" || status === "LOADING"}
+            disabled={status === "LOADED" || status === "LOADING"}
           >
             <FormattedMessage id="page.reports.generate" defaultMessage="Generate" />
           </Button>

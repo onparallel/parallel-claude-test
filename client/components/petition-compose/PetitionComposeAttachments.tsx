@@ -4,7 +4,6 @@ import {
   AlertDescription,
   AlertIcon,
   Box,
-  Button,
   HStack,
   MenuButton,
   MenuItem,
@@ -29,6 +28,7 @@ import {
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { FileSize } from "@parallel/components/common/FileSize";
+import { Button, Text } from "@parallel/components/ui";
 import {
   PetitionAttachmentType,
   PetitionComposeAttachments_createPetitionAttachmentUploadLinkDocument,
@@ -71,7 +71,6 @@ import { RestrictedFeaturePopover } from "../common/RestrictedFeaturePopover";
 import { PetitionComposeVisibilityAccordion } from "../petition-common/PetitionComposeVisibilityAccordion";
 import { PetitionVisibilityEditor } from "./logic/PetitionVisibilityEditor";
 import { PetitionComposeDragActiveIndicator } from "./PetitionComposeDragActiveIndicator";
-import { Text } from "@parallel/components/ui";
 
 const MAX_FILE_SIZE = 1024 * 1024 * 50;
 const TOTAL_MAX_FILES_SIZE = 1024 * 1024 * 10;
@@ -401,7 +400,7 @@ export const PetitionComposeAttachments = chakraForwardRef<"div", PetitionCompos
                   defaultMessage: "Add attachment",
                 })}
                 onClick={open}
-                isDisabled={allAttachments.length > 9 || isReadOnly}
+                disabled={allAttachments.length > 9 || isReadOnly}
               />
             </RestrictedFeaturePopover>
           }
@@ -828,7 +827,7 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
                 aria-label={menuButtonLabel}
                 leftIcon={menuIcon}
                 rightIcon={<ChevronDownIcon marginStart={-2} />}
-                isDisabled={isDisabled}
+                disabled={isDisabled}
               />
             </Box>
             <Portal>
@@ -932,7 +931,7 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
                   onVisibilityChange(id, null);
                 }
               }}
-              isDisabled={isDisabled || !canChangeVisibility}
+              disabled={isDisabled || !canChangeVisibility}
               color={hasVisibilityConditions ? "primary.500" : "gray.600"}
               size="sm"
               variant="ghost"
@@ -955,7 +954,7 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
                     })
               }
               variant="ghost"
-              isDisabled={!isComplete}
+              disabled={!isComplete}
               onClick={() =>
                 onPreview(
                   id,
@@ -973,7 +972,7 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
                 defaultMessage: "Remove attachment",
               })}
               variant="ghost"
-              isDisabled={isDisabled}
+              disabled={isDisabled}
               onClick={() => onRemove(id)}
             />
           </HStack>

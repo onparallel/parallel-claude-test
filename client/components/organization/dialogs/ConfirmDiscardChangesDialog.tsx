@@ -1,10 +1,10 @@
-import { Button, Stack } from "@chakra-ui/react";
+import { Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import { usePreventNavigation } from "@parallel/utils/usePreventNavigation";
 import { useCallback, useRef } from "react";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export function ConfirmDiscardChangesDialog({ ...props }: DialogProps) {
   const cancelRef = useRef<HTMLButtonElement>(null);
@@ -36,7 +36,7 @@ export function ConfirmDiscardChangesDialog({ ...props }: DialogProps) {
         </Button>
       }
       confirm={
-        <Button colorScheme="primary" onClick={() => props.onResolve()}>
+        <Button colorPalette="primary" onClick={() => props.onResolve()}>
           <FormattedMessage
             id="component.confirm-discard-changes-dialog.confirm"
             defaultMessage="Discard and continue"

@@ -4,7 +4,6 @@ import {
   AlertIcon,
   AlertProps,
   Box,
-  Button,
   Flex,
   HStack,
   MenuItem,
@@ -12,13 +11,13 @@ import {
 } from "@chakra-ui/react";
 import { TimeIcon } from "@parallel/chakra/icons";
 import { ButtonWithMoreOptions } from "@parallel/components/common/ButtonWithMoreOptions";
+import { Button, Text } from "@parallel/components/ui";
 import {
   PetitionApprovalRequestStatus,
   PetitionSignatureStatusFilter,
   PetitionStatus,
 } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 interface PetitionComposeAndPreviewAlertsProps {
   petitionStatus: PetitionStatus;
@@ -138,7 +137,7 @@ function PetitionApprovalsAlert({
               />
             </ButtonWithMoreOptions>
           ) : (
-            <Button colorScheme="red" onClick={onCancelApprovals}>
+            <Button colorPalette="red" onClick={onCancelApprovals}>
               <FormattedMessage
                 id="component.petition-approvals-alert.cancel-approvals"
                 defaultMessage="Cancel approvals"
@@ -178,7 +177,7 @@ function PetitionSignatureSentAlert({
           </Text>
         </AlertDescription>
         <Box alignSelf={{ base: "flex-start", md: "center" }}>
-          <Button colorScheme="red" onClick={onCancelSignature}>
+          <Button colorPalette="red" onClick={onCancelSignature}>
             <FormattedMessage
               id="component.petition-signature-sent-alert.cancel-signature"
               defaultMessage="Cancel signature"
@@ -247,7 +246,7 @@ function PetitionCompletedAlert({
         </AlertDescription>
         <Box>
           {showStartApprovalsButton ? (
-            <Button onClick={onStartApprovals} colorScheme="primary">
+            <Button onClick={onStartApprovals} colorPalette="primary">
               <FormattedMessage
                 id="component.petition-completed-alert.start-approvals"
                 defaultMessage="Start approvals"
@@ -273,7 +272,7 @@ function PetitionCompletedAlert({
               <FormattedMessage id="generic.start-signature" defaultMessage="Start signature" />
             </ButtonWithMoreOptions>
           ) : showStartSignatureButton ? (
-            <Button onClick={onStartSignature} colorScheme="primary">
+            <Button onClick={onStartSignature} colorPalette="primary">
               <FormattedMessage id="generic.start-signature" defaultMessage="Start signature" />
             </Button>
           ) : null}
@@ -296,7 +295,7 @@ function PetitionCompletedAlert({
               <FormattedMessage id="generic.close-petition" defaultMessage="Close parallel" />
             </ButtonWithMoreOptions>
           ) : showClosePetitionButton ? (
-            <Button onClick={onClosePetition} colorScheme="primary">
+            <Button onClick={onClosePetition} colorPalette="primary">
               <FormattedMessage id="generic.close-petition" defaultMessage="Close parallel" />
             </Button>
           ) : null}

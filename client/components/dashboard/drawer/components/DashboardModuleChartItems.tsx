@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client";
-import { Box, Button, FormControl, FormErrorMessage, HStack, Input, Stack } from "@chakra-ui/react";
+import { Box, FormControl, FormErrorMessage, HStack, Input, Stack } from "@chakra-ui/react";
 import { AddIcon, DeleteIcon, PlusCircleFilledIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
+import { Button, Text } from "@parallel/components/ui";
 import { DashboardModuleChartItems_ProfileTypeFragment } from "@parallel/graphql/__types";
 import { useRerender } from "@parallel/utils/useRerender";
 import { Fragment, useState } from "react";
@@ -16,7 +17,6 @@ import {
 import { DashboardModuleFormLabel } from "./DashboardModuleFormLabel";
 import { PetitionsModuleFilterEditor } from "./PetitionsModuleFilterEditor";
 import { ProfilesModuleFilterEditor } from "./ProfilesModuleFilterEditor";
-import { Text } from "@parallel/components/ui";
 
 export function DashboardModuleChartItems({
   isProfileTypeModule,
@@ -115,7 +115,7 @@ export function DashboardModuleChartItems({
               })}
               icon={<AddIcon />}
               onClick={handleAddNewChartItem}
-              isDisabled={isDisabled}
+              disabled={isDisabled}
             />
 
             <IconButtonWithTooltip
@@ -125,7 +125,7 @@ export function DashboardModuleChartItems({
                 remove(selectedIndex);
                 setSelectedFieldIndex(Math.max(0, selectedIndex - 1));
               }}
-              isDisabled={isDisabled || fields.length <= 1}
+              disabled={isDisabled || fields.length <= 1}
               placement="bottom-end"
             />
           </HStack>
@@ -148,7 +148,7 @@ export function DashboardModuleChartItems({
                     <PlusCircleFilledIcon color="primary.500" position="relative" boxSize={5} />
                   }
                   onClick={handleAddNewChartItem}
-                  isDisabled={isDisabled}
+                  disabled={isDisabled}
                 >
                   <FormattedMessage
                     id="component.petitions-chart-module-settings.add-item-button"

@@ -1,17 +1,9 @@
-import {
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
-  Button,
-  Flex,
-  Stack,
-  useToast,
-} from "@chakra-ui/react";
+import { AlertDescription, AlertIcon, AlertTitle, Flex, Stack, useToast } from "@chakra-ui/react";
+import { Button, Text } from "@parallel/components/ui";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { CloseableAlert } from "../common/CloseableAlert";
-import { Text } from "@parallel/components/ui";
 
 interface EmailVerificationRequiredAlertProps {
   isOpen: boolean;
@@ -91,7 +83,7 @@ export function EmailVerificationRequiredAlert({
                 values={{
                   a: (chunks: any) => (
                     <Button
-                      isDisabled={isEmailSent}
+                      disabled={isEmailSent}
                       variant="link"
                       fontWeight="bold"
                       onClick={() => handleResendEmail()}

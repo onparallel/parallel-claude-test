@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
   Box,
-  Button,
   Center,
   Flex,
   FormControl,
@@ -29,6 +28,7 @@ import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withPermission } from "@parallel/components/common/withPermission";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
+import { Button, Text } from "@parallel/components/ui";
 import {
   Contact_contactDocument,
   Contact_PetitionAccessFragment,
@@ -47,7 +47,6 @@ import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 type ContactProps = UnwrapPromise<ReturnType<typeof Contact.getInitialProps>>;
 
@@ -185,7 +184,7 @@ function Contact({ contactId }: ContactProps) {
                 <FormLabel fontWeight="bold">
                   <FormattedMessage id="generic.forms-last-name-label" defaultMessage="Last name" />
                 </FormLabel>
-                <ToggleInput {...register("lastName")} isEditing={isEditing} isDisabled={loading}>
+                <ToggleInput {...register("lastName")} isEditing={isEditing} disabled={loading}>
                   {contact!.lastName}
                 </ToggleInput>
               </FormControl>
@@ -207,9 +206,9 @@ function Contact({ contactId }: ContactProps) {
                     <FormattedMessage id="generic.cancel-save-changes" defaultMessage="Cancel" />
                   </Button>
                   <Button
-                    colorScheme="primary"
+                    colorPalette="primary"
                     type="submit"
-                    isLoading={loading}
+                    loading={loading}
                     loadingText={intl.formatMessage({
                       id: "generic.saving-changes",
                       defaultMessage: "Saving...",
@@ -221,7 +220,7 @@ function Contact({ contactId }: ContactProps) {
               ) : (
                 <Button
                   leftIcon={<EditIcon />}
-                  colorScheme="gray"
+                  colorPalette="gray"
                   onClick={() => setIsEditing(true)}
                 >
                   <FormattedMessage id="contact.edit-details-button" defaultMessage="Edit" />

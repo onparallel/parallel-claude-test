@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
-import { Badge, Box, Button, HStack, Stack } from "@chakra-ui/react";
+import { Badge, Box, HStack, Stack } from "@chakra-ui/react";
+import { Button, Text } from "@parallel/components/ui";
 import { DocumentThemeSelect_OrganizationThemeFragment } from "@parallel/graphql/__types";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomSelectProps } from "@parallel/utils/react-select/types";
@@ -12,7 +13,6 @@ import Select, {
   SelectInstance,
   SingleValueProps,
 } from "react-select";
-import { Text } from "@parallel/components/ui";
 
 type Selection = DocumentThemeSelect_OrganizationThemeFragment;
 export type DocumentThemeSelectInstance = SelectInstance<Selection>;
@@ -91,11 +91,7 @@ function NoOptionsMessage(props: NoticeProps & { selectProps: ReactSelectExtraPr
           defaultMessage="No more themes created"
         />
       </Text>
-      <Button
-        colorScheme="primary"
-        onClick={onCreateNewTheme}
-        isDisabled={isCreateNewThemeDisabled}
-      >
+      <Button colorPalette="primary" onClick={onCreateNewTheme} disabled={isCreateNewThemeDisabled}>
         <FormattedMessage
           id="component.document-theme-select.new-theme-button"
           defaultMessage="New theme"

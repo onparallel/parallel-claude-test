@@ -7,7 +7,6 @@ import {
   AlertTitle,
   Badge,
   Box,
-  Button,
   Center,
   Heading,
   Image,
@@ -30,6 +29,7 @@ import {
   IntegrationSwitchCard,
   IntegrationSwitchCardProps,
 } from "@parallel/components/organization/IntegrationSwitchCard";
+import { Button, Text } from "@parallel/components/ui";
 import {
   OrganizationIntegrations_deleteDowJonesKycIntegrationDocument,
   OrganizationIntegrations_userDocument,
@@ -43,7 +43,6 @@ import { isNonNullish } from "remeda";
 import { noop } from "ts-essentials";
 import { useDeactivateDowJonesIntegrationDialog } from "../../../../components/organization/integrations/dialogs/DeactivateDowJonesIntegrationDialog";
 import { useDowJonesIntegrationDialog } from "../../../../components/organization/integrations/dialogs/DowJonesIntegrationDialog";
-import { Text } from "@parallel/components/ui";
 
 function OrganizationIntegrations() {
   const intl = useIntl();
@@ -421,7 +420,7 @@ function OrganizationIntegrations() {
           <Center>
             <Button
               variant="outline"
-              colorScheme="blue"
+              colorPalette="blue"
               backgroundColor="white"
               as="a"
               target="_blank"

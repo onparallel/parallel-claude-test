@@ -1,9 +1,8 @@
 import { gql } from "@apollo/client";
 import {
-  Button,
   Flex,
-  HStack,
   Heading,
+  HStack,
   PopoverArrow,
   PopoverBody,
   PopoverCloseButton,
@@ -12,6 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { Popover } from "@parallel/chakra/components";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Button, Text } from "@parallel/components/ui";
 import {
   RecipientViewProgressBar_PetitionFieldFragment,
   RecipientViewProgressBar_PetitionFragment,
@@ -27,7 +27,6 @@ import { FormattedMessage } from "react-intl";
 import { isNonNullish, zip } from "remeda";
 import { ProgressIndicator, ProgressTrack } from "../common/Progress";
 import { useTone } from "../common/ToneProvider";
-import { Text } from "@parallel/components/ui";
 
 type PetitionSelection =
   | RecipientViewProgressBar_PublicPetitionFragment
@@ -150,9 +149,9 @@ export const RecipientViewProgressBar = chakraForwardRef<"div", RecipientViewPro
               <Button
                 data-testid="recipient-view-finalize-button"
                 data-action="finalize"
-                colorScheme="primary"
+                colorPalette="primary"
                 size="sm"
-                isDisabled={isCompleted || isDisabled}
+                disabled={isCompleted || isDisabled}
                 onClick={onFinalize}
               >
                 {canFinalize ? (

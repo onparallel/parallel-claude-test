@@ -4,7 +4,6 @@ import {
   AlertDescription,
   AlertIcon,
   Badge,
-  Button,
   Center,
   Flex,
   FormControl,
@@ -29,6 +28,7 @@ import { FileSize } from "@parallel/components/common/FileSize";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { RestrictedFeatureAlert } from "@parallel/components/common/RestrictedFeatureAlert";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
+import { Button, Text } from "@parallel/components/ui";
 import {
   BrandingGeneral_UserFragment,
   BrandingGeneral_updateOrgLogoDocument,
@@ -48,7 +48,6 @@ import { sort } from "remeda";
 import fonts from "../../../utils/webSafeFonts.json";
 import { useAutoConfirmDiscardChangesDialog } from "../dialogs/ConfirmDiscardChangesDialog";
 import { BrandingGeneralPreview } from "./BrandingGeneralPreview";
-import { Text } from "@parallel/components/ui";
 
 interface BrandingGeneralProps {
   user: BrandingGeneral_UserFragment;
@@ -221,9 +220,9 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
                 <Flex marginTop={4}>
                   <Button
                     flex="1"
-                    colorScheme="primary"
+                    colorPalette="primary"
                     onClick={() => dropzoneRef.current?.open()}
-                    isDisabled={!userCanEditBranding}
+                    disabled={!userCanEditBranding}
                   >
                     <FormattedMessage
                       id="organization.branding.upload-logo"
@@ -356,9 +355,9 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
           <Button
             type="submit"
             width={{ base: "auto", sm: "fit-content" }}
-            colorScheme="primary"
-            isDisabled={!isDirty || !isValid}
-            isLoading={updateBrandLoading || updateLogoLoading}
+            colorPalette="primary"
+            disabled={!isDirty || !isValid}
+            loading={updateBrandLoading || updateLogoLoading}
           >
             <FormattedMessage
               id="component.branding-general.save-changes"

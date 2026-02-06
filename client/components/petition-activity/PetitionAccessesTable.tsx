@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import {
   Box,
   BoxProps,
-  Button,
   Center,
   Flex,
   HStack,
@@ -24,6 +23,7 @@ import {
   UserPlusIcon,
   UserXIcon,
 } from "@parallel/chakra/icons";
+import { Button, Text } from "@parallel/components/ui";
 import {
   PetitionAccessTable_PetitionAccessFragment,
   PetitionAccessTable_PetitionFragment,
@@ -39,7 +39,6 @@ import { DateTime } from "../common/DateTime";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NormalLink } from "../common/Link";
 import { Table, TableColumn } from "../common/Table";
-import { Text } from "@parallel/components/ui";
 
 export interface PetitionAccessesTable extends BoxProps {
   petition: PetitionAccessTable_PetitionFragment;
@@ -145,7 +144,7 @@ export function PetitionAccessesTable({
             <Button
               leftIcon={<UserPlusIcon fontSize="18px" />}
               onClick={onAddPetitionAccess}
-              isDisabled={
+              disabled={
                 petition.isAnonymized ||
                 myEffectivePermission === "READ" ||
                 isNonNullish(petition.permanentDeletionAt)
@@ -442,7 +441,7 @@ function usePetitionAccessesColumns(): TableColumn<
                 placement="bottom"
                 icon={<UserXIcon fontSize="16px" />}
                 size="sm"
-                isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
+                disabled={petition.isAnonymized || myEffectivePermission === "READ"}
               />
             </Stack>
           );

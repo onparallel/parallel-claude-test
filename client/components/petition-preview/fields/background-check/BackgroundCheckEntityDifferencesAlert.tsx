@@ -4,7 +4,6 @@ import {
   AlertDescription,
   AlertIcon,
   AlertTitle,
-  Button,
   HStack,
   List,
   ListItem,
@@ -12,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
 import { BackgroundCheckRiskLabel } from "@parallel/components/petition-common/BackgroundCheckRiskLabel";
-import { Stack } from "@parallel/components/ui";
+import { Button, Stack } from "@parallel/components/ui";
 import { BackgroundCheckEntityDifferencesAlert_BackgroundCheckEntityDetailsReviewDiffFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
@@ -127,7 +126,7 @@ export function BackgroundCheckEntityDifferencesAlert({
         </Stack>
       </HStack>
       <HStack>
-        <Button colorScheme="primary" leftIcon={<CheckIcon />} onClick={onConfirmChangesClick}>
+        <Button colorPalette="primary" leftIcon={<CheckIcon />} onClick={onConfirmChangesClick}>
           <FormattedMessage
             id="component.background-check-entity-differences-alert.mark-as-reviewed"
             defaultMessage="Mark as reviewed"

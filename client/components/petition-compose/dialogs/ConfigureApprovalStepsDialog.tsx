@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 import {
   Box,
-  Button,
   Center,
   Checkbox,
   Editable,
@@ -32,6 +31,7 @@ import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { SimpleSelect, useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
+import { Button, Text } from "@parallel/components/ui";
 import {
   ApprovalFlowConfigInput,
   ConfigureApprovalStepsDialog_PetitionBaseFragment,
@@ -43,7 +43,6 @@ import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, omit } from "remeda";
 import { PetitionVisibilityEditor } from "../logic/PetitionVisibilityEditor";
-import { Text } from "@parallel/components/ui";
 
 type ConfigureApprovalStepsDialogSteps = {
   LOADING: {
@@ -100,7 +99,7 @@ function ConfigureApprovalStepsLoadingDialog({
         </Center>
       }
       confirm={
-        <Button colorScheme="primary" isDisabled>
+        <Button colorPalette="primary" disabled>
           <FormattedMessage id="generic.save-changes" defaultMessage="Save changes" />
         </Button>
       }
@@ -222,7 +221,7 @@ function ConfigureApprovalStepsDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="primary" type="submit">
+        <Button colorPalette="primary" type="submit">
           <FormattedMessage id="generic.save-changes" defaultMessage="Save changes" />
         </Button>
       }

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Button, Center, Flex, Heading, HStack, Skeleton, Stack } from "@chakra-ui/react";
+import { Box, Center, Flex, Heading, HStack, Skeleton, Stack } from "@chakra-ui/react";
 import { CheckIcon, DeleteIcon, SaveIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -9,6 +9,7 @@ import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { DowJonesRiskLabel } from "@parallel/components/petition-common/DowJonesRiskLabel";
+import { Button, Text } from "@parallel/components/ui";
 import {
   DowJonesFieldSearchResults_createDowJonesKycReplyDocument,
   DowJonesFieldSearchResults_deletePetitionFieldReplyDocument,
@@ -31,7 +32,6 @@ import { useRouter } from "next/router";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 type DowJonesFieldSearchResults_Selection =
   DowJonesFieldSearchResults_DowJonesKycEntitySearchResultFragment;
@@ -387,9 +387,9 @@ function useDowJonesKycDataColumns() {
                 <Button
                   size="sm"
                   fontSize="md"
-                  isLoading={context.isCreatingReply[row.profileId]}
+                  loading={context.isCreatingReply[row.profileId]}
                   variant="solid"
-                  colorScheme="primary"
+                  colorPalette="primary"
                   leftIcon={<SaveIcon />}
                   onClick={(e) => {
                     e.stopPropagation();

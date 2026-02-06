@@ -3,12 +3,12 @@ import { DownloadIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { Spacer } from "@parallel/components/common/Spacer";
+import { Text } from "@parallel/components/ui";
 import { ArcElement, ChartData, Chart as ChartJS, ChartOptions, Legend, Tooltip } from "chart.js";
 import { useMemo } from "react";
 import { Doughnut } from "react-chartjs-2";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../../common/IconButtonWithTooltip";
-import { Text } from "@parallel/components/ui";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -146,7 +146,7 @@ export function ReportsDoughnutChart({
             id: "generic.download-report",
             defaultMessage: "Download report",
           })}
-          isDisabled={!petitionsTotal}
+          disabled={!petitionsTotal}
         />
       </HStack>
       <Center maxWidth="150px" alignSelf="center">

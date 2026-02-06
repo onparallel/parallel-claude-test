@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 import {
   Box,
-  Button,
   Checkbox,
   Flex,
   FormControl,
@@ -30,6 +29,7 @@ import { SimpleSelect, useSimpleSelectOptions } from "@parallel/components/commo
 import { Steps } from "@parallel/components/common/Steps";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import {
   CreateOrUpdateProfileEventSubscriptionDialog_EventSubscriptionSignatureKeyFragment,
   CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscriptionFragment,
@@ -45,7 +45,6 @@ import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
 import { useDeleteWebhookSignatureKeysDialog } from "./ConfirmDeleteWebhookSignatureKeysDialog";
-import { Text } from "@parallel/components/ui";
 interface CreateOrUpdateProfileEventSubscriptionDialogProps {
   eventSubscription?: CreateOrUpdateProfileEventSubscriptionDialog_ProfileEventSubscriptionFragment;
   initialStep?: number;
@@ -481,7 +480,7 @@ export function CreateOrUpdateProfileEventSubscriptionDialog({
                 marginY={2}
                 variant="outline"
                 onClick={() => handleAddNewSignatureKey(newSubscriptionId!)}
-                isDisabled={signatureKeys.length >= 5}
+                disabled={signatureKeys.length >= 5}
               >
                 <FormattedMessage id="generic.add" defaultMessage="Add" />
               </Button>
@@ -518,7 +517,7 @@ export function CreateOrUpdateProfileEventSubscriptionDialog({
         </Steps>
       }
       confirm={
-        <Button colorScheme="primary" type="submit" isLoading={isSubmitting}>
+        <Button colorPalette="primary" type="submit" loading={isSubmitting}>
           {currentStep === 0 ? (
             isNonNullish(newSubscriptionId) ? (
               <FormattedMessage id="generic.continue" defaultMessage="Continue" />

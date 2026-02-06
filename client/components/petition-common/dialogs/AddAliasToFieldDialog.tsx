@@ -1,15 +1,8 @@
 import { gql } from "@apollo/client";
-import {
-  Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  HStack,
-  Input,
-  Stack,
-} from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel, HStack, Input, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import {
   AddAliasToFieldDialog_PetitionFieldFragment,
   UpdatePetitionFieldInput,
@@ -22,7 +15,6 @@ import { useCallback, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { PetitionFieldTypeIndicator } from "../PetitionFieldTypeIndicator";
-import { Text } from "@parallel/components/ui";
 
 interface AddAliasToFieldDialogProps {
   field: AddAliasToFieldDialog_PetitionFieldFragment;
@@ -151,7 +143,7 @@ export function AddAliasToFieldDialog({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="primary" variant="solid">
+        <Button type="submit" colorPalette="primary" variant="solid">
           <FormattedMessage id="generic.done" defaultMessage="Done" />
         </Button>
       }

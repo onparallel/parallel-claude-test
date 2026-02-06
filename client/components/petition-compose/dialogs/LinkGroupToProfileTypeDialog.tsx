@@ -2,7 +2,6 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Button,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -14,12 +13,12 @@ import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { ProfileTypeSelect } from "@parallel/components/common/ProfileTypeSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import { useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { SelectInstance } from "react-select";
 import { isNonNullish } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 function LinkGroupToProfileTypeDialog({
   defaultProfileTypeId,
@@ -164,7 +163,7 @@ function LinkGroupToProfileTypeDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="primary" type="submit">
+        <Button colorPalette="primary" type="submit">
           <FormattedMessage id="generic.save" defaultMessage="Save" />
         </Button>
       }

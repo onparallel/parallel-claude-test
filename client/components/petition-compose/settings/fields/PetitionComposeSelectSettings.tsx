@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box, Stack } from "@chakra-ui/react";
 import { StandardListSelect } from "@parallel/components/common/StandardListSelect";
+import { Text } from "@parallel/components/ui";
 import { UpdatePetitionFieldInput } from "@parallel/graphql/__types";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { FormattedMessage } from "react-intl";
@@ -8,7 +9,6 @@ import { useConfirmOverwriteOptionsDialog } from "../../dialogs/ConfirmOverwrite
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { ImportOptionsSettingsRow } from "../rows/ImportOptionsSettingsRow";
 import { SettingsRow } from "../rows/SettingsRow";
-import { Text } from "@parallel/components/ui";
 
 export function PetitionComposeSelectSettings({
   field,

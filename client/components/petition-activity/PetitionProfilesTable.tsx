@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
-import { Box, BoxProps, Button, Center, Flex, Stack } from "@chakra-ui/react";
+import { Box, BoxProps, Center, Flex, Stack } from "@chakra-ui/react";
 import { AddIcon, CloseIconSmall } from "@parallel/chakra/icons";
+import { Button, Text } from "@parallel/components/ui";
 import {
   PetitionProfilesTable_PetitionFragment,
   PetitionProfilesTable_ProfileFragment,
@@ -18,7 +19,6 @@ import { LocalizableUserTextRender } from "../common/LocalizableUserTextRender";
 import { ProfileReference } from "../common/ProfileReference";
 import { Table, TableColumn } from "../common/Table";
 import { UserAvatarList } from "../common/UserAvatarList";
-import { Text } from "@parallel/components/ui";
 
 type PetitionProfilesTableSelection = PetitionProfilesTable_ProfileFragment;
 export interface PetitionProfilesTable extends BoxProps {
@@ -78,7 +78,7 @@ export function PetitionProfilesTable({
             <Button
               leftIcon={<AddIcon fontSize="18px" />}
               onClick={onAddProfile}
-              isDisabled={
+              disabled={
                 petition.isAnonymized ||
                 myEffectivePermission === "READ" ||
                 isNonNullish(petition.permanentDeletionAt)

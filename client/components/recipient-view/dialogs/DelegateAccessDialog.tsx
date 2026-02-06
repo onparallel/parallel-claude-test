@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
   Box,
-  Button,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -14,6 +13,7 @@ import { UserArrowIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
+import { Button, Text } from "@parallel/components/ui";
 import {
   Tone,
   useDelegateAccessDialog_publicDelegateAccessToContactDocument,
@@ -25,7 +25,6 @@ import { isValidEmail } from "@parallel/utils/validation";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 interface DelegateAccessDialogData {
   email: string;
@@ -207,7 +206,7 @@ function DelegateAccessDialog({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="primary" variant="solid">
+        <Button type="submit" colorPalette="primary" variant="solid">
           <FormattedMessage id="generic.send" defaultMessage="Send" />
         </Button>
       }

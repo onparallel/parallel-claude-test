@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Badge, Button, Center, Flex, Grid, HStack, Stack } from "@chakra-ui/react";
+import { Badge, Center, Flex, Grid, HStack, Stack } from "@chakra-ui/react";
 import { AdminOrganizationsLayout } from "@parallel/components/admin-organizations/AdminOrganizationsLayout";
 import { AdminOrganizationsSubscriptionCard } from "@parallel/components/admin-organizations/AdminOrganizationsSubscriptionCard";
 import { useUpdateOrganizationCurrentUsagePeriodDialog } from "@parallel/components/admin-organizations/dialogs/UpdateOrganizationCurrentUsagePeriodDialog";
@@ -12,6 +12,7 @@ import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdminAccess";
 import { TimeSpan } from "@parallel/components/reports/common/TimeSpan";
+import { Button, Text } from "@parallel/components/ui";
 import {
   AdminOrganizationsSubscriptions_modifyCurrentUsagePeriodDocument,
   AdminOrganizationsSubscriptions_organizationUsagePeriodsQueryDocument,
@@ -33,7 +34,6 @@ import { add, Duration } from "date-fns";
 import { useMemo } from "react";
 import { FormattedDate, FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
-import { Text } from "@parallel/components/ui";
 type AdminOrganizationsSubscriptionsProps = UnwrapPromise<
   ReturnType<typeof AdminOrganizationsSubscriptions.getInitialProps>
 >;
@@ -560,7 +560,7 @@ export function OrganizationUsagePeriodsTable({
           {isNonNullish(items?.items?.[0]) ? (
             <Button
               onClick={onModifyCurrentPeriod}
-              isDisabled={isNonNullish(items?.items[0]?.periodEndDate)}
+              disabled={isNonNullish(items?.items[0]?.periodEndDate)}
             >
               <FormattedMessage
                 id="component.organization-usage-periods-table.modify-ongoing-period-button"

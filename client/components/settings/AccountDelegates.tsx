@@ -1,13 +1,13 @@
 import { gql } from "@apollo/client";
-import { Button, FormControl, FormLabel, Heading, Stack, StackProps } from "@chakra-ui/react";
+import { FormControl, FormLabel, Heading, Stack, StackProps } from "@chakra-ui/react";
 import { UserSelect, UserSelectInstance } from "@parallel/components/common/UserSelect";
+import { Button, Text } from "@parallel/components/ui";
 import { AccountDelegates_UserFragment, UserSelect_UserFragment } from "@parallel/graphql/__types";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ContactSupportAlert } from "../common/ContactSupportAlert";
-import { Text } from "@parallel/components/ui";
 
 export interface AccountDelegatesData {
   delegates: UserSelect_UserFragment[];
@@ -121,9 +121,9 @@ export function AccountDelegates({ user, onSubmit, ...props }: AccountDelegatesP
 
         <Button
           type="submit"
-          colorScheme="primary"
+          colorPalette="primary"
           width="min-content"
-          isDisabled={!user.hasOnBehalfOf || !isDirty}
+          disabled={!user.hasOnBehalfOf || !isDirty}
         >
           <FormattedMessage id="generic.save" defaultMessage="Save" />
         </Button>

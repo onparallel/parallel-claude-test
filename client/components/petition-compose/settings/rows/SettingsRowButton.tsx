@@ -1,5 +1,6 @@
-import { Box, Button, HStack, Stack } from "@chakra-ui/react";
+import { Box, HStack, Stack } from "@chakra-ui/react";
 import { DeleteIcon, SettingsIcon } from "@parallel/chakra/icons";
+import { Button } from "@parallel/components/ui";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../../../common/IconButtonWithTooltip";
@@ -31,7 +32,7 @@ export function SettingsRowButton({
         {isActive ? (
           <HStack>
             <IconButtonWithTooltip
-              isDisabled={props.isDisabled}
+              disabled={props.isDisabled}
               icon={<SettingsIcon />}
               label={intl.formatMessage({
                 id: "generic.edit-setting",
@@ -42,7 +43,7 @@ export function SettingsRowButton({
               onClick={() => onConfig?.()}
             />
             <IconButtonWithTooltip
-              isDisabled={props.isDisabled}
+              disabled={props.isDisabled}
               icon={<DeleteIcon />}
               label={intl.formatMessage({
                 id: "generic.remove-setting",
@@ -59,7 +60,7 @@ export function SettingsRowButton({
             size="sm"
             fontWeight="normal"
             fontSize="16px"
-            isDisabled={props.isDisabled}
+            disabled={props.isDisabled}
             onClick={() => onAdd?.()}
           >
             <FormattedMessage id="generic.add" defaultMessage="Add" />

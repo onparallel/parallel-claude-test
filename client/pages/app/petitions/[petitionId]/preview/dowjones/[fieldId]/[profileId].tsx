@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
 import {
   Box,
-  Button,
   Center,
   Flex,
   HStack,
@@ -29,6 +28,7 @@ import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider"
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { DowJonesRiskLabel } from "@parallel/components/petition-common/DowJonesRiskLabel";
+import { Button, Text } from "@parallel/components/ui";
 import {
   DowJonesFieldProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultEntity_Fragment,
   DowJonesFieldProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultPerson_Fragment,
@@ -52,7 +52,6 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 function DowJonesFieldProfileDetails({
   petitionId,
@@ -238,11 +237,11 @@ function DowJonesFieldProfileDetails({
                 ) : (
                   <Button
                     variant="solid"
-                    colorScheme="primary"
+                    colorPalette="primary"
                     leftIcon={<SaveIcon />}
                     onClick={handleSaveClick}
-                    isLoading={isSavingProfile}
-                    isDisabled={loading}
+                    loading={isSavingProfile}
+                    disabled={loading}
                   >
                     <FormattedMessage id="generic.save" defaultMessage="Save" />
                   </Button>
@@ -342,7 +341,7 @@ function DowJonesFieldProfileDetails({
             </Text>
             <Button
               variant="ghost"
-              colorScheme="primary"
+              colorPalette="primary"
               leftIcon={<DownloadIcon />}
               onClick={() => downloadDowJonesProfilePdf(profileId)}
             >

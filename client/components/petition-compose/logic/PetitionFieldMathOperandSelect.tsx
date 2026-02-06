@@ -3,6 +3,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
+import { Text } from "@parallel/components/ui";
 import { PetitionFieldLogicContext_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
@@ -21,7 +22,6 @@ import Select, {
 import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
 import { usePetitionFieldLogicContext } from "./PetitionFieldLogicContext";
-import { Text } from "@parallel/components/ui";
 
 export function PetitionFieldMathOperandSelect({
   value: operand,

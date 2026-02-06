@@ -1,5 +1,4 @@
 import {
-  Button,
   Center,
   HStack,
   ModalBody,
@@ -20,7 +19,7 @@ import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog"
 import { useState } from "react";
 import { FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
+import { Button, Text } from "@parallel/components/ui";
 
 const MAX_FILESIZE = 1024 * 1024 * 10;
 

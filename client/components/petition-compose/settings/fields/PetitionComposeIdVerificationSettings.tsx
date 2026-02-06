@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import { Box, Stack } from "@chakra-ui/react";
 import { MultiCheckboxSimpleSelect } from "@parallel/components/common/MultiCheckboxSimpleSelect";
 import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
+import { Text } from "@parallel/components/ui";
 import { UnwrapArray } from "@parallel/utils/types";
 import { Children, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -9,7 +10,6 @@ import { OptionProps, ValueContainerProps, components } from "react-select";
 import { omit } from "remeda";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { SettingsRow } from "../rows/SettingsRow";
-import { Text } from "@parallel/components/ui";
 
 export function PetitionComposeIdVerificationSettings({
   field,

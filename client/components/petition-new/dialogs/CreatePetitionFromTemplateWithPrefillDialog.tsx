@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import { useLazyQuery, useMutation } from "@apollo/client/react";
 import {
-  Button,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -22,7 +21,7 @@ import { ProfileTypeReference } from "@parallel/components/common/ProfileTypeRef
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import { usePreviewImportFromProfileFormatErrorDialog } from "@parallel/components/petition-preview/dialogs/PreviewImportFromProfileFormatErrorDialog";
 import { AssociateNewPetitionToProfileDialogPrefillFieldGroups } from "@parallel/components/profiles/dialogs/AssociateNewPetitionToProfileDialog";
-import { Text } from "@parallel/components/ui";
+import { Button, Text } from "@parallel/components/ui";
 import {
   useCreatePetitionFromTemplateWithPrefillDialog_createPetitionFromProfileDocument,
   useCreatePetitionFromTemplateWithPrefillDialog_PetitionBaseFragment,
@@ -199,7 +198,7 @@ function CreatePetitionFromTemplateSelectFieldGroupsStep({
         </Button>
       }
       confirm={
-        <Button type="submit" colorScheme="primary">
+        <Button type="submit" colorPalette="primary">
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }
@@ -420,7 +419,7 @@ function CreatePetitionFromTemplateSelectProfileStep({
         </Button>
       }
       confirm={
-        <Button type="submit" colorScheme="primary">
+        <Button type="submit" colorPalette="primary">
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }

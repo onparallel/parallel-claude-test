@@ -24,7 +24,7 @@ export function SettingsRowConfigButton({
         <HStack>
           {children}
           <IconButtonWithTooltip
-            isDisabled={props.isDisabled}
+            disabled={props.isDisabled}
             icon={<SettingsIcon />}
             label={intl.formatMessage({
               id: "generic.edit-setting",

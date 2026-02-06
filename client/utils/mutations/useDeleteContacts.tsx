@@ -4,12 +4,12 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Button,
   ListItem,
   Stack,
   UnorderedList,
 } from "@chakra-ui/react";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
+import { Button, Text } from "@parallel/components/ui";
 import {
   useDeleteContacts_ContactFragment,
   useDeleteContacts_deleteContactsDocument,
@@ -17,7 +17,6 @@ import {
 import { useCallback } from "react";
 import { FormattedMessage } from "react-intl";
 import { isApolloError } from "../apollo/isApolloError";
-import { Text } from "@parallel/components/ui";
 
 export function useDeleteContacts() {
   const [deleteContacts] = useMutation(useDeleteContacts_deleteContactsDocument);
@@ -150,7 +149,7 @@ function useConfirmDeleteContactsDialog() {
         ),
 
         confirm: (
-          <Button colorScheme="red" type="submit">
+          <Button colorPalette="red" type="submit">
             <FormattedMessage
               id="util.use-delete-contact.confirm-delete-button"
               defaultMessage="Yes, delete {count, plural, =1{contact} other {contacts}}"

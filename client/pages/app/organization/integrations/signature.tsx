@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
   Badge,
-  Button,
   Heading,
   HStack,
   IconButton,
@@ -26,6 +25,7 @@ import { OrganizationSettingsLayout } from "@parallel/components/layout/Organiza
 import { useAddSignatureCredentialsDialog } from "@parallel/components/organization/dialogs/AddSignatureCredentialsDialog";
 import { useDeleteSignatureErrorConfirmationDialog } from "@parallel/components/organization/dialogs/DeleteSignatureErrorConfirmationDialog";
 import { useDeleteSignatureTokenDialog } from "@parallel/components/organization/dialogs/DeleteSignatureTokenDialog";
+import { Button, Text } from "@parallel/components/ui";
 import {
   IntegrationsSignature_deleteSignatureIntegrationDocument,
   IntegrationsSignature_markSignatureIntegrationAsDefaultDocument,
@@ -43,7 +43,6 @@ import { useDocusignConsentPopup } from "@parallel/utils/useDocusignConsentPopup
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
@@ -242,8 +241,8 @@ function IntegrationsSignature() {
 
               <Spacer />
               <Button
-                isDisabled={!me.hasPetitionSignature}
-                colorScheme="primary"
+                disabled={!me.hasPetitionSignature}
+                colorPalette="primary"
                 onClick={handleAddSignatureProvider}
               >
                 <FormattedMessage

@@ -1,4 +1,5 @@
-import { Button, ButtonOptions, ThemingProps } from "@chakra-ui/react";
+import { ButtonOptions, ThemingProps } from "@chakra-ui/react";
+import { Button } from "@parallel/components/ui";
 import { PlusCircleIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldLogicCondition } from "@parallel/utils/fieldLogic/types";

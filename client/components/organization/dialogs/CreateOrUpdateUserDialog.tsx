@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client";
-import { Button, FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { UserGroupSelect } from "@parallel/components/common/UserGroupSelect";
+import { Button } from "@parallel/components/ui";
 import {
   useCreateOrUpdateUserDialog_UserFragment,
   UserSelect_UserGroupFragment,
@@ -202,9 +203,9 @@ function CreateOrUpdateUserDialog({
       confirm={
         <Button
           type="submit"
-          colorScheme="primary"
+          colorPalette="primary"
           variant="solid"
-          isDisabled={user?.status === "INACTIVE"}
+          disabled={user?.status === "INACTIVE"}
         >
           {isUpdate ? (
             <FormattedMessage

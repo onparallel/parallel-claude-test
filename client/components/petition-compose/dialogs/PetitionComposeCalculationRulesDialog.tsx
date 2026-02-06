@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import { Badge, Box, Button, Center, Spinner } from "@chakra-ui/react";
+import { Badge, Box, Center, Spinner } from "@chakra-ui/react";
 import { EyeOffIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
@@ -9,7 +9,7 @@ import {
 } from "@parallel/components/common/dialogs/WizardDialog";
 import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
-import { Flex, HStack, Stack, Text, Tooltip } from "@parallel/components/ui";
+import { Button, Flex, HStack, Stack, Text, Tooltip } from "@parallel/components/ui";
 import {
   PetitionComposeCalculationRulesDialog_petitionDocument,
   PetitionComposeCalculationRulesDialog_PetitionFieldFragment,

@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import {
   Box,
-  Button,
   Center,
   Drawer,
   DrawerContent,
@@ -42,7 +41,7 @@ import {
   UserIcon,
   UsersIcon,
 } from "@parallel/chakra/icons";
-import { Text } from "@parallel/components/ui";
+import { Button, Text } from "@parallel/components/ui";
 import {
   AppLayoutNavBar_ProfileTypeFragment,
   AppLayoutNavBar_QueryFragment,
@@ -940,7 +939,7 @@ function CreateMenuButtonSection({
       <NakedLink href="/app/petitions/new">
         <Button
           as="a"
-          colorScheme="purple"
+          colorPalette="purple"
           width="full"
           paddingInlineStart={3}
           paddingInlineEnd={3}
@@ -967,7 +966,7 @@ function CreateMenuButtonSection({
         <MenuButton
           as={Button}
           ref={buttonRef}
-          colorScheme="purple"
+          colorPalette="purple"
           width="full"
           paddingInlineStart={3}
           paddingInlineEnd={3}

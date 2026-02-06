@@ -1,5 +1,4 @@
 import {
-  Button,
   ButtonGroup,
   Flex,
   FormControl,
@@ -12,6 +11,7 @@ import {
 import { CloseIcon, PlusCircleFilledIcon } from "@parallel/chakra/icons";
 import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { Spacer } from "@parallel/components/common/Spacer";
+import { Button, Text } from "@parallel/components/ui";
 import {
   FilterSharedWithLogicalOperator,
   FilterSharedWithOperator,
@@ -27,7 +27,6 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
 import { useSearchUsers } from "../../../utils/useSearchUsers";
 import { UserSelect } from "../../common/UserSelect";
-import { Text } from "@parallel/components/ui";
 
 export function PetitionListSharedWithFilter() {
   const { control, setValue, watch } = useFormContext<{
@@ -78,7 +77,7 @@ export function PetitionListSharedWithFilter() {
             fontWeight="normal"
             leftIcon={<PlusCircleFilledIcon color="primary.500" position="relative" boxSize={5} />}
             onClick={handleAddFilter}
-            isDisabled={filters.length >= 5}
+            disabled={filters.length >= 5}
           >
             <FormattedMessage id="generic.add-filter" defaultMessage="Add filter" />
           </Button>
@@ -101,7 +100,7 @@ export function PetitionListSharedWithFilter() {
             fontWeight="normal"
             leftIcon={<PlusCircleFilledIcon color="primary.500" position="relative" boxSize={5} />}
             onClick={handleAddFilter}
-            isDisabled={filters.length >= 5}
+            disabled={filters.length >= 5}
           >
             <FormattedMessage id="generic.add-filter" defaultMessage="Add filter" />
           </Button>
@@ -112,7 +111,7 @@ export function PetitionListSharedWithFilter() {
           <Button size="sm" onClick={() => setValue("filter.filters", [])}>
             <FormattedMessage id="generic.clear" defaultMessage="Clear" />
           </Button>
-          <Button type="submit" colorScheme="primary" size="sm">
+          <Button type="submit" colorPalette="primary" size="sm">
             <FormattedMessage id="generic.apply" defaultMessage="Apply" />
           </Button>
         </ButtonGroup>

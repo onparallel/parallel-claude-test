@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useLazyQuery } from "@apollo/client/react";
-import { Button, FormControl, FormErrorMessage, FormLabel, Stack } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
   useWizardDialog,
@@ -8,6 +8,7 @@ import {
 } from "@parallel/components/common/dialogs/WizardDialog";
 import { ProfileSelect, ProfileSelectInstance } from "@parallel/components/common/ProfileSelect";
 import { ProfileRelationshipsAssociationTable } from "@parallel/components/profiles/ProfileRelationshipsAssociationTable";
+import { Button, Text } from "@parallel/components/ui";
 import {
   CreatePetitionFromProfilePrefillInput,
   usePreviewImportFromProfileDialog_PetitionBaseFragment,
@@ -23,7 +24,6 @@ import { useRef } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 type PreviewImportFromProfileDialogSteps = {
   SELECT_PROFILES: {
@@ -172,7 +172,7 @@ function PreviewImportFromProfileDialogSelectProfiles({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="primary" variant="solid">
+        <Button type="submit" colorPalette="primary" variant="solid">
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }
@@ -234,7 +234,7 @@ function PreviewImportFromProfileDialogPrefillFieldGroups({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="primary" variant="solid">
+        <Button type="submit" colorPalette="primary" variant="solid">
           <FormattedMessage id="generic.import" defaultMessage="Import" />
         </Button>
       }

@@ -1,4 +1,5 @@
-import { Button, Flex, RadioProps, useRadio, useRadioGroup } from "@chakra-ui/react";
+import { Flex, RadioProps, useRadio, useRadioGroup } from "@chakra-ui/react";
+import { Button } from "@parallel/components/ui";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
 import { ValueProps } from "@parallel/utils/ValueProps";

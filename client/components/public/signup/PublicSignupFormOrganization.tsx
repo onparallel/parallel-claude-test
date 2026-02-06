@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Center,
   FormControl,
   FormErrorMessage,
@@ -14,10 +13,10 @@ import {
 import { CloseIcon } from "@parallel/chakra/icons";
 import { fileSize } from "@parallel/components/common/FileSize";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
+import { Button, Text } from "@parallel/components/ui";
 import { Maybe } from "@parallel/utils/types";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export interface PublicSignupFormOrganizationProps {
   onBack: () => void;
@@ -104,7 +103,7 @@ export function PublicSignupFormOrganization({
         <Button width="100%" variant="outline" onClick={onBack}>
           <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
         </Button>
-        <Button width="100%" colorScheme="primary" onClick={handleNext}>
+        <Button width="100%" colorPalette="primary" onClick={handleNext}>
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       </Stack>

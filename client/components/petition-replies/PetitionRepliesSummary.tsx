@@ -3,15 +3,15 @@ import {
   AlertDescription,
   AlertIcon,
   Box,
-  Button,
   Center,
-  HStack,
   Heading,
+  HStack,
   Image,
   Spinner,
   Stack,
 } from "@chakra-ui/react";
 import { RepeatIcon, SparklesIcon } from "@parallel/chakra/icons";
+import { Button, Text } from "@parallel/components/ui";
 import {
   PetitionRepliesSummary_PetitionFragment,
   PetitionRepliesSummary_UserFragment,
@@ -27,7 +27,6 @@ import { MarkdownRender } from "../common/MarkdownRender";
 import { ScrollShadows } from "../common/ScrollShadows";
 import { SupportButton } from "../common/SupportButton";
 import { SupportLink } from "../common/SupportLink";
-import { Text } from "@parallel/components/ui";
 
 interface PetitionRepliesSummaryProps {
   petition: PetitionRepliesSummary_PetitionFragment;
@@ -157,7 +156,7 @@ export function PetitionRepliesSummary({ petition, user, onRefetch }: PetitionRe
               })}
               onClick={handleRegenerateSummary}
               icon={<RepeatIcon />}
-              isDisabled={
+              disabled={
                 petition.isAnonymized || !user.hasSummaryAccess || isNullish(petition.summaryConfig)
               }
             />
@@ -174,9 +173,9 @@ export function PetitionRepliesSummary({ petition, user, onRefetch }: PetitionRe
           <Box>
             <Button
               leftIcon={<SparklesIcon />}
-              colorScheme="primary"
+              colorPalette="primary"
               onClick={handleGenerateSummary}
-              isDisabled={
+              disabled={
                 petition.isAnonymized || !user.hasSummaryAccess || isNullish(petition.summaryConfig)
               }
             >

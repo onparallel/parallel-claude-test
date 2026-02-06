@@ -3,6 +3,7 @@ import { useMutation } from "@apollo/client/react";
 import { Box, Center, Grid, HStack, useToast } from "@chakra-ui/react";
 import { AddIcon, SignatureIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Text } from "@parallel/components/ui";
 import {
   PetitionSignaturesCard_PetitionFragment,
   PetitionSignaturesCard_UserFragment,
@@ -27,7 +28,6 @@ import { CurrentSignatureRequestRow } from "./CurrentSignatureRequestRow";
 import { NewSignatureRequestRow } from "./NewSignatureRequestRow";
 import { OlderSignatureRequestRows } from "./OlderSignatureRequestRows";
 import { CommentsButton } from "./PetitionRepliesField";
-import { Text } from "@parallel/components/ui";
 
 export interface PetitionSignaturesCardProps {
   petition: PetitionSignaturesCard_PetitionFragment;

@@ -3,13 +3,13 @@ import { Box, HStack } from "@chakra-ui/react";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { isDialogError } from "@parallel/components/common/dialogs/DialogProvider";
+import { Text } from "@parallel/components/ui";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { useConfigureBackgroundCheckAutomateSearchDialog } from "../../dialogs/ConfigureBackgroundCheckAutomateSearchDialog";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { SettingsRowButton } from "../rows/SettingsRowButton";
-import { Text } from "@parallel/components/ui";
 
 export function PetitionComposeBackgroundCheckSettings({
   petition,

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Button, Center, Flex, Heading, useToast } from "@chakra-ui/react";
+import { Center, Flex, Heading, useToast } from "@chakra-ui/react";
 import { CopyIcon, DeleteIcon, KeyIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { OverflownText } from "@parallel/components/common/OverflownText";
@@ -20,6 +20,7 @@ import { withPermission } from "@parallel/components/common/withPermission";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
 import { OrganizationGroupsListTableHeader } from "@parallel/components/organization/OrganizationGroupsListTableHeader";
 import { useCreateGroupDialog } from "@parallel/components/organization/dialogs/CreateGroupDialog";
+import { Button, Text } from "@parallel/components/ui";
 import {
   OrganizationGroups_UserGroupFragment,
   OrganizationGroups_cloneUserGroupsDocument,
@@ -42,7 +43,6 @@ import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 const SORTING = ["name", "members", "createdAt"] as const;
 
@@ -449,7 +449,7 @@ function ConfirmDeleteGroupsDialog({
         />
       }
       confirm={
-        <Button colorScheme="red" onClick={() => props.onResolve()}>
+        <Button colorPalette="red" onClick={() => props.onResolve()}>
           <FormattedMessage id="generic.confirm-delete-button" defaultMessage="Yes, delete" />
         </Button>
       }

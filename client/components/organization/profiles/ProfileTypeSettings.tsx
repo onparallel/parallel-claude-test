@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
   Box,
-  Button,
   Center,
   FormControl,
   FormErrorMessage,
@@ -22,6 +21,7 @@ import {
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { RestrictedFeaturePopover } from "@parallel/components/common/RestrictedFeaturePopover";
 import { PlaceholderInput } from "@parallel/components/common/slate/PlaceholderInput";
+import { Button, Text } from "@parallel/components/ui";
 import {
   ProfileTypeSettings_createProfileTypeProcessDocument,
   ProfileTypeSettings_editProfileTypeProcessDocument,
@@ -43,7 +43,6 @@ import { sortBy } from "remeda";
 import { useAutoConfirmDiscardChangesDialog } from "../dialogs/ConfirmDiscardChangesDialog";
 import { useConfirmRemoveProfileTypeKeyProcessDialog } from "./dialogs/ConfirmRemoveProfileTypeKeyProcessDialog";
 import { useCreateOrUpdateProfileTypeKeyProcessDialog } from "./dialogs/CreateOrUpdateProfileTypeKeyProcessDialog";
-import { Text } from "@parallel/components/ui";
 
 const MAX_KEY_PROCESSES = 3;
 interface ProfileTypeSettingsProps extends CardProps {
@@ -264,7 +263,7 @@ export function ProfileTypeSettings({ profileType, onSave, ...props }: ProfileTy
               ) : null}
             </Stack>
             <Box paddingTop={{ base: 2, lg: 0 }} alignSelf={{ base: "end", lg: "start" }}>
-              <Button isDisabled={!isDirty} colorScheme="primary" type="submit">
+              <Button disabled={!isDirty} colorPalette="primary" type="submit">
                 <FormattedMessage id="generic.save" defaultMessage="Save" />
               </Button>
             </Box>
@@ -304,7 +303,7 @@ export function ProfileTypeSettings({ profileType, onSave, ...props }: ProfileTy
                 size="sm"
                 fontSize="md"
                 onClick={handleAddNewKeyProcess}
-                isDisabled={maxKeyProcessesReached}
+                disabled={maxKeyProcessesReached}
               >
                 <FormattedMessage id="generic.add" defaultMessage="Add" />
               </Button>

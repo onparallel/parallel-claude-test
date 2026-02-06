@@ -1,9 +1,8 @@
-import { Button } from "@chakra-ui/react";
 import { useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
 import { PathName } from "../../common/PathName";
 import { GenericFolderDialog, GenericFolderDialogProps } from "./GenericFolderDialog";
-import { Text } from "@parallel/components/ui";
 
 type SelectFolderDialogProps = Omit<GenericFolderDialogProps, "header" | "body" | "confirm">;
 
@@ -29,7 +28,7 @@ function SelectFolderDialog(props: SelectFolderDialogProps) {
         </Text>
       )}
       confirm={({ onResolve, selectedPath }) => (
-        <Button colorScheme="primary" onClick={() => onResolve(selectedPath)}>
+        <Button colorPalette="primary" onClick={() => onResolve(selectedPath)}>
           <FormattedMessage id="generic.select" defaultMessage="Select" />
         </Button>
       )}

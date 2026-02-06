@@ -1,12 +1,12 @@
 import { gql } from "@apollo/client";
-import { Button, ButtonProps } from "@chakra-ui/react";
+import { ButtonProps } from "@chakra-ui/react";
 import { UserArrowIcon } from "@parallel/chakra/icons";
 import { ShareButton_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { FormattedList, FormattedMessage } from "react-intl";
 import { SmallPopover } from "./SmallPopover";
 import { UserGroupReference } from "./UserGroupReference";
 import { UserReference } from "./UserReference";
-import { Text } from "@parallel/components/ui";
+import { Button, Text } from "@parallel/components/ui";
 
 export function ShareButton({
   petition,

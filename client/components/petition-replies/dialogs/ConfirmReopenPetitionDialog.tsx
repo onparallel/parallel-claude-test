@@ -1,8 +1,8 @@
-import { Button, Stack } from "@chakra-ui/react";
+import { Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export function ConfirmReopenPetitionDialog(props: DialogProps) {
   return (
@@ -23,7 +23,7 @@ export function ConfirmReopenPetitionDialog(props: DialogProps) {
         </Stack>
       }
       confirm={
-        <Button colorScheme="primary" onClick={() => props.onResolve()}>
+        <Button colorPalette="primary" onClick={() => props.onResolve()}>
           <FormattedMessage id="petition.reopen.confirm" defaultMessage="Yes, reopen" />
         </Button>
       }

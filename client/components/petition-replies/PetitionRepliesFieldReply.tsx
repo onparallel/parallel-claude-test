@@ -9,6 +9,7 @@ import {
   ShortSearchIcon,
   UserIcon,
 } from "@parallel/chakra/icons";
+import { Text } from "@parallel/components/ui";
 import {
   PetitionFieldReplyStatus,
   PetitionFieldType,
@@ -45,7 +46,6 @@ import { PetitionRepliesFieldFileSchema } from "./field-replies/PetitionRepliesF
 import { PetitionRepliesFieldFileUploadPayslipReply } from "./field-replies/PetitionRepliesFieldFileUploadPayslipReply";
 import { PetitionRepliesFieldIdVerificationReply } from "./field-replies/PetitionRepliesFieldIdVerificationReply";
 import { PetitionRepliesFieldUserAssignmentReply } from "./field-replies/PetitionRepliesFieldUserAssignmentReply";
-import { Text } from "@parallel/components/ui";
 
 export interface PetitionRepliesFieldReplyProps {
   petition: PetitionRepliesFieldReply_PetitionFragment;
@@ -604,7 +604,7 @@ export function PetitionRepliesFieldReply({
             role="switch"
             aria-checked={reply.status === "APPROVED"}
             onClick={() => onUpdateStatus(reply.status === "APPROVED" ? "PENDING" : "APPROVED")}
-            isDisabled={isDisabled || reply.isAnonymized}
+            disabled={isDisabled || reply.isAnonymized}
           />
 
           <IconButtonWithTooltip
@@ -620,7 +620,7 @@ export function PetitionRepliesFieldReply({
             colorScheme={reply.status === "REJECTED" ? "red" : "gray"}
             aria-checked={reply.status === "REJECTED"}
             onClick={() => onUpdateStatus(reply.status === "REJECTED" ? "PENDING" : "REJECTED")}
-            isDisabled={isDisabled || reply.isAnonymized}
+            disabled={isDisabled || reply.isAnonymized}
           />
         </Stack>
       ) : null}

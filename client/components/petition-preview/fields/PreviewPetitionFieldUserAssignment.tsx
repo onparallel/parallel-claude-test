@@ -2,6 +2,7 @@ import { Box, Center, FormControl, forwardRef, List, Stack } from "@chakra-ui/re
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { UserSelect, UserSelectSelection } from "@parallel/components/common/UserSelect";
+import { Text } from "@parallel/components/ui";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
@@ -19,7 +20,6 @@ import {
   RecipientViewPetitionFieldLayoutProps,
 } from "../../recipient-view/fields/RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "../../recipient-view/fields/RecipientViewPetitionFieldReplyStatusIndicator";
-import { Text } from "@parallel/components/ui";
 
 interface PreviewPetitionFieldUserAssignmentProps
   extends Omit<
@@ -307,7 +307,7 @@ const RecipientViewPetitionFieldReplyUserAssignment = forwardRef(
           </Box>
         </FormControl>
         <IconButtonWithTooltip
-          isDisabled={isDisabled || reply.status === "APPROVED"}
+          disabled={isDisabled || reply.status === "APPROVED"}
           onClick={() => onDelete()}
           variant="ghost"
           icon={<DeleteIcon />}

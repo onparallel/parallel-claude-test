@@ -28,7 +28,7 @@ export const FileExportAccessIconButton = chakraForwardRef<
         href={url}
         target="_href"
         rel="noopener"
-        isDisabled={isRestricted}
+        disabled={isRestricted}
         icon={<IManageIcon />}
         label={intl.formatMessage(
           {

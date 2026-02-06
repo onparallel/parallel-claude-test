@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
-import { Box, Button, GridItem, Heading, HStack, MenuItem, MenuList } from "@chakra-ui/react";
+import { Box, GridItem, Heading, HStack, MenuItem, MenuList } from "@chakra-ui/react";
 import { DocumentIcon, DownloadIcon } from "@parallel/chakra/icons";
+import { Button, Text } from "@parallel/components/ui";
 import { OlderSignatureRequestRows_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
 import { useSignatureCancelledRequestErrorMessage } from "@parallel/utils/useSignatureCancelledRequestErrorMessage";
 import { Fragment } from "react";
@@ -14,7 +15,6 @@ import { SignerReference } from "../common/SignerReference";
 import { useSignatureCancelledRequestErrorDialog } from "../petition-activity/dialogs/SignatureCancelledRequestErrorDialog";
 import { PetitionSignatureRequestSignerStatusIcon } from "./PetitionSignatureRequestSignerStatusIcon";
 import { PetitionSignatureRequestStatusText } from "./PetitionSignatureRequestStatusText";
-import { Text } from "@parallel/components/ui";
 
 export function OlderSignatureRequestRows({
   signatures,

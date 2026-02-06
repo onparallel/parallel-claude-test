@@ -1,5 +1,4 @@
 import {
-  Button,
   Center,
   FormControl,
   FormErrorMessage,
@@ -25,7 +24,7 @@ import {
 } from "@parallel/components/common/dialogs/WizardDialog";
 import { LocalizableUserTextInput } from "@parallel/components/common/LocalizableUserTextInput";
 import { LocalizableUserText } from "@parallel/components/common/LocalizableUserTextRender";
-import { HStack, Stack, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { ProfileTypeStandardType, UserLocale } from "@parallel/graphql/__types";
 import { useSetFocusRef } from "@parallel/utils/react-form-hook/useSetFocusRef";
 import { forwardRef, ReactNode, Ref, useMemo, useRef, useState } from "react";
@@ -113,7 +112,7 @@ function SelectStandardTypeDialog({
         </FormControl>
       }
       confirm={
-        <Button type="submit" colorScheme="primary">
+        <Button type="submit" colorPalette="primary">
           <FormattedMessage id="generic.next-button" defaultMessage="Next" />
         </Button>
       }
@@ -316,7 +315,7 @@ function UpdateProfileTypeDialog({
         </SimpleGrid>
       }
       confirm={
-        <Button colorScheme="primary" type="submit">
+        <Button colorPalette="primary" type="submit">
           <FormattedMessage id="generic.accept" defaultMessage="Accept" />
         </Button>
       }

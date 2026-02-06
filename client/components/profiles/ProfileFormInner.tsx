@@ -6,6 +6,7 @@ import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { ProfileFormField } from "@parallel/components/profiles/form-fields/ProfileFormField";
 import { ProfileFormFieldFileAction } from "@parallel/components/profiles/form-fields/ProfileFormFieldFileUpload";
+import { Text } from "@parallel/components/ui";
 import {
   PetitionFieldType,
   ProfileFormInner_ProfileFieldPropertyFragment,
@@ -32,7 +33,6 @@ import { UseFormReturn } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { filter, fromEntries, isNonNullish, map, partition, pipe } from "remeda";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
-import { Text } from "@parallel/components/ui";
 
 export interface ProfileFormInnerInstance {
   handleSubmit: (

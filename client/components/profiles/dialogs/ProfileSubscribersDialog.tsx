@@ -1,15 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import {
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Stack,
-} from "@chakra-ui/react";
+import { Box, Flex, FormControl, MenuButton, MenuItem, MenuList, Stack } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
 import { UserAvatar } from "@parallel/components/common/UserAvatar";
@@ -20,7 +11,7 @@ import {
 } from "@parallel/components/common/UserSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Text } from "@parallel/components/ui";
+import { Button, Text } from "@parallel/components/ui";
 import {
   useProfileSubscribersDialog_UserFragment,
   useProfileSubscribersDialog_subscribeToProfileDocument,
@@ -218,7 +209,7 @@ function ProfileSubscribersDialog({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="primary">
+        <Button type="submit" colorPalette="primary">
           {hasNewSubscribers ? (
             <FormattedMessage id="generic.subscribe" defaultMessage="Subscribe" />
           ) : (

@@ -13,6 +13,7 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { ChevronLeftIcon, CommentIcon, NoteIcon } from "@parallel/chakra/icons";
+import { Text } from "@parallel/components/ui";
 import {
   PetitionRepliesFieldComments_PetitionBaseFragment,
   PetitionRepliesFieldComments_petitionCommentAttachmentDownloadLinkDocument,
@@ -43,7 +44,6 @@ import {
   PetitionCommentsAndNotesEditorInstance,
 } from "../petition-common/PetitionCommentsAndNotesEditor";
 import { useFailureGeneratingLinkDialog } from "./dialogs/FailureGeneratingLinkDialog";
-import { Text } from "@parallel/components/ui";
 
 export interface PetitionRepliesFieldCommentsProps {
   petition: PetitionRepliesFieldComments_PetitionBaseFragment;

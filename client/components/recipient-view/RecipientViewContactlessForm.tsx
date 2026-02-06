@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
   Box,
-  Button,
   Center,
   FormControl,
   FormErrorMessage,
@@ -20,6 +19,7 @@ import { CheckIcon, QuestionOutlineIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
 import { RecipientViewPinForm } from "@parallel/components/recipient-view/RecipientViewPinForm";
+import { Button, Text } from "@parallel/components/ui";
 import {
   RecipientViewContactlessForm_publicCheckVerificationCodeDocument,
   RecipientViewContactlessForm_PublicOrganizationFragment,
@@ -40,7 +40,6 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
 import { useTone } from "../common/ToneProvider";
 import { useRecipientViewContactlessHelpDialog } from "./dialogs/RecipientViewContactlessHelpDialog";
-import { Text } from "@parallel/components/ui";
 
 export interface RecipientViewContactlessFormData {
   firstName: string;
@@ -369,7 +368,7 @@ export function RecipientViewContactlessForm({
                 </FormErrorMessage>
               </FormControl>
             </Stack>
-            <Button type="submit" colorScheme="primary" isLoading={isSendingCode}>
+            <Button type="submit" colorPalette="primary" loading={isSendingCode}>
               <FormattedMessage
                 id="component.recipient-view-contactless-form.access"
                 defaultMessage="Access"
@@ -418,9 +417,9 @@ export function RecipientViewContactlessForm({
               </Box>
               <Box flex="1">
                 <Button
-                  colorScheme="primary"
+                  colorPalette="primary"
                   width="full"
-                  isLoading={reminderLoading}
+                  loading={reminderLoading}
                   onClick={handleSendReminder}
                 >
                   <FormattedMessage
@@ -482,7 +481,7 @@ export function RecipientViewContactlessForm({
               </Text>
               <Button
                 variant="link"
-                colorScheme="primary"
+                colorPalette="primary"
                 onClick={handleChangeEmail}
                 width="fit-content"
               >

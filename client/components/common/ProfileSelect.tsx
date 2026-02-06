@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import { useApolloClient, useQuery } from "@apollo/client/react";
 import { Box } from "@chakra-ui/react";
+import { Text } from "@parallel/components/ui";
 import {
   ProfileSelect_ProfileFragment,
   ProfileSelect_ProfileFragmentDoc,
@@ -47,7 +48,6 @@ import { useCreateProfileDialog } from "../profiles/dialogs/CreateProfileDialog"
 import { HighlightText } from "./HighlightText";
 import { LocalizableUserTextRender, localizableUserTextRender } from "./LocalizableUserTextRender";
 import { OverflownText } from "./OverflownText";
-import { Text } from "@parallel/components/ui";
 
 export type ProfileSelectSelection = ProfileSelect_ProfileFragment;
 

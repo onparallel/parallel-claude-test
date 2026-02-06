@@ -1,8 +1,9 @@
-import { Button, FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
 import { Select } from "@parallel/chakra/components";
 import { UserPlusIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import { UserLocale } from "@parallel/graphql/__types";
 import { asSupportedUserLocale, useSupportedUserLocales } from "@parallel/utils/locales";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
@@ -10,7 +11,6 @@ import { isValidEmail } from "@parallel/utils/validation";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 interface InviteUserDialogData {
   email: string;
@@ -122,7 +122,7 @@ export function InviteUserDialog({ ...props }: DialogProps<{}, InviteUserDialogD
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="primary" variant="solid">
+        <Button type="submit" colorPalette="primary" variant="solid">
           <FormattedMessage id="generic.invite-user" defaultMessage="Invite user" />
         </Button>
       }

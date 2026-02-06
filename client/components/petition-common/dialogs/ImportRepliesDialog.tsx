@@ -2,7 +2,6 @@ import { ApolloLink, gql } from "@apollo/client";
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client/react";
 import {
   Box,
-  Button,
   Checkbox,
   Flex,
   FormControl,
@@ -22,6 +21,7 @@ import {
   WizardStepDialogProps,
   useWizardDialog,
 } from "@parallel/components/common/dialogs/WizardDialog";
+import { Button, Text } from "@parallel/components/ui";
 import {
   CreatePetitionFieldReplyInput,
   ImportRepliesDialog_PetitionFragment,
@@ -34,7 +34,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { groupBy, isNonNullish, isNullish, pick } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 type ImportRepliesDialogSteps = {
   LOADING: {
@@ -118,7 +117,7 @@ function ImportRepliesLoadingDialog({
         </FormControl>
       }
       confirm={
-        <Button colorScheme="primary" isDisabled>
+        <Button colorPalette="primary" disabled>
           <FormattedMessage
             id="component.import-replies-dialog.next-button"
             defaultMessage="Next"
@@ -255,7 +254,7 @@ function ImportRepliesSelectSourceDialog({
         </FormControl>
       }
       confirm={
-        <Button colorScheme="primary" type="submit" isLoading={isLoadingSource}>
+        <Button colorPalette="primary" type="submit" loading={isLoadingSource}>
           <FormattedMessage
             id="component.import-replies-dialog.next-button"
             defaultMessage="Next"
@@ -263,7 +262,7 @@ function ImportRepliesSelectSourceDialog({
         </Button>
       }
       cancel={
-        <Button onClick={() => props.onReject("CLOSE")} isDisabled={isLoadingSource}>
+        <Button onClick={() => props.onReject("CLOSE")} disabled={isLoadingSource}>
           <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
         </Button>
       }
@@ -567,12 +566,12 @@ function ImportRepliesMappingDialog({
         ) : null
       }
       confirm={
-        <Button colorScheme="primary" type="submit" isLoading={isSubmitting}>
+        <Button colorPalette="primary" type="submit" loading={isSubmitting}>
           <FormattedMessage id="generic.import" defaultMessage="Import" />
         </Button>
       }
       cancel={
-        <Button onClick={() => props.onBack()} isDisabled={isSubmitting}>
+        <Button onClick={() => props.onBack()} disabled={isSubmitting}>
           <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
         </Button>
       }

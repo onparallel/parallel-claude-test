@@ -1,4 +1,4 @@
-import { Button, HStack, Progress, Stack } from "@chakra-ui/react";
+import { HStack, Progress, Stack } from "@chakra-ui/react";
 import { RepeatIcon, RepeatOffIcon, RepeatPauseIcon } from "@parallel/chakra/icons";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { ProfileFormField_ProfileFieldPropertyFragment } from "@parallel/graphql/__types";
@@ -6,7 +6,7 @@ import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage, useIntl } from "react-intl";
 
 // Helper to check if monitoring is active based on conditions
-import { Text } from "@parallel/components/ui";
+import { Button, Text } from "@parallel/components/ui";
 export function checkIfMonitoringIsActive(
   monitoring: any,
   properties: ProfileFormField_ProfileFieldPropertyFragment[] | undefined,

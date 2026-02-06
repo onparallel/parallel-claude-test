@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import {
   Box,
-  Button,
   Flex,
   HStack,
   MenuItem,
@@ -30,7 +29,7 @@ import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMe
 import { RestrictedFeaturePopover } from "@parallel/components/common/RestrictedFeaturePopover";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { TemplateActiveSettingsIcons } from "@parallel/components/petition-new/TemplateActiveSettingsIcons";
-import { Accordion, Text } from "@parallel/components/ui";
+import { Accordion, Button, Text } from "@parallel/components/ui";
 import {
   PetitionFieldTitleContent_LandingTemplateFieldFragment,
   PetitionFieldTitleContent_PetitionFieldFragment,
@@ -204,7 +203,7 @@ export function TemplateDetailsModal({
                       data-testid="create-parallel-button"
                       data-action="use-template"
                       leftIcon={<PaperPlaneIcon />}
-                      isDisabled={!userCanCreatePetition || !userCanViewPublicTemplates}
+                      disabled={!userCanCreatePetition || !userCanViewPublicTemplates}
                       onClick={handleCreatePetition}
                     >
                       <FormattedMessage
@@ -230,8 +229,8 @@ export function TemplateDetailsModal({
                   >
                     <Button
                       width="100%"
-                      colorScheme="primary"
-                      isDisabled={!userCanClone || !userCanViewPublicTemplates}
+                      colorPalette="primary"
+                      disabled={!userCanClone || !userCanViewPublicTemplates}
                       onClick={handleCloneTemplate}
                       leftIcon={<CopyIcon />}
                     >
@@ -244,7 +243,7 @@ export function TemplateDetailsModal({
                 ) : template.publicLink?.isActive ? (
                   <Button
                     width="100%"
-                    colorScheme="primary"
+                    colorPalette="primary"
                     leftIcon={<LinkIcon />}
                     onClick={() => onCopyPublicLink({ value: template.publicLink!.url })}
                   >
@@ -256,9 +255,9 @@ export function TemplateDetailsModal({
                       width="100%"
                       data-testid="create-parallel-button"
                       data-action="use-template"
-                      colorScheme="primary"
+                      colorPalette="primary"
                       leftIcon={<PaperPlaneIcon />}
-                      isDisabled={!userCanCreatePetition}
+                      disabled={!userCanCreatePetition}
                       onClick={handleCreatePetition}
                     >
                       <FormattedMessage

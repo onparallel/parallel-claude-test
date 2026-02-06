@@ -1,11 +1,11 @@
-import { Box, Button, Stack } from "@chakra-ui/react";
+import { Box, Stack } from "@chakra-ui/react";
 import { RepeatIcon, UserPlusIcon } from "@parallel/chakra/icons";
+import { Button, Text } from "@parallel/components/ui";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
 import { WhenPermission } from "../common/WhenPermission";
-import { Text } from "@parallel/components/ui";
 
 export interface OrganizationGroupListTableHeaderProps {
   search: string | null;
@@ -42,10 +42,10 @@ export function OrganizationGroupListTableHeader({
       <WhenPermission permission="TEAMS:CRUD_TEAMS">
         <Spacer />
         <Button
-          colorScheme="primary"
+          colorPalette="primary"
           leftIcon={<UserPlusIcon fontSize="18px" />}
           onClick={onAddMember}
-          isDisabled={!canAddMember}
+          disabled={!canAddMember}
         >
           <Text as="span" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
             <FormattedMessage id="organization-groups.add-user" defaultMessage="Add user" />

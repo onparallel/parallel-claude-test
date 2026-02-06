@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
-  Button,
   Checkbox,
   Flex,
   FormControl,
@@ -22,6 +21,7 @@ import { DialogProps, useDialog } from "@parallel/components/common/dialogs/Dial
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { NormalLink } from "@parallel/components/common/Link";
 import { Steps } from "@parallel/components/common/Steps";
+import { Button, Text } from "@parallel/components/ui";
 import {
   SignatureOrgIntegrationProvider,
   useAddSignatureCredentialsDialog_createSignaturitIntegrationDocument,
@@ -31,7 +31,6 @@ import { useDocusignConsentPopup } from "@parallel/utils/useDocusignConsentPopup
 import { MouseEvent, useEffect } from "react";
 import { Controller, FormProvider, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 const PROVIDERS: SignatureOrgIntegrationProvider[] = ["SIGNATURIT", "DOCUSIGN"];
 type SignatureCredentials<TProvider extends SignatureOrgIntegrationProvider> = {
@@ -165,7 +164,7 @@ function AddSignatureCredentialsDialog({
       }
       confirm={
         isLastStep ? (
-          <Button colorScheme="primary" type="submit" isLoading={form.formState.isSubmitting}>
+          <Button colorPalette="primary" type="submit" loading={form.formState.isSubmitting}>
             {selectedProvider === "DOCUSIGN" ? (
               <FormattedMessage
                 id="component.add-signature-credentials-dialog.docusign-authorize.button"
@@ -176,7 +175,7 @@ function AddSignatureCredentialsDialog({
             )}
           </Button>
         ) : (
-          <Button type="button" colorScheme="primary" variant="solid" onClick={handleNextClick}>
+          <Button type="button" colorPalette="primary" variant="solid" onClick={handleNextClick}>
             <FormattedMessage id="generic.continue" defaultMessage="Continue" />
           </Button>
         )

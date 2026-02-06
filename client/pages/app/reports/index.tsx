@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import {
   Badge,
-  Button,
   Center,
   Container,
   Grid,
@@ -21,6 +20,7 @@ import { NakedLink } from "@parallel/components/common/Link";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withPermission } from "@parallel/components/common/withPermission";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
+import { Button, Text } from "@parallel/components/ui";
 import { Reports_userDocument } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
@@ -28,7 +28,6 @@ import { useHandleNavigation } from "@parallel/utils/navigation";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export function Reports() {
   const intl = useIntl();
@@ -110,7 +109,7 @@ export function Reports() {
             as={NakedHelpCenterLink}
             variant="ghost"
             fontWeight="normal"
-            colorScheme="primary"
+            colorPalette="primary"
             articleId={6272487}
           >
             <FormattedMessage id="generic.help-question" defaultMessage="Help?" />

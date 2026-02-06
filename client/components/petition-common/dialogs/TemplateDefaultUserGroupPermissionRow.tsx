@@ -1,20 +1,11 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  Button,
-  Flex,
-  MenuButton,
-  MenuDivider,
-  MenuItem,
-  MenuList,
-  Stack,
-} from "@chakra-ui/react";
+import { Box, Flex, MenuButton, MenuDivider, MenuItem, MenuList, Stack } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import { ChevronDownIcon, DeleteIcon, UsersIcon } from "@parallel/chakra/icons";
 import { SubscribedNotificationsIcon } from "@parallel/components/common/SubscribedNotificationsIcon";
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
 import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
-import { Avatar, Text } from "@parallel/components/ui";
+import { Avatar, Button, Text } from "@parallel/components/ui";
 import {
   PetitionPermissionTypeRW,
   TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment,

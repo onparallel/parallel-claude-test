@@ -4,7 +4,6 @@ import {
   AlertDescription,
   AlertIcon,
   Box,
-  Button,
   Checkbox,
   FormControl,
   FormErrorMessage,
@@ -41,6 +40,7 @@ import {
 import { StandardListSelect } from "@parallel/components/common/StandardListSelect";
 import { TagColorSelect } from "@parallel/components/common/TagColorSelect";
 import { useImportSelectOptionsDialog } from "@parallel/components/common/dialogs/ImportSelectOptionsDialog";
+import { Button, Text } from "@parallel/components/ui";
 import {
   ProfileFieldSelectSettings_ProfileTypeFieldFragment,
   ProfileFieldSelectSettings_ProfileTypeFragment,
@@ -62,7 +62,6 @@ import { Controller, useFormContext } from "react-hook-form";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { isNonNullish, times, zip } from "remeda";
 import { CreateOrUpdateProfileTypeFieldDialogFormData } from "../dialogs/CreateOrUpdateProfileTypeFieldDialog";
-import { Text } from "@parallel/components/ui";
 
 const DEFAULT_TAG_COLOR = "#E2E8F0";
 
@@ -420,7 +419,7 @@ export function ProfileFieldSelectSettings({
             <Button
               leftIcon={<PlusCircleIcon />}
               variant="outline"
-              isDisabled={fields.length >= 1000 || isReferenced} // standard fields can still add options
+              disabled={fields.length >= 1000 || isReferenced} // standard fields can still add options
               onClick={() => {
                 append({
                   id: nanoid(),
@@ -441,7 +440,7 @@ export function ProfileFieldSelectSettings({
             <Button
               variant="outline"
               onClick={handleImportOptions}
-              isDisabled={isReferenced || isStandard}
+              disabled={isReferenced || isStandard}
             >
               <FormattedMessage
                 id="component.create-or-update-property-dialog.import-options-button"

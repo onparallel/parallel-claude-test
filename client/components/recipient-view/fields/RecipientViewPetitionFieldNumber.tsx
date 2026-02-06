@@ -2,6 +2,7 @@ import { Center, Flex, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
+import { Text } from "@parallel/components/ui";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { isMetaReturn } from "@parallel/utils/keys";
@@ -20,7 +21,6 @@ import {
   RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
-import { Text } from "@parallel/components/ui";
 export interface RecipientViewPetitionFieldNumberProps
   extends Omit<
     RecipientViewPetitionFieldLayoutProps,
@@ -458,7 +458,7 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
         </Center>
       </Flex>
       <IconButtonWithTooltip
-        isDisabled={isDisabled || reply.status === "APPROVED"}
+        disabled={isDisabled || reply.status === "APPROVED"}
         onClick={() => {
           debouncedUpdateReply.clear();
           onDelete();

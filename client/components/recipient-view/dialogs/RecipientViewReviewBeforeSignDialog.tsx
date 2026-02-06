@@ -1,7 +1,7 @@
-import { Button } from "@chakra-ui/react";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button } from "@parallel/components/ui";
 import { Tone } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 
@@ -40,7 +40,7 @@ function RecipientViewReviewBeforeSignDialog({
         </>
       }
       confirm={
-        <Button colorScheme="primary" onClick={() => props.onResolve()}>
+        <Button colorPalette="primary" onClick={() => props.onResolve()}>
           <FormattedMessage id="generic.accept" defaultMessage="Accept" />
         </Button>
       }

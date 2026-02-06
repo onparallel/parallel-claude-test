@@ -17,6 +17,7 @@ import {
 import { Select } from "@parallel/chakra/components";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
+import { Text } from "@parallel/components/ui";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useState } from "react";
@@ -24,7 +25,6 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { SettingsRowSwitch } from "../rows/SettingsRowSwitch";
-import { Text } from "@parallel/components/ui";
 
 export function PetitionComposeNumberSettings({
   field,

@@ -3,7 +3,6 @@ import { useMutation } from "@apollo/client/react";
 import {
   Box,
   BoxProps,
-  Button,
   ButtonOptions,
   Center,
   Grid,
@@ -23,6 +22,7 @@ import {
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
+import { Button, Text } from "@parallel/components/ui";
 import {
   PetitionFieldReplyStatus,
   PetitionRepliesField_PetitionFieldFragment,
@@ -51,7 +51,6 @@ import { Accordion } from "../ui";
 import { NoRepliesHintWithButton } from "./NoRepliesHintWithButton";
 import { PetitionRepliesFieldAction, PetitionRepliesFieldReply } from "./PetitionRepliesFieldReply";
 import { PetitionRepliesFilteredFields } from "./PetitionRepliesFilteredFields";
-import { Text } from "@parallel/components/ui";
 
 export interface PetitionRepliesFieldProps extends Omit<BoxProps, "filter"> {
   petition: PetitionRepliesField_PetitionFragment;

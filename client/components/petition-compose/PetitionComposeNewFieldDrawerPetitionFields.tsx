@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import {
   Box,
-  Button,
   HStack,
   Icon,
   Image,
@@ -9,6 +8,7 @@ import {
   useBreakpointValue,
   useDisclosure,
 } from "@chakra-ui/react";
+import { Button, Text } from "@parallel/components/ui";
 import {
   PetitionComposeNewFieldDrawer_UserFragment,
   PetitionComposeNewFieldDrawerPetitionFields_ProfileTypeFragment,
@@ -36,7 +36,6 @@ import { SearchInput } from "../common/SearchInput";
 import { SmallPopover } from "../common/SmallPopover";
 import { getProfileTypeIcon } from "../organization/profiles/getProfileTypeIcon";
 import { PetitionFieldTypeLabel } from "./PetitionFieldTypeLabel";
-import { Text } from "@parallel/components/ui";
 
 const FIELD_GROUP_EXCLUDED_FIELD_TYPES = ["FIELD_GROUP", "HEADING"] as PetitionFieldType[];
 

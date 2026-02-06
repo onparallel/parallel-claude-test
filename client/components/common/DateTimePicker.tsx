@@ -1,4 +1,5 @@
-import { Box, Button, Flex, Input } from "@chakra-ui/react";
+import { Box, Flex, Input } from "@chakra-ui/react";
+import { Button } from "@parallel/components/ui";
 import { FORMATS } from "@parallel/utils/dates";
 import { useTimeInput } from "@parallel/utils/useTimeInput";
 import { format, isEqual, isToday, isTomorrow, parse } from "date-fns";
@@ -67,7 +68,7 @@ export function DateTimePicker({
           <Button
             marginTop={2}
             key={date.valueOf()}
-            colorScheme={isEqual(date, value) ? "primary" : "gray"}
+            colorPalette={isEqual(date, value) ? "primary" : "gray"}
             onClick={() => onChange(date)}
           >
             {isToday(date) ? (

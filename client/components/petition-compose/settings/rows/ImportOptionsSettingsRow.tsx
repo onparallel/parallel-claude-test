@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
-import { Box, Button } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
+import { Button } from "@parallel/components/ui";
 import { UpdatePetitionFieldInput } from "@parallel/graphql/__types";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { SettingsRow } from "./SettingsRow";
@@ -91,7 +92,7 @@ export function ImportOptionsSettingsRow({
           size="sm"
           fontWeight="normal"
           fontSize="16px"
-          isDisabled={isDisabled}
+          disabled={isDisabled}
           onClick={handleImportOptions}
         >
           <FormattedMessage id="generic.import" defaultMessage="Import" />

@@ -22,6 +22,7 @@ import {
   PublicPetitionInitialFormData,
 } from "@parallel/components/public/public-petitions/PublicPetitionInitialForm";
 import { PublicPetitionReminder } from "@parallel/components/public/public-petitions/PublicPetitionReminder";
+import { Text } from "@parallel/components/ui";
 import {
   PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkDocument,
   PublicPetitionLink_publicPetitionLinkBySlugDocument,
@@ -40,7 +41,6 @@ import Head from "next/head";
 import { useState } from "react";
 import { SubmitHandler } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 export type PublicPetitionLinkSteps = "INITIAL" | "EMAIL_SENT" | "EMAIL_EXISTS" | "REMINDER_SENT";
 
 interface HandleNewPublicPetitionProps {

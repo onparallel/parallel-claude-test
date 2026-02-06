@@ -1,6 +1,7 @@
-import { Button, FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button } from "@parallel/components/ui";
 import { PetitionBaseOrFolder } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useRef } from "react";
@@ -101,7 +102,7 @@ function RenameDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="primary" isDisabled={!isDirty} type="submit">
+        <Button colorPalette="primary" disabled={!isDirty} type="submit">
           <FormattedMessage id="component.rename-dialog.change-name" defaultMessage="Change name" />
         </Button>
       }

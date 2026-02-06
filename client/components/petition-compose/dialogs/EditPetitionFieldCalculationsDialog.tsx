@@ -1,19 +1,11 @@
 import { gql } from "@apollo/client";
 import { useFragment } from "@apollo/client/react";
-import {
-  Alert,
-  AlertDescription,
-  Box,
-  Button,
-  Center,
-  Flex,
-  HStack,
-  Stack,
-} from "@chakra-ui/react";
+import { Alert, AlertDescription, Box, Center, Flex, HStack, Stack } from "@chakra-ui/react";
 import { CalculatorIcon } from "@parallel/chakra/icons";
 import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import {
   useEditPetitionFieldCalculationsDialog_PetitionBaseFragment,
   useEditPetitionFieldCalculationsDialog_PetitionBaseFragmentDoc,
@@ -27,7 +19,6 @@ import { FormattedMessage } from "react-intl";
 import { isNullish, pick } from "remeda";
 import { PetitionFieldMathEditor } from "../logic/PetitionFieldMathEditor";
 import { useCreatePetitionVariableDialog } from "./CreateOrUpdatePetitionVariableDialog";
-import { Text } from "@parallel/components/ui";
 
 interface EditPetitionFieldCalculationsDialogProps {
   field: useEditPetitionFieldCalculationsDialog_PetitionFieldFragment;
@@ -150,7 +141,7 @@ function EditPetitionFieldCalculationsDialog({
       }
       confirm={
         <Button
-          colorScheme="primary"
+          colorPalette="primary"
           onClick={() => {
             if (
               !math.current ||

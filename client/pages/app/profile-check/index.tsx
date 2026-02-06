@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useLazyQuery, useMutation } from "@apollo/client/react";
 import {
   Box,
-  Button,
   Center,
   Flex,
   Heading,
@@ -29,6 +28,7 @@ import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
+import { Button, Text } from "@parallel/components/ui";
 import {
   ProfileSearch_conflictCheckProfileSearchDocument,
   ProfileSearch_conflictCheckProfileSearchQuery,
@@ -47,7 +47,6 @@ import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, pick } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 type ProfileSearchProps = UnwrapPromise<ReturnType<typeof ProfileSearch.getInitialProps>>;
 
@@ -187,9 +186,9 @@ function ProfileSearch({ fieldId, petitionId, profileTypeIds, parentReplyId }: P
 
           <Box alignSelf="flex-end">
             <Button
-              colorScheme="primary"
+              colorPalette="primary"
               leftIcon={<SaveIcon />}
-              isDisabled={
+              disabled={
                 !currentSearch || petitionFieldData.petitionField.petition.type === "TEMPLATE"
               }
               onClick={handleSaveProfileSearchData}
@@ -548,7 +547,7 @@ function useProfileSearchTableColumns({
                   size="sm"
                   fontSize="md"
                   variant="solid"
-                  colorScheme="primary"
+                  colorPalette="primary"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleSaveClick();

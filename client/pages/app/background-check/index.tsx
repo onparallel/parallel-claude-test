@@ -4,7 +4,6 @@ import {
   AlertDescription,
   AlertIcon,
   AlertTitle,
-  Button,
   Center,
   Flex,
   FormControl,
@@ -23,6 +22,7 @@ import { SupportLink } from "@parallel/components/common/SupportLink";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { BackgroundCheckEntityTypeSelect } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityTypeSelect";
+import { Button, Text } from "@parallel/components/ui";
 import {
   BackgroundCheckEntitySearchType,
   BackgroundCheckFieldSearch_userDocument,
@@ -36,7 +36,6 @@ import { useRouter } from "next/router";
 import { useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export interface BackgroundCheckFormData {
   name: string | null;
@@ -289,7 +288,7 @@ function BackgroundCheckFieldSearch({
                   </FormControl>
                 ) : null}
               </Stack>
-              <Button colorScheme="primary" type="submit" isDisabled={isDisabled}>
+              <Button colorPalette="primary" type="submit" disabled={isDisabled}>
                 <FormattedMessage id="page.background-check.search" defaultMessage="Search" />
               </Button>
             </Stack>

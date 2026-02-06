@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import { Button, Center, Checkbox, Flex, FormControl, Spinner, Stack } from "@chakra-ui/react";
+import { Center, Checkbox, Flex, FormControl, Spinner, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
@@ -10,6 +10,7 @@ import {
   UserSelectInstance,
   UserSelectSelection,
 } from "@parallel/components/common/UserSelect";
+import { Button, Text } from "@parallel/components/ui";
 import {
   PetitionPermissionType,
   PetitionPermissionTypeRW,
@@ -26,7 +27,6 @@ import { FormattedMessage } from "react-intl";
 import { PetitionPermissionTypeSelect } from "../PetitionPermissionTypeSelect";
 import { TemplateDefaultUserGroupPermissionRow } from "./TemplateDefaultUserGroupPermissionRow";
 import { TemplateDefaultUserPermissionRow } from "./TemplateDefaultUserPermissionRow";
-import { Text } from "@parallel/components/ui";
 
 export interface TemplateDefaultPermissionsDialogProps {
   petitionId: string;
@@ -314,7 +314,7 @@ export function TemplateDefaultPermissionsDialog({
         )
       }
       confirm={
-        <Button type="submit" colorScheme="primary" variant="solid" isLoading={isSubmitting}>
+        <Button type="submit" colorPalette="primary" variant="solid" loading={isSubmitting}>
           {editors.length > 0 ? (
             <FormattedMessage id="generic.add" defaultMessage="Add" />
           ) : (

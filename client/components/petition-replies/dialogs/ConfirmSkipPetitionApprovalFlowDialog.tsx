@@ -1,14 +1,14 @@
-import { Button, FormControl, Stack } from "@chakra-ui/react";
+import { FormControl, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
+import { Button, Text } from "@parallel/components/ui";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
-import { Text } from "@parallel/components/ui";
 
 export function ConfirmSkipPetitionApprovalFlowDialog(props: DialogProps<{}, string>) {
   const intl = useIntl();
@@ -76,7 +76,7 @@ export function ConfirmSkipPetitionApprovalFlowDialog(props: DialogProps<{}, str
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="red">
+        <Button type="submit" colorPalette="red">
           <FormattedMessage id="generic.yes-continue" defaultMessage="Yes, continue" />
         </Button>
       }

@@ -5,7 +5,6 @@ import {
   AlertDescription,
   AlertIcon,
   Box,
-  Button,
   Center,
   Flex,
   MenuButton,
@@ -50,6 +49,7 @@ import { usePetitionSharingDialog } from "@parallel/components/petition-common/d
 import { useRenameDialog } from "@parallel/components/petition-common/dialogs/RenameDialog";
 import { PetitionListHeader } from "@parallel/components/petition-list/PetitionListHeader";
 import { useNewTemplateDialog } from "@parallel/components/petition-new/dialogs/NewTemplateDialog";
+import { Button, Text } from "@parallel/components/ui";
 import {
   PetitionBaseType,
   PetitionPermissionType,
@@ -92,7 +92,6 @@ import { MotionConfig } from "framer-motion";
 import { MouseEvent, PropsWithChildren, ReactNode, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { firstBy, isNonNullish, isNullish, map, omit, pick, pipe } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 function rowKeyProp(row: Petitions_PetitionBaseOrFolderFragment) {
   return row.__typename === "PetitionFolder" ? row.folderId : (row as any).id;
@@ -564,7 +563,7 @@ function Petitions() {
               <Button
                 display={{ base: "none", md: "block" }}
                 onClick={handleCreateFolder}
-                isDisabled={!userCanChangePath}
+                disabled={!userCanChangePath}
               >
                 <FormattedMessage id="page.petitions-list.new-folder" defaultMessage="New folder" />
               </Button>
@@ -574,9 +573,9 @@ function Petitions() {
             >
               <Button
                 display={{ base: "none", md: "block" }}
-                colorScheme="primary"
+                colorPalette="primary"
                 onClick={handleCreateNewParallelOrTemplate}
-                isDisabled={!userCanCreateTemplate && queryState.type === "TEMPLATE"}
+                disabled={!userCanCreateTemplate && queryState.type === "TEMPLATE"}
               >
                 {queryState.type === "PETITION" ? (
                   <FormattedMessage id="generic.create-petition" defaultMessage="Create parallel" />

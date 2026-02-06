@@ -17,7 +17,7 @@ export const SendButton = chakraForwardRef<"button", SendButtonProps>(function S
   return (
     <ButtonWithMoreOptions
       ref={ref}
-      colorScheme="primary"
+      colorPalette="primary"
       leftIcon={<PaperPlaneIcon fontSize="18px" />}
       data-testid="send-button"
       moreOptionsButtonProps={{ "data-testid": "send-button-more-options-button" } as any}

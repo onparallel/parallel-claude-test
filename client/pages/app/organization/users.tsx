@@ -32,6 +32,7 @@ import { useConfirmDeactivateUserDialog } from "@parallel/components/organizatio
 import { useConfirmReactivateInvitedUserDialog } from "@parallel/components/organization/dialogs/ConfirmReactivateInvitedUserDialog";
 import { useConfirmResendInvitationDialog } from "@parallel/components/organization/dialogs/ConfirmResendInvitationDialog";
 import { useCreateOrUpdateUserDialog } from "@parallel/components/organization/dialogs/CreateOrUpdateUserDialog";
+import { Text } from "@parallel/components/ui";
 import {
   OrganizationUsers_OrderBy,
   OrganizationUsers_UserFragment,
@@ -69,7 +70,6 @@ import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, sort } from "remeda";
-import { Text } from "@parallel/components/ui";
 const SORTING = ["fullName", "email", "createdAt", "lastActiveAt"] as const;
 
 const QUERY_STATE = {

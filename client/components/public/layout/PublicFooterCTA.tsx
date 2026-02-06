@@ -1,4 +1,5 @@
-import { Button, Heading, Stack } from "@chakra-ui/react";
+import { Heading, Stack } from "@chakra-ui/react";
+import { Button } from "@parallel/components/ui";
 import { NakedLink } from "@parallel/components/common/Link";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { FormattedMessage } from "react-intl";

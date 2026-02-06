@@ -1,6 +1,5 @@
 import {
   Badge,
-  Button,
   ButtonProps,
   HStack,
   Image,
@@ -18,6 +17,7 @@ import {
 import { Menu } from "@parallel/chakra/components";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Button, Text } from "@parallel/components/ui";
 import { UserLocale } from "@parallel/graphql/__types";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { asSupportedUserLocale, useSupportedUserLocales } from "@parallel/utils/locales";
@@ -27,7 +27,6 @@ import { ChangeEvent, Ref, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { LocalizableUserText } from "./LocalizableUserTextRender";
-import { Text } from "@parallel/components/ui";
 
 interface LocalizableUserTextInputProps extends ValueProps<LocalizableUserText, false> {
   inputRef?: Ref<HTMLInputElement>;

@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, Grid, HStack, IconButton, Stack } from "@chakra-ui/react";
+import { Box, Flex, Grid, HStack, IconButton, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
+import { Button } from "@parallel/components/ui";
 import { PetitionVisibilityEditor_PetitionBaseFragment } from "@parallel/graphql/__types";
 import {
   defaultFieldCondition,
@@ -260,7 +261,7 @@ export function PetitionVisibilityEditor({
           <Box>
             {visibility.conditions.length < 15 && !isReadOnly ? (
               <PetitionFieldLogicAddConditionButton
-                isDisabled={
+                disabled={
                   "fieldId" in lastCondition &&
                   (!lastConditionField || lastConditionField.type === "HEADING")
                 }
@@ -275,7 +276,7 @@ export function PetitionVisibilityEditor({
           {onRemove && visibilityOn === "APPROVAL" ? (
             <Button
               variant="ghost"
-              colorScheme="red"
+              colorPalette="red"
               onClick={onRemove}
               size="sm"
               fontSize="md"

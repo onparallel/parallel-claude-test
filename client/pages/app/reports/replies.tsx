@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Center, Heading, HStack, Stack } from "@chakra-ui/react";
+import { Box, Center, Heading, HStack, Stack } from "@chakra-ui/react";
 import { CheckIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { NakedHelpCenterLink } from "@parallel/components/common/HelpCenterLink";
@@ -11,6 +11,7 @@ import { ReportsSidebarLayout } from "@parallel/components/layout/ReportsSidebar
 import { DateRangePickerButton } from "@parallel/components/reports/common/DateRangePickerButton";
 import { ReportsLoadingMessage } from "@parallel/components/reports/common/ReportsLoadingMessage";
 import { ReportsReadyMessage } from "@parallel/components/reports/common/ReportsReadyMessage";
+import { Button, Text } from "@parallel/components/ui";
 import { ReportsReplies_userDocument } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
@@ -18,7 +19,6 @@ import { date, string, useQueryState } from "@parallel/utils/queryState";
 import { useTemplateRepliesReportTask } from "@parallel/utils/tasks/useTemplateRepliesReportTask";
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 const QUERY_STATE = {
   range: date().list({ maxItems: 2 }),
@@ -74,7 +74,7 @@ export function ReportsReplies() {
             as={NakedHelpCenterLink}
             variant="ghost"
             fontWeight="normal"
-            colorScheme="primary"
+            colorPalette="primary"
             articleId={6272487}
           >
             <FormattedMessage id="generic.help-question" defaultMessage="Help?" />
@@ -120,10 +120,10 @@ export function ReportsReplies() {
 
           <Button
             minWidth="fit-content"
-            colorScheme="primary"
+            colorPalette="primary"
             onClick={handleGenerateReportClick}
             fontWeight="500"
-            isDisabled={showDownload || !queryState.template}
+            disabled={showDownload || !queryState.template}
           >
             <FormattedMessage id="page.reports.generate" defaultMessage="Generate" />
           </Button>
@@ -141,7 +141,7 @@ export function ReportsReplies() {
             </Text>
             <Button
               leftIcon={<DownloadIcon />}
-              colorScheme="primary"
+              colorPalette="primary"
               onClick={() =>
                 handleTemplateRepliesReportTask(
                   activeTemplateId!,

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Button, Grid, HStack, Heading, Stack } from "@chakra-ui/react";
+import { Box, Grid, Heading, HStack, Stack } from "@chakra-ui/react";
 import { EditIcon, SaveIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
@@ -14,12 +14,13 @@ import { DocumentThemePreview } from "@parallel/components/organization/branding
 import { DocumentThemeSelect } from "@parallel/components/organization/branding/DocumentThemeSelect";
 import { useConfirmDeleteThemeDialog } from "@parallel/components/organization/dialogs/ConfirmDeleteThemeDialog";
 import { useCreateOrUpdateDocumentThemeDialog } from "@parallel/components/organization/dialogs/CreateOrUpdateDocumentThemeDialog";
+import { Button } from "@parallel/components/ui";
 import {
-  BrandingDocumentTheme_OrganizationThemeFragment,
-  BrandingDocumentTheme_UserFragment,
   BrandingDocumentTheme_createOrganizationPdfDocumentThemeDocument,
   BrandingDocumentTheme_deleteOrganizationPdfDocumentThemeDocument,
+  BrandingDocumentTheme_OrganizationThemeFragment,
   BrandingDocumentTheme_updateOrganizationPdfDocumentThemeDocument,
+  BrandingDocumentTheme_UserFragment,
 } from "@parallel/graphql/__types";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useState } from "react";
@@ -186,7 +187,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
               id: "generic.save",
               defaultMessage: "Save",
             })}
-            isDisabled={!isDirty || !isValid || !userHasPermission}
+            disabled={!isDirty || !isValid || !userHasPermission}
           />
           <IconButtonWithTooltip
             icon={<EditIcon />}
@@ -194,15 +195,15 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
               id: "component.branding-document-theme.edit-theme-tooltip",
               defaultMessage: "Edit theme",
             })}
-            isDisabled={!userHasPermission}
+            disabled={!userHasPermission}
             onClick={handleEditDocumentTheme}
           />
           <Box display={{ base: "block", xl: "none" }}>
             <Button
               variant="solid"
-              colorScheme="primary"
+              colorPalette="primary"
               onClick={handleCreateNewDocumentTheme}
-              isDisabled={!userHasPermission}
+              disabled={!userHasPermission}
               width="full"
             >
               <FormattedMessage
@@ -216,9 +217,9 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
       <Box display={{ base: "none", xl: "flex" }} alignSelf="flex-end" justifySelf="flex-end">
         <Button
           variant="solid"
-          colorScheme="primary"
+          colorPalette="primary"
           onClick={handleCreateNewDocumentTheme}
-          isDisabled={!userHasPermission}
+          disabled={!userHasPermission}
           width="full"
         >
           <FormattedMessage

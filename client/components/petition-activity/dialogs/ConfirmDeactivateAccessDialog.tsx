@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
-import { Button } from "@chakra-ui/react";
 import { ContactReference } from "@parallel/components/common/ContactReference";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button } from "@parallel/components/ui";
 import { ConfirmDeactivateAccessDialog_PetitionAccessFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";
@@ -35,7 +35,7 @@ export function ConfirmDeactivateAccessDialog({
         )
       }
       confirm={
-        <Button colorScheme="red" onClick={() => props.onResolve()}>
+        <Button colorPalette="red" onClick={() => props.onResolve()}>
           <FormattedMessage
             id="component.confirm-deactivate-access-dialog.confirm"
             defaultMessage="Yes, remove access"

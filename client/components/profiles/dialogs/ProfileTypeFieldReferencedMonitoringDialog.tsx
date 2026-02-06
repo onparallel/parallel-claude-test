@@ -1,13 +1,13 @@
 import { gql } from "@apollo/client";
-import { Button } from "@chakra-ui/react";
+
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import {
   UserLocale,
   useProfileTypeFieldReferencedMonitoringDialog_ProfileTypeFieldFragment,
 } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 function ProfileTypeFieldReferencedMonitoringDialog({
   properties,
@@ -56,7 +56,7 @@ function ProfileTypeFieldReferencedMonitoringDialog({
       cancel={<></>}
       confirm={
         <Button
-          colorScheme="primary"
+          colorPalette="primary"
           onClick={() => {
             props.onResolve();
           }}

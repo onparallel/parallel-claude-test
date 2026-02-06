@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
 
+import { Text } from "@parallel/components/ui";
 import { ProfilesNumberModuleSettings_ProfileTypeFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { ProfilesModuleFilterEditor } from "../../components/ProfilesModuleFilterEditor";
-import { Text } from "@parallel/components/ui";
 
 export function ProfilesNumberModuleSettings({
   profileType,

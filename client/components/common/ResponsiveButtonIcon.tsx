@@ -1,5 +1,4 @@
 import {
-  Button,
   chakra,
   IconButtonProps,
   IconProps,
@@ -8,6 +7,7 @@ import {
 } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Button } from "@parallel/components/ui";
 import { cloneElement, isValidElement } from "react";
 
 export interface ResponsiveButtonIconProps extends Omit<IconButtonProps, "aria-label"> {
@@ -15,6 +15,8 @@ export interface ResponsiveButtonIconProps extends Omit<IconButtonProps, "aria-l
   breakpoint?: string;
   hideIconOnDesktop?: boolean;
   placement?: Placement;
+  disabled?: boolean;
+  loading?: boolean;
 }
 
 export const ResponsiveButtonIcon = chakraForwardRef<"button", ResponsiveButtonIconProps>(function (
@@ -24,16 +26,24 @@ export const ResponsiveButtonIcon = chakraForwardRef<"button", ResponsiveButtonI
     breakpoint = "md",
     hideIconOnDesktop,
     placement,
+    disabled,
+    loading,
     ...props
   }: ResponsiveButtonIconProps,
   ref,
 ) {
   const isOnlyIcon = useBreakpointValue({ base: true, [breakpoint]: false });
   return (
-    <Tooltip placement={placement} label={label} isDisabled={props.isDisabled || !isOnlyIcon}>
+    <Tooltip
+      placement={placement}
+      label={label}
+      isDisabled={props.isDisabled || disabled || !isOnlyIcon}
+    >
       <Button
         aria-label={isOnlyIcon ? label : undefined}
         paddingX={{ base: 0, [breakpoint]: props.size === "sm" ? 3 : 4 }}
+        disabled={props.isDisabled || disabled}
+        loading={props.isLoading || loading}
         {...props}
         ref={ref}
       >

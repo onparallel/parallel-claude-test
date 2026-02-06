@@ -1,16 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  Badge,
-  Box,
-  Button,
-  Center,
-  Flex,
-  HStack,
-  Heading,
-  List,
-  ListItem,
-  Stack,
-} from "@chakra-ui/react";
+import { Badge, Box, Center, Flex, Heading, HStack, List, ListItem, Stack } from "@chakra-ui/react";
 import { ChevronFilledIcon, ListIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
@@ -29,7 +18,7 @@ import { isNonNullish, zip } from "remeda";
 import { CloseButton } from "../common/CloseButton";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { NakedLink } from "../common/Link";
-import { Text } from "@parallel/components/ui";
+import { Button, Text } from "@parallel/components/ui";
 
 type PetitionSelection =
   | RecipientViewContents_PublicPetitionFragment

@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client";
 import { Badge } from "@chakra-ui/react";
+import { Text } from "@parallel/components/ui";
 import { TestModeSignatureBadge_UserFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { SmallPopover } from "../common/SmallPopover";
 import { SupportLink } from "../common/SupportLink";
-import { Text } from "@parallel/components/ui";
 
 export function TestModeSignatureBadge({
   hasPetitionSignature,

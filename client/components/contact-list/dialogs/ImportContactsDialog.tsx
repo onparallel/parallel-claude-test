@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
   Box,
-  Button,
   Center,
   ModalBody,
   ModalCloseButton,
@@ -14,6 +13,7 @@ import {
 import { AlertCircleIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
+import { Button, Text } from "@parallel/components/ui";
 import { ImportContactsDialog_bulkCreateContactsDocument } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { withError } from "@parallel/utils/promises/withError";
@@ -24,7 +24,6 @@ import { BaseDialog, DialogProps, useDialog } from "../../common/dialogs/DialogP
 import { Dropzone } from "../../common/Dropzone";
 import { FileSize } from "../../common/FileSize";
 import { NormalLink } from "../../common/Link";
-import { Text } from "@parallel/components/ui";
 
 const MAX_FILESIZE = 1024 * 1024 * 10;
 
@@ -246,7 +245,7 @@ function ImportErrorResolveDomainDialog({ emails, ...props }: DialogProps<{ emai
         </>
       }
       confirm={
-        <Button colorScheme="primary" onClick={() => props.onResolve()}>
+        <Button colorPalette="primary" onClick={() => props.onResolve()}>
           <FormattedMessage
             id="contacts.import-from-excel.import-error.create-contacts"
             defaultMessage="Create contacts"

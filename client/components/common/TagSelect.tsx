@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useApolloClient, useMutation } from "@apollo/client/react";
 import {
   Box,
-  Button,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -12,6 +11,7 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { EditIcon } from "@parallel/chakra/icons";
+import { Button, Text } from "@parallel/components/ui";
 import {
   ManageTagsDialog_updateTagDocument,
   TagSelect_TagFragment,
@@ -65,7 +65,6 @@ import { DialogProps, useDialog } from "./dialogs/DialogProvider";
 import { NoElement } from "./NoElement";
 import { Tag } from "./Tag";
 import { DEFAULT_COLORS, TagColorSelect } from "./TagColorSelect";
-import { Text } from "@parallel/components/ui";
 
 type TagSelection = TagSelect_TagFragment;
 
@@ -636,13 +635,13 @@ export function ManageTagsDialog({ ...props }: ManageTagsDialogProps) {
         </Box>
       }
       confirm={
-        <Button isLoading={isUpdating} isDisabled={!isDirty} type="submit" colorScheme="primary">
+        <Button loading={isUpdating} disabled={!isDirty} type="submit" colorPalette="primary">
           <FormattedMessage id="generic.save-changes" defaultMessage="Save changes" />
         </Button>
       }
       alternative={
         canDeleteTags ? (
-          <Button isDisabled={!tagId} colorScheme="red" variant="outline" onClick={handleDeleteTag}>
+          <Button disabled={!tagId} colorPalette="red" variant="outline" onClick={handleDeleteTag}>
             <FormattedMessage id="generic.delete" defaultMessage="Delete" />
           </Button>
         ) : null

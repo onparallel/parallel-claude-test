@@ -1,14 +1,14 @@
 import { gql } from "@apollo/client";
-import { Button, Radio, RadioGroup, Stack } from "@chakra-ui/react";
+import { Radio, RadioGroup, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import {
   BulkSendSigningMode,
   CopySignatureConfigDialog_PetitionSignerFragment,
 } from "@parallel/graphql/__types";
 import { useState } from "react";
 import { FormattedList, FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export function CopySignatureConfigDialog({
   signers,
@@ -80,8 +80,8 @@ export function CopySignatureConfigDialog({
       }
       confirm={
         <Button
-          isDisabled={option === undefined}
-          colorScheme="primary"
+          disabled={option === undefined}
+          colorPalette="primary"
           onClick={() => props.onResolve(option)}
         >
           <FormattedMessage id="generic.send" defaultMessage="Send" />

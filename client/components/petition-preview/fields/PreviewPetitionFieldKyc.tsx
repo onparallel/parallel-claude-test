@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Center, Flex, HStack, List, Progress, Stack } from "@chakra-ui/react";
+import { Box, Center, Flex, HStack, List, Progress, Stack } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import {
   BusinessIcon,
@@ -14,6 +14,7 @@ import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { DowJonesRiskLabel } from "@parallel/components/petition-common/DowJonesRiskLabel";
 import { usePreviewDowJonesPermissionDeniedDialog } from "@parallel/components/petition-preview/dialogs/PreviewDowJonesPermissionDeniedDialog";
+import { Button, Text } from "@parallel/components/ui";
 import { PreviewPetitionFieldKyc_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { FORMATS } from "@parallel/utils/dates";
@@ -29,7 +30,6 @@ import {
   RecipientViewPetitionFieldLayoutProps,
   RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
 } from "../../recipient-view/fields/RecipientViewPetitionFieldLayout";
-import { Text } from "@parallel/components/ui";
 
 export interface PreviewPetitionFieldKycProps
   extends Omit<
@@ -173,7 +173,7 @@ export function PreviewPetitionFieldKyc({
       <Button
         variant="outline"
         onClick={handleStart}
-        isDisabled={isDisabled || state === "FETCHING"}
+        disabled={isDisabled || state === "FETCHING"}
         marginTop={3}
         outlineColor={state !== "FETCHING" && isInvalid ? "red.500" : undefined}
         id={`reply-${field.id}${parentReplyId ? `-${parentReplyId}` : ""}-new`}
@@ -316,7 +316,7 @@ export function KYCResearchFieldReplyProfile({
       ) : null}
       {onDownload !== undefined ? (
         <IconButtonWithTooltip
-          isDisabled={uploadHasFailed || isDownloadDisabled}
+          disabled={uploadHasFailed || isDownloadDisabled}
           onClick={() => onDownload(reply.id)}
           variant="ghost"
           icon={<DownloadIcon />}
@@ -330,7 +330,7 @@ export function KYCResearchFieldReplyProfile({
       ) : null}
       {onRemove !== undefined ? (
         <IconButtonWithTooltip
-          isDisabled={isDisabled || reply.status === "APPROVED"}
+          disabled={isDisabled || reply.status === "APPROVED"}
           onClick={onRemove}
           variant="ghost"
           icon={<DeleteIcon />}

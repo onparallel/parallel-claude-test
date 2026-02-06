@@ -1,14 +1,7 @@
 import { gql } from "@apollo/client";
-import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
-  Button,
-  HStack,
-  Stack,
-} from "@chakra-ui/react";
+import { Alert, AlertDescription, AlertIcon, AlertTitle, HStack, Stack } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
+import { Button } from "@parallel/components/ui";
 import { BackgroundCheckSearchDifferencesAlert_BackgroundCheckEntitySearchReviewDiffFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 
@@ -46,7 +39,7 @@ export function BackgroundCheckSearchDifferencesAlert({
           </AlertDescription>
         </Stack>
       </HStack>
-      <Button colorScheme="primary" leftIcon={<CheckIcon />} onClick={onConfirmChangesClick}>
+      <Button colorPalette="primary" leftIcon={<CheckIcon />} onClick={onConfirmChangesClick}>
         <FormattedMessage
           id="component.background-check-search-result.mark-as-reviewed"
           defaultMessage="Mark as reviewed"

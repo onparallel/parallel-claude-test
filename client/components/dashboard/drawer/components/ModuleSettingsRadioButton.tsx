@@ -1,4 +1,5 @@
-import { Button, RadioProps, Stack, useRadio } from "@chakra-ui/react";
+import { RadioProps, Stack, useRadio } from "@chakra-ui/react";
+import { Button } from "@parallel/components/ui";
 
 export function ModuleSettingsRadioButton(props: RadioProps) {
   const { getInputProps, getRadioProps } = useRadio(props);

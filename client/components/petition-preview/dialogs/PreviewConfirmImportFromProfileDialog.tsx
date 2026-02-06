@@ -1,13 +1,13 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import { Button, ListItem, Stack, UnorderedList } from "@chakra-ui/react";
+import { ListItem, Stack, UnorderedList } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { ProfileReference } from "@parallel/components/common/ProfileReference";
+import { Button, Text } from "@parallel/components/ui";
 import { usePreviewConfirmImportFromProfileDialog_profilesDocument } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export function PreviewConfirmImportFromProfileDialog({
   profileIds,
@@ -58,7 +58,7 @@ export function PreviewConfirmImportFromProfileDialog({
         </Stack>
       }
       confirm={
-        <Button onClick={() => props.onResolve()} colorScheme="primary" variant="solid">
+        <Button onClick={() => props.onResolve()} colorPalette="primary" variant="solid">
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }

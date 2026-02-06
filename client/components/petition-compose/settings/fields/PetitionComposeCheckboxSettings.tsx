@@ -10,6 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { SimpleSelect, useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { StandardListSelect } from "@parallel/components/common/StandardListSelect";
+import { Text } from "@parallel/components/ui";
 import { UpdatePetitionFieldInput } from "@parallel/graphql/__types";
 import { getMinMaxCheckboxLimit } from "@parallel/utils/petitionFields";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
@@ -20,7 +21,6 @@ import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettin
 import { ImportOptionsSettingsRow } from "../rows/ImportOptionsSettingsRow";
 import { SettingsRow } from "../rows/SettingsRow";
 import { SettingsRowSwitch } from "../rows/SettingsRowSwitch";
-import { Text } from "@parallel/components/ui";
 
 type CheckboxLimitType = "UNLIMITED" | "EXACT" | "RANGE" | "RADIO";
 

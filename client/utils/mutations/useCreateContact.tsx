@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Button, Stack } from "@chakra-ui/react";
+import { Stack } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { useAskContactDetailsDialog } from "@parallel/components/common/dialogs/AskContactDetailsDialog";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
@@ -10,12 +10,12 @@ import {
   isDialogError,
   useDialog,
 } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import { useCreateContact_createContactDocument } from "@parallel/graphql/__types";
 import { useCallback } from "react";
 import { FormattedMessage } from "react-intl";
 import { isApolloError } from "../apollo/isApolloError";
 import { useGenericErrorToast } from "../useGenericErrorToast";
-import { Text } from "@parallel/components/ui";
 
 export function useCreateContact() {
   const [createContact] = useMutation(useCreateContact_createContactDocument);
@@ -106,7 +106,7 @@ function ForceCreateContactDialog({ ...props }: DialogProps<{}>) {
         </>
       }
       confirm={
-        <Button colorScheme="primary" onClick={() => props.onResolve()}>
+        <Button colorPalette="primary" onClick={() => props.onResolve()}>
           <FormattedMessage
             id="component.use-create-contact.create-contact"
             defaultMessage="Create contact"

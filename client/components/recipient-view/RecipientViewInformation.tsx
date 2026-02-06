@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, HStack, Heading, Stack } from "@chakra-ui/react";
+import { Box, Flex, Heading, HStack, Stack } from "@chakra-ui/react";
 import { InfoCircleIcon, UserArrowIcon } from "@parallel/chakra/icons";
+import { Button, Text } from "@parallel/components/ui";
 import {
   RecipientViewInformation_PublicContactFragment,
   RecipientViewInformation_PublicPetitionAccessFragment,
@@ -9,7 +10,6 @@ import {
 import { FormattedMessage } from "react-intl";
 import { CloseButton } from "../common/CloseButton";
 import { useDelegateAccess } from "./hooks/useDelegateAccess";
-import { Text } from "@parallel/components/ui";
 
 interface RecipientViewInformationProps {
   keycode: string;
@@ -89,7 +89,7 @@ export function RecipientViewInformation({
           <Flex alignItems="center">
             <Button
               leftIcon={<UserArrowIcon />}
-              colorScheme="primary"
+              colorPalette="primary"
               variant="outline"
               onClick={handleDelegateAccess}
             >

@@ -1,10 +1,10 @@
 import { HStack, Icon } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Text } from "@parallel/components/ui";
 import { ProfileTypeFieldType } from "@parallel/graphql/__types";
 import { PROFILE_TYPE_FIELD_CONFIG } from "@parallel/utils/profileFields";
 import { useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export interface ProfileTypeFieldTypeIndicatorProps {
   type: ProfileTypeFieldType;

@@ -5,7 +5,6 @@ import {
   AlertDescription,
   AlertIcon,
   Box,
-  Button,
   Flex,
   FormControl,
   HStack,
@@ -30,7 +29,7 @@ import { UserAvatar } from "@parallel/components/common/UserAvatar";
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
 import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
 import { UserSelect, UserSelectInstance } from "@parallel/components/common/UserSelect";
-import { Avatar, Text } from "@parallel/components/ui";
+import { Avatar, Button, Text } from "@parallel/components/ui";
 import {
   ProfileTypeField,
   ProfileTypeFieldPermissionType,
@@ -413,7 +412,7 @@ export function ProfileTypeFieldPermissionDialog({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="primary" variant="solid">
+        <Button type="submit" colorPalette="primary" variant="solid">
           <FormattedMessage id="generic.save" defaultMessage="Save" />
         </Button>
       }

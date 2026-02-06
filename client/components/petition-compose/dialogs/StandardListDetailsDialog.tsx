@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 import {
   Box,
-  Button,
   Center,
   Heading,
   HStack,
@@ -26,7 +25,7 @@ import {
 import { useRef } from "react";
 import { FormattedDate, FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
-import { Text } from "@parallel/components/ui";
+import { Button, Text } from "@parallel/components/ui";
 
 export function useStandardListDetailsDialog() {
   return useDialog(StandardListDetailsDialog);

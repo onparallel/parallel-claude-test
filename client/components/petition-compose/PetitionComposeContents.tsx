@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box, Center, LinkBox, LinkOverlay, Stack } from "@chakra-ui/react";
 import { ProfilesIcon } from "@parallel/chakra/icons";
+import { Text } from "@parallel/components/ui";
 import {
   PetitionComposeContents_PetitionFieldFragment,
   PetitionComposeContents_PetitionFieldFragmentDoc,
@@ -17,7 +18,6 @@ import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { CopyLiquidReferenceButton } from "../petition-common/CopyLiquidReferenceButton";
 import { MoreLiquidReferencesButton } from "../petition-common/MoreLiquidReferencesButton";
 import { useAddAliasToFieldDialog } from "../petition-common/dialogs/AddAliasToFieldDialog";
-import { Text } from "@parallel/components/ui";
 
 export interface PetitionComposeContentsProps<
   T extends PetitionComposeContents_PetitionFieldFragment,

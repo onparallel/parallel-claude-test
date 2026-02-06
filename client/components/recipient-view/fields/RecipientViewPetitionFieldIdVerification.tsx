@@ -1,4 +1,4 @@
-import { Box, Button, Center, Flex, HStack, Progress, Stack } from "@chakra-ui/react";
+import { Box, Center, Flex, HStack, Progress, Stack } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import {
   AlertCircleIcon,
@@ -10,6 +10,7 @@ import {
 import { DateTime } from "@parallel/components/common/DateTime";
 import { useTone } from "@parallel/components/common/ToneProvider";
 import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-common/alerts/RestrictedPetitionFieldAlert";
+import { Button, Text } from "@parallel/components/ui";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { FORMATS } from "@parallel/utils/dates";
 import { centeredPopup, isWindowBlockedError, openNewWindow } from "@parallel/utils/openNewWindow";
@@ -25,7 +26,6 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
   RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
-import { Text } from "@parallel/components/ui";
 
 export interface RecipientViewPetitionFieldIdVerificationProps
   extends Omit<
@@ -203,7 +203,7 @@ export function RecipientViewPetitionFieldIdVerification({
               <Button
                 variant="outline"
                 onClick={handleStart}
-                isDisabled={isDisabled || hasIdVerificationFeature === false}
+                disabled={isDisabled || hasIdVerificationFeature === false}
                 outlineColor={isInvalid ? "red.500" : undefined}
                 id={`reply-${field.id}${parentReplyId ? `-${parentReplyId}` : ""}-new`}
               >
@@ -240,9 +240,7 @@ export function RecipientViewPetitionFieldIdVerification({
                 <Button
                   variant="link"
                   onClick={handleStartAgain}
-                  isDisabled={
-                    allRepliesApproved || isDisabled || hasIdVerificationFeature === false
-                  }
+                  disabled={allRepliesApproved || isDisabled || hasIdVerificationFeature === false}
                 >
                   <FormattedMessage
                     id="component.recipient-view-petition-field-id-verification.start-again"

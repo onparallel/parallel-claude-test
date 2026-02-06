@@ -1,9 +1,10 @@
-import { Box, Button, Center, Flex, IconButton, Spinner, Stack } from "@chakra-ui/react";
+import { Box, Center, Flex, IconButton, Spinner, Stack } from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@parallel/chakra/icons";
 import { WithChakraProps } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { Table, TableProps } from "@parallel/components/common/Table";
+import { Button } from "@parallel/components/ui";
 import { ComponentType, PropsWithChildren, ReactNode, useEffect, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ScrollTableContainer } from "./ScrollTableContainer";

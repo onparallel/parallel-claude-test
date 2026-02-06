@@ -1,8 +1,9 @@
-import { Box, Button, HStack } from "@chakra-ui/react";
+import { Box, HStack } from "@chakra-ui/react";
 import { RepeatIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { Spacer } from "@parallel/components/common/Spacer";
+import { Button } from "@parallel/components/ui";
 import { QueryStateOf, SetQueryState } from "@parallel/utils/queryState";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
@@ -65,7 +66,7 @@ export function ProfileTypesListHeader({
       {onCreateType ? (
         <>
           <Spacer />
-          <Button colorScheme="primary" onClick={onCreateType}>
+          <Button colorPalette="primary" onClick={onCreateType}>
             <FormattedMessage
               id="component.profile-types-table.new-type"
               defaultMessage="New type"

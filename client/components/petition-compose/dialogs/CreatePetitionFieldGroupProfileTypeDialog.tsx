@@ -1,11 +1,12 @@
 import { gql } from "@apollo/client";
 import { useLazyQuery } from "@apollo/client/react";
-import { Button, FormControl, HStack, Input, Stack } from "@chakra-ui/react";
+import { FormControl, HStack, Input, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
   useWizardDialog,
   WizardStepDialogProps,
 } from "@parallel/components/common/dialogs/WizardDialog";
+import { Button } from "@parallel/components/ui";
 import {
   CreatePetitionFieldInput,
   PetitionFieldType,
@@ -240,10 +241,10 @@ function CreatePetitionFieldGroupProfileTypeDialogGroupName({
                     key={suggestion.id}
                     variant="outline"
                     size="xs"
-                    colorScheme="purple"
+                    colorPalette="purple"
                     fontWeight={400}
                     fontSize="sm"
-                    isDisabled={isLoading}
+                    disabled={isLoading}
                     onClick={() => {
                       setValue("name", suggestion.name, { shouldValidate: true });
                       onSubmit();
@@ -257,7 +258,7 @@ function CreatePetitionFieldGroupProfileTypeDialogGroupName({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="primary" isLoading={isLoading}>
+        <Button type="submit" colorPalette="primary" loading={isLoading}>
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }

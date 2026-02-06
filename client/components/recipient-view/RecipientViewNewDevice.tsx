@@ -1,10 +1,11 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Button, Center, Heading, Image, ScaleFade, Stack } from "@chakra-ui/react";
+import { Box, Center, Heading, Image, ScaleFade, Stack } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
 import { RecipientViewPinForm } from "@parallel/components/recipient-view/RecipientViewPinForm";
+import { Button, Text } from "@parallel/components/ui";
 import {
   RecipientViewNewDevice_publicCheckVerificationCodeDocument,
   RecipientViewNewDevice_PublicOrganizationFragment,
@@ -18,7 +19,6 @@ import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
 import { useTone } from "../common/ToneProvider";
-import { Text } from "@parallel/components/ui";
 
 type RecipientViewNewDeviceState =
   | { step: "REQUEST" }
@@ -164,8 +164,8 @@ export function RecipientViewNewDevice({ organization, email }: RecipientViewNew
         {state.step === "REQUEST" ? (
           <Center>
             <Button
-              colorScheme="primary"
-              isLoading={isSendingCode}
+              colorPalette="primary"
+              loading={isSendingCode}
               onClick={handleSendVerificationCode}
               data-testid="send-verification-code-button"
             >

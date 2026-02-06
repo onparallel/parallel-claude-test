@@ -2,9 +2,9 @@ import { Center, HStack, LinkBox, LinkOverlay, Stack } from "@chakra-ui/react";
 import { ChevronRightIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { NakedLink } from "@parallel/components/common/Link";
+import { Text } from "@parallel/components/ui";
 import { ReactNode } from "react";
 import { Card } from "../common/Card";
-import { Text } from "@parallel/components/ui";
 
 export interface IntegrationLinkCardProps {
   logo: ReactNode | null;

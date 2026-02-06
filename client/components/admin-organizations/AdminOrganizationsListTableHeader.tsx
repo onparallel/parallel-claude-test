@@ -1,5 +1,6 @@
-import { Box, Button, Stack } from "@chakra-ui/react";
+import { Box, Stack } from "@chakra-ui/react";
 import { RepeatIcon } from "@parallel/chakra/icons";
+import { Button } from "@parallel/components/ui";
 import { useEffect, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -47,7 +48,7 @@ export function AdminOrganizationsListTableHeader({
       </Box>
       <Spacer />
       <Box>
-        <Button colorScheme="primary" onClick={onCreateClick}>
+        <Button colorPalette="primary" onClick={onCreateClick}>
           <FormattedMessage
             id="component.admin-organizations-list-table-header.create-organization"
             defaultMessage="Create organization"

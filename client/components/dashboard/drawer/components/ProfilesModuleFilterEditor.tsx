@@ -1,11 +1,12 @@
 import { gql } from "@apollo/client";
-import { Box, Button, FormControl, FormErrorMessage, Grid, HStack, Stack } from "@chakra-ui/react";
+import { Box, FormControl, FormErrorMessage, Grid, HStack, Stack } from "@chakra-ui/react";
 import { AddIcon, CloseIcon, PlusCircleFilledIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { MultiCheckboxSimpleSelect } from "@parallel/components/common/MultiCheckboxSimpleSelect";
 import { ProfileQueryFilterSubjectSelect } from "@parallel/components/common/ProfileQueryFilterSubjectSelect";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { Spacer } from "@parallel/components/common/Spacer";
+import { Button, Text } from "@parallel/components/ui";
 import {
   ProfileQueryFilterInput,
   ProfileQueryFilterProperty,
@@ -22,7 +23,6 @@ import { Controller, get, useFieldArray, useFormContext } from "react-hook-form"
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { DashboardModuleFilterContainer } from "./DashboardModuleFilterContainer";
-import { Text } from "@parallel/components/ui";
 
 const MAX_GROUP_DEPTH = 2;
 
@@ -240,7 +240,7 @@ function FilterGroupComponent({
         <HStack>
           {depth < MAX_GROUP_DEPTH ? (
             <Button
-              isDisabled={fields.length >= 5 || isDisabled}
+              disabled={fields.length >= 5 || isDisabled}
               variant="outline"
               leftIcon={<AddIcon boxSize={3} />}
               size="sm"
@@ -255,7 +255,7 @@ function FilterGroupComponent({
           ) : null}
 
           <Button
-            isDisabled={fields.length >= 5 || isDisabled}
+            disabled={fields.length >= 5 || isDisabled}
             variant="outline"
             leftIcon={<PlusCircleFilledIcon color="primary.500" boxSize={5} />}
             size="sm"

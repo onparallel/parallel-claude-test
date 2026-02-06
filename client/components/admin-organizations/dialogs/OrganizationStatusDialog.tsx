@@ -1,13 +1,13 @@
-import { Button, FormControl, FormLabel } from "@chakra-ui/react";
+import { FormControl, FormLabel } from "@chakra-ui/react";
 import { Select } from "@parallel/chakra/components";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import { OrganizationStatus } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 interface OrganizationStatusDialogData {
   status: OrganizationStatus;
@@ -77,7 +77,7 @@ function OrganizationStatusDialog({
         </FormControl>
       }
       confirm={
-        <Button type="submit" colorScheme="primary" variant="solid">
+        <Button type="submit" colorPalette="primary" variant="solid">
           <FormattedMessage id="generic.save" defaultMessage="Save" />
         </Button>
       }

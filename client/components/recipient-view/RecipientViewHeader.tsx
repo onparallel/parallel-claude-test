@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import {
   Box,
-  Button,
   HStack,
   Img,
   PopoverArrow,
@@ -14,6 +13,7 @@ import { Popover } from "@parallel/chakra/components";
 import { CloudOkIcon, DownloadIcon, HelpOutlineIcon, UserArrowIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Logo } from "@parallel/components/common/Logo";
+import { Button, Text } from "@parallel/components/ui";
 import { RecipientViewHeader_PublicPetitionAccessFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { usePublicPrintPdfTask } from "@parallel/utils/tasks/usePublicPrintPdfTask";
@@ -27,7 +27,6 @@ import { useLastSaved } from "./LastSavedProvider";
 import { RecipientViewMenuButton } from "./RecipientViewMenuButton";
 import { useRecipientViewHelpDialog } from "./dialogs/RecipientViewHelpDialog";
 import { useDelegateAccess } from "./hooks/useDelegateAccess";
-import { Text } from "@parallel/components/ui";
 
 interface RecipientViewHeaderProps {
   access: RecipientViewHeader_PublicPetitionAccessFragment;
@@ -173,9 +172,9 @@ export const RecipientViewHeader = chakraForwardRef<"section", RecipientViewHead
               <Button
                 data-testid="recipient-view-finalize-button"
                 data-action="finalize"
-                colorScheme="primary"
+                colorPalette="primary"
                 onClick={onFinalize}
-                isDisabled={isClosed}
+                disabled={isClosed}
               >
                 {canFinalize ? (
                   hasSignature ? (
@@ -207,7 +206,7 @@ export const RecipientViewHeader = chakraForwardRef<"section", RecipientViewHead
           <HStack display={{ base: "none", md: "flex" }} spacing={0} gap={2}>
             <Button
               leftIcon={<UserArrowIcon />}
-              colorScheme="primary"
+              colorPalette="primary"
               variant="outline"
               onClick={handleDelegateAccess}
             >

@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 import {
   Box,
-  Button,
   Center,
   ModalBody,
   ModalContent,
@@ -23,6 +22,7 @@ import {
   CuatrecasasExportError,
   useCuatrecasasExport,
 } from "@parallel/components/petition-common/useCuatrecasasExport";
+import { Button, Text } from "@parallel/components/ui";
 import { ExportRepliesProgressDialog_petitionDocument } from "@parallel/graphql/__types";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { withError } from "@parallel/utils/promises/withError";
@@ -31,7 +31,6 @@ import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { pick } from "remeda";
 import { useExportFailedDialog } from "./ExportFailedDialog";
-import { Text } from "@parallel/components/ui";
 
 export interface ExportRepliesProgressDialogProps {
   externalClientId: string;
@@ -241,7 +240,7 @@ export function ExportRepliesProgressDialog({
                   defaultMessage="Your files have been exported successfully."
                 />
               </Text>
-              <Button colorScheme="primary" onClick={() => props.onResolve()}>
+              <Button colorPalette="primary" onClick={() => props.onResolve()}>
                 <FormattedMessage id="generic.continue" defaultMessage="Continue" />
               </Button>
             </Stack>

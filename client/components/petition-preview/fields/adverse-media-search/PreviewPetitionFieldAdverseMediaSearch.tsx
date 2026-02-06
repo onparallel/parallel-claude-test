@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Center, Flex, HStack, List, Progress, Stack } from "@chakra-ui/react";
+import { Box, Center, Flex, HStack, List, Progress, Stack } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import {
   BookOpenIcon,
@@ -19,6 +19,7 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
   RecipientViewPetitionFieldLayoutProps,
 } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldLayout";
+import { Button, Text } from "@parallel/components/ui";
 import {
   AdverseMediaArticle,
   AdverseMediaSearchTermInput,
@@ -34,7 +35,6 @@ import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, zip } from "remeda";
 import { useConfirmDeleteAdverseMediaSearchDialog } from "../../dialogs/ConfirmDeleteAdverseMediaSearchDialog";
-import { Text } from "@parallel/components/ui";
 
 export interface PreviewPetitionFieldAdverseMediaSearchProps
   extends Omit<
@@ -293,7 +293,7 @@ export function PreviewPetitionFieldAdverseMediaSearch({
       <Button
         variant="outline"
         onClick={handleStart}
-        isDisabled={
+        disabled={
           isDisabled ||
           state === "FETCHING" ||
           !hasAdverseMediaSearchFeatureFlag ||
@@ -457,7 +457,7 @@ export function AdverseMediaSearchReply({
       ) : null}
 
       <IconButtonWithTooltip
-        isDisabled={isViewDisabled}
+        disabled={isViewDisabled}
         onClick={() => {
           onViewReply?.(reply);
         }}
@@ -473,7 +473,7 @@ export function AdverseMediaSearchReply({
 
       {onRemove !== undefined ? (
         <IconButtonWithTooltip
-          isDisabled={isDisabled || reply.status === "APPROVED"}
+          disabled={isDisabled || reply.status === "APPROVED"}
           onClick={onRemove}
           variant="ghost"
           icon={<DeleteIcon />}
@@ -551,7 +551,7 @@ export function AdverseMediaSearchArticle({
       </Box>
 
       <IconButtonWithTooltip
-        isDisabled={isViewDisabled}
+        disabled={isViewDisabled}
         onClick={onViewArticle}
         variant="ghost"
         icon={<EyeIcon />}

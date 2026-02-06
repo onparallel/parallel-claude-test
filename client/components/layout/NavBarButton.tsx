@@ -1,4 +1,5 @@
-import { Button, ButtonOptions, Center, ThemingProps } from "@chakra-ui/react";
+import { ButtonOptions, Center, ThemingProps } from "@chakra-ui/react";
+import { Button } from "@parallel/components/ui";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { ReactElement, ReactNode } from "react";
 import { OverflownText } from "../common/OverflownText";

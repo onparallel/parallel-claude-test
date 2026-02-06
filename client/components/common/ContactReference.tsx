@@ -2,12 +2,12 @@ import { gql } from "@apollo/client";
 import { SystemStyleObject } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Text } from "@parallel/components/ui";
 import { ContactReference_ContactFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { isNonNullish } from "remeda";
 import { DeletedContact } from "./DeletedContact";
 import { Link } from "./Link";
-import { Text } from "@parallel/components/ui";
 
 export const ContactReference = chakraForwardRef<
   "a" | "span",

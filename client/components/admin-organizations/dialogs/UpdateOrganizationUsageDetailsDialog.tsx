@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Button,
   Checkbox,
   FormLabel,
   Grid,
@@ -17,6 +16,7 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
+import { Button, Text } from "@parallel/components/ui";
 import { UpdateOrganizationUsageDetailsDialog_OrganizationUsageLimitFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { add, Duration } from "date-fns";
@@ -24,7 +24,6 @@ import { ReactNode, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedDate, FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 interface UpdateOrganizationUsageDetailsDialogProps {
   header: ReactNode;
@@ -301,7 +300,7 @@ export function UpdateOrganizationUsageDetailsDialog({
                 />
               </GridItem>
               <GridItem colSpan={3}>
-                <Checkbox {...register("startNewPeriod")} isDisabled={!usageDetails}>
+                <Checkbox {...register("startNewPeriod")} disabled={!usageDetails}>
                   <HStack alignItems="center">
                     <FormattedMessage
                       id="component.update-organization-usage-details-dialog.start-new-period-label"
@@ -391,7 +390,7 @@ export function UpdateOrganizationUsageDetailsDialog({
         </Grid>
       }
       confirm={
-        <Button colorScheme="primary" type="submit" isDisabled={!isDirty && !!usageDetails}>
+        <Button colorPalette="primary" type="submit" disabled={!isDirty && !!usageDetails}>
           <FormattedMessage id="generic.update" defaultMessage="Update" />
         </Button>
       }

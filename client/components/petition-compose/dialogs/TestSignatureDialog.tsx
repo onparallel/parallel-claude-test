@@ -1,12 +1,12 @@
-import { Button, Checkbox, Stack } from "@chakra-ui/react";
+import { Checkbox, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import { SignatureOrgIntegrationEnvironment } from "@parallel/graphql/__types";
 import { useLocalStorage } from "@parallel/utils/useLocalStorage";
 import { useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 interface TestSignatureDialogData {
   dontShow: boolean;
@@ -56,7 +56,7 @@ function TestSignatureDialog({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="primary" variant="solid">
+        <Button type="submit" colorPalette="primary" variant="solid">
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }

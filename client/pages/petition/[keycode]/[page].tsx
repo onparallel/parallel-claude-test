@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
 import {
   Box,
-  Button,
   Center,
   Flex,
   HStack,
@@ -42,6 +41,7 @@ import {
 import { useRecipientViewReviewBeforeSignDialog } from "@parallel/components/recipient-view/dialogs/RecipientViewReviewBeforeSignDialog";
 import { useSignatureStatusDialog } from "@parallel/components/recipient-view/dialogs/SignatureStatusDialog";
 import { RecipientViewPetitionField } from "@parallel/components/recipient-view/fields/RecipientViewPetitionField";
+import { Button } from "@parallel/components/ui";
 import {
   RecipientView_accessDocument,
   RecipientView_accessesDocument,
@@ -409,9 +409,9 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
                         {pages.length === currentPage ? (
                           <Center paddingTop={4}>
                             <Button
-                              colorScheme="primary"
+                              colorPalette="primary"
                               onClick={handleFinalize}
-                              isDisabled={isClosed}
+                              disabled={isClosed}
                             >
                               {hasSignature ? (
                                 <FormattedMessage

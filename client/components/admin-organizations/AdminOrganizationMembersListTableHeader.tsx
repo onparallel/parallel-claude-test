@@ -1,10 +1,10 @@
-import { Badge, Box, Button, HStack, Stack } from "@chakra-ui/react";
+import { Badge, Box, HStack, Stack } from "@chakra-ui/react";
 import { RepeatIcon } from "@parallel/chakra/icons";
+import { Button, Text } from "@parallel/components/ui";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
-import { Text } from "@parallel/components/ui";
 
 export interface AdminOrganizationMembersListTableHeaderProps {
   search: string | null;
@@ -70,7 +70,7 @@ export function AdminOrganizationMembersListTableHeader({
             defaultMessage="Change limit"
           />
         </Button>
-        <Button colorScheme="primary" isDisabled={!canInviteUsers} onClick={onInviteClick}>
+        <Button colorPalette="primary" disabled={!canInviteUsers} onClick={onInviteClick}>
           <FormattedMessage id="generic.invite-user" defaultMessage="Invite user" />
         </Button>
       </HStack>

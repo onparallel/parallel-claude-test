@@ -1,15 +1,6 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import {
-  Box,
-  Button,
-  Center,
-  FormControl,
-  FormErrorMessage,
-  Grid,
-  Spinner,
-  Stack,
-} from "@chakra-ui/react";
+import { Box, Center, FormControl, FormErrorMessage, Grid, Spinner, Stack } from "@chakra-ui/react";
 import { PlusCircleIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
@@ -24,7 +15,7 @@ import {
   PetitionUpdateProfileOnCloseSourceSelect,
   PetitionUpdateProfileOnCloseSourceSelectOptionValue,
 } from "@parallel/components/petition-compose/PetitionUpdateProfileOnCloseSourceSelect";
-import { Input, Text } from "@parallel/components/ui";
+import { Button, Input, Text } from "@parallel/components/ui";
 import {
   ConfigureUpdateProfileOnCloseDialog_petitionDocument,
   ConfigureUpdateProfileOnCloseDialog_profileTypeDocument,
@@ -150,12 +141,12 @@ function ConfigureUpdateProfileOnCloseDialogLoading({
         </Center>
       }
       confirm={
-        <Button colorScheme="primary" isDisabled>
+        <Button colorPalette="primary" disabled>
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }
       cancel={
-        <Button isDisabled>
+        <Button disabled>
           <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
         </Button>
       }
@@ -297,7 +288,7 @@ function ConfigureUpdateProfileOnCloseDialogStep1({
               size="sm"
               fontWeight={400}
               onClick={handleAddUpdate}
-              isDisabled={fields.length >= MAX_UPDATES}
+              disabled={fields.length >= MAX_UPDATES}
             >
               <FormattedMessage
                 id="component.configure-update-profile-on-close-dialog.add-property-button"
@@ -308,7 +299,7 @@ function ConfigureUpdateProfileOnCloseDialogStep1({
         </Stack>
       }
       confirm={
-        <Button colorScheme="primary" type="submit">
+        <Button colorPalette="primary" type="submit">
           <FormattedMessage id="generic.save" defaultMessage="Save" />
         </Button>
       }
@@ -321,7 +312,7 @@ function ConfigureUpdateProfileOnCloseDialogStep1({
         isNonNullish(options?.updateProfileOnClose) ? (
           <Button
             type="submit"
-            colorScheme="red"
+            colorPalette="red"
             variant="outline"
             onClick={() => props.onReject("REMOVE_SETTING")}
           >
@@ -553,13 +544,13 @@ function UpdatePropertyCard({
       ) : null}
       <Box alignSelf="flex-end">
         <Button
-          colorScheme="red"
+          colorPalette="red"
           size="sm"
           fontSize="md"
           fontWeight={400}
           variant="ghost"
           onClick={onRemove}
-          isDisabled={fieldsLength === 1}
+          disabled={fieldsLength === 1}
         >
           <FormattedMessage
             id="component.configure-update-profile-on-close-dialog.remove-property-button"

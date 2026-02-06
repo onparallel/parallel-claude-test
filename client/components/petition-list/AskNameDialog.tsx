@@ -1,4 +1,5 @@
-import { Button, FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
+import { Button } from "@parallel/components/ui";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { isNotEmptyText } from "@parallel/utils/strings";
 import { ReactNode, useRef } from "react";
@@ -69,7 +70,7 @@ export function AskNameDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="primary" isDisabled={!isValid} type="submit">
+        <Button colorPalette="primary" disabled={!isValid} type="submit">
           {confirm}
         </Button>
       }

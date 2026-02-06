@@ -1,7 +1,8 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Badge, Button, HStack } from "@chakra-ui/react";
+import { Badge, HStack } from "@chakra-ui/react";
 import { AdminSettingsLayout } from "@parallel/components/layout/AdminSettingsLayout";
+import { Button } from "@parallel/components/ui";
 import {
   AdminOrganizationsLayout_OrganizationFragment,
   AdminOrganizationsLayout_QueryFragment,
@@ -103,9 +104,9 @@ export function AdminOrganizationsLayout({
             height="auto"
             padding={1}
             as={Button}
-            isDisabled={organization.status === "ROOT"}
+            disabled={organization.status === "ROOT"}
             onClick={handleChangeOrgStatus}
-            colorScheme={
+            colorPalette={
               (
                 {
                   DEV: "gray",

@@ -1,8 +1,9 @@
-import { Box, Button, Center, Flex, HStack, List, Stack } from "@chakra-ui/react";
+import { Box, Center, Flex, HStack, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon, FieldDateIcon } from "@parallel/chakra/icons";
 import { DateInput } from "@parallel/components/common/DateInput";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { TimezoneSelect } from "@parallel/components/common/TimezoneSelect";
+import { Button, Text } from "@parallel/components/ui";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { prettifyTimezone } from "@parallel/utils/dates";
 import { isMetaReturn } from "@parallel/utils/keys";
@@ -30,7 +31,6 @@ import {
   RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
-import { Text } from "@parallel/components/ui";
 
 interface FieldDateTimeReply {
   datetime: string;
@@ -406,7 +406,7 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
             </Box>
           ) : null}
           <IconButtonWithTooltip
-            isDisabled={isDisabled || reply.status === "APPROVED"}
+            disabled={isDisabled || reply.status === "APPROVED"}
             onClick={() => {
               debouncedUpdateReply.clear();
               onDelete();
@@ -436,7 +436,7 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
               size="sm"
               onClick={handleRestoreTimezoneDefaults}
               marginStart={2}
-              isDisabled={isDisabled || reply.status === "APPROVED"}
+              disabled={isDisabled || reply.status === "APPROVED"}
             >
               <FormattedMessage
                 id="component.recipient-view-petition-field-date-time.restore-defaults"
@@ -458,7 +458,7 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
               size="sm"
               onClick={() => setShowTimezone(true)}
               marginStart={1.5}
-              isDisabled={isDisabled || reply.status === "APPROVED"}
+              disabled={isDisabled || reply.status === "APPROVED"}
             >
               <FormattedMessage
                 id="component.recipient-view-petition-field-date-time.change-zone"

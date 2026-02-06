@@ -1,14 +1,6 @@
-import {
-  Box,
-  Button,
-  Center,
-  HStack,
-  HTMLChakraProps,
-  List,
-  ListItem,
-  Stack,
-} from "@chakra-ui/react";
+import { Box, Center, HStack, HTMLChakraProps, List, ListItem, Stack } from "@chakra-ui/react";
 import { DragHandleIcon, EyeIcon, EyeOffIcon } from "@parallel/chakra/icons";
+import { Button, Text } from "@parallel/components/ui";
 import { Reorder, useDragControls } from "framer-motion";
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -17,7 +9,6 @@ import { IconButtonWithTooltip } from "../IconButtonWithTooltip";
 import { TableColumn } from "../Table";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { DialogProps, useDialog } from "./DialogProvider";
-import { Text } from "@parallel/components/ui";
 
 interface ColumnVisibilityDialogProps<T extends string> {
   columns: TableColumn<any, any, any>[];
@@ -133,7 +124,7 @@ function ColumnVisibilityDialog<T extends string>({
                       .map((c) => c.key as T),
                   ])
                 }
-                isDisabled={notVisible.length === 0}
+                disabled={notVisible.length === 0}
               >
                 <FormattedMessage
                   id="component.column-visibility-dialog.show-all"
@@ -169,7 +160,7 @@ function ColumnVisibilityDialog<T extends string>({
         </Stack>
       }
       confirm={
-        <Button colorScheme="primary" onClick={() => props.onResolve(currentSelection)}>
+        <Button colorPalette="primary" onClick={() => props.onResolve(currentSelection)}>
           <FormattedMessage id="generic.apply" defaultMessage="Apply" />
         </Button>
       }

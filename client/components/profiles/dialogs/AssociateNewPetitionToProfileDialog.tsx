@@ -4,7 +4,6 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Button,
   Checkbox,
   FormControl,
   FormErrorMessage,
@@ -25,7 +24,7 @@ import { PetitionFieldReference } from "@parallel/components/common/PetitionFiel
 import { PetitionSelect, PetitionSelectInstance } from "@parallel/components/common/PetitionSelect";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import { usePreviewImportFromProfileFormatErrorDialog } from "@parallel/components/petition-preview/dialogs/PreviewImportFromProfileFormatErrorDialog";
-import { Text } from "@parallel/components/ui";
+import { Button, Text } from "@parallel/components/ui";
 import {
   CreatePetitionFromProfilePrefillInput,
   useAssociateNewPetitionToProfileDialog_createPetitionFromProfileDocument,
@@ -287,9 +286,9 @@ function AssociateNewPetitionToProfileDialogSelectTemplate({
       confirm={
         <Button
           type="submit"
-          colorScheme="primary"
-          isLoading={loading || creatingPetition}
-          isDisabled={!formState.isValid || (isFromKeyProcess && keyProcessTemplates.length === 0)}
+          colorPalette="primary"
+          loading={loading || creatingPetition}
+          disabled={!formState.isValid || (isFromKeyProcess && keyProcessTemplates.length === 0)}
         >
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
@@ -495,9 +494,9 @@ function AssociateNewPetitionToProfileDialogSelectFieldGroup({
       confirm={
         <Button
           type="submit"
-          colorScheme="primary"
-          isDisabled={!formState.isValid}
-          isLoading={creatingPetition}
+          colorPalette="primary"
+          disabled={!formState.isValid}
+          loading={creatingPetition}
         >
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
@@ -627,7 +626,7 @@ export function AssociateNewPetitionToProfileDialogPrefillFieldGroups({
         </Button>
       }
       confirm={
-        <Button colorScheme="primary" type="submit" isLoading={creatingPetition}>
+        <Button colorPalette="primary" type="submit" loading={creatingPetition}>
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }

@@ -1,7 +1,7 @@
-import { Button, Img, Stack } from "@chakra-ui/react";
+import { Img, Stack } from "@chakra-ui/react";
 import { Logo } from "@parallel/components/common/Logo";
+import { Button, Text } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 interface PublicPetitionEmailExistsProps {
   organizationName: string;
@@ -63,7 +63,7 @@ export function PublicPetitionEmailExists({
             size="md"
             fontSize="md"
             onClick={() => onNewPetition({ force: true })}
-            isLoading={isNewRequestLoading}
+            loading={isNewRequestLoading}
           >
             <FormattedMessage
               id="public-petition-email-exists.new-petition-button"
@@ -72,11 +72,11 @@ export function PublicPetitionEmailExists({
           </Button>
           <Button
             width="100%"
-            colorScheme="primary"
+            colorPalette="primary"
             size="md"
             fontSize="md"
             onClick={onContinue}
-            isLoading={isReminderLoading}
+            loading={isReminderLoading}
           >
             <FormattedMessage
               id="public-petition-email-exists.continue-existing-button"

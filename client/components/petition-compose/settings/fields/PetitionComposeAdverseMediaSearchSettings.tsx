@@ -2,13 +2,13 @@ import { gql } from "@apollo/client";
 import { HStack } from "@chakra-ui/react";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { isDialogError } from "@parallel/components/common/dialogs/DialogProvider";
+import { Text } from "@parallel/components/ui";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";
 import { useConfigureAdverseMediaAutomateSearchDialog } from "../../dialogs/ConfigureAdverseMediaAutomateSearchDialog";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { SettingsRowButton } from "../rows/SettingsRowButton";
-import { Text } from "@parallel/components/ui";
 
 export function PetitionComposeAdverseMediaSearchSettings({
   petition,

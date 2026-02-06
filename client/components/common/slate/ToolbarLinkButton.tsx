@@ -1,6 +1,7 @@
-import { Button, FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
 import { LinkIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Button } from "@parallel/components/ui";
 import { getPreventDefaultHandler } from "@parallel/utils/events";
 import { withError } from "@parallel/utils/promises/withError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
@@ -175,7 +176,7 @@ function AddLinkDialog({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="primary">
+        <Button type="submit" colorPalette="primary">
           <FormattedMessage id="generic.done" defaultMessage="Done" />
         </Button>
       }

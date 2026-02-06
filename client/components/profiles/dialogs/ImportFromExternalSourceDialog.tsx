@@ -5,7 +5,6 @@ import {
   AlertDescription,
   AlertIcon,
   Box,
-  Button,
   Center,
   FormControl,
   FormErrorMessage,
@@ -44,6 +43,7 @@ import { SelectableTd, SelectableTr } from "@parallel/components/common/Selectab
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { SupportLink } from "@parallel/components/common/SupportLink";
+import { Button, Text } from "@parallel/components/ui";
 import {
   ImportFromExternalSourceDialog_completeProfileFromExternalSourceDocument,
   ImportFromExternalSourceDialog_integrationsDocument,
@@ -67,7 +67,6 @@ import { PropsWithChildren, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { entries, fromEntries, isNonNullish, isTruthy, map, pipe } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 type ImportFromExternalSourceDialogResult = {
   profileId: string;
@@ -207,7 +206,7 @@ function ImportFromExternalSourceDialogSelectSource({
             rules={{ required: true }}
             render={({ field }) => (
               <SimpleSelect
-                isDisabled={noIntegrations}
+                disabled={noIntegrations}
                 placeholder={intl.formatMessage({
                   id: "component.import-from-external-source-dialog.header",
                   defaultMessage: "Select an external data source",
@@ -231,7 +230,7 @@ function ImportFromExternalSourceDialogSelectSource({
         </Button>
       }
       confirm={
-        <Button type="submit" isDisabled={!formState.isValid} colorScheme="primary">
+        <Button type="submit" disabled={!formState.isValid} colorPalette="primary">
           <FormattedMessage id="generic.next-button" defaultMessage="Next" />
         </Button>
       }
@@ -394,7 +393,7 @@ function ImportFromExternalSourceDialogSearch({
         </Button>
       }
       confirm={
-        <Button type="submit" colorScheme="primary" isDisabled={loading} isLoading={loading}>
+        <Button type="submit" colorPalette="primary" disabled={loading} loading={loading}>
           <FormattedMessage id="generic.next-button" defaultMessage="Next" />
         </Button>
       }
@@ -553,7 +552,7 @@ function ImportFromExternalSourceDialogSearchResults({
         </Button>
       }
       confirm={
-        <Button type="submit" colorScheme="primary" isDisabled={loading} isLoading={loading}>
+        <Button type="submit" colorPalette="primary" disabled={loading} loading={loading}>
           <FormattedMessage id="generic.next-button" defaultMessage="Next" />
         </Button>
       }
@@ -939,9 +938,9 @@ function ImportFromExternalSourceDialogUpdateProfile({
         <Button
           ref={confirmRef}
           type="submit"
-          colorScheme="primary"
-          isDisabled={loading}
-          isLoading={loading}
+          colorPalette="primary"
+          disabled={loading}
+          loading={loading}
         >
           <FormattedMessage
             id="component.import-from-external-source-dialog.update-profile-button"

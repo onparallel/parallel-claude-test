@@ -1,14 +1,14 @@
-import { Button, FormControl, FormLabel, Input, Stack } from "@chakra-ui/react";
+import { FormControl, FormLabel, Input, Stack } from "@chakra-ui/react";
 import {
   ConfirmDialog,
   ConfirmDialogProps,
 } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { ReactNode, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export interface ConfirmDeleteDialogProps
   extends Omit<ConfirmDialogProps<void>, "body" | "confirm"> {
@@ -76,7 +76,7 @@ function ConfirmDeleteDialog({
       }
       confirm={
         confirm ?? (
-          <Button colorScheme="red" type="submit">
+          <Button colorPalette="red" type="submit">
             <FormattedMessage id="generic.confirm-delete-button" defaultMessage="Yes, delete" />
           </Button>
         )

@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
-import { Alert, AlertDescription, AlertIcon, Button, HStack, Stack } from "@chakra-ui/react";
+import { Alert, AlertDescription, AlertIcon, HStack, Stack } from "@chakra-ui/react";
+import { Button, Text } from "@parallel/components/ui";
 import { AppSumoLicenseAlert_OrgLicenseFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { SupportButton } from "./SupportButton";
-import { Text } from "@parallel/components/ui";
 
 interface AppSumoLicenseAlertProps {
   license: AppSumoLicenseAlert_OrgLicenseFragment;
@@ -65,7 +65,7 @@ export function AppSumoLicenseAlert({ license }: AppSumoLicenseAlertProps) {
             rel="noopener"
             target="_blank"
             variant="outline"
-            colorScheme="blue"
+            colorPalette="blue"
             backgroundColor="white"
           >
             <FormattedMessage id="generic.upgrade" defaultMessage="Upgrade" />

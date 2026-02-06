@@ -12,6 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { AppWindowIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Text } from "@parallel/components/ui";
 import {
   PetitionLocale,
   PetitionTemplateCompletingMessageCard_PetitionTemplateFragment,
@@ -28,7 +29,6 @@ import { CloseableAlert } from "../common/CloseableAlert";
 import { HelpPopover } from "../common/HelpPopover";
 import { PaddedCollapse } from "../common/PaddedCollapse";
 import { RichTextEditor } from "../common/slate/RichTextEditor";
-import { Text } from "@parallel/components/ui";
 
 interface PetitionTemplateCompletingMessageCardProps {
   petition: PetitionTemplateCompletingMessageCard_PetitionTemplateFragment;

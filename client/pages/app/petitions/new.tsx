@@ -316,7 +316,7 @@ function NewPetition() {
                 colorScheme="primary"
                 alignSelf="flex-end"
                 icon={<AddIcon fontSize={{ base: "16px", md: "12px" }} />}
-                isDisabled={!canCreateTemplate}
+                disabled={!canCreateTemplate}
                 label={intl.formatMessage({
                   id: "generic.create-template",
                   defaultMessage: "Create template",

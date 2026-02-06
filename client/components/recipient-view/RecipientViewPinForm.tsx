@@ -1,8 +1,8 @@
-import { Button, Flex, HStack } from "@chakra-ui/react";
+import { Flex, HStack } from "@chakra-ui/react";
+import { Button, Text } from "@parallel/components/ui";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { PinInput } from "../ui";
-import { Text } from "@parallel/components/ui";
 
 interface RecipientViewPinFormProps {
   onSubmit: (code: string) => void;
@@ -71,9 +71,9 @@ export function RecipientViewPinForm({
       ) : null}
       <Button
         type="submit"
-        colorScheme="primary"
-        isLoading={isLoading}
-        isDisabled={code.length < 6}
+        colorPalette="primary"
+        loading={isLoading}
+        disabled={code.length < 6}
         marginTop={4}
         data-testid="pin-input-verify-button"
       >

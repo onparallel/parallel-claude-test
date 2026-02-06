@@ -1,10 +1,11 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Button, Stack } from "@chakra-ui/react";
+import { Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { PathName } from "@parallel/components/common/PathName";
 import { PetitionNameWithPath } from "@parallel/components/common/PetitionNameWithPath";
+import { Button, Text } from "@parallel/components/ui";
 import {
   PetitionBaseType,
   useRecoverPetition_PetitionBaseOrFolderFragment,
@@ -13,7 +14,6 @@ import {
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { partitionOnTypename } from "../apollo/typename";
-import { Text } from "@parallel/components/ui";
 
 export function useRecoverPetition() {
   const showRecoverPetitionDialog = useRecoverPetitionDialog();
@@ -218,7 +218,7 @@ function RecoverPetitionDialog({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="primary">
+        <Button type="submit" colorPalette="primary">
           <FormattedMessage id="generic.recover" defaultMessage="Recover" />
         </Button>
       }

@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import {
   AlertDescription,
   AlertIcon,
-  Button,
   Center,
   Circle,
   Flex,
@@ -10,6 +9,7 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Button } from "@parallel/components/ui";
 import { AppLayout_QueryFragment } from "@parallel/graphql/__types";
 import { useCheckForNewVersion } from "@parallel/utils/useCheckForNewVersion";
 import { useCookie } from "@parallel/utils/useCookie";
@@ -244,7 +244,7 @@ export const AppLayout = chakraForwardRef<"div", AppLayoutProps>(function AppLay
                   </AlertDescription>
                   <Button
                     variant="outline"
-                    colorScheme="blue"
+                    colorPalette="blue"
                     backgroundColor="white"
                     size="sm"
                     marginX={2}

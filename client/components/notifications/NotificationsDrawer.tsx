@@ -1,7 +1,6 @@
 import { gql, NetworkStatus } from "@apollo/client";
 import { useApolloClient, useLazyQuery } from "@apollo/client/react";
 import {
-  Button,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
@@ -13,6 +12,7 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { BellIcon, EmailOpenedIcon } from "@parallel/chakra/icons";
+import { Button, Text } from "@parallel/components/ui";
 import {
   NotificationsDrawer_notificationsDocument,
   PetitionUserNotificationFilter,
@@ -26,7 +26,6 @@ import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { NotificationsFilterSelect } from "./NotificationsFilterSelect";
 import { NotificationsList } from "./NotificationsList";
-import { Text } from "@parallel/components/ui";
 
 const NOTIFICATIONS_LIMIT = 16;
 const POLL_INTERVAL = 30_000;
@@ -182,7 +181,7 @@ export function NotificationsDrawer() {
             >
               <Button
                 variant="outline"
-                colorScheme="primary"
+                colorPalette="primary"
                 border="none"
                 width="100%"
                 height="48px"

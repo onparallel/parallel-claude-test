@@ -1,15 +1,15 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import { Button, List, ListItem, Stack } from "@chakra-ui/react";
+import { List, ListItem, Stack } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { ProfileTypeFieldReference } from "@parallel/components/common/ProfileTypeFieldReference";
+import { Button, Text } from "@parallel/components/ui";
 import { PreviewImportFromProfileFormatErrorDialog_profilesDocument } from "@parallel/graphql/__types";
 import { useRef } from "react";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish, unique, uniqueBy } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 export interface PreviewImportFromProfileFormatErrorDialogProps {
   profileTypeId: string;
@@ -80,7 +80,7 @@ export function PreviewImportFromProfileFormatErrorDialog({
       confirm={
         <Button
           ref={focusRef}
-          colorScheme="primary"
+          colorPalette="primary"
           minWidth={24}
           onClick={() => props.onResolve()}
         >

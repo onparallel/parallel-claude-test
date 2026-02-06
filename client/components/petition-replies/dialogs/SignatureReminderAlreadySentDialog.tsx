@@ -1,7 +1,7 @@
-import { Button } from "@chakra-ui/react";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button } from "@parallel/components/ui";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 
@@ -32,7 +32,7 @@ function SignatureReminderAlreadySentDialog({
       cancel={<></>}
       confirm={
         <Button
-          colorScheme="primary"
+          colorPalette="primary"
           onClick={() => {
             props.onResolve();
           }}

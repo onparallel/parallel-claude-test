@@ -1,8 +1,8 @@
-import { Button, Stack } from "@chakra-ui/react";
+import { Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 function ConfirmResendInvitationDialog({ fullName, ...props }: DialogProps<{ fullName: string }>) {
   return (
@@ -45,7 +45,7 @@ function ConfirmResendInvitationDialog({ fullName, ...props }: DialogProps<{ ful
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="primary">
+        <Button type="submit" colorPalette="primary">
           <FormattedMessage id="generic.confirm-send" defaultMessage="Yes, send" />
         </Button>
       }

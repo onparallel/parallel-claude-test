@@ -1,6 +1,7 @@
-import { Box, Button, Flex, HStack, List, Progress, Stack } from "@chakra-ui/react";
+import { Box, Flex, HStack, List, Progress, Stack } from "@chakra-ui/react";
 import { ExclamationOutlineIcon } from "@parallel/chakra/icons";
 import { useTone } from "@parallel/components/common/ToneProvider";
+import { Button, Text } from "@parallel/components/ui";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { centeredPopup, isWindowBlockedError, openNewWindow } from "@parallel/utils/openNewWindow";
@@ -18,7 +19,6 @@ import {
   RecipientViewPetitionFieldLayout,
   RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
-import { Text } from "@parallel/components/ui";
 
 export interface RecipientViewPetitionFieldTaxDocumentsProps
   extends Omit<
@@ -307,7 +307,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
             variant="outline"
             width="min-content"
             onClick={handleRetryRequest}
-            isDisabled={isDisabled || state === "FETCHING"}
+            disabled={isDisabled || state === "FETCHING"}
           >
             <FormattedMessage
               id="component.recipient-view-petition-field-tax-documents.retry-button"
@@ -319,7 +319,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
             variant="outline"
             width="min-content"
             onClick={handleStart}
-            isDisabled={state === "FETCHING" || isDisabled}
+            disabled={state === "FETCHING" || isDisabled}
             outlineColor={state !== "FETCHING" && isInvalid ? "red.500" : undefined}
             id={`reply-${field.id}${parentReplyId ? `-${parentReplyId}` : ""}-new`}
           >

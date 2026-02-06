@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Button,
   Checkbox,
   FormControl,
   FormErrorMessage,
@@ -17,12 +16,12 @@ import {
   UserSelectInstance,
   UserSelectSelection,
 } from "@parallel/components/common/UserSelect";
+import { Button, Text } from "@parallel/components/ui";
 import { useConfirmDeactivateUserDialog_UserFragment } from "@parallel/graphql/__types";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 interface ConfirmDeactivateUserDialogData {
   userId: string;
@@ -210,14 +209,14 @@ function ConfirmDeactivateUserDialog({
       }
       confirm={
         showTransferText ? (
-          <Button type="submit" colorScheme="primary">
+          <Button type="submit" colorPalette="primary">
             <FormattedMessage
               id="component.confirm-deactivate-user-dialog.transfer"
               defaultMessage="Transfer"
             />
           </Button>
         ) : (
-          <Button type="submit" colorScheme="red">
+          <Button type="submit" colorPalette="red">
             <FormattedMessage
               id="petition.confirm-deactivate-users.confirm"
               defaultMessage="Deactivate {count, plural, =1{user} other {users}}"

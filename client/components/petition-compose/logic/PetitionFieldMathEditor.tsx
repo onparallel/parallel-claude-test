@@ -1,17 +1,8 @@
 import { gql } from "@apollo/client";
-import {
-  Badge,
-  Box,
-  Button,
-  Center,
-  Flex,
-  Grid,
-  HStack,
-  IconButton,
-  Stack,
-} from "@chakra-ui/react";
+import { Badge, Box, Center, Flex, Grid, HStack, IconButton, Stack } from "@chakra-ui/react";
 import { DeleteIcon, PlusCircleIcon } from "@parallel/chakra/icons";
 import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
+import { Button } from "@parallel/components/ui";
 import {
   PetitionFieldMathEditor_PetitionBaseFragment,
   PetitionFieldMathEditor_PetitionFieldFragment,
@@ -149,7 +140,7 @@ export function PetitionFieldMathEditor({
             onClick={() => {
               setMath((rows) => [...rows, getDefaultMath()]);
             }}
-            isDisabled={isReadOnly || math.length >= MAX_CALCULATIONS}
+            disabled={isReadOnly || math.length >= MAX_CALCULATIONS}
           >
             <FormattedMessage
               id="component.petition-field-math-editor.add-calculation"
@@ -453,7 +444,7 @@ function PetitionFieldMathRow({
           <Button
             fontWeight="normal"
             size="sm"
-            colorScheme="red"
+            colorPalette="red"
             alignSelf="start"
             onClick={onDelete}
             variant="ghost"

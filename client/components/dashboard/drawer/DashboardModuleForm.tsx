@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useApolloClient } from "@apollo/client/react";
 import {
   Box,
-  Button,
   DrawerBody,
   DrawerFooter,
   FormControl,
@@ -16,6 +15,7 @@ import {
   useRadioGroup,
 } from "@chakra-ui/react";
 import { ScrollShadows } from "@parallel/components/common/ScrollShadows";
+import { Button, Text } from "@parallel/components/ui";
 import {
   DashboardModuleForm_createCreatePetitionButtonDashboardModuleDocument,
   DashboardModuleForm_createPetitionsNumberDashboardModuleDocument,
@@ -54,7 +54,6 @@ import {
   defaultDashboardModulePetitionFilter,
   defaultDashboardModuleProfileFilter,
 } from "./utils/moduleUtils";
-import { Text } from "@parallel/components/ui";
 
 export interface DashboardModuleFormData {
   name: string | null;
@@ -340,7 +339,7 @@ export function DashboardModuleForm({
         <Button variant="outline" onClick={isNonNullish(module) ? onClose : onBack} marginEnd={2}>
           <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
         </Button>
-        <Button colorScheme="primary" type="submit">
+        <Button colorPalette="primary" type="submit">
           <FormattedMessage id="generic.save" defaultMessage="Save" />
         </Button>
       </DrawerFooter>

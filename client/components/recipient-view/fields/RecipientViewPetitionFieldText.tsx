@@ -2,6 +2,7 @@ import { Center, Flex, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { Text } from "@parallel/components/ui";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { isMetaReturn } from "@parallel/utils/keys";
@@ -28,7 +29,6 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
-import { Text } from "@parallel/components/ui";
 
 export interface RecipientViewPetitionFieldTextProps
   extends Omit<
@@ -369,7 +369,7 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
         </Center>
       </Flex>
       <IconButtonWithTooltip
-        isDisabled={isDisabled || reply.status === "APPROVED"}
+        disabled={isDisabled || reply.status === "APPROVED"}
         onClick={() => {
           debouncedUpdateReply.clear();
           onDelete();

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Button, Center, Flex, Stack, useToast } from "@chakra-ui/react";
+import { Box, Center, Flex, Stack, useToast } from "@chakra-ui/react";
 import { ChevronRightIcon, EditSimpleIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { NakedLink } from "@parallel/components/common/Link";
@@ -37,6 +37,7 @@ import { RecipientViewPagination } from "@parallel/components/recipient-view/Rec
 import { RecipientViewProgressBar } from "@parallel/components/recipient-view/RecipientViewProgressBar";
 import { RecipientViewSidebarContextProvider } from "@parallel/components/recipient-view/RecipientViewSidebarContextProvider";
 import { RecipientViewRefreshRepliesAlert } from "@parallel/components/recipient-view/alerts/RecipientViewRefreshRepliesAlert";
+import { Button } from "@parallel/components/ui";
 import {
   PetitionPreview_PetitionBaseFragment,
   PetitionPreview_cancelSignatureRequestDocument,
@@ -577,7 +578,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                 id="petition-next"
                 colorScheme="primary"
                 icon={<PaperPlaneIcon fontSize="18px" />}
-                isDisabled={
+                disabled={
                   petition.isAnonymized ||
                   myEffectivePermission === "READ" ||
                   isNonNullish(petition.permanentDeletionAt)
@@ -594,7 +595,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                 id="petition-start-signature"
                 colorScheme="primary"
                 petition={petition}
-                isDisabled={
+                disabled={
                   petition.isAnonymized ||
                   myEffectivePermission === "READ" ||
                   isNonNullish(petition.permanentDeletionAt)
@@ -863,9 +864,9 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                     {pages.length === currentPage && isPetition ? (
                       <Center paddingTop={4}>
                         <Button
-                          colorScheme="primary"
+                          colorPalette="primary"
                           onClick={handleFinalize}
-                          isDisabled={
+                          disabled={
                             petition.isAnonymized ||
                             isClosed ||
                             myEffectivePermission === "READ" ||

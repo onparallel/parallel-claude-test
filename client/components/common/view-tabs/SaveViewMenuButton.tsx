@@ -1,16 +1,16 @@
 import {
-  Button,
+  chakra,
   Circle,
   MenuItem,
   MenuList,
   Portal,
-  chakra,
   useBreakpointValue,
   useMenuButton,
 } from "@chakra-ui/react";
 import { Menu, Tooltip } from "@parallel/chakra/components";
 import { ChevronDownIcon, SaveIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Button } from "@parallel/components/ui";
 import { ForwardedRef, forwardRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 

@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, Stack, useToast } from "@chakra-ui/react";
+import { Box, Flex, Stack, useToast } from "@chakra-ui/react";
 import { ChevronRightIcon, ImportIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { NakedLink } from "@parallel/components/common/Link";
@@ -21,6 +21,7 @@ import { RecipientViewPetitionFieldSelect } from "@parallel/components/recipient
 import { RecipientViewPetitionFieldShortText } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldShortText";
 import { RecipientViewPetitionFieldTaxDocuments } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldTaxDocuments";
 import { RecipientViewPetitionFieldText } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldText";
+import { Button, Text } from "@parallel/components/ui";
 import {
   CreatePetitionFromProfilePrefillInput,
   PreviewPetitionFieldGroup_PetitionBaseFragment,
@@ -49,7 +50,6 @@ import { PreviewPetitionFieldProfileSearch } from "./PreviewPetitionFieldProfile
 import { PreviewPetitionFieldUserAssignment } from "./PreviewPetitionFieldUserAssignment";
 import { PreviewPetitionFieldAdverseMediaSearch } from "./adverse-media-search/PreviewPetitionFieldAdverseMediaSearch";
 import { PreviewPetitionFieldBackgroundCheck } from "./background-check/PreviewPetitionFieldBackgroundCheck";
-import { Text } from "@parallel/components/ui";
 
 export interface PreviewPetitionFieldGroupProps
   extends Omit<
@@ -319,7 +319,7 @@ export function PreviewPetitionFieldGroup({
               backgroundColor="white"
               placement="bottom"
               color="gray.600"
-              isDisabled={!groupHasSomeReply}
+              disabled={!groupHasSomeReply}
               label={intl.formatMessage({
                 id: "component.preview-petition-field-group.review-reply",
                 defaultMessage: "Review reply",

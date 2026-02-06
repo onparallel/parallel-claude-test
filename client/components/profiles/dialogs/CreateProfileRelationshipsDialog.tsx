@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 import {
   Box,
-  Button,
   FormControl,
   FormErrorMessage,
   Grid,
@@ -21,6 +20,7 @@ import { ProfileRelationshipTypeWithDirectionSelect } from "@parallel/components
 import { ProfileSelect, ProfileSelectSelection } from "@parallel/components/common/ProfileSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import {
   CreateProfileRelationshipInput,
   useCreateProfileRelationshipsDialog_ProfileFragment,
@@ -30,7 +30,6 @@ import {
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { groupBy, isNonNullish, unique } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 interface CreateProfileRelationshipsDialogProps {
   profile: useCreateProfileRelationshipsDialog_ProfileFragment;
@@ -311,7 +310,7 @@ function CreateProfileRelationshipsDialog({
         </>
       }
       confirm={
-        <Button colorScheme="primary" type="submit">
+        <Button colorPalette="primary" type="submit">
           <FormattedMessage id="generic.add" defaultMessage="Add" />
         </Button>
       }
@@ -446,7 +445,7 @@ function ProfileRelationshipRow({
             id: "generic.remove",
             defaultMessage: "Remove",
           })}
-          isDisabled={!canRemove}
+          disabled={!canRemove}
         />
       )}
 

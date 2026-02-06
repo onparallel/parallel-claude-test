@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
   Box,
-  Button,
   Flex,
   Grid,
   Heading,
@@ -38,7 +37,7 @@ import { usePreviewPetitionFieldBackgroundCheckReplaceReplyDialog } from "@paral
 import { BackgroundCheckSearchDifferencesAlert } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckSearchDifferencesAlert";
 import { useBackgroundCheckContentsNotUpdatedDialog } from "@parallel/components/profiles/dialogs/BackgroundCheckContentsNotUpdatedDialog";
 import { useConfirmModifyBackgroundCheckSearch } from "@parallel/components/profiles/dialogs/ConfirmModifyBackgroundCheckSearchDialog";
-import { Text, Tooltip } from "@parallel/components/ui";
+import { Button, Text, Tooltip } from "@parallel/components/ui";
 import {
   BackgroundCheckEntitySearchType,
   BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchDocument,
@@ -548,7 +547,7 @@ function BackgroundCheckFieldSearchResults({
                   variant="outline"
                   fontWeight={500}
                   onClick={handleResetClick}
-                  isDisabled={query.readonly === "true" || isDisabled}
+                  disabled={query.readonly === "true" || isDisabled}
                 >
                   <FormattedMessage
                     id="component.background-check-search-result.modify-search"
@@ -566,7 +565,7 @@ function BackgroundCheckFieldSearchResults({
                       defaultMessage: "Save to profile",
                     })}
                     breakpoint="lg"
-                    isDisabled={isDisabled}
+                    disabled={isDisabled}
                   />
                 ) : (
                   <Button
@@ -575,7 +574,7 @@ function BackgroundCheckFieldSearchResults({
                     color="primary.500"
                     borderColor="primary.500"
                     onClick={handleFalsePositivesButtonClick}
-                    isDisabled={
+                    disabled={
                       isTemplate ||
                       isReadOnly ||
                       totalCount === 0 ||
@@ -928,8 +927,8 @@ function useBackgroundCheckDataColumns({ type }: { type: string | null }) {
                     })}
                     size="sm"
                     fontSize="md"
-                    isLoading={context.isSavingEntity[row.id]}
-                    isDisabled={context.isReadOnly || context.isDisabled}
+                    loading={context.isSavingEntity[row.id]}
+                    disabled={context.isReadOnly || context.isDisabled}
                     variant="solid"
                     colorScheme="primary"
                     icon={<StarEmptyIcon />}
@@ -954,7 +953,7 @@ function useBackgroundCheckDataColumns({ type }: { type: string | null }) {
                     size="sm"
                     fontSize="md"
                     icon={<UserXIcon />}
-                    isDisabled={
+                    disabled={
                       context.isReadOnly ||
                       isNonNullish(context.savedEntityId) ||
                       context.isDisabled

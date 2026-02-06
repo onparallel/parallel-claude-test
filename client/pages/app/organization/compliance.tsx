@@ -5,7 +5,6 @@ import {
   AlertDescription,
   AlertIcon,
   Box,
-  Button,
   Center,
   Checkbox,
   FormControl,
@@ -34,6 +33,7 @@ import { SupportLink } from "@parallel/components/common/SupportLink";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withPermission } from "@parallel/components/common/withPermission";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
+import { Button, Text } from "@parallel/components/ui";
 import {
   OrganizationCompliance_updateOrganizationAutoAnonymizePeriodDocument,
   OrganizationCompliance_userDocument,
@@ -43,7 +43,6 @@ import { compose } from "@parallel/utils/compose";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 interface ComplianceFormData {
   period: number | null;
@@ -133,7 +132,7 @@ function OrganizationCompliance() {
                     as={SupportLink}
                     variant="outline"
                     backgroundColor="white"
-                    colorScheme="blue"
+                    colorPalette="blue"
                     message={intl.formatMessage({
                       id: "page.compliance.upgrade-plan-message",
                       defaultMessage:
@@ -221,10 +220,10 @@ function OrganizationCompliance() {
               </FormControl>
 
               <Button
-                colorScheme="primary"
+                colorPalette="primary"
                 type="submit"
                 width="fit-content"
-                isDisabled={defaultPeriod === period}
+                disabled={defaultPeriod === period}
               >
                 <FormattedMessage
                   id="page.compliance.upload-period"

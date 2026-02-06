@@ -6,7 +6,6 @@ import {
   AlertDescription,
   AlertIcon,
   Box,
-  Button,
   Center,
   Checkbox,
   Circle,
@@ -31,7 +30,7 @@ import { SubscribedNotificationsIcon } from "@parallel/components/common/Subscri
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
 import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
 import { UserReference } from "@parallel/components/common/UserReference";
-import { Avatar, Text } from "@parallel/components/ui";
+import { Avatar, Button, Text } from "@parallel/components/ui";
 import {
   PetitionActivity_petitionDocument,
   PetitionBaseType,
@@ -712,14 +711,14 @@ export function PetitionSharingDialog({
           <Button
             data-testid="share-petition-send-button"
             type="submit"
-            colorScheme="primary"
+            colorPalette="primary"
             variant="solid"
-            isLoading={isLoading}
+            loading={isLoading}
           >
             <FormattedMessage id="generic.send" defaultMessage="Send" />
           </Button>
         ) : (
-          <Button colorScheme="primary" variant="solid" onClick={() => props.onReject()}>
+          <Button colorPalette="primary" variant="solid" onClick={() => props.onReject()}>
             <FormattedMessage id="generic.done" defaultMessage="Done" />
           </Button>
         )
@@ -834,7 +833,7 @@ function ConfirmRemovePetitionPermissionDialog({
         )
       }
       confirm={
-        <Button colorScheme="red" onClick={() => props.onResolve()}>
+        <Button colorPalette="red" onClick={() => props.onResolve()}>
           <FormattedMessage id="generic.confirm-remove-button" defaultMessage="Yes, remove" />
         </Button>
       }
@@ -861,7 +860,7 @@ function ConfirmEditPetitionPermissionDialog({ ...props }: DialogProps) {
         />
       }
       confirm={
-        <Button colorScheme="red" onClick={() => props.onResolve()}>
+        <Button colorPalette="red" onClick={() => props.onResolve()}>
           <FormattedMessage id="generic.yes-continue" defaultMessage="Yes, continue" />
         </Button>
       }
@@ -914,7 +913,7 @@ function ConfirmTransferPetitionOwnershipDialog({
         />
       }
       confirm={
-        <Button colorScheme="red" onClick={() => props.onResolve()}>
+        <Button colorPalette="red" onClick={() => props.onResolve()}>
           <FormattedMessage
             id="component.confirm-transfer-petition-ownership-dialog.confirm-button"
             defaultMessage="Yes, transfer"

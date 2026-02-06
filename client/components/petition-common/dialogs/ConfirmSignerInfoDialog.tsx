@@ -3,7 +3,6 @@ import {
   AlertDescription,
   AlertIcon,
   AlertTitle,
-  Button,
   Center,
   Flex,
   FormControl,
@@ -22,6 +21,7 @@ import { Dropzone } from "@parallel/components/common/Dropzone";
 import { FileSize } from "@parallel/components/common/FileSize";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
+import { Button, Text } from "@parallel/components/ui";
 import { SignatureConfigInputSigner } from "@parallel/graphql/__types";
 import { fullName } from "@parallel/utils/fullName";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
@@ -32,7 +32,6 @@ import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
 import type { SignerSelectSelection } from "./ConfirmPetitionSignersDialog";
-import { Text } from "@parallel/components/ui";
 
 const MAX_FILE_SIZE = 1024 * 1024 * 1;
 
@@ -401,7 +400,7 @@ function ConfirmSignerInfoDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="primary" type="submit">
+        <Button colorPalette="primary" type="submit">
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }

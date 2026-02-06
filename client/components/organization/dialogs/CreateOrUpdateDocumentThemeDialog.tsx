@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Button,
   Checkbox,
   FormControl,
   FormErrorMessage,
@@ -12,6 +11,7 @@ import {
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
+import { Button } from "@parallel/components/ui";
 import { CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragment } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { Maybe } from "@parallel/utils/types";
@@ -105,7 +105,7 @@ export function CreateOrUpdateDocumentThemeDialog({
       }
       alternative={
         isNonNullish(theme) && !theme.isDefault ? (
-          <Button colorScheme="red" variant="ghost" onClick={() => props.onReject("DELETE_THEME")}>
+          <Button colorPalette="red" variant="ghost" onClick={() => props.onReject("DELETE_THEME")}>
             <FormattedMessage
               id="component.create-or-update-document-theme-dialog.delete-theme-button"
               defaultMessage="Delete theme"
@@ -114,7 +114,7 @@ export function CreateOrUpdateDocumentThemeDialog({
         ) : null
       }
       confirm={
-        <Button type="submit" colorScheme="primary" variant="solid">
+        <Button type="submit" colorPalette="primary" variant="solid">
           {isUpdate ? (
             <FormattedMessage id="generic.save" defaultMessage="Save" />
           ) : (

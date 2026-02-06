@@ -1,12 +1,12 @@
 import { gql } from "@apollo/client";
 
+import { Text } from "@parallel/components/ui";
 import { ProfilesRatioModuleSettings_ProfileTypeFragment } from "@parallel/graphql/__types";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { DashboardModuleRatioFilters } from "../../components/DashboardModuleRatioFilters";
 import { ProfilesModuleFilterEditor } from "../../components/ProfilesModuleFilterEditor";
-import { Text } from "@parallel/components/ui";
 
 export function ProfilesRatioModuleSettings({
   profileType,

@@ -5,7 +5,6 @@ import {
   AlertDescription,
   AlertIcon,
   Box,
-  Button,
   Center,
   Flex,
   HStack,
@@ -54,6 +53,7 @@ import { useAskNameDialog } from "@parallel/components/petition-list/AskNameDial
 import { useCreateProfileDialog } from "@parallel/components/profiles/dialogs/CreateProfileDialog";
 import { useImportProfilesFromExcelDialog } from "@parallel/components/profiles/dialogs/ImportProfilesFromExcelDialog";
 import { useProfileSubscribersDialog } from "@parallel/components/profiles/dialogs/ProfileSubscribersDialog";
+import { Button, Text } from "@parallel/components/ui";
 import {
   ProfileListViewDataInput,
   ProfileStatus,
@@ -116,7 +116,6 @@ import {
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDeepEqual, isNonNullish, isNullish, omit, pick, pickBy, unique } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 interface ProfilesTableContext {
   status: ProfileStatus[];
@@ -565,9 +564,9 @@ function Profiles() {
               </ButtonWithMoreOptions>
             ) : (
               <Button
-                colorScheme="primary"
+                colorPalette="primary"
                 onClick={handleCreateProfile}
-                isDisabled={
+                disabled={
                   !userCanCreateProfiles ||
                   isNullish(profileType) ||
                   !profileType.canCreate ||

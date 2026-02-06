@@ -6,6 +6,7 @@ import { FieldDescription } from "@parallel/components/common/FieldDescription";
 import { FileAttachmentButton } from "@parallel/components/common/FileAttachmentButton";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { InternalFieldBadge } from "@parallel/components/common/InternalFieldBadge";
+import { Text } from "@parallel/components/ui";
 import {
   RecipientViewPetitionFieldLayout_PetitionFieldFragment,
   RecipientViewPetitionFieldLayout_PetitionFieldReplyFragment,
@@ -17,7 +18,6 @@ import { MouseEvent, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { CommentsButton } from "../CommentsButton";
-import { Text } from "@parallel/components/ui";
 
 export type RecipientViewPetitionFieldLayout_PetitionFieldSelection =
   | RecipientViewPetitionFieldLayout_PublicPetitionFieldFragment
@@ -113,7 +113,7 @@ export function RecipientViewPetitionFieldLayout({
         <Center marginTop={2}>
           <IconButtonWithTooltip
             onMouseDown={onMouseDownNewReply}
-            isDisabled={addNewReplyIsDisabled}
+            disabled={addNewReplyIsDisabled}
             icon={<AddIcon />}
             variant="outline"
             isRound

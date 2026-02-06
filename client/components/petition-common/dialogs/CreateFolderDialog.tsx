@@ -1,16 +1,9 @@
 import { gql } from "@apollo/client";
 import { useApolloClient } from "@apollo/client/react";
-import {
-  Box,
-  Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  Stack,
-} from "@chakra-ui/react";
+import { Box, FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import {
   CreateFolderDialog_PetitionBaseFragment,
   CreateFolderDialog_petitionsDocument,
@@ -25,7 +18,6 @@ import { components, MultiValueGenericProps, NoticeProps, OptionProps } from "re
 import AsyncSelect from "react-select/async";
 import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
-import { Text } from "@parallel/components/ui";
 
 interface CreateFolderDialogProps {
   isTemplate: boolean;
@@ -200,7 +192,7 @@ function CreateFolderDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="primary" type="submit">
+        <Button colorPalette="primary" type="submit">
           <FormattedMessage
             id="component.create-folder-dialog.create-folder"
             defaultMessage="Create folder"

@@ -1,17 +1,7 @@
 import { gql } from "@apollo/client";
-import {
-  Badge,
-  Box,
-  Button,
-  Center,
-  Flex,
-  HStack,
-  LinkBox,
-  LinkOverlay,
-  Stack,
-} from "@chakra-ui/react";
+import { Badge, Box, Center, Flex, HStack, LinkBox, LinkOverlay, Stack } from "@chakra-ui/react";
 import { CommentIcon, EditIcon } from "@parallel/chakra/icons";
-import { Text } from "@parallel/components/ui";
+import { Button, Text } from "@parallel/components/ui";
 import { PetitionComments_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage, useIntl } from "react-intl";

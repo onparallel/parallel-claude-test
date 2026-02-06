@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
   Box,
-  Button,
   Center,
   ModalBody,
   ModalCloseButton,
@@ -11,6 +10,7 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { DownloadIcon } from "@parallel/chakra/icons";
+import { Button, Text } from "@parallel/components/ui";
 import {
   ImportProfilesFromExcelDialog_profileImportExcelModelDownloadLinkDocument,
   UserLocale,
@@ -24,7 +24,6 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { BaseDialog, DialogProps, useDialog } from "../../common/dialogs/DialogProvider";
 import { Dropzone } from "../../common/Dropzone";
 import { FileSize } from "../../common/FileSize";
-import { Text } from "@parallel/components/ui";
 
 const MAX_FILESIZE = 1024 * 1024 * 10;
 

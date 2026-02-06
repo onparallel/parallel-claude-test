@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Heading, HStack, Stack } from "@chakra-ui/react";
+import { Box, Heading, HStack, Stack } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { NakedHelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { PetitionSelect } from "@parallel/components/common/PetitionSelect";
@@ -13,6 +13,7 @@ import { ReportsReadyMessage } from "@parallel/components/reports/common/Reports
 import { ReportsStatisticsAverage } from "@parallel/components/reports/statistics/ReportsStatisticsAverage";
 import { ReportsStatisticsConversion } from "@parallel/components/reports/statistics/ReportsStatisticsConversion";
 import { ReportsStatisticsTime } from "@parallel/components/reports/statistics/ReportsStatisticsTime";
+import { Button, Text } from "@parallel/components/ui";
 import { ReportsTemplates_userDocument } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
@@ -23,7 +24,6 @@ import { Maybe } from "@parallel/utils/types";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 export interface ReportTypeStatistics {
   from_template_id: string;
@@ -164,7 +164,7 @@ export function ReportsTemplates() {
             as={NakedHelpCenterLink}
             variant="ghost"
             fontWeight="normal"
-            colorScheme="primary"
+            colorPalette="primary"
             articleId={6272487}
           >
             <FormattedMessage id="generic.help-question" defaultMessage="Help?" />
@@ -211,8 +211,8 @@ export function ReportsTemplates() {
 
           <Button
             minWidth="fit-content"
-            colorScheme="primary"
-            isDisabled={status === "LOADED" || status === "LOADING" || !queryState.template}
+            colorPalette="primary"
+            disabled={status === "LOADED" || status === "LOADING" || !queryState.template}
             onClick={handleGenerateReportClick}
             fontWeight="500"
           >

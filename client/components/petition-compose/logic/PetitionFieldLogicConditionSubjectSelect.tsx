@@ -2,6 +2,7 @@ import { Badge, Box, Flex, HStack, StackProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
+import { Text } from "@parallel/components/ui";
 import {
   PetitionFieldLogicContext_PetitionBaseFragment,
   PetitionFieldLogicContext_PetitionFieldFragment,
@@ -30,7 +31,6 @@ import Select, {
 import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
 import { usePetitionFieldLogicContext } from "./PetitionFieldLogicContext";
-import { Text } from "@parallel/components/ui";
 
 export function PetitionFieldLogicConditionSubjectSelect({
   value: condition,

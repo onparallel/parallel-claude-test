@@ -5,7 +5,6 @@ import {
   AlertDescription,
   AlertIcon,
   Box,
-  Button,
   Center,
   Checkbox,
   FormControl,
@@ -33,6 +32,7 @@ import {
   useDialog,
 } from "@parallel/components/common/dialogs/DialogProvider";
 import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-common/alerts/RestrictedPetitionFieldAlert";
+import { Button, Text } from "@parallel/components/ui";
 import {
   CreateProfileTypeFieldInput,
   ProfileTypeFieldType,
@@ -75,7 +75,6 @@ import {
 import { ProfileFieldShortTextSettings } from "../settings/ProfileFieldShortTextSettings";
 import { ProfileFieldUserAssignmentSettings } from "../settings/ProfileFieldUserAssignmentSettings";
 import { useConfirmRemovedSelectOptionsReplacementDialog } from "./ConfirmRemovedSelectOptionsReplacementDialog";
-import { Text } from "@parallel/components/ui";
 
 export interface CreateOrUpdateProfileTypeFieldDialogProps {
   profileType: useCreateOrUpdateProfileTypeFieldDialog_ProfileTypeFragment;
@@ -359,7 +358,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
                         ),
 
                         confirm: (
-                          <Button colorScheme="red" type="submit">
+                          <Button colorPalette="red" type="submit">
                             <FormattedMessage
                               id="generic.yes-continue"
                               defaultMessage="Yes, continue"
@@ -417,7 +416,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
                           defaultMessage: "confirm",
                         }),
                         confirm: (
-                          <Button colorScheme="red" type="submit">
+                          <Button colorPalette="red" type="submit">
                             <FormattedMessage id="generic.deactivate" defaultMessage="Deactivate" />
                           </Button>
                         ),
@@ -741,7 +740,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="primary" type="submit">
+        <Button colorPalette="primary" type="submit">
           {isUpdating ? (
             <FormattedMessage id="generic.save" defaultMessage="Save" />
           ) : (
@@ -900,7 +899,7 @@ function ProfilesWithSameContentDialog({
       }
       cancel={<></>}
       confirm={
-        <Button colorScheme="primary" onClick={() => props.onResolve()}>
+        <Button colorPalette="primary" onClick={() => props.onResolve()}>
           <FormattedMessage id="generic.ok" defaultMessage="OK" />
         </Button>
       }

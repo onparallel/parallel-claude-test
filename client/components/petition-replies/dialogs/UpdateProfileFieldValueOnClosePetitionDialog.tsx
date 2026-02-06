@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import { Button, Center, Icon, Skeleton, Spinner, Stack } from "@chakra-ui/react";
+import { Center, Icon, Skeleton, Spinner, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
   useWizardDialog,
@@ -13,7 +13,7 @@ import {
   ProfileFormInner,
   useProfileFormInnerSubmitHandler,
 } from "@parallel/components/profiles/ProfileFormInner";
-import { HStack, Text } from "@parallel/components/ui";
+import { Button, HStack, Text } from "@parallel/components/ui";
 import {
   UpdateProfileFieldValueOnClosePetitionDialog_PetitionBaseFragment,
   UpdateProfileFieldValueOnClosePetitionDialog_petitionDocument,
@@ -116,12 +116,12 @@ function UpdateProfileFieldValueOnClosePetitionLoadingDialog({
         </Center>
       }
       confirm={
-        <Button colorScheme="primary" isDisabled>
+        <Button colorPalette="primary" disabled>
           <FormattedMessage id="generic.save" defaultMessage="Save" />
         </Button>
       }
       cancel={
-        <Button isDisabled>
+        <Button disabled>
           <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
         </Button>
       }
@@ -213,9 +213,9 @@ function UpdateProfileFieldValueOnClosePetitionDialog({
       }
       confirm={
         <Button
-          colorScheme="primary"
+          colorPalette="primary"
           type="submit"
-          isDisabled={formState.dirtyFields.fields === undefined || formState.isSubmitting}
+          disabled={formState.dirtyFields.fields === undefined || formState.isSubmitting}
         >
           <FormattedMessage id="generic.save" defaultMessage="Save" />
         </Button>

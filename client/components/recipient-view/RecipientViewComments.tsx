@@ -3,11 +3,10 @@ import { useMutation, useQuery } from "@apollo/client/react";
 import {
   Badge,
   Box,
-  Button,
   Center,
   Flex,
-  HStack,
   Heading,
+  HStack,
   LinkBox,
   LinkOverlay,
   Spinner,
@@ -15,15 +14,15 @@ import {
   usePrevious,
 } from "@chakra-ui/react";
 import { ChevronLeftIcon, CommentIcon, EditIcon } from "@parallel/chakra/icons";
-import { Text } from "@parallel/components/ui";
+import { Button, Text } from "@parallel/components/ui";
 import {
-  RecipientViewComments_PublicPetitionAccessFragment,
-  RecipientViewComments_PublicPetitionFieldFragment,
   RecipientViewComments_accessDocument,
   RecipientViewComments_markPetitionFieldCommentsAsReadDocument,
   RecipientViewComments_publicCreatePetitionCommentDocument,
   RecipientViewComments_publicDeletePetitionCommentDocument,
+  RecipientViewComments_PublicPetitionAccessFragment,
   RecipientViewComments_publicPetitionFieldDocument,
+  RecipientViewComments_PublicPetitionFieldFragment,
   RecipientViewComments_publicUpdatePetitionCommentDocument,
   Tone,
 } from "@parallel/graphql/__types";
@@ -371,8 +370,8 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
               </Stack>
               <Box>
                 <Button
-                  colorScheme="primary"
-                  isDisabled={draft.length === 0 || isNullish(fieldId)}
+                  colorPalette="primary"
+                  disabled={draft.length === 0 || isNullish(fieldId)}
                   onClick={handleSubmitClick}
                 >
                   <FormattedMessage id="generic.submit" defaultMessage="Submit" />

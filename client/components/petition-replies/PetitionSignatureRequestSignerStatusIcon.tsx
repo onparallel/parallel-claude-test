@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import { Stack } from "@chakra-ui/react";
 import { CheckIcon, CloseIcon, TimeIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Text } from "@parallel/components/ui";
 import {
   DatesList_SignerStatusFragment,
   PetitionSignatureRequestSignerStatusIcon_SignerStatusFragment,
@@ -11,7 +12,6 @@ import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import { DateTime } from "../common/DateTime";
 import { SmallPopover } from "../common/SmallPopover";
-import { Text } from "@parallel/components/ui";
 
 function DatesList({
   sentAt,

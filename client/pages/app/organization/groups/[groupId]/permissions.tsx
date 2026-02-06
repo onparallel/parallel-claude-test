@@ -3,7 +3,6 @@ import { useMutation } from "@apollo/client/react";
 import {
   Badge,
   Box,
-  Button,
   Center,
   Flex,
   FormControl,
@@ -26,6 +25,7 @@ import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider"
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import { withPermission } from "@parallel/components/common/withPermission";
 import { UserGroupLayout } from "@parallel/components/layout/UserGroupLayout";
+import { Button, Text } from "@parallel/components/ui";
 import {
   PermissionsGroup_updateUserGroupPermissionsDocument,
   PermissionsGroup_userDocument,
@@ -42,7 +42,6 @@ import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { OptionProps, SingleValueProps, components } from "react-select";
 import { zip } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 type PermissionsGroupProps = UnwrapPromise<ReturnType<typeof PermissionsGroup.getInitialProps>>;
 
@@ -810,14 +809,14 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
               })}
 
             <HStack paddingTop={6} alignSelf="flex-end">
-              <Button onClick={() => reset()} isDisabled={!formState.isDirty || !canEdit}>
+              <Button onClick={() => reset()} disabled={!formState.isDirty || !canEdit}>
                 <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
               </Button>
               <Button
-                colorScheme="primary"
+                colorPalette="primary"
                 type="submit"
-                isDisabled={!formState.isDirty || !canEdit}
-                isLoading={isSubmitting}
+                disabled={!formState.isDirty || !canEdit}
+                loading={isSubmitting}
               >
                 <FormattedMessage id="generic.save-changes" defaultMessage="Save changes" />
               </Button>

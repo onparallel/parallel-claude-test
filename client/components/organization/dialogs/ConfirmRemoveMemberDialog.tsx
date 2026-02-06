@@ -1,11 +1,11 @@
-import { Button, Stack } from "@chakra-ui/react";
+import { Stack } from "@chakra-ui/react";
 import { UserXIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { UserSelectSelection } from "@parallel/components/common/UserSelect";
+import { Button, Text } from "@parallel/components/ui";
 import { OrganizationGroup_UserGroupMemberFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 function ConfirmRemoveMemberDialog({
   selected,
@@ -49,7 +49,7 @@ function ConfirmRemoveMemberDialog({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="red">
+        <Button type="submit" colorPalette="red">
           <FormattedMessage
             id="component.confirm-remove-member-dialog.confirm"
             defaultMessage="Yes, remove from team"

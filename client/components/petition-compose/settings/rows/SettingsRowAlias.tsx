@@ -11,6 +11,7 @@ import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
 import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { CopyLiquidReferenceButton } from "@parallel/components/petition-common/CopyLiquidReferenceButton";
 import { MoreLiquidReferencesButton } from "@parallel/components/petition-common/MoreLiquidReferencesButton";
+import { Text } from "@parallel/components/ui";
 import {
   SettingsRowAlias_PetitionFieldFragment,
   UpdatePetitionFieldInput,
@@ -23,7 +24,6 @@ import { ChangeEvent, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";
 import { SettingsRow } from "./SettingsRow";
-import { Text } from "@parallel/components/ui";
 
 export type AliasErrorType = "UNIQUE" | "INVALID";
 

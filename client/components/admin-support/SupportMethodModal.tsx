@@ -2,7 +2,6 @@
 import { gql } from "@apollo/client";
 import { useApolloClient } from "@apollo/client/react";
 import {
-  Button,
   Grid,
   Modal,
   ModalBody,
@@ -13,6 +12,7 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
+import { Button, Text } from "@parallel/components/ui";
 import { SupportMethodResponse } from "@parallel/graphql/__types";
 import { unCamelCase } from "@parallel/utils/strings";
 import { Maybe } from "@parallel/utils/types";
@@ -21,7 +21,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { HtmlBlock } from "../common/HtmlBlock";
 import { getDefaultInputTypeValue } from "./helpers";
 import { SupportMethodArgumentInput } from "./SupportMethodArgumentInput";
-import { Text } from "@parallel/components/ui";
 
 interface MethodModalProps {
   field: IntrospectionField;
@@ -166,7 +165,7 @@ export function SupportMethodModal({ field, queryType, schemaTypes, onClose }: M
             <StatusTag status={status} />
             <Stack direction="row">
               <Button onClick={() => onClose()}>Cancel</Button>
-              <Button isLoading={status.loading} colorScheme="primary" onClick={handleExecute}>
+              <Button loading={status.loading} colorPalette="primary" onClick={handleExecute}>
                 Execute
               </Button>
             </Stack>

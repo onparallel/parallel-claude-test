@@ -1,4 +1,5 @@
-import { Button, ButtonOptions, ThemingProps } from "@chakra-ui/react";
+import { ButtonOptions, ThemingProps } from "@chakra-ui/react";
+import { Button } from "@parallel/components/ui";
 import { CommentIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { useIntl } from "react-intl";

@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client";
-import { Alert, AlertDescription, Button, HStack, Input } from "@chakra-ui/react";
+import { Alert, AlertDescription, HStack, Input } from "@chakra-ui/react";
 import { ProfilesIcon } from "@parallel/chakra/icons";
 import { isDialogError } from "@parallel/components/common/dialogs/DialogProvider";
 import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
+import { Button, Text } from "@parallel/components/ui";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
@@ -14,7 +15,6 @@ import { useCreateOrUpdateFieldGroupRelationshipsDialog } from "../../dialogs/Cr
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { SettingsRow } from "../rows/SettingsRow";
 import { SettingsRowButton } from "../rows/SettingsRowButton";
-import { Text } from "@parallel/components/ui";
 
 export function PetitionComposeFieldGroupSettings({
   petition,

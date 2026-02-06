@@ -9,6 +9,7 @@ import { FileSize } from "@parallel/components/common/FileSize";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { NormalLink } from "@parallel/components/common/Link";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
+import { Text } from "@parallel/components/ui";
 import {
   DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkDocument,
   DynamicSelectSettings_uploadDynamicSelectFieldFileDocument,
@@ -23,7 +24,6 @@ import { FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
 import { PetitionComposeFieldSettingsProps } from "../PetitionComposeFieldSettings";
 import { SettingsRow } from "../rows/SettingsRow";
-import { Text } from "@parallel/components/ui";
 
 export function PetitionComposeDynamicSelectFieldSettings({
   petition,
@@ -174,7 +174,7 @@ function UploadedFileData({
 
       <IconButtonWithTooltip
         variant="ghost"
-        isDisabled={!file || !file.id}
+        disabled={!file || !file.id}
         icon={<DownloadIcon />}
         label={intl.formatMessage({
           id: "generic.download",
@@ -185,7 +185,7 @@ function UploadedFileData({
 
       <IconButtonWithTooltip
         variant="ghost"
-        isDisabled={!file || isReadOnly}
+        disabled={!file || isReadOnly}
         icon={<DeleteIcon />}
         label={intl.formatMessage({
           id: "generic.delete",

@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import { FormControl, FormErrorMessage, Radio, RadioGroup, Stack } from "@chakra-ui/react";
 import { Divider } from "@parallel/components/common/Divider";
 import { ProfileTypeFieldSelect } from "@parallel/components/common/ProfileTypeFieldSelect";
+import { Text } from "@parallel/components/ui";
 import { ProfilesChartModuleSettings_ProfileTypeFragment } from "@parallel/graphql/__types";
 import { useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
@@ -12,7 +13,6 @@ import { DashboardModuleChartType } from "../../components/DashboardModuleChartT
 import { DashboardModuleFormLabel } from "../../components/DashboardModuleFormLabel";
 import { ProfilesModuleFilterEditor } from "../../components/ProfilesModuleFilterEditor";
 import { defaultDashboardModuleProfileFilter } from "../../utils/moduleUtils";
-import { Text } from "@parallel/components/ui";
 
 export function ProfilesChartModuleSettings({
   profileType,

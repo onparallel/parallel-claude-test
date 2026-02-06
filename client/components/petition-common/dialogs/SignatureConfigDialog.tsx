@@ -3,7 +3,6 @@ import { useQuery } from "@apollo/client/react";
 import {
   AlertDescription,
   AlertIcon,
-  Button,
   Center,
   Checkbox,
   Flex,
@@ -34,7 +33,7 @@ import {
   useWizardDialog,
   WizardStepDialogProps,
 } from "@parallel/components/common/dialogs/WizardDialog";
-import { Text } from "@parallel/components/ui";
+import { Button, Text } from "@parallel/components/ui";
 import {
   SignatureConfigDialog_meDocument,
   SignatureConfigDialog_PetitionBaseFragment,
@@ -195,12 +194,12 @@ function SignatureConfigDialogLoading({
         </Center>
       }
       confirm={
-        <Button colorScheme="primary" isDisabled>
+        <Button colorPalette="primary" disabled>
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }
       cancel={
-        <Button isDisabled>
+        <Button disabled>
           <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
         </Button>
       }
@@ -498,7 +497,7 @@ function SignatureConfigDialogStep1({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="primary">
+        <Button type="submit" colorPalette="primary">
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }
@@ -744,11 +743,11 @@ function SignatureConfigDialogStep2({
       }
       confirm={
         includePresetSigners ? (
-          <Button type="submit" colorScheme="primary">
+          <Button type="submit" colorPalette="primary">
             <FormattedMessage id="generic.continue" defaultMessage="Continue" />
           </Button>
         ) : (
-          <Button type="submit" colorScheme="primary">
+          <Button type="submit" colorPalette="primary">
             <FormattedMessage id="generic.save" defaultMessage="Save" />
           </Button>
         )
@@ -931,7 +930,7 @@ function SignatureConfigDialogStep3({
         </FormControl>
       }
       confirm={
-        <Button type="submit" colorScheme="primary" isDisabled={!isValid}>
+        <Button type="submit" colorPalette="primary" disabled={!isValid}>
           <FormattedMessage id="generic.save" defaultMessage="Save" />
         </Button>
       }

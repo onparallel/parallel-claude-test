@@ -1,4 +1,4 @@
-import { Button, Grid, HStack, Stack } from "@chakra-ui/react";
+import { Grid, HStack, Stack } from "@chakra-ui/react";
 import { PlusCircleFilledIcon } from "@parallel/chakra/icons";
 import { MultiCheckboxSimpleSelect } from "@parallel/components/common/MultiCheckboxSimpleSelect";
 import { PetitionSelect } from "@parallel/components/common/PetitionSelect";
@@ -6,6 +6,7 @@ import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { PetitionListApprovalsFilterLine } from "@parallel/components/petition-list/filters/PetitionListApprovalsFilter";
 import { PetitionListSharedWithFilterLine } from "@parallel/components/petition-list/filters/PetitionListSharedWithFilter";
 import { PetitionListTagFilterLine } from "@parallel/components/petition-list/filters/PetitionListTagFilter";
+import { Button, Text } from "@parallel/components/ui";
 import { useLogicalOperators } from "@parallel/utils/useLogicalOperators";
 import { usePetitionSignatureStatusLabels } from "@parallel/utils/usePetitionSignatureStatusLabels";
 import { usePetitionStatusLabels } from "@parallel/utils/usePetitionStatusLabels";
@@ -13,7 +14,6 @@ import { ReactNode, useCallback, useMemo } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { DashboardModuleFilterContainer } from "./DashboardModuleFilterContainer";
-import { Text } from "@parallel/components/ui";
 
 interface PetitionsModuleFilterEditorProps {
   field: string;
@@ -283,7 +283,7 @@ function LogicalOperatorFilterContainer({
           fontWeight="normal"
           leftIcon={<PlusCircleFilledIcon color="primary.500" position="relative" boxSize={5} />}
           onClick={onAddFilter}
-          isDisabled={filterCount >= 5}
+          disabled={filterCount >= 5}
         >
           <FormattedMessage id="generic.add-filter" defaultMessage="Add filter" />
         </Button>

@@ -1,15 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import {
-  Box,
-  Button,
-  Flex,
-  HStack,
-  MenuDivider,
-  MenuItem,
-  MenuList,
-  Stack,
-} from "@chakra-ui/react";
+import { Box, Flex, HStack, MenuDivider, MenuItem, MenuList, Stack } from "@chakra-ui/react";
 import { BusinessIcon, SearchIcon, ShortSearchIcon, UserIcon } from "@parallel/chakra/icons";
 import {
   FalsePositivesBadge,
@@ -19,6 +10,7 @@ import {
 import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
 import { BackgroundCheckRiskLabel } from "@parallel/components/petition-common/BackgroundCheckRiskLabel";
 import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-common/alerts/RestrictedPetitionFieldAlert";
+import { Button, Text } from "@parallel/components/ui";
 import {
   ProfileFormFieldBackgroundCheck_copyReplyContentToProfileFieldValueDocument,
   ProfileFormFieldBackgroundCheck_updateProfileFieldValueDocument,
@@ -51,7 +43,6 @@ import {
   ProfileFormFieldInputGroup,
   ProfileFormFieldInputGroupProps,
 } from "./ProfileFormFieldInputGroup";
-import { Text } from "@parallel/components/ui";
 
 interface ProfileFormFieldBackgroundCheckProps
   extends ProfileFormFieldProps,
@@ -399,7 +390,7 @@ export function ProfileFormFieldBackgroundCheck({
                     whiteSpace="pre-wrap"
                     textAlign="left"
                     onClick={handleOpenSearchOrEntity}
-                    isDisabled={!hasBackgroundCheck}
+                    disabled={!hasBackgroundCheck}
                   >
                     {entityOrSearchName}
                   </Button>
@@ -492,7 +483,7 @@ export function ProfileFormFieldBackgroundCheck({
               <Button
                 size="sm"
                 fontSize="md"
-                isDisabled={isDisabled || !hasBackgroundCheck || state === "FETCHING"}
+                disabled={isDisabled || !hasBackgroundCheck || state === "FETCHING"}
                 onClick={handleStart}
                 leftIcon={<ShortSearchIcon />}
                 fontWeight={500}

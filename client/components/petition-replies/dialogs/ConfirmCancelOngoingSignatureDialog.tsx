@@ -1,6 +1,6 @@
-import { Button } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
 
 function ConfirmCancelOngoingSignatureDialog(props: DialogProps) {
@@ -19,7 +19,7 @@ function ConfirmCancelOngoingSignatureDialog(props: DialogProps) {
         />
       }
       confirm={
-        <Button colorScheme="red" onClick={() => props.onResolve()}>
+        <Button colorPalette="red" onClick={() => props.onResolve()}>
           <FormattedMessage
             id="component.confirm-disable-ongoing-signature-petition-close.confirm"
             defaultMessage="Cancel eSignature and continue"

@@ -1,14 +1,15 @@
 import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
-import { Button, Center, HStack, Heading, Stack } from "@chakra-ui/react";
+import { Center, Heading, HStack, Stack } from "@chakra-ui/react";
 import { AddIcon, CloseIconSmall } from "@parallel/chakra/icons";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { TableColumn } from "@parallel/components/common/Table";
+import { Button, Text } from "@parallel/components/ui";
 import {
-  ProfileRelationshipsTable_ProfileFragment,
-  ProfileRelationshipsTable_ProfileRelationshipFragment,
   ProfileRelationshipsTable_createProfileRelationshipDocument,
   ProfileRelationshipsTable_profileDocument,
+  ProfileRelationshipsTable_ProfileFragment,
+  ProfileRelationshipsTable_ProfileRelationshipFragment,
   ProfileRelationshipsTable_removeProfileRelationshipDocument,
   UserLocale,
 } from "@parallel/graphql/__types";
@@ -25,7 +26,6 @@ import { Spacer } from "../common/Spacer";
 import { TablePage } from "../common/TablePage";
 import { useConfirmRemoveProfileRelationshipsDialog } from "./dialogs/ConfirmRemoveProfileRelationshipsDialog";
 import { useCreateProfileRelationshipsDialog } from "./dialogs/CreateProfileRelationshipsDialog";
-import { Text } from "@parallel/components/ui";
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
@@ -155,7 +155,7 @@ export function ProfileRelationshipsTable({ profileId }: { profileId: string }) 
           <Button
             leftIcon={<AddIcon />}
             onClick={handleCreateProfileRelationship}
-            isDisabled={
+            disabled={
               !profile || profile?.status === "DELETION_SCHEDULED" || (rows && rows.length >= 100)
             }
           >
@@ -179,7 +179,7 @@ export function ProfileRelationshipsTable({ profileId }: { profileId: string }) 
               <Button
                 variant="link"
                 onClick={handleCreateProfileRelationship}
-                isDisabled={!profile || profile?.status === "DELETION_SCHEDULED"}
+                disabled={!profile || profile?.status === "DELETION_SCHEDULED"}
               >
                 <FormattedMessage
                   id="component.profile-relationships-table.add-relationship"

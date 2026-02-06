@@ -1,8 +1,8 @@
-import { Button, Stack } from "@chakra-ui/react";
+import { Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export function ConfirmCompliancePeriodDialog({
   months,
@@ -35,7 +35,7 @@ export function ConfirmCompliancePeriodDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="primary" type="submit" onClick={() => props.onResolve()}>
+        <Button colorPalette="primary" type="submit" onClick={() => props.onResolve()}>
           <FormattedMessage id="generic.yes-continue" defaultMessage="Yes, continue" />
         </Button>
       }

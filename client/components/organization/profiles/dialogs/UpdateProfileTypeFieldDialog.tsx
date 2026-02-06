@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import {
   Box,
-  Button,
   Checkbox,
   FormControl,
   FormErrorMessage,
@@ -12,6 +11,7 @@ import {
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button } from "@parallel/components/ui";
 import { useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment } from "@parallel/graphql/__types";
 import {
   ExpirationOption,
@@ -169,7 +169,7 @@ function UpdateProfileTypeFieldDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="primary" type="submit">
+        <Button colorPalette="primary" type="submit">
           <FormattedMessage id="generic.accept" defaultMessage="Accept" />
         </Button>
       }

@@ -5,11 +5,11 @@ import {
   SimpleSelect,
   SimpleSelectProps,
 } from "@parallel/components/common/SimpleSelect";
+import { Text } from "@parallel/components/ui";
 import { REFERENCE_REGEX } from "@parallel/utils/validation";
 import { FormattedMessage, useIntl } from "react-intl";
 import { CSSObjectWithLabel, OptionProps, SingleValueProps, components } from "react-select";
 import CreatableSelect from "react-select/creatable";
-import { Text } from "@parallel/components/ui";
 
 interface PetitionVariableSelectProps extends SimpleSelectProps<string> {
   onCreateVariable?: (name: string) => void;

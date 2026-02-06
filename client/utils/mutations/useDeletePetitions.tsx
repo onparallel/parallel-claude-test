@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useApolloClient, useMutation, useQuery } from "@apollo/client/react";
-import { Button, Center, ListItem, Spinner, Stack, UnorderedList } from "@chakra-ui/react";
+import { Center, ListItem, Spinner, Stack, UnorderedList } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
@@ -12,7 +12,7 @@ import {
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { PathName } from "@parallel/components/common/PathName";
 import { PetitionNameWithPath } from "@parallel/components/common/PetitionNameWithPath";
-import { Text } from "@parallel/components/ui";
+import { Button, Text } from "@parallel/components/ui";
 import {
   PetitionBaseType,
   useDeletePetitions_deletePetitionsDocument,
@@ -381,7 +381,7 @@ function ConfirmDeletePetitionsDialog({
       confirm={
         <Button
           data-testid="dialog-delete-button"
-          colorScheme="red"
+          colorPalette="red"
           onClick={() => props.onResolve()}
         >
           {isOneSharedToMe ? (
@@ -488,7 +488,7 @@ function ConfirmDeleteSharedPetitionsDialog({
       confirm={
         <Button
           data-testid="dialog-delete-button"
-          colorScheme="red"
+          colorPalette="red"
           onClick={() => props.onResolve()}
         >
           <FormattedMessage id="generic.confirm-delete-button" defaultMessage="Yes, delete" />

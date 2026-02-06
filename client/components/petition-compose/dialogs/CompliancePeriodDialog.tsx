@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Button,
   FormControl,
   FormLabel,
   HStack,
@@ -14,6 +13,7 @@ import {
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
+import { Button, Text } from "@parallel/components/ui";
 import { CompliancePeriodDialog_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { addMonths } from "date-fns";
@@ -21,7 +21,6 @@ import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { useConfirmCompliancePeriodDialog } from "./ConfirmCompliancePeriodDialog";
-import { Text } from "@parallel/components/ui";
 
 interface CompliancePeriodDialogInput {
   petition: CompliancePeriodDialog_PetitionBaseFragment;
@@ -139,7 +138,7 @@ export function CompliancePeriodDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="primary" type="submit">
+        <Button colorPalette="primary" type="submit">
           <FormattedMessage id="generic.apply-changes" defaultMessage="Apply changes" />
         </Button>
       }

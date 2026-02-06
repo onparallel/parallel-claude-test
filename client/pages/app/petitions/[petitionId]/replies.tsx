@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Button, Flex, HStack, Stack, useToast } from "@chakra-ui/react";
+import { Box, Flex, HStack, Stack, useToast } from "@chakra-ui/react";
 import { VariablesOf } from "@graphql-typed-document-node/core";
 import {
   CheckIcon,
@@ -38,6 +38,7 @@ import { ProfileDrawer } from "@parallel/components/petition-replies/ProfileDraw
 import { useArchiveRepliesIntoProfileDialog } from "@parallel/components/petition-replies/dialogs/ArchiveRepliesIntoProfileDialog";
 import { useExportRepliesDialog } from "@parallel/components/petition-replies/dialogs/ExportRepliesDialog";
 import { useExportRepliesProgressDialog } from "@parallel/components/petition-replies/dialogs/ExportRepliesProgressDialog";
+import { Button, Text } from "@parallel/components/ui";
 import {
   AdverseMediaArticle,
   PetitionFieldReplyStatus,
@@ -88,7 +89,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
-import { Text } from "@parallel/components/ui";
 type PetitionRepliesProps = UnwrapPromise<ReturnType<typeof PetitionReplies.getInitialProps>>;
 
 const GENERAL_COMMENTS_FIELD_ID = "general";
@@ -631,7 +631,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             id: "generic.reload-data",
             defaultMessage: "Reload",
           })}
-          isDisabled={isAnonymizedOrDeletionScheduled}
+          disabled={isAnonymizedOrDeletionScheduled}
         />
 
         {petition.status === "CLOSED" ||
@@ -639,7 +639,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         isAnonymizedOrDeletionScheduled ? null : (
           <Button
             data-action="close-petition"
-            colorScheme="primary"
+            colorPalette="primary"
             leftIcon={<CheckIcon />}
             onClick={() => handleClosePetition(petition)}
           >

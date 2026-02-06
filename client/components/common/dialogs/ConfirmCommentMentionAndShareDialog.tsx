@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import { useFragment } from "@apollo/client/react";
 import {
-  Button,
   Checkbox,
   FormControl,
   FormLabel,
@@ -13,6 +12,7 @@ import {
 import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
 import { UserReference } from "@parallel/components/common/UserReference";
 import { PetitionPermissionTypeSelect } from "@parallel/components/petition-common/PetitionPermissionTypeSelect";
+import { Button, Text } from "@parallel/components/ui";
 import {
   ConfirmCommentMentionAndShareDialog_PetitionFragmentDoc,
   PetitionPermissionTypeRW,
@@ -26,7 +26,6 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { DialogProps, useDialog } from "./DialogProvider";
-import { Text } from "@parallel/components/ui";
 
 interface ConfirmCommentMentionAndShareDialogProps {
   petitionId: string;
@@ -166,7 +165,7 @@ function ConfirmCommentMentionAndShareDialog({
       confirm={
         <Button
           ref={confirmRef}
-          colorScheme="primary"
+          colorPalette="primary"
           onClick={handleSubmit((data) => {
             props.onResolve({
               sharePetition: true,

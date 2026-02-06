@@ -3,7 +3,6 @@ import { useMutation } from "@apollo/client/react";
 import {
   Badge,
   Box,
-  Button,
   Flex,
   Grid,
   Heading,
@@ -43,6 +42,7 @@ import { useConfirmDeleteDashboardDialog } from "@parallel/components/dashboard/
 import { DashboardModuleDrawer } from "@parallel/components/dashboard/drawer/DashboardModuleDrawer";
 import { SortableDashboardModule } from "@parallel/components/dashboard/SortableDashboardModule";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
+import { Button, Text } from "@parallel/components/ui";
 import {
   Home_cloneDashboardDocument,
   Home_createDashboardDocument,
@@ -76,7 +76,6 @@ import { memo, RefObject, useCallback, useEffect, useMemo, useRef, useState } fr
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { noop } from "ts-essentials";
-import { Text } from "@parallel/components/ui";
 
 const POLL_INTERVAL_REFRESHING = 1_500;
 const POLL_INTERVAL = 30_000;
@@ -357,7 +356,7 @@ function Home() {
                   leftIcon={<AddIcon boxSize={3.5} />}
                   onClick={() => handleAddModule(topAddModuleButtonRef)}
                   fontWeight={500}
-                  isDisabled={
+                  disabled={
                     dashboard.modules.length >= 20 || dashboard.myEffectivePermission === "READ"
                   }
                 >
@@ -403,7 +402,7 @@ function Home() {
                     leftIcon={<PlusCircleIcon />}
                     onClick={() => handleAddModule(bottomAddModuleButtonRef)}
                     fontWeight={500}
-                    isDisabled={
+                    disabled={
                       dashboard.modules.length >= 20 || dashboard.myEffectivePermission === "READ"
                     }
                   >
@@ -430,11 +429,11 @@ function Home() {
                 <Box>
                   <Button
                     ref={bottomAddModuleButtonRef}
-                    colorScheme="primary"
+                    colorPalette="primary"
                     leftIcon={<AddIcon />}
                     onClick={() => handleAddModule(bottomAddModuleButtonRef)}
                     fontWeight={500}
-                    isDisabled={
+                    disabled={
                       dashboard.modules.length >= 20 || dashboard.myEffectivePermission === "READ"
                     }
                   >

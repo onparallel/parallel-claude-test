@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client";
-import { Button, Stack } from "@chakra-ui/react";
+import { Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { usePetitionShouldConfirmNavigation } from "@parallel/components/layout/PetitionLayout";
+import { Button, Text } from "@parallel/components/ui";
 import { useConfirmDiscardDraftDialog_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { assignRef } from "@parallel/utils/assignRef";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
@@ -10,7 +11,6 @@ import { usePreventNavigation } from "@parallel/utils/usePreventNavigation";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { useCallback, useEffect, useRef } from "react";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export function ConfirmDiscardDraftDialog({ ...props }: DialogProps<{}, "KEEP" | "DISCARD">) {
   const keepRef = useRef<HTMLButtonElement>(null);
@@ -41,7 +41,7 @@ export function ConfirmDiscardDraftDialog({ ...props }: DialogProps<{}, "KEEP" |
         </Button>
       }
       cancel={
-        <Button onClick={() => props.onResolve("DISCARD")} colorScheme="red" variant="ghost">
+        <Button onClick={() => props.onResolve("DISCARD")} colorPalette="red" variant="ghost">
           <FormattedMessage
             id="component.confirm-discard-draft-dialog.discard-draft"
             defaultMessage="Discard draft"
@@ -49,7 +49,7 @@ export function ConfirmDiscardDraftDialog({ ...props }: DialogProps<{}, "KEEP" |
         </Button>
       }
       confirm={
-        <Button ref={keepRef} colorScheme="primary" onClick={() => props.onResolve("KEEP")}>
+        <Button ref={keepRef} colorPalette="primary" onClick={() => props.onResolve("KEEP")}>
           <FormattedMessage
             id="component.confirm-discard-draft-dialog.keep-draft"
             defaultMessage="Keep draft"

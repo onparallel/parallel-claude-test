@@ -1,15 +1,7 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  Button,
-  Center,
-  Image,
-  ListItem,
-  SkeletonText,
-  Stack,
-  UnorderedList,
-} from "@chakra-ui/react";
+import { Box, Center, Image, ListItem, SkeletonText, Stack, UnorderedList } from "@chakra-ui/react";
 import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
+import { Button, Text } from "@parallel/components/ui";
 import {
   BrandingGeneralPreview_OrganizationBrandThemeDataFragment,
   BrandingGeneralPreview_UserFragment,
@@ -17,7 +9,6 @@ import {
 import { Maybe } from "@parallel/utils/types";
 import { useMemo } from "react";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 interface BrandingGeneralPreviewProps {
   user: BrandingGeneralPreview_UserFragment;
@@ -122,7 +113,7 @@ export function BrandingGeneralPreview({ user, brand, logo }: BrandingGeneralPre
               spacing={2.5}
               paddingBottom={6}
             >
-              <Button colorScheme="primary" marginY={3}>
+              <Button colorPalette="primary" marginY={3}>
                 <FormattedMessage
                   id="component.branding-general-preview.complete-information"
                   defaultMessage="Complete the information"

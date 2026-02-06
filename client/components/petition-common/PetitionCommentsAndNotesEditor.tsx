@@ -1,5 +1,6 @@
-import { Box, Button, HStack, Stack } from "@chakra-ui/react";
+import { Box, HStack, Stack } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Button, Text } from "@parallel/components/ui";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { KeyboardEvent, useImperativeHandle, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -13,7 +14,6 @@ import {
   emptyCommentEditorValue,
   isEmptyCommentEditorValue,
 } from "../common/slate/CommentEditor";
-import { Text } from "@parallel/components/ui";
 
 interface PetitionCommentsAndNotesEditorProps
   extends Pick<CommentEditorProps, "defaultMentionables" | "onSearchMentionables"> {
@@ -168,8 +168,8 @@ export const PetitionCommentsAndNotesEditor = chakraForwardRef<
         </Stack>
         <Box>
           <Button
-            colorScheme="primary"
-            isDisabled={isDisabled || isEmpty || isTemplate}
+            colorPalette="primary"
+            disabled={isDisabled || isEmpty || isTemplate}
             onClick={handleSubmitClick}
           >
             <FormattedMessage id="generic.submit" defaultMessage="Submit" />

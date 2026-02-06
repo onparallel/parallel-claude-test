@@ -2,10 +2,9 @@ import { CombinedGraphQLErrors, gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
   Box,
-  Button,
   Flex,
-  HStack,
   Heading,
+  HStack,
   MenuButton,
   MenuDivider,
   MenuItem,
@@ -24,11 +23,12 @@ import {
   MoreVerticalIcon,
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Button, Text } from "@parallel/components/ui";
 import {
+  PetitionComposeVariables_deletePetitionVariableDocument,
   PetitionComposeVariables_PetitionBaseFragment,
   PetitionComposeVariables_PetitionFieldFragment,
   PetitionComposeVariables_PetitionVariableFragment,
-  PetitionComposeVariables_deletePetitionVariableDocument,
   PetitionComposeVariables_updatePetitionFieldDocument,
   PetitionVariableType,
   UpdatePetitionFieldInput,
@@ -54,7 +54,6 @@ import {
 } from "./dialogs/CreateOrUpdatePetitionVariableDialog";
 import { usePetitionComposeCalculationRulesDialog } from "./dialogs/PetitionComposeCalculationRulesDialog";
 import { useReferencedCalculationsDialog } from "./dialogs/ReferencedCalculationsDialog";
-import { Text } from "@parallel/components/ui";
 
 export interface PetitionComposeVariablesProps {
   allFieldsWithIndices: [
@@ -390,7 +389,7 @@ export function PetitionComposeVariables({
                   id: "component.copy-liquid-reference-button.copy-reference",
                   defaultMessage: "Copy reference",
                 })}
-                isDisabled={isReadOnly}
+                disabled={isReadOnly}
               />
 
               <Flex flex="1" alignContent="center" minWidth="0">

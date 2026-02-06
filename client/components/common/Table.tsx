@@ -1,7 +1,6 @@
 import {
   Box,
   BoxProps,
-  Button,
   ButtonProps,
   Center,
   Table as ChakraTable,
@@ -30,6 +29,7 @@ import {
   ChevronUpIcon,
   FilterIcon,
 } from "@parallel/chakra/icons";
+import { Button, Text } from "@parallel/components/ui";
 import { getKey, KeyProp } from "@parallel/utils/keyProp";
 import { MaybeFunction, unMaybeFunction } from "@parallel/utils/types";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
@@ -58,7 +58,6 @@ import { Collapsible } from "../ui";
 import { HelpPopover } from "./HelpPopover";
 import { IconButtonWithTooltip } from "./IconButtonWithTooltip";
 import { Wrap } from "./Wrap";
-import { Text } from "@parallel/components/ui";
 
 export type TableSortingDirection = "ASC" | "DESC";
 

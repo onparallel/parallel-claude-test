@@ -5,6 +5,7 @@ import { FileAttachment } from "@parallel/components/common/FileAttachment";
 import { FileSize } from "@parallel/components/common/FileSize";
 import { SuggestionsButton } from "@parallel/components/common/SuggestionsButton";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
+import { Text } from "@parallel/components/ui";
 import { discriminator } from "@parallel/utils/discriminator";
 import { downloadLocalFile } from "@parallel/utils/downloadLocalFile";
 import { useDownloadProfileFieldFile } from "@parallel/utils/useDownloadProfileFieldFile";
@@ -15,7 +16,6 @@ import { differenceWith, isNullish, sumBy } from "remeda";
 import { ProfileFormInnerData } from "../ProfileFormInner";
 import { ProfileFormFieldProps } from "./ProfileFormField";
 import { ProfileFieldExpiresAtIcon } from "./ProfileFormFieldInputGroup";
-import { Text } from "@parallel/components/ui";
 
 interface ProfileFormFieldFileUploadProps extends ProfileFormFieldProps {
   showSuggestionsButton: boolean;

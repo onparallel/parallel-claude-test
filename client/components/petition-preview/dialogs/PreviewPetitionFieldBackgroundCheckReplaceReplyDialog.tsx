@@ -1,8 +1,7 @@
-import { Button } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export function PreviewPetitionFieldBackgroundCheckReplaceReplyDialog({
   ...props
@@ -28,7 +27,7 @@ export function PreviewPetitionFieldBackgroundCheckReplaceReplyDialog({
         </Text>
       }
       confirm={
-        <Button onClick={() => props.onResolve()} colorScheme="primary" variant="solid">
+        <Button onClick={() => props.onResolve()} colorPalette="primary" variant="solid">
           <FormattedMessage
             id="component.preview-petition-field-background-check-replace-reply-dialog.yes-overwrite"
             defaultMessage="Yes, overwrite"

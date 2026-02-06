@@ -3,7 +3,6 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Button,
   Checkbox,
   Flex,
   ListItem,
@@ -18,6 +17,7 @@ import {
   RichTextEditor,
   RichTextEditorInstance,
 } from "@parallel/components/common/slate/RichTextEditor";
+import { Button, Text } from "@parallel/components/ui";
 import { useConfirmSendReminderDialog_PetitionFragment } from "@parallel/graphql/__types";
 import { emptyRTEValue } from "@parallel/utils/slate/RichTextEditor/emptyRTEValue";
 import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
@@ -25,7 +25,6 @@ import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types"
 import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/usePetitionMessagePlaceholderOptions";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export function ConfirmSendReminderDialog({
   petition,
@@ -135,7 +134,7 @@ export function ConfirmSendReminderDialog({
       }
       confirm={
         <Button
-          colorScheme="primary"
+          colorPalette="primary"
           onClick={() => {
             if (hasMessage && isEmptyRTEValue(message)) {
               setIsInvalid(true);

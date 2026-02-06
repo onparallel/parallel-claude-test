@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 import {
   Box,
-  Button,
   Center,
   FormControl,
   FormErrorMessage,
@@ -17,6 +16,7 @@ import {
 } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { OverflownText } from "@parallel/components/common/OverflownText";
+import { Button } from "@parallel/components/ui";
 import { GenericFolderDialog_foldersDocument, PetitionBaseType } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { isNotEmptyText } from "@parallel/utils/strings";
@@ -249,10 +249,10 @@ export function GenericFolderDialog({
                       as="div"
                       data-folder-path={path}
                       variant="ghost"
-                      colorScheme="gray"
+                      colorPalette="gray"
                       width="full"
                       size="sm"
-                      isDisabled={isDisabled}
+                      disabled={isDisabled}
                       _focus={{ _disabled: { boxShadow: "outline" } }}
                       leftIcon={isExpanded ? <FolderOpenIcon /> : <FolderIcon />}
                       justifyContent="flex-start"
@@ -369,7 +369,7 @@ function NewFolderNameDialog(props: DialogProps<{}, string>) {
         </FormControl>
       }
       confirm={
-        <Button colorScheme="primary" type="submit" isDisabled={!!errors.name}>
+        <Button colorPalette="primary" type="submit" disabled={!!errors.name}>
           <FormattedMessage id="generic.create-folder" defaultMessage="Create folder" />
         </Button>
       }

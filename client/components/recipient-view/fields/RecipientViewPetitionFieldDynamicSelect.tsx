@@ -2,6 +2,7 @@ import { Box, Center, Flex, FormControl, FormLabel, List, Stack } from "@chakra-
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { SimpleSelect, toSimpleSelectOption } from "@parallel/components/common/SimpleSelect";
+import { Text } from "@parallel/components/ui";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { DynamicSelectOption, FieldOptions } from "@parallel/utils/fieldOptions";
@@ -19,7 +20,6 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
-import { Text } from "@parallel/components/ui";
 export type DynamicSelectValue = [string, Maybe<string>][];
 
 export interface RecipientViewPetitionFieldDynamicSelectProps
@@ -376,7 +376,7 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
           (level === 0 ? (
             <IconButtonWithTooltip
               marginStart={2}
-              isDisabled={isDisabled || !reply || reply.status === "APPROVED"}
+              disabled={isDisabled || !reply || reply.status === "APPROVED"}
               onClick={() => onDeleteReply?.()}
               variant="ghost"
               icon={<DeleteIcon />}

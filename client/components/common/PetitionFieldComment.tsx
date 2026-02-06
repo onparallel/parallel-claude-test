@@ -1,16 +1,7 @@
 import { gql } from "@apollo/client";
-import {
-  Badge,
-  Box,
-  Button,
-  Circle,
-  HStack,
-  MenuItem,
-  MenuList,
-  Spacer,
-  Stack,
-} from "@chakra-ui/react";
+import { Badge, Box, Circle, HStack, MenuItem, MenuList, Spacer, Stack } from "@chakra-ui/react";
 import { ThumbsDownIcon, ThumbsUpIcon } from "@parallel/chakra/icons";
+import { Button, Text } from "@parallel/components/ui";
 import { PetitionFieldComment_PetitionFieldCommentFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { isMetaReturn } from "@parallel/utils/keys";
@@ -31,7 +22,6 @@ import {
   CommentEditorProps,
   CommentEditorValue,
 } from "./slate/CommentEditor";
-import { Text } from "@parallel/components/ui";
 
 interface PetitionFieldCommentProps
   extends Pick<CommentEditorProps, "defaultMentionables" | "onSearchMentionables"> {
@@ -254,7 +244,7 @@ export function PetitionFieldComment({
             <Button size="sm" onClick={handleCancelClick}>
               <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
             </Button>
-            <Button size="sm" colorScheme="primary" onClick={handleSaveClick}>
+            <Button size="sm" colorPalette="primary" onClick={handleSaveClick}>
               <FormattedMessage id="generic.save" defaultMessage="Save" />
             </Button>
           </Stack>

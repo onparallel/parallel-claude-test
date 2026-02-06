@@ -2,6 +2,7 @@ import { Center, Flex, FormControl, HStack, List, Stack } from "@chakra-ui/react
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { FormatFormErrorMessage, ShortTextInput } from "@parallel/components/common/ShortTextInput";
+import { Text } from "@parallel/components/ui";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { isMetaReturn } from "@parallel/utils/keys";
@@ -30,7 +31,6 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
-import { Text } from "@parallel/components/ui";
 
 export interface RecipientViewPetitionFieldShortTextProps
   extends Omit<
@@ -463,7 +463,7 @@ export const RecipientViewPetitionFieldReplyShortText = forwardRef<
           </Center>
         </Flex>
         <IconButtonWithTooltip
-          isDisabled={isDisabled || reply.status === "APPROVED"}
+          disabled={isDisabled || reply.status === "APPROVED"}
           onClick={() => {
             debouncedUpdateReply.clear();
             onDelete();

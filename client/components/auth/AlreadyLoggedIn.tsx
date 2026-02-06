@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client";
-import { Box, Button } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { NormalLink } from "@parallel/components/common/Link";
+import { Button, Text } from "@parallel/components/ui";
 import { AlreadyLoggedIn_UserFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { UserAvatar } from "../common/UserAvatar";
-import { Text } from "@parallel/components/ui";
 
 interface AlreadyLoggedInProps {
   me: AlreadyLoggedIn_UserFragment;
@@ -25,7 +25,13 @@ export function AlreadyLoggedIn({ me, onRelogin, onContinueAs }: AlreadyLoggedIn
         </Text>
         {me.fullName ? <Text>({me.email})</Text> : null}
       </Box>
-      <Button marginTop={6} width="100%" colorScheme="primary" type="submit" onClick={onContinueAs}>
+      <Button
+        marginTop={6}
+        width="100%"
+        colorPalette="primary"
+        type="submit"
+        onClick={onContinueAs}
+      >
         <FormattedMessage
           id="public.login.already-logged-in.continue-button"
           defaultMessage="Continue as {name}"

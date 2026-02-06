@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
 import {
   Box,
-  Button,
   Flex,
   Heading,
   HStack,
@@ -22,6 +21,7 @@ import { withApolloData, WithApolloDataContext } from "@parallel/components/comm
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { AdverseMediaArticleCard } from "@parallel/components/petition-preview/fields/adverse-media-search/AdverseMediaArticleCard";
 import { AdverseMediaSearchInput } from "@parallel/components/petition-preview/fields/adverse-media-search/AdverseMediaSearchInput";
+import { Button, Text } from "@parallel/components/ui";
 import {
   AdverseMediaArticleRelevance,
   AdverseMediaSearch_adverseMediaAlternativeSearchSuggestionsDocument,
@@ -41,7 +41,6 @@ import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "re
 import { Controller, FormProvider, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish, omitBy, uniqueBy } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 type AdverseMediaSearchProps = UnwrapPromise<ReturnType<typeof AdverseMediaSearch.getInitialProps>>;
 
@@ -304,7 +303,7 @@ function AdverseMediaSearch({
               {isProfile ? (
                 <ResponsiveButtonIcon
                   colorScheme="purple"
-                  isDisabled={!isDraft}
+                  disabled={!isDraft}
                   icon={<SaveIcon boxSize={5} />}
                   onClick={handleSaveToProfile}
                   label={intl.formatMessage({
@@ -474,9 +473,9 @@ function SearchInputWithSuggestions({
                 />
               </Box>
               <Button
-                colorScheme="purple"
+                colorPalette="purple"
                 onClick={onSubmit}
-                isDisabled={isReadOnly || isLoading || isNullish(value) || value.length === 0}
+                disabled={isReadOnly || isLoading || isNullish(value) || value.length === 0}
               >
                 <FormattedMessage
                   id="page.adverse-media-search.search-button"
@@ -492,7 +491,7 @@ function SearchInputWithSuggestions({
                     key={index}
                     leftIcon={suggestion.wikiDataId ? <UserIcon boxSize={4} /> : undefined}
                     variant="outline"
-                    colorScheme="purple"
+                    colorPalette="purple"
                     borderRadius="full"
                     size="xs"
                     fontWeight={400}
@@ -508,7 +507,7 @@ function SearchInputWithSuggestions({
                         },
                       ]);
                     }}
-                    isDisabled={isReadOnly || isLoading}
+                    disabled={isReadOnly || isLoading}
                   >
                     {suggestion.label}
                   </Button>

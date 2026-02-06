@@ -1,9 +1,10 @@
 import { gql } from "@apollo/client";
-import { Button, Checkbox, FormControl, FormLabel, Input, Stack } from "@chakra-ui/react";
+import { Checkbox, FormControl, FormLabel, Input, Stack } from "@chakra-ui/react";
 import { DoubleCheckIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { PETITION_CLOSING_DEFAULT_MESSAGE } from "@parallel/components/petition-messages/PetitionTemplateClosingMessageCard";
+import { Button, Text } from "@parallel/components/ui";
 import { useClosePetitionDialog_PetitionFragment } from "@parallel/graphql/__types";
 import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
@@ -15,7 +16,6 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { HelpPopover } from "../../common/HelpPopover";
 import { PaddedCollapse } from "../../common/PaddedCollapse";
 import { RichTextEditor, RichTextEditorInstance } from "../../common/slate/RichTextEditor";
-import { Text } from "@parallel/components/ui";
 
 interface ClosePetitionDialogInput {
   petition: useClosePetitionDialog_PetitionFragment;
@@ -184,7 +184,7 @@ export function ClosePetitionDialog({
       confirm={
         <Button
           leftIcon={sendMessage ? <PaperPlaneIcon /> : undefined}
-          colorScheme="primary"
+          colorPalette="primary"
           onClick={() => {
             if (sendMessage && isEmptyRTEValue(message)) {
               setIsInvalid(true);

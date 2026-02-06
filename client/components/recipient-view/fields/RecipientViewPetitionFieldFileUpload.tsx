@@ -10,6 +10,7 @@ import { FileSize } from "@parallel/components/common/FileSize";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { useTone } from "@parallel/components/common/ToneProvider";
 import { EsTaxDocumentsContentErrorMessage } from "@parallel/components/petition-common/EsTaxDocumentsContentErrorMessage";
+import { Text } from "@parallel/components/ui";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
@@ -29,7 +30,6 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
   RecipientViewPetitionFieldLayout_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldLayout";
-import { Text } from "@parallel/components/ui";
 
 export interface RecipientViewPetitionFieldFileUploadProps
   extends Omit<
@@ -310,7 +310,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
       ) : null}
       {onDownload !== undefined ? (
         <IconButtonWithTooltip
-          isDisabled={
+          disabled={
             reply.content!.uploadComplete === false || isDownloadDisabled || reply.content.error
           }
           onClick={() => onDownload(reply.id)}
@@ -326,7 +326,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
       ) : null}
       {onRemove !== undefined ? (
         <IconButtonWithTooltip
-          isDisabled={isDisabled || reply.status === "APPROVED"}
+          disabled={isDisabled || reply.status === "APPROVED"}
           onClick={onRemove}
           variant="ghost"
           icon={<DeleteIcon />}

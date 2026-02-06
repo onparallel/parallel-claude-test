@@ -48,6 +48,7 @@ import {
   cleanPreviewFieldReplies,
   updatePreviewFieldReplies,
 } from "@parallel/components/petition-preview/clientMutations";
+import { Text } from "@parallel/components/ui";
 import {
   CreatePetitionFieldInput,
   PetitionCompose_PetitionFieldFragment,
@@ -93,7 +94,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, uniqueBy, zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
-import { Text } from "@parallel/components/ui";
 
 type PetitionComposeProps = UnwrapPromise<ReturnType<typeof PetitionCompose.getInitialProps>>;
 
@@ -1323,7 +1323,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               id="petition-next"
               colorScheme="primary"
               icon={<PaperPlaneIcon fontSize="18px" />}
-              isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
+              disabled={petition.isAnonymized || myEffectivePermission === "READ"}
               label={intl.formatMessage({
                 id: "generic.send-to",
                 defaultMessage: "Send to...",

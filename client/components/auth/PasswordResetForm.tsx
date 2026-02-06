@@ -1,12 +1,12 @@
-import { Box, Button, Center, FormControl, FormErrorMessage, FormLabel } from "@chakra-ui/react";
+import { Box, Center, FormControl, FormErrorMessage, FormLabel } from "@chakra-ui/react";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
+import { Button, Text } from "@parallel/components/ui";
 import { PASSWORD_REGEX } from "@parallel/utils/validation";
 import { ReactElement, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { PasswordStrengthIndicator } from "../common/PasswordStrengthIndicator";
 import { PinInput } from "../ui";
-import { Text } from "@parallel/components/ui";
 
 export interface PasswordResetData {
   verificationCode: string;
@@ -172,8 +172,8 @@ export function PasswordResetForm({
         <Button
           marginTop={6}
           width="100%"
-          colorScheme="primary"
-          isLoading={isSubmitting}
+          colorPalette="primary"
+          loading={isSubmitting}
           type="submit"
         >
           <FormattedMessage

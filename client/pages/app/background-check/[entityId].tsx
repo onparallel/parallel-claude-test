@@ -17,6 +17,7 @@ import { BackgroundCheckEntityDetailsRelationships } from "@parallel/components/
 import { BackgroundCheckEntityDetailsSanctions } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityDetailsSanctions";
 import { BackgroundCheckEntityDifferencesAlert } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityDifferencesAlert";
 import { useBackgroundCheckContentsNotUpdatedDialog } from "@parallel/components/profiles/dialogs/BackgroundCheckContentsNotUpdatedDialog";
+import { Text } from "@parallel/components/ui";
 import {
   BackgroundCheckEntitySearchType,
   BackgroundCheckProfileDetails_backgroundCheckEntityDetailsDocument,
@@ -39,7 +40,6 @@ import { useRouter } from "next/router";
 import { useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, pick } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 function BackgroundCheckProfileDetails({
   entityId,
@@ -271,7 +271,7 @@ function BackgroundCheckProfileDetails({
               onClick={handleGoBackClick}
               variant="outline"
               backgroundColor="white"
-              isDisabled={isDisabled}
+              disabled={isDisabled}
             />
 
             <Box>
@@ -315,7 +315,7 @@ function BackgroundCheckProfileDetails({
                 })}
                 icon={<RepeatIcon />}
                 onClick={handleRefreshEntity}
-                isDisabled={isDisabled}
+                disabled={isDisabled}
               />
             ) : null}
           </HStack>

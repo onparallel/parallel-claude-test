@@ -3,7 +3,6 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Button,
   Flex,
   ListItem,
   Stack,
@@ -13,6 +12,7 @@ import { ContactReference } from "@parallel/components/common/ContactReference";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { PetitionRemindersConfig } from "@parallel/components/petition-compose/PetitionRemindersConfig";
+import { Button, Text } from "@parallel/components/ui";
 import {
   useConfigureRemindersDialog_PetitionAccessFragment,
   useConfigureRemindersDialog_RemindersConfigFragment,
@@ -20,7 +20,6 @@ import {
 import { Maybe } from "@parallel/utils/types";
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export interface ConfigureRemindersDialogProps {
   accesses: useConfigureRemindersDialog_PetitionAccessFragment[];
@@ -89,7 +88,7 @@ export function ConfigureRemindersDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="primary" onClick={() => props.onResolve(remindersConfig)}>
+        <Button colorPalette="primary" onClick={() => props.onResolve(remindersConfig)}>
           <FormattedMessage id="generic.apply-changes" defaultMessage="Apply changes" />
         </Button>
       }

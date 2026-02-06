@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useApolloClient } from "@apollo/client/react";
 import {
   Box,
-  Button,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -13,6 +12,7 @@ import {
 import { NormalLink } from "@parallel/components/common/Link";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { PasswordStrengthIndicator } from "@parallel/components/common/PasswordStrengthIndicator";
+import { Button, Text } from "@parallel/components/ui";
 import { PublicSignupForm_emailIsAvailableDocument } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
@@ -21,7 +21,6 @@ import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
-import { Text } from "@parallel/components/ui";
 
 interface PublicSignupFormData {
   email: string;
@@ -185,7 +184,7 @@ export function PublicSignupForm({ onNext, email, source }: PublicSignupFormProp
         </FormControl>
       </Stack>
       <Box marginTop={8}>
-        <Button width="100%" colorScheme="primary" size="md" fontSize="md" type="submit">
+        <Button width="100%" colorPalette="primary" size="md" fontSize="md" type="submit">
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       </Box>

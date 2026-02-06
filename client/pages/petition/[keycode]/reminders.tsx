@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
-  Button,
   Center,
   Circle,
   Flex,
@@ -20,6 +19,7 @@ import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { withApolloData } from "@parallel/components/common/withApolloData";
 import { RecipientViewPageNotAvailableError } from "@parallel/components/recipient-view/RecipientViewPageNotAvailableError";
+import { Button, Text } from "@parallel/components/ui";
 import {
   OptOut_publicRemindersOptOutDocument,
   OptOut_remindersOptOutDocument,
@@ -34,7 +34,6 @@ import { useRouter } from "next/router";
 import { FormEvent, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNullish } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 type OptOutProps = UnwrapPromise<ReturnType<typeof getServerSideProps>>["props"];
 
@@ -167,7 +166,7 @@ function OptOut(props: OptOutProps) {
                 <Button
                   fontWeight="500"
                   width="min-content"
-                  colorScheme="primary"
+                  colorPalette="primary"
                   variant="solid"
                   type="submit"
                 >

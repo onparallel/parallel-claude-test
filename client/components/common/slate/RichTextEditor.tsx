@@ -1,4 +1,5 @@
 import { Box, useFormControl, useMultiStyleConfig } from "@chakra-ui/react";
+import { Text } from "@parallel/components/ui";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import {
   PlaceholderCombobox,
@@ -48,7 +49,6 @@ import { identity, isNonNullish, omit, pick, piped } from "remeda";
 import { EditableProps } from "slate-react/dist/components/editable";
 import { PlateWithEditorRef } from "./PlateWithEditorRef";
 import { RichTextEditorToolbar } from "./RichTextEditorToolbar";
-import { Text } from "@parallel/components/ui";
 
 const components = {
   [ELEMENT_H1]: withProps(RenderElement, {

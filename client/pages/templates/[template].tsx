@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import {
   Box,
-  Button,
   Center,
   Grid,
   Heading,
@@ -22,6 +21,7 @@ import { PetitionFieldTitleContent } from "@parallel/components/petition-common/
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { LandingTemplateCard } from "@parallel/components/public/templates/LandingTemplateCard";
+import { Button, Text } from "@parallel/components/ui";
 import {
   LandingTemplateCard_LandingTemplateFragment,
   LandingTemplateDetails_landingTemplateBySlugDocument,
@@ -39,7 +39,6 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, zip } from "remeda";
 import { assert } from "ts-essentials";
-import { Text } from "@parallel/components/ui";
 
 function LandingTemplateDetails({
   template,
@@ -158,7 +157,7 @@ function LandingTemplateDetails({
                 </Text>
                 <HStack paddingTop={4}>
                   {/* <NakedLink href="/signup">
-                     <Button as="a" colorScheme="primary">
+                     <Button as="a" colorPalette="primary">
                        <FormattedMessage
                          id="public.try-for-free-button"
                          defaultMessage="Try for free"

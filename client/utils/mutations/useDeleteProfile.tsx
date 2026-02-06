@@ -1,11 +1,11 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Button } from "@chakra-ui/react";
+
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import { useDeleteProfile_scheduleProfileForDeletionDocument } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export function useDeleteProfile() {
   const [scheduleProfileForDeletion] = useMutation(
@@ -78,7 +78,7 @@ function ConfirmDeleteProfileDialog({
         </Text>
       }
       confirm={
-        <Button type="submit" colorScheme="red">
+        <Button type="submit" colorPalette="red">
           <FormattedMessage id="generic.delete" defaultMessage="Delete" />
         </Button>
       }

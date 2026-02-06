@@ -3,7 +3,6 @@ import { useMutation } from "@apollo/client/react";
 import {
   Badge,
   Box,
-  Button,
   Center,
   Divider,
   Heading,
@@ -24,6 +23,7 @@ import { RestrictedFeatureAlert } from "@parallel/components/common/RestrictedFe
 import { SupportButton } from "@parallel/components/common/SupportButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
+import { Button, Text } from "@parallel/components/ui";
 import {
   OrganizationGeneral_updateOrgLogoDocument,
   OrganizationGeneral_userDocument,
@@ -34,7 +34,6 @@ import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useRef } from "react";
 import { DropzoneRef, FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 const MAX_FILE_SIZE = 1024 * 1024;
 
 function OrganizationGeneral() {
@@ -232,9 +231,9 @@ function OrganizationGeneral() {
                     />
                   </Text>
                   <Button
-                    colorScheme="primary"
+                    colorPalette="primary"
                     onClick={() => dropzoneRef.current?.open()}
-                    isDisabled={!userCanEditOrganization}
+                    disabled={!userCanEditOrganization}
                   >
                     <FormattedMessage
                       id="organization.branding.upload-logo"

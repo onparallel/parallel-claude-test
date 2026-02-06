@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Button,
   Circle,
   HStack,
   IconButton,
@@ -27,7 +26,7 @@ import { NakedLink } from "../common/Link";
 import { useTone } from "../common/ToneProvider";
 import { Avatar } from "../ui";
 import { useRecipientViewHelpDialog } from "./dialogs/RecipientViewHelpDialog";
-import { Text } from "@parallel/components/ui";
+import { Button, Text } from "@parallel/components/ui";
 export function RecipientViewMenuButton({
   keycode,
   hasClientPortalAccess,

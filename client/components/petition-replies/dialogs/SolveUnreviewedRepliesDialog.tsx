@@ -1,11 +1,11 @@
-import { Box, Button, Flex, Radio, RadioGroup, Stack, useTheme } from "@chakra-ui/react";
+import { Box, Flex, Radio, RadioGroup, Stack, useTheme } from "@chakra-ui/react";
 import { CheckIcon, CloseIcon, ForbiddenIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import deepmerge from "deepmerge";
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 type SolveUnreviewedRepliesDialogAction = "APPROVE" | "REJECT" | "NOTHING";
 
@@ -53,7 +53,7 @@ export function SolveUnreviewedRepliesDialog(
                   width="100%"
                   justifyContent="flex-start"
                   variant="outline"
-                  isActive={value === "APPROVE"}
+                  data-active={value === "APPROVE"}
                 >
                   <Flex
                     justifyContent="center"
@@ -82,7 +82,7 @@ export function SolveUnreviewedRepliesDialog(
                   width="100%"
                   justifyContent="flex-start"
                   variant="outline"
-                  isActive={value === "REJECT"}
+                  data-active={value === "REJECT"}
                 >
                   <Flex
                     justifyContent="center"
@@ -111,7 +111,7 @@ export function SolveUnreviewedRepliesDialog(
                   width="100%"
                   justifyContent="flex-start"
                   variant="outline"
-                  isActive={value === "NOTHING"}
+                  data-active={value === "NOTHING"}
                 >
                   <Flex
                     justifyContent="center"
@@ -134,7 +134,7 @@ export function SolveUnreviewedRepliesDialog(
         </Box>
       }
       confirm={
-        <Button colorScheme="primary" isDisabled={!value} onClick={() => props.onResolve(value)}>
+        <Button colorPalette="primary" disabled={!value} onClick={() => props.onResolve(value)}>
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }

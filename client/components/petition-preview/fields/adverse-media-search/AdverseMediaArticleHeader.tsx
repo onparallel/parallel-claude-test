@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, HStack, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
+import { Box, Flex, HStack, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import {
   CheckIcon,
@@ -12,7 +12,7 @@ import {
 import { ButtonWithMoreOptions } from "@parallel/components/common/ButtonWithMoreOptions";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { Text } from "@parallel/components/ui";
+import { Button, Text } from "@parallel/components/ui";
 import {
   AdverseMediaArticleHeader_AdverseMediaArticleFragment,
   AdverseMediaArticleRelevance,
@@ -82,7 +82,7 @@ export function AdverseMediaArticleHeader({
                   fontWeight={500}
                   fontSize="md"
                   size="sm"
-                  isDisabled={isReadOnly}
+                  disabled={isReadOnly}
                 >
                   {article.classification === "RELEVANT" ? (
                     <FormattedMessage
@@ -146,11 +146,11 @@ export function AdverseMediaArticleHeader({
                   <Button
                     size="sm"
                     fontSize="md"
-                    colorScheme="primary"
+                    colorPalette="primary"
                     fontWeight={500}
                     onClick={() => onClassifyArticle("RELEVANT")}
                     leftIcon={<StarEmptyIcon />}
-                    isDisabled={isReadOnly}
+                    disabled={isReadOnly}
                   >
                     <FormattedMessage
                       id="component.adverse-media-article-header.relevant"
@@ -164,7 +164,7 @@ export function AdverseMediaArticleHeader({
                     fontWeight={500}
                     onClick={() => onClassifyArticle("IRRELEVANT")}
                     leftIcon={<ForbiddenIcon />}
-                    isDisabled={isReadOnly}
+                    disabled={isReadOnly}
                   >
                     <FormattedMessage
                       id="component.adverse-media-article-header.not-relevant"
@@ -177,7 +177,7 @@ export function AdverseMediaArticleHeader({
                     fontWeight={500}
                     leftIcon={<UserXIcon />}
                     onClick={() => onClassifyArticle("DISMISSED")}
-                    isDisabled={isReadOnly}
+                    disabled={isReadOnly}
                   >
                     <FormattedMessage
                       id="component.adverse-media-article-header.not-the-person"

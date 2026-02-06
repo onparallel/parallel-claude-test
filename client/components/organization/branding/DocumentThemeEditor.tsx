@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Button,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -21,6 +20,7 @@ import { ColorInput } from "@parallel/components/common/ColorInput";
 import { Divider } from "@parallel/components/common/Divider";
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
 import { RichTextEditor } from "@parallel/components/common/slate/RichTextEditor";
+import { Button, Text } from "@parallel/components/ui";
 import { DocumentThemeEditor_UserFragment, PetitionLocale } from "@parallel/graphql/__types";
 import { useAvailablePetitionLocales } from "@parallel/utils/locales";
 import { untranslated } from "@parallel/utils/untranslated";
@@ -29,7 +29,6 @@ import { Controller, useFormContext } from "react-hook-form";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { isNonNullish, sort, zip } from "remeda";
 import fonts from "../../../utils/fonts.json";
-import { Text } from "@parallel/components/ui";
 
 interface DocumentThemeEditorProps {
   user: DocumentThemeEditor_UserFragment;
@@ -323,7 +322,7 @@ export function DocumentThemeEditor({ user, isDisabled, themeId }: DocumentTheme
           <Button
             variant="link"
             onClick={handleRestoreFonts}
-            isDisabled={!canRestoreFonts || isDisabled}
+            disabled={!canRestoreFonts || isDisabled}
           >
             <FormattedMessage
               id="component.document-theme-editor.restore-defaults"

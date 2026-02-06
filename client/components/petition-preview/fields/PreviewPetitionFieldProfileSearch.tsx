@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Badge, Box, Button, Center, HStack, List, Progress, Stack } from "@chakra-ui/react";
+import { Badge, Box, Center, HStack, List, Progress, Stack } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import {
   CheckIcon,
@@ -15,6 +15,7 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
   RecipientViewPetitionFieldLayoutProps,
 } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldLayout";
+import { Button, Text } from "@parallel/components/ui";
 import {
   PreviewPetitionFieldProfileSearch_PetitionBaseFragment,
   PreviewPetitionFieldProfileSearch_UserFragment,
@@ -27,7 +28,6 @@ import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 export interface PreviewPetitionFieldProfileSearchProps
   extends Omit<
@@ -171,7 +171,7 @@ export function PreviewPetitionFieldProfileSearch({
       <Button
         variant="outline"
         onClick={handleStart}
-        isDisabled={isDisabled || !user.hasProfileSearchField}
+        disabled={isDisabled || !user.hasProfileSearchField}
         marginTop={3}
         id={`reply-${field.id}${parentReplyId ? `-${parentReplyId}` : ""}-new`}
       >
@@ -324,7 +324,7 @@ export function PreviewPetitionFieldProfileSearchReply({
       ) : null}
       {onRemove !== undefined ? (
         <IconButtonWithTooltip
-          isDisabled={isDisabled || reply.status === "APPROVED"}
+          disabled={isDisabled || reply.status === "APPROVED"}
           onClick={onRemove}
           variant="ghost"
           icon={<DeleteIcon />}

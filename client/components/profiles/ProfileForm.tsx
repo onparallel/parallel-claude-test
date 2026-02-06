@@ -5,7 +5,6 @@ import {
   AlertIcon,
   Badge,
   Box,
-  Button,
   Center,
   Flex,
   HStack,
@@ -18,6 +17,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Divider } from "@parallel/components/common/Divider";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { OverflownText } from "@parallel/components/common/OverflownText";
+import { Button } from "@parallel/components/ui";
 import {
   ProfileForm_PetitionBaseFragment,
   ProfileForm_ProfileFragment,
@@ -199,7 +199,7 @@ export const ProfileForm = chakraForwardRef<"div", ProfileFormProps>(function Pr
           {profile.profileType.standardType === "INDIVIDUAL" ||
           profile.profileType.standardType === "LEGAL_ENTITY" ? (
             <IconButtonWithTooltip
-              isDisabled={isFormDisabled}
+              disabled={isFormDisabled}
               onClick={handleCheckExternalSourcesClick}
               icon={<SearchIcon />}
               size="sm"
@@ -442,9 +442,9 @@ function EditedFieldsAlert({
           )}
           <Button
             size="sm"
-            colorScheme="purple"
+            colorPalette="purple"
             type="submit"
-            isDisabled={isSubmitting || hasErrors}
+            disabled={isSubmitting || hasErrors}
           >
             <FormattedMessage id="generic.save" defaultMessage="Save" />
           </Button>

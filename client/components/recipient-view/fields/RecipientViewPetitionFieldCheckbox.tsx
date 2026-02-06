@@ -10,6 +10,7 @@ import {
 import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { useTone } from "@parallel/components/common/ToneProvider";
 import { CheckboxTypeLabel } from "@parallel/components/petition-common/CheckboxTypeLabel";
+import { Text } from "@parallel/components/ui";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { OptimizedMenuList } from "@parallel/utils/react-select/OptimizedMenuList";
@@ -29,7 +30,6 @@ import {
   RecipientViewPetitionFieldLayoutProps,
 } from "./RecipientViewPetitionFieldLayout";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
-import { Text } from "@parallel/components/ui";
 
 type SelectOptionValue = {
   label: LocalizableUserText;
@@ -298,7 +298,7 @@ export function RecipientViewPetitionFieldCheckbox({
 
             {isNonNullish(reply) ? (
               <IconButtonWithTooltip
-                isDisabled={isDisabled || reply.status === "APPROVED"}
+                disabled={isDisabled || reply.status === "APPROVED"}
                 onClick={() => handleDelete()}
                 variant="ghost"
                 icon={<DeleteIcon />}

@@ -1,10 +1,11 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import { Button, FormControl, FormHelperText, FormLabel, Stack } from "@chakra-ui/react";
+import { FormControl, FormHelperText, FormLabel, Stack } from "@chakra-ui/react";
 import { PetitionFieldSelect } from "@parallel/components/common/PetitionFieldSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { BackgroundCheckEntityTypeSelect } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityTypeSelect";
+import { Button, Text } from "@parallel/components/ui";
 import {
   ConfigureBackgroundCheckAutomateSearchDialog_petitionDocument,
   PetitionComposeFieldSettings_PetitionFieldFragment,
@@ -14,7 +15,6 @@ import { useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 interface ConfigureBackgroundCheckAutomateSearchDialogInput {
   petitionId: string;
@@ -312,7 +312,7 @@ export function ConfigureBackgroundCheckAutomateSearchDialog({
         isNonNullish(autoSearchConfig) ? (
           <Button
             type="submit"
-            colorScheme="red"
+            colorPalette="red"
             variant="outline"
             onClick={() => props.onReject("DELETE_AUTO_SEARCH_CONFIG")}
           >
@@ -321,7 +321,7 @@ export function ConfigureBackgroundCheckAutomateSearchDialog({
         ) : null
       }
       confirm={
-        <Button type="submit" colorScheme="primary" isDisabled={!textFields.length}>
+        <Button type="submit" colorPalette="primary" disabled={!textFields.length}>
           <FormattedMessage id="generic.save" defaultMessage="Save" />
         </Button>
       }

@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
 import {
   Box,
-  Button,
   Circle,
   Flex,
   FormControl,
@@ -22,7 +21,7 @@ import { UserGroupReference } from "@parallel/components/common/UserGroupReferen
 import { UserReference } from "@parallel/components/common/UserReference";
 
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
-import { Avatar, Text } from "@parallel/components/ui";
+import { Avatar, Button, Text } from "@parallel/components/ui";
 import {
   DashboardPermissionType,
   DashboardSharingDialog_createDashboardPermissionsDocument,
@@ -513,13 +512,13 @@ export function DashboardSharingDialog({
           <Button
             data-testid="share-petition-send-button"
             type="submit"
-            colorScheme="primary"
+            colorPalette="primary"
             variant="solid"
           >
             <FormattedMessage id="generic.send" defaultMessage="Send" />
           </Button>
         ) : (
-          <Button colorScheme="primary" variant="solid" onClick={() => props.onReject()}>
+          <Button colorPalette="primary" variant="solid" onClick={() => props.onReject()}>
             <FormattedMessage id="generic.done" defaultMessage="Done" />
           </Button>
         )
@@ -655,7 +654,7 @@ function ConfirmUpdateDashboardPermissionDialog({
         )
       }
       confirm={
-        <Button colorScheme="red" onClick={() => props.onResolve()}>
+        <Button colorPalette="red" onClick={() => props.onResolve()}>
           <FormattedMessage id="generic.yes-continue" defaultMessage="Yes, continue" />
         </Button>
       }
@@ -685,7 +684,7 @@ function ConfirmStopSharingDashboardDialog({ name, ...props }: DialogProps<{ nam
         />
       }
       confirm={
-        <Button colorScheme="red" onClick={() => props.onResolve()}>
+        <Button colorPalette="red" onClick={() => props.onResolve()}>
           <FormattedMessage id="generic.confirm-remove-button" defaultMessage="Yes, remove" />
         </Button>
       }

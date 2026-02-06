@@ -1,11 +1,11 @@
-import { Box, Button, Checkbox, Stack } from "@chakra-ui/react";
+import { Box, Checkbox, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Button, Text } from "@parallel/components/ui";
 import { useLocalStorage } from "@parallel/utils/useLocalStorage";
 import { useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 interface PetitionFromTemplateDialogData {
   dontShow: boolean;
@@ -64,7 +64,7 @@ function PetitionFromTemplateDialog({
       confirm={
         <Button
           type="submit"
-          colorScheme="primary"
+          colorPalette="primary"
           variant="solid"
           data-testid="accept-edit-parallel-button"
         >

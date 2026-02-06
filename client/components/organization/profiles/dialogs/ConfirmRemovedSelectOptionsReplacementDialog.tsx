@@ -1,4 +1,4 @@
-import { Button, FormControl, Grid, HStack, Stack } from "@chakra-ui/react";
+import { FormControl, Grid, HStack, Stack } from "@chakra-ui/react";
 import { AssignIcon } from "@parallel/chakra/icons";
 import {
   localizableUserTextRender,
@@ -8,6 +8,7 @@ import { OverflownText } from "@parallel/components/common/OverflownText";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { ProfileFormFieldSelectOptionItem } from "@parallel/components/profiles/form-fields/ProfileFormFieldSelect";
+import { Button, Text } from "@parallel/components/ui";
 import { UpdateProfileTypeFieldSelectOptionsSubstitution } from "@parallel/graphql/__types";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
@@ -15,7 +16,6 @@ import { UnwrapArray } from "@parallel/utils/types";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, { components, OptionProps, SingleValueProps } from "react-select";
-import { Text } from "@parallel/components/ui";
 
 type SelectOptionValue = UnwrapArray<ProfileTypeFieldOptions<"SELECT">["values"]>;
 
@@ -147,7 +147,7 @@ function ConfirmRemovedSelectOptionsReplacementDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="primary" type="submit">
+        <Button colorPalette="primary" type="submit">
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }

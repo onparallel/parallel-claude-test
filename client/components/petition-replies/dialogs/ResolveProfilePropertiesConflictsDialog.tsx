@@ -5,7 +5,6 @@ import {
   AlertDescription,
   AlertIcon,
   Box,
-  Button,
   Center,
   FormControl,
   Spinner,
@@ -29,6 +28,7 @@ import {
   useWizardDialog,
   WizardStepDialogProps,
 } from "@parallel/components/common/dialogs/WizardDialog";
+import { Button, Text } from "@parallel/components/ui";
 import {
   ArchiveFieldGroupReplyIntoProfileConflictResolutionAction,
   ArchiveFieldGroupReplyIntoProfileConflictResolutionInput,
@@ -47,7 +47,6 @@ import { Controller, useForm } from "react-hook-form";
 import { FormattedDate, FormattedMessage } from "react-intl";
 import { entries, filter, flatMap, fromEntries, isNonNullish, isNullish, map, pipe } from "remeda";
 import { assert } from "ts-essentials";
-import { Text } from "@parallel/components/ui";
 
 type ResolveProfilePropertiesConflictsDialogSteps = {
   LOADING: {
@@ -397,7 +396,7 @@ function ResolveProfilePropertiesConflictsDialog({
               </AlertDescription>
               <Button
                 variant="outline"
-                colorScheme="blue"
+                colorPalette="blue"
                 backgroundColor="white"
                 marginX={2}
                 onClick={() => props.onReject("CREATE_NEW_PROFILE")}
@@ -551,7 +550,7 @@ function ResolveProfilePropertiesConflictsDialog({
         </Button>
       }
       confirm={
-        <Button colorScheme="primary" type="submit">
+        <Button colorPalette="primary" type="submit">
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }

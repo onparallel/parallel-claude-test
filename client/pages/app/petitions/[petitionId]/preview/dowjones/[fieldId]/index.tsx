@@ -4,7 +4,6 @@ import {
   AlertDescription,
   AlertIcon,
   AlertTitle,
-  Button,
   Center,
   Flex,
   FormControl,
@@ -20,6 +19,7 @@ import { DateInput } from "@parallel/components/common/DateInput";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { SupportLink } from "@parallel/components/common/SupportLink";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { Button, Text } from "@parallel/components/ui";
 import {
   DowJonesFieldSearch_petitionFieldDocument,
   DowJonesFieldSearch_userDocument,
@@ -30,7 +30,6 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 
 export interface DowJonesSearchFormData {
   name: string;
@@ -163,7 +162,7 @@ function DowJonesFieldSearch() {
                   </Flex>
                 </FormControl>
               </Stack>
-              <Button colorScheme="primary" type="submit" isDisabled={isDisabled}>
+              <Button colorPalette="primary" type="submit" disabled={isDisabled}>
                 <FormattedMessage
                   id="component.internal-field-kyc-research.search"
                   defaultMessage="Search"

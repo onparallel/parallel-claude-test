@@ -5,7 +5,6 @@ import {
   AlertDescription,
   AlertIcon,
   Box,
-  Button,
   Center,
   Flex,
   FormControl,
@@ -37,10 +36,10 @@ import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFil
 import { isPast, sub } from "date-fns";
 import { useEffect, useState } from "react";
 
+import { Button, Text } from "@parallel/components/ui";
 import { FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 type ConfigureExpirationsDateDialogSteps = {
   LOADING: {
@@ -207,7 +206,7 @@ function ConfigureExpirationsDateDialog({
         </Button>
       }
       confirm={
-        <Button colorScheme="primary" type="submit">
+        <Button colorPalette="primary" type="submit">
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }
