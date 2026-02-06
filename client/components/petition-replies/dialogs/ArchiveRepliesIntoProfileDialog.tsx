@@ -363,6 +363,16 @@ function ArchiveRepliesIntoProfileRow({
     fieldLogic,
   });
 
+  const hasAskUserUsedInName = Boolean(
+    mergedOptions.updateProfileOnClose?.some(
+      (update) =>
+        update?.source?.type === "ASK_USER" &&
+        profileType?.fields?.some(
+          (f) => f.id === update.profileTypeFieldId && f.isUsedInProfileName === true,
+        ),
+    ),
+  );
+
   const showConfigureUpdateProfileOnCloseDialog = useUpdateProfileFieldValueOnClosePetitionDialog();
   // Called at the end of the archive process to update the profile on close if needed
   async function handleUpdateProfileOnClose({
@@ -523,6 +533,11 @@ function ArchiveRepliesIntoProfileRow({
         petitionId: petition.id,
         options: mergedOptions,
       });
+      if (hasAskUserUsedInName) {
+        const { data: refetched } = await refetch({ profileId: profile.id });
+        if (refetched?.profile) savedProfile.current = refetched.profile;
+        rerender();
+      }
     } catch (error) {
       if (isApolloError(error, "CONFLICT_RESOLUTION_REQUIRED_ERROR")) {
         try {
@@ -600,7 +615,6 @@ function ArchiveRepliesIntoProfileRow({
             selectedProfileId: newProfile?.id ?? null,
             isSaved: true,
             isEditing: false,
-            omitUpdateChanges: true,
           }));
           savedProfile.current = newProfile ?? null;
           onRefetch();
@@ -608,16 +622,19 @@ function ArchiveRepliesIntoProfileRow({
         } catch (e) {
           if (isDialogError(e) && e.reason === "CREATE_NEW_PROFILE") {
             try {
-              const { profile } = await showCreateProfileDialog({
+              const { profile: newProfile } = await showCreateProfileDialog({
                 profileTypeId: field.profileType!.id,
                 profileFieldValues: profileFieldValues,
               });
-              await handleArchiveRepliesIntoProfile(profile as any, true);
+              if (!newProfile?.id) return;
+              await handleArchiveRepliesIntoProfile(newProfile.id, true);
               setState((current) => ({
                 ...current,
-                selectedProfile: profile ?? null,
+                selectedProfileId: newProfile.id,
               }));
               onRefetch();
+              rerender(); // rerender the profile select to show the new profile name
+              return;
             } catch {}
           }
         }
@@ -647,6 +664,11 @@ function ArchiveRepliesIntoProfileRow({
           petitionId: petition.id,
           options: mergedOptions,
         });
+        if (hasAskUserUsedInName) {
+          const { data: refetched } = await refetch({ profileId: profile.id });
+          if (refetched?.profile) savedProfile.current = refetched.profile;
+          rerender();
+        }
       }
     }
   }
