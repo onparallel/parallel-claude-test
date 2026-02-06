@@ -23,12 +23,8 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          additional_permissions: |
-            - "Bash(git diff:*)"
-            - "Bash(git log:*)"
-            - "Bash(git show:*)"
-            - "Bash(gh pr diff:*)"
-            - "Bash(gh pr view:*)"
+          claude_args: |
+            --allowedTools "Bash(git *),Bash(gh pr *),Bash(gh api *)"
           prompt: |
             IMPORTANT CONTEXT: You are running in GitHub Actions CI environment.
             The PR number is ${{ github.event.pull_request.number }}.
@@ -55,12 +51,8 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          additional_permissions: |
-            - "Bash(git diff:*)"
-            - "Bash(git log:*)"
-            - "Bash(git show:*)"
-            - "Bash(gh pr diff:*)"
-            - "Bash(gh pr view:*)"
+          claude_args: |
+            --allowedTools "Bash(git *),Bash(gh pr *),Bash(gh api *)"
           prompt: |
             IMPORTANT CONTEXT: You are running in GitHub Actions CI environment.
             The PR number is ${{ github.event.pull_request.number }}.
