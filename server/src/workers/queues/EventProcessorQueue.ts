@@ -31,10 +31,6 @@ import {
   DocumentProcessingListener,
 } from "./event-listeners/DocumentProcessingListener";
 import {
-  KYC_REFRESH_DATE_UPDATE_LISTENER,
-  KycRefreshDateUpdateListener,
-} from "./event-listeners/KycRefreshDateUpdateListener";
-import {
   PETITION_ACTIVITY_LISTENER,
   PetitionActivityListener,
 } from "./event-listeners/PetitionActivityListener";
@@ -46,6 +42,10 @@ import {
   PETITION_EVENT_SUBSCRIPTIONS_LISTENER,
   PetitionEventSubscriptionsListener,
 } from "./event-listeners/PetitionEventSubscriptionsListener";
+import {
+  PROFILE_DATE_REFRESH_BY_RISK_LISTENER,
+  ProfileDateRefreshByRiskListener,
+} from "./event-listeners/ProfileDateRefreshByRiskListener";
 import {
   PROFILE_EVENT_SUBSCRIPTIONS_LISTENER,
   ProfileEventSubscriptionsListener,
@@ -107,15 +107,15 @@ export class EventProcessor extends QueueWorker<EventProcessorPayload> {
     petitionApprovalProcessListener: PetitionApprovalProcessListener,
     @inject(CLIENT_RISK_UPDATE_LISTENER)
     clientRiskUpdateListener: ClientRiskUpdateListener,
-    @inject(KYC_REFRESH_DATE_UPDATE_LISTENER)
-    kycRefreshDateUpdateListener: KycRefreshDateUpdateListener,
+    @inject(PROFILE_DATE_REFRESH_BY_RISK_LISTENER)
+    profileDateRefreshByRiskListener: ProfileDateRefreshByRiskListener,
     @inject(PROFILE_SYNC_LISTENER)
     profileSyncListener: ProfileSyncListener,
   ) {
     super();
 
     this.register(clientRiskUpdateListener)
-      .register(kycRefreshDateUpdateListener)
+      .register(profileDateRefreshByRiskListener)
       .register(automaticBackgroundCheckProfileListener)
       .register(automaticBackgroundCheckPetitionListener)
       .register(documentProcessingListener)

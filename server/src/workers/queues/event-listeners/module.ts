@@ -13,10 +13,6 @@ import {
   DOCUMENT_PROCESSING_LISTENER,
   DocumentProcessingListener,
 } from "./DocumentProcessingListener";
-import {
-  KYC_REFRESH_DATE_UPDATE_LISTENER,
-  KycRefreshDateUpdateListener,
-} from "./KycRefreshDateUpdateListener";
 import { PETITION_ACTIVITY_LISTENER, PetitionActivityListener } from "./PetitionActivityListener";
 import {
   PETITION_APPROVAL_PROCESS_LISTENER,
@@ -26,6 +22,10 @@ import {
   PETITION_EVENT_SUBSCRIPTIONS_LISTENER,
   PetitionEventSubscriptionsListener,
 } from "./PetitionEventSubscriptionsListener";
+import {
+  PROFILE_DATE_REFRESH_BY_RISK_LISTENER,
+  ProfileDateRefreshByRiskListener,
+} from "./ProfileDateRefreshByRiskListener";
 import {
   PROFILE_EVENT_SUBSCRIPTIONS_LISTENER,
   ProfileEventSubscriptionsListener,
@@ -51,6 +51,6 @@ export const eventListenersModule = new ContainerModule((options) => {
     .to(AutomaticBackgroundCheckProfileListener);
   options.bind(PETITION_APPROVAL_PROCESS_LISTENER).to(PetitionApprovalProcessListener);
   options.bind(CLIENT_RISK_UPDATE_LISTENER).to(ClientRiskUpdateListener);
-  options.bind(KYC_REFRESH_DATE_UPDATE_LISTENER).to(KycRefreshDateUpdateListener);
+  options.bind(PROFILE_DATE_REFRESH_BY_RISK_LISTENER).to(ProfileDateRefreshByRiskListener);
   options.bind(PROFILE_SYNC_LISTENER).to(ProfileSyncListener);
 });
