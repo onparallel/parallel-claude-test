@@ -1,0 +1,57 @@
+name: Move Asana Task on PR Merge
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [develop]
+
+jobs:
+  move-asana-task:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract Asana Task ID and Move to Section
+        uses: actions/github-script@v7
+        env:
+          ASANA_TOKEN: ${{ secrets.ASANA_API_KEY }}
+        with:
+          script: |
+            const body = context.payload.pull_request.body || '';
+            const MERGED_SECTION_ID = '1203958824854918';
+
+            // Buscar links de Asana en la descripción
+            const asanaRegex = /https:\/\/app\.asana\.com\/\d+\/\d+\/(\d+)/g;
+            const matches = [...body.matchAll(asanaRegex)];
+
+            if (matches.length === 0) {
+              console.log('No Asana task links found in PR description');
+              return;
+            }
+
+            const taskIds = [...new Set(matches.map(m => m[1]))];
+            console.log(`Found Asana task IDs: ${taskIds.join(', ')}`);
+
+            for (const taskId of taskIds) {
+              try {
+                const response = await fetch(
+                  `https://app.asana.com/api/1.0/sections/${MERGED_SECTION_ID}/addTask`,
+                  {
+                    method: 'POST',
+                    headers: {
+                      'Authorization': `Bearer ${process.env.ASANA_TOKEN}`,
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ data: { task: taskId } })
+                  }
+                );
+
+                if (response.ok) {
+                  console.log(`✓ Moved task ${taskId} to "Merged to develop"`);
+                } else {
+                  const error = await response.text();
+                  console.error(`✗ Failed to move task ${taskId}: ${error}`);
+                }
+              } catch (error) {
+                console.error(`✗ Error moving task ${taskId}:`, error);
+              }
+            }
