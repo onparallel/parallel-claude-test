@@ -10260,11 +10260,6 @@
     "context": "Relationship"
   },
   {
-    "term": "util.use-profile-table-columns.subscribed-plural",
-    "definition": "Suscritos",
-    "context": "Subscribed"
-  },
-  {
     "term": "component.profile-type-field-and-metadata-select.metadata-close-date",
     "definition": "Fecha de cierre",
     "context": "Close date"
@@ -11793,6 +11788,21 @@
     "term": "component.recover-petition-dialog.header-template",
     "definition": "Recuperar {count, plural, =1 {plantilla} other {# plantillas}}",
     "context": "Recover {count, plural, =1 {template} other {# templates}}"
+  },
+  {
+    "term": "component.recover-profile-conflict-dialog.body",
+    "definition": "Los siguientes perfiles no se pueden recuperar porque sus valores de campo únicos ahora entran en conflicto con perfiles existentes:",
+    "context": "The following profiles cannot be recovered because their unique field values now conflict with existing profiles:"
+  },
+  {
+    "term": "component.recover-profile-conflict-dialog.conflict-item",
+    "definition": "{fieldName}: el valor \"{value}\" entra en conflicto con el perfil {conflictingProfileName}",
+    "context": "{fieldName}: value \"{value}\" conflicts with profile {conflictingProfileName}"
+  },
+  {
+    "term": "component.recover-profile-conflict-dialog.header",
+    "definition": "No se puede recuperar el perfil",
+    "context": "Cannot recover profile"
   },
   {
     "term": "component.recover-profile-dialog.body",
@@ -20918,6 +20928,11 @@
     "term": "util.use-profile-status-labels.open",
     "definition": "Abierto",
     "context": "Open"
+  },
+  {
+    "term": "util.use-profile-table-columns.subscribed-plural",
+    "definition": "Suscritos",
+    "context": "Subscribed"
   },
   {
     "term": "util.use-short-text-formats.email",

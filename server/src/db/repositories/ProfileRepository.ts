@@ -1090,33 +1090,46 @@ export class ProfileRepository extends BaseRepository {
     if (profileIds.length === 0) {
       return [];
     }
-    return await this.raw<Profile>(
-      /* sql */ `
-      update "profile"
-      set
-        status = ?,
-        closed_at = (
-          case 
-            when ? = 'OPEN' then null
-            when ? = 'CLOSED' then coalesce(closed_at, now())
-            else closed_at
-          end
-        ),
-        deletion_scheduled_at = (
-          case
-            when ? = 'DELETION_SCHEDULED' then now()
-            else null
-          end
-        ),
-        updated_by = ?,
-        updated_at = now()
-      where id in ?
-      and deleted_at is null
-      and status != ?
-      returning *;
-    `,
-      [status, status, status, status, updatedBy, this.sqlIn(profileIds), status],
-    );
+
+    return await this.withTransaction(async (t) => {
+      const profiles = await this.raw<Profile>(
+        /* sql */ `
+        update "profile"
+        set
+          status = ?,
+          closed_at = (
+            case
+              when ? = 'OPEN' then null
+              when ? = 'CLOSED' then coalesce(closed_at, now())
+              else closed_at
+            end
+          ),
+          deletion_scheduled_at = (
+            case
+              when ? = 'DELETION_SCHEDULED' then now()
+              else null
+            end
+          ),
+          updated_by = ?,
+          updated_at = now()
+        where id in ?
+        and deleted_at is null
+        and status != ?
+        returning *;
+      `,
+        [status, status, status, status, updatedBy, this.sqlIn(profileIds), status],
+        t,
+      );
+
+      // Sync the denormalized flag on profile_field_value
+      await this.updateProfileFieldValuesIsDeletionScheduled(
+        profiles.map((p) => p.id),
+        status === "DELETION_SCHEDULED",
+        t,
+      );
+
+      return profiles;
+    });
   }
 
   async countProfilesWithValuesOrFilesByProfileTypeFieldId(profileTypeFieldIds: number[]) {
@@ -1346,6 +1359,20 @@ export class ProfileRepository extends BaseRepository {
       .where("profile_type_field_id", profileTypeFieldId)
       .whereNull("deleted_at")
       .update({ profile_type_field_is_unique: isUnique });
+  }
+
+  async updateProfileFieldValuesIsDeletionScheduled(
+    profileIds: number[],
+    isDeletionScheduled: boolean,
+    t?: Knex.Transaction,
+  ) {
+    if (profileIds.length === 0) {
+      return;
+    }
+    await this.from("profile_field_value", t)
+      .whereIn("profile_id", profileIds)
+      .whereNull("deleted_at")
+      .update({ profile_is_deletion_scheduled: isDeletionScheduled });
   }
 
   async findProfileFieldValuesWithSameContent(profileTypeFieldId: number, t?: Knex.Transaction) {

@@ -85,7 +85,7 @@ interface ProfileQueryFilterFieldValueCondition {
 interface ProfileQueryFilterPropertyCondition {
   property: ProfileQueryFilterProperty;
   operator: ProfileQueryFilterOperator;
-  value?: number | string | string[];
+  value?: number | number[] | string | string[];
 }
 
 const MAX_GROUP_DEPTH = 4;

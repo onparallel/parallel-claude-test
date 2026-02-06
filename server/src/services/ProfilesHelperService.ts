@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { format as formatPhoneNumber } from "libphonenumber-js";
-import { isNonNullish, pick } from "remeda";
+import { flat, indexBy, isNonNullish, pick, pipe, unique } from "remeda";
 import { assert } from "ts-essentials";
 import {
   PetitionFieldType,
@@ -216,5 +216,161 @@ export class ProfilesHelperService {
           content: value!.content,
         };
       });
+  }
+
+  /**
+   * Gets unique value conflicts that would occur if the specified profiles were recovered from DELETION_SCHEDULED status.
+   * This checks if any OPEN or CLOSED profiles have the same unique field values as the profiles being recovered.
+   */
+  public async getRecoverProfileUniqueConflicts(profileIds: number[], orgId: number) {
+    if (profileIds.length === 0) {
+      return [];
+    }
+
+    // Load profiles being recovered
+    const profilesToRecover = (await this.profiles.loadProfile(profileIds)).filter(isNonNullish);
+
+    if (profilesToRecover.length === 0) {
+      return [];
+    }
+
+    const profileTypeIds = unique(profilesToRecover.map((p) => p.profile_type_id));
+
+    const allProperties = pipe(
+      await this.profiles.loadProfileTypeFieldsByProfileTypeId(profileTypeIds),
+      flat(),
+    );
+
+    const allUniqueProperties = allProperties.filter((f) => f.is_unique);
+
+    // Get all unique field values from profiles being reopened
+    const uniqueFieldValues = (
+      await this.profiles.loadProfileFieldValue(
+        profilesToRecover.flatMap((p) => {
+          const uniqueProperties = allUniqueProperties.filter(
+            (f) => f.profile_type_id === p.profile_type_id,
+          );
+          return uniqueProperties.map((f) => ({
+            profileId: p.id,
+            profileTypeFieldId: f.id,
+          }));
+        }),
+      )
+    ).filter(isNonNullish);
+
+    if (uniqueFieldValues.length === 0) {
+      return [];
+    }
+
+    const allConflicts: Array<{
+      recoveringProfileId: number;
+      recoveringProfileName: any;
+      profileTypeFieldId: number;
+      profileTypeFieldName: any;
+      conflictingProfileId: number;
+      conflictingProfileName: any;
+      value: string;
+    }> = [];
+
+    for (const profileTypeId of profileTypeIds) {
+      const profilesOfType = profilesToRecover.filter((p) => p.profile_type_id === profileTypeId);
+      const profileIdsOfType = profilesOfType.map((p) => p.id);
+      const valuesOfType = uniqueFieldValues.filter((v) => profileIdsOfType.includes(v.profile_id));
+
+      if (valuesOfType.length === 0) {
+        continue;
+      }
+
+      // Build filter conditions for values
+      const possibleConflictingFields = valuesOfType.map((v) => ({
+        profileTypeFieldId: v.profile_type_field_id,
+        content: v.content,
+      }));
+
+      const profileTypeFieldsById = indexBy(allProperties, (f) => f.id);
+
+      // Search for OPEN or CLOSED profiles with same values (not including profiles being recovered)
+      const conflictingProfiles = await this.profiles.getPaginatedProfileForOrg(
+        orgId,
+        {
+          offset: 0,
+          limit: possibleConflictingFields.length * 2,
+          profileTypeId: [profileTypeId],
+          filter: {
+            logicalOperator: "AND",
+            conditions: [
+              {
+                property: "status",
+                operator: "IS_ONE_OF",
+                value: ["OPEN", "CLOSED"],
+              },
+              {
+                property: "id",
+                operator: "NOT_IS_ONE_OF",
+                value: profileIdsOfType,
+              },
+              {
+                logicalOperator: "OR",
+                conditions: possibleConflictingFields.map((f) => ({
+                  profileTypeFieldId: f.profileTypeFieldId,
+                  operator: "EQUAL" as const,
+                  value: f.content.value,
+                })),
+              },
+            ],
+          },
+        },
+        profileTypeFieldsById,
+      ).items;
+
+      if (conflictingProfiles.length === 0) {
+        continue;
+      }
+
+      // Get field values for conflicting profiles to match exact conflicts
+      const conflictingFieldValues = await this.profiles.loadProfileFieldValue(
+        conflictingProfiles.flatMap((p) =>
+          possibleConflictingFields.map((f) => ({
+            profileId: p.id,
+            profileTypeFieldId: f.profileTypeFieldId,
+          })),
+        ),
+      );
+
+      // Match conflicts
+      for (const cfv of conflictingFieldValues) {
+        if (!cfv) {
+          continue;
+        }
+
+        const matchingRecoveringValue = valuesOfType.find(
+          (v) =>
+            v.profile_type_field_id === cfv.profile_type_field_id &&
+            v.content?.value === cfv.content?.value,
+        );
+
+        if (matchingRecoveringValue) {
+          const recoveringProfile = profilesOfType.find(
+            (p) => p.id === matchingRecoveringValue.profile_id,
+          );
+          const conflictingProfile = conflictingProfiles.find((p) => p.id === cfv.profile_id);
+
+          if (recoveringProfile && conflictingProfile) {
+            allConflicts.push({
+              recoveringProfileId: recoveringProfile.id,
+              recoveringProfileName: recoveringProfile.localizable_name,
+              profileTypeFieldId: matchingRecoveringValue.profile_type_field_id,
+              profileTypeFieldName:
+                profileTypeFieldsById[matchingRecoveringValue.profile_type_field_id]?.name,
+              conflictingProfileId: conflictingProfile.id,
+              conflictingProfileName: conflictingProfile.localizable_name,
+              value: matchingRecoveringValue.content?.value,
+            });
+          }
+        }
+      }
+    }
+
+    return allConflicts;
   }
 }

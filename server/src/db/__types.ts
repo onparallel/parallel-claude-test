@@ -2307,6 +2307,7 @@ export interface ProfileFieldValue {
   review_reason: Maybe<any>; // jsonb
   profile_type_field_is_unique: boolean; // bool
   source: Maybe<string>; // varchar
+  profile_is_deletion_scheduled: boolean; // bool
 }
 
 export type CreateProfileFieldValue = PartialProps<
@@ -2328,6 +2329,7 @@ export type CreateProfileFieldValue = PartialProps<
   | "review_reason"
   | "profile_type_field_is_unique"
   | "source"
+  | "profile_is_deletion_scheduled"
 >;
 
 export interface ProfileListView {

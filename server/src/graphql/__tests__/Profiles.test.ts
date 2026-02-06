@@ -15647,4 +15647,242 @@ describe("GraphQL/Profiles", () => {
       });
     });
   });
+
+  describe("unique constraint with DELETION_SCHEDULED status", () => {
+    const uniqueValue = "UNIQUE-TEST-12345";
+
+    it("allows creating profile with same unique value as DELETION_SCHEDULED profile", async () => {
+      // Create first profile with unique value
+      const profile1 = await createProfile(toGlobalId("ProfileType", profileTypes[4].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+          content: { value: uniqueValue },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[1].id),
+          content: { value: "Test Name 1" },
+        },
+      ]);
+      expect(profile1).toBeDefined();
+
+      // Schedule first profile for deletion
+      const { errors: scheduleErrors } = await testClient.execute(
+        gql`
+          mutation ($profileIds: [GID!]!) {
+            scheduleProfileForDeletion(profileIds: $profileIds) {
+              id
+              status
+            }
+          }
+        `,
+        { profileIds: [profile1.id] },
+      );
+      expect(scheduleErrors).toBeUndefined();
+
+      // Verify the flag is set on profile_field_value
+      const [pfv1] = await mocks.knex
+        .from("profile_field_value")
+        .where("profile_id", fromGlobalId(profile1.id).id)
+        .where("profile_type_field_id", profileType4Fields[0].id)
+        .select("profile_is_deletion_scheduled");
+      expect(pfv1.profile_is_deletion_scheduled).toBe(true);
+
+      // Create second profile with same unique value - should succeed
+      const profile2 = await createProfile(toGlobalId("ProfileType", profileTypes[4].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+          content: { value: uniqueValue },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[1].id),
+          content: { value: "Test Name 2" },
+        },
+      ]);
+      expect(profile2).toBeDefined();
+      expect(profile2.id).not.toEqual(profile1.id);
+    });
+
+    it("returns conflict error when reopening DELETION_SCHEDULED profile with conflicting unique value", async () => {
+      // Create first profile with unique value
+      const profile1 = await createProfile(toGlobalId("ProfileType", profileTypes[4].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+          content: { value: `${uniqueValue}-conflict` },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[1].id),
+          content: { value: "Conflict Test 1" },
+        },
+      ]);
+
+      // Schedule first profile for deletion
+      await testClient.execute(
+        gql`
+          mutation ($profileIds: [GID!]!) {
+            scheduleProfileForDeletion(profileIds: $profileIds) {
+              id
+            }
+          }
+        `,
+        { profileIds: [profile1.id] },
+      );
+
+      // Create second profile with same unique value
+      const profile2 = await createProfile(toGlobalId("ProfileType", profileTypes[4].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+          content: { value: `${uniqueValue}-conflict` },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[1].id),
+          content: { value: "Conflict Test 2" },
+        },
+      ]);
+      expect(profile2).toBeDefined();
+
+      // Try to reopen first profile - should fail with conflict error
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileIds: [GID!]!) {
+            reopenProfile(profileIds: $profileIds) {
+              id
+            }
+          }
+        `,
+        { profileIds: [profile1.id] },
+      );
+
+      expect(errors).toContainGraphQLError("PROFILE_RECOVER_UNIQUE_CONFLICT");
+      expect(data).toBeNull();
+
+      // Verify error contains conflict details
+      const errorExtensions = errors![0].extensions;
+      expect(errorExtensions?.conflicts).toBeDefined();
+      expect(errorExtensions?.conflicts).toHaveLength(1);
+      expect((errorExtensions?.conflicts as any)[0]).toMatchObject({
+        recoveringProfileId: profile1.id,
+        profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+        conflictingProfileId: profile2.id,
+        value: `${uniqueValue}-conflict`,
+      });
+    });
+
+    it("allows reopening DELETION_SCHEDULED profile when no conflicts exist", async () => {
+      // Create profile with unique value
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[4].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+          content: { value: `${uniqueValue}-no-conflict` },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[1].id),
+          content: { value: "No Conflict Test" },
+        },
+      ]);
+
+      // Schedule for deletion
+      await testClient.execute(
+        gql`
+          mutation ($profileIds: [GID!]!) {
+            scheduleProfileForDeletion(profileIds: $profileIds) {
+              id
+            }
+          }
+        `,
+        { profileIds: [profile.id] },
+      );
+
+      // Verify flag is set
+      const [pfvScheduled] = await mocks.knex
+        .from("profile_field_value")
+        .where("profile_id", fromGlobalId(profile.id).id)
+        .where("profile_type_field_id", profileType4Fields[0].id)
+        .select("profile_is_deletion_scheduled");
+      expect(pfvScheduled.profile_is_deletion_scheduled).toBe(true);
+
+      // Reopen - should succeed since no other profile has the same value
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileIds: [GID!]!) {
+            reopenProfile(profileIds: $profileIds) {
+              id
+              status
+            }
+          }
+        `,
+        { profileIds: [profile.id] },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.reopenProfile).toEqual([
+        {
+          id: profile.id,
+          status: "OPEN",
+        },
+      ]);
+
+      // Verify flag is cleared
+      const [pfvReopened] = await mocks.knex
+        .from("profile_field_value")
+        .where("profile_id", fromGlobalId(profile.id).id)
+        .where("profile_type_field_id", profileType4Fields[0].id)
+        .select("profile_is_deletion_scheduled");
+      expect(pfvReopened.profile_is_deletion_scheduled).toBe(false);
+    });
+
+    it("allows reopening CLOSED profile without unique conflict check", async () => {
+      // Create and close a profile (not schedule for deletion)
+      const profile = await createProfile(toGlobalId("ProfileType", profileTypes[4].id), [
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[0].id),
+          content: { value: `${uniqueValue}-closed` },
+        },
+        {
+          profileTypeFieldId: toGlobalId("ProfileTypeField", profileType4Fields[1].id),
+          content: { value: "Closed Test" },
+        },
+      ]);
+
+      // Close the profile
+      await testClient.execute(
+        gql`
+          mutation ($profileIds: [GID!]!) {
+            closeProfile(profileIds: $profileIds) {
+              id
+            }
+          }
+        `,
+        { profileIds: [profile.id] },
+      );
+
+      // Verify flag is NOT set (only set for DELETION_SCHEDULED)
+      const [pfvClosed] = await mocks.knex
+        .from("profile_field_value")
+        .where("profile_id", fromGlobalId(profile.id).id)
+        .where("profile_type_field_id", profileType4Fields[0].id)
+        .select("profile_is_deletion_scheduled");
+      expect(pfvClosed.profile_is_deletion_scheduled).toBe(false);
+
+      // Reopen - should succeed without conflict check
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($profileIds: [GID!]!) {
+            reopenProfile(profileIds: $profileIds) {
+              id
+              status
+            }
+          }
+        `,
+        { profileIds: [profile.id] },
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.reopenProfile).toEqual([
+        {
+          id: profile.id,
+          status: "OPEN",
+        },
+      ]);
+    });
+  });
 });

@@ -2151,6 +2151,38 @@ export const reopenProfile = mutationField("reopenProfile", {
     profileIds: nonNull(list(nonNull(globalIdArg("Profile")))),
   },
   resolve: async (_, { profileIds }, ctx) => {
+    // Check if any profiles are coming from DELETION_SCHEDULED status
+    const profilesToReopen = (await ctx.profiles.loadProfile(profileIds)).filter(isNonNullish);
+    const deletionScheduledProfileIds = profilesToReopen
+      .filter((p) => p.status === "DELETION_SCHEDULED")
+      .map((p) => p.id);
+
+    // If reopening from DELETION_SCHEDULED, check for unique value conflicts
+    if (deletionScheduledProfileIds.length > 0) {
+      const conflicts = await ctx.profilesHelper.getRecoverProfileUniqueConflicts(
+        deletionScheduledProfileIds,
+        ctx.user!.org_id,
+      );
+
+      if (conflicts.length > 0) {
+        throw new ApolloError(
+          "Cannot reopen profile due to unique value conflicts",
+          "PROFILE_RECOVER_UNIQUE_CONFLICT",
+          {
+            conflicts: conflicts.map((c) => ({
+              recoveringProfileId: toGlobalId("Profile", c.recoveringProfileId),
+              recoveringProfileName: c.recoveringProfileName,
+              profileTypeFieldId: toGlobalId("ProfileTypeField", c.profileTypeFieldId),
+              profileTypeFieldName: c.profileTypeFieldName,
+              conflictingProfileId: toGlobalId("Profile", c.conflictingProfileId),
+              conflictingProfileName: c.conflictingProfileName,
+              value: c.value,
+            })),
+          },
+        );
+      }
+    }
+
     const profiles = await ctx.profiles.updateProfileStatus(
       profileIds,
       "OPEN",
@@ -2188,6 +2220,38 @@ export const closeProfile = mutationField("closeProfile", {
     source: nullable("ProfileFieldPropertyValueSource"),
   },
   resolve: async (_, { profileIds, source }, ctx) => {
+    // Check if any profiles are coming from DELETION_SCHEDULED status
+    const profilesToClose = (await ctx.profiles.loadProfile(profileIds)).filter(isNonNullish);
+    const deletionScheduledProfileIds = profilesToClose
+      .filter((p) => p.status === "DELETION_SCHEDULED")
+      .map((p) => p.id);
+
+    // If closing from DELETION_SCHEDULED, check for unique value conflicts
+    if (deletionScheduledProfileIds.length > 0) {
+      const conflicts = await ctx.profilesHelper.getRecoverProfileUniqueConflicts(
+        deletionScheduledProfileIds,
+        ctx.user!.org_id,
+      );
+
+      if (conflicts.length > 0) {
+        throw new ApolloError(
+          "Cannot close profile due to unique value conflicts",
+          "PROFILE_RECOVER_UNIQUE_CONFLICT",
+          {
+            conflicts: conflicts.map((c) => ({
+              recoveringProfileId: toGlobalId("Profile", c.recoveringProfileId),
+              recoveringProfileName: c.recoveringProfileName,
+              profileTypeFieldId: toGlobalId("ProfileTypeField", c.profileTypeFieldId),
+              profileTypeFieldName: c.profileTypeFieldName,
+              conflictingProfileId: toGlobalId("Profile", c.conflictingProfileId),
+              conflictingProfileName: c.conflictingProfileName,
+              value: c.value,
+            })),
+          },
+        );
+      }
+    }
+
     const profiles = await ctx.profiles.updateProfileStatus(
       profileIds,
       "CLOSED",

@@ -3,6 +3,10 @@ import { useMutation } from "@apollo/client/react";
 import { Radio, RadioGroup } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import {
+  RecoverProfileConflict,
+  useRecoverProfileConflictDialog,
+} from "@parallel/components/profiles/dialogs/RecoverProfileConflictDialog";
 import { Button, Stack, Text } from "@parallel/components/ui";
 import {
   useRecoverProfile_closeProfileDocument,
@@ -10,9 +14,11 @@ import {
 } from "@parallel/graphql/__types";
 import { useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
+import { isApolloError } from "../apollo/isApolloError";
 
 export function useRecoverProfile() {
   const showReopenProfileDialog = useRecoverProfileDialog();
+  const showRecoverProfileConflictDialog = useRecoverProfileConflictDialog();
   const [closeProfile] = useMutation(useRecoverProfile_closeProfileDocument);
   const [reopenProfile] = useMutation(useRecoverProfile_reopenProfileDocument);
   return async function ({
@@ -40,7 +46,12 @@ export function useRecoverProfile() {
           },
         });
       }
-    } catch {}
+    } catch (e) {
+      if (isApolloError(e, "PROFILE_RECOVER_UNIQUE_CONFLICT")) {
+        const conflicts = (e.errors[0].extensions?.conflicts ?? []) as RecoverProfileConflict[];
+        await showRecoverProfileConflictDialog.ignoringDialogErrors({ conflicts });
+      }
+    }
   };
 }
 
