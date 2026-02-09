@@ -87,6 +87,9 @@ export class QueuesService implements IQueuesService {
   }
 
   public async waitForPendingMessages(maxWaitTime?: number) {
+    if (this.pending.length === 0) {
+      return;
+    }
     const controller = new AbortController();
     try {
       await Promise.race([
