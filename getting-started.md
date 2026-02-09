@@ -11,7 +11,7 @@ Complete guide to set up a local development environment for Parallel.
 You must have the following installed:
 
 - **Git** - Version control
-- **Node.js** - JavaScript runtime (v22.14.0 - see `.nvmrc`)
+- **Node.js** - JavaScript runtime (version in `.nvmrc`)
 - **Yarn** - Package manager
 - **Docker Desktop** - Container runtime
 - **Visual Studio Code** - IDE (recommended)
