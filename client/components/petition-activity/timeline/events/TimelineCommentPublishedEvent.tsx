@@ -4,7 +4,7 @@ import { CommentIcon, NoteIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { Divider } from "@parallel/components/common/Divider";
-import { NakedLink } from "@parallel/components/common/Link";
+import NextLink from "next/link";
 import { PetitionFieldCommentContent } from "@parallel/components/common/PetitionFieldCommentContent";
 import { TimelineCommentPublishedEvent_CommentPublishedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -149,18 +149,19 @@ export function TimelineCommentPublishedEvent({ event }: TimelineCommentPublishe
             </Box>
             {field || isGeneral ? (
               <Box>
-                <NakedLink
+                <Button
+                  as={NextLink}
                   href={buildUrlToSection("replies", {
                     comments: isGeneral ? "general" : field!.id,
                   })}
+                  variant="outline"
+                  backgroundColor="white"
                 >
-                  <Button as="a" variant="outline" backgroundColor="white">
-                    <FormattedMessage
-                      id="component.timeline-comment-published-event.reply-comment"
-                      defaultMessage="Reply"
-                    />
-                  </Button>
-                </NakedLink>
+                  <FormattedMessage
+                    id="component.timeline-comment-published-event.reply-comment"
+                    defaultMessage="Reply"
+                  />
+                </Button>
               </Box>
             ) : null}
           </Stack>

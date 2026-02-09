@@ -12,7 +12,6 @@ import {
   Spacer,
   useToast,
 } from "@chakra-ui/react";
-import { NakedLink } from "@parallel/components/common/Link";
 import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
 import { withApolloData } from "@parallel/components/common/withApolloData";
 import { PublicPetitionEmailExists } from "@parallel/components/public/public-petitions/PublicPetitionEmailExists";
@@ -38,9 +37,11 @@ import {
   InferGetServerSidePropsType,
 } from "next";
 import Head from "next/head";
+import NextLink from "next/link";
 import { useState } from "react";
 import { SubmitHandler } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+
 export type PublicPetitionLinkSteps = "INITIAL" | "EMAIL_SENT" | "EMAIL_EXISTS" | "REMINDER_SENT";
 
 interface HandleNewPublicPetitionProps {
@@ -275,26 +276,23 @@ function PublicPetitionLink({
               <>
                 <Spacer />
                 <Flex justifyContent="flex-end">
-                  <NakedLink
+                  <Box
+                    as={NextLink}
                     href={`https://www.onparallel.com/${intl.locale}?ref=parallel_public_link`}
+                    target="_blank"
+                    backgroundColor="gray.200"
+                    borderTopStartRadius="xl"
+                    paddingX={4}
+                    paddingY={1.5}
+                    fontSize="sm"
+                    whiteSpace="nowrap"
                   >
-                    <Box
-                      as="a"
-                      target="_blank"
-                      backgroundColor="gray.200"
-                      borderTopStartRadius="xl"
-                      paddingX={4}
-                      paddingY={1.5}
-                      fontSize="sm"
-                      whiteSpace="nowrap"
-                    >
-                      <FormattedMessage
-                        id="generic.created-with-parallel"
-                        defaultMessage="Created with {parallel}"
-                        values={{ parallel: <Text as="b">Parallel</Text> }}
-                      />
-                    </Box>
-                  </NakedLink>
+                    <FormattedMessage
+                      id="generic.created-with-parallel"
+                      defaultMessage="Created with {parallel}"
+                      values={{ parallel: <Text as="b">Parallel</Text> }}
+                    />
+                  </Box>
                 </Flex>
               </>
             )}

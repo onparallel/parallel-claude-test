@@ -29,7 +29,7 @@ import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { NakedLink } from "@parallel/components/common/Link";
+import NextLink from "next/link";
 import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
 import { ProgressIndicator, ProgressTrack } from "@parallel/components/common/Progress";
 import { SearchInput } from "@parallel/components/common/SearchInput";
@@ -196,17 +196,16 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
           <Flex width="100%" justifyContent="center">
             <Stack maxWidth="container.lg" width="100%" spacing={4} paddingY={4} paddingX={4}>
               <HStack>
-                <NakedLink href={`/petition/${keycode}`}>
-                  <IconButtonWithTooltip
-                    as="a"
-                    icon={<ArrowBackIcon />}
-                    variant="ghost"
-                    label={intl.formatMessage({
-                      id: "generic.go-back",
-                      defaultMessage: "Go back",
-                    })}
-                  />
-                </NakedLink>
+                <IconButtonWithTooltip
+                  as={NextLink}
+                  href={`/petition/${keycode}`}
+                  icon={<ArrowBackIcon />}
+                  variant="ghost"
+                  label={intl.formatMessage({
+                    id: "generic.go-back",
+                    defaultMessage: "Go back",
+                  })}
+                />
 
                 <Heading as="h1" size="md">
                   <FormattedMessage
@@ -426,21 +425,21 @@ function PetitionCard({ access }: { access: RecipientPortal_PublicPetitionAccess
           width="100%"
         >
           <Stack spacing={0}>
-            <NakedLink href={`/petition/${keycode}`}>
-              <LinkOverlay
-                fontWeight={600}
-                noOfLines={[2, 1]}
-                wordBreak="break-all"
-                color={title ? undefined : "gray.500"}
-                fontStyle={title ? "normal" : "italic"}
-              >
-                {title ??
-                  intl.formatMessage({
-                    id: "generic.untitled",
-                    defaultMessage: "Untitled",
-                  })}
-              </LinkOverlay>
-            </NakedLink>
+            <LinkOverlay
+              as={NextLink}
+              href={`/petition/${keycode}`}
+              fontWeight={600}
+              noOfLines={[2, 1]}
+              wordBreak="break-all"
+              color={title ? undefined : "gray.500"}
+              fontStyle={title ? "normal" : "italic"}
+            >
+              {title ??
+                intl.formatMessage({
+                  id: "generic.untitled",
+                  defaultMessage: "Untitled",
+                })}
+            </LinkOverlay>
             <Text fontSize="sm" color="gray.600" lineClamp={2} wordBreak="break-all">
               <FormattedMessage
                 id="page.recipient-view-client-portal.requested-by"

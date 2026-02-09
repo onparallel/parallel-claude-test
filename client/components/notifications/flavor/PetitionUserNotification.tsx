@@ -3,7 +3,7 @@ import { Box, Circle, Flex, LinkBox, LinkOverlay, Stack } from "@chakra-ui/react
 import { EmailIcon, EmailOpenedIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { NakedLink } from "@parallel/components/common/Link";
+import NextLink from "next/link";
 import { Text } from "@parallel/components/ui";
 import { PetitionUserNotification_PetitionUserNotificationFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -88,48 +88,48 @@ export const PetitionUserNotification = forwardRef<HTMLElement, PetitionUserNoti
           {icon}
         </Flex>
         <Stack flex="1 1 auto" minWidth="0" spacing={0} ref={bodyRef}>
-          <NakedLink href={`/${intl.locale}/app/petitions/${petition.id}${path}`}>
-            <LinkOverlay
-              ref={linkRef}
-              draggable="false"
-              tabIndex={isFirst ? 0 : -1}
-              _focus={{
-                outline: "none",
-                _before: { boxShadow: "inline" },
-                ".mark-as": { display: "flex" },
-              }}
-              onKeyDown={(e) => {
-                if (e.code === "Space") {
-                  handleMarkAsReadUnread();
-                  e.preventDefault();
-                }
-              }}
+          <LinkOverlay
+            as={NextLink}
+            href={`/${intl.locale}/app/petitions/${petition.id}${path}`}
+            ref={linkRef}
+            draggable="false"
+            tabIndex={isFirst ? 0 : -1}
+            _focus={{
+              outline: "none",
+              _before: { boxShadow: "inline" },
+              ".mark-as": { display: "flex" },
+            }}
+            onKeyDown={(e) => {
+              if (e.code === "Space") {
+                handleMarkAsReadUnread();
+                e.preventDefault();
+              }
+            }}
+          >
+            <Text
+              data-testid="notification-title"
+              as="div"
+              position="relative"
+              paddingX={4}
+              lineClamp={1}
+              fontSize="sm"
+              minWidth="0"
+              fontWeight={petition.name ? "bold" : "normal"}
+              fontStyle={petition.name ? "normal" : "italic"}
+              color="gray.600"
             >
-              <Text
-                data-testid="notification-title"
-                as="div"
-                position="relative"
-                paddingX={4}
-                lineClamp={1}
-                fontSize="sm"
-                minWidth="0"
-                fontWeight={petition.name ? "bold" : "normal"}
-                fontStyle={petition.name ? "normal" : "italic"}
-                color="gray.600"
-              >
-                {petition.name ??
-                  (petition.__typename === "Petition"
-                    ? intl.formatMessage({
-                        id: "generic.unnamed-parallel",
-                        defaultMessage: "Unnamed parallel",
-                      })
-                    : intl.formatMessage({
-                        id: "generic.unnamed-template",
-                        defaultMessage: "Unnamed template",
-                      }))}
-              </Text>
-            </LinkOverlay>
-          </NakedLink>
+              {petition.name ??
+                (petition.__typename === "Petition"
+                  ? intl.formatMessage({
+                      id: "generic.unnamed-parallel",
+                      defaultMessage: "Unnamed parallel",
+                    })
+                  : intl.formatMessage({
+                      id: "generic.unnamed-template",
+                      defaultMessage: "Unnamed template",
+                    }))}
+            </Text>
+          </LinkOverlay>
           <Text
             data-testid="notification-text"
             fontWeight={isRead ? "normal" : "medium"}

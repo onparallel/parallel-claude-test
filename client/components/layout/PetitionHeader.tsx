@@ -65,7 +65,6 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
 import { ButtonWithMoreOptions } from "../common/ButtonWithMoreOptions";
 import { Divider } from "../common/Divider";
-import { NakedLink } from "../common/Link";
 import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
 import { PathName } from "../common/PathName";
 import { PetitionStatusLabel } from "../common/PetitionStatusLabel";
@@ -614,15 +613,15 @@ export const PetitionHeader = chakraForwardRef<"div", PetitionHeaderProps, Petit
             }
 
             return (
-              <NakedLink key={section} href={href}>
-                <PetitionHeaderTab
-                  isActive={current === section}
-                  rightIcon={rightIcon}
-                  {...attributes}
-                >
-                  {label}
-                </PetitionHeaderTab>
-              </NakedLink>
+              <PetitionHeaderTab
+                key={section}
+                href={href}
+                isActive={current === section}
+                rightIcon={rightIcon}
+                {...attributes}
+              >
+                {label}
+              </PetitionHeaderTab>
             );
           })}
         </GridItem>

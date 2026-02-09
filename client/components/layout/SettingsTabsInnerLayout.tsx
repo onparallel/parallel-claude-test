@@ -1,6 +1,6 @@
 import { Tab, TabList, TabPanel, TabPanels, Tabs, useSafeLayoutEffect } from "@chakra-ui/react";
 import { Fragment, ReactNode, useRef } from "react";
-import { NakedLink } from "../common/Link";
+import NextLink from "next/link";
 
 export interface TabDefinition<T extends string> {
   key: T;
@@ -45,21 +45,20 @@ export function SettingsTabsInnerLayout<T extends string>({
               {title}
             </Tab>
           ) : (
-            <NakedLink href={href!}>
-              <Tab
-                ref={key === currentTabKey ? currentTabRef : undefined}
-                as="a"
-                fontWeight="500"
-                _selected={{
-                  backgroundColor: "gray.50",
-                  borderColor: "gray.200",
-                  borderBottom: "1px solid transparent",
-                  color: "blue.600",
-                }}
-              >
-                {title}
-              </Tab>
-            </NakedLink>
+            <Tab
+              as={NextLink}
+              href={href!}
+              ref={key === currentTabKey ? currentTabRef : undefined}
+              fontWeight="500"
+              _selected={{
+                backgroundColor: "gray.50",
+                borderColor: "gray.200",
+                borderBottom: "1px solid transparent",
+                color: "blue.600",
+              }}
+            >
+              {title}
+            </Tab>
           );
           return <Fragment key={key}>{decorate ? decorate(tab) : tab}</Fragment>;
         })}

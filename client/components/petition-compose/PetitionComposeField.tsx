@@ -76,7 +76,7 @@ import { HelpCenterLink } from "../common/HelpCenterLink";
 import { HelpPopover } from "../common/HelpPopover";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
-import { NakedLink } from "../common/Link";
+import NextLink from "next/link";
 import { LocalizableUserTextRender } from "../common/LocalizableUserTextRender";
 import { NumberingBadge } from "../common/NumberingBadge";
 import { SmallPopover } from "../common/SmallPopover";
@@ -1434,20 +1434,19 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
             />
           </ConfimationPopover>
         ) : (
-          <NakedLink href={buildUrlToSection("preview", { field: field.id })}>
-            <IconButtonWithTooltip
-              as="a"
-              icon={<ChevronRightIcon boxSize={6} />}
-              size="sm"
-              variant="ghost"
-              placement="bottom"
-              color="gray.600"
-              label={intl.formatMessage({
-                id: "component.petition-compose-field.field-preview",
-                defaultMessage: "Preview",
-              })}
-            />
-          </NakedLink>
+          <IconButtonWithTooltip
+            as={NextLink}
+            href={buildUrlToSection("preview", { field: field.id })}
+            icon={<ChevronRightIcon boxSize={6} />}
+            size="sm"
+            variant="ghost"
+            placement="bottom"
+            color="gray.600"
+            label={intl.formatMessage({
+              id: "component.petition-compose-field.field-preview",
+              defaultMessage: "Preview",
+            })}
+          />
         )}
       </Stack>
     );

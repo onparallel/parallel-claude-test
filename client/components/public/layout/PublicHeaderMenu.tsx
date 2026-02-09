@@ -2,9 +2,9 @@ import { Stack, StackProps } from "@chakra-ui/react";
 import { Button } from "@parallel/components/ui";
 import { Select } from "@parallel/chakra/components";
 import { ArrowShortRightIcon } from "@parallel/chakra/icons";
-import { NakedLink } from "@parallel/components/common/Link";
 import { useSupportedUserLocales } from "@parallel/utils/locales";
 import { resolveUrl } from "@parallel/utils/next";
+import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { ChangeEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -43,11 +43,9 @@ export function PublicHeaderMenu(props: StackProps) {
       <Button as="a" fontWeight="normal" rightIcon={<ArrowShortRightIcon />} href="/">
         <FormattedMessage id="public.go-to-parallel" defaultMessage="Go to Parallel" />
       </Button>
-      <NakedLink href="/login">
-        <Button as="a" variant="outline">
-          <FormattedMessage id="public.login-button" defaultMessage="Login" />
-        </Button>
-      </NakedLink>
+      <Button as={NextLink} href="/login" variant="outline">
+        <FormattedMessage id="public.login-button" defaultMessage="Login" />
+      </Button>
     </Stack>
   );
 }

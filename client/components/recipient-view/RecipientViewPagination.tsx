@@ -4,8 +4,8 @@ import { Text } from "@parallel/components/ui";
 import { useRouter } from "next/router";
 import { useMemo, useRef } from "react";
 import { useIntl } from "react-intl";
+import NextLink from "next/link";
 import { range } from "remeda";
-import { NakedLink } from "../common/Link";
 import { Spacer } from "../common/Spacer";
 
 export interface RecipientViewPaginationProps extends BoxProps {
@@ -93,9 +93,13 @@ function PageLink({
 }: IconButtonProps & { isActive?: boolean; page: number }) {
   const { query } = useRouter();
   const ref = useRef<HTMLButtonElement>(null);
-  const button = (
+  const url = query.petitionId
+    ? `/app/petitions/${query.petitionId}/preview?page=${page}`
+    : `/petition/${query.keycode}/${page}`;
+
+  return (
     <IconButton
-      as="a"
+      {...(props.isDisabled ? {} : { as: NextLink, href: url })}
       ref={ref}
       variant={isActive ? "solid" : "outline"}
       colorScheme={isActive ? "primary" : "gray"}
@@ -105,12 +109,6 @@ function PageLink({
       {...props}
     />
   );
-
-  const url = query.petitionId
-    ? `/app/petitions/${query.petitionId}/preview?page=${page}`
-    : `/petition/${query.keycode}/${page}`;
-
-  return props.isDisabled ? button : <NakedLink href={url}>{button}</NakedLink>;
 }
 
 function usePagination({

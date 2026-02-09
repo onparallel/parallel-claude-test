@@ -8,7 +8,7 @@ import { FieldDescription } from "@parallel/components/common/FieldDescription";
 import { FileAttachmentButton } from "@parallel/components/common/FileAttachmentButton";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { InternalFieldBadge } from "@parallel/components/common/InternalFieldBadge";
-import { NakedLink } from "@parallel/components/common/Link";
+import NextLink from "next/link";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { useTone } from "@parallel/components/common/ToneProvider";
 import { CommentsButton } from "@parallel/components/recipient-view/CommentsButton";
@@ -382,21 +382,20 @@ export function RecipientViewPetitionFieldGroupLayout({
             padding={2}
           >
             <Box className={"edit-preview-field-buttons"} display="none">
-              <NakedLink href={composeUrl}>
-                <IconButtonWithTooltip
-                  as="a"
-                  size="sm"
-                  variant="outline"
-                  backgroundColor="white"
-                  placement="bottom"
-                  color="gray.600"
-                  icon={<EditSimpleIcon boxSize={4} />}
-                  label={intl.formatMessage({
-                    id: "component.recipient-view-petition-field-group.edit-field",
-                    defaultMessage: "Edit field",
-                  })}
-                />
-              </NakedLink>
+              <IconButtonWithTooltip
+                as={NextLink}
+                href={composeUrl}
+                size="sm"
+                variant="outline"
+                backgroundColor="white"
+                placement="bottom"
+                color="gray.600"
+                icon={<EditSimpleIcon boxSize={4} />}
+                label={intl.formatMessage({
+                  id: "component.recipient-view-petition-field-group.edit-field",
+                  defaultMessage: "Edit field",
+                })}
+              />
             </Box>
           </Center>
         ) : null}

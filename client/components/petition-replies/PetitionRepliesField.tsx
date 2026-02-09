@@ -45,7 +45,7 @@ import { FieldDescription } from "../common/FieldDescription";
 import { FileAttachmentButton } from "../common/FileAttachmentButton";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
-import { NakedLink } from "../common/Link";
+import NextLink from "next/link";
 import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
 import { Accordion } from "../ui";
 import { NoRepliesHintWithButton } from "./NoRepliesHintWithButton";
@@ -106,20 +106,19 @@ export const PetitionRepliesField = forwardRef<HTMLElement, PetitionRepliesField
     const buildUrlToSection = useBuildUrlToPetitionSection();
 
     const goToComposeButton = (
-      <NakedLink href={buildUrlToSection("compose", { field: field.id })}>
-        <IconButtonWithTooltip
-          as="a"
-          opacity={0}
-          className="edit-field-button"
-          size="xs"
-          variant="ghost"
-          icon={<EditSimpleIcon />}
-          label={intl.formatMessage({
-            id: "component.petition-replies-field.edit-field",
-            defaultMessage: "Edit field",
-          })}
-        />
-      </NakedLink>
+      <IconButtonWithTooltip
+        as={NextLink}
+        href={buildUrlToSection("compose", { field: field.id })}
+        opacity={0}
+        className="edit-field-button"
+        size="xs"
+        variant="ghost"
+        icon={<EditSimpleIcon />}
+        label={intl.formatMessage({
+          id: "component.petition-replies-field.edit-field",
+          defaultMessage: "Edit field",
+        })}
+      />
     );
 
     const headerNumber = fieldLogic.headerNumber ? `${fieldLogic.headerNumber}. ` : "";

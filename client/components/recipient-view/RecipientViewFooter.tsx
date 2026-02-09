@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Flex, List, ListItem, Stack } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { Link, NakedLink, NormalLink } from "@parallel/components/common/Link";
+import { Link, NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { RecipientViewFooter_PublicPetitionFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -29,14 +29,14 @@ export const RecipientViewFooter = chakraForwardRef<"div", RecipientViewFooterPr
               defaultMessage="Created with {parallel}"
               values={{
                 parallel: (
-                  <NakedLink
+                  <Flex
+                    as="a"
                     href={`https://www.onparallel.com/${intl.locale}?utm_source=parallel&utm_medium=recipient_view&utm_campaign=recipients`}
-                    passHref
+                    marginStart={2.5}
+                    target="_blank"
                   >
-                    <Flex as="a" marginStart={2.5}>
-                      <Logo display="inline-block" width="100px" />
-                    </Flex>
-                  </NakedLink>
+                    <Logo display="inline-block" width="100px" />
+                  </Flex>
                 ),
               }}
             />

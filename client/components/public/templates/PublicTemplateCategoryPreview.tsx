@@ -1,7 +1,7 @@
 import { Flex, Grid, GridItem, Heading } from "@chakra-ui/react";
 import { Button } from "@parallel/components/ui";
-import { NakedLink } from "@parallel/components/common/Link";
 import { LandingTemplateCard_LandingTemplateFragment } from "@parallel/graphql/__types";
+import NextLink from "next/link";
 import { FormattedMessage } from "react-intl";
 import { PublicTemplateCategory } from "../../../utils/usePublicTemplateCategories";
 import { LandingTemplateCard } from "./LandingTemplateCard";
@@ -35,14 +35,19 @@ export function PublicTemplateCategoryPreview({
         </Heading>
       </GridItem>
       <GridItem gridArea="actions">
-        <NakedLink href={`/templates/categories/${slug}`}>
-          <Button as="a" variant="outline" cursor="pointer" backgroundColor="white" width={"100%"}>
-            <FormattedMessage
-              id="public.template-category-preview.view-all"
-              defaultMessage="View all"
-            />
-          </Button>
-        </NakedLink>
+        <Button
+          as={NextLink}
+          href={`/templates/categories/${slug}`}
+          variant="outline"
+          cursor="pointer"
+          backgroundColor="white"
+          width={"100%"}
+        >
+          <FormattedMessage
+            id="public.template-category-preview.view-all"
+            defaultMessage="View all"
+          />
+        </Button>
       </GridItem>
       <GridItem gridArea="content">
         <Grid

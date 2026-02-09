@@ -6,7 +6,7 @@ import { useOnMediaQueryChange } from "@parallel/utils/useOnMediaQueryChange";
 import { useRouter } from "next/router";
 import { ReactNode, useCallback } from "react";
 import { useIntl } from "react-intl";
-import { NakedLink } from "../common/Link";
+import NextLink from "next/link";
 import { AppLayout } from "./AppLayout";
 import { Text } from "@parallel/components/ui";
 
@@ -100,22 +100,21 @@ export function SidebarLayout({
               borderBottom="1px solid"
               borderBottomColor="gray.200"
             >
-              <NakedLink href={basePath}>
-                <IconButton
-                  as="a"
-                  icon={<ArrowBackIcon />}
-                  variant="ghost"
-                  aria-label={intl.formatMessage({
-                    id: "generic.go-back",
-                    defaultMessage: "Go back",
-                  })}
-                  marginEnd={2}
-                  display={{
-                    base: "flex",
-                    md: showBackButton ? "flex" : "none",
-                  }}
-                />
-              </NakedLink>
+              <IconButton
+                as={NextLink}
+                href={basePath}
+                icon={<ArrowBackIcon />}
+                variant="ghost"
+                aria-label={intl.formatMessage({
+                  id: "generic.go-back",
+                  defaultMessage: "Go back",
+                })}
+                marginEnd={2}
+                display={{
+                  base: "flex",
+                  md: showBackButton ? "flex" : "none",
+                }}
+              />
               {header}
             </Flex>
             {subHeader ? <Box>{subHeader}</Box> : null}
@@ -155,33 +154,32 @@ function SidebarLayoutMenuItem({ path, children }: SidebarLayoutMenuItemProps) {
   const active = pathname.startsWith(path);
 
   return (
-    <NakedLink href={path}>
-      <Box
-        as="a"
-        display="flex"
-        borderBottom="1px solid"
-        borderBottomColor="gray.200"
-        borderEnd="4px solid"
-        borderEndColor="transparent"
-        backgroundColor="white"
-        alignItems="center"
-        aria-current={active ? "page" : undefined}
-        _activeLink={{
+    <Box
+      as={NextLink}
+      href={path}
+      display="flex"
+      borderBottom="1px solid"
+      borderBottomColor="gray.200"
+      borderEnd="4px solid"
+      borderEndColor="transparent"
+      backgroundColor="white"
+      alignItems="center"
+      aria-current={active ? "page" : undefined}
+      _activeLink={{
+        backgroundColor: "gray.75",
+        borderEndColor: "primary.500",
+      }}
+      _hover={{
+        backgroundColor: "gray.50",
+        _activeLink: {
           backgroundColor: "gray.75",
-          borderEndColor: "primary.500",
-        }}
-        _hover={{
-          backgroundColor: "gray.50",
-          _activeLink: {
-            backgroundColor: "gray.75",
-          },
-        }}
-      >
-        <Box flex="1" padding={3}>
-          <Text fontSize="md">{children}</Text>
-        </Box>
-        <ChevronRightIcon boxSize="6" marginEnd={2} />
+        },
+      }}
+    >
+      <Box flex="1" padding={3}>
+        <Text fontSize="md">{children}</Text>
       </Box>
-    </NakedLink>
+      <ChevronRightIcon boxSize="6" marginEnd={2} />
+    </Box>
   );
 }

@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Center, Image, LinkBox, LinkOverlay, Stack } from "@chakra-ui/react";
-import { NakedLink } from "@parallel/components/common/Link";
 import { LandingTemplateCard_LandingTemplateFragment } from "@parallel/graphql/__types";
+import NextLink from "next/link";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Card } from "../../common/Card";
 import { Text } from "@parallel/components/ui";
@@ -36,11 +36,17 @@ export function LandingTemplateCard({ template }: LandingTemplateCardProps) {
           />
         </Center>
         <Stack padding={4} gap={2}>
-          <NakedLink locale={locale} href={`/templates/${slug}`}>
-            <LinkOverlay display="block" height="72px" fontWeight="semibold" noOfLines={3}>
-              {name}
-            </LinkOverlay>
-          </NakedLink>
+          <LinkOverlay
+            as={NextLink}
+            locale={locale}
+            href={`/templates/${slug}`}
+            display="block"
+            height="72px"
+            fontWeight="semibold"
+            noOfLines={3}
+          >
+            {name}
+          </LinkOverlay>
           <Text color="gray.600" fontSize="sm">
             <FormattedMessage
               id="public.template-card.created-by"

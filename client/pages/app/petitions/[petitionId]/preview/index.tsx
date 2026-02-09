@@ -3,7 +3,7 @@ import { useMutation } from "@apollo/client/react";
 import { Box, Center, Flex, Stack, useToast } from "@chakra-ui/react";
 import { ChevronRightIcon, EditSimpleIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { NakedLink } from "@parallel/components/common/Link";
+import NextLink from "next/link";
 import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { Spacer } from "@parallel/components/common/Spacer";
@@ -753,22 +753,19 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                       {fieldsWithLogic.map(({ field, logic }) => {
                         const fieldHasReplies = field.replies.length !== 0;
 
-                        const iconButtonReviewReply = (
-                          <IconButtonWithTooltip
-                            as="a"
-                            icon={<ChevronRightIcon boxSize={5} />}
-                            size="sm"
-                            variant="outline"
-                            backgroundColor="white"
-                            placement="bottom"
-                            color="gray.600"
-                            isDisabled={!fieldHasReplies}
-                            label={intl.formatMessage({
-                              id: "page.preview.review-reply",
-                              defaultMessage: "Review reply",
-                            })}
-                          />
-                        );
+                        const reviewReplyProps = {
+                          icon: <ChevronRightIcon boxSize={5} />,
+                          size: "sm" as const,
+                          variant: "outline" as const,
+                          backgroundColor: "white",
+                          placement: "bottom" as const,
+                          color: "gray.600",
+                          isDisabled: !fieldHasReplies,
+                          label: intl.formatMessage({
+                            id: "page.preview.review-reply",
+                            defaultMessage: "Review reply",
+                          }),
+                        };
 
                         return (
                           <LiquidPetitionVariableProvider
@@ -826,32 +823,29 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                                     position="sticky"
                                     top={2}
                                   >
-                                    <NakedLink
+                                    <IconButtonWithTooltip
+                                      as={NextLink}
                                       href={buildUrlToSection("compose", { field: field.id })}
-                                    >
-                                      <IconButtonWithTooltip
-                                        as="a"
-                                        size="sm"
-                                        variant="outline"
-                                        backgroundColor="white"
-                                        placement="bottom"
-                                        color="gray.600"
-                                        icon={<EditSimpleIcon boxSize={4} />}
-                                        label={intl.formatMessage({
-                                          id: "page.preview.edit-field",
-                                          defaultMessage: "Edit field",
-                                        })}
-                                      />
-                                    </NakedLink>
+                                      size="sm"
+                                      variant="outline"
+                                      backgroundColor="white"
+                                      placement="bottom"
+                                      color="gray.600"
+                                      icon={<EditSimpleIcon boxSize={4} />}
+                                      label={intl.formatMessage({
+                                        id: "page.preview.edit-field",
+                                        defaultMessage: "Edit field",
+                                      })}
+                                    />
                                     {field.type === "HEADING" ||
                                     !isPetition ? null : fieldHasReplies ? (
-                                      <NakedLink
+                                      <IconButtonWithTooltip
+                                        as={NextLink}
                                         href={buildUrlToSection("replies", { field: field.id })}
-                                      >
-                                        {iconButtonReviewReply}
-                                      </NakedLink>
+                                        {...reviewReplyProps}
+                                      />
                                     ) : (
-                                      iconButtonReviewReply
+                                      <IconButtonWithTooltip {...reviewReplyProps} />
                                     )}
                                   </Stack>
                                 </Flex>

@@ -22,7 +22,7 @@ import {
 import { RecipientViewMenuButton_PublicContactFragment } from "@parallel/graphql/__types";
 import { usePublicPrintPdfTask } from "@parallel/utils/tasks/usePublicPrintPdfTask";
 import { FormattedMessage, useIntl } from "react-intl";
-import { NakedLink } from "../common/Link";
+import NextLink from "next/link";
 import { useTone } from "../common/ToneProvider";
 import { Avatar } from "../ui";
 import { useRecipientViewHelpDialog } from "./dialogs/RecipientViewHelpDialog";
@@ -138,27 +138,27 @@ export function RecipientViewMenuButton({
               </MenuItem>
             ) : null}
             {hideHomeButton ? null : (
-              <NakedLink
+              <MenuItem
+                as={NextLink}
                 href={`/petition/${keycode}/home${pendingPetitions ? "?status=PENDING" : ""}`}
+                icon={<HomeIcon display="block" boxSize={4} />}
               >
-                <MenuItem as="a" icon={<HomeIcon display="block" boxSize={4} />}>
-                  <HStack justifyContent="space-between">
-                    <Text as="span">
-                      <FormattedMessage
-                        id="recipient-view.go-to-my-processes"
-                        defaultMessage="Go to my processes"
-                      />
-                    </Text>
+                <HStack justifyContent="space-between">
+                  <Text as="span">
+                    <FormattedMessage
+                      id="recipient-view.go-to-my-processes"
+                      defaultMessage="Go to my processes"
+                    />
+                  </Text>
 
-                    {pendingPetitions ? (
-                      <HStack fontWeight={600} color="yellow.500" spacing={1}>
-                        <Text as="span">{pendingPetitions}</Text>
-                        <TimeIcon boxSize={4} color="yellow.600" />
-                      </HStack>
-                    ) : null}
-                  </HStack>
-                </MenuItem>
-              </NakedLink>
+                  {pendingPetitions ? (
+                    <HStack fontWeight={600} color="yellow.500" spacing={1}>
+                      <Text as="span">{pendingPetitions}</Text>
+                      <TimeIcon boxSize={4} color="yellow.600" />
+                    </HStack>
+                  ) : null}
+                </HStack>
+              </MenuItem>
             )}
 
             <MenuItem

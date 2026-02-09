@@ -2,7 +2,6 @@ import { ButtonOptions, ThemingProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Button } from "@parallel/components/ui";
 import { isNonNullish } from "remeda";
-import { NakedLink } from "./Link";
 
 interface SupportButton extends ButtonOptions, ThemingProps<"Button"> {
   message: string;
@@ -21,21 +20,20 @@ export const SupportButton = chakraForwardRef<"a", SupportButton>(function Suppo
   }
 
   return (
-    <NakedLink href={`mailto:support@onparallel.com?body=${encodeURIComponent(message)}`}>
-      <Button
-        ref={ref as any}
-        as="a"
-        {...(props as any)}
-        onClick={(event) => {
-          if (isNonNullish(window.Intercom)) {
-            event.preventDefault();
-            window.Intercom("showNewMessage", message);
-          }
-          onClick?.(event as any);
-        }}
-      >
-        {children}
-      </Button>
-    </NakedLink>
+    <Button
+      ref={ref as any}
+      as="a"
+      href={`mailto:support@onparallel.com?body=${encodeURIComponent(message)}`}
+      {...(props as any)}
+      onClick={(event) => {
+        if (isNonNullish(window.Intercom)) {
+          event.preventDefault();
+          window.Intercom("showNewMessage", message);
+        }
+        onClick?.(event as any);
+      }}
+    >
+      {children}
+    </Button>
   );
 });

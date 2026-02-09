@@ -3,7 +3,7 @@ import { Box, Flex } from "@chakra-ui/react";
 import { Button } from "@parallel/components/ui";
 import { SignatureIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { NakedLink } from "@parallel/components/common/Link";
+import NextLink from "next/link";
 import { SignerReference } from "@parallel/components/common/SignerReference";
 import { TimelineSignatureCancelledEvent_SignatureCancelledEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -131,14 +131,18 @@ export function TimelineSignatureCancelledEvent({ event }: TimelineSignatureCanc
           ["CONSENT_REQUIRED", "INVALID_CREDENTIALS", "ACCOUNT_SUSPENDED"].includes(
             event.errorCode,
           ) && (
-            <NakedLink href="/app/organization/integrations/signature">
-              <Button as="a" variant="outline" size="sm" marginStart={4}>
-                <FormattedMessage
-                  id="component.timeline-signature-cancelled-event.review"
-                  defaultMessage="Review"
-                />
-              </Button>
-            </NakedLink>
+            <Button
+              as={NextLink}
+              href="/app/organization/integrations/signature"
+              variant="outline"
+              size="sm"
+              marginStart={4}
+            >
+              <FormattedMessage
+                id="component.timeline-signature-cancelled-event.review"
+                defaultMessage="Review"
+              />
+            </Button>
           )}
       </Flex>
     </TimelineItem>

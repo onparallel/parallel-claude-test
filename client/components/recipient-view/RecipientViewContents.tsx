@@ -17,7 +17,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, zip } from "remeda";
 import { CloseButton } from "../common/CloseButton";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
-import { NakedLink } from "../common/Link";
+import NextLink from "next/link";
 import { Button, Text } from "@parallel/components/ui";
 
 type PetitionSelection =
@@ -129,59 +129,58 @@ export const RecipientViewContents = chakraForwardRef<"section", RecipientViewCo
               return (
                 <ListItem key={index}>
                   <Text as="h2">
-                    <NakedLink href={url}>
-                      <Button
-                        variant="ghost"
-                        as="a"
-                        size="sm"
-                        fontSize="md"
-                        display="flex"
-                        width="100%"
-                        paddingStart={7}
-                        _focus={{ outline: "none" }}
-                        aria-current={index + 1 !== currentPage ? "page" : undefined}
+                    <Button
+                      as={NextLink}
+                      href={url}
+                      variant="ghost"
+                      size="sm"
+                      fontSize="md"
+                      display="flex"
+                      width="100%"
+                      paddingStart={7}
+                      _focus={{ outline: "none" }}
+                      aria-current={index + 1 !== currentPage ? "page" : undefined}
+                    >
+                      <ChevronFilledIcon
+                        color="gray.500"
+                        position="absolute"
+                        insetStart={2}
+                        top={2.5}
+                        fontSize="sm"
+                        transform={index + 1 === currentPage ? "rotate(90deg)" : undefined}
+                      />
+
+                      <Box
+                        flex="1"
+                        overflow="hidden"
+                        textOverflow="ellipsis"
+                        whiteSpace="nowrap"
+                        {...(title ? {} : { textStyle: "hint", fontWeight: "normal" })}
                       >
-                        <ChevronFilledIcon
-                          color="gray.500"
-                          position="absolute"
-                          insetStart={2}
-                          top={2.5}
-                          fontSize="sm"
-                          transform={index + 1 === currentPage ? "rotate(90deg)" : undefined}
-                        />
+                        {pageTitle}
+                      </Box>
 
-                        <Box
-                          flex="1"
-                          overflow="hidden"
-                          textOverflow="ellipsis"
-                          whiteSpace="nowrap"
-                          {...(title ? {} : { textStyle: "hint", fontWeight: "normal" })}
+                      {showCommentsNumber ? (
+                        <Badge
+                          background="primary.500"
+                          color="white"
+                          fontSize="xs"
+                          borderRadius="full"
+                          minW="18px"
+                          minH="18px"
+                          lineHeight="18px"
+                          pointerEvents="none"
+                          textAlign="center"
                         >
-                          {pageTitle}
-                        </Box>
-
-                        {showCommentsNumber ? (
-                          <Badge
-                            background="primary.500"
-                            color="white"
-                            fontSize="xs"
-                            borderRadius="full"
-                            minW="18px"
-                            minH="18px"
-                            lineHeight="18px"
-                            pointerEvents="none"
-                            textAlign="center"
-                          >
-                            {_commentCount < 100 ? _commentCount : "99+"}
-                          </Badge>
-                        ) : null}
-                        {isInternal ? (
-                          <Center>
-                            <InternalFieldBadge marginStart={2} />
-                          </Center>
-                        ) : null}
-                      </Button>
-                    </NakedLink>
+                          {_commentCount < 100 ? _commentCount : "99+"}
+                        </Badge>
+                      ) : null}
+                      {isInternal ? (
+                        <Center>
+                          <InternalFieldBadge marginStart={2} />
+                        </Center>
+                      ) : null}
+                    </Button>
                   </Text>
                   {index + 1 === currentPage ? (
                     <Stack as={List} spacing={1}>

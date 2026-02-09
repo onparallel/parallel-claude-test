@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { Box, Flex, Stack, useToast } from "@chakra-ui/react";
 import { ChevronRightIcon, ImportIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { NakedLink } from "@parallel/components/common/Link";
+import NextLink from "next/link";
 import { isDialogError } from "@parallel/components/common/dialogs/DialogProvider";
 import { RecipientViewPetitionFieldCheckbox } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldCheckbox";
 import { RecipientViewPetitionFieldDate } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldDate";
@@ -310,22 +310,19 @@ export function PreviewPetitionFieldGroup({
             c.replies.some((r) => r.status === "APPROVED"),
           );
 
-          const iconButtonReviewReply = (
-            <IconButtonWithTooltip
-              as="a"
-              icon={<ChevronRightIcon boxSize={5} />}
-              size="sm"
-              variant="outline"
-              backgroundColor="white"
-              placement="bottom"
-              color="gray.600"
-              disabled={!groupHasSomeReply}
-              label={intl.formatMessage({
-                id: "component.preview-petition-field-group.review-reply",
-                defaultMessage: "Review reply",
-              })}
-            />
-          );
+          const reviewReplyProps = {
+            icon: <ChevronRightIcon boxSize={5} />,
+            size: "sm" as const,
+            variant: "outline" as const,
+            backgroundColor: "white",
+            placement: "bottom" as const,
+            color: "gray.600",
+            disabled: !groupHasSomeReply,
+            label: intl.formatMessage({
+              id: "component.preview-petition-field-group.review-reply",
+              defaultMessage: "Review reply",
+            }),
+          };
 
           return (
             <RecipientViewPetitionFieldGroupCard
@@ -411,11 +408,13 @@ export function PreviewPetitionFieldGroup({
                     ) : null}
 
                     {petition.__typename === "PetitionTemplate" ? null : groupHasSomeReply ? (
-                      <NakedLink href={buildUrlToSection("replies", { parentReply: group.id })}>
-                        {iconButtonReviewReply}
-                      </NakedLink>
+                      <IconButtonWithTooltip
+                        as={NextLink}
+                        href={buildUrlToSection("replies", { parentReply: group.id })}
+                        {...reviewReplyProps}
+                      />
                     ) : (
-                      iconButtonReviewReply
+                      <IconButtonWithTooltip {...reviewReplyProps} />
                     )}
                   </Stack>
                 </Flex>

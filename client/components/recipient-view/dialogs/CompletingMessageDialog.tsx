@@ -19,7 +19,8 @@ import {
 } from "@parallel/components/common/dialogs/DialogProvider";
 import { Divider } from "@parallel/components/common/Divider";
 import { HtmlBlock } from "@parallel/components/common/HtmlBlock";
-import { Link, NakedLink, NormalLink } from "@parallel/components/common/Link";
+import { Link, NormalLink } from "@parallel/components/common/Link";
+import NextLink from "next/link";
 import { Logo } from "@parallel/components/common/Logo";
 import { Button, Text } from "@parallel/components/ui";
 import { Tone, useCompletingMessageDialog_PublicPetitionFragment } from "@parallel/graphql/__types";
@@ -123,23 +124,23 @@ function CompletingMessageDialog({
                     </Text>
                   </HStack>
                 ) : null}
-                <NakedLink
+                <Button
+                  as={NextLink}
                   href={`/petition/${keycode}/home${pendingPetitions ? "?status=PENDING" : ""}`}
+                  colorPalette="primary"
                 >
-                  <Button colorPalette="primary">
-                    {pendingPetitions > 0 ? (
-                      <FormattedMessage
-                        id="component.completing-message-dialog.go-to-pending-processes-button"
-                        defaultMessage="Go to my pending processes"
-                      />
-                    ) : (
-                      <FormattedMessage
-                        id="component.completing-message-dialog.go-to-processes-button"
-                        defaultMessage="Go to my processes"
-                      />
-                    )}
-                  </Button>
-                </NakedLink>
+                  {pendingPetitions > 0 ? (
+                    <FormattedMessage
+                      id="component.completing-message-dialog.go-to-pending-processes-button"
+                      defaultMessage="Go to my pending processes"
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="component.completing-message-dialog.go-to-processes-button"
+                      defaultMessage="Go to my processes"
+                    />
+                  )}
+                </Button>
               </Flex>
             </>
           ) : null}

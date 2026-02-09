@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { HtmlBlock } from "@parallel/components/common/HtmlBlock";
-import { Link, NakedLink } from "@parallel/components/common/Link";
+import { Link } from "@parallel/components/common/Link";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { UserAvatar } from "@parallel/components/common/UserAvatar";
@@ -35,6 +35,7 @@ import { EnumerateList } from "@parallel/utils/EnumerateList";
 import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import NextLink from "next/link";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, zip } from "remeda";
@@ -156,20 +157,16 @@ function LandingTemplateDetails({
                   />
                 </Text>
                 <HStack paddingTop={4}>
-                  {/* <NakedLink href="/signup">
-                     <Button as="a" colorPalette="primary">
-                       <FormattedMessage
-                         id="public.try-for-free-button"
-                         defaultMessage="Try for free"
-                       />
-                     </Button>
-                    </NakedLink> */}
                   {template.publicLinkUrl ? (
-                    <NakedLink href={template.publicLinkUrl}>
-                      <Button as="a" variant="outline" target="_blank" onClick={handleClickPreview}>
-                        <FormattedMessage id="public.preview-button" defaultMessage="Preview" />
-                      </Button>
-                    </NakedLink>
+                    <Button
+                      as={NextLink}
+                      href={template.publicLinkUrl}
+                      variant="outline"
+                      target="_blank"
+                      onClick={handleClickPreview}
+                    >
+                      <FormattedMessage id="public.preview-button" defaultMessage="Preview" />
+                    </Button>
                   ) : null}
                 </HStack>
                 <Spacer />

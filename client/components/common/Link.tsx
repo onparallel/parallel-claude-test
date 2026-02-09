@@ -9,7 +9,6 @@ import {
 } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import NextLink, { LinkProps as NextLinkProps } from "next/link";
-import { PropsWithChildren } from "react";
 
 const cx = (...classNames: any[]) => classNames.filter(Boolean).join(" ");
 
@@ -38,9 +37,5 @@ export const Link = chakraForwardRef<"a", LinkProps>(function Link(props, ref) {
     </chakra.a>
   );
 });
-
-export function NakedLink(props: PropsWithChildren<NextLinkProps>) {
-  return <NextLink passHref legacyBehavior {...props} />;
-}
 
 export const NormalLink = ChakraLink;

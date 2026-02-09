@@ -44,7 +44,7 @@ import { useHandleNavigation } from "@parallel/utils/navigation";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { NakedLink } from "../common/Link";
+import NextLink from "next/link";
 
 export type ProfilesSection = "general" | "parallels";
 
@@ -258,9 +258,9 @@ export function ProfileLayout({
               <TabList paddingStart={4} background="white" height="65px">
                 {tabs.map(({ href, key, title }) => {
                   return (
-                    <NakedLink key={key} href={href!}>
-                      <Tab {...buttonTabProps}>{title}</Tab>
-                    </NakedLink>
+                    <Tab key={key} as={NextLink} href={href!} {...buttonTabProps}>
+                      {title}
+                    </Tab>
                   );
                 })}
               </TabList>

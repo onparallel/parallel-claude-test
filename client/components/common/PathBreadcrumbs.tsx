@@ -1,9 +1,9 @@
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionBaseType } from "@parallel/graphql/__types";
+import NextLink from "next/link";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
-import { NakedLink } from "./Link";
 
 interface PathBreadcrumbsProps {
   path: string;
@@ -55,8 +55,9 @@ export const PathBreadcrumbs = chakraForwardRef<"nav", PathBreadcrumbsProps>(
         {breadcrumbs.map((part, i) =>
           part.type === "path" ? (
             <BreadcrumbItem key={i}>
-              <NakedLink href={part.getUrl()}>
+              <NextLink href={part.getUrl()} passHref>
                 <BreadcrumbLink
+                  as="span"
                   isCurrentPage={part.isCurrent}
                   color="primary.600"
                   fontWeight="medium"
@@ -69,7 +70,7 @@ export const PathBreadcrumbs = chakraForwardRef<"nav", PathBreadcrumbsProps>(
                 >
                   {part.text}
                 </BreadcrumbLink>
-              </NakedLink>
+              </NextLink>
             </BreadcrumbItem>
           ) : (
             <BreadcrumbItem key={i}>

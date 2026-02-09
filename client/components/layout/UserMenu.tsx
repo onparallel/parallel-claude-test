@@ -27,7 +27,7 @@ import { useLoginAs } from "@parallel/utils/useLoginAs";
 import { useNotificationsState } from "@parallel/utils/useNotificationsState";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
-import { NakedLink } from "../common/Link";
+import NextLink from "next/link";
 import { UserAvatar } from "../common/UserAvatar";
 import { Avatar } from "../ui";
 import { Button, Text } from "@parallel/components/ui";
@@ -210,27 +210,33 @@ export function UserMenu({ extended, placement, me, realMe, onToggle }: UserMenu
             </MenuItem>
           ) : null}
 
-          <NakedLink href="/app/settings">
-            <MenuItem as="a" icon={<EditIcon display="block" boxSize={4} />}>
-              <FormattedMessage
-                id="component.user-menu.edit-account"
-                defaultMessage="Edit my account"
-              />
-            </MenuItem>
-          </NakedLink>
+          <MenuItem
+            as={NextLink}
+            href="/app/settings"
+            icon={<EditIcon display="block" boxSize={4} />}
+          >
+            <FormattedMessage
+              id="component.user-menu.edit-account"
+              defaultMessage="Edit my account"
+            />
+          </MenuItem>
 
-          <NakedLink href="/app/organization">
-            <MenuItem as="a" icon={<SettingsIcon display="block" boxSize={4} />}>
-              <FormattedMessage id="page.organization.title" defaultMessage="Organization" />
-            </MenuItem>
-          </NakedLink>
+          <MenuItem
+            as={NextLink}
+            href="/app/organization"
+            icon={<SettingsIcon display="block" boxSize={4} />}
+          >
+            <FormattedMessage id="page.organization.title" defaultMessage="Organization" />
+          </MenuItem>
 
           {realMe.isSuperAdmin ? (
-            <NakedLink href="/app/admin">
-              <MenuItem as="a" icon={<KeyIcon display="block" boxSize={4} />}>
-                <FormattedMessage id="admin.title" defaultMessage="Admin panel" />
-              </MenuItem>
-            </NakedLink>
+            <MenuItem
+              as={NextLink}
+              href="/app/admin"
+              icon={<KeyIcon display="block" boxSize={4} />}
+            >
+              <FormattedMessage id="admin.title" defaultMessage="Admin panel" />
+            </MenuItem>
           ) : null}
           <MenuDivider />
           <MenuItem data-action="start-tour" icon={<MapIcon display="block" boxSize={4} />}>

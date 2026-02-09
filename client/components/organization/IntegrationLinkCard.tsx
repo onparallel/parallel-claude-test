@@ -1,7 +1,7 @@
 import { Center, HStack, LinkBox, LinkOverlay, Stack } from "@chakra-ui/react";
 import { ChevronRightIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { NakedLink } from "@parallel/components/common/Link";
+import NextLink from "next/link";
 import { Text } from "@parallel/components/ui";
 import { ReactNode } from "react";
 import { Card } from "../common/Card";
@@ -41,13 +41,11 @@ export const IntegrationLinkCard = chakraForwardRef<"div", IntegrationLinkCardPr
                     {title}
                   </Text>
                 ) : (
-                  <NakedLink href={href}>
-                    <LinkOverlay isExternal={isExternal}>
-                      <Text fontSize="xl" as="h3" fontWeight="bold">
-                        {title}
-                      </Text>
-                    </LinkOverlay>
-                  </NakedLink>
+                  <LinkOverlay as={NextLink} href={href} isExternal={isExternal}>
+                    <Text fontSize="xl" as="h3" fontWeight="bold">
+                      {title}
+                    </Text>
+                  </LinkOverlay>
                 )}
 
                 {badge}

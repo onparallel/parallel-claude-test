@@ -4,7 +4,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { NakedLink } from "../common/Link";
+import NextLink from "next/link";
 import { PetitionRepliesPopoverField } from "./PetitionRepliesPopoverField";
 import { Text } from "@parallel/components/ui";
 
@@ -42,20 +42,19 @@ export const NoRepliesHintWithButton = chakraForwardRef<
       </Text>
 
       <Box display={{ base: "block", lg: "none" }}>
-        <NakedLink href={href}>
-          <IconButtonWithTooltip
-            as="a"
-            opacity={0}
-            className="edit-field-reply-button"
-            variant="ghost"
-            size="xs"
-            icon={<EditSimpleIcon />}
-            label={intl.formatMessage({
-              id: "component.petition-replies-field.add-field-reply",
-              defaultMessage: "Add reply",
-            })}
-          />
-        </NakedLink>
+        <IconButtonWithTooltip
+          as={NextLink}
+          href={href}
+          opacity={0}
+          className="edit-field-reply-button"
+          variant="ghost"
+          size="xs"
+          icon={<EditSimpleIcon />}
+          label={intl.formatMessage({
+            id: "component.petition-replies-field.add-field-reply",
+            defaultMessage: "Add reply",
+          })}
+        />
       </Box>
       <Box display={{ base: "none", lg: "block" }}>
         <PetitionRepliesPopoverField

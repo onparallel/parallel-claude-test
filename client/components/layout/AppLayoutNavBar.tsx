@@ -71,7 +71,7 @@ import { isNonNullish } from "remeda";
 import smoothScrollIntoView from "smooth-scroll-into-view-if-needed";
 import { CloseButton } from "../common/CloseButton";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { NakedLink } from "../common/Link";
+import NextLink from "next/link";
 import {
   LocalizableUserText,
   localizableUserTextRender,
@@ -253,45 +253,50 @@ export function AppLayoutNavBar({ queryObject, onHelpCenterClick }: AppLayoutNav
               justify="space-between"
               position="relative"
             >
-              <NakedLink href="/app">
-                <Box as="a" width="40px" height="40px" position="relative" zIndex={1}>
-                  <Tooltip
-                    label={intl.formatMessage({
-                      id: "component.app-layout-nav-bar.switch-organization",
-                      defaultMessage: "Switch organization",
-                    })}
-                    placement="right"
-                    isDisabled={realMe.organizations.length === 1}
-                    openDelay={600}
+              <Box
+                as={NextLink}
+                href="/app"
+                width="40px"
+                height="40px"
+                position="relative"
+                zIndex={1}
+              >
+                <Tooltip
+                  label={intl.formatMessage({
+                    id: "component.app-layout-nav-bar.switch-organization",
+                    defaultMessage: "Switch organization",
+                  })}
+                  placement="right"
+                  isDisabled={realMe.organizations.length === 1}
+                  openDelay={600}
+                >
+                  <Box
+                    position="absolute"
+                    cursor="pointer"
+                    transition="transform 150ms"
+                    width="40px"
+                    height="40px"
+                    borderRadius="full"
+                    _hover={{
+                      color: "gray.900",
+                      shadow: "lg",
+                      transform: "scale(1.1)",
+                    }}
+                    overflow="hidden"
                   >
-                    <Box
-                      position="absolute"
-                      cursor="pointer"
-                      transition="transform 150ms"
-                      width="40px"
-                      height="40px"
-                      borderRadius="full"
-                      _hover={{
-                        color: "gray.900",
-                        shadow: "lg",
-                        transform: "scale(1.1)",
-                      }}
-                      overflow="hidden"
-                    >
-                      {me.organization.iconUrl80 ? (
-                        <Image
-                          boxSize="40px"
-                          objectFit="contain"
-                          alt={me.organization.name}
-                          src={me.organization.iconUrl80}
-                        />
-                      ) : (
-                        <Logo width="40px" hideText={true} color="gray.800" padding={1.5} />
-                      )}
-                    </Box>
-                  </Tooltip>
-                </Box>
-              </NakedLink>
+                    {me.organization.iconUrl80 ? (
+                      <Image
+                        boxSize="40px"
+                        objectFit="contain"
+                        alt={me.organization.name}
+                        src={me.organization.iconUrl80}
+                      />
+                    ) : (
+                      <Logo width="40px" hideText={true} color="gray.800" padding={1.5} />
+                    )}
+                  </Box>
+                </Tooltip>
+              </Box>
               {/* This Center adds a bit of margin around to make it the button easier to click, preventing the menu from closing when the mouse goes by a slight margin. Uncomment background to see */}
               <Center
                 rounded="100%"
@@ -636,28 +641,27 @@ function SectionsAndProfilesList({
                 </SmallPopover>
               )}
             >
-              <NakedLink href={href!}>
-                <NavBarButton
-                  as="a"
-                  isActive={isActive}
-                  section={section}
-                  onClick={onClick}
-                  icon={icon}
-                  badge={
-                    warning ? (
-                      <AlertCircleFilledIcon
-                        position="absolute"
-                        color="yellow.500"
-                        boxSize="14px"
-                        insetStart={-1}
-                        top={-1}
-                      />
-                    ) : null
-                  }
-                >
-                  {text}
-                </NavBarButton>
-              </NakedLink>
+              <NavBarButton
+                as={NextLink}
+                href={href!}
+                isActive={isActive}
+                section={section}
+                onClick={onClick}
+                icon={icon}
+                badge={
+                  warning ? (
+                    <AlertCircleFilledIcon
+                      position="absolute"
+                      color="yellow.500"
+                      boxSize="14px"
+                      insetStart={-1}
+                      top={-1}
+                    />
+                  ) : null
+                }
+              >
+                {text}
+              </NavBarButton>
             </Wrap>
           </ListItem>
         ))}
@@ -733,16 +737,15 @@ function SectionsAndProfilesList({
                   const icon = getProfileTypeIcon(profileType.icon);
                   return (
                     <ListItem key={profileType.id}>
-                      <NakedLink href={`/app/profiles?type=${profileType.id}`}>
-                        <NavBarButton
-                          as="a"
-                          isActive={pathname === "/app/profiles" && query.type === profileType.id}
-                          section={`profiles`}
-                          icon={<Icon as={icon} boxSize={5} />}
-                        >
-                          <ProfileTypeReference profileType={profileType} usePlural />
-                        </NavBarButton>
-                      </NakedLink>
+                      <NavBarButton
+                        as={NextLink}
+                        href={`/app/profiles?type=${profileType.id}`}
+                        isActive={pathname === "/app/profiles" && query.type === profileType.id}
+                        section={`profiles`}
+                        icon={<Icon as={icon} boxSize={5} />}
+                      >
+                        <ProfileTypeReference profileType={profileType} usePlural />
+                      </NavBarButton>
                     </ListItem>
                   );
                 })
@@ -840,18 +843,17 @@ const ProfileTypeButton = forwardRef<HTMLAnchorElement, ProfileTypeButtonProps>(
         }}
       >
         <Icon className="custom-icon" as={icon} boxSize={5} />
-        <NakedLink href={`/app/profiles?type=${profileType.id}`}>
-          <OverflownText
-            as={LinkOverlay}
-            aria-current={isActive ? "page" : undefined}
-            minWidth={0}
-            flex={1}
-            _focusVisible={{ outline: "none" }}
-            {...menuItemProps}
-          >
-            <ProfileTypeReference profileType={profileType} usePlural />
-          </OverflownText>
-        </NakedLink>
+        <OverflownText
+          as={LinkOverlay}
+          href={`/app/profiles?type=${profileType.id}`}
+          aria-current={isActive ? "page" : undefined}
+          minWidth={0}
+          flex={1}
+          _focusVisible={{ outline: "none" }}
+          {...menuItemProps}
+        >
+          <ProfileTypeReference profileType={profileType} usePlural />
+        </OverflownText>
         <IconButtonWithTooltip
           variant="ghost"
           rounded="full"
@@ -936,23 +938,22 @@ function CreateMenuButtonSection({
 
   if (!me.hasProfilesAccess || !userCanCreateProfiles || pinnedProfileTypes.length === 0) {
     return (
-      <NakedLink href="/app/petitions/new">
-        <Button
-          as="a"
-          colorPalette="purple"
-          width="full"
-          paddingInlineStart={3}
-          paddingInlineEnd={3}
-          overflow="hidden"
-        >
-          <HStack margin="0 auto" width="fit-content" minWidth={0}>
-            <AddIcon boxSize={4} />
-            <Text as="span" className="show-on-expand" minWidth={0}>
-              <FormattedMessage id="generic.create-petition" defaultMessage="Create parallel" />
-            </Text>
-          </HStack>
-        </Button>
-      </NakedLink>
+      <Button
+        as={NextLink}
+        href="/app/petitions/new"
+        colorPalette="purple"
+        width="full"
+        paddingInlineStart={3}
+        paddingInlineEnd={3}
+        overflow="hidden"
+      >
+        <HStack margin="0 auto" width="fit-content" minWidth={0}>
+          <AddIcon boxSize={4} />
+          <Text as="span" className="show-on-expand" minWidth={0}>
+            <FormattedMessage id="generic.create-petition" defaultMessage="Create parallel" />
+          </Text>
+        </HStack>
+      </Button>
     );
   }
 
@@ -995,11 +996,9 @@ function CreateMenuButtonSection({
             maxHeight="400px"
             overflow="auto"
           >
-            <NakedLink href="/app/petitions/new">
-              <MenuItem as="a" icon={<PaperPlaneIcon boxSize={4} />}>
-                {untranslated("Parallel")}
-              </MenuItem>
-            </NakedLink>
+            <MenuItem as={NextLink} href="/app/petitions/new" icon={<PaperPlaneIcon boxSize={4} />}>
+              {untranslated("Parallel")}
+            </MenuItem>
             {pinnedProfileTypes.map((profileType) => {
               const icon = getProfileTypeIcon(profileType.icon);
               return (

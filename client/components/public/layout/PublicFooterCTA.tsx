@@ -1,7 +1,7 @@
 import { Heading, Stack } from "@chakra-ui/react";
 import { Button } from "@parallel/components/ui";
-import { NakedLink } from "@parallel/components/common/Link";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
+import NextLink from "next/link";
 import { FormattedMessage } from "react-intl";
 
 export function PublicFooterCTA() {
@@ -36,11 +36,16 @@ export function PublicFooterCTA() {
           defaultMessage="Do you want to use our templates?"
         />
       </Heading>
-      <NakedLink href="/signup">
-        <Button as="a" size="lg" backgroundColor="white" height="3.5rem" width="auto">
-          <FormattedMessage id="public.sign-up-for-free-button" defaultMessage="Sign up for free" />
-        </Button>
-      </NakedLink>
+      <Button
+        as={NextLink}
+        href="/signup"
+        size="lg"
+        backgroundColor="white"
+        height="3.5rem"
+        width="auto"
+      >
+        <FormattedMessage id="public.sign-up-for-free-button" defaultMessage="Sign up for free" />
+      </Button>
     </PublicContainer>
   );
 }

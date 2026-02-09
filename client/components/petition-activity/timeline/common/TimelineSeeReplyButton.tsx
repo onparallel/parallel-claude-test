@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { ButtonOptions, ThemingProps } from "@chakra-ui/react";
-import { NakedLink } from "@parallel/components/common/Link";
+import NextLink from "next/link";
 import { TimelineSeeReplyButton_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { FormattedMessage } from "react-intl";
@@ -18,24 +18,21 @@ export function TimelineSeeReplyButton({ field, replyId, ...props }: TimelineSee
 
   return isNonNullish(field) ? (
     reply !== undefined ? (
-      <NakedLink
+      <Button
+        as={NextLink}
         href={
           reply!.parent?.id
             ? buildUrlToSection("replies", { parentReply: reply.parent.id })
             : buildUrlToSection("replies", { field: field.id })
         }
+        className="no-print"
+        size="sm"
+        variant="outline"
+        background="white"
+        {...props}
       >
-        <Button
-          as="a"
-          className="no-print"
-          size="sm"
-          variant="outline"
-          background="white"
-          {...props}
-        >
-          <FormattedMessage id="component.timeline-see-reply-button.see" defaultMessage="See" />
-        </Button>
-      </NakedLink>
+        <FormattedMessage id="component.timeline-see-reply-button.see" defaultMessage="See" />
+      </Button>
     ) : (
       <Text as="span" textStyle="hint">
         <FormattedMessage

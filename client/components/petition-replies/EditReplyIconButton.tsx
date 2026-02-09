@@ -4,7 +4,7 @@ import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
 import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { NakedLink } from "../common/Link";
+import NextLink from "next/link";
 import { PetitionRepliesPopoverField } from "./PetitionRepliesPopoverField";
 
 export function EditReplyIconButton({
@@ -26,26 +26,23 @@ export function EditReplyIconButton({
   return (
     <HStack>
       <Box display={{ base: "block", lg: "none" }}>
-        <NakedLink
+        <IconButtonWithTooltip
+          as={NextLink}
           href={buildUrlToSection("preview", {
             field: petitionFieldId,
             ...(parentReplyId ? { parentReply: parentReplyId } : {}),
             ...(idSuffix ? { sufix: idSuffix } : {}),
           })}
-        >
-          <IconButtonWithTooltip
-            as="a"
-            opacity={0}
-            className="edit-field-reply-button"
-            variant="ghost"
-            size="xs"
-            icon={<EditSimpleIcon />}
-            label={intl.formatMessage({
-              id: "component.petition-replies-field.edit-field-reply",
-              defaultMessage: "Edit reply",
-            })}
-          />
-        </NakedLink>
+          opacity={0}
+          className="edit-field-reply-button"
+          variant="ghost"
+          size="xs"
+          icon={<EditSimpleIcon />}
+          label={intl.formatMessage({
+            id: "component.petition-replies-field.edit-field-reply",
+            defaultMessage: "Edit reply",
+          })}
+        />
       </Box>
       <Box display={{ base: "none", lg: "block" }}>
         <PetitionRepliesPopoverField

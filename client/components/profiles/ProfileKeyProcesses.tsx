@@ -21,7 +21,8 @@ import { Card, CardHeader } from "../common/Card";
 import { DateTime } from "../common/DateTime";
 import { isDialogError } from "../common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { Link, NakedLink } from "../common/Link";
+import { Link } from "../common/Link";
+import NextLink from "next/link";
 import {
   localizableUserTextRender,
   LocalizableUserTextRender,
@@ -291,16 +292,19 @@ function KeyProcessCard({
           isNonNullish(latestPetition) ? (
             <HStack>
               {showViewOthers ? (
-                <NakedLink
+                <Button
+                  as={NextLink}
                   href={`/app/profiles/${profileId}/parallels?${new URLSearchParams({ p_fromTemplateId: templates.map((t) => t.id).join(",") })}`}
+                  variant="outline"
+                  size="sm"
+                  fontSize="md"
+                  fontWeight={500}
                 >
-                  <Button as="a" variant="outline" size="sm" fontSize="md" fontWeight={500}>
-                    <FormattedMessage
-                      id="component.profile-key-process.view-others"
-                      defaultMessage="View others"
-                    />
-                  </Button>
-                </NakedLink>
+                  <FormattedMessage
+                    id="component.profile-key-process.view-others"
+                    defaultMessage="View others"
+                  />
+                </Button>
               ) : null}
 
               <IconButtonWithTooltip
@@ -448,13 +452,11 @@ function KeyProcessCard({
 function PlaceholderEmpty({ profileTypeId }: { profileTypeId: string }) {
   const userCanAccessProfileTypes = useHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES");
 
-  const addProcessButton = (
-    <Button as="a" variant="link" disabled={!userCanAccessProfileTypes}>
-      <FormattedMessage
-        id="component.profile-key-processes.add-process-button"
-        defaultMessage="Add process"
-      />
-    </Button>
+  const addProcessButtonContent = (
+    <FormattedMessage
+      id="component.profile-key-processes.add-process-button"
+      defaultMessage="Add process"
+    />
   );
 
   return (
@@ -482,11 +484,19 @@ function PlaceholderEmpty({ profileTypeId }: { profileTypeId: string }) {
         />
       </Text>
       {userCanAccessProfileTypes ? (
-        <NakedLink href={`/app/organization/profiles/types/${profileTypeId}`}>
-          {addProcessButton}
-        </NakedLink>
+        <Button
+          as={NextLink}
+          href={`/app/organization/profiles/types/${profileTypeId}`}
+          variant="link"
+        >
+          {addProcessButtonContent}
+        </Button>
       ) : (
-        <RestrictedFeaturePopover isRestricted={true}>{addProcessButton}</RestrictedFeaturePopover>
+        <RestrictedFeaturePopover isRestricted={true}>
+          <Button variant="link" disabled>
+            {addProcessButtonContent}
+          </Button>
+        </RestrictedFeaturePopover>
       )}
     </Center>
   );
@@ -501,20 +511,11 @@ function PlaceholderAddNewProcess({
 }) {
   const userCanAccessProfileTypes = useHasPermission("PROFILE_TYPES:CRUD_PROFILE_TYPES");
 
-  const addProcessButton = (
-    <Button
-      as="a"
-      variant="outline"
-      fontSize="md"
-      size="sm"
-      fontWeight={500}
-      disabled={!userCanAccessProfileTypes}
-    >
-      <FormattedMessage
-        id="component.profile-key-processes.add-process-button"
-        defaultMessage="Add process"
-      />
-    </Button>
+  const addProcessButtonContent = (
+    <FormattedMessage
+      id="component.profile-key-processes.add-process-button"
+      defaultMessage="Add process"
+    />
   );
 
   return (
@@ -532,11 +533,22 @@ function PlaceholderAddNewProcess({
     >
       <PlusCircleIcon boxSize={8} color="gray.400" />
       {userCanAccessProfileTypes ? (
-        <NakedLink href={`/app/organization/profiles/types/${profileTypeId}`}>
-          {addProcessButton}
-        </NakedLink>
+        <Button
+          as={NextLink}
+          href={`/app/organization/profiles/types/${profileTypeId}`}
+          variant="outline"
+          fontSize="md"
+          size="sm"
+          fontWeight={500}
+        >
+          {addProcessButtonContent}
+        </Button>
       ) : (
-        <RestrictedFeaturePopover isRestricted={true}>{addProcessButton}</RestrictedFeaturePopover>
+        <RestrictedFeaturePopover isRestricted={true}>
+          <Button variant="outline" fontSize="md" size="sm" fontWeight={500} disabled>
+            {addProcessButtonContent}
+          </Button>
+        </RestrictedFeaturePopover>
       )}
     </Center>
   );

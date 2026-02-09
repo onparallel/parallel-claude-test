@@ -16,7 +16,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { NakedHelpCenterLink } from "@parallel/components/common/HelpCenterLink";
-import { NakedLink } from "@parallel/components/common/Link";
+import NextLink from "next/link";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withPermission } from "@parallel/components/common/withPermission";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
@@ -202,13 +202,11 @@ const ReportsCard = chakraForwardRef<"div", ReportsCardProps>(function ReportsCa
                 </Badge>
               </>
             ) : (
-              <NakedLink href={href}>
-                <LinkOverlay>
-                  <Text as="h2" fontSize="2xl" fontWeight="bold">
-                    {title}
-                  </Text>
-                </LinkOverlay>
-              </NakedLink>
+              <LinkOverlay as={NextLink} href={href}>
+                <Text as="h2" fontSize="2xl" fontWeight="bold">
+                  {title}
+                </Text>
+              </LinkOverlay>
             )}
           </HStack>
           <Text>{description}</Text>

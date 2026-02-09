@@ -15,7 +15,6 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
-import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { withApolloData } from "@parallel/components/common/withApolloData";
 import { RecipientViewPageNotAvailableError } from "@parallel/components/recipient-view/RecipientViewPageNotAvailableError";
@@ -30,6 +29,7 @@ import { UnwrapPromise } from "@parallel/utils/types";
 import { useReminderOptOutReasons } from "@parallel/utils/useReminderOptOutReasons";
 import { GetServerSidePropsContext } from "next";
 import Head from "next/head";
+import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { FormEvent, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -189,14 +189,17 @@ function OptOut(props: OptOutProps) {
                 defaultMessage="Before opting out from receiving reminders, check the requested information."
               />
             </Text>
-            <NakedLink href={`/petition/${keycode}`}>
-              <Button variant="outline" as="a" backgroundColor="white">
-                <FormattedMessage
-                  id="page.opt-out.review-button"
-                  defaultMessage="Review the information"
-                />
-              </Button>
-            </NakedLink>
+            <Button
+              as={NextLink}
+              href={`/petition/${keycode}`}
+              variant="outline"
+              backgroundColor="white"
+            >
+              <FormattedMessage
+                id="page.opt-out.review-button"
+                defaultMessage="Review the information"
+              />
+            </Button>
           </Stack>
         </Flex>
       </Grid>
