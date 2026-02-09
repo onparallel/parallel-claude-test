@@ -776,10 +776,7 @@ export const petitionHasStatus = createPetitionAuthorizer(
 
 export const petitionIsNotClosed = createPetitionAuthorizer((petition) => {
   if (petition.status === "CLOSED") {
-    throw new ApolloError(
-      `Expected petition to have status CLOSED but got ${petition.status}`,
-      "PETITION_STATUS_ERROR",
-    );
+    throw new ApolloError(`Expected petition not to be closed`, "PETITION_STATUS_ERROR");
   }
   return true;
 });

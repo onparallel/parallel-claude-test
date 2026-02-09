@@ -2246,7 +2246,9 @@ export function publicApi(container: Container) {
 
           return Ok(mapReplyResponse(newReply));
         } catch (error) {
-          if (containsGraphQLError(error, "INVALID_REPLY_ERROR")) {
+          if (containsGraphQLError(error, "PETITION_STATUS_ERROR")) {
+            throw new BadRequestError(error.message);
+          } else if (containsGraphQLError(error, "INVALID_REPLY_ERROR")) {
             const extra = error.response.errors?.[0].extensions?.extra as
               | { subcode: string }
               | undefined;
