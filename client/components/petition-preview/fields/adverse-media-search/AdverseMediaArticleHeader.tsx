@@ -188,7 +188,7 @@ export function AdverseMediaArticleHeader({
                 <Box display={{ base: "flex", xl: "none" }}>
                   <ButtonWithMoreOptions
                     size="sm"
-                    colorScheme="primary"
+                    colorPalette="primary"
                     leftIcon={<StarEmptyIcon />}
                     onClick={() => onClassifyArticle("RELEVANT")}
                     isDisabled={isReadOnly}

@@ -256,7 +256,7 @@ function PetitionCompletedAlert({
 
           {showStartSignatureButton && approvalsStatus === "APPROVED" ? (
             <ButtonWithMoreOptions
-              colorScheme="primary"
+              colorPalette="primary"
               onClick={onStartSignature}
               options={
                 <MenuList minWidth="fit-content">
@@ -279,7 +279,7 @@ function PetitionCompletedAlert({
 
           {showClosePetitionButton && approvalsStatus === "APPROVED" ? (
             <ButtonWithMoreOptions
-              colorScheme="primary"
+              colorPalette="primary"
               onClick={onClosePetition}
               options={
                 <MenuList minWidth="fit-content">

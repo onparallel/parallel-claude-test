@@ -15,21 +15,32 @@ import { omit, pick } from "remeda";
 import { Divider } from "../common/Divider";
 import { MoreOptionsMenuButton } from "./MoreOptionsMenuButton";
 
-export interface ButtonWithMoreOptionsProps extends ButtonOptions, ThemingProps<"Button"> {
+export interface ButtonWithMoreOptionsProps
+  extends ButtonOptions,
+    Omit<ThemingProps<"Button">, "colorScheme"> {
   options: ReactNode;
   moreOptionsButtonProps?: ButtonProps;
+  colorPalette?: string;
 }
 
 export const ButtonWithMoreOptions = chakraForwardRef<"button", ButtonWithMoreOptionsProps>(
-  function ButtonWithMoreOptions({ as, options, moreOptionsButtonProps, ...props }, ref) {
+  function ButtonWithMoreOptions(
+    { as, options, moreOptionsButtonProps, colorPalette, ...props },
+    ref,
+  ) {
     const layoutProps = pick(props, layoutPropNames as any);
     const otherProps = omitThemingProps(omit(props, layoutPropNames as any));
-    const themingProps = pick(props, ["styleConfig", "size", "variant", "colorScheme"]);
-    const style = useStyleConfig("Button", { ...props });
+    const themingProps = pick(props, ["styleConfig", "size", "variant"]);
+    const style = useStyleConfig("Button", { ...props, colorScheme: colorPalette });
 
     return (
-      <ButtonGroup isAttached {...(layoutProps as any)} {...themingProps}>
-        <Button ref={ref} as={as} flex="1" {...(otherProps as any)} />
+      <ButtonGroup
+        isAttached
+        {...(layoutProps as any)}
+        {...themingProps}
+        colorScheme={colorPalette}
+      >
+        <Button ref={ref} as={as} flex="1" colorPalette={colorPalette} {...(otherProps as any)} />
         {style.border ? null : (
           <Divider
             isVertical

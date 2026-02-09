@@ -5,7 +5,9 @@ import { MouseEvent } from "react";
 import { FormattedMessage } from "react-intl";
 import { ButtonWithMoreOptions } from "../common/ButtonWithMoreOptions";
 
-export interface SendButtonProps extends ButtonOptions, ThemingProps<"Button"> {
+export interface SendButtonProps
+  extends ButtonOptions,
+    Omit<ThemingProps<"Button">, "colorScheme"> {
   onSendClick: (event: MouseEvent) => void;
   onScheduleClick: (event: MouseEvent) => void;
 }

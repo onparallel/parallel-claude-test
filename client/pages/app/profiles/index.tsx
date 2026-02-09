@@ -497,7 +497,7 @@ function Profiles() {
           <Box>
             {userCanImportExportProfiles ? (
               <ButtonWithMoreOptions
-                colorScheme="primary"
+                colorPalette="primary"
                 onClick={handleCreateProfile}
                 isDisabled={
                   !userCanCreateProfiles ||

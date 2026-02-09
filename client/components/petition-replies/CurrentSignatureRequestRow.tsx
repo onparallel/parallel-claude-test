@@ -174,7 +174,7 @@ export function CurrentSignatureRequestRow({
             ) : null}
 
             <ButtonWithMoreOptions
-              colorScheme="primary"
+              colorPalette="primary"
               isDisabled={signatureRequest.isAnonymized}
               as={ResponsiveButtonIcon}
               icon={<DownloadIcon fontSize="lg" display="block" />}
