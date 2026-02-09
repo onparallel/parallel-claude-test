@@ -35,6 +35,19 @@ export function I18nProvider({ children, ...props }: I18nProps & { children: Rea
   );
 }
 
+const langImports: Record<string, () => Promise<{ default: any }>> = {
+  en: () => import("@parallel/lang/en.json"),
+  es: () => import("@parallel/lang/es.json"),
+};
+
+const recipientLangImports: Record<string, () => Promise<{ default: any }>> = {
+  en: () => import("@parallel/lang/recipient/en.json"),
+  es: () => import("@parallel/lang/recipient/es.json"),
+  ca: () => import("@parallel/lang/recipient/ca.json"),
+  it: () => import("@parallel/lang/recipient/it.json"),
+  pt: () => import("@parallel/lang/recipient/pt.json"),
+};
+
 function useTranslations(isRecipientPage: boolean) {
   const { locale } = useRouter();
   const [{ current, cache }, setState] = useState<IntlCache>(() => {
@@ -56,9 +69,8 @@ function useTranslations(isRecipientPage: boolean) {
         );
         messages = await res.json();
       } else {
-        const { default: data } = await import(
-          "@parallel/lang" + (isRecipientPage ? "/recipient" : "") + `/${locale}.json`
-        );
+        const imports = isRecipientPage ? recipientLangImports : langImports;
+        const { default: data } = await imports[locale]();
         messages = Object.fromEntries<string>(data.map((t: any) => [t.term, t.definition]));
       }
       setState(({ cache }) => ({
