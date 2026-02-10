@@ -231,7 +231,6 @@
     "prettier": "^3.3.3",
     "storybook": "^10.2.3",
     "testcontainers": "^11.7.0",
-    "ts-jest": "^29.4.0",
-    "typescript": "^5.5.4"
+    "ts-jest": "^29.4.0"
   }
 }

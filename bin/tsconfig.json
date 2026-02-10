@@ -4,10 +4,7 @@
     "target": "es2023",
     "lib": ["es2023"],
     "module": "commonjs",
-    "noEmit": false,
-    "rootDir": "./src",
-    "outDir": "./dist",
-    "sourceMap": false
-  },
-  "exclude": ["dist"]
+    "noEmit": true,
+    "rootDir": "./src"
+  }
 }
