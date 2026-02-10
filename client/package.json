@@ -8,6 +8,7 @@
     "dev": "next",
     "dev:webpack": "next --webpack",
     "build": "next build --webpack",
+    "check-types": "tsc --noEmit",
     "build:turbopack": "next build",
     "start": "next start",
     "test": "jest",

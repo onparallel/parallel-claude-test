@@ -7,7 +7,24 @@ import {
 import { toGlobalId } from "../../../util/globalId";
 import { JsonSchema, JsonSchemaFor } from "../../../util/jsonSchema";
 import { pascalCase } from "../../../util/strings";
-import { _PetitionSigner } from "./core";
+
+const _PetitionSigner = {
+  type: "object",
+  title: "PetitionSigner",
+  description: "Information about the signer",
+  required: ["email", "firstName", "lastName"],
+  additionalProperties: false,
+  properties: {
+    firstName: { type: "string" },
+    lastName: { type: ["string", "null"] },
+    email: { type: ["string", "null"] },
+  },
+  example: {
+    firstName: "Tywin",
+    lastName: "Lannister",
+    email: "tywin@casterlyrock.com",
+  },
+} as const;
 
 const PetitionEventSchemas = {
   ACCESS_ACTIVATED: {

@@ -14,7 +14,7 @@ import { ReadOnlySystemRepository, SystemRepository } from "./SystemRepository";
 export class UserRepository extends BaseRepository {
   constructor(
     @inject(KNEX) knex: Knex,
-    private system: SystemRepository,
+    @inject(SystemRepository) private system: SystemRepository,
   ) {
     super(knex);
   }

@@ -71,7 +71,8 @@ export const USER_COGNITO_ID = "test-cognito-id";
 @injectable()
 export class MockAuth implements IAuth {
   constructor(
-    private users: UserRepository,
+    @inject(UserRepository) private users: UserRepository,
+    @inject(UserAuthenticationRepository)
     private userAuthentication: UserAuthenticationRepository,
   ) {}
   async getOrCreateCognitoUser(): Promise<string> {

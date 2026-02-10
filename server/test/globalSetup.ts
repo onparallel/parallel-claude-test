@@ -20,7 +20,7 @@ export default async function () {
   console.time(SETUP_POSTGRES_TIME);
   await new GenericContainer("postgres:16.8")
     .withExposedPorts({ container: 5432, host: 5433 })
-    .withWaitStrategy(Wait.forLogMessage("database system is ready to accept connections"))
+    .withWaitStrategy(Wait.forLogMessage("database system is ready to accept connections", 2))
     .withEnvironment({
       POSTGRES_USER: "test",
       POSTGRES_PASSWORD: "test",

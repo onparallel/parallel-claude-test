@@ -218,15 +218,11 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
                               ? forkTimeout
                               : await forkTimeout(parser(message.Body!), queueConfig);
                           await new Promise<void>((resolve, reject) => {
-                            fork(
-                              script,
-                              [
-                                "run",
-                                message.Body!,
-                                ...(script.endsWith(".ts") ? ["-r", "ts-node/register"] : []),
-                              ],
-                              { stdio: "inherit", timeout, env: process.env },
-                            ).on("close", (code, signal) => {
+                            fork(script, ["run", message.Body!], {
+                              stdio: "inherit",
+                              timeout,
+                              env: process.env,
+                            }).on("close", (code, signal) => {
                               if (code === 0) {
                                 resolve();
                               } else {

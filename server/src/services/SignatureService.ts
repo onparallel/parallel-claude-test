@@ -65,8 +65,7 @@ export const SIGNATURE = Symbol.for("SIGNATURE");
 export class SignatureService implements ISignatureService {
   constructor(
     @inject(CONFIG) private config: Config,
-    @inject(IntegrationRepository)
-    private integrations: IntegrationRepository,
+    @inject(IntegrationRepository) private integrations: IntegrationRepository,
     @inject(PetitionRepository) private petitions: PetitionRepository,
     @inject(QUEUES_SERVICE) private queues: IQueuesService,
     @inject(FileRepository) private files: FileRepository,

@@ -105,14 +105,10 @@ const COLORS = ["#E2E8F0", "#F5EFE8", "#FEEBC8", "#FED7D7", "#DDDCF8", "#CEEDFF"
 export class DashboardRepository extends BaseRepository {
   constructor(
     @inject(KNEX) knex: Knex,
-    @inject(PROFILE_QUERY_HELPER)
-    private profileQueryHelper: ProfileQueryHelper,
-    @inject(PETITION_QUERY_HELPER)
-    private petitionQueryHelper: PetitionQueryHelper,
-    @inject(PROFILE_TYPE_FIELD_SERVICE)
-    private profileTypeFields: ProfileTypeFieldService,
-    @inject(UserRepository)
-    private users: UserRepository,
+    @inject(PROFILE_QUERY_HELPER) private profileQueryHelper: ProfileQueryHelper,
+    @inject(PETITION_QUERY_HELPER) private petitionQueryHelper: PetitionQueryHelper,
+    @inject(PROFILE_TYPE_FIELD_SERVICE) private profileTypeFields: ProfileTypeFieldService,
+    @inject(UserRepository) private users: UserRepository,
   ) {
     super(knex);
   }

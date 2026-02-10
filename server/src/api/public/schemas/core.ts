@@ -713,7 +713,7 @@ const _PetitionFieldWithReplies = {
   },
 } as const;
 
-export const _PetitionSigner = {
+const _PetitionSigner = {
   type: "object",
   title: "PetitionSigner",
   description: "Information about the signer",

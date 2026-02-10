@@ -1,12 +1,11 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "target": "es2020",
-    "lib": ["esnext"],
+    "target": "es2023",
+    "lib": ["es2023"],
     "module": "commonjs",
     "jsx": "react-jsxdev",
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "sourceMap": true
   },
   "include": ["**/*.ts", "**/*.tsx"]

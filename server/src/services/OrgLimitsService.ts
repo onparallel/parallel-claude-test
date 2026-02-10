@@ -29,8 +29,7 @@ export interface IOrgLimitsService {
 export class OrgLimitsService implements IOrgLimitsService {
   constructor(
     @inject(OrganizationRepository) private organizations: OrganizationRepository,
-    @inject(FeatureFlagRepository)
-    private featureFlags: FeatureFlagRepository,
+    @inject(FeatureFlagRepository) private featureFlags: FeatureFlagRepository,
     @inject(SIGNATURE) private signatures: SignatureService,
   ) {}
 
