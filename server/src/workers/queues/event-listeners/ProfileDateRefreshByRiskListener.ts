@@ -300,8 +300,8 @@ const CONFIG: Config[] =
               // Portfolio companies
               {
                 profileTypeId: 11389,
-                triggerUpdateProfileTypeField: 199520,
-                triggerUpdateValues: ["ACTIVE"],
+                triggerUpdateProfileTypeField: 200545,
+                triggerUpdateValues: ["activo"],
                 riskProfileTypeFieldId: 199507,
                 dateProfileTypeFields: [
                   {
