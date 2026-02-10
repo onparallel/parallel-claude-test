@@ -4,7 +4,7 @@ import { BankflipWebhookEvent } from "../services/BankflipService";
 import { fromGlobalId } from "../util/globalId";
 
 const verifyHMAC = (req: Request, _: Response, buffer: Buffer) => {
-  const secret = req.context.bankflip.webhookSecret(req.params.orgId);
+  const secret = req.context.bankflip.webhookSecret(req.params.orgId as string);
   const requestUri = `https://${req.hostname}${req.originalUrl}`;
   const requestMethod = req.method;
   const requestBody = buffer.toString();
@@ -20,32 +20,23 @@ const verifyHMAC = (req: Request, _: Response, buffer: Buffer) => {
   }
 };
 
-export const bankflip = Router().post(
-  "/:orgId",
-  json({ verify: verifyHMAC }),
-  async (req, res, next) => {
-    try {
-      const body = req.body as BankflipWebhookEvent;
-      const retry = typeof req.query.retry === "string" && req.query.retry === "true";
+export const bankflip = Router().post("/:orgId", json({ verify: verifyHMAC }), async (req, res) => {
+  const body = req.body as BankflipWebhookEvent;
+  const retry = typeof req.query.retry === "string" && req.query.retry === "true";
 
-      if (body.name === "SESSION_COMPLETED") {
-        await req.context.tasks.createTask(
-          {
-            name: "BANKFLIP_SESSION_COMPLETED",
-            input: {
-              bankflip_session_id: body.payload.sessionId,
-              org_id: fromGlobalId(req.params.orgId, "Organization").id,
-              update_errors: retry,
-            },
-          },
-          req.context.config.instanceName,
-        );
-      }
+  if (body.name === "SESSION_COMPLETED") {
+    await req.context.tasks.createTask(
+      {
+        name: "BANKFLIP_SESSION_COMPLETED",
+        input: {
+          bankflip_session_id: body.payload.sessionId,
+          org_id: fromGlobalId(req.params.orgId, "Organization").id,
+          update_errors: retry,
+        },
+      },
+      req.context.config.instanceName,
+    );
+  }
 
-      res.sendStatus(200).end();
-    } catch (error: any) {
-      req.context.logger.error(error.message, { stack: error.stack });
-      next(error);
-    }
-  },
-);
+  res.sendStatus(200).end();
+});

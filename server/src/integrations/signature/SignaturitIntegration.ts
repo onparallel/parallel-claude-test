@@ -79,57 +79,50 @@ export class SignaturitIntegration extends GenericIntegration<
   ) {
     super(encryption, integrations);
     this.registerHandlers((router) => {
-      router
-        .use(urlencoded({ extended: true }))
-        .post("/:petitionId/events", async (req, res, next) => {
-          try {
-            const body = req.body as SignaturitEventBody;
-            const signature = await req.context.petitions.loadPetitionSignatureByExternalId(
-              `SIGNATURIT/${body.document.signature.id}`,
-            );
+      router.use(urlencoded({ extended: true })).post("/:petitionId/events", async (req, res) => {
+        const body = req.body as SignaturitEventBody;
+        const signature = await req.context.petitions.loadPetitionSignatureByExternalId(
+          `SIGNATURIT/${body.document.signature.id}`,
+        );
 
-            if (isNullish(signature) || signature.status === "CANCELLED") {
-              // status 200 to kill request but avoid sending an error to signaturit
-              return res.sendStatus(200).end();
-            }
-            const petitionId = fromGlobalId(req.params.petitionId, "Petition").id;
-            try {
-              await this.appendEventLogs(body);
-              switch (body.type) {
-                case "document_opened":
-                  await this.documentOpened(body, petitionId);
-                  break;
-                case "document_signed":
-                  await this.documentSigned(body, petitionId);
-                  break;
-                case "document_declined":
-                  await this.documentDeclined(body, petitionId);
-                  break;
-                case "audit_trail_completed":
-                  await this.auditTrailCompleted(body, petitionId);
-                  break;
-                case "email_delivered":
-                  await this.emailDelivered(body, petitionId);
-                  break;
-                case "email_opened":
-                  await this.emailOpened(body, petitionId);
-                  break;
-                case "email_bounced":
-                  await this.emailBounced(body, petitionId);
-                  break;
-                case "document_expired":
-                  await this.documentExpired(body, petitionId);
-                  break;
-              }
-            } catch (error: any) {
-              req.context.logger.error(error.message, { stack: error.stack });
-            }
-            res.sendStatus(200).end();
-          } catch (error: any) {
-            req.context.logger.error(error.message, { stack: error.stack });
-            next(error);
+        if (isNullish(signature) || signature.status === "CANCELLED") {
+          // status 200 to kill request but avoid sending an error to signaturit
+          return res.sendStatus(200).end();
+        }
+        const petitionId = fromGlobalId(req.params.petitionId, "Petition").id;
+        try {
+          await this.appendEventLogs(body);
+          switch (body.type) {
+            case "document_opened":
+              await this.documentOpened(body, petitionId);
+              break;
+            case "document_signed":
+              await this.documentSigned(body, petitionId);
+              break;
+            case "document_declined":
+              await this.documentDeclined(body, petitionId);
+              break;
+            case "audit_trail_completed":
+              await this.auditTrailCompleted(body, petitionId);
+              break;
+            case "email_delivered":
+              await this.emailDelivered(body, petitionId);
+              break;
+            case "email_opened":
+              await this.emailOpened(body, petitionId);
+              break;
+            case "email_bounced":
+              await this.emailBounced(body, petitionId);
+              break;
+            case "document_expired":
+              await this.documentExpired(body, petitionId);
+              break;
           }
-        });
+        } catch (error: any) {
+          req.context.logger.error(error.message, { stack: error.stack });
+        }
+        res.sendStatus(200).end();
+      });
     });
   }
 

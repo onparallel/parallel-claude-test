@@ -253,35 +253,31 @@ export class Auth implements IAuth {
     return body.success ?? false;
   }
 
-  async guessLogin(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { email, locale, redirect } = req.body;
-      assert(typeof email === "string", "Invalid body");
-      const [, domain] = email.split("@");
-      const sso = await this.integrations.loadSSOIntegrationByDomain(domain);
-      if (sso) {
-        const org = (await this.orgs.loadOrg(sso.org_id))!;
-        const provider = (sso.settings as IntegrationSettings<"SSO">).COGNITO_PROVIDER;
-        const url = `https://${this.config.cognito.domain}/oauth2/authorize?${new URLSearchParams({
-          identity_provider: provider,
-          redirect_uri: `${this.config.misc.parallelUrl}/api/auth/callback`,
-          response_type: "code",
-          client_id: this.config.cognito.clientId,
-          scope: "aws.cognito.signin.user.admin email openid profile",
-          state: Buffer.from(
-            new URLSearchParams({
-              orgId: org.id.toString(),
-              ...(locale ? { locale: locale.toString() } : {}),
-              ...(redirect ? { redirect: redirect.toString() } : {}),
-            }).toString(),
-          ).toString("base64"),
-        })}`;
-        res.json({ type: "SSO", url });
-      } else {
-        res.json({ type: "PASSWORD" });
-      }
-    } catch (error) {
-      next(error);
+  async guessLogin(req: Request, res: Response, _next: NextFunction) {
+    const { email, locale, redirect } = req.body;
+    assert(typeof email === "string", "Invalid body");
+    const [, domain] = email.split("@");
+    const sso = await this.integrations.loadSSOIntegrationByDomain(domain);
+    if (sso) {
+      const org = (await this.orgs.loadOrg(sso.org_id))!;
+      const provider = (sso.settings as IntegrationSettings<"SSO">).COGNITO_PROVIDER;
+      const url = `https://${this.config.cognito.domain}/oauth2/authorize?${new URLSearchParams({
+        identity_provider: provider,
+        redirect_uri: `${this.config.misc.parallelUrl}/api/auth/callback`,
+        response_type: "code",
+        client_id: this.config.cognito.clientId,
+        scope: "aws.cognito.signin.user.admin email openid profile",
+        state: Buffer.from(
+          new URLSearchParams({
+            orgId: org.id.toString(),
+            ...(locale ? { locale: locale.toString() } : {}),
+            ...(redirect ? { redirect: redirect.toString() } : {}),
+          }).toString(),
+        ).toString("base64"),
+      })}`;
+      res.json({ type: "SSO", url });
+    } else {
+      res.json({ type: "PASSWORD" });
     }
   }
 

@@ -180,6 +180,7 @@ Organization members who access the dashboard.
 **Purpose**: Multi-stage approval workflows for petitions
 
 **Key Fields**:
+
 - `petition_id`: Associated petition
 - `step_order`: Approval sequence
 - `approver_user_id`: Required approver
@@ -188,6 +189,7 @@ Organization members who access the dashboard.
 **Service**: `ApprovalsService` (injected as `ctx.approvals`)
 
 **Flow**:
+
 1. Create approval requests when petition moves to approval stage
 2. Notify approvers
 3. Track approval/rejection
@@ -202,6 +204,7 @@ Organization members who access the dashboard.
 **Purpose**: User-customized list views with saved filters and columns
 
 **Key Fields**:
+
 - `user_id`: View owner
 - `name`: View name
 - `filters`: JSON filter configuration
@@ -254,18 +257,21 @@ Key repositories: `petitions`, `profiles`, `contacts`, `users`, `organizations`,
 InversifyJS modules are defined in `module.ts` files. Registration patterns differ for services vs repositories.
 
 **Services** (`server/src/services/module.ts`):
+
 - Import: `{ SERVICE_SYMBOL, ServiceClass, IServiceInterface }`
 - Register: `options.bind<IServiceInterface>(SERVICE_SYMBOL).to(ServiceClass).inSingletonScope();`
 - Singleton scope for stateless services
 - Request scope for services that need request context
 
 **Repositories** (`server/src/db/module.ts`):
+
 - Import: `{ RepositoryClass }`
 - Register: `options.bind<RepositoryClass>(RepositoryClass).toSelf();`
 - No symbol needed, bind to class itself
 - Request scope by default
 
 **Integrations** (`server/src/integrations/module.ts`):
+
 - Similar to services pattern
 - Often includes factory functions for multi-provider integrations
 
@@ -295,6 +301,7 @@ InversifyJS modules are defined in `module.ts` files. Registration patterns diff
 **Example**: `PetitionRepository.loadPetition` (DataLoader via `buildLoadBy`), `PetitionRepository.getPetitionVariables` (direct query)
 
 **Real-world examples:**
+
 - [server/src/db/repositories/PetitionRepository.ts](server/src/db/repositories/PetitionRepository.ts) - complex repository with all DataLoader patterns
 - [server/src/db/repositories/ProfileRepository.ts](server/src/db/repositories/ProfileRepository.ts) - advanced DataLoader usage
 
@@ -341,6 +348,7 @@ await this.createEvent(
 **Event Listeners**: Implement `EventListener<EventType>`, register in `server/src/workers/queues/event-listeners/module.ts`, inject in `EventProcessorQueue` and call `.register()`
 
 **Real-world examples:**
+
 - [server/src/workers/queues/event-listeners/PetitionActivityListener.ts](server/src/workers/queues/event-listeners/PetitionActivityListener.ts) - petition event listener
 - [server/src/workers/queues/event-listeners/ProfileSyncListener.ts](server/src/workers/queues/event-listeners/ProfileSyncListener.ts) - profile event listener with side effects
 
@@ -367,6 +375,7 @@ await this.createEvent(
 **Task Pattern**: Extend `TaskRunner<TaskName>`, register in module, inject in `TaskWorkerQueue`
 
 **Real-world examples:**
+
 - [server/src/workers/queues/task-runners/ExportRepliesRunner.ts](server/src/workers/queues/task-runners/ExportRepliesRunner.ts) - export task
 - [server/src/workers/queues/task-runners/ProfileSyncRunner.ts](server/src/workers/queues/task-runners/ProfileSyncRunner.ts) - sync task
 - [server/src/workers/queues/task-runners/PrintPdfRunner.ts](server/src/workers/queues/task-runners/PrintPdfRunner.ts) - PDF generation task
@@ -404,6 +413,7 @@ await this.createEvent(
 **Factory**: `signatureClientFactory(provider, integrationId)` returns appropriate client
 
 **Real-world examples:**
+
 - [server/src/integrations/signature/DocusignClient.ts](server/src/integrations/signature/DocusignClient.ts) - complete OAuth integration
 - [server/src/integrations/signature/SignaturitClient.ts](server/src/integrations/signature/SignaturitClient.ts) - API key integration
 
@@ -454,11 +464,13 @@ await this.createEvent(
 **Purpose**: Enable/disable features per organization
 
 **Key Fields**:
+
 - `organization_id`: Organization scope
 - `flag_name`: Feature identifier (enum)
 - `enabled`: Boolean flag
 
 **Usage in code**:
+
 ```typescript
 const hasFeature = await ctx.featureFlags.checkFlag(organizationId, "FEATURE_NAME");
 ```
@@ -539,6 +551,7 @@ const _mutations = [
 **Naming Convention**: `ComponentName_EntityType` for fragments, `ComponentName_queryName` for queries/mutations.
 
 **Real-world examples:**
+
 - [client/utils/useUnpinProfileType.ts](client/utils/useUnpinProfileType.ts) - mutation hook with fragments
 - [client/pages/app/petitions/[petitionId]/compose.tsx](client/pages/app/petitions/[petitionId]/compose.tsx) - page with queries
 - [client/components/profiles/ProfileForm.tsx](client/components/profiles/ProfileForm.tsx) - component with fragments and queries
@@ -574,6 +587,7 @@ export default compose(withApolloData)(MyPage);
 ```
 
 **Real-world examples:**
+
 - [client/pages/app/petitions/index.tsx](client/pages/app/petitions/index.tsx) - SSR with fetchQuery
 - [client/pages/app/profiles/index.tsx](client/pages/app/profiles/index.tsx) - SSR with multiple queries
 
@@ -718,6 +732,7 @@ const label = intl.formatMessage({ id: "generic.save", defaultMessage: "Save" })
 | `QueuesService`     | Queue/worker message management                            |
 
 **Real-world examples:**
+
 - [server/src/services/EmailsService.ts](server/src/services/EmailsService.ts) - service with multiple integrations
 - [server/src/services/PetitionsHelperService.ts](server/src/services/PetitionsHelperService.ts) - complex business logic service
 
@@ -1001,12 +1016,14 @@ For local development setup and running the application, see [getting-started.md
 **Naming Convention**: kebab-case (table/column names use underscores to match DB convention)
 
 **Examples**:
+
 - `add-column-petition_field_reply__associated_at.ts` - adding column to table
 - `add-profile_type__standard_type__matter.ts` - adding enum value
 - `add-petition_field-index.ts` - adding database index
 - `remove-feature-flags.ts` - removing deprecated features
 
 **Commands** (from `server/` directory):
+
 ```bash
 # Create new migration (use kebab-case)
 yarn migrate-make add-field-to-profile
@@ -1023,7 +1040,12 @@ yarn generate-db-types
 
 **Example migration**: See `server/migrations/` for patterns
 
+### Checking if Code Compiles
+
+To verify that code compiles correctly, run `yarn check-types` in the appropriate directory
+
 ### Common Development Gotchas
+
 - Always run `generate-db-types` after migrations
 - Always run `generate-graphql-types` after GraphQL schema changes (server) or operation changes (client)
 - Worker processes must be restarted separately from API server

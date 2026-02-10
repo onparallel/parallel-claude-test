@@ -2,8 +2,8 @@ import "./init";
 // keep this space to prevent import sorting removing init from top
 
 import { ApolloServer, ApolloServerPlugin } from "@apollo/server";
-import { expressMiddleware } from "@apollo/server/express4";
 import { ApolloServerPluginLandingPageDisabled } from "@apollo/server/plugin/disabled";
+import { expressMiddleware } from "@as-integrations/express5";
 import chalk from "chalk";
 import compression from "compression";
 import cookieParser from "cookie-parser";
@@ -154,6 +154,16 @@ if (process.env.TS_NODE_DEV) {
         context: async ({ req }) => req.context,
       }),
     )
+    .use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+      req.context.logger.error(err.message, { stack: err.stack });
+
+      // Don't expose internal errors to clients
+      if (process.env.NODE_ENV === "production") {
+        res.status(500).json({ error: "Internal server error" });
+      } else {
+        res.status(500).json({ error: err.message, stack: err.stack });
+      }
+    })
     .listen(port, () => {
       const host = `http://localhost:${port}`;
       const logger = container.get<ILogger>(LOGGER);

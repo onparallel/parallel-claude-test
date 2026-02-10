@@ -28,20 +28,16 @@ export const webhooks = Router()
   .use("/appsumo", appsumo);
 
 function redirect(url: (req: Request) => string): RequestHandler {
-  return async (req, res, next) => {
-    try {
-      const headers = { ...req.headers } as any;
-      req.context.logger.info(JSON.stringify(headers, null, 2));
-      delete headers["expect"];
-      const response = await fetch(url(req), {
-        method: req.method,
-        headers,
-        body: await getRawBody(req, { encoding: true }),
-      });
-      response.headers.forEach((value, name) => res.setHeader(name, value));
-      res.status(response.status).send(response.body);
-    } catch (error) {
-      next(error);
-    }
+  return async (req, res) => {
+    const headers = { ...req.headers } as any;
+    req.context.logger.info(JSON.stringify(headers, null, 2));
+    delete headers["expect"];
+    const response = await fetch(url(req), {
+      method: req.method,
+      headers,
+      body: await getRawBody(req, { encoding: true }),
+    });
+    response.headers.forEach((value, name) => res.setHeader(name, value));
+    res.status(response.status).send(response.body);
   };
 }

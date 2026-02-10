@@ -126,8 +126,11 @@ export class IManageFileExportIntegration
       try {
         this.logger.info(`Error handling request: ${message}`);
 
-        if (req.params.exportId && isGlobalId(req.params.exportId, "FileExportLog")) {
-          const fileExportLogId = fromGlobalId(req.params.exportId, "FileExportLog").id;
+        if (
+          (req.params.exportId as string) &&
+          isGlobalId(req.params.exportId as string, "FileExportLog")
+        ) {
+          const fileExportLogId = fromGlobalId(req.params.exportId as string, "FileExportLog").id;
           await this.integrations.appendFileExportRequestLog(fileExportLogId, {
             error: message,
           });
@@ -142,56 +145,52 @@ export class IManageFileExportIntegration
 
   private verifyHMAC(): RequestHandler {
     return async (req, res, next) => {
-      try {
-        const requestUri = `${process.env.NODE_ENV === "development" ? "http" : "https"}://${req.hostname}${req.originalUrl}`;
-        const requestBody = (req as any).rawBody;
+      const requestUri = `${process.env.NODE_ENV === "development" ? "http" : "https"}://${req.hostname}${req.originalUrl}`;
+      const requestBody = (req as any).rawBody;
 
-        const signature1 = req.headers["x-signature-1"] as string | undefined;
-        const signature2 = req.headers["x-signature-2"] as string | undefined;
-        const timestamp = req.headers["x-signature-timestamp"] as string | undefined;
-        const signatures = [signature1, signature2].filter(isNonNullish);
+      const signature1 = req.headers["x-signature-1"] as string | undefined;
+      const signature2 = req.headers["x-signature-2"] as string | undefined;
+      const timestamp = req.headers["x-signature-timestamp"] as string | undefined;
+      const signatures = [signature1, signature2].filter(isNonNullish);
 
-        if (signatures.length === 0 || !timestamp) {
-          this.logger.info("HMAC verification failed: missing signature or timestamp");
-          throw new RequestError(403, "HMAC verification failed");
-        }
-
-        const numericTimestamp = parseInt(timestamp, 10);
-        const diff = Date.now() - numericTimestamp;
-        if (isNaN(diff) || diff < 0 || diff > 60_000) {
-          // received timestamp is more than 1 minute old
-          // this may be a replay attack
-          this.logger.info("HMAC verification failed: invalid timestamp");
-          throw new RequestError(403, "HMAC verification failed");
-        }
-
-        const hash = createHmac(
-          "sha256",
-          Buffer.from(this.config.fileExport.iManage.signatureSecret),
-        )
-          .update(Buffer.from(requestUri + requestBody + timestamp))
-          .digest();
-
-        if (
-          !signatures.some((signature) => timingSafeEqual(Buffer.from(signature, "base64"), hash))
-        ) {
-          this.logger.info("HMAC verification failed: invalid signature");
-          throw new RequestError(403, "HMAC verification failed");
-        }
-
-        this.logger.info("HMAC verification passed");
-        next();
-      } catch (error) {
-        next(error);
+      if (signatures.length === 0 || !timestamp) {
+        this.logger.info("HMAC verification failed: missing signature or timestamp");
+        throw new RequestError(403, "HMAC verification failed");
       }
+
+      const numericTimestamp = parseInt(timestamp, 10);
+      const diff = Date.now() - numericTimestamp;
+      if (isNaN(diff) || diff < 0 || diff > 60_000) {
+        // received timestamp is more than 1 minute old
+        // this may be a replay attack
+        this.logger.info("HMAC verification failed: invalid timestamp");
+        throw new RequestError(403, "HMAC verification failed");
+      }
+
+      const hash = createHmac("sha256", Buffer.from(this.config.fileExport.iManage.signatureSecret))
+        .update(Buffer.from(requestUri + requestBody + timestamp))
+        .digest();
+
+      if (
+        !signatures.some((signature) => timingSafeEqual(Buffer.from(signature, "base64"), hash))
+      ) {
+        this.logger.info("HMAC verification failed: invalid signature");
+        throw new RequestError(403, "HMAC verification failed");
+      }
+
+      this.logger.info("HMAC verification passed");
+      next();
     };
   }
 
   private appendRequestLog(): RequestHandler {
     return async (req, res, next) => {
-      if (req.params.exportId && isGlobalId(req.params.exportId, "FileExportLog")) {
+      if (
+        (req.params.exportId as string) &&
+        isGlobalId(req.params.exportId as string, "FileExportLog")
+      ) {
         this.logger.info("Appending request log...");
-        const fileExportLogId = fromGlobalId(req.params.exportId, "FileExportLog").id;
+        const fileExportLogId = fromGlobalId(req.params.exportId as string, "FileExportLog").id;
         await this.integrations.appendFileExportRequestLog(fileExportLogId, {
           method: req.method,
           url: req.originalUrl,
@@ -206,42 +205,38 @@ export class IManageFileExportIntegration
 
   private validateParams(): RequestHandler {
     return async (req, res, next) => {
-      try {
-        this.logger.info("Verifying params...");
-        this.logger.info(JSON.stringify(req.params, null, 2));
-        const clientId = req.params.clientId;
-        const exportId = req.params.exportId;
+      this.logger.info("Verifying params...");
+      this.logger.info(JSON.stringify(req.params, null, 2));
+      const clientId = req.params.clientId;
+      const exportId = req.params.exportId as string;
 
-        if (!clientId || !exportId) {
-          throw new RequestError(403, "Missing clientId or exportId");
-        }
-
-        if (!isGlobalId(exportId, "FileExportLog")) {
-          throw new RequestError(403, "Invalid exportId");
-        }
-
-        const fileExportLog = await this.integrations.loadFileExportLog(
-          fromGlobalId(exportId, "FileExportLog").id,
-        );
-
-        if (!fileExportLog) {
-          throw new RequestError(403, "invalid exportId");
-        }
-
-        const isValidClientId = await this.withCredentials(
-          fileExportLog.integration_id,
-          async (_, context) => context.clientId === clientId,
-        );
-
-        if (!isValidClientId) {
-          throw new RequestError(403, "Invalid clientId");
-        }
-
-        this.logger.info("Params verified");
-        next();
-      } catch (error) {
-        next(error);
+      if (!clientId || !exportId) {
+        throw new RequestError(403, "Missing clientId or exportId");
       }
+
+      if (!isGlobalId(exportId, "FileExportLog")) {
+        throw new RequestError(403, "Invalid exportId");
+      }
+
+      const fileExportLog = await this.integrations.loadFileExportLog(
+        fromGlobalId(exportId, "FileExportLog").id,
+      );
+
+      if (!fileExportLog) {
+        throw new RequestError(403, "invalid exportId");
+      }
+
+      const isValidClientId = await this.withCredentials(
+        fileExportLog.integration_id,
+        async (_, context) => context.clientId === clientId,
+      );
+
+      if (!isValidClientId) {
+        throw new RequestError(403, "Invalid clientId");
+      }
+
+      this.logger.info("Params verified");
+      next();
     };
   }
 
@@ -324,120 +319,108 @@ export class IManageFileExportIntegration
   }
 
   private fetchFileExportJson(): RequestHandler {
-    return async (req, res, next) => {
-      try {
-        this.logger.info("Fetching file export JSON...");
-        const fileExportLogId = fromGlobalId(req.params.exportId, "FileExportLog").id;
-        const log = await req.context.integrations.loadFileExportLog(fileExportLogId);
-        if (!log) {
-          throw new RequestError(403, "Invalid file export log ID");
-        }
-
-        const exportStatus = await this.fetchFileExportStatus(log.json_export);
-
-        return res
-          .json(
-            zip(log.json_export, exportStatus)
-              .filter(([, s]) => isNonNullish(s)) // filter null statuses, as those files may have been deleted
-              .map(([e, s]) => ({
-                id: e.id,
-                filename: e.filename,
-                temporaryUrl: e.temporary_url,
-                status: s!.status,
-                url: s!.url,
-              })),
-          )
-          .status(200)
-          .end();
-      } catch (error) {
-        next(error);
+    return async (req, res) => {
+      this.logger.info("Fetching file export JSON...");
+      const fileExportLogId = fromGlobalId(req.params.exportId as string, "FileExportLog").id;
+      const log = await req.context.integrations.loadFileExportLog(fileExportLogId);
+      if (!log) {
+        throw new RequestError(403, "Invalid file export log ID");
       }
+
+      const exportStatus = await this.fetchFileExportStatus(log.json_export);
+
+      return res
+        .json(
+          zip(log.json_export, exportStatus)
+            .filter(([, s]) => isNonNullish(s)) // filter null statuses, as those files may have been deleted
+            .map(([e, s]) => ({
+              id: e.id,
+              filename: e.filename,
+              temporaryUrl: e.temporary_url,
+              status: s!.status,
+              url: s!.url,
+            })),
+        )
+        .status(200)
+        .end();
     };
   }
 
   private validateBodySchema(schema: JsonSchemaFor<any>): RequestHandler {
     return (req, res, next) => {
-      try {
-        this.logger.info("Validating body schema...");
-        this.logger.info(JSON.stringify(req.body, null, 2));
-        const ajv = new Ajv();
-        if (!ajv.validate(schema, req.body)) {
-          throw new RequestError(400, "Invalid JSON object: " + ajv.errorsText());
-        }
-
-        this.logger.info("Body schema validated");
-        next();
-      } catch (error) {
-        next(error);
+      this.logger.info("Validating body schema...");
+      this.logger.info(JSON.stringify(req.body, null, 2));
+      const ajv = new Ajv();
+      if (!ajv.validate(schema, req.body)) {
+        throw new RequestError(400, "Invalid JSON object: " + ajv.errorsText());
       }
+
+      this.logger.info("Body schema validated");
+      next();
     };
   }
 
   private processCompletedFiles(): RequestHandler {
-    return async (req, res, next) => {
-      try {
-        const body = req.body as FromSchema<typeof FILE_SCHEMA>[];
-        for (const url of body.map((data) => data.url).filter(isNonNullish)) {
-          try {
-            new URL(url);
-          } catch {
-            throw new RequestError(400, `Invalid URL: ${url}`);
-          }
+    return async (req, res) => {
+      const body = req.body as FromSchema<typeof FILE_SCHEMA>[];
+      for (const url of body.map((data) => data.url).filter(isNonNullish)) {
+        try {
+          new URL(url);
+        } catch {
+          throw new RequestError(400, `Invalid URL: ${url}`);
         }
-
-        const fileExportLogId = fromGlobalId(req.params.exportId, "FileExportLog").id;
-        const log = await req.context.integrations.loadFileExportLog(fileExportLogId);
-        if (!log) {
-          throw new RequestError(403, "Invalid exportId");
-        }
-
-        const files = body.map((data) => log.json_export.find((f) => f.id === data.id));
-
-        if (!files.every(isNonNullish)) {
-          throw new RequestError(403, "Unknown file ID");
-        }
-
-        for (const [file, result] of zip(files, body)) {
-          file.status = result.status;
-          file.url = result.status === "OK" ? result.url : undefined;
-          file.error = result.status === "NOK" ? result.error : undefined;
-
-          switch (file.metadata.type) {
-            case "PETITION_EXCEL_EXPORT":
-              await req.context.petitions.attachPetitionMetadata(
-                file.metadata.petitionId,
-                { FILE_EXPORT_IMANAGE_URL: file.url ?? null },
-                `User:${log.created_by_user_id}`,
-              );
-              break;
-            case "PETITION_FILE_FIELD_REPLIES":
-              await req.context.petitions.attachPetitionFieldReplyMetadata(
-                file.metadata.replyId,
-                { FILE_EXPORT_IMANAGE_URL: file.url ?? null },
-                `User:${log.created_by_user_id}`,
-              );
-              break;
-            case "PETITION_LATEST_SIGNATURE":
-              await req.context.petitions.attachPetitionSignatureRequestMetadata(
-                file.metadata.petitionSignatureRequestId,
-                {
-                  [file.metadata.subtype === "SIGNED_DOCUMENT"
-                    ? "SIGNED_DOCUMENT_FILE_EXPORT_IMANAGE_URL"
-                    : "AUDIT_TRAIL_FILE_EXPORT_IMANAGE_URL"]: file.url ?? null,
-                },
-              );
-          }
-        }
-
-        await req.context.integrations.updateFileExportLog(log.id, {
-          // update json_export with new status and url
-          json_export: log.json_export,
-        });
-
-        return res.json({}).status(200).end();
-      } catch (error) {
-        next(error);
       }
+
+      const fileExportLogId = fromGlobalId(req.params.exportId as string, "FileExportLog").id;
+      const log = await req.context.integrations.loadFileExportLog(fileExportLogId);
+      if (!log) {
+        throw new RequestError(403, "Invalid exportId");
+      }
+
+      const files = body.map((data) => log.json_export.find((f) => f.id === data.id));
+
+      if (!files.every(isNonNullish)) {
+        throw new RequestError(403, "Unknown file ID");
+      }
+
+      for (const [file, result] of zip(files, body)) {
+        file.status = result.status;
+        file.url = result.status === "OK" ? result.url : undefined;
+        file.error = result.status === "NOK" ? result.error : undefined;
+
+        switch (file.metadata.type) {
+          case "PETITION_EXCEL_EXPORT":
+            await req.context.petitions.attachPetitionMetadata(
+              file.metadata.petitionId,
+              { FILE_EXPORT_IMANAGE_URL: file.url ?? null },
+              `User:${log.created_by_user_id}`,
+            );
+            break;
+          case "PETITION_FILE_FIELD_REPLIES":
+            await req.context.petitions.attachPetitionFieldReplyMetadata(
+              file.metadata.replyId,
+              { FILE_EXPORT_IMANAGE_URL: file.url ?? null },
+              `User:${log.created_by_user_id}`,
+            );
+            break;
+          case "PETITION_LATEST_SIGNATURE":
+            await req.context.petitions.attachPetitionSignatureRequestMetadata(
+              file.metadata.petitionSignatureRequestId,
+              {
+                [file.metadata.subtype === "SIGNED_DOCUMENT"
+                  ? "SIGNED_DOCUMENT_FILE_EXPORT_IMANAGE_URL"
+                  : "AUDIT_TRAIL_FILE_EXPORT_IMANAGE_URL"]: file.url ?? null,
+              },
+            );
+        }
+      }
+
+      await req.context.integrations.updateFileExportLog(log.id, {
+        // update json_export with new status and url
+        json_export: log.json_export,
+      });
+
+      return res.json({}).status(200).end();
     };
   }
 }

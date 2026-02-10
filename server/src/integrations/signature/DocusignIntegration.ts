@@ -179,54 +179,49 @@ export class DocusignIntegration extends OAuthIntegration<
         //     res.sendStatus(401).end();
         //   }
         // },
-        async (req, res, next) => {
-          try {
-            const body = req.body as DocuSignEventBody;
-            const signature = await req.context.petitions.loadPetitionSignatureByExternalId(
-              `DOCUSIGN/${body.data.envelopeId}`,
-            );
+        async (req, res) => {
+          const body = req.body as DocuSignEventBody;
+          const signature = await req.context.petitions.loadPetitionSignatureByExternalId(
+            `DOCUSIGN/${body.data.envelopeId}`,
+          );
 
-            if (isNullish(signature) || signature.status === "CANCELLED") {
-              // status 200 to kill request but avoid sending an error to signaturit
-              return res.sendStatus(200).end();
+          if (isNullish(signature) || signature.status === "CANCELLED") {
+            // status 200 to kill request but avoid sending an error to signaturit
+            return res.sendStatus(200).end();
+          }
+          const petitionId = fromGlobalId(req.params.petitionId, "Petition").id;
+          try {
+            await this.appendEventLogs(body);
+            switch (body.event) {
+              case "recipient-sent":
+                await this.recipientSent(body, petitionId);
+                break;
+              case "recipient-delivered":
+                await this.recipientDelivered(body, petitionId);
+                break;
+              case "recipient-declined":
+                await this.recipientDeclined(body, petitionId);
+                break;
+              case "envelope-voided":
+                await this.envelopeVoided(body, petitionId);
+                break;
+              case "recipient-completed":
+                await this.recipientCompleted(body, petitionId);
+                break;
+              case "envelope-completed":
+                await this.envelopeCompleted(body, petitionId);
+                break;
+              case "recipient-autoresponded":
+                await this.recipientAutoresponded(body, petitionId);
+                break;
+              case "recipient-reassign":
+                await this.recipientReassigned(body, petitionId);
+                break;
             }
-            const petitionId = fromGlobalId(req.params.petitionId, "Petition").id;
-            try {
-              await this.appendEventLogs(body);
-              switch (body.event) {
-                case "recipient-sent":
-                  await this.recipientSent(body, petitionId);
-                  break;
-                case "recipient-delivered":
-                  await this.recipientDelivered(body, petitionId);
-                  break;
-                case "recipient-declined":
-                  await this.recipientDeclined(body, petitionId);
-                  break;
-                case "envelope-voided":
-                  await this.envelopeVoided(body, petitionId);
-                  break;
-                case "recipient-completed":
-                  await this.recipientCompleted(body, petitionId);
-                  break;
-                case "envelope-completed":
-                  await this.envelopeCompleted(body, petitionId);
-                  break;
-                case "recipient-autoresponded":
-                  await this.recipientAutoresponded(body, petitionId);
-                  break;
-                case "recipient-reassign":
-                  await this.recipientReassigned(body, petitionId);
-                  break;
-              }
-            } catch (error: any) {
-              req.context.logger.error(error.message, { stack: error.stack });
-            }
-            res.sendStatus(200).end();
           } catch (error: any) {
             req.context.logger.error(error.message, { stack: error.stack });
-            next(error);
           }
+          res.sendStatus(200).end();
         },
       );
     });
