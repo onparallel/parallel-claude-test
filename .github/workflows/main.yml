@@ -153,10 +153,10 @@ jobs:
         if: needs.detect-changes.outputs.e2e == 'true' || needs.detect-changes.outputs.root-config == 'true'
         run: yarn workspace @parallel/e2e check-types
 
-  server-tests:
-    name: Server tests
+  tests:
+    name: Tests
     needs: detect-changes
-    if: needs.detect-changes.outputs.server == 'true'
+    if: needs.detect-changes.outputs.any-project == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -174,39 +174,21 @@ jobs:
       - name: Install dependencies
         if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile --production=false
+
       - name: Run server test suite
+        if: needs.detect-changes.outputs.server == 'true' || needs.detect-changes.outputs.root-config == 'true'
         timeout-minutes: 15
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
         run: yarn --cwd server/ test --silent
 
-  client-tests:
-    name: Client tests
-    needs: detect-changes
-    if: needs.detect-changes.outputs.client == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: ".nvmrc"
-      - uses: actions/cache@v4
-        id: yarn-cache
-        with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-yarn-cache-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-cache-
-      - name: Install dependencies
-        if: steps.yarn-cache.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile --production=false
       - name: Run client test suite
+        if: needs.detect-changes.outputs.client == 'true' || needs.detect-changes.outputs.root-config == 'true'
         run: yarn workspace @parallel/client test
 
   code-review:
     name: Code Review
-    needs: [lint, check-types, server-tests, client-tests]
+    needs: [lint, check-types, tests]
     if: |
       always() &&
       github.event_name == 'pull_request' &&
@@ -215,8 +197,7 @@ jobs:
       github.event.pull_request.head.ref != 'master' &&
       needs.lint.result != 'failure' && needs.lint.result != 'cancelled' &&
       needs.check-types.result != 'failure' && needs.check-types.result != 'cancelled' &&
-      needs.server-tests.result != 'failure' && needs.server-tests.result != 'cancelled' &&
-      needs.client-tests.result != 'failure' && needs.client-tests.result != 'cancelled'
+      needs.tests.result != 'failure' && needs.tests.result != 'cancelled'
     runs-on: ubuntu-latest
     permissions:
       contents: read
