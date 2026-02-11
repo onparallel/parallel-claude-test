@@ -141,3 +141,23 @@ cp /tmp/code-suggestions/[filename].suggested.ts path/to/file.ts
 - Anything ESLint/Prettier handles (style, unused vars, const vs let)
 - Missing documentation
 - Refactoring suggestions for unchanged code
+
+## Step 7: Documentation check (CI only)
+
+After completing the code review, **only in GitHub Actions**, evaluate whether the changes warrant a documentation review. Be conservative to control costs.
+
+**Invoke `/check-documentation` if the changes include:**
+- New features or user-facing functionality
+- New or removed API endpoints or GraphQL resolvers
+- New database tables, services, workers, or architectural components
+- Changes to configuration or environment variables
+
+**Do NOT invoke `/check-documentation` if the changes are:**
+- Bug fixes
+- Internal refactoring without API changes
+- Test additions or modifications
+- Dependency updates
+- Code style or formatting changes
+- Minor logic changes to existing code without API impact
+
+If the changes meet the criteria, run the `/check-documentation` skill. You already have the diff and analysis in context — the documentation check should reuse them instead of fetching the diff again. Otherwise, skip it entirely.
