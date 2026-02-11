@@ -1027,6 +1027,18 @@ For local development setup and running the application, see [getting-started.md
 
 Only **hotfix** PRs should be opened directly against `staging` or `master`. For all other changes, always target `develop`.
 
+**Branch Naming**: Use prefixed branch names based on the type of change:
+
+- `feat/short-description-of-feature` - New features
+- `fix/short-description-of-bug` - Bug fixes
+- `chore/short-description-of-task` - Maintenance, refactoring, tooling
+
+**PR Title Prefix**: PR titles must be prefixed with the change type in brackets:
+
+- `[feat] Add user authentication`
+- `[fix] Resolve petition loading issue`
+- `[chore] Update dependencies`
+
 ### Database Migrations
 
 **Naming Convention**: kebab-case (table/column names use underscores to match DB convention)
