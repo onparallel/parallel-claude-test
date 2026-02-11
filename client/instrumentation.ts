@@ -7,3 +7,4 @@ export async function register() {
 }
 
 export const onRequestError = (Sentry as any).captureRequestError;
+// CI test trigger
