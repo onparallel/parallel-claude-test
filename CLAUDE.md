@@ -1019,6 +1019,14 @@ Use DataLoaders for **all** relations in GraphQL resolvers. Batch database queri
 
 For local development setup and running the application, see [getting-started.md](./getting-started.md).
 
+### Branching Strategy
+
+- **`develop`**: Main integration branch. All PRs are opened against `develop` by default.
+- **`staging`**: Used for releases to the staging environment.
+- **`master`**: Used for releases to production.
+
+Only **hotfix** PRs should be opened directly against `staging` or `master`. For all other changes, always target `develop`.
+
 ### Database Migrations
 
 **Naming Convention**: kebab-case (table/column names use underscores to match DB convention)
