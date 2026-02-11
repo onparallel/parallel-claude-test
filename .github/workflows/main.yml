@@ -142,6 +142,8 @@ jobs:
       - name: Check client types
         if: needs.detect-changes.outputs.client == 'true' || needs.detect-changes.outputs.root-config == 'true'
         run: yarn workspace @parallel/client check-types
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
 
       - name: Check bin types
         if: needs.detect-changes.outputs.bin == 'true' || needs.detect-changes.outputs.root-config == 'true'
