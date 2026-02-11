@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Flex, MenuDivider, MenuItem, MenuList, Square } from "@chakra-ui/react";
 import { AddIcon, CopyIcon, DeleteIcon, EditIcon, UserArrowIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { DashboardTabs_DashboardFragment } from "@parallel/graphql/__types";
 import { DashboardQueryState } from "@parallel/pages/app/home";
 import { SetQueryState } from "@parallel/utils/queryState";
@@ -33,23 +33,21 @@ interface DashboardTabsProps {
   onRefetchDashboards: (resetState?: boolean) => void;
 }
 
-export const DashboardTabs = chakraForwardRef<"div", DashboardTabsProps>(function DashboardTabs(
-  {
-    userId,
-    state,
-    onStateChange,
-    onCreateDashboard,
-    dashboards,
-    onRenameDashboard,
-    onCloneDashboard,
-    onDeleteDashboard,
-    onReorder,
-    isEditing,
-    canCreateDashboard,
-    onRefetchDashboards,
-  },
+export const DashboardTabs = chakraComponent<"div", DashboardTabsProps>(function DashboardTabs({
   ref,
-) {
+  userId,
+  state,
+  onStateChange,
+  onCreateDashboard,
+  dashboards,
+  onRenameDashboard,
+  onCloneDashboard,
+  onDeleteDashboard,
+  onReorder,
+  isEditing,
+  canCreateDashboard,
+  onRefetchDashboards,
+}) {
   const intl = useIntl();
   const showGenericErrorToast = useGenericErrorToast();
 

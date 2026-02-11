@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { Box } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { PetitionFieldCommentExcerpt_PetitionFieldCommentFragment } from "@parallel/graphql/__types";
 import { sanitizeHtml } from "@parallel/utils/sanitizeHtml";
 import parse, { Element, HTMLReactParserOptions } from "html-react-parser";
@@ -11,10 +11,10 @@ interface PetitionFieldCommentExcerptProps {
   comment: PetitionFieldCommentExcerpt_PetitionFieldCommentFragment;
 }
 
-export const PetitionFieldCommentExcerpt = chakraForwardRef<
+export const PetitionFieldCommentExcerpt = chakraComponent<
   "div",
   PetitionFieldCommentExcerptProps
->(function CommentContent({ comment, ...props }, ref) {
+>(function CommentContent({ ref, comment, ...props }) {
   const options: HTMLReactParserOptions = {
     replace(domNode) {
       if (domNode instanceof Element && domNode.name === "mention") {

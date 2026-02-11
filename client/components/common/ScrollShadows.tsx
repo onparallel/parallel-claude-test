@@ -1,5 +1,5 @@
 import { Box, useSafeLayoutEffect } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { scrollBarSize } from "@parallel/utils/scrollBarSize";
 import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import { useResizeObserver } from "@parallel/utils/useResizeObserver";
@@ -15,19 +15,17 @@ interface ScrollShadowsProps {
   shadowEnd?: boolean;
 }
 
-export const ScrollShadows = chakraForwardRef<"div", ScrollShadowsProps>(function ScrollShadows(
-  {
-    children,
-    direction = "vertical",
-    size = 40,
-    shadowTop = true,
-    shadowBottom = true,
-    shadowStart = true,
-    shadowEnd = true,
-    ...props
-  },
+export const ScrollShadows = chakraComponent<"div", ScrollShadowsProps>(function ScrollShadows({
   ref,
-) {
+  children,
+  direction = "vertical",
+  size = 40,
+  shadowTop = true,
+  shadowBottom = true,
+  shadowStart = true,
+  shadowEnd = true,
+  ...props
+}) {
   const innerRef = useRef<HTMLDivElement>(null);
   const _ref = useMergeRefs(ref, innerRef);
   const scrollRef = useRef<Record<"top" | "end" | "bottom" | "start", boolean | null>>({

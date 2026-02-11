@@ -31,7 +31,7 @@ import {
   EditSimpleIcon,
   EyeIcon,
 } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import {
@@ -762,20 +762,18 @@ interface ProfileTypeFieldProps {
   onToggle: (event: MouseEvent) => void;
 }
 
-const ProfileTypeField = chakraForwardRef<"div", ProfileTypeFieldProps>(function ProfileTypeField(
-  {
-    item,
-    index,
-    isSelected,
-    onEdit,
-    onConfigureVisibility,
-    onDelete,
-    onDragEnd,
-    onToggle,
-    ...props
-  },
+const ProfileTypeField = chakraComponent<"div", ProfileTypeFieldProps>(function ProfileTypeField({
   ref,
-) {
+  item,
+  index,
+  isSelected,
+  onEdit,
+  onConfigureVisibility,
+  onDelete,
+  onDragEnd,
+  onToggle,
+  ...props
+}) {
   const intl = useIntl();
   const dragControls = useDragControls();
 

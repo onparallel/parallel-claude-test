@@ -29,7 +29,7 @@ import {
   ThumbsUpIcon,
   TimeIcon,
 } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Button, Text } from "@parallel/components/ui";
 import {
   PetitionApprovalRequestStep,
@@ -86,18 +86,16 @@ interface PetitionApprovalsCardProps {
   isDisabled: boolean;
 }
 
-export const PetitionApprovalsCard = chakraForwardRef<"section", PetitionApprovalsCardProps>(
-  function PetitionApprovalsCard(
-    {
-      petition,
-      user,
-      onToggleGeneralComments,
-      onRefetchPetition,
-      isShowingGeneralComments,
-      isDisabled,
-    },
+export const PetitionApprovalsCard = chakraComponent<"section", PetitionApprovalsCardProps>(
+  function PetitionApprovalsCard({
     ref,
-  ) {
+    petition,
+    user,
+    onToggleGeneralComments,
+    onRefetchPetition,
+    isShowingGeneralComments,
+    isDisabled,
+  }) {
     const intl = useIntl();
     const toast = useToast();
     const tabsRefs = useMultipleRefs<HTMLButtonElement>();

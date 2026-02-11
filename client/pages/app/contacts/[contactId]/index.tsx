@@ -14,7 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { DeleteIcon, EditIcon, SignatureIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -463,10 +463,12 @@ interface ToggleInputProps extends ThemingProps<"Input">, FormControlOptions {
   isEditing: boolean;
 }
 
-const ToggleInput = chakraForwardRef<"input", ToggleInputProps>(function ToggleInput(
-  { isEditing, children, ...props },
+const ToggleInput = chakraComponent<"input", ToggleInputProps>(function ToggleInput({
   ref,
-) {
+  isEditing,
+  children,
+  ...props
+}) {
   return isEditing ? (
     <Input ref={ref} {...props} />
   ) : children === null ? (

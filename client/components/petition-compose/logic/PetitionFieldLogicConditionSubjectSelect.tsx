@@ -1,5 +1,5 @@
 import { Badge, Box, Flex, HStack, StackProps } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import { Text } from "@parallel/components/ui";
@@ -205,14 +205,14 @@ type ConditionSubjectSelectOption =
       variable: PetitionFieldLogicContext_PetitionBaseFragment["variables"][number];
     };
 
-const ConditionSubjectItem = chakraForwardRef<
+const ConditionSubjectItem = chakraComponent<
   "div",
   {
     option: ConditionSubjectSelectOption;
     highlight?: string;
     indent?: boolean;
   } & StackProps
->(function ConditionSubjectItem({ option, highlight, indent, ...props }, ref) {
+>(function ConditionSubjectItem({ ref, option, highlight, indent, ...props }) {
   if (option.type === "FIELD") {
     const { field, fieldIndex } = option;
     return (

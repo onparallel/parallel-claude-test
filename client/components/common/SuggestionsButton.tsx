@@ -1,5 +1,5 @@
 import { SparklesIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import {
   IconButtonWithTooltip,
   IconButtonWithTooltipProps,
@@ -11,8 +11,8 @@ interface SuggestionsButtonProps extends Omit<IconButtonWithTooltipProps, "label
   onClick: () => void;
 }
 
-export const SuggestionsButton = chakraForwardRef<"button", SuggestionsButtonProps>(
-  function ASuggestionsButton({ areSuggestionsVisible, ...props }, ref) {
+export const SuggestionsButton = chakraComponent<"button", SuggestionsButtonProps>(
+  function ASuggestionsButton({ ref, areSuggestionsVisible, ...props }) {
     const intl = useIntl();
     return (
       <IconButtonWithTooltip

@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box, Flex, MenuDivider, MenuItem, MenuList, Square } from "@chakra-ui/react";
 import { CopyIcon, DeleteIcon, EditIcon, StarEmptyIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
 import { useAskNameDialog } from "@parallel/components/petition-list/AskNameDialog";
 import { Button, Text } from "@parallel/components/ui";
@@ -28,19 +28,17 @@ interface ViewTabsProps {
   onReorder: (viewIds: string[]) => Promise<void>;
 }
 
-export const ViewTabs = chakraForwardRef<"div", ViewTabsProps>(function ViewTabs(
-  {
-    currentViewId,
-    onChange,
-    views,
-    onRenameView,
-    onCloneView,
-    onMarkViewAsDefault,
-    onDeleteView,
-    onReorder,
-  },
+export const ViewTabs = chakraComponent<"div", ViewTabsProps>(function ViewTabs({
   ref,
-) {
+  currentViewId,
+  onChange,
+  views,
+  onRenameView,
+  onCloneView,
+  onMarkViewAsDefault,
+  onDeleteView,
+  onReorder,
+}) {
   const showGenericErrorToast = useGenericErrorToast();
 
   const allView = views.find((v) => v.type === "ALL");

@@ -1,5 +1,5 @@
 import { Center, Image, Stack } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { FormattedMessage } from "react-intl";
 import { Text } from "@parallel/components/ui";
 
@@ -8,8 +8,8 @@ interface NewPetitionEmptySearchProps {
   onClickNewTemplate: () => void;
 }
 
-export const NewPetitionEmptySearch = chakraForwardRef<"div", NewPetitionEmptySearchProps>(
-  function ({ onClickPublicTemplates, onClickNewTemplate, ...props }, ref) {
+export const NewPetitionEmptySearch = chakraComponent<"div", NewPetitionEmptySearchProps>(
+  function ({ ref, onClickPublicTemplates, onClickNewTemplate, ...props }) {
     return (
       <Center ref={ref} {...props}>
         <Stack justifyContent="center" alignItems="center" paddingX={4}>

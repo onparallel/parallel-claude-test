@@ -1,6 +1,6 @@
 import { Flex, RadioProps, useRadio, useRadioGroup } from "@chakra-ui/react";
 import { Button } from "@parallel/components/ui";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { useIntl } from "react-intl";
@@ -10,8 +10,8 @@ interface NewPetitionCategoryFilterProps extends ValueProps<string> {
   categories: string[];
 }
 
-export const NewPetitionCategoryFilter = chakraForwardRef<"div", NewPetitionCategoryFilterProps>(
-  function NewPetitionCategoryFilter({ value, onChange, categories, ...props }, ref) {
+export const NewPetitionCategoryFilter = chakraComponent<"div", NewPetitionCategoryFilterProps>(
+  function NewPetitionCategoryFilter({ ref, value, onChange, categories, ...props }) {
     const intl = useIntl();
 
     const allCategories = usePublicTemplateCategories();

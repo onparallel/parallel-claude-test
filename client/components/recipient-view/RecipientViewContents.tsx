@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Badge, Box, Center, Flex, Heading, HStack, List, ListItem, Stack } from "@chakra-ui/react";
 import { ChevronFilledIcon, ListIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import {
   RecipientViewContents_PetitionBaseFragment,
   RecipientViewContents_PublicPetitionFragment,
@@ -35,11 +35,17 @@ interface RecipientViewContentsProps {
   closeOnNavigate?: boolean;
 }
 
-export const RecipientViewContents = chakraForwardRef<"section", RecipientViewContentsProps>(
-  function RecipientViewContents(
-    { currentPage, petition, usePreviewReplies, isPreview, closeOnNavigate, onClose, ...props },
+export const RecipientViewContents = chakraComponent<"section", RecipientViewContentsProps>(
+  function RecipientViewContents({
     ref,
-  ) {
+    currentPage,
+    petition,
+    usePreviewReplies,
+    isPreview,
+    closeOnNavigate,
+    onClose,
+    ...props
+  }) {
     const intl = useIntl();
     const router = useRouter();
     const { query } = router;

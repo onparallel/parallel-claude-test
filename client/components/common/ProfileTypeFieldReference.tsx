@@ -1,18 +1,18 @@
 import { HStack, SystemStyleObject } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { ProfileTypeField } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 import { ProfileTypeFieldTypeIndicator } from "../organization/profiles/ProfileTypeFieldTypeIndicator";
 import { LocalizableUserTextRender } from "./LocalizableUserTextRender";
 
-export const ProfileTypeFieldReference = chakraForwardRef<
+export const ProfileTypeFieldReference = chakraComponent<
   "div",
   {
     field: Pick<ProfileTypeField, "name" | "type">;
     _icon?: SystemStyleObject;
   }
->(function ProfileTypeFieldReference({ field, _icon, ...props }, ref) {
+>(function ProfileTypeFieldReference({ ref, field, _icon, ...props }) {
   const intl = useIntl();
   return (
     <HStack ref={ref} {...props}>

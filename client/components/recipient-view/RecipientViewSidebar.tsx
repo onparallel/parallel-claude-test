@@ -12,7 +12,7 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { CommentIcon, InfoCircleIcon, ListIcon, UserArrowIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { RecipientViewSidebar_PublicPetitionAccessFragment } from "@parallel/graphql/__types";
 import { AnimatePresence, motion } from "framer-motion";
 import { useIntl } from "react-intl";
@@ -295,7 +295,7 @@ function SidebarIconButton({
   );
 }
 
-const RecipientViewSidebarBody = chakraForwardRef<
+const RecipientViewSidebarBody = chakraComponent<
   "div",
   {
     keycode: string;
@@ -304,10 +304,15 @@ const RecipientViewSidebarBody = chakraForwardRef<
     isRecipientViewContentsHidden: boolean;
     closeOnNavigate?: boolean;
   }
->(function RecipientViewSidebarBody(
-  { keycode, currentPage, access, isRecipientViewContentsHidden, closeOnNavigate, ...props },
+>(function RecipientViewSidebarBody({
   ref,
-) {
+  keycode,
+  currentPage,
+  access,
+  isRecipientViewContentsHidden,
+  closeOnNavigate,
+  ...props
+}) {
   const { setSidebarState, sidebarState } = useRecipientViewSidebarContext();
 
   const handleClose = () => {

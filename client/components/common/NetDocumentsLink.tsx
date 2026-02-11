@@ -1,5 +1,5 @@
 import { NetDocumentsIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip, IconButtonWithTooltipProps } from "./IconButtonWithTooltip";
 import { NormalLink } from "./Link";
@@ -8,8 +8,8 @@ interface NetDocumentsLinkProps {
   externalId: string;
 }
 
-export const NetDocumentsLink = chakraForwardRef<"a", NetDocumentsLinkProps>(
-  function NetDocumentsLink({ externalId, ...props }, ref) {
+export const NetDocumentsLink = chakraComponent<"a", NetDocumentsLinkProps>(
+  function NetDocumentsLink({ ref, externalId, ...props }) {
     return (
       <NormalLink
         ref={ref}
@@ -26,10 +26,10 @@ export const NetDocumentsLink = chakraForwardRef<"a", NetDocumentsLinkProps>(
   },
 );
 
-export const NetDocumentsIconButton = chakraForwardRef<
+export const NetDocumentsIconButton = chakraComponent<
   "button",
   { externalId: string } & Omit<IconButtonWithTooltipProps, "label">
->(function NetDocumentsIconButton({ externalId, ...props }, ref) {
+>(function NetDocumentsIconButton({ ref, externalId, ...props }) {
   const intl = useIntl();
   return (
     <IconButtonWithTooltip

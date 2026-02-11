@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { Badge, Box, Flex, HStack } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import { Text } from "@parallel/components/ui";
@@ -338,14 +338,14 @@ const _fragments = {
   `,
 };
 
-const PetitionUpdateProfileOnCloseSourceSelectItem = chakraForwardRef<
+const PetitionUpdateProfileOnCloseSourceSelectItem = chakraComponent<
   "div",
   {
     option: PetitionUpdateProfileOnCloseSourceSelectOption<PetitionUpdateProfileOnCloseSourceSelect_PetitionBaseFragment>;
     highlight?: string;
     indent?: boolean;
   }
->(function PetitionUpdateProfileOnCloseSourceSelectItem({ option, highlight }, ref) {
+>(function PetitionUpdateProfileOnCloseSourceSelectItem({ ref, option, highlight }) {
   const intl = useIntl();
   const { value, fieldIndex } = option;
 

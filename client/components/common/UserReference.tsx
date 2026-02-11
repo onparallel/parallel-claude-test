@@ -1,20 +1,20 @@
 import { gql } from "@apollo/client";
 
 import { Tooltip } from "@parallel/chakra/components";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { UserReference_UserFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { Text } from "@parallel/components/ui";
 
-export const UserReference = chakraForwardRef<
+export const UserReference = chakraComponent<
   "span",
   {
     user?: Maybe<UserReference_UserFragment>;
     useYou?: boolean;
   }
->(function UserReference({ user, useYou, ...props }, ref) {
+>(function UserReference({ ref, user, useYou, ...props }) {
   const intl = useIntl();
 
   return isNonNullish(user) ? (

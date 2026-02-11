@@ -22,7 +22,7 @@ import {
   HelpOutlineIcon,
   MoreVerticalIcon,
 } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Button, Text } from "@parallel/components/ui";
 import {
   PetitionComposeVariables_deletePetitionVariableDocument,
@@ -508,8 +508,8 @@ interface MoreLiquidVariablesButtonProps extends Omit<IconButtonWithTooltipProps
   name: string;
 }
 
-const MoreLiquidVariablesButton = chakraForwardRef<"button", MoreLiquidVariablesButtonProps>(
-  function MoreLiquidVariablesButton({ name, ...props }, ref) {
+const MoreLiquidVariablesButton = chakraComponent<"button", MoreLiquidVariablesButtonProps>(
+  function MoreLiquidVariablesButton({ ref, name, ...props }) {
     const intl = useIntl();
     const copyReference = useClipboardWithToast({
       text: intl.formatMessage({

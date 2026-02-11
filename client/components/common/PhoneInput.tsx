@@ -7,7 +7,7 @@ import {
   ThemingProps,
 } from "@chakra-ui/react";
 import { FieldPhoneIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { phoneCodes } from "@parallel/utils/phoneCodes";
 import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { useConstant } from "@parallel/utils/useConstant";
@@ -32,10 +32,17 @@ export interface PhoneInputProps extends ThemingProps<"Input">, FormControlOptio
   ): void;
 }
 
-const PhoneInput = chakraForwardRef<"input", PhoneInputProps>(function PhoneInput(
-  { value, placeholder, onLoad, onChange, onBlur, defaultCountry, inputRef, ...props },
+const PhoneInput = chakraComponent<"input", PhoneInputProps>(function PhoneInput({
   ref,
-) {
+  value,
+  placeholder,
+  onLoad,
+  onChange,
+  onBlur,
+  defaultCountry,
+  inputRef,
+  ...props
+}) {
   const _ref = useRef<HTMLInputElement>(null);
   const intl = useIntl();
   const { countries } = useLoadCountryNames(intl.locale);

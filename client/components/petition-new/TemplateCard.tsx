@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { Flex, Stack } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { Text } from "@parallel/components/ui";
@@ -15,10 +15,12 @@ export interface TemplateCardProps {
   onPress: () => void;
 }
 
-export const TemplateCard = chakraForwardRef<"div", TemplateCardProps>(function TemplateCard(
-  { template, onPress, ...props },
+export const TemplateCard = chakraComponent<"div", TemplateCardProps>(function TemplateCard({
   ref,
-) {
+  template,
+  onPress,
+  ...props
+}) {
   const buttonProps = useRoleButton(onPress);
 
   return (

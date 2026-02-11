@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Stack } from "@chakra-ui/react";
 import { DownloadIcon, EyeIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import {
   CopyOrDownloadReplyButton_PetitionFieldReplyFragment,
   PetitionFieldType,
@@ -123,10 +123,10 @@ const _fragments = {
   `,
 };
 
-const ReplyDownloadButton = chakraForwardRef<
+const ReplyDownloadButton = chakraComponent<
   "button",
   { contentType: string; onDownload: (preview: boolean) => void; isDisabled: boolean }
->(function ReplyDownloadButton({ contentType, onDownload, ...props }, ref) {
+>(function ReplyDownloadButton({ ref, contentType, onDownload, ...props }) {
   const intl = useIntl();
   const userHasRemovePreviewFiles = useHasRemovePreviewFiles();
   const isPreviewable =

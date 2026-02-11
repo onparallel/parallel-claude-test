@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { HStack, Stack } from "@chakra-ui/react";
 import { CalculatorIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import {
   PetitionVariablesCard_PetitionBaseFragment,
   PetitionVariableType,
@@ -18,8 +18,8 @@ export interface PetitionSignaturesCardProps {
   finalVariables: Record<string, number | string>;
 }
 
-export const PetitionVariablesCard = chakraForwardRef<"section", PetitionSignaturesCardProps>(
-  function PetitionVariablesCard({ petition, finalVariables, ...props }, ref) {
+export const PetitionVariablesCard = chakraComponent<"section", PetitionSignaturesCardProps>(
+  function PetitionVariablesCard({ ref, petition, finalVariables, ...props }) {
     const intl = useIntl();
 
     const showCalculationRulesDialog = usePetitionComposeCalculationRulesDialog();

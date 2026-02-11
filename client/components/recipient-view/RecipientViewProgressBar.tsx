@@ -10,7 +10,7 @@ import {
   PopoverTrigger,
 } from "@chakra-ui/react";
 import { Popover } from "@parallel/chakra/components";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Button, Text } from "@parallel/components/ui";
 import {
   RecipientViewProgressBar_PetitionFieldFragment,
@@ -49,11 +49,15 @@ export interface RecipientViewProgressBarProps {
   onFinalize?: () => void;
 }
 
-export const RecipientViewProgressBar = chakraForwardRef<"div", RecipientViewProgressBarProps>(
-  function RecipientViewProgressBar(
-    { petition, isDisabled, canFinalize, onFinalize, ...props },
+export const RecipientViewProgressBar = chakraComponent<"div", RecipientViewProgressBarProps>(
+  function RecipientViewProgressBar({
     ref,
-  ) {
+    petition,
+    isDisabled,
+    canFinalize,
+    onFinalize,
+    ...props
+  }) {
     const tone = useTone();
     const fieldLogic = useFieldLogic(petition);
     const [poppoverClosed, setPoppoverClosed] = useState(false);

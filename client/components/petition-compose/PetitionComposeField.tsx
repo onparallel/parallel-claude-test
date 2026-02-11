@@ -27,7 +27,7 @@ import {
   SettingsIcon,
   UnlinkIcon,
 } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import {
   PetitionComposeFieldAttachment_PetitionFieldAttachmentFragmentDoc,
   PetitionComposeField_PetitionBaseFragment,
@@ -150,42 +150,40 @@ export interface PetitionComposeFieldRef {
   focusFromNext: () => void;
 }
 
-const _PetitionComposeField = chakraForwardRef<
+const _PetitionComposeField = chakraComponent<
   "div",
   PetitionComposeFieldProps,
   PetitionComposeFieldRef
->(function PetitionComposeField(
-  {
-    petition,
-    field,
-    fieldIndex,
-    index,
-    childrenFieldIndices,
-    fieldRefs,
-    isActive,
-    activeChildFieldId,
-    showError,
-    onMove,
-    onFocus,
-    onCloneField,
-    onSettingsClick,
-    onTypeIndicatorClick,
-    onDeleteClick,
-    onFieldEdit,
-    onFieldVisibilityClick,
-    onFieldCalculationsClick,
-    onFocusNextField,
-    onFocusPrevField,
-    fieldProps,
-    onUpdateFieldPositions,
-    onLinkField,
-    onUnlinkField,
-    showAddField,
-    isReadOnly,
-    ...props
-  },
+>(function PetitionComposeField({
   ref,
-) {
+  petition,
+  field,
+  fieldIndex,
+  index,
+  childrenFieldIndices,
+  fieldRefs,
+  isActive,
+  activeChildFieldId,
+  showError,
+  onMove,
+  onFocus,
+  onCloneField,
+  onSettingsClick,
+  onTypeIndicatorClick,
+  onDeleteClick,
+  onFieldEdit,
+  onFieldVisibilityClick,
+  onFieldCalculationsClick,
+  onFocusNextField,
+  onFocusPrevField,
+  fieldProps,
+  onUpdateFieldPositions,
+  onLinkField,
+  onUnlinkField,
+  showAddField,
+  isReadOnly,
+  ...props
+}) {
   const intl = useIntl();
   const { elementRef, dragRef, previewRef, isDragging, isOverCurrent } = useDragAndDrop(
     field.id,
@@ -691,37 +689,35 @@ interface PetitionComposeFieldInnerProps
 
 // This component was extracted so the whole PetitionComposeField doesn't rerender
 // when the fieldIndex changes
-const _PetitionComposeFieldInner = chakraForwardRef<
+const _PetitionComposeFieldInner = chakraComponent<
   "div",
   PetitionComposeFieldInnerProps,
   PetitionComposeFieldRef
->(function PetitionComposeFieldInner(
-  {
-    field,
-    fieldIndex,
-    petition,
-    showError,
-    attachmentUploadProgress,
-    onFieldEdit,
-    onTypeIndicatorClick,
-    onFocusNextField,
-    onFocusPrevField,
-    onDownloadAttachment,
-    onRemoveAttachment,
-    onCloneField,
-    onSettingsClick,
-    onDeleteClick,
-    onFieldVisibilityClick,
-    fieldProps,
-    onUpdateFieldPositions,
-    onFieldCalculationsClick,
-    index,
-    isReadOnly,
-    showAddField,
-    ...props
-  },
+>(function PetitionComposeFieldInner({
   ref,
-) {
+  field,
+  fieldIndex,
+  petition,
+  showError,
+  attachmentUploadProgress,
+  onFieldEdit,
+  onTypeIndicatorClick,
+  onFocusNextField,
+  onFocusPrevField,
+  onDownloadAttachment,
+  onRemoveAttachment,
+  onCloneField,
+  onSettingsClick,
+  onDeleteClick,
+  onFieldVisibilityClick,
+  fieldProps,
+  onUpdateFieldPositions,
+  onFieldCalculationsClick,
+  index,
+  isReadOnly,
+  showAddField,
+  ...props
+}) {
   const intl = useIntl();
   const [title, setTitle] = useState(field.title);
 
@@ -1194,24 +1190,22 @@ interface PetitionComposeFieldActionsProps
   isReadOnly?: boolean;
 }
 
-const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFieldActionsProps>(
-  function PetitionComposeFieldActions(
-    {
-      field,
-      canChangeVisibility,
-      onVisibilityClick,
-      onFieldCalculationsClick,
-      onAttachmentClick,
-      onCloneField,
-      onSettingsClick,
-      onDeleteClick,
-      onUnlinkField,
-      isReadOnly,
-      isActive,
-      ...props
-    },
+const _PetitionComposeFieldActions = chakraComponent<"div", PetitionComposeFieldActionsProps>(
+  function PetitionComposeFieldActions({
     ref,
-  ) {
+    field,
+    canChangeVisibility,
+    onVisibilityClick,
+    onFieldCalculationsClick,
+    onAttachmentClick,
+    onCloneField,
+    onSettingsClick,
+    onDeleteClick,
+    onUnlinkField,
+    isReadOnly,
+    isActive,
+    ...props
+  }) {
     const intl = useIntl();
     const hasCondition = field.visibility;
     const hasMath = field.math;
@@ -1730,13 +1724,16 @@ interface PetitionComposeFieldVariablesAccordionProps {
   onEditClick: () => void;
 }
 
-const PetitionComposeFieldVariablesAccordion = chakraForwardRef<
+const PetitionComposeFieldVariablesAccordion = chakraComponent<
   "div",
   PetitionComposeFieldVariablesAccordionProps
->(function PetitionComposeFieldVariablesAccordion(
-  { isOpen, onEditClick, isReadOnly, children },
+>(function PetitionComposeFieldVariablesAccordion({
   ref,
-) {
+  isOpen,
+  onEditClick,
+  isReadOnly,
+  children,
+}) {
   return (
     <Accordion.Root
       defaultValue={isOpen ? ["0"] : undefined}

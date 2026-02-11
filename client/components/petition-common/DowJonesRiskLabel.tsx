@@ -1,7 +1,7 @@
 import { Badge, HStack } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { BusinessIcon, UserIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Text } from "@parallel/components/ui";
 import { isNullish } from "remeda";
 
@@ -40,8 +40,8 @@ const LABELS = {
   "LOCATIONS-COUNTRY": "Enhanced Country Risk - Entity (Country)",
 } as Record<string, string>;
 
-export const DowJonesRiskLabel = chakraForwardRef<"span", { risk: string }>(
-  function DowJonesRiskLabel({ risk, ...props }, ref) {
+export const DowJonesRiskLabel = chakraComponent<"span", { risk: string }>(
+  function DowJonesRiskLabel({ ref, risk, ...props }) {
     const label = LABELS[risk];
     const text = /-(ENTITY|PERSON)$/.test(risk) ? risk.replace(/-(ENTITY|PERSON)$/, "") : risk;
     const icon = /-ENTITY$/.test(risk) ? (

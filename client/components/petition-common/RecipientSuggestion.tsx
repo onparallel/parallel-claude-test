@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { HStack, Stack } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Button, Text } from "@parallel/components/ui";
 import { RecipientSuggestion_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
@@ -18,13 +18,19 @@ export interface RecipientSuggestionProps {
   petitionFieldIndex: PetitionFieldIndex;
 }
 
-export const RecipientSuggestion = chakraForwardRef<
+export const RecipientSuggestion = chakraComponent<
   "button",
   PropsWithChildren<RecipientSuggestionProps>
->(function RecipientSuggestion(
-  { petitionField, petitionFieldIndex, groupName, firstName, lastName, email, ...props },
+>(function RecipientSuggestion({
   ref,
-) {
+  petitionField,
+  petitionFieldIndex,
+  groupName,
+  firstName,
+  lastName,
+  email,
+  ...props
+}) {
   const name = `${firstName ?? ""} ${lastName ?? ""}`.trim();
   return (
     <SmallPopover

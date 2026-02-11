@@ -13,7 +13,7 @@ import {
   ThemingProps,
 } from "@chakra-ui/react";
 import { CloseIcon, PlusCircleFilledIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { BackgroundCheckTopicSelect } from "@parallel/components/common/BackgroundCheckTopicSelect";
 import { DateInput } from "@parallel/components/common/DateInput";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -657,8 +657,8 @@ const _fragmentsProfileValueFilterLine = {
   `,
 };
 
-const SimpleDurationInput = chakraForwardRef<"input", ValueProps<string> & ThemingProps<"Input">>(
-  function SimpleDurationInput({ value, onChange, ...props }, ref) {
+const SimpleDurationInput = chakraComponent<"input", ValueProps<string> & ThemingProps<"Input">>(
+  function SimpleDurationInput({ ref, value, onChange, ...props }) {
     const intl = useIntl();
     const match = value?.match(/^P(\d+)([YMWD])$/);
     const [_, amount, span] = match ?? [, "", "M"];

@@ -2,7 +2,7 @@ import { MenuButton, MenuItemOption, MenuList, MenuOptionGroup, Portal } from "@
 import { Button } from "@parallel/components/ui";
 import { Menu } from "@parallel/chakra/components";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { useIntl } from "react-intl";
@@ -12,10 +12,10 @@ interface NewPetitionCategoryMenuFilterProps extends ValueProps<string> {
   categories: string[];
 }
 
-export const NewPetitionCategoryMenuFilter = chakraForwardRef<
+export const NewPetitionCategoryMenuFilter = chakraComponent<
   "button",
   NewPetitionCategoryMenuFilterProps
->(function NewPetitionCategoryMenuFilter({ value, onChange, categories, ...props }, ref) {
+>(function NewPetitionCategoryMenuFilter({ ref, value, onChange, categories, ...props }) {
   const intl = useIntl();
 
   const allCategories = usePublicTemplateCategories();

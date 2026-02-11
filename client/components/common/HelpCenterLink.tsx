@@ -1,6 +1,6 @@
 import { Box } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { NormalLink } from "./Link";
@@ -9,10 +9,11 @@ interface HelpCenterLinkProps {
   articleId: number;
 }
 
-export const HelpCenterLink = chakraForwardRef<"a", HelpCenterLinkProps>(function HelpCenterLink(
-  { children, ...props },
+export const HelpCenterLink = chakraComponent<"a", HelpCenterLinkProps>(function HelpCenterLink({
   ref,
-) {
+  children,
+  ...props
+}) {
   return (
     <NormalLink
       as={NakedHelpCenterLink}
@@ -31,8 +32,8 @@ interface NakedHelpCenterLinkProps {
   articleId: number;
 }
 
-export const NakedHelpCenterLink = chakraForwardRef<"a", NakedHelpCenterLinkProps>(
-  function HelpCenterLink({ articleId, onClick, ...props }, ref) {
+export const NakedHelpCenterLink = chakraComponent<"a", NakedHelpCenterLinkProps>(
+  function HelpCenterLink({ ref, articleId, onClick, ...props }) {
     const intl = useIntl();
     return (
       <Box

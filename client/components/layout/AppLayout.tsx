@@ -8,7 +8,7 @@ import {
   PortalManager,
   Spinner,
 } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Button } from "@parallel/components/ui";
 import { AppLayout_QueryFragment } from "@parallel/graphql/__types";
 import { useCheckForNewVersion } from "@parallel/utils/useCheckForNewVersion";
@@ -36,10 +36,13 @@ export interface AppLayoutProps {
   title: string;
 }
 
-export const AppLayout = chakraForwardRef<"div", AppLayoutProps>(function AppLayout(
-  { title, queryObject, children, ...props },
+export const AppLayout = chakraComponent<"div", AppLayoutProps>(function AppLayout({
   ref,
-) {
+  title,
+  queryObject,
+  children,
+  ...props
+}) {
   const { me, realMe } = queryObject;
   const rehydrated = useRehydrated();
   const [isLoading, setIsLoading] = useState(false);

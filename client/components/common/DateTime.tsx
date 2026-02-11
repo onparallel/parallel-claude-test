@@ -1,5 +1,5 @@
 import { ThemingProps } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { DateTimeFormatOptions } from "@parallel/utils/dates";
 import { useForceUpdate } from "@parallel/utils/useForceUpdate";
 import { useEffect } from "react";
@@ -39,10 +39,13 @@ function selectUnit(from: Date | number, to: Date | number) {
   return { value, unit };
 }
 
-export const DateTime = chakraForwardRef<"time", DateTimeProps>(function DateTime(
-  { value, format, useRelativeTime, ...props },
+export const DateTime = chakraComponent<"time", DateTimeProps>(function DateTime({
   ref,
-) {
+  value,
+  format,
+  useRelativeTime,
+  ...props
+}) {
   const intl = useIntl();
   const date = new Date(value);
   const { value: _value, unit } = selectUnit(date, Date.now());

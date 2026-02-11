@@ -10,7 +10,7 @@ import {
   MenuList,
   useMenuContext,
 } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import {
   PetitionFieldType,
   PetitionFieldTypeSelectDropdown_UserFragment,
@@ -37,21 +37,19 @@ export interface PetitionFieldTypeSelectDropdownProps {
 
 const FIELD_GROUP_EXCLUDED_FIELD_TYPES = ["FIELD_GROUP", "HEADING"] as PetitionFieldType[];
 
-export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
+export const PetitionFieldTypeSelectDropdown = chakraComponent<
   "div",
   PetitionFieldTypeSelectDropdownProps
->(function PetitionFieldTypeSelectDropdown(
-  {
-    user,
-    onSelectFieldType,
-    isFieldGroupChild,
-    showHeader,
-    showDescription,
-    role = "menu",
-    ...props
-  },
+>(function PetitionFieldTypeSelectDropdown({
   ref,
-) {
+  user,
+  onSelectFieldType,
+  isFieldGroupChild,
+  showHeader,
+  showDescription,
+  role = "menu",
+  ...props
+}) {
   const intl = useIntl();
   const typesRefs = useMultipleRefs<HTMLButtonElement>();
   const [activeType, setActiveType] = useState<PetitionFieldType>("HEADING");

@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import { Box, Center, Grid, HStack, useToast } from "@chakra-ui/react";
 import { AddIcon, SignatureIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Text } from "@parallel/components/ui";
 import {
   PetitionSignaturesCard_PetitionFragment,
@@ -38,19 +38,17 @@ export interface PetitionSignaturesCardProps {
   isDisabled: boolean;
 }
 
-export const PetitionSignaturesCard = chakraForwardRef<"section", PetitionSignaturesCardProps>(
-  function PetitionSignaturesCard(
-    {
-      petition,
-      user,
-      isDisabled,
-      onRefetchPetition,
-      onToggleGeneralComments,
-      isShowingGeneralComments,
-      ...props
-    },
+export const PetitionSignaturesCard = chakraComponent<"section", PetitionSignaturesCardProps>(
+  function PetitionSignaturesCard({
     ref,
-  ) {
+    petition,
+    user,
+    isDisabled,
+    onRefetchPetition,
+    onToggleGeneralComments,
+    isShowingGeneralComments,
+    ...props
+  }) {
     let current: Maybe<UnwrapArray<PetitionSignaturesCard_PetitionFragment["signatureRequests"]>> =
       petition.signatureRequests[0];
 

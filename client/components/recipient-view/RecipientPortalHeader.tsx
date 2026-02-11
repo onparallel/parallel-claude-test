@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { Box, HStack, Img } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Logo } from "@parallel/components/common/Logo";
 import {
   RecipientPortalHeader_PublicContactFragment,
@@ -16,8 +16,8 @@ interface RecipientPortalHeaderProps {
   keycode: string;
 }
 
-export const RecipientPortalHeader = chakraForwardRef<"section", RecipientPortalHeaderProps>(
-  function RecipientPortalHeader({ organization, contact, keycode, ...props }, ref) {
+export const RecipientPortalHeader = chakraComponent<"section", RecipientPortalHeaderProps>(
+  function RecipientPortalHeader({ ref, organization, contact, keycode, ...props }) {
     return (
       <HStack
         ref={ref as any}

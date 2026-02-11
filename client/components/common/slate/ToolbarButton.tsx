@@ -1,14 +1,16 @@
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { IconButtonWithTooltip, IconButtonWithTooltipProps } from "../IconButtonWithTooltip";
 
 export interface ToolbarButtonProps extends IconButtonWithTooltipProps {
   isToggleable?: boolean;
 }
 
-export const ToolbarButton = chakraForwardRef<"button", ToolbarButtonProps>(function ToolbarButton(
-  { isToggleable, isActive, ...props },
+export const ToolbarButton = chakraComponent<"button", ToolbarButtonProps>(function ToolbarButton({
   ref,
-) {
+  isToggleable,
+  isActive,
+  ...props
+}) {
   return (
     <IconButtonWithTooltip
       ref={ref}

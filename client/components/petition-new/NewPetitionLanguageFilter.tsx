@@ -3,7 +3,7 @@ import { MenuButton, MenuItemOption, MenuList, MenuOptionGroup, Portal } from "@
 import { Button } from "@parallel/components/ui";
 import { Menu } from "@parallel/chakra/components";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { NewPetitionLanguageFilter_UserFragment, PetitionLocale } from "@parallel/graphql/__types";
 import { useAvailablePetitionLocales } from "@parallel/utils/locales";
 import { ValueProps } from "@parallel/utils/ValueProps";
@@ -13,8 +13,8 @@ interface NewPetitionLanguageFilterProps extends ValueProps<PetitionLocale> {
   user: NewPetitionLanguageFilter_UserFragment;
 }
 
-export const NewPetitionLanguageFilter = chakraForwardRef<"button", NewPetitionLanguageFilterProps>(
-  function NewPetitionLanguageFilter({ value, onChange, user, ...props }, ref) {
+export const NewPetitionLanguageFilter = chakraComponent<"button", NewPetitionLanguageFilterProps>(
+  function NewPetitionLanguageFilter({ ref, value, onChange, user, ...props }) {
     const locales = useAvailablePetitionLocales(user);
 
     return (

@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Stack } from "@chakra-ui/react";
 import { CheckIcon, CloseIcon, TimeIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Text } from "@parallel/components/ui";
 import {
   DatesList_SignerStatusFragment,
@@ -83,20 +83,18 @@ const _fragments = {
   `,
 };
 
-export const PetitionSignatureRequestSignerStatusIcon = chakraForwardRef<
+export const PetitionSignatureRequestSignerStatusIcon = chakraComponent<
   "svg",
   {
     signerStatus: PetitionSignatureRequestSignerStatusIcon_SignerStatusFragment;
     signingMode: SignatureConfigSigningMode;
   }
->(function PetitionSignatureRequestSignerStatusIcon(
-  {
-    signerStatus: { status, sentAt, openedAt, signedAt, declinedAt, bouncedAt },
-    signingMode,
-    ...props
-  },
+>(function PetitionSignatureRequestSignerStatusIcon({
   ref,
-) {
+  signerStatus: { status, sentAt, openedAt, signedAt, declinedAt, bouncedAt },
+  signingMode,
+  ...props
+}) {
   switch (status) {
     case "SIGNED":
       return (

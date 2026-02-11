@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { SystemStyleObject } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Text } from "@parallel/components/ui";
 import { ContactReference_ContactFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
@@ -9,7 +9,7 @@ import { isNonNullish } from "remeda";
 import { DeletedContact } from "./DeletedContact";
 import { Link } from "./Link";
 
-export const ContactReference = chakraForwardRef<
+export const ContactReference = chakraComponent<
   "a" | "span",
   {
     contact?: Maybe<ContactReference_ContactFragment>;
@@ -17,7 +17,7 @@ export const ContactReference = chakraForwardRef<
     asLink?: boolean;
     _activeContact?: SystemStyleObject;
   }
->(function ContactReference({ contact, withEmail, asLink = true, _activeContact, ...props }, ref) {
+>(function ContactReference({ ref, contact, withEmail, asLink = true, _activeContact, ...props }) {
   return isNonNullish(contact) ? (
     <Tooltip isDisabled={withEmail} label={contact.email}>
       <Text

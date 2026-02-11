@@ -9,7 +9,7 @@ import {
   useMultiStyleConfig,
 } from "@chakra-ui/react";
 import { cx } from "@chakra-ui/utils";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { IMaskInput } from "react-imask";
 import { omit } from "remeda";
@@ -20,8 +20,8 @@ interface ColorInputProps extends ThemingProps<"Input">, FormControlOptions {
   onChange?: (value: string) => any;
 }
 
-export const ColorInput = chakraForwardRef<"input", ColorInputProps, HTMLInputElement>(
-  function ColorInput({ value, onChange, ...props }, ref) {
+export const ColorInput = chakraComponent<"input", ColorInputProps, HTMLInputElement>(
+  function ColorInput({ ref, value, onChange, ...props }) {
     const handleChange = useDebouncedCallback(onChange ?? noop, 100, []);
     const styles = useMultiStyleConfig("Input", props);
     const ownProps = omitThemingProps(props);

@@ -12,7 +12,7 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { ReportsIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { NakedHelpCenterLink } from "@parallel/components/common/HelpCenterLink";
@@ -147,10 +147,15 @@ interface ReportsCardProps {
   isPending?: boolean;
 }
 
-const ReportsCard = chakraForwardRef<"div", ReportsCardProps>(function ReportsCard(
-  { imgSrc, title, description, href, isPending, ...props },
+const ReportsCard = chakraComponent<"div", ReportsCardProps>(function ReportsCard({
   ref,
-) {
+  imgSrc,
+  title,
+  description,
+  href,
+  isPending,
+  ...props
+}) {
   return (
     <LinkBox
       ref={ref}

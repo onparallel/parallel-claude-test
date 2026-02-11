@@ -10,7 +10,7 @@ import {
   Td,
   Tr,
 } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { createContext, useContext } from "react";
 import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";
@@ -24,10 +24,15 @@ interface SelectableTdProps {
   _content?: SystemStyleObject;
 }
 
-export const SelectableTd = chakraForwardRef<"td", SelectableTdProps>(function SelectableTd(
-  { value, isDisabled, _control, _content, children, ...props },
+export const SelectableTd = chakraComponent<"td", SelectableTdProps>(function SelectableTd({
   ref,
-) {
+  value,
+  isDisabled,
+  _control,
+  _content,
+  children,
+  ...props
+}) {
   const type = useContext(SelectableTrTypeContext);
   assert(isNonNullish(type), "SelectableTd must be used within a SelectableTr");
   return (
@@ -59,10 +64,16 @@ interface SelectableTrProps {
   onChange: (value: string | string[] | undefined) => void;
 }
 
-export const SelectableTr = chakraForwardRef<"tr", SelectableTrProps>(function SelectableTr(
-  { labelId, type, value, onChange, isDisabled, children, ...props },
+export const SelectableTr = chakraComponent<"tr", SelectableTrProps>(function SelectableTr({
   ref,
-) {
+  labelId,
+  type,
+  value,
+  onChange,
+  isDisabled,
+  children,
+  ...props
+}) {
   if (type === "CHECKBOX") {
     assert(Array.isArray(value), 'value must be an array if type="CHECKBOX"');
     return (

@@ -1,5 +1,5 @@
 import { FormErrorMessage, FormErrorMessageProps, Input } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Maybe } from "@parallel/utils/types";
 import { ShortTextFormat } from "@parallel/utils/useShortTextFormats";
 import { useImperativeHandle, useRef } from "react";
@@ -11,10 +11,12 @@ interface ShortTextInput {
   format?: Maybe<ShortTextFormat>;
 }
 
-export const ShortTextInput = chakraForwardRef<"input", ShortTextInput>(function ShortTextInput(
-  { format, onChange, ...props },
+export const ShortTextInput = chakraComponent<"input", ShortTextInput>(function ShortTextInput({
   ref,
-) {
+  format,
+  onChange,
+  ...props
+}) {
   const inputRef = useRef<any>(null);
   useImperativeHandle(ref, () => {
     if (format?.type === "MASK") {
@@ -45,12 +47,12 @@ export const ShortTextInput = chakraForwardRef<"input", ShortTextInput>(function
   );
 });
 
-export const FormatFormErrorMessage = chakraForwardRef<
+export const FormatFormErrorMessage = chakraComponent<
   "div",
   Omit<FormErrorMessageProps, "children"> & {
     format: ShortTextFormat;
   }
->(function FormatFormErrorMessage({ format, ...props }, ref) {
+>(function FormatFormErrorMessage({ ref, format, ...props }) {
   return (
     <FormErrorMessage ref={ref} {...props}>
       <FormattedMessage

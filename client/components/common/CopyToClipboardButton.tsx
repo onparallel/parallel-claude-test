@@ -1,6 +1,6 @@
 import { ButtonOptions, PlacementWithLogical, ThemingProps } from "@chakra-ui/react";
 import { ClipboardIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import copy from "copy-to-clipboard";
 import { MouseEvent, ReactElement, useState } from "react";
 import { useIntl } from "react-intl";
@@ -15,21 +15,19 @@ export interface CopyToClipboardButtonProps extends ButtonOptions, ThemingProps<
   copiedLabel?: string;
 }
 
-export const CopyToClipboardButton = chakraForwardRef<"button", CopyToClipboardButtonProps>(
-  function CopyToClipboardButton(
-    {
-      "aria-label": ariaLabel,
-      text,
-      placement,
-      icon,
-      copyLabel,
-      copiedLabel,
-      onClick,
-      onMouseEnter,
-      ...props
-    },
+export const CopyToClipboardButton = chakraComponent<"button", CopyToClipboardButtonProps>(
+  function CopyToClipboardButton({
     ref,
-  ) {
+    "aria-label": ariaLabel,
+    text,
+    placement,
+    icon,
+    copyLabel,
+    copiedLabel,
+    onClick,
+    onMouseEnter,
+    ...props
+  }) {
     const intl = useIntl();
     const labels = {
       copy:

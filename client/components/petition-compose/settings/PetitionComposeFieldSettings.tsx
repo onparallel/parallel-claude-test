@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { Box, Heading, Stack } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { CloseableCardHeader } from "@parallel/components/common/Card";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { Text } from "@parallel/components/ui";
@@ -96,23 +96,21 @@ const ONLY_ONE_REPLY_FIELD_TYPES = [
   "ADVERSE_MEDIA_SEARCH",
 ] as PetitionFieldType[];
 
-export const PetitionComposeFieldSettings = chakraForwardRef<
+export const PetitionComposeFieldSettings = chakraComponent<
   "section",
   PetitionComposeFieldSettingsProps
->(function PetitionComposeFieldSettings(
-  {
-    petition,
-    user,
-    field,
-    fieldIndex,
-    onFieldEdit,
-    onFieldTypeChange,
-    onClose,
-    isReadOnly,
-    ...props
-  },
+>(function PetitionComposeFieldSettings({
   ref,
-) {
+  petition,
+  user,
+  field,
+  fieldIndex,
+  onFieldEdit,
+  onFieldTypeChange,
+  onClose,
+  isReadOnly,
+  ...props
+}) {
   const showErrorDialog = useErrorDialog();
 
   const isFieldGroupChild = isNonNullish(field.parent);

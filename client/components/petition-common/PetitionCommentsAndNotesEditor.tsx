@@ -1,5 +1,5 @@
 import { Box, HStack, Stack } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Button, Text } from "@parallel/components/ui";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { KeyboardEvent, useImperativeHandle, useRef, useState } from "react";
@@ -30,24 +30,22 @@ export interface PetitionCommentsAndNotesEditorInstance {
   focus: () => void;
 }
 
-export const PetitionCommentsAndNotesEditor = chakraForwardRef<
+export const PetitionCommentsAndNotesEditor = chakraComponent<
   "div",
   PetitionCommentsAndNotesEditorProps,
   PetitionCommentsAndNotesEditorInstance
->(function PetitionCommentsAndNotesEditor(
-  {
-    id,
-    onSubmit,
-    defaultMentionables,
-    onSearchMentionables,
-    hasCommentsEnabled,
-    isDisabled,
-    isTemplate,
-    tabIsNotes,
-    onTabChange,
-  },
+>(function PetitionCommentsAndNotesEditor({
   ref,
-) {
+  id,
+  onSubmit,
+  defaultMentionables,
+  onSearchMentionables,
+  hasCommentsEnabled,
+  isDisabled,
+  isTemplate,
+  tabIsNotes,
+  onTabChange,
+}) {
   const intl = useIntl();
   const [draft, setDraft] = useState(emptyCommentEditorValue());
   const isEmpty = isEmptyCommentEditorValue(draft);

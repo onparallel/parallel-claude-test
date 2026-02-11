@@ -1,6 +1,6 @@
 import { Center, HStack, LinkBox, LinkOverlay, Stack } from "@chakra-ui/react";
 import { ChevronRightIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import NextLink from "next/link";
 import { Text } from "@parallel/components/ui";
 import { ReactNode } from "react";
@@ -16,11 +16,18 @@ export interface IntegrationLinkCardProps {
   isExternal?: boolean;
 }
 
-export const IntegrationLinkCard = chakraForwardRef<"div", IntegrationLinkCardProps>(
-  function IntegrationLinkCard(
-    { logo, title, body, badge, isDisabled, href, isExternal, ...props },
+export const IntegrationLinkCard = chakraComponent<"div", IntegrationLinkCardProps>(
+  function IntegrationLinkCard({
     ref,
-  ) {
+    logo,
+    title,
+    body,
+    badge,
+    isDisabled,
+    href,
+    isExternal,
+    ...props
+  }) {
     return (
       <LinkBox
         ref={ref}

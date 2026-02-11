@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import { BusinessIcon, ChevronDownIcon, DeleteIcon, UsersIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { AlertPopover } from "@parallel/components/common/AlertPopover";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
@@ -529,10 +529,10 @@ const ProfileTypeFieldPermissionTypeSelect = forwardRef<
   return <SimpleSelect ref={ref as any} options={options} {...props} />;
 });
 
-const ProfileTypeFieldPermissionTypeText = chakraForwardRef<
+const ProfileTypeFieldPermissionTypeText = chakraComponent<
   "span",
   { type: ProfileTypeFieldPermissionType }
->(function ProfileTypeFieldPermissionTypeText({ type, ...props }, ref) {
+>(function ProfileTypeFieldPermissionTypeText({ ref, type, ...props }) {
   return (
     <Text ref={ref as any} as="span" {...props}>
       {type === "HIDDEN" ? (

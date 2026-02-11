@@ -1,5 +1,5 @@
 import { Center, Image, Stack } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { FormattedMessage } from "react-intl";
 import { Text } from "@parallel/components/ui";
 
@@ -7,8 +7,8 @@ interface EmptyFolderIllustrationProps {
   isTemplate: boolean;
 }
 
-export const EmptyFolderIllustration = chakraForwardRef<"div", EmptyFolderIllustrationProps>(
-  function ({ isTemplate, ...props }, ref) {
+export const EmptyFolderIllustration = chakraComponent<"div", EmptyFolderIllustrationProps>(
+  function ({ ref, isTemplate, ...props }) {
     return (
       <Center ref={ref} {...props}>
         <Stack justifyContent="center" alignItems="center" minHeight="300px" paddingX={4}>

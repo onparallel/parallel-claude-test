@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { Box, Center, HStack, Image, Stack, useMultiStyleConfig } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { Text } from "@parallel/components/ui";
@@ -16,8 +16,8 @@ export interface PublicTemplateCardProps {
   onPress: () => void;
 }
 
-export const PublicTemplateCard = chakraForwardRef<"div", PublicTemplateCardProps>(
-  function TemplateCard({ template, onPress, ...props }, ref) {
+export const PublicTemplateCard = chakraComponent<"div", PublicTemplateCardProps>(
+  function TemplateCard({ ref, template, onPress, ...props }) {
     const intl = useIntl();
     const buttonProps = useRoleButton(onPress);
 

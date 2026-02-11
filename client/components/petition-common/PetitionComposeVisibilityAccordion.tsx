@@ -1,6 +1,6 @@
 import { HStack, Heading } from "@chakra-ui/react";
 import { ChevronFilledIcon, ConditionIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { HelpPopover } from "../common/HelpPopover";
@@ -11,10 +11,10 @@ interface PetitionComposeVisibilityAccordionProps {
   popoverContent?: ReactNode;
 }
 
-export const PetitionComposeVisibilityAccordion = chakraForwardRef<
+export const PetitionComposeVisibilityAccordion = chakraComponent<
   "div",
   PetitionComposeVisibilityAccordionProps
->(function PetitionComposeVisibilityAccordion({ isOpen, children, popoverContent }, ref) {
+>(function PetitionComposeVisibilityAccordion({ ref, isOpen, children, popoverContent }) {
   return (
     <Accordion.Root
       defaultValue={isOpen ? ["0"] : undefined}

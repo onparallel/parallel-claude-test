@@ -1,5 +1,5 @@
 import { HStack, SystemProps, TypographyProps } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { PetitionStatus } from "@parallel/graphql/__types";
 import { usePetitionStatusColor } from "@parallel/utils/usePetitionStatusColor";
 import { usePetitionStatusLabels } from "@parallel/utils/usePetitionStatusLabels";
@@ -13,8 +13,8 @@ interface PetitionStatusLabelProps {
   status: PetitionStatus;
 }
 
-export const PetitionStatusLabel = chakraForwardRef<"div", PetitionStatusLabelProps>(
-  function PetitionStatusLabel({ status, fontSize, lineHeight, ...props }, ref) {
+export const PetitionStatusLabel = chakraComponent<"div", PetitionStatusLabelProps>(
+  function PetitionStatusLabel({ ref, status, fontSize, lineHeight, ...props }) {
     const labels = usePetitionStatusLabels();
     const color = usePetitionStatusColor(status);
 

@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Mention_PetitionFieldCommentMentionFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
@@ -67,10 +67,13 @@ interface MentionBadgeProps {
   isFaded?: boolean;
 }
 
-const MentionBadge = chakraForwardRef<"span", MentionBadgeProps>(function MentionBadge(
-  { mentionId, isHighlighted, isFaded, ...props },
+const MentionBadge = chakraComponent<"span", MentionBadgeProps>(function MentionBadge({
   ref,
-) {
+  mentionId,
+  isHighlighted,
+  isFaded,
+  ...props
+}) {
   return (
     <Box
       ref={ref as any}

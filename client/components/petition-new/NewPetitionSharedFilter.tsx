@@ -2,7 +2,7 @@ import { MenuButton, MenuItemOption, MenuList, MenuOptionGroup, Portal } from "@
 import { Button } from "@parallel/components/ui";
 import { Menu } from "@parallel/chakra/components";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { useSimpleSelectOptions } from "../common/SimpleSelect";
 
@@ -10,8 +10,8 @@ export type NewPetitionSharedFilterValue = "IS_OWNER" | "NOT_IS_OWNER";
 
 interface NewPetitionSharedFilterProps extends ValueProps<NewPetitionSharedFilterValue> {}
 
-export const NewPetitionSharedFilter = chakraForwardRef<"button", NewPetitionSharedFilterProps>(
-  function NewPetitionSharedFilter({ value, onChange, ...props }, ref) {
+export const NewPetitionSharedFilter = chakraComponent<"button", NewPetitionSharedFilterProps>(
+  function NewPetitionSharedFilter({ ref, value, onChange, ...props }) {
     const options = useSimpleSelectOptions(
       (intl) => [
         {

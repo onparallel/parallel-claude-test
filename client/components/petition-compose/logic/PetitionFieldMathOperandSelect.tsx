@@ -1,5 +1,5 @@
 import { Badge, Box, Flex, HStack, StackProps } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
@@ -197,14 +197,14 @@ type MathOperandOption =
     }
   | { type: "ENUM"; value: string };
 
-const MathOperandItem = chakraForwardRef<
+const MathOperandItem = chakraComponent<
   "div",
   {
     option: MathOperandOption;
     highlight?: string;
     indent?: boolean;
   } & StackProps
->(function MathOperandItem({ option, highlight, indent, ...props }, ref) {
+>(function MathOperandItem({ ref, option, highlight, indent, ...props }) {
   if (option.type === "NUMBER") {
     return (
       <Box>

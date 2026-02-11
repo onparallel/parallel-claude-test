@@ -1,6 +1,6 @@
 import { Center, HStack } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { generateCssStripe } from "@parallel/utils/css";
 import { AnimatePresence } from "framer-motion";
 import { FormattedMessage } from "react-intl";
@@ -10,10 +10,10 @@ interface PetitionComposeNewFieldPlaceholderProps {
   isTemplate?: boolean;
 }
 
-export const PetitionComposeNewFieldPlaceholder = chakraForwardRef<
+export const PetitionComposeNewFieldPlaceholder = chakraComponent<
   "div",
   PetitionComposeNewFieldPlaceholderProps
->(function PetitionComposeNewFieldPlaceholder({ isTemplate, isGroupChild, ...props }, ref) {
+>(function PetitionComposeNewFieldPlaceholder({ ref, isTemplate, isGroupChild, ...props }) {
   return (
     <AnimatePresence>
       <Center

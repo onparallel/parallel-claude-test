@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { Box, Flex, useMultiStyleConfig } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { UsersIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import {
   UserAvatarList_UserFragment,
   UserAvatarList_UserGroupFragment,
@@ -19,10 +19,13 @@ interface UserAvatarListProps {
   boxSize?: number;
 }
 
-export const UserAvatarList = chakraForwardRef<"div", UserAvatarListProps>(function UserAvatarList(
-  { usersOrGroups, size = "xs", max = 3, boxSize = 7 },
+export const UserAvatarList = chakraComponent<"div", UserAvatarListProps>(function UserAvatarList({
   ref,
-) {
+  usersOrGroups,
+  size = "xs",
+  max = 3,
+  boxSize = 7,
+}) {
   const styles = useMultiStyleConfig("Avatar", { size });
   const slice = usersOrGroups.length === max + 1 ? [...usersOrGroups] : usersOrGroups.slice(0, max);
   slice.reverse();

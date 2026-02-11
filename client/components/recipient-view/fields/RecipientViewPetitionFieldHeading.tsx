@@ -1,5 +1,5 @@
 import { Box, Flex, Heading, HStack, Stack } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { FieldDescription } from "@parallel/components/common/FieldDescription";
 import { FileAttachmentButton } from "@parallel/components/common/FileAttachmentButton";
 import { InternalFieldBadge } from "@parallel/components/common/InternalFieldBadge";
@@ -15,13 +15,17 @@ export interface RecipientViewPetitionFieldHeadingProps {
   onCommentsButtonClick?: () => void;
 }
 
-export const RecipientViewPetitionFieldHeading = chakraForwardRef<
+export const RecipientViewPetitionFieldHeading = chakraComponent<
   "div",
   RecipientViewPetitionFieldHeadingProps
->(function RecipientViewPetitionFieldHeading(
-  { field, headerNumber, onDownloadAttachment, onCommentsButtonClick, ...props },
+>(function RecipientViewPetitionFieldHeading({
   ref,
-) {
+  field,
+  headerNumber,
+  onDownloadAttachment,
+  onCommentsButtonClick,
+  ...props
+}) {
   const [commentsFieldId] = useFieldCommentsQueryState();
 
   const number = headerNumber ? `${headerNumber}. ` : "";

@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import { HelpOutlineIcon, MoreVerticalIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import {
   MoreLiquidReferencesButton_PetitionFieldFragment,
   PetitionField,
@@ -30,10 +30,10 @@ export interface MoreLiquidReferencesButtonProps extends Omit<IconButtonWithTool
   onAddAliasToField?: () => Promise<string>;
 }
 
-export const MoreLiquidReferencesButton = chakraForwardRef<
+export const MoreLiquidReferencesButton = chakraComponent<
   "button",
   MoreLiquidReferencesButtonProps
->(function MoreLiquidReferencesButton({ field, onAddAliasToField, ...props }, ref) {
+>(function MoreLiquidReferencesButton({ ref, field, onAddAliasToField, ...props }) {
   const intl = useIntl();
   const copyReference = useClipboardWithToast({
     text: intl.formatMessage({

@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { MenuButton, Portal, ThemingProps } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { PetitionFieldType, PetitionFieldTypeSelect_UserFragment } from "@parallel/graphql/__types";
 import { SelectLikeButton } from "../common/SelectLikeButton";
 import { PetitionFieldTypeLabel } from "./PetitionFieldTypeLabel";
@@ -16,8 +16,8 @@ interface PetitionFieldTypeSelectProps extends ThemingProps<"Select"> {
   isFieldGroupChild?: boolean;
 }
 
-export const PetitionFieldTypeSelect = chakraForwardRef<"button", PetitionFieldTypeSelectProps>(
-  function PetitionFieldTypeSelect({ user, type, onChange, isFieldGroupChild, ...props }, ref) {
+export const PetitionFieldTypeSelect = chakraComponent<"button", PetitionFieldTypeSelectProps>(
+  function PetitionFieldTypeSelect({ ref, user, type, onChange, isFieldGroupChild, ...props }) {
     return (
       <Menu placement="bottom" gutter={2}>
         <MenuButton as={SelectLikeButton} ref={ref} {...(props as any)}>

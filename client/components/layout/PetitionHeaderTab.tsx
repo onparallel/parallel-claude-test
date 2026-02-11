@@ -1,5 +1,5 @@
 import { Box, BoxProps, Center, ListItem } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { motion } from "framer-motion";
 import NextLink from "next/link";
 import { ReactNode, Ref } from "react";
@@ -7,7 +7,7 @@ import { SmallPopover } from "../common/SmallPopover";
 
 const MotionBox = motion<Omit<BoxProps, "transition">>(Box);
 
-export const PetitionHeaderTab = chakraForwardRef<
+export const PetitionHeaderTab = chakraComponent<
   "a",
   {
     isActive?: boolean;
@@ -17,10 +17,25 @@ export const PetitionHeaderTab = chakraForwardRef<
     rightIcon?: ReactNode;
     children: ReactNode;
   }
->(function (
-  { isActive, isDisabled, children, popoverContent, rightIcon, href, ...props },
-  ref: Ref<any>,
-) {
+>(function ({
+  ref,
+  isActive,
+  isDisabled,
+  children,
+  popoverContent,
+  rightIcon,
+  href,
+  ...props
+}: {
+  ref?: Ref<any>;
+  isActive?: boolean;
+  isDisabled?: boolean;
+  children: ReactNode;
+  popoverContent?: ReactNode;
+  rightIcon?: ReactNode;
+  href: string;
+  [key: string]: any;
+}) {
   const link = (
     <ListItem position="relative" display="flex" alignItems="stretch">
       <Center

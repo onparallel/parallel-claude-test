@@ -1,5 +1,5 @@
 import { Box, BoxProps, Placement, PopoverProps, TextProps } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Text } from "@parallel/components/ui";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { ReactNode } from "react";
@@ -16,19 +16,17 @@ export type RestrictedFeaturePopoverProps = {
   fontSize?: TextProps["fontSize"];
 } & PopoverProps;
 
-export const RestrictedFeaturePopover = chakraForwardRef<"div", RestrictedFeaturePopoverProps>(
-  function (
-    {
-      children,
-      isRestricted,
-      content,
-      placement = "bottom",
-      popoverWidth,
-      fontSize = "sm",
-      ...props
-    },
+export const RestrictedFeaturePopover = chakraComponent<"div", RestrictedFeaturePopoverProps>(
+  function ({
     ref,
-  ) {
+    children,
+    isRestricted,
+    content,
+    placement = "bottom",
+    popoverWidth,
+    fontSize = "sm",
+    ...props
+  }) {
     const userCanListOrgUsers = useHasPermission("USERS:LIST_USERS");
     return (
       <SmallPopover

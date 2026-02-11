@@ -1,6 +1,6 @@
 import { Box, HStack, StackProps } from "@chakra-ui/react";
 import { EditSimpleIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -8,7 +8,7 @@ import NextLink from "next/link";
 import { PetitionRepliesPopoverField } from "./PetitionRepliesPopoverField";
 import { Text } from "@parallel/components/ui";
 
-export const NoRepliesHintWithButton = chakraForwardRef<
+export const NoRepliesHintWithButton = chakraComponent<
   "div",
   StackProps & {
     href: string;
@@ -17,10 +17,15 @@ export const NoRepliesHintWithButton = chakraForwardRef<
     fieldLogic: FieldLogicResult;
     parentReplyId?: string;
   }
->(function NoRepliesHintWithButton(
-  { href, petitionId, petitionFieldId, fieldLogic, parentReplyId, ...rest },
+>(function NoRepliesHintWithButton({
   ref,
-) {
+  href,
+  petitionId,
+  petitionFieldId,
+  fieldLogic,
+  parentReplyId,
+  ...rest
+}) {
   const intl = useIntl();
   return (
     <HStack

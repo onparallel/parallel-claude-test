@@ -1,5 +1,5 @@
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { PetitionBaseType } from "@parallel/graphql/__types";
 import NextLink from "next/link";
 import { useMemo } from "react";
@@ -11,8 +11,8 @@ interface PathBreadcrumbsProps {
   pathUrl: (path: string) => string;
 }
 
-export const PathBreadcrumbs = chakraForwardRef<"nav", PathBreadcrumbsProps>(
-  function PathBreadcrumbs({ path, type, pathUrl, ...props }, ref) {
+export const PathBreadcrumbs = chakraComponent<"nav", PathBreadcrumbsProps>(
+  function PathBreadcrumbs({ ref, path, type, pathUrl, ...props }) {
     const intl = useIntl();
     const breadcrumbs = useMemo(() => {
       const breadcrumbs: (

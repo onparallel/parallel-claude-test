@@ -10,7 +10,7 @@ import {
   Tabs,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Divider } from "@parallel/components/common/Divider";
 import {
   PetitionComposeNewFieldDrawer_PetitionBaseFragment,
@@ -45,22 +45,20 @@ interface PetitionComposeNewFieldDrawerProps {
   newFieldPlaceholderParentFieldId?: string;
 }
 
-export const PetitionComposeNewFieldDrawer = chakraForwardRef<
+export const PetitionComposeNewFieldDrawer = chakraComponent<
   "div",
   PetitionComposeNewFieldDrawerProps
->(function PetitionComposeNewFieldDrawer(
-  {
-    user,
-    profileTypes,
-    onClose,
-    onAddField,
-    onAddProfileTypeFieldGroup,
-    onFieldEdit,
-    petition,
-    newFieldPlaceholderParentFieldId,
-  },
+>(function PetitionComposeNewFieldDrawer({
   ref,
-) {
+  user,
+  profileTypes,
+  onClose,
+  onAddField,
+  onAddProfileTypeFieldGroup,
+  onFieldEdit,
+  petition,
+  newFieldPlaceholderParentFieldId,
+}) {
   const intl = useIntl();
 
   const isFieldGroupChild = Boolean(newFieldPlaceholderParentFieldId);

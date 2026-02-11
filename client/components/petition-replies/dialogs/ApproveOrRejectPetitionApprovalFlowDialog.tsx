@@ -13,7 +13,7 @@ import {
   useRadioGroup,
 } from "@chakra-ui/react";
 import { ThumbsDownIcon, ThumbsUpIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
@@ -239,8 +239,8 @@ interface ApproveOrRejectRadioProps {
   value: ApproveOrRejectAction;
 }
 
-export const ApproveOrRejectRadio = chakraForwardRef<"div", ApproveOrRejectRadioProps>(
-  function ApproveOrRejectRadio({ onChange, value, ...props }, ref) {
+export const ApproveOrRejectRadio = chakraComponent<"div", ApproveOrRejectRadioProps>(
+  function ApproveOrRejectRadio({ ref, onChange, value, ...props }) {
     const { getRootProps, getRadioProps } = useRadioGroup({
       name: "action",
       value,

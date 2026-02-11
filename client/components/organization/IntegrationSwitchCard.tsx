@@ -1,5 +1,5 @@
 import { Center, HStack, Stack, Switch } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Text } from "@parallel/components/ui";
 import { ReactNode } from "react";
 import { Card } from "../common/Card";
@@ -17,22 +17,20 @@ export interface IntegrationSwitchCardProps {
   switchButton?: ReactNode;
 }
 
-export const IntegrationSwitchCard = chakraForwardRef<"div", IntegrationSwitchCardProps>(
-  function IntegrationSwitchCard(
-    {
-      logo,
-      title,
-      body,
-      badge,
-      isDisabled,
-      isChecked,
-      disabledMessage,
-      onChange,
-      switchButton,
-      ...props
-    },
+export const IntegrationSwitchCard = chakraComponent<"div", IntegrationSwitchCardProps>(
+  function IntegrationSwitchCard({
     ref,
-  ) {
+    logo,
+    title,
+    body,
+    badge,
+    isDisabled,
+    isChecked,
+    disabledMessage,
+    onChange,
+    switchButton,
+    ...props
+  }) {
     return (
       <RestrictedFeaturePopover
         isRestricted={isDisabled ?? false}

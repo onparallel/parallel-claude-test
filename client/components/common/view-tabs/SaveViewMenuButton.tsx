@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { Menu, Tooltip } from "@parallel/chakra/components";
 import { ChevronDownIcon, SaveIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Button } from "@parallel/components/ui";
 import { ForwardedRef, forwardRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -47,8 +47,8 @@ export const SaveViewTabsMenu = forwardRef(function SaveViewTabsMenu(
   );
 });
 
-const SaveViewMenuButton = chakraForwardRef<"button", { isDirty?: boolean }>(
-  function SaveViewMenuButton({ isDirty }, ref) {
+const SaveViewMenuButton = chakraComponent<"button", { isDirty?: boolean }>(
+  function SaveViewMenuButton({ ref, isDirty }) {
     const buttonProps = useMenuButton({}, ref);
     const isSmallScreen = useBreakpointValue({ base: true, md: false });
     const intl = useIntl();

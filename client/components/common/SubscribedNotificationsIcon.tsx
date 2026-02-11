@@ -1,10 +1,10 @@
 import { Tooltip } from "@parallel/chakra/components";
 import { BellOnIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { useIntl } from "react-intl";
 
-export const SubscribedNotificationsIcon = chakraForwardRef<"svg">(
-  function SubscribedNotificationsIcon({ ...props }, ref) {
+export const SubscribedNotificationsIcon = chakraComponent<"svg">(
+  function SubscribedNotificationsIcon({ ref, ...props }) {
     const intl = useIntl();
     return (
       <Tooltip

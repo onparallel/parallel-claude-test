@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box, Center } from "@chakra-ui/react";
 import { CloseIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Tag_TagFragment } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 import { OverflownText } from "./OverflownText";
@@ -12,10 +12,13 @@ export interface TagProps {
   onRemove?: (event: any) => void;
 }
 
-export const Tag = chakraForwardRef<"div", TagProps>(function (
-  { tag, isRemovable, onRemove, ...props },
+export const Tag = chakraComponent<"div", TagProps>(function Tag({
   ref,
-) {
+  tag,
+  isRemovable,
+  onRemove,
+  ...props
+}) {
   const intl = useIntl();
   return (
     <Box

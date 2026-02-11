@@ -1,6 +1,6 @@
 import { Input, InputGroup, InputLeftElement, PropsOf } from "@chakra-ui/react";
 import { FieldPhoneIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { phoneCodes } from "@parallel/utils/phoneCodes";
 import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { withDynamicLoadingProps } from "@parallel/utils/withDynamicLoadingProps";
@@ -20,8 +20,8 @@ export const PhoneInputLazy = withDynamicLoadingProps<PropsOf<typeof FakeInputPh
     }),
 );
 
-const FakeInputPhone = chakraForwardRef<"input", PhoneInputProps>(
-  ({ value, placeholder, defaultCountry, onChange, onBlur, inputRef, ...props }, ref) => {
+const FakeInputPhone = chakraComponent<"input", PhoneInputProps>(
+  ({ ref, value, placeholder, defaultCountry, onChange, onBlur, inputRef, ...props }) => {
     const _ref = useRef<HTMLInputElement>(null);
     const metadata = useBrowserMetadata();
     const _defaultCountry = defaultCountry ?? metadata.country ?? undefined;

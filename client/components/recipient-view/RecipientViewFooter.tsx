@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { Flex, List, ListItem, Stack } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Link, NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { RecipientViewFooter_PublicPetitionFragment } from "@parallel/graphql/__types";
@@ -10,8 +10,8 @@ export interface RecipientViewFooterProps {
   petition: RecipientViewFooter_PublicPetitionFragment;
 }
 
-export const RecipientViewFooter = chakraForwardRef<"div", RecipientViewFooterProps>(
-  function RecipientViewFooter(props, ref) {
+export const RecipientViewFooter = chakraComponent<"div", RecipientViewFooterProps>(
+  function RecipientViewFooter({ ref, ...props }) {
     const intl = useIntl();
     return (
       <Flex

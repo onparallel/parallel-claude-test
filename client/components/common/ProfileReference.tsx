@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { HTMLChakraProps } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { ProfileReference_ProfileFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
@@ -16,11 +16,15 @@ interface ProfileReferenceProps {
   showNameEvenIfDeleted?: boolean;
 }
 
-export const ProfileReference = chakraForwardRef<"span" | "a", ProfileReferenceProps>(
-  function ProfileReference(
-    { profile, asLink, _notDeleted, showNameEvenIfDeleted, ...props },
+export const ProfileReference = chakraComponent<"span" | "a", ProfileReferenceProps>(
+  function ProfileReference({
     ref,
-  ) {
+    profile,
+    asLink,
+    _notDeleted,
+    showNameEvenIfDeleted,
+    ...props
+  }) {
     if (
       isNonNullish(profile) &&
       (showNameEvenIfDeleted || ["OPEN", "CLOSED"].includes(profile.status))

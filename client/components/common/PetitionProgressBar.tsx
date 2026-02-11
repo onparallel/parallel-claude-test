@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box, HStack, Square, Stack } from "@chakra-ui/react";
 import { CheckIcon, QuestionIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { PetitionProgressBar_PetitionFragment } from "@parallel/graphql/__types";
 import { generateCssStripe } from "@parallel/utils/css";
 import { FormattedMessage } from "react-intl";
@@ -26,8 +26,8 @@ const STYLES = (() => {
   return styles as Record<keyof typeof styles, any>;
 })();
 
-export const PetitionProgressBar = chakraForwardRef<"div", PetitionProgressBarProps>(
-  function PetitionProgressBar({ petition: { progress, status }, ...props }, ref) {
+export const PetitionProgressBar = chakraComponent<"div", PetitionProgressBarProps>(
+  function PetitionProgressBar({ ref, petition: { progress, status }, ...props }) {
     const { external, internal } = progress;
     const sum = {
       approved: external.approved + internal.approved,
@@ -218,10 +218,12 @@ function OptionalProgressText({
   );
 }
 
-const ProgressText = chakraForwardRef<"li", { type: keyof typeof STYLES }>(function ProgressText(
-  { children, type, ...props },
+const ProgressText = chakraComponent<"li", { type: keyof typeof STYLES }>(function ProgressText({
   ref,
-) {
+  children,
+  type,
+  ...props
+}) {
   return (
     <HStack ref={ref as any} as="li" {...(props as any)}>
       <Square size="14px" borderRadius="sm" position="relative" top="1px" {...STYLES[type]} />

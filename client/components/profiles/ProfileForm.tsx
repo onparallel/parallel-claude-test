@@ -13,7 +13,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { ExternalLinkIcon, SearchIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Divider } from "@parallel/components/common/Divider";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { OverflownText } from "@parallel/components/common/OverflownText";
@@ -57,19 +57,17 @@ interface ProfileFormProps {
   omitProfileTabNavigation?: boolean;
 }
 
-export const ProfileForm = chakraForwardRef<"div", ProfileFormProps>(function ProfileForm(
-  {
-    profile,
-    onRefetch,
-    overlapsIntercomBadge,
-    petition,
-    petitionId,
-    onRecover,
-    includeLinkToProfile,
-    ...props
-  },
+export const ProfileForm = chakraComponent<"div", ProfileFormProps>(function ProfileForm({
   ref,
-) {
+  profile,
+  onRefetch,
+  overlapsIntercomBadge,
+  petition,
+  petitionId,
+  onRecover,
+  includeLinkToProfile,
+  ...props
+}) {
   const intl = useIntl();
   const router = useRouter();
   const queryProfileId = router?.query.profileId;

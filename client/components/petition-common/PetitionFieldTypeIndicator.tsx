@@ -1,5 +1,5 @@
 import { Tooltip } from "@parallel/chakra/components";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Button, Text } from "@parallel/components/ui";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
@@ -17,20 +17,18 @@ export interface PetitionFieldTypeIndicatorProps {
   hideIcon?: boolean;
 }
 
-export const PetitionFieldTypeIndicator = chakraForwardRef<
+export const PetitionFieldTypeIndicator = chakraComponent<
   "button",
   PetitionFieldTypeIndicatorProps
->(function PetitionFieldTypeIndicator(
-  {
-    type,
-    fieldIndex,
-    isTooltipDisabled,
-    hideIcon,
-    isFixedWidth = true,
-    ...props
-  }: PetitionFieldTypeIndicatorProps,
+>(function PetitionFieldTypeIndicator({
   ref,
-) {
+  type,
+  fieldIndex,
+  isTooltipDisabled,
+  hideIcon,
+  isFixedWidth = true,
+  ...props
+}) {
   const label = usePetitionFieldTypeLabel(type);
   const color = usePetitionFieldTypeColor(type);
 

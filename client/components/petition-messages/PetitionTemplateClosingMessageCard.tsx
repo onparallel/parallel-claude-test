@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box } from "@chakra-ui/react";
 import { EmailIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import {
   PetitionLocale,
   PetitionTemplateClosingMessageCard_PetitionTemplateFragment,
@@ -72,13 +72,16 @@ export const PETITION_CLOSING_DEFAULT_MESSAGE: Record<PetitionLocale, string> = 
   `,
 };
 
-export const PetitionTemplateClosingMessageCard = chakraForwardRef<
+export const PetitionTemplateClosingMessageCard = chakraComponent<
   "section",
   PetitionTemplateClosingMessageCardProps
->(function PetitionTemplateClosingMessageCard(
-  { petition, onUpdatePetition, isDisabled, ...props },
+>(function PetitionTemplateClosingMessageCard({
   ref,
-) {
+  petition,
+  onUpdatePetition,
+  isDisabled,
+  ...props
+}) {
   const placeholders = usePetitionMessagePlaceholderOptions({ petition });
   const [closingEmailBody, setClosingEmailBody] = useState<RichTextEditorValue>(
     petition.closingEmailBody ??

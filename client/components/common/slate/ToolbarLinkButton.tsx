@@ -1,6 +1,6 @@
 import { FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
 import { LinkIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Button } from "@parallel/components/ui";
 import { getPreventDefaultHandler } from "@parallel/utils/events";
 import { withError } from "@parallel/utils/promises/withError";
@@ -32,8 +32,8 @@ interface LinkNode extends SlateElement<"link", SlateText> {
   url: string;
 }
 
-export const ToolbarLinkButton = chakraForwardRef<"button", ToolbarLinkButtonProps>(
-  function ToolbarLinkButton({ ...props }, ref) {
+export const ToolbarLinkButton = chakraComponent<"button", ToolbarLinkButtonProps>(
+  function ToolbarLinkButton({ ref, ...props }) {
     const intl = useIntl();
     const showAddLinkDialog = useAddLinkDialog();
     const editor = usePlateEditorRef();

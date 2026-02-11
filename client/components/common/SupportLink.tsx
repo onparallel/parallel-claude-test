@@ -1,4 +1,4 @@
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { isNonNullish } from "remeda";
 import { NormalLink } from "./Link";
 
@@ -6,10 +6,12 @@ interface SupportLink {
   message: string;
 }
 
-export const SupportLink = chakraForwardRef<"a", SupportLink>(function SupportLink(
-  { message, onClick, ...props },
+export const SupportLink = chakraComponent<"a", SupportLink>(function SupportLink({
   ref,
-) {
+  message,
+  onClick,
+  ...props
+}) {
   return (
     <NormalLink
       ref={ref}

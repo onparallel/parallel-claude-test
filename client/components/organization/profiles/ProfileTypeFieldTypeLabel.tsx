@@ -1,5 +1,5 @@
 import { Box, Icon } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { PaidBadge } from "@parallel/components/common/PaidBadge";
 import { ProfileTypeFieldType } from "@parallel/graphql/__types";
 import { PROFILE_TYPE_FIELD_CONFIG } from "@parallel/utils/profileFields";
@@ -12,8 +12,8 @@ interface ProfileTypeFieldTypeLabelProps {
   type: ProfileTypeFieldType;
 }
 
-export const ProfileTypeFieldTypeLabel = chakraForwardRef<"div", ProfileTypeFieldTypeLabelProps>(
-  function ProfileTypeFieldTypeLabel({ type, ...props }, ref) {
+export const ProfileTypeFieldTypeLabel = chakraComponent<"div", ProfileTypeFieldTypeLabelProps>(
+  function ProfileTypeFieldTypeLabel({ ref, type, ...props }) {
     const intl = useIntl();
     const { label, color, icon } = PROFILE_TYPE_FIELD_CONFIG[type];
 

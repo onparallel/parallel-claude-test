@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { Box } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { PublicPetitionFieldCommentExcerpt_PetitionFieldCommentFragment } from "@parallel/graphql/__types";
 import { sanitizeHtml } from "@parallel/utils/sanitizeHtml";
 import parse from "html-react-parser";
@@ -10,10 +10,10 @@ interface PublicPetitionFieldCommentExcerptProps {
   comment: PublicPetitionFieldCommentExcerpt_PetitionFieldCommentFragment;
 }
 
-export const PublicPetitionFieldCommentExcerpt = chakraForwardRef<
+export const PublicPetitionFieldCommentExcerpt = chakraComponent<
   "div",
   PublicPetitionFieldCommentExcerptProps
->(function CommentContent({ comment, ...props }, ref) {
+>(function CommentContent({ ref, comment, ...props }) {
   const memoizedHtml = useMemo(() => {
     return comment.excerptHtml
       ? parse(

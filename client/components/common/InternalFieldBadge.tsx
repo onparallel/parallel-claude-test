@@ -1,6 +1,6 @@
 /** no-recipient */
 import { Badge, BoxProps, Placement, TextProps, ThemingProps } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Text } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
 import { SmallPopover } from "./SmallPopover";
@@ -11,11 +11,14 @@ export interface InternalFieldBadgeProps extends ThemingProps<"Badge"> {
   fontSize?: TextProps["fontSize"];
 }
 
-export const InternalFieldBadge = chakraForwardRef<"span", InternalFieldBadgeProps>(
-  function InternalFieldBadge(
-    { placement = "bottom", popoverWidth, fontSize = "sm", ...props },
+export const InternalFieldBadge = chakraComponent<"span", InternalFieldBadgeProps>(
+  function InternalFieldBadge({
     ref,
-  ) {
+    placement = "bottom",
+    popoverWidth,
+    fontSize = "sm",
+    ...props
+  }) {
     return (
       <SmallPopover
         content={

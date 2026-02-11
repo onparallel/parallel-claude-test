@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box, Flex, HStack, List, ListItem, Stack } from "@chakra-ui/react";
 import { BusinessIcon, SearchIcon, ShortSearchIcon, UserIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import {
   AdverseMediaArticle,
   AdverseMediaSearchTermInput,
@@ -39,10 +39,10 @@ export interface PetitionFieldRepliesContentProps {
   sample?: number;
 }
 
-export const PetitionFieldRepliesContent = chakraForwardRef<
+export const PetitionFieldRepliesContent = chakraComponent<
   "p" | "span" | "ul" | "div",
   PetitionFieldRepliesContentProps
->(function PetitionFieldRepliesContent(props, ref) {
+>(function PetitionFieldRepliesContent({ ref, ...props }) {
   if (isFileTypeField(props.field.type)) {
     return <PetitionFieldRepliesContentFile ref={ref} {...(props as any)} />;
   } else {
@@ -50,8 +50,8 @@ export const PetitionFieldRepliesContent = chakraForwardRef<
   }
 });
 
-const PetitionFieldRepliesContentFile = chakraForwardRef<"ul", PetitionFieldRepliesContentProps>(
-  function PetitionFieldRepliesContentFile({ petitionId, field, replies, sample, ...props }, ref) {
+const PetitionFieldRepliesContentFile = chakraComponent<"ul", PetitionFieldRepliesContentProps>(
+  function PetitionFieldRepliesContentFile({ ref, petitionId, field, replies, sample, ...props }) {
     const downloadReplyFile = useDownloadReplyFile();
     const isShiftDown = useIsGlobalKeyDown("Shift");
     const userHasRemovePreviewFiles = useHasRemovePreviewFiles();
@@ -98,13 +98,17 @@ const PetitionFieldRepliesContentFile = chakraForwardRef<"ul", PetitionFieldRepl
   },
 );
 
-const PetitionFieldRepliesContentNonFile = chakraForwardRef<
+const PetitionFieldRepliesContentNonFile = chakraComponent<
   "p" | "span" | "button",
   PetitionFieldRepliesContentProps
->(function PetitionFieldRepliesContentNonFile(
-  { petitionId, field, replies, sample, ...props },
+>(function PetitionFieldRepliesContentNonFile({
   ref,
-) {
+  petitionId,
+  field,
+  replies,
+  sample,
+  ...props
+}) {
   const intl = useIntl();
   if (replies.length === 0) {
     return (

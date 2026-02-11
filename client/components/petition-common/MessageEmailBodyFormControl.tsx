@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { FormControl, FormControlProps, FormErrorMessage } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { MessageEmailBodyFormControl_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
 import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/usePetitionMessagePlaceholderOptions";
@@ -13,10 +13,10 @@ interface MessageEmailBodyFormControlProps extends Omit<FormControlProps, "value
   petition: MessageEmailBodyFormControl_PetitionBaseFragment;
 }
 
-export const MessageEmailBodyFormControl = chakraForwardRef<
+export const MessageEmailBodyFormControl = chakraComponent<
   "div",
   MessageEmailBodyFormControlProps
->(function MessageEmailBodyFormControl({ value, onChange, petition, ...props }, ref) {
+>(function MessageEmailBodyFormControl({ ref, value, onChange, petition, ...props }) {
   const intl = useIntl();
   const placeholderOptions = usePetitionMessagePlaceholderOptions({ petition });
   return (

@@ -25,7 +25,7 @@ import {
   FrontCoverIcon,
   PaperclipIcon,
 } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { FileSize } from "@parallel/components/common/FileSize";
 import { Button, Text } from "@parallel/components/ui";
@@ -80,8 +80,8 @@ export interface PetitionComposeAttachmentsProps {
   isReadOnly?: boolean;
 }
 
-export const PetitionComposeAttachments = chakraForwardRef<"div", PetitionComposeAttachmentsProps>(
-  function PetitionComposeAttachments({ petition, isReadOnly, ...props }, ref) {
+export const PetitionComposeAttachments = chakraComponent<"div", PetitionComposeAttachmentsProps>(
+  function PetitionComposeAttachments({ ref, petition, isReadOnly, ...props }) {
     const intl = useIntl();
 
     const petitionId = petition.id;
@@ -686,24 +686,22 @@ interface AttachmentItemProps {
   onVisibilityChange: (id: string, visibility: PetitionFieldVisibility | null) => void;
 }
 
-const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function AttachmentItem(
-  {
-    item,
-    index,
-    progress,
-    isDraggable,
-    isDisabled,
-    petition,
-    visibility,
-    onRemove,
-    onPreview,
-    onChangeType,
-    onDragEnd,
-    onVisibilityChange,
-    ...props
-  },
+const AttachmentItem = chakraComponent<"div", AttachmentItemProps>(function AttachmentItem({
   ref,
-) {
+  item,
+  index,
+  progress,
+  isDraggable,
+  isDisabled,
+  petition,
+  visibility,
+  onRemove,
+  onPreview,
+  onChangeType,
+  onDragEnd,
+  onVisibilityChange,
+  ...props
+}) {
   const intl = useIntl();
   const userHasRemovePreviewFiles = useHasRemovePreviewFiles();
   const dragControls = useDragControls();

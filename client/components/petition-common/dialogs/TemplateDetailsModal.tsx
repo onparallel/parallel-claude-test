@@ -22,7 +22,7 @@ import {
   PaperPlaneIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { HtmlBlock } from "@parallel/components/common/HtmlBlock";
 import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
@@ -444,8 +444,8 @@ export interface PetitionFieldTitleContentProps {
     | PetitionFieldTitleContent_LandingTemplateFieldFragment;
 }
 
-export const PetitionFieldTitleContent = chakraForwardRef<"p", PetitionFieldTitleContentProps>(
-  function PetitionFieldTitleContent({ index, field, ...props }, ref) {
+export const PetitionFieldTitleContent = chakraComponent<"p", PetitionFieldTitleContentProps>(
+  function PetitionFieldTitleContent({ ref, index, field, ...props }) {
     return (
       <Text {...props} ref={ref}>
         {index}.{" "}

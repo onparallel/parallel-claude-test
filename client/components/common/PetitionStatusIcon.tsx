@@ -1,6 +1,6 @@
 import { Tooltip } from "@parallel/chakra/components";
 import { CheckIcon, DoubleCheckIcon, EditIcon, TimeIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { PetitionStatus } from "@parallel/graphql/__types";
 import { usePetitionStatusColor } from "@parallel/utils/usePetitionStatusColor";
 import { usePetitionStatusLabels } from "@parallel/utils/usePetitionStatusLabels";
@@ -10,8 +10,8 @@ interface PetitionStatusIconProps {
   disableTooltip?: boolean;
 }
 
-export const PetitionStatusIcon = chakraForwardRef<"svg", PetitionStatusIconProps>(
-  function PetitionStatusIcon({ disableTooltip, status, ...props }, ref) {
+export const PetitionStatusIcon = chakraComponent<"svg", PetitionStatusIconProps>(
+  function PetitionStatusIcon({ ref, disableTooltip, status, ...props }) {
     const labels = usePetitionStatusLabels();
     const color = usePetitionStatusColor(status);
     return (

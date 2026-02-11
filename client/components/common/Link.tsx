@@ -7,7 +7,7 @@ import {
   ThemingProps,
   useStyleConfig,
 } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import NextLink, { LinkProps as NextLinkProps } from "next/link";
 
 const cx = (...classNames: any[]) => classNames.filter(Boolean).join(" ");
@@ -19,7 +19,7 @@ export type LinkProps = Merge<
   Omit<NextLinkProps, "as" | "legacyBehavior" | "passHref">
 >;
 
-export const Link = chakraForwardRef<"a", LinkProps>(function Link(props, ref) {
+export const Link = chakraComponent<"a", LinkProps>(function Link({ ref, ...props }) {
   const styles = useStyleConfig("Link", props);
   const { className, isExternal, href, children, ...rest } = omitThemingProps(props);
 

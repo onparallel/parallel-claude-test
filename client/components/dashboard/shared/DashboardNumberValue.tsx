@@ -1,5 +1,5 @@
 import { chakra, TextProps } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Text } from "@parallel/components/ui";
 import MotionNumber from "motion-number";
 import { FormatNumberOptions, useIntl } from "react-intl";
@@ -12,8 +12,8 @@ interface DashboardNumberValueProps extends TextProps {
   isEditing?: boolean;
 }
 
-export const DashboardNumberValue = chakraForwardRef<"span", DashboardNumberValueProps>(
-  ({ value, isPercentage, isEditing, ...props }, ref) => {
+export const DashboardNumberValue = chakraComponent<"span", DashboardNumberValueProps>(
+  ({ ref, value, isPercentage, isEditing, ...props }) => {
     const intl = useIntl();
 
     const format =

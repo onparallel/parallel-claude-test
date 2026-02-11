@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { PetitionName_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
@@ -11,8 +11,8 @@ interface PetitionNameWithPathProps {
   relativePath?: string;
 }
 
-export const PetitionNameWithPath = chakraForwardRef<"div", PetitionNameWithPathProps>(
-  function PetitionName({ children, petition, relativePath, ...props }, ref) {
+export const PetitionNameWithPath = chakraComponent<"div", PetitionNameWithPathProps>(
+  function PetitionName({ ref, children, petition, relativePath, ...props }) {
     const intl = useIntl();
     return (
       <Text as="span" {...props}>

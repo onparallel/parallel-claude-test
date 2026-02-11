@@ -1,6 +1,6 @@
 import { Box, PlacementWithLogical } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { PetitionBaseType } from "@parallel/graphql/__types";
 import { createElement, ReactElement } from "react";
 import { useIntl } from "react-intl";
@@ -13,17 +13,15 @@ interface PathNameProps {
   render?: (props: any) => ReactElement;
 }
 
-export const PathName = chakraForwardRef<"span", PathNameProps>(function PathName(
-  {
-    path,
-    type,
-    disableTooltip,
-    tooltipPlacement,
-    render = ({ children }) => <>{children}</>,
-    ...props
-  },
+export const PathName = chakraComponent<"span", PathNameProps>(function PathName({
   ref,
-) {
+  path,
+  type,
+  disableTooltip,
+  tooltipPlacement,
+  render = ({ children }) => <>{children}</>,
+  ...props
+}) {
   const intl = useIntl();
   const root =
     type === "PETITION"

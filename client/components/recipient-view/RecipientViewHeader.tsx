@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { Popover } from "@parallel/chakra/components";
 import { CloudOkIcon, DownloadIcon, HelpOutlineIcon, UserArrowIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Logo } from "@parallel/components/common/Logo";
 import { Button, Text } from "@parallel/components/ui";
 import { RecipientViewHeader_PublicPetitionAccessFragment } from "@parallel/graphql/__types";
@@ -38,20 +38,18 @@ interface RecipientViewHeaderProps {
   canFinalize: boolean;
 }
 
-export const RecipientViewHeader = chakraForwardRef<"section", RecipientViewHeaderProps>(
-  function RecipientViewHeader(
-    {
-      access,
-      hasSignature,
-      pendingPetitions,
-      keycode,
-      isClosed,
-      onFinalize,
-      canFinalize,
-      ...props
-    },
+export const RecipientViewHeader = chakraComponent<"section", RecipientViewHeaderProps>(
+  function RecipientViewHeader({
     ref,
-  ) {
+    access,
+    hasSignature,
+    pendingPetitions,
+    keycode,
+    isClosed,
+    onFinalize,
+    canFinalize,
+    ...props
+  }) {
     const intl = useIntl();
     const tone = useTone();
 

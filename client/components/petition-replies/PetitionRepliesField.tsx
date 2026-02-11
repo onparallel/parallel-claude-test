@@ -19,7 +19,7 @@ import {
   EditSimpleIcon,
   PaperclipIcon,
 } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import { Button, Text } from "@parallel/components/ui";
@@ -786,8 +786,8 @@ interface CommentsButtonProps extends ButtonOptions, ThemingProps<"Button"> {
   isActive: boolean;
 }
 
-export const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(
-  function CommentsButton({ commentCount, hasUnreadComments, isActive, ...props }, ref) {
+export const CommentsButton = chakraComponent<"button", CommentsButtonProps>(
+  function CommentsButton({ ref, commentCount, hasUnreadComments, isActive, ...props }) {
     const intl = useIntl();
     const common = {
       "aria-pressed": isActive,

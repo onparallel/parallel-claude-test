@@ -33,7 +33,7 @@ import {
   TagIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import {
   usePetitionShouldConfirmNavigation,
   usePetitionState,
@@ -93,8 +93,8 @@ export interface PetitionHeaderInstance {
   focusName(): void;
 }
 
-export const PetitionHeader = chakraForwardRef<"div", PetitionHeaderProps, PetitionHeaderInstance>(
-  function PetitionHeader({ petition, me, section: current, actions, onRefetch, ...props }, ref) {
+export const PetitionHeader = chakraComponent<"div", PetitionHeaderProps, PetitionHeaderInstance>(
+  function PetitionHeader({ ref, petition, me, section: current, actions, onRefetch, ...props }) {
     const intl = useIntl();
     const router = useRouter();
     const toast = useToast();
