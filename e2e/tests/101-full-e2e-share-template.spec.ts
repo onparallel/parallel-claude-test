@@ -65,7 +65,7 @@ test.describe("Full e2e share template", () => {
       const email = await waitForEmail(
         (e) =>
           e.subject === `User 1 has shared ${templateName} with you` &&
-          e.to.some((c) => c.address === process.env.USER2_EMAIL),
+          e.to?.some((c) => c.address === process.env.USER2_EMAIL) === true,
         {
           user: process.env.IMAP_USER,
           password: process.env.IMAP_PASSWORD,
