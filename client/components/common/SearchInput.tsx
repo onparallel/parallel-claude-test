@@ -16,7 +16,10 @@ import { useIntl } from "react-intl";
 import { omit, pick } from "remeda";
 import { CloseButton } from "./CloseButton";
 
-export const SearchInput = chakraComponent<"input", InputProps>(function SearchInput({ ref, ...props }) {
+export const SearchInput = chakraComponent<"input", InputProps>(function SearchInput({
+  ref,
+  ...props
+}) {
   const inputRef = useRef<HTMLInputElement>(null);
   const mergedRef = useMergeRefs(ref, inputRef);
   const intl = useIntl();

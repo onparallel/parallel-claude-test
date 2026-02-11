@@ -11,39 +11,38 @@ interface PetitionFieldCommentExcerptProps {
   comment: PetitionFieldCommentExcerpt_PetitionFieldCommentFragment;
 }
 
-export const PetitionFieldCommentExcerpt = chakraComponent<
-  "div",
-  PetitionFieldCommentExcerptProps
->(function CommentContent({ ref, comment, ...props }) {
-  const options: HTMLReactParserOptions = {
-    replace(domNode) {
-      if (domNode instanceof Element && domNode.name === "mention") {
-        const mention = comment.mentions.find(
-          (m) => m.mentionedId === domNode.attribs["data-mention-id"],
-        )!;
-        return <Mention mention={mention} />;
-      }
-    },
-  };
-  const memoizedHtml = useMemo(() => {
-    return comment.excerptHtml
-      ? parse(
-          sanitizeHtml(comment.excerptHtml, {
-            ADD_TAGS: ["mention"],
-            ADD_ATTR: ["data-mention-id"],
-            FORBID_TAGS: ["p", "a"],
-          }),
-          options,
-        )
-      : null;
-  }, [comment.excerptHtml]);
+export const PetitionFieldCommentExcerpt = chakraComponent<"div", PetitionFieldCommentExcerptProps>(
+  function CommentContent({ ref, comment, ...props }) {
+    const options: HTMLReactParserOptions = {
+      replace(domNode) {
+        if (domNode instanceof Element && domNode.name === "mention") {
+          const mention = comment.mentions.find(
+            (m) => m.mentionedId === domNode.attribs["data-mention-id"],
+          )!;
+          return <Mention mention={mention} />;
+        }
+      },
+    };
+    const memoizedHtml = useMemo(() => {
+      return comment.excerptHtml
+        ? parse(
+            sanitizeHtml(comment.excerptHtml, {
+              ADD_TAGS: ["mention"],
+              ADD_ATTR: ["data-mention-id"],
+              FORBID_TAGS: ["p", "a"],
+            }),
+            options,
+          )
+        : null;
+    }, [comment.excerptHtml]);
 
-  return (
-    <Box ref={ref} {...props}>
-      {memoizedHtml}
-    </Box>
-  );
-});
+    return (
+      <Box ref={ref} {...props}>
+        {memoizedHtml}
+      </Box>
+    );
+  },
+);
 
 const _fragments = {
   PetitionFieldComment: gql`
