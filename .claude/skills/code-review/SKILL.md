@@ -160,4 +160,4 @@ After completing the code review, **only in GitHub Actions**, evaluate whether t
 - Code style or formatting changes
 - Minor logic changes to existing code without API impact
 
-If the changes meet the criteria, run the `/check-documentation` skill. Otherwise, skip it entirely.
+If the changes meet the criteria, run the `/check-documentation` skill. You already have the diff and analysis in context — the documentation check should reuse them instead of fetching the diff again. Otherwise, skip it entirely.
