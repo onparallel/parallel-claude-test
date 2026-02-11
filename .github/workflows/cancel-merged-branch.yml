@@ -1,0 +1,49 @@
+name: Cancel merged branch runs
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  cancel-runs:
+    name: Cancel branch runs
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Cancel all runs for merged branch
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const branch = context.payload.pull_request.head.ref;
+            const { owner, repo } = context.repo;
+
+            const runs = await github.rest.actions.listWorkflowRunsForRepo({
+              owner,
+              repo,
+              branch,
+              status: 'in_progress',
+              per_page: 100,
+            });
+
+            const queuedRuns = await github.rest.actions.listWorkflowRunsForRepo({
+              owner,
+              repo,
+              branch,
+              status: 'queued',
+              per_page: 100,
+            });
+
+            const allRuns = [...runs.data.workflow_runs, ...queuedRuns.data.workflow_runs];
+
+            for (const run of allRuns) {
+              console.log(`Cancelling run ${run.id} (${run.name}) - status: ${run.status}`);
+              await github.rest.actions.cancelWorkflowRun({
+                owner,
+                repo,
+                run_id: run.id,
+              });
+            }
+
+            console.log(`Cancelled ${allRuns.length} runs for branch: ${branch}`);
