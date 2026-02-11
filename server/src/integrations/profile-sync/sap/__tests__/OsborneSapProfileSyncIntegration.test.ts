@@ -448,11 +448,14 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
             name: "SAP",
             settings: {
               ...omit(settings, ["authorization"]),
-              CREDENTIALS: {
-                password: settings.authorization.password,
-                type: "BASIC",
-                user: settings.authorization.user,
-              },
+              CREDENTIALS:
+                settings.authorization.type === "BASIC"
+                  ? {
+                      type: "BASIC" as const,
+                      password: settings.authorization.password,
+                      user: settings.authorization.user,
+                    }
+                  : settings.authorization,
             },
           },
           "TEST",

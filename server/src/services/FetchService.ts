@@ -1,14 +1,17 @@
 import { injectable } from "inversify";
 import { isNonNullish } from "remeda";
-import { RetryOptions, StopRetryError, retry } from "../util/retry";
+import { Dispatcher } from "undici";
+import { retry, RetryOptions, StopRetryError } from "../util/retry";
 import { MaybeFunction, unMaybeFunction } from "../util/types";
 
 export const FETCH_SERVICE = Symbol.for("FETCH_SERVICE");
 
+export type FetchRequestInit = Omit<RequestInit, "signal"> & { dispatcher?: Dispatcher };
+
 export interface IFetchService {
   fetch(
     url: RequestInfo,
-    init?: MaybeFunction<Omit<RequestInit, "signal">, [tryIndex: number]>,
+    init?: MaybeFunction<FetchRequestInit, [tryIndex: number]>,
     options?: FetchOptions,
   ): Promise<Response>;
 }

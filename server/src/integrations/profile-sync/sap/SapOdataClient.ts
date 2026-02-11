@@ -1,7 +1,8 @@
 import DataLoader from "dataloader";
 import { inject, injectable, ResolutionContext } from "inversify";
 import { entries, fromEntries, groupBy, isNonNullish, mapValues, pipe, zip } from "remeda";
-import { FETCH_SERVICE, IFetchService } from "../../../services/FetchService";
+import { Agent } from "undici";
+import { FETCH_SERVICE, FetchRequestInit, IFetchService } from "../../../services/FetchService";
 import { ILogger } from "../../../services/Logger";
 import { never } from "../../../util/never";
 import { pFlatMap } from "../../../util/promises/pFlatMap";
@@ -62,11 +63,13 @@ export class SapOdataClient implements ISapOdataClient {
   private authorization!: SapProfileSyncIntegrationSettingsAuthorization;
   private additionalHeaders!: Record<string, string>;
   private logger!: ILogger;
+  private agent?: Agent;
 
   constructor(@inject(FETCH_SERVICE) private readonly fetch: IFetchService) {}
 
   [Symbol.dispose]() {
     this.clearCache();
+    this.agent?.close();
   }
 
   public clearCache(): void {
@@ -209,14 +212,27 @@ export class SapOdataClient implements ISapOdataClient {
   }
 
   private async makeAuthorizedFetch(url: string, options?: RequestInit) {
-    return await this.fetch.fetch(url, {
+    const _options = {
       ...options,
       headers: {
-        Authorization: `Basic ${Buffer.from(`${this.authorization.user}:${this.authorization.password}`).toString("base64")}`,
-        ...this.additionalHeaders,
         ...options?.headers,
-      },
-    });
+        ...this.additionalHeaders,
+      } as Record<string, string>,
+    } as FetchRequestInit;
+    if (this.authorization.type === "BASIC") {
+      (_options.headers as Record<string, string>).Authorization =
+        `Basic ${Buffer.from(`${this.authorization.user}:${this.authorization.password}`).toString("base64")}`;
+    } else if (this.authorization.type === "CERTIFICATE") {
+      _options.dispatcher = this.agent ??= new Agent({
+        connect: {
+          pfx: Buffer.from(this.authorization.pfx, "base64"),
+          passphrase: this.authorization.passphrase,
+        },
+      });
+    } else {
+      never(`Unsupported authorization type: ${this.authorization}`);
+    }
+    return await this.fetch.fetch(url, _options);
   }
 
   private _batchRequestDataLoader = new DataLoader<

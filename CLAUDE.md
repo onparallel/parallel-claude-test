@@ -444,10 +444,18 @@ await this.createEvent(
 - `SapProfileSyncIntegration`: Main sync orchestration
 - `SapProfileSyncIntegrationSettingsValidator`: Config validation
 
+**Authentication Types**:
+
+- `BASIC`: Username/password authentication
+  - Fields: `user`, `password`
+- `CERTIFICATE`: PFX certificate authentication (TLS client certificates)
+  - Fields: `pfx` (base64-encoded PFX certificate), `passphrase`
+
 **Sync Types**: `INITIAL` (first import), `TO_LOCAL` (SAP→Parallel), `TO_REMOTE` (Parallel→SAP)
 
 **Settings** (stored in `org_integration.settings` JSON):
 
+- Authentication configuration (basic or certificate)
 - Entity, filter, profile type mapping
 - Field mappings with directions (`TO_LOCAL`, `TO_REMOTE`, `BIDIRECTIONAL`)
 - Field transformations (date format, enum mapping, concat, split)
