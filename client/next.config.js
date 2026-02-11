@@ -174,7 +174,6 @@ module.exports = [
             // side errors will fail.
             tunnelRoute: "/monitoring",
             hideSourceMaps: true,
-            disableLogger: true,
             sourcemaps: {
               deleteSourcemapsAfterUpload: true,
             },
