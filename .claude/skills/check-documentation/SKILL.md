@@ -1,5 +1,5 @@
 ---
-name: check-if-documentation-needs-update
+name: check-documentation
 description: Check if code changes require documentation updates. Use before creating a PR or in CI to ensure new features, API changes, or significant code changes are properly documented. Analyzes the diff and suggests updates to README.md, CLAUDE.md, or files in /docs/.
 ---
 
