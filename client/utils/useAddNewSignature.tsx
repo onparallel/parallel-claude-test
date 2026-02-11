@@ -7,11 +7,12 @@ import {
   useAddNewSignature_updatePetitionSignatureConfigDocument,
 } from "@parallel/graphql/__types";
 import { Maybe, UnwrapArray } from "@parallel/utils/types";
+import { RefObject } from "react";
 import { isNonNullish, pick } from "remeda";
 
 interface useAddNewSignatureProps {
   petition: useAddNewSignature_PetitionFragment;
-  addSignatureButtonRef?: React.RefObject<HTMLButtonElement>;
+  addSignatureButtonRef?: RefObject<HTMLButtonElement | null>;
 }
 
 export function useAddNewSignature({ petition, addSignatureButtonRef }: useAddNewSignatureProps) {

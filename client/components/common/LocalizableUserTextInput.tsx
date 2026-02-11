@@ -22,7 +22,7 @@ import { UserLocale } from "@parallel/graphql/__types";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { asSupportedUserLocale, useSupportedUserLocales } from "@parallel/utils/locales";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
-import useMergedRef from "@react-hook/merged-ref";
+import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import { ChangeEvent, Ref, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
@@ -54,7 +54,7 @@ export const LocalizableUserTextInput = chakraForwardRef<"div", LocalizableUserT
   ) {
     const intl = useIntl();
     const inputRef = useRef<HTMLInputElement>(null);
-    const mergedInputRef = useMergedRef(inputRef, ...(_inputRef ? [_inputRef] : []));
+    const mergedInputRef = useMergeRefs(inputRef, _inputRef);
 
     // Helper to check if a locale has a non-empty translation
     const hasTranslation = (loc: UserLocale | undefined): loc is UserLocale =>

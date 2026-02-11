@@ -11,8 +11,8 @@ import {
   LinkOverlay,
   Spinner,
   Stack,
-  usePrevious,
 } from "@chakra-ui/react";
+import { usePrevious } from "@parallel/utils/use-previous";
 import { ChevronLeftIcon, CommentIcon, EditIcon } from "@parallel/chakra/icons";
 import { Button, Text } from "@parallel/components/ui";
 import {

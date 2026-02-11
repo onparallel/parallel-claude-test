@@ -12,7 +12,7 @@
     "lint-warnings": "eslint .",
     "update-deps": "yarn ncux && yarn ncux --packageFile bin/package.json && yarn ncux --packageFile client/package.json && yarn ncux --packageFile server/package.json  && yarn ncux --packageFile e2e/package.json",
     "ud": "yarn update-deps",
-    "ncux": "ncu -u -x 'chalk,camelcase,escape-string-regexp,p-all,p-map,p-props,file-type,graphql-upload,graphql-request,@types/graphql-upload,graphql-upload-client,flat,@react-hook/resize-observer'",
+    "ncux": "ncu -u -x 'chalk,camelcase,escape-string-regexp,p-all,p-map,p-props,file-type,graphql-upload,graphql-request,@types/graphql-upload,graphql-upload-client,flat'",
     "cp-scripts": "cp node_modules/pdfjs-dist/legacy/build/pdf.worker.min.mjs node_modules/@onparallel/consent-manager-do-not-use/standalone/consent-manager.js node_modules/redoc/bundles/redoc.standalone.js client/public/static/js/",
     "update-ip-db": "if [ -z \"$SKIP_UPDATE_IP_DB\" ]; then node node_modules/ip-location-api/script/updatedb.mjs; fi",
     "postinstall": "patch-package && yarn cp-scripts && yarn update-ip-db",

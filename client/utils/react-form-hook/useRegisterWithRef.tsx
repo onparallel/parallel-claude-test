@@ -1,4 +1,4 @@
-import useMergedRef from "@react-hook/merged-ref";
+import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import { Ref } from "react";
 import {
   FieldPath,
@@ -23,5 +23,5 @@ export function useRegisterWithRef<
   options?: RegisterOptions<TFieldValues, TFieldName>,
 ): UseFormRegisterReturn {
   const { ref: registerRef, ...props } = register(name, options);
-  return { ref: useMergedRef(ref, registerRef), ...props };
+  return { ref: useMergeRefs(ref, registerRef), ...props };
 }

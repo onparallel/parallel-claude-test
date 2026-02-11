@@ -1,6 +1,6 @@
 import { ProfileFieldPropertyValueSource } from "@parallel/graphql/__types";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
-import { useCallback } from "react";
+import { ReactNode, useCallback } from "react";
 import { FormattedMessage } from "react-intl";
 import { Button, Text } from "../ui";
 
@@ -13,7 +13,7 @@ export function ProfileValueSource({
 }: {
   source?: ProfileFieldPropertyValueSource | null;
   externalSourceName?: string | null;
-  createdBy?: React.ReactNode;
+  createdBy?: ReactNode;
   petitionId?: string | null;
   parentReplyId?: string | null;
 }) {

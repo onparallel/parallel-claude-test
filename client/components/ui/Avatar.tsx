@@ -75,10 +75,10 @@ export const AvatarRoot = forwardRef<HTMLSpanElement, AvatarRootProps>(
     // Look for Avatar.Image and Avatar.Fallback in children
     const processChild = (child: ReactElement) => {
       if (child?.type === AvatarImage) {
-        extractedSrc = child.props.src;
+        extractedSrc = (child.props as AvatarImageProps).src;
       }
       if (child?.type === AvatarFallback) {
-        extractedName = child.props.name;
+        extractedName = (child.props as AvatarFallbackProps).name;
       }
     };
 

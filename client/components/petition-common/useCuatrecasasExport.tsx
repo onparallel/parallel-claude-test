@@ -15,7 +15,7 @@ import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { useExportExcelBackgroundTask } from "@parallel/utils/tasks/useExportExcelTask";
 import { usePrintPdfBackgroundTask } from "@parallel/utils/tasks/usePrintPdfTask";
 import { Maybe } from "@parallel/utils/types";
-import { MutableRefObject, useRef } from "react";
+import { RefObject, useRef } from "react";
 import { isNonNullish } from "remeda";
 import { useAlreadyExportedDialog } from "./dialogs/AlreadyExportedDialog";
 
@@ -79,8 +79,8 @@ interface ExportOpts {
 }
 
 interface ExportRefs {
-  exportAgain: MutableRefObject<boolean>;
-  dontAskAgain: MutableRefObject<boolean>;
+  exportAgain: RefObject<boolean>;
+  dontAskAgain: RefObject<boolean>;
 }
 
 function useExportExcel(clientId: string) {

@@ -15,8 +15,8 @@ export interface ContactListHeaderProps {
   search: string | null;
   onSearchChange: (value: string | null) => void;
   onReload: () => void;
-  onCreateClick: (finalFocusRef?: RefObject<Focusable>) => void;
-  onImportClick: (finalFocusRef?: RefObject<Focusable>) => void;
+  onCreateClick: (finalFocusRef?: RefObject<Focusable | null>) => void;
+  onImportClick: (finalFocusRef?: RefObject<Focusable | null>) => void;
 }
 
 export function ContactListHeader({

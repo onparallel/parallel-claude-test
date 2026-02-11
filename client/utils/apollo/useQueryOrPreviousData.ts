@@ -16,7 +16,7 @@ export function useQueryOrPreviousData<
     current?: useQuery.Result<TData, TVariables, "complete" | "empty">,
   ) => boolean = () => true,
 ): useQuery.Result<TData, TVariables, "complete" | "empty"> {
-  const previousRef = useRef<useQuery.Result<TData, TVariables, "complete">>();
+  const previousRef = useRef<useQuery.Result<TData, TVariables, "complete">>(undefined);
   const queryResult = useQuery<TData, TVariables>(
     query,
     options as useQuery.Options<TData, TVariables>,

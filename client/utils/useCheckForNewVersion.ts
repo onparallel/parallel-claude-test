@@ -7,7 +7,7 @@ import { usePageVisibility } from "./usePageVisibility";
 
 export function useCheckForNewVersion() {
   const [hasNewVersion, setHasNewVersion] = useState(false);
-  const currentVersionRef = useRef<string>();
+  const currentVersionRef = useRef<string>(undefined);
   const isPageVisible = usePageVisibility();
   useInterval(
     async () => {

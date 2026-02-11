@@ -1,6 +1,6 @@
 import { RefObject, useEffect, useState } from "react";
 
-export function useIsFocusWithin(ref: RefObject<HTMLElement>) {
+export function useIsFocusWithin(ref: RefObject<HTMLElement | null>) {
   const [isFocusWithin, setIsFocusWithin] = useState(false);
   useEffect(() => {
     function handleFocusIn() {

@@ -153,7 +153,7 @@ function Home() {
   }, []);
 
   const handleAddModule = useCallback(
-    (buttonRef: RefObject<HTMLButtonElement>) => {
+    (buttonRef: RefObject<HTMLButtonElement | null>) => {
       addModuleButtonRef.current = buttonRef.current;
       onOpen();
     },

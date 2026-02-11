@@ -25,7 +25,7 @@ export function usePetitionComposeFieldReorder<T extends PetitionComposeFieldSel
   );
   const depsRef = useUpdatingRef({ fieldIds, fields, onUpdateFieldPositions });
   const showError = useErrorDialog();
-  const startDragIndex = useRef<number | null>();
+  const startDragIndex = useRef<number | null>(undefined);
 
   async function verifyFieldPositions(field: T, position: number, newFieldOrder: string[]) {
     const visibility = field.visibility as Maybe<PetitionFieldVisibility>;

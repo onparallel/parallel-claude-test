@@ -9,7 +9,7 @@ import {
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { UploadFileError, uploadFile } from "@parallel/utils/uploadFile";
 import pMap from "p-map";
-import { MutableRefObject, useCallback } from "react";
+import { RefObject, useCallback } from "react";
 
 const _publicCreateFileUploadReply = gql`
   mutation RecipientViewPetitionFieldMutations_publicCreateFileUploadReply(
@@ -118,7 +118,7 @@ export function useCreateFileUploadReply() {
       keycode: string;
       fieldId: string;
       content: { file: File; password?: string }[];
-      uploads: MutableRefObject<Record<string, AbortController>>;
+      uploads: RefObject<Record<string, AbortController>>;
       parentReplyId?: string;
     }) {
       await pMap(

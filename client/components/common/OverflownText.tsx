@@ -2,8 +2,8 @@ import { Box, PlacementWithLogical } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { assignRef } from "@parallel/utils/assignRef";
-import useMergedRef from "@react-hook/merged-ref";
-import useResizeObserver from "@react-hook/resize-observer";
+import { useMergeRefs } from "@parallel/utils/useMergeRefs";
+import { useResizeObserver } from "@parallel/utils/useResizeObserver";
 import { ReactNode, useRef, useState } from "react";
 
 export interface OverflownTextProps {
@@ -16,7 +16,7 @@ export const OverflownText = chakraForwardRef<"div", OverflownTextProps>(functio
   ref,
 ) {
   const innerRef = useRef<HTMLElement>(null);
-  const _ref = useMergedRef(innerRef, ref);
+  const _ref = useMergeRefs(innerRef, ref);
   const [isOverflown, setIsOverflown] = useState(false);
   // avoid unnecessary rerenders or listener changes
   const isOverflownRef = useRef(isOverflown);

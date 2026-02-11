@@ -1,6 +1,6 @@
 import { RefObject, useEffect, useState } from "react";
 
-export function useIsMouseOver(ref: RefObject<HTMLElement>) {
+export function useIsMouseOver(ref: RefObject<HTMLElement | null>) {
   const [isMouseOver, setIsMouseOver] = useState(false);
   useEffect(() => {
     function handleMouseEnter() {

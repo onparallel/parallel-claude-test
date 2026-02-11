@@ -71,7 +71,7 @@ export function PreviewPetitionFieldKyc({
     [onDeleteReply],
   );
 
-  const browserTabRef = useRef<Window>();
+  const browserTabRef = useRef<Window>(undefined);
   useInterval(
     async (done) => {
       if (isNonNullish(browserTabRef.current) && browserTabRef.current.closed) {

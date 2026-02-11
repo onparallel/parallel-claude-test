@@ -24,7 +24,7 @@ import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { useSupportedUserLocales } from "@parallel/utils/locales";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { unMaybeArray } from "@parallel/utils/types";
-import usePrevious from "@react-hook/previous";
+import { usePrevious } from "@parallel/utils/use-previous";
 import { Duration, isPast, sub } from "date-fns";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { useFormContext, UseFormSetValue, useFormState, useWatch } from "react-hook-form";

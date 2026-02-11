@@ -1,6 +1,6 @@
 import { Box } from "@chakra-ui/react";
 import { Button } from "@parallel/components/ui";
-import useResizeObserver from "@react-hook/resize-observer";
+import { useResizeObserver } from "@parallel/utils/useResizeObserver";
 import { useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 

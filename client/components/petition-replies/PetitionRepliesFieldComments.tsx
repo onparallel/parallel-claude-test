@@ -30,7 +30,7 @@ import { useGetDefaultMentionables } from "@parallel/utils/useGetDefaultMentiona
 import { useSearchUserGroups } from "@parallel/utils/useSearchUserGroups";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { useTimeoutEffect } from "@parallel/utils/useTimeoutEffect";
-import usePrevious from "@react-hook/previous";
+import { usePrevious } from "@parallel/utils/use-previous";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";

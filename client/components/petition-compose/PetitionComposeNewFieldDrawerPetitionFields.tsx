@@ -349,7 +349,7 @@ function PetitionComposeNewFieldDrawerField({
 }: PetitionComposeNewFieldDrawerFieldProps) {
   const intl = useIntl();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const openingTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const openingTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   return (
     <SmallPopover
       isOpen={isOpen}
@@ -442,7 +442,7 @@ function PetitionComposeNewFieldDrawerProfileType({
 }: PetitionComposeNewFieldDrawerProfileTypeProps) {
   const intl = useIntl();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const openingTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const openingTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const profileTypeIcon = getProfileTypeIcon(profileType.icon);
   const color = usePetitionFieldTypeColor(type);
   return (

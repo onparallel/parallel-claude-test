@@ -3,7 +3,7 @@ import { useMutation } from "@apollo/client/react";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import { Text } from "@parallel/components/ui";
 import { usePermanentlyDeleteProfile_deleteProfileDocument } from "@parallel/graphql/__types";
-import { useCallback } from "react";
+import { ReactNode, useCallback } from "react";
 import { FormattedMessage } from "react-intl";
 
 export function usePermanentlyDeleteProfile() {
@@ -15,7 +15,7 @@ export function usePermanentlyDeleteProfile() {
     profileName,
   }: {
     profileIds: string[];
-    profileName: React.ReactNode;
+    profileName: ReactNode;
   }) {
     try {
       await showConfirmPermanentlyDeleteProfile({
@@ -49,13 +49,7 @@ usePermanentlyDeleteProfile.mutations = [
 function useConfirmPermanentlyDeleteProfileDialog() {
   const showDialog = useConfirmDeleteDialog();
   return useCallback(
-    async ({
-      profileCount,
-      profileName,
-    }: {
-      profileCount: number;
-      profileName: React.ReactNode;
-    }) => {
+    async ({ profileCount, profileName }: { profileCount: number; profileName: ReactNode }) => {
       return await showDialog({
         size: "lg",
         header: (

@@ -1,11 +1,14 @@
-import { Ref } from "react";
+import { Ref, RefCallback } from "react";
 
-export function assignRef<T = any>(ref: Ref<T>, instance: T) {
+export function assignRef<T = any>(
+  ref: Ref<T> | undefined,
+  instance: T,
+): ReturnType<RefCallback<T>> {
   if (!ref) {
     return;
   }
   if (typeof ref === "function") {
-    ref(instance);
+    return ref(instance);
   } else {
     (ref as any).current = instance;
   }

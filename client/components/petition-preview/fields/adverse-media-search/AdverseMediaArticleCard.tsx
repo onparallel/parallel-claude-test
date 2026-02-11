@@ -13,6 +13,7 @@ import { Card } from "@parallel/components/common/Card";
 import { Divider } from "@parallel/components/common/Divider";
 import { AdverseMediaArticleDetails } from "@parallel/components/petition-preview/fields/adverse-media-search/AdverseMediaArticleDetails";
 import { AdverseMediaArticleHeader } from "@parallel/components/petition-preview/fields/adverse-media-search/AdverseMediaArticleHeader";
+import { Text } from "@parallel/components/ui";
 import {
   AdverseMediaArticleCard_adverseMediaArticleDetailsDocument,
   AdverseMediaArticleCard_AdverseMediaArticleFragment,
@@ -21,10 +22,9 @@ import {
 } from "@parallel/graphql/__types";
 import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { FORMATS } from "@parallel/utils/dates";
-import React, { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 export function AdverseMediaArticleCard({
   token,
@@ -131,7 +131,7 @@ export function AdverseMediaArticleCard({
                 : undefined;
               const source = article.source;
               return (
-                <React.Fragment key={article.id}>
+                <Fragment key={article.id}>
                   <Stack
                     id={`article-${article.id}`}
                     paddingY={4}
@@ -203,7 +203,7 @@ export function AdverseMediaArticleCard({
                     />
                   </Stack>
                   <Divider />
-                </React.Fragment>
+                </Fragment>
               );
             })
           ) : isLoadingList ? (

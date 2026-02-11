@@ -21,7 +21,7 @@ import { NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { Button, Collapsible, Text } from "@parallel/components/ui";
 import { isValidEmail } from "@parallel/utils/validation";
-import useResizeObserver from "@react-hook/resize-observer";
+import { useResizeObserver } from "@parallel/utils/useResizeObserver";
 import { useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";

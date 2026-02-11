@@ -1,4 +1,5 @@
 import { FormControl } from "@chakra-ui/react";
+import { ReactNode } from "react";
 import { DashboardModuleFormLabel } from "./DashboardModuleFormLabel";
 
 export function DashboardModuleFilterContainer({
@@ -8,8 +9,8 @@ export function DashboardModuleFilterContainer({
   field,
   isUpdating,
 }: {
-  children: React.ReactNode;
-  label: React.ReactNode;
+  children: ReactNode;
+  label: ReactNode;
   isInvalid?: boolean;
   field: string;
   isUpdating?: boolean;

@@ -30,7 +30,7 @@ import { useDashboardModuleCategories, useDashboardModules } from "./hooks/useDa
 interface DashboardModuleDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  finalFocusRef: RefObject<HTMLElement>;
+  finalFocusRef: RefObject<HTMLElement | null>;
   dashboardId: string;
   module: DashboardModuleDrawer_DashboardModuleFragment | null;
 }

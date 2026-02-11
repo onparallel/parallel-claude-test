@@ -340,7 +340,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
   );
   const handleConfigureVisibility = async (
     rows: OrganizationProfileType_ProfileTypeFieldFragment[],
-    finalFocusRef?: RefObject<Focusable>,
+    finalFocusRef?: RefObject<Focusable | null>,
   ) => {
     try {
       const { defaultPermission, permissions: data } = await showProfileTypeFieldPermissionDialog({
@@ -366,7 +366,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
 
   const handleEditProperty = async (
     fields: OrganizationProfileType_ProfileTypeFieldFragment[],
-    finalFocusRef?: RefObject<Focusable>,
+    finalFocusRef?: RefObject<Focusable | null>,
   ) => {
     try {
       if (fields.length > 1) {
@@ -636,11 +636,11 @@ interface DraggableListProps extends BoxProps {
   actions?: (ButtonProps & { key: Key; wrap?: (node: ReactNode) => ReactNode })[];
   onEdit: (
     row: OrganizationProfileType_ProfileTypeFieldFragment,
-    finalFocusRef?: RefObject<Focusable>,
+    finalFocusRef?: RefObject<Focusable | null>,
   ) => void;
   onConfigureVisibility: (
     row: OrganizationProfileType_ProfileTypeFieldFragment,
-    finalFocusRef?: RefObject<Focusable>,
+    finalFocusRef?: RefObject<Focusable | null>,
   ) => void;
   onDelete: (row: OrganizationProfileType_ProfileTypeFieldFragment) => void;
   onSelectionChange: (selected: string[]) => void;
@@ -755,8 +755,8 @@ interface ProfileTypeFieldProps {
   item: any;
   index: number;
   isSelected: boolean;
-  onEdit: (finalFocusRef?: RefObject<Focusable>) => void;
-  onConfigureVisibility: (finalFocusRef?: RefObject<Focusable>) => void;
+  onEdit: (finalFocusRef?: RefObject<Focusable | null>) => void;
+  onConfigureVisibility: (finalFocusRef?: RefObject<Focusable | null>) => void;
   onDelete: () => void;
   onDragEnd: () => void;
   onToggle: (event: MouseEvent) => void;

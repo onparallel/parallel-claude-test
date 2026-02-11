@@ -12,7 +12,7 @@ import { phoneCodes } from "@parallel/utils/phoneCodes";
 import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { useConstant } from "@parallel/utils/useConstant";
 import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
-import useMergedRef from "@react-hook/merged-ref";
+import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import { AsYouType } from "libphonenumber-js";
 import { ChangeEvent, FocusEvent, Ref, useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
@@ -39,7 +39,7 @@ const PhoneInput = chakraForwardRef<"input", PhoneInputProps>(function PhoneInpu
   const _ref = useRef<HTMLInputElement>(null);
   const intl = useIntl();
   const { countries } = useLoadCountryNames(intl.locale);
-  const mergedRef = useMergedRef(ref, _ref, ...(inputRef ? [inputRef] : []));
+  const mergedRef = useMergeRefs(ref, _ref, inputRef);
   const metadata = useBrowserMetadata();
   const _defaultCountry = defaultCountry ?? metadata.country ?? undefined;
 

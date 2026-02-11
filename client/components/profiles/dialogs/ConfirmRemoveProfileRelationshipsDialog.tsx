@@ -2,7 +2,7 @@ import { Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { Button, Text } from "@parallel/components/ui";
-import React from "react";
+import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 
 export function ConfirmRemoveProfileRelationshipsDialog({
@@ -11,8 +11,8 @@ export function ConfirmRemoveProfileRelationshipsDialog({
   selectedProfiles,
   ...props
 }: DialogProps<{
-  relatedProfileName?: React.ReactNode | null;
-  profileName?: React.ReactNode | null;
+  relatedProfileName?: ReactNode | null;
+  profileName?: ReactNode | null;
   selectedProfiles?: number;
 }>) {
   return (

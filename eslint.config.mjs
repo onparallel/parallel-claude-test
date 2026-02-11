@@ -72,6 +72,20 @@ export default defineConfig([
       "@typescript-eslint/explicit-module-boundary-types": "off",
       "@typescript-eslint/no-empty-object-type": "off",
 
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "MemberExpression[object.name='React']",
+          message:
+            'Use explicit named imports from "react" instead of React.* (e.g., `import { ReactNode } from "react"`).',
+        },
+        {
+          selector: "TSQualifiedName[left.name='React']",
+          message:
+            'Use explicit named imports from "react" instead of React.* (e.g., `import { ReactNode } from "react"`).',
+        },
+      ],
+
       eqeqeq: ["error", "always"],
 
       "react/react-in-jsx-scope": "off",
@@ -89,9 +103,19 @@ export default defineConfig([
           paths: [
             {
               name: "@chakra-ui/react",
-              importNames: ["useMergeRefs", "CloseButton", "Tooltip", "Menu", "Popover", "Select"],
+              importNames: ["useMergeRefs"],
+              message: "Please use utils/useMergeRefs instead.",
+            },
+            {
+              name: "@chakra-ui/react",
+              importNames: ["CloseButton"],
+              message: 'Please use CloseButton from "@parallel/common/CloseButton" instead.',
+            },
+            {
+              name: "@chakra-ui/react",
+              importNames: ["Tooltip", "Menu", "Popover", "Select"],
               message:
-                'Please use instead useMergedRef from "@react-hook/merged-ref", CloseButton from "@parallel/common/CloseButton", Menu, Popover, Select and Tooltip from "@parallel/chakra/components"',
+                'Please use Menu, Popover, Select and Tooltip from "@parallel/chakra/components" instead.',
             },
             {
               name: "@chakra-ui/react",

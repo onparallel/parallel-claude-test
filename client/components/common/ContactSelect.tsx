@@ -7,7 +7,7 @@ import { UseReactSelectProps, useReactSelectProps } from "@parallel/utils/react-
 import { CustomAsyncCreatableSelectProps } from "@parallel/utils/react-select/types";
 import { Maybe, MaybePromise, unMaybeArray } from "@parallel/utils/types";
 import { isValidEmail } from "@parallel/utils/validation";
-import useMergedRef from "@react-hook/merged-ref";
+import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import {
   ClipboardEvent,
   ForwardedRef,
@@ -86,8 +86,8 @@ export const ContactSelect = forwardRef(function ContactSelect<IsMulti extends b
     ...props,
     isDisabled: props.isDisabled || isCreating,
   });
-  const innerRef = useRef<any>();
-  const _ref = useMergedRef(ref, innerRef);
+  const innerRef = useRef<any>(undefined);
+  const _ref = useMergeRefs(ref, innerRef);
 
   const [inputValue, setInputValue] = useState("");
 

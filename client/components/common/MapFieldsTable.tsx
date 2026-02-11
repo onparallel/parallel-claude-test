@@ -11,8 +11,8 @@ import {
 } from "@parallel/graphql/__types";
 import { PetitionFieldIndex, useAllFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { isReplyContentCompatible } from "@parallel/utils/petitionFieldsReplies";
-import useMergedRef from "@react-hook/merged-ref";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useMergeRefs } from "@parallel/utils/useMergeRefs";
+import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { groupBy, isNonNullish, isNullish, omit } from "remeda";
 import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
@@ -73,7 +73,7 @@ export const MapFieldsTable = chakraForwardRef<"table", MapFieldsTableProps>(
     }));
 
     const containerRef = useRef<HTMLDivElement>(null);
-    const _ref = useMergedRef(ref, containerRef);
+    const _ref = useMergeRefs(ref, containerRef);
     const fieldsWithIndices = useAllFieldsWithIndices(petition);
 
     const allSourcePetitionFields = useMemo(
@@ -291,7 +291,7 @@ function TableRow({
   isDisabled?: boolean;
   parentFieldMatchedFieldId?: string;
   isInvalid?: boolean;
-  containerRef: React.RefObject<HTMLDivElement>;
+  containerRef: RefObject<HTMLDivElement | null>;
 }) {
   const intl = useIntl();
   const targetFieldIsChild = field.parent?.id !== undefined;

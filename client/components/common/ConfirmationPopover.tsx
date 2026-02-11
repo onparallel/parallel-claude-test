@@ -8,6 +8,7 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { Popover } from "@parallel/chakra/components";
+import { Button, Text } from "@parallel/components/ui";
 import {
   MouseEvent,
   PropsWithChildren,
@@ -17,11 +18,10 @@ import {
   useRef,
 } from "react";
 import { FormattedMessage } from "react-intl";
-import { Button, Text } from "@parallel/components/ui";
 
 interface ConfirmPopoverProps {
   description: ReactNode;
-  confirm: ReactElement;
+  confirm: ReactElement<{ onClick?: (e: MouseEvent) => void }>;
   cancel?: ReactNode;
 }
 

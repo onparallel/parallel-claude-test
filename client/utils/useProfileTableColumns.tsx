@@ -38,7 +38,7 @@ import {
   useProfileTableColumns_ProfileWithPropertiesFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import useMergedRef from "@react-hook/merged-ref";
+import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import { format, startOfMonth } from "date-fns";
 import {
   ClipboardEvent,
@@ -713,7 +713,7 @@ interface FreeTextMultiSelectProps
 const FreeTextMultiSelect = forwardRef<CreatableSelect, FreeTextMultiSelectProps>(
   function FreeTextMultiSelect({ value, onChange, ...props }, ref) {
     const innerRef = useRef<CreatableSelect>(null);
-    const _ref = useMergedRef(ref, innerRef);
+    const _ref = useMergeRefs(ref, innerRef);
     const rsProps = useReactSelectProps({
       ...props,
       components: _components as any,

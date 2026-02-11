@@ -17,7 +17,7 @@ import {
   MenuOptionGroupProps,
   MenuProps,
 } from "@chakra-ui/react";
-import React, { forwardRef, ReactNode } from "react";
+import { ElementType, forwardRef, isValidElement, ReactNode } from "react";
 
 // Docs: https://chakra-ui.com/docs/components/menu
 
@@ -25,7 +25,7 @@ import React, { forwardRef, ReactNode } from "react";
 export interface ExtendedMenuProps extends Omit<MenuProps, "children"> {
   lazy?: MenuProps["isLazy"]; // For v3 instead of isLazy
   open?: boolean; // For v3 instead of isOpen
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 // Menu.Root component
@@ -45,12 +45,15 @@ interface MenuTriggerProps extends MenuButtonProps {
 
 export const MenuTrigger = forwardRef<HTMLButtonElement, MenuTriggerProps>(
   ({ asChild, children, ...props }, ref) => {
-    if (asChild && React.isValidElement(children)) {
+    if (asChild && isValidElement(children)) {
       // Render MenuButton with child's props but use child's element type and styling
       return (
-        <MenuButton ref={ref} as={children.type} {...children.props} {...props}>
-          {children.props.children}
-        </MenuButton>
+        <MenuButton
+          ref={ref}
+          as={children.type as ElementType}
+          {...(children.props as any)}
+          {...props}
+        />
       );
     }
     return (

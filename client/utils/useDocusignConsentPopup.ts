@@ -7,9 +7,9 @@ import { useWindowEvent } from "./useWindowEvent";
 type PromiseArgs = Parameters<ConstructorParameters<typeof Promise<void>>[0]>;
 
 export function useDocusignConsentPopup() {
-  const windowRef = useRef<Window>();
+  const windowRef = useRef<Window>(undefined);
   const [isRunning, setIsRunning] = useState(false);
-  const promiseArgsRef = useRef<PromiseArgs>();
+  const promiseArgsRef = useRef<PromiseArgs>(undefined);
 
   useInterval(
     () => {

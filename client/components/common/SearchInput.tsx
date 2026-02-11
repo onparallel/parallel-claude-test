@@ -10,7 +10,7 @@ import { SearchIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useFocus } from "@parallel/utils/useFocus";
-import useMergedRef from "@react-hook/merged-ref";
+import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import { useRef } from "react";
 import { useIntl } from "react-intl";
 import { omit, pick } from "remeda";
@@ -18,7 +18,7 @@ import { CloseButton } from "./CloseButton";
 
 export const SearchInput = chakraForwardRef<"input", InputProps>(function SearchInput(props, ref) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const mergedRef = useMergedRef(ref, inputRef);
+  const mergedRef = useMergeRefs(ref, inputRef);
   const intl = useIntl();
   const [focused, bind] = useFocus<HTMLInputElement>(props);
   const isActive = Boolean(props.value || focused);

@@ -1,4 +1,4 @@
-import usePrevious from "@react-hook/previous";
+import { usePrevious } from "@parallel/utils/use-previous";
 import { DependencyList, useEffect } from "react";
 import { isNonNullish } from "remeda";
 

@@ -47,7 +47,7 @@ export const AppLayout = chakraForwardRef<"div", AppLayoutProps>(function AppLay
   const hasNewVersion = useCheckForNewVersion();
   const [hasNavBarExpanded] = useCookie(`navbar-expanded-${realMe.id}`, false);
 
-  const timeoutRef = useRef<number>();
+  const timeoutRef = useRef<number>(undefined);
 
   useOnMediaQueryChange(
     "sm",

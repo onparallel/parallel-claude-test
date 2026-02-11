@@ -10,7 +10,7 @@ import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFiles";
 import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
-import useMergedRef from "@react-hook/merged-ref";
+import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import { useRef } from "react";
 import { useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
@@ -133,8 +133,8 @@ const ReplyDownloadButton = chakraForwardRef<
     !userHasRemovePreviewFiles &&
     !!contentType &&
     (contentType === "application/pdf" || contentType.startsWith("image/"));
-  const innerRef = useRef<HTMLElement>(null);
-  const _ref = useMergedRef(ref, innerRef);
+  const innerRef = useRef<HTMLButtonElement>(null);
+  const _ref = useMergeRefs(ref, innerRef);
   const isMouseOver = useIsMouseOver(innerRef);
   const isShiftDown = useIsGlobalKeyDown("Shift");
   const mode: "PREVIEW" | "DOWNLOAD" = isPreviewable

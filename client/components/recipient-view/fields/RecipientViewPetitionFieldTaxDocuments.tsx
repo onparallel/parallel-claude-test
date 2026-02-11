@@ -95,7 +95,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
     filteredReplies.map((r) => ({ id: r.id, updatedAt: r.updatedAt })),
   );
 
-  const popupRef = useRef<Window>();
+  const popupRef = useRef<Window>(undefined);
   useInterval(
     async (done) => {
       const someChange =

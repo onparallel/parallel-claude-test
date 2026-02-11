@@ -292,7 +292,7 @@ export const PetitionComposeFieldList = memo(function PetitionComposeFieldList({
     },
     [_setFocusedFieldId],
   );
-  const timeoutRef = useRef<number>();
+  const timeoutRef = useRef<number>(undefined);
   const fieldMouseHandlers = useMemoFactory(
     (fieldId) =>
       ({

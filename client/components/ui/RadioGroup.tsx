@@ -6,7 +6,7 @@ import {
   RadioGroupProps,
   RadioProps,
 } from "@chakra-ui/react";
-import { forwardRef } from "react";
+import { ReactNode, forwardRef } from "react";
 
 // Docs: https://chakra-ui.com/docs/components/radio
 
@@ -89,7 +89,7 @@ export const RadioGroupItemText = ({
   children,
   ...props
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   [key: string]: any;
 }) => <span {...props}>{children}</span>;
 

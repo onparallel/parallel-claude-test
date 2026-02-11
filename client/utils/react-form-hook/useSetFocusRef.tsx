@@ -13,7 +13,7 @@ export function useSetFocusRef<
   setFocus: UseFormSetFocus<TFieldValues>,
   name: TFieldName,
   options?: SetFocusOptions,
-): RefObject<Focusable> {
+): RefObject<Focusable | null> {
   const params = useUpdatingRef({ setFocus, name, options });
   return useRef<Focusable>({
     focus() {

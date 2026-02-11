@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import React from "react";
+import { ReactNode, createElement } from "react";
 
 // Mock Next.js router
 jest.mock("next/router", () => ({
@@ -26,7 +26,7 @@ jest.mock("next/router", () => ({
 
 // Mock Next.js Link component
 jest.mock("next/link", () => {
-  return ({ children, href }: { children: React.ReactNode; href: string }) => {
-    return React.createElement("a", { href }, children);
+  return ({ children, href }: { children: ReactNode; href: string }) => {
+    return createElement("a", { href }, children);
   };
 });

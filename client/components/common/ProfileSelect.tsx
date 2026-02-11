@@ -16,12 +16,13 @@ import { useAsyncMemo } from "@parallel/utils/useAsyncMemo";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
+import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import { useRerender } from "@parallel/utils/useRerender";
-import useMergedRef from "@react-hook/merged-ref";
 import pMap from "p-map";
 import {
   ForwardedRef,
   ReactElement,
+  ReactNode,
   RefAttributes,
   createContext,
   forwardRef,
@@ -93,8 +94,8 @@ export const ProfileSelect = forwardRef(function ProfileSelect<
   }: ProfileSelectProps<IsMulti, IsSync, OptionType>,
   ref: ForwardedRef<ProfileSelectInstance<IsMulti, OptionType>>,
 ) {
-  const innerRef = useRef<ProfileSelectInstance<IsMulti, OptionType>>();
-  const _ref = useMergedRef(ref, innerRef);
+  const innerRef = useRef<ProfileSelectInstance<IsMulti, OptionType>>(undefined);
+  const _ref = useMergeRefs(ref, innerRef);
   const intl = useIntl();
   const needsLoading =
     typeof value === "string" || (Array.isArray(value) && typeof value[0] === "string");
@@ -535,7 +536,7 @@ const ProfileSelectRerenderContext = createContext<ProfileSelectRerenderValue>({
   triggerRerender: noop,
 });
 
-export function ProfileSelectRerenderProvider({ children }: { children: React.ReactNode }) {
+export function ProfileSelectRerenderProvider({ children }: { children: ReactNode }) {
   const profileSelectsRef = useRef<Record<string, Set<() => void>>>({});
 
   const value = useMemo(() => {

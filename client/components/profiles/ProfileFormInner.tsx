@@ -28,7 +28,7 @@ import { MaybePromise } from "@parallel/utils/types";
 import { UploadFileError, uploadFile } from "@parallel/utils/uploadFile";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import pMap from "p-map";
-import { useMemo } from "react";
+import { BaseSyntheticEvent, useMemo } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { filter, fromEntries, isNonNullish, map, partition, pipe } from "remeda";
@@ -37,7 +37,7 @@ import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 export interface ProfileFormInnerInstance {
   handleSubmit: (
     onValid: (data: ProfileFormInnerData) => Promise<void>,
-  ) => (e?: React.BaseSyntheticEvent) => Promise<void>;
+  ) => (e?: BaseSyntheticEvent) => Promise<void>;
 }
 
 export interface ProfileFormInnerData {

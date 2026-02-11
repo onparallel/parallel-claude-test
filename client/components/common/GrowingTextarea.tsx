@@ -1,13 +1,13 @@
 import { Textarea, TextareaProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import useMergedRef from "@react-hook/merged-ref";
+import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import autosize from "autosize";
 import { useEffect, useRef } from "react";
 
 export const GrowingTextarea = chakraForwardRef<"textarea", TextareaProps>(
   function GrowingTextarea(props, outerRef) {
     const ref = useRef<HTMLTextAreaElement>(null);
-    const _ref = useMergedRef(outerRef, ref);
+    const _ref = useMergeRefs(outerRef, ref);
     useEffect(() => {
       autosize(ref.current!);
       return () => {

@@ -5,6 +5,7 @@ import { Button, Stack, Text } from "@parallel/components/ui";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { useReopenProfile_reopenProfileDocument } from "@parallel/graphql/__types";
+import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 
 export function useReopenProfile() {
@@ -16,7 +17,7 @@ export function useReopenProfile() {
     confirmText,
   }: {
     profileIds: string[];
-    profileName: React.ReactNode;
+    profileName: ReactNode;
     confirmText?: string;
   }) {
     try {
@@ -46,10 +47,7 @@ function ReopenProfileDialog({
   profileName,
   confirmText,
   ...props
-}: DialogProps<
-  { profileName: React.ReactNode; profileCount: number; confirmText?: string },
-  void
->) {
+}: DialogProps<{ profileName: ReactNode; profileCount: number; confirmText?: string }, void>) {
   return (
     <ConfirmDialog
       {...props}

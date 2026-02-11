@@ -1,5 +1,5 @@
 import { cloneElement, isValidElement, ReactNode } from "react";
-
+// Same as /client/components/common/BreakLines.tsx
 export function BreakLines({ children }: { children: ReactNode }) {
   return <>{parse(children)}</>;
 }
@@ -14,8 +14,8 @@ function parse(children: ReactNode, key = 0): ReactNode {
     } else {
       return children;
     }
-  } else if (isValidElement(children)) {
-    return cloneElement(children, { key: key }, parse(children.props.children));
+  } else if (isValidElement(children) && "children" in (children.props as any)) {
+    return cloneElement(children, { key: key }, parse((children.props as any).children));
   } else if (Array.isArray(children)) {
     return children.map((child, i) => parse(child, i));
   }

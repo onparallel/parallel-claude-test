@@ -44,7 +44,7 @@ export interface PetitionLayoutProps {
   section: PetitionSection;
   headerActions?: ReactNode;
   drawer?: ReactNode;
-  drawerInitialFocusRef?: RefObject<Focusable>;
+  drawerInitialFocusRef?: RefObject<Focusable | null>;
   onRefetch?: () => void;
   hasRightPane?: boolean;
   isRightPaneActive?: boolean;

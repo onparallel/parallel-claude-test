@@ -58,9 +58,10 @@ import { useHasAdverseMediaSearch } from "@parallel/utils/useHasAdverseMediaSear
 import { useHasBackgroundCheck } from "@parallel/utils/useHasBackgroundCheck";
 import { useHasIdVerification } from "@parallel/utils/useHasIdVerification";
 import { MultipleRefObject } from "@parallel/utils/useMultipleRefs";
-import useMergedRef from "@react-hook/merged-ref";
-import usePrevious from "@react-hook/previous";
+import { useMergeRefs } from "@parallel/utils/useMergeRefs";
+import { usePrevious } from "@parallel/utils/use-previous";
 import { fromEvent } from "file-selector";
+import NextLink from "next/link";
 import pMap from "p-map";
 import { RefObject, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { XYCoord, useDrag, useDrop } from "react-dnd";
@@ -76,7 +77,6 @@ import { HelpCenterLink } from "../common/HelpCenterLink";
 import { HelpPopover } from "../common/HelpPopover";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
-import NextLink from "next/link";
 import { LocalizableUserTextRender } from "../common/LocalizableUserTextRender";
 import { NumberingBadge } from "../common/NumberingBadge";
 import { SmallPopover } from "../common/SmallPopover";
@@ -145,7 +145,7 @@ export interface PetitionComposeFieldProps {
 }
 
 export interface PetitionComposeFieldRef {
-  elementRef: RefObject<HTMLDivElement>;
+  elementRef: RefObject<HTMLDivElement | null>;
   focusFromPrevious: () => void;
   focusFromNext: () => void;
 }
@@ -377,7 +377,7 @@ const _PetitionComposeField = chakraForwardRef<
     "tabIndex",
     "role",
   ]);
-  const rootRef = useMergedRef(_rootProps.ref, elementRef);
+  const rootRef = useMergeRefs(_rootProps.ref, elementRef);
 
   const { sx, ...restProps } = props;
 

@@ -52,7 +52,7 @@ import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFil
 import { useIsAnimated } from "@parallel/utils/useIsAnimated";
 import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
-import useMergedRef from "@react-hook/merged-ref";
+import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import { fromEvent } from "file-selector";
 import { MotionConfig, Reorder, useDragControls, useMotionValue } from "framer-motion";
 import pMap from "p-map";
@@ -350,7 +350,7 @@ export const PetitionComposeAttachments = chakraForwardRef<"div", PetitionCompos
       "tabIndex",
       "role",
     ]);
-    const rootRef = useMergedRef(_rootProps.ref, ref);
+    const rootRef = useMergeRefs(_rootProps.ref, ref);
 
     return (
       <Card

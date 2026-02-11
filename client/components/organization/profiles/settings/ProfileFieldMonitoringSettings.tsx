@@ -31,7 +31,7 @@ import {
 } from "@parallel/graphql/__types";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { Maybe } from "@parallel/utils/types";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
@@ -173,7 +173,7 @@ export function ProfileFieldMonitoringSettings({
   const monitoring = watch("options.monitoring");
   const hasActivationCondition = isNonNullish(monitoring?.activationCondition);
 
-  function handleActivationConditionChange(event: React.ChangeEvent<HTMLInputElement>) {
+  function handleActivationConditionChange(event: ChangeEvent<HTMLInputElement>) {
     setValue(
       "options.monitoring.activationCondition",
       event.target.checked

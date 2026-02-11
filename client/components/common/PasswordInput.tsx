@@ -1,7 +1,7 @@
 import { Input, InputGroup, InputProps, InputRightElement } from "@chakra-ui/react";
 import { EyeIcon, EyeOffIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import useMergedRef from "@react-hook/merged-ref";
+import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import { useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "./IconButtonWithTooltip";
@@ -10,7 +10,7 @@ export const PasswordInput = chakraForwardRef<"input", InputProps>(
   function PasswordInput(props, ref) {
     const [show, setShow] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
-    const mergedRef = useMergedRef(ref, inputRef);
+    const mergedRef = useMergeRefs(ref, inputRef);
     const intl = useIntl();
 
     const labels = {

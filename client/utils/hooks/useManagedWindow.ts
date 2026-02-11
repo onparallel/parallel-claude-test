@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import { isNonNullish, isNullish } from "remeda";
 import { openNewWindow } from "../openNewWindow";
 import { useInterval } from "../useInterval";
@@ -7,7 +7,7 @@ import { useWindowEvent } from "../useWindowEvent";
 
 export interface ManagedWindowState {
   state: "IDLE" | "FETCHING";
-  browserTabRef: React.MutableRefObject<Window | undefined>;
+  browserTabRef: RefObject<Window | undefined>;
   setState: (state: "IDLE" | "FETCHING") => void;
   openWindow: (url: string) => Promise<void>;
   closeWindow: () => void;
@@ -21,7 +21,7 @@ export function useManagedWindow({
   onRefreshField: () => void;
 }): ManagedWindowState {
   const [state, setState] = useState<"IDLE" | "FETCHING">("IDLE");
-  const browserTabRef = useRef<Window>();
+  const browserTabRef = useRef<Window>(undefined);
   const router = useRouter();
 
   useInterval(

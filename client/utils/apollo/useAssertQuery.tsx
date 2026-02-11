@@ -26,7 +26,7 @@ export function useAssertQueryOrPreviousData<
 >(
   ...args: Parameters<typeof useQuery<TData, TVariables>>
 ): useQuery.Result<TData, TVariables, "complete"> {
-  const previous = useRef<useQuery.Result<TData, TVariables, "complete">>();
+  const previous = useRef<useQuery.Result<TData, TVariables, "complete">>(undefined);
   const result = useQuery(...args);
   if (result.dataState === "complete") {
     assignRef(previous, result);

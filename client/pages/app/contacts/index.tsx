@@ -10,6 +10,7 @@ import { withPermission } from "@parallel/components/common/withPermission";
 import { ContactListHeader } from "@parallel/components/contact-list/ContactListHeader";
 import { useImportContactsDialog } from "@parallel/components/contact-list/dialogs/ImportContactsDialog";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
+import { Text } from "@parallel/components/ui";
 import {
   Contacts_contactsDocument,
   Contacts_ContactsListFragment,
@@ -30,7 +31,6 @@ import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useSelection } from "@parallel/utils/useSelectionState";
 import { MouseEvent, RefObject, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
 const SORTING = ["firstName", "lastName", "fullName", "email", "createdAt"] as const;
 
 const QUERY_STATE = {
@@ -78,7 +78,7 @@ function Contacts() {
     goToContact(row.id, event);
   }
 
-  async function handleCreateClick(finalFocusRef?: RefObject<Focusable>) {
+  async function handleCreateClick(finalFocusRef?: RefObject<Focusable | null>) {
     try {
       await createContact({
         modalProps: { finalFocusRef },
@@ -98,7 +98,7 @@ function Contacts() {
 
   const showImportContactsDialog = useImportContactsDialog();
 
-  async function handleImportClick(finalFocusRef?: RefObject<Focusable>) {
+  async function handleImportClick(finalFocusRef?: RefObject<Focusable | null>) {
     const [error, data] = await withError(
       showImportContactsDialog({
         modalProps: { finalFocusRef },

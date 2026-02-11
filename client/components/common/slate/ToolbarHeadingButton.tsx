@@ -26,7 +26,7 @@ export const ToolbarHeadingButton = chakraForwardRef<"button", ToolbarHeadingBut
       ["heading", "subheading", "paragraph"].find((type) =>
         someNode(editor as any, { match: { type } }),
       ) ?? "paragraph";
-    const selectionRef = useRef<Selection>();
+    const selectionRef = useRef<Selection>(undefined);
     return (
       <Box>
         <Menu>

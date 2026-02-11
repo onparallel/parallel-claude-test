@@ -95,7 +95,7 @@ export function RecipientViewPetitionFieldIdVerification({
     ],
   );
 
-  const popupRef = useRef<Window>();
+  const popupRef = useRef<Window>(undefined);
 
   useWindowEvent(
     "message",

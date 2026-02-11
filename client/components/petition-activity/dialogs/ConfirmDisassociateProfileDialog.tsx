@@ -2,6 +2,7 @@ import { Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { Button, Text } from "@parallel/components/ui";
+import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 
 export function ConfirmDisassociateProfileDialog({
@@ -12,7 +13,7 @@ export function ConfirmDisassociateProfileDialog({
   ...props
 }: DialogProps<{
   petitionName?: string | null;
-  profileName?: React.ReactNode | null;
+  profileName?: ReactNode | null;
   selectedPetitions?: number;
   selectedProfiles?: number;
 }>) {

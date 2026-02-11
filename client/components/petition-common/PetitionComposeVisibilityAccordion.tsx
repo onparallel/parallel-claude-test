@@ -1,13 +1,14 @@
 import { HStack, Heading } from "@chakra-ui/react";
 import { ChevronFilledIcon, ConditionIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { HelpPopover } from "../common/HelpPopover";
 import { Accordion } from "../ui";
 
 interface PetitionComposeVisibilityAccordionProps {
   isOpen: boolean;
-  popoverContent?: React.ReactNode;
+  popoverContent?: ReactNode;
 }
 
 export const PetitionComposeVisibilityAccordion = chakraForwardRef<

@@ -17,7 +17,7 @@ import {
   PopoverProps,
   PopoverTrigger,
 } from "@chakra-ui/react";
-import { forwardRef } from "react";
+import { ReactNode, forwardRef } from "react";
 
 // Docs: https://chakra-ui.com/docs/components/popover
 
@@ -25,7 +25,7 @@ import { forwardRef } from "react";
 export interface ExtendedPopoverProps extends Omit<PopoverProps, "isOpen" | "isLazy" | "children"> {
   open?: boolean;
   lazy?: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 // Apply default props from components.tsx
@@ -48,7 +48,7 @@ export const PopoverRoot = ({
 };
 
 // Popover.Trigger component
-export const PopoverTriggerWrapper = ({ children }: { children: React.ReactNode }) => {
+export const PopoverTriggerWrapper = ({ children }: { children: ReactNode }) => {
   return <PopoverTrigger>{children}</PopoverTrigger>;
 };
 
@@ -85,7 +85,7 @@ export const PopoverArrowWrapper = (props: PopoverArrowProps) => {
 };
 
 // Popover.Anchor component
-export const PopoverAnchorWrapper = ({ children }: { children: React.ReactNode }) => {
+export const PopoverAnchorWrapper = ({ children }: { children: ReactNode }) => {
   return <PopoverAnchor>{children}</PopoverAnchor>;
 };
 

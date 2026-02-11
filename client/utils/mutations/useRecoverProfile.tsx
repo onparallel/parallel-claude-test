@@ -12,7 +12,7 @@ import {
   useRecoverProfile_closeProfileDocument,
   useRecoverProfile_reopenProfileDocument,
 } from "@parallel/graphql/__types";
-import { useRef, useState } from "react";
+import { ReactNode, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { isApolloError } from "../apollo/isApolloError";
 
@@ -26,7 +26,7 @@ export function useRecoverProfile() {
     profileName,
   }: {
     profileIds: string[];
-    profileName: React.ReactNode;
+    profileName: ReactNode;
   }) {
     try {
       const { status } = await showReopenProfileDialog({
@@ -82,10 +82,7 @@ function RecoverProfileDialog({
   profileName,
   profileCount,
   ...props
-}: DialogProps<
-  { profileName: React.ReactNode; profileCount: number },
-  RecoverProfileDialogResult
->) {
+}: DialogProps<{ profileName: ReactNode; profileCount: number }, RecoverProfileDialogResult>) {
   const [status, setStatus] = useState<"CLOSED" | "OPEN">("CLOSED");
   const radioRef = useRef<HTMLInputElement>(null);
 

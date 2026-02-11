@@ -16,7 +16,7 @@ import { Popover } from "@parallel/chakra/components";
 import { PetitionRepliesPopoverField_dataDocument } from "@parallel/graphql/__types";
 import { assertTypename } from "@parallel/utils/apollo/typename";
 import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
-import { MouseEvent } from "react";
+import { MouseEvent, ReactNode } from "react";
 import { isNonNullish } from "remeda";
 import { Wrap } from "../common/Wrap";
 import { PreviewPetitionField } from "../petition-preview/PreviewPetitionField";
@@ -28,7 +28,7 @@ export function PetitionRepliesPopoverField({
   fieldLogic,
   parentReplyId,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   petitionFieldId: string;
   petitionId: string;
   fieldLogic: FieldLogicResult;

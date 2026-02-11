@@ -5,6 +5,7 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { Button, Text } from "@parallel/components/ui";
 import { useCloseProfile_closeProfileDocument } from "@parallel/graphql/__types";
+import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 
 export function useCloseProfile() {
@@ -15,7 +16,7 @@ export function useCloseProfile() {
     profileName,
   }: {
     profileIds: string[];
-    profileName: React.ReactNode;
+    profileName: ReactNode;
   }) {
     try {
       await showCloseProfileDialog({ profileCount: profileIds.length, profileName });
@@ -43,7 +44,7 @@ function CloseProfileDialog({
   profileCount,
   profileName,
   ...props
-}: DialogProps<{ profileName: React.ReactNode; profileCount: number }, void>) {
+}: DialogProps<{ profileName: ReactNode; profileCount: number }, void>) {
   return (
     <ConfirmDialog
       {...props}

@@ -4,7 +4,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Button, Text } from "@parallel/components/ui";
 import { ProfileFieldSuggestion_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { SmallPopover } from "../common/SmallPopover";
 import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
@@ -12,7 +12,7 @@ import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldType
 interface ProfileFieldSuggestionProps {
   petitionField: ProfileFieldSuggestion_PetitionFieldFragment;
   petitionFieldIndex: PetitionFieldIndex;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
 }
 
 export const ProfileFieldSuggestion = chakraForwardRef<

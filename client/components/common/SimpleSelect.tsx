@@ -1,18 +1,8 @@
 import { useReactSelectProps, UseReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { OptionBase } from "@parallel/utils/react-select/types";
 import { If } from "@parallel/utils/types";
-import useMergedRef from "@react-hook/merged-ref";
-import {
-  Component,
-  DependencyList,
-  ForwardedRef,
-  forwardRef,
-  ReactElement,
-  RefAttributes,
-  useCallback,
-  useMemo,
-  useRef,
-} from "react";
+import { useMergeRefs } from "@parallel/utils/useMergeRefs";
+import { Component, DependencyList, RefAttributes, useCallback, useMemo, useRef } from "react";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import Select, {
   ActionMeta,
@@ -55,16 +45,21 @@ export function toSimpleSelectOption<T extends string = string>(
   return value === null ? null : { value, label: value as string };
 }
 
-export const SimpleSelect = forwardRef(function SimpleSelect<
+export function SimpleSelect<
   T extends string = string,
   IsMulti extends boolean = false,
   OptionType extends SimpleOption<T> = SimpleOption<T>,
->(
-  { as, value, onChange, maxItems, ...props }: SimpleSelectProps<T, IsMulti, OptionType>,
-  ref: ForwardedRef<SimpleSelectInstance<T, IsMulti, OptionType>>,
-) {
+>({
+  ref,
+  as,
+  value,
+  onChange,
+  maxItems,
+  ...props
+}: SimpleSelectProps<T, IsMulti, OptionType> &
+  RefAttributes<SimpleSelectInstance<T, IsMulti, OptionType> | null>) {
   const innerRef = useRef<SimpleSelectInstance<T, IsMulti, OptionType>>(null);
-  const _ref = useMergedRef(ref, innerRef);
+  const _ref = useMergeRefs(ref, innerRef);
   const rsProps = useReactSelectProps({
     ...props,
     components: {
@@ -137,14 +132,7 @@ export const SimpleSelect = forwardRef(function SimpleSelect<
       onChange={handleChange}
     />
   );
-}) as <
-  T extends string = string,
-  IsMulti extends boolean = false,
-  OptionType extends SimpleOption<T> = SimpleOption<T>,
->(
-  props: SimpleSelectProps<T, IsMulti, OptionType> &
-    RefAttributes<SimpleSelectInstance<T, IsMulti, OptionType>>,
-) => ReactElement;
+}
 
 export function useSimpleSelectOptions<T extends string = string>(
   factory: (intl: IntlShape) => SimpleOption<T>[],

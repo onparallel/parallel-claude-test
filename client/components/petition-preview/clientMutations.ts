@@ -26,7 +26,7 @@ import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { uploadFile, UploadFileError } from "@parallel/utils/uploadFile";
 import { customAlphabet } from "nanoid";
 import pMap from "p-map";
-import { MutableRefObject, useCallback } from "react";
+import { RefObject, useCallback } from "react";
 import { isNonNullish } from "remeda";
 
 function getRandomId() {
@@ -438,7 +438,7 @@ export function useCreateFileUploadReply() {
       petitionId: string;
       fieldId: string;
       content: { file: File; password?: string }[];
-      uploads: MutableRefObject<Record<string, AbortController>>;
+      uploads: RefObject<Record<string, AbortController>>;
       parentReplyId?: string;
       isCacheOnly?: boolean;
       omitOldChildReplies?: boolean;

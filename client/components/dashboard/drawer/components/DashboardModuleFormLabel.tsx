@@ -1,13 +1,14 @@
 import { FormLabel } from "@chakra-ui/react";
 import { EditedBadge } from "@parallel/components/common/EditedBadge";
 import { HStack } from "@parallel/components/ui";
+import { ReactNode } from "react";
 
 export function DashboardModuleFormLabel({
   children,
   field,
   isUpdating,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   field: string | string[];
   isUpdating?: boolean;
 }) {

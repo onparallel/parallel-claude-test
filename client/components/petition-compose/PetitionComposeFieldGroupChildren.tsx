@@ -7,6 +7,7 @@ import {
 } from "@parallel/graphql/__types";
 import { MultipleRefObject } from "@parallel/utils/useMultipleRefs";
 import { usePetitionComposeFieldReorder } from "@parallel/utils/usePetitionComposeFieldReorder";
+import { ReactNode } from "react";
 import { useDrop } from "react-dnd";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, zip } from "remeda";
@@ -272,7 +273,7 @@ function PetitionComposeFieldWrapper({
   onAddNewField: (linkToPreviousField: boolean) => void;
   hideAddButtons?: boolean;
   newFieldPlaceholderIndex?: number;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   const intl = useIntl();
 

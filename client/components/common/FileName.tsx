@@ -3,7 +3,7 @@ import { Tooltip } from "@parallel/chakra/components";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Text } from "@parallel/components/ui";
 import { Maybe } from "@parallel/graphql/__types";
-import useMergedRef from "@react-hook/merged-ref";
+import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import { useEffect, useRef, useState } from "react";
 
 export interface FileNameProps extends ThemingProps<"Text"> {
@@ -16,7 +16,7 @@ export const FileName = chakraForwardRef<"span", FileNameProps>(function FileNam
 ) {
   const [isTruncated, setIsTruncated] = useState(false);
   const innerRef = useRef<HTMLSpanElement>(null);
-  const mergedRef = useMergedRef(ref, innerRef);
+  const mergedRef = useMergeRefs(ref, innerRef);
   useEffect(() => {
     if (innerRef.current!.scrollWidth > innerRef.current!.offsetWidth) {
       setIsTruncated(true);

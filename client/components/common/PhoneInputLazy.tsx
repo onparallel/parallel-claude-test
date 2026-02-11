@@ -4,7 +4,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { phoneCodes } from "@parallel/utils/phoneCodes";
 import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { withDynamicLoadingProps } from "@parallel/utils/withDynamicLoadingProps";
-import useMergedRef from "@react-hook/merged-ref";
+import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import dynamic from "next/dynamic";
 import { ChangeEvent, FocusEvent, useRef } from "react";
 import type { PhoneInputProps } from "./PhoneInput";
@@ -25,7 +25,7 @@ const FakeInputPhone = chakraForwardRef<"input", PhoneInputProps>(
     const _ref = useRef<HTMLInputElement>(null);
     const metadata = useBrowserMetadata();
     const _defaultCountry = defaultCountry ?? metadata.country ?? undefined;
-    const mergedRef = useMergedRef(ref, _ref, ...(inputRef ? [inputRef] : []));
+    const mergedRef = useMergeRefs(ref, _ref, inputRef);
     const handleChange =
       onChange &&
       ((e: ChangeEvent<HTMLInputElement>) => {
