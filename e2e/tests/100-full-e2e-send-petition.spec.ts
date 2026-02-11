@@ -142,7 +142,7 @@ test.describe("Full e2e send petition", () => {
 
     const { page: page2, context: _ } = await test.step("open recipient view", async () => {
       const email = await waitForEmail(
-        (e) => e.subject === subject && e.to.some((c) => c.address === address),
+        (e) => e.subject === subject && e.to?.some((c) => c.address === address) === true,
         {
           user: process.env.IMAP_USER,
           password: process.env.IMAP_PASSWORD,
@@ -166,8 +166,8 @@ test.describe("Full e2e send petition", () => {
       await page.getByTestId("send-verification-code-button").click();
       const email = await waitForEmail(
         (e) =>
-          /^\d{6} is your verification code on Parallel/.test(e.subject) &&
-          e.to.some((c) => c.address === address),
+          /^\d{6} is your verification code on Parallel/.test(e.subject ?? "") &&
+          e.to?.some((c) => c.address === address) === true,
         {
           user: process.env.IMAP_USER,
           password: process.env.IMAP_PASSWORD,
@@ -210,7 +210,7 @@ test.describe("Full e2e send petition", () => {
       const email = await waitForEmail(
         (e) =>
           e.subject === `${name} completed!` &&
-          e.to.some((c) => c.address === process.env.USER1_EMAIL),
+          e.to?.some((c) => c.address === process.env.USER1_EMAIL) === true,
         {
           user: process.env.IMAP_USER,
           password: process.env.IMAP_PASSWORD,
