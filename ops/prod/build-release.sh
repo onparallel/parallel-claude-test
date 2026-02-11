@@ -22,7 +22,7 @@ git clone --no-checkout git@github.com:onparallel/parallel.git $BUILD_DIR
 pushd $BUILD_DIR
 git -c advice.detachedHead=false checkout $COMMIT
 rm -rf .git
-SKIP_UPDATE_IP_DB=1 yarn install --prefer-offline --frozen-lockfile --ignore-optional
+SKIP_UPDATE_IP_DB=1 yarn install --prefer-offline --frozen-lockfile
 
 CLIENT_SERVER_TOKEN=$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 32; echo)
 SECURITY_SERVICE_JWT_SECRET=$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 32; echo)
