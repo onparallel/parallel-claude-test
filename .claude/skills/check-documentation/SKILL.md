@@ -28,6 +28,8 @@ echo $GITHUB_ACTIONS
 
 ### Step 1: Get changes
 
+If you already have the diff from a previous step (e.g., invoked from `/code-review`), skip this step and reuse the existing diff.
+
 **In GitHub Actions:**
 ```bash
 gh pr diff $PR_NUMBER
