@@ -6,7 +6,7 @@ import {
   STSClient,
   STSServiceException,
 } from "@aws-sdk/client-sts";
-import { fromIni } from "@aws-sdk/credential-provider-ini";
+import { fromIni } from "@aws-sdk/credential-providers";
 import { outdent } from "outdent";
 import yargs from "yargs";
 import { run } from "./utils/run";

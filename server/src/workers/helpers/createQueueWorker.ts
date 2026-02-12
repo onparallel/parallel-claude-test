@@ -202,6 +202,7 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
                   );
                   const queuesService = container.get<IQueuesService>(QUEUES_SERVICE);
                   await queuesService.waitForPendingMessages(60_000);
+                  return undefined;
                 },
               }
             : {
@@ -267,6 +268,7 @@ export async function createQueueWorker<Q extends keyof Config["queueWorkers"]>(
                       payload: message.Body,
                     });
                   }
+                  return undefined;
                 },
               }),
           sqs: new SQSClient({

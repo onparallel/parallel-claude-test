@@ -44,6 +44,7 @@
     "interpret": "^3.1.1",
     "postgres-interval": "^4.0.2",
     "tmp": "0.2.4",
-    "nodemailer": "7.0.11"
+    "nodemailer": "7.0.11",
+    "@aws-sdk/client-sqs": "^3.988.0"
   }
 }

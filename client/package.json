@@ -110,7 +110,7 @@
     "react-select": "^5.10.2",
     "react-window": "^2.2.6",
     "read-excel-file": "^5.8.5",
-    "redoc": "^2.4.0",
+    "redoc": "^2.5.2",
     "remeda": "^1.61.0",
     "request-ip": "^3.3.0",
     "rxjs": "^7.8.2",
