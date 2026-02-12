@@ -2,6 +2,7 @@
 const config = {
   env: {
     ROOT: __dirname,
+    BUILD_ID: process.env.BUILD_ID || "development",
   },
   i18n: {
     locales: ["en", "es", "ca", "it", "pt"],
@@ -16,9 +17,6 @@ const config = {
   poweredByHeader: false,
   webpack(config, options) {
     config.resolve.alias["@parallel"] = __dirname;
-    config.plugins.push(
-      new options.webpack.DefinePlugin({ "process.env.BUILD_ID": JSON.stringify(options.buildId) }),
-    );
 
     // Exclude Node.js built-in modules from client bundle
     // jsdom requires these but they don't exist in the browser
@@ -122,14 +120,7 @@ const config = {
     largePageDataBytes: 0.5 * 1024 * 1024,
     swcPlugins:
       process.env.NODE_ENV === "production"
-        ? [
-            [
-              "@swc/plugin-formatjs",
-              {
-                removeDefaultMessage: true,
-              },
-            ],
-          ]
+        ? [["@swc/plugin-formatjs", { removeDefaultMessage: true }]]
         : [],
   },
   transpilePackages: ["pdfjs-dist"],
