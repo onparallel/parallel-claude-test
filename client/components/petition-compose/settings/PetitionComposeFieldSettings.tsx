@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
-import { Box, Heading, Stack } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
+import { Heading } from "@chakra-ui/react";
 import { CloseableCardHeader } from "@parallel/components/common/Card";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import { Text } from "@parallel/components/ui";
+import { Box, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionComposeFieldSettings_PetitionBaseFragment,
   PetitionComposeFieldSettings_PetitionFieldFragment,
@@ -168,7 +168,7 @@ export const PetitionComposeFieldSettings = chakraComponent<
         as="section"
         padding={4}
         paddingBottom="80px"
-        spacing={5}
+        gap={5}
         flex={1}
         minHeight={0}
         overflow="auto"
@@ -488,7 +488,7 @@ function SettingsRowGroup({
   children,
 }: PropsWithChildren<{ label: ReactNode; isReadOnly?: boolean }>) {
   return (
-    <Stack spacing={2} as="section">
+    <Stack gap={2} as="section">
       <Heading as="h4" size="sm" textStyle={isReadOnly ? "muted" : undefined}>
         {label}
       </Heading>

@@ -1,10 +1,11 @@
 import { gql } from "@apollo/client";
-import { Box, Flex } from "@chakra-ui/react";
+
 import { EmailSentIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { SignerReference } from "@parallel/components/common/SignerReference";
 import { TimelineSignatureDeliveredEvent_SignatureDeliveredEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
+import { Box, Flex } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
 import { EmailEventsIndicator } from "../../EmailEventsIndicator";
 import { TimelineIcon } from "../common/TimelineIcon";

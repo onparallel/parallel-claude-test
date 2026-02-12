@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client";
-import { Center, Image, LinkBox, LinkOverlay, Stack } from "@chakra-ui/react";
+import { Center, Image, LinkBox, LinkOverlay } from "@chakra-ui/react";
 import { LandingTemplateCard_LandingTemplateFragment } from "@parallel/graphql/__types";
 import NextLink from "next/link";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Card } from "../../common/Card";
-import { Text } from "@parallel/components/ui";
+import { Stack, Text } from "@parallel/components/ui";
 
 export interface LandingTemplateCardProps {
   template: LandingTemplateCard_LandingTemplateFragment;
@@ -18,7 +18,7 @@ export function LandingTemplateCard({ template }: LandingTemplateCardProps) {
 
   return (
     <LinkBox as={Card} outline="none" isInteractive cursor="pointer" overflow="hidden">
-      <Stack spacing={0}>
+      <Stack gap={0}>
         <Center height="130px" padding={5} backgroundColor={backgroundColor ?? "gray.200"}>
           <Image
             loading="lazy"

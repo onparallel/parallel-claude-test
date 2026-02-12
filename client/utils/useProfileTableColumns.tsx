@@ -1,15 +1,11 @@
 import { gql } from "@apollo/client";
 import {
-  Box,
   ButtonGroup,
-  Flex,
   FormControl,
   FormErrorMessage,
   Grid,
-  HStack,
   IconButton,
   Input,
-  Stack,
   ThemingProps,
 } from "@chakra-ui/react";
 import { CloseIcon, PlusCircleFilledIcon } from "@parallel/chakra/icons";
@@ -30,7 +26,7 @@ import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { UserSelect } from "@parallel/components/common/UserSelect";
 import { ProfileFormFieldCheckboxInner } from "@parallel/components/profiles/form-fields/ProfileFormFieldCheckbox";
 import { ProfileFormFieldSelectInner } from "@parallel/components/profiles/form-fields/ProfileFormFieldSelect";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   FilterSharedWithLogicalOperator,
   ProfileValueFilterLine_ProfileTypeFieldFragment,
@@ -345,7 +341,7 @@ function ProfileValueFilter({
           </Button>
         )}
         <Spacer />
-        <ButtonGroup spacing={2}>
+        <ButtonGroup gap={2}>
           <Button size="sm" onClick={() => setValue("filter.conditions", [])}>
             <FormattedMessage id="generic.clear" defaultMessage="Clear" />
           </Button>

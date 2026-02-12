@@ -1,7 +1,7 @@
 /** no-recipient */
-import { Badge, BoxProps, Placement, TextProps, ThemingProps } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
-import { Text } from "@parallel/components/ui";
+import { BoxProps, Text } from "@parallel/components/ui";
+import { Badge, Placement, TextProps, ThemingProps } from "@chakra-ui/react";
 import { FormattedMessage } from "react-intl";
 import { SmallPopover } from "./SmallPopover";
 

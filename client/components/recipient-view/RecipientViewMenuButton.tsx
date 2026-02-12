@@ -1,14 +1,12 @@
 import { gql } from "@apollo/client";
 import {
   Circle,
-  HStack,
   IconButton,
   MenuButton,
   MenuDivider,
   MenuItem,
   MenuList,
   Portal,
-  Stack,
   useBreakpointValue,
 } from "@chakra-ui/react";
 import { Menu, Tooltip } from "@parallel/chakra/components";
@@ -26,7 +24,7 @@ import NextLink from "next/link";
 import { useTone } from "../common/ToneProvider";
 import { Avatar } from "../ui";
 import { useRecipientViewHelpDialog } from "./dialogs/RecipientViewHelpDialog";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 export function RecipientViewMenuButton({
   keycode,
   hasClientPortalAccess,
@@ -115,7 +113,7 @@ export function RecipientViewMenuButton({
               >
                 <Avatar.Fallback name={contact.fullName} />
               </Avatar.Root>
-              <Stack spacing={0}>
+              <Stack gap={0}>
                 <Text as="div" fontWeight="semibold">
                   {contact.fullName}
                 </Text>
@@ -152,7 +150,7 @@ export function RecipientViewMenuButton({
                   </Text>
 
                   {pendingPetitions ? (
-                    <HStack fontWeight={600} color="yellow.500" spacing={1}>
+                    <HStack fontWeight={600} color="yellow.500" gap={1}>
                       <Text as="span">{pendingPetitions}</Text>
                       <TimeIcon boxSize={4} color="yellow.600" />
                     </HStack>

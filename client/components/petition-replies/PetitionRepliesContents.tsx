@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, BoxProps, Center, Flex, LinkBox, LinkOverlay, Stack } from "@chakra-ui/react";
+import { Center, LinkBox, LinkOverlay } from "@chakra-ui/react";
 import { CommentIcon, EyeOffIcon } from "@parallel/chakra/icons";
 import {
   PetitionRepliesContents_PetitionFieldFragment,
@@ -18,7 +18,7 @@ import { Divider } from "../common/Divider";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { PetitionSignatureStatusIcon } from "../common/PetitionSignatureStatusIcon";
 import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, BoxProps, Button, Flex, Stack, Text } from "@parallel/components/ui";
 
 export interface PetitionRepliesContentsProps<
   T extends PetitionRepliesContents_PetitionFieldFragment,
@@ -51,7 +51,7 @@ export function PetitionRepliesContents<T extends PetitionRepliesContents_Petiti
   );
 
   return (
-    <Stack as="ol" spacing={1} padding={4}>
+    <Stack as="ol" gap={1} padding={4}>
       {signatureStatus ? (
         <SignatureStatusInfo
           status={signatureStatus}
@@ -236,7 +236,7 @@ function _PetitionRepliesContentsItem<T extends PetitionRepliesContents_Petition
               <Stack
                 as="span"
                 direction="row-reverse"
-                spacing={1}
+                gap={1}
                 display="inline-flex"
                 alignItems="flex-end"
                 color="gray.600"

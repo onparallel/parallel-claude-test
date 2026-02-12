@@ -1,6 +1,6 @@
-import { Box, BoxProps, Placement, PopoverProps, TextProps } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
-import { Text } from "@parallel/components/ui";
+import { Box, BoxProps, Text } from "@parallel/components/ui";
+import { Placement, PopoverProps, TextProps } from "@chakra-ui/react";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";

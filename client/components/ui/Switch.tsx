@@ -1,5 +1,5 @@
 import { Switch as ChakraSwitch, SwitchProps } from "@chakra-ui/react";
-import { forwardRef } from "react";
+import { RefAttributes } from "react";
 
 // Docs: https://chakra-ui.com/docs/components/switch
 
@@ -11,18 +11,20 @@ export interface ExtendedSwitchProps
   colorPalette?: string;
 }
 
-export const Switch = forwardRef<HTMLInputElement, ExtendedSwitchProps>(
-  ({ disabled, checked, colorPalette, ...props }, ref) => {
-    return (
-      <ChakraSwitch
-        ref={ref}
-        isDisabled={disabled}
-        isChecked={checked}
-        colorScheme={colorPalette}
-        {...props}
-      />
-    );
-  },
-);
-
-Switch.displayName = "Switch";
+export function Switch({
+  disabled,
+  checked,
+  colorPalette,
+  ref,
+  ...props
+}: ExtendedSwitchProps & RefAttributes<HTMLInputElement>) {
+  return (
+    <ChakraSwitch
+      ref={ref}
+      isDisabled={disabled}
+      isChecked={checked}
+      colorScheme={colorPalette}
+      {...props}
+    />
+  );
+}

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Center, Flex, Image, useToast } from "@chakra-ui/react";
+import { Center, Image, useToast } from "@chakra-ui/react";
 import { EmailVerificationRequiredAlert } from "@parallel/components/auth/EmailVerificationRequiredAlert";
 import {
   ForgotPasswordData,
@@ -20,6 +20,7 @@ import {
 } from "@parallel/graphql/__types";
 import { asSupportedUserLocale } from "@parallel/utils/locales";
 import { postJSON } from "@parallel/utils/rest";
+import { Box, Flex } from "@parallel/components/ui";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Stack } from "@chakra-ui/react";
+
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import {
@@ -22,6 +22,7 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { Box, Stack } from "@parallel/components/ui";
 import { isNonNullish } from "remeda";
 
 type PetitionMessagesProps = UnwrapPromise<ReturnType<typeof PetitionMessages.getInitialProps>>;
@@ -75,7 +76,7 @@ function PetitionMessages({ petitionId }: PetitionMessagesProps) {
         ) : null}
       </Box>
       <Box paddingX={4} backgroundColor="primary.50" height="100%">
-        <Stack spacing={4} paddingY={4} maxWidth="container.md" margin="auto">
+        <Stack gap={4} paddingY={4} maxWidth="container.md" margin="auto">
           <PetitionTemplateRequestMessageCard {...cardCommonProps} user={queryObject.me} />
           <PetitionTemplateCompletingMessageCard {...cardCommonProps} />
           <PetitionTemplateClosingMessageCard {...cardCommonProps} />

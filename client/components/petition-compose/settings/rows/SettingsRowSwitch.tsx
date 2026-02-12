@@ -1,6 +1,7 @@
-import { Box, Stack, Switch } from "@chakra-ui/react";
+import { Switch } from "@chakra-ui/react";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
+import { Box, Stack } from "@parallel/components/ui";
 import { ReactNode } from "react";
 import { SettingsRow, SettingsRowProps } from "./SettingsRow";
 
@@ -21,7 +22,7 @@ export function SettingsRowSwitch({
   ...props
 }: SettingsRowSwitchProps) {
   return (
-    <Stack spacing={0}>
+    <Stack gap={0}>
       <SettingsRow isActive={isChecked} isDisabled={isDisabled} {...props}>
         <SmallPopover isDisabled={!isDisabled || !disabledReadon} content={disabledReadon}>
           <Box>

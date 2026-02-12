@@ -1,6 +1,6 @@
-import { Box, FormControl, FormErrorMessage, FormLabel, Input } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel, Input } from "@chakra-ui/react";
 import { Link } from "@parallel/components/common/Link";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Text } from "@parallel/components/ui";
 import { isValidEmail } from "@parallel/utils/validation";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";

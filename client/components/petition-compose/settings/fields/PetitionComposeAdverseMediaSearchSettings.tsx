@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
-import { HStack } from "@chakra-ui/react";
+
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { isDialogError } from "@parallel/components/common/dialogs/DialogProvider";
-import { Text } from "@parallel/components/ui";
+import { HStack, Text } from "@parallel/components/ui";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";

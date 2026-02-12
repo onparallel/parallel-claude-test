@@ -1,4 +1,5 @@
-import { Box, Heading, HeadingProps, HStack } from "@chakra-ui/react";
+import { Box, HStack } from "@parallel/components/ui";
+import { Heading, HeadingProps } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
 import { ReactNode } from "react";
 import { CloseButton } from "./CloseButton";

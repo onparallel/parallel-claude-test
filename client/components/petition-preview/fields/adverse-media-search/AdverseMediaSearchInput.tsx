@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
 import { useApolloClient } from "@apollo/client/react";
-import { HStack } from "@chakra-ui/react";
+
 import { UserIcon } from "@parallel/chakra/icons";
 import { CloseButton } from "@parallel/components/common/CloseButton";
-import { Text } from "@parallel/components/ui";
+import { HStack, Text } from "@parallel/components/ui";
 import {
   AdverseMediaSearchInput_adverseMediaEntitySuggestDocument,
   AdverseMediaSearchTermInput,
@@ -59,11 +59,11 @@ const MultiValueComponent: ComponentType<MultiValueProps<Option, true, OptionGro
     <HStack
       borderRadius="full"
       backgroundColor="gray.200"
-      spacing={1}
+      gap={1}
       paddingX={2}
       paddingY={0.5}
       margin={0.5}
-      {...innerProps}
+      {...(innerProps as Record<string, unknown>)}
     >
       {data._search.wikiDataId ? <UserIcon boxSize={4} /> : null}
       <Text fontSize="sm">{data.label}</Text>

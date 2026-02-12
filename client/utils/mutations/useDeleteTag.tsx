@@ -1,13 +1,13 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Stack } from "@chakra-ui/react";
+
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import { useDeleteTag_deleteTagDocument } from "@parallel/graphql/__types";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { isApolloError } from "../apollo/isApolloError";
-import { Text } from "@parallel/components/ui";
+import { Stack, Text } from "@parallel/components/ui";
 
 export function useDeleteTag() {
   const [deleteTag] = useMutation(useDeleteTag_deleteTagDocument);
@@ -94,7 +94,7 @@ function useConfirmDeleteTagDialog() {
                 defaultMessage="The following users are using the selected tag:"
               />
             </Text>
-            <Stack as="ul" paddingStart={8} spacing={0}>
+            <Stack as="ul" paddingStart={8} gap={0}>
               {extra.map((data, i) => {
                 const { fullName, email, petitionCount, templateCount, petitionListViewCount } =
                   data;

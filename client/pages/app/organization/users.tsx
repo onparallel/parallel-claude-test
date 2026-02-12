@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Badge, Center, Heading, Stack, useToast } from "@chakra-ui/react";
+import { Badge, Center, Heading, useToast } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import {
   AlertCircleFilledIcon,
@@ -32,7 +32,7 @@ import { useConfirmDeactivateUserDialog } from "@parallel/components/organizatio
 import { useConfirmReactivateInvitedUserDialog } from "@parallel/components/organization/dialogs/ConfirmReactivateInvitedUserDialog";
 import { useConfirmResendInvitationDialog } from "@parallel/components/organization/dialogs/ConfirmResendInvitationDialog";
 import { useCreateOrUpdateUserDialog } from "@parallel/components/organization/dialogs/CreateOrUpdateUserDialog";
-import { Text } from "@parallel/components/ui";
+import { Stack, Text } from "@parallel/components/ui";
 import {
   OrganizationUsers_OrderBy,
   OrganizationUsers_UserFragment,
@@ -831,7 +831,7 @@ function useOrganizationUsersTableColumns() {
                     id="other-groups"
                     width="auto"
                     content={
-                      <Stack width="auto" spacing={1}>
+                      <Stack width="auto" gap={1}>
                         {remaining
                           .sort((a, b) => (a.name && b.name ? a.name.localeCompare(b.name) : 1))
                           .map((userGroup, index) => {

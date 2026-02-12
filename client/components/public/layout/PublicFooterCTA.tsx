@@ -1,5 +1,5 @@
-import { Heading, Stack } from "@chakra-ui/react";
-import { Button } from "@parallel/components/ui";
+import { Heading } from "@chakra-ui/react";
+import { Button, Stack } from "@parallel/components/ui";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import NextLink from "next/link";
 import { FormattedMessage } from "react-intl";
@@ -8,7 +8,7 @@ export function PublicFooterCTA() {
   return (
     <PublicContainer
       as={Stack}
-      spacing={8}
+      gap={8}
       paddingY={20}
       maxWidth="container.xl"
       textAlign="center"

@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, MenuDivider, MenuItem, MenuList, Square } from "@chakra-ui/react";
+import { MenuDivider, MenuItem, MenuList, Square } from "@chakra-ui/react";
 import { CopyIcon, DeleteIcon, EditIcon, StarEmptyIcon } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
 import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
 import { useAskNameDialog } from "@parallel/components/petition-list/AskNameDialog";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, Text } from "@parallel/components/ui";
 import { ViewTabs_ListViewFragment } from "@parallel/graphql/__types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { Reorder } from "framer-motion";

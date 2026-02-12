@@ -1,5 +1,5 @@
-import { Box, BoxProps, Flex } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
+import { Box, BoxProps, Flex } from "@parallel/components/ui";
 import { Ref } from "react";
 
 export interface PublicContainerProps {

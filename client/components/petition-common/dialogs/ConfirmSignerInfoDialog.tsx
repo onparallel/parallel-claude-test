@@ -4,14 +4,11 @@ import {
   AlertIcon,
   AlertTitle,
   Center,
-  Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
-  HStack,
   Image,
   Input,
-  Stack,
   Switch,
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
@@ -21,7 +18,7 @@ import { Dropzone } from "@parallel/components/common/Dropzone";
 import { FileSize } from "@parallel/components/common/FileSize";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import { SignatureConfigInputSigner } from "@parallel/graphql/__types";
 import { fullName } from "@parallel/utils/fullName";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
@@ -150,7 +147,7 @@ function ConfirmSignerInfoDialog({
               </Text>
               <Alert status="warning" rounded="md">
                 <AlertIcon />
-                <Stack spacing={1}>
+                <Stack gap={1}>
                   <AlertTitle fontSize="14px">
                     <FormattedMessage
                       id="component.confirm-signer-info-dialog.alert-title"
@@ -362,7 +359,7 @@ function ConfirmSignerInfoDialog({
                             undefined
                           }
                           fallback={
-                            <Stack textAlign="center" spacing={1}>
+                            <Stack textAlign="center" gap={1}>
                               <Text fontSize="sm">
                                 <FormattedMessage
                                   id="component.confirm-signer-info-dialog.embed-signature-image-fallback"

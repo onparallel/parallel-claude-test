@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Divider, Stack, useToast } from "@chakra-ui/react";
+import { Divider, useToast } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import { UserSettingsLayout } from "@parallel/components/layout/UserSettingsLayout";
@@ -20,6 +20,7 @@ import {
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
+import { Stack } from "@parallel/components/ui";
 import { useRouter } from "next/router";
 import { useIntl } from "react-intl";
 
@@ -83,7 +84,7 @@ function Account() {
 
   return (
     <UserSettingsLayout queryObject={queryObject}>
-      <Stack padding={6} spacing={8} maxWidth="container.sm" width="100%" paddingBottom={16}>
+      <Stack padding={6} gap={8} maxWidth="container.sm" width="100%" paddingBottom={16}>
         <AccountChangeName user={me} onSubmit={onSaveName} />
         <Divider borderColor="gray.300" />
         <AccountLocaleChange user={me} onChange={handleLocaleChange} />

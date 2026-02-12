@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Badge, Box, Center, Flex, Heading, HStack, List, ListItem, Stack } from "@chakra-ui/react";
+import { Badge, Center, Heading, List, ListItem } from "@chakra-ui/react";
 import { ChevronFilledIcon, ListIcon } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
 import {
@@ -18,7 +18,7 @@ import { isNonNullish, zip } from "remeda";
 import { CloseButton } from "../common/CloseButton";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import NextLink from "next/link";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 
 type PetitionSelection =
   | RecipientViewContents_PublicPetitionFragment
@@ -103,7 +103,7 @@ export const RecipientViewContents = chakraComponent<"section", RecipientViewCon
 
         <Stack
           as={List}
-          spacing={1}
+          gap={1}
           paddingY={2.5}
           paddingX={3}
           overflow="auto"
@@ -189,7 +189,7 @@ export const RecipientViewContents = chakraComponent<"section", RecipientViewCon
                     </Button>
                   </Text>
                   {index + 1 === currentPage ? (
-                    <Stack as={List} spacing={1}>
+                    <Stack as={List} gap={1}>
                       {filteredFields.map(([field, fieldLogic]) => {
                         const replies =
                           usePreviewReplies && field.__typename === "PetitionField"

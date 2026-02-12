@@ -1,22 +1,13 @@
 import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
-import {
-  ButtonGroup,
-  Center,
-  Flex,
-  Heading,
-  HStack,
-  MenuItem,
-  MenuList,
-  Stack,
-} from "@chakra-ui/react";
+import { ButtonGroup, Center, Heading, MenuItem, MenuList } from "@chakra-ui/react";
 import { ChevronDownIcon, CloseIconSmall, LockClosedIcon } from "@parallel/chakra/icons";
 import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { Link, NormalLink } from "@parallel/components/common/Link";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { TableColumn } from "@parallel/components/common/Table";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   ProfilePetitionsTable_associateProfileToPetitionDocument,
   ProfilePetitionsTable_disassociateProfilesFromPetitionsDocument,
@@ -240,7 +231,7 @@ export function ProfilePetitionsTable({ profileId }: { profileId: string }) {
       body={
         petitions?.totalCount === 0 && !loading ? (
           <Center minHeight="150px" height="full">
-            <Stack spacing={1} align="center">
+            <Stack gap={1} align="center">
               <Text color="gray.400">
                 <FormattedMessage
                   id="component.profile-petitions-table.no-petitions"

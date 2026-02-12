@@ -2,23 +2,19 @@ import { gql } from "@apollo/client";
 import {
   AlertDescription,
   AlertIcon,
-  Box,
   Circle,
-  Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
-  HStack,
   IconButton,
   Image,
   ListItem,
   Radio,
   RadioGroup,
-  Stack,
   UnorderedList,
 } from "@chakra-ui/react";
 import { AddIcon, DeleteIcon } from "@parallel/chakra/icons";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import { RecipientSelectGroups_PetitionFragment } from "@parallel/graphql/__types";
 import { useFieldsWithIndices } from "@parallel/utils/fieldIndices";
 import { useFieldLogic } from "@parallel/utils/fieldLogic/useFieldLogic";
@@ -117,7 +113,7 @@ export function RecipientSelectGroups({
                   values={{ count: unknownEmails.length }}
                 />
               </Text>
-              <Stack as="ul" paddingX={6} spacing={0}>
+              <Stack as="ul" paddingX={6} gap={0}>
                 {unknownEmails.slice(0, 10).map((email, i) => (
                   <Text as="li" key={i}>
                     {email}
@@ -434,7 +430,7 @@ export function RecipientSelectGroups({
                           defaultMessage="The recipients of each parallel will answer the same form."
                         />
                       </Text>
-                      <Stack spacing={0.5}>
+                      <Stack gap={0.5}>
                         <HStack>
                           <Text>{untranslated("Parallel 1:")}</Text>
                           <Image

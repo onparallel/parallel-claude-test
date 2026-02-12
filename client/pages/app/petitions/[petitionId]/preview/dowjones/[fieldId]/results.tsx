@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Center, Flex, Heading, HStack, Skeleton, Stack } from "@chakra-ui/react";
+import { Center, Heading, Skeleton } from "@chakra-ui/react";
 import { CheckIcon, DeleteIcon, SaveIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -9,7 +9,7 @@ import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { DowJonesRiskLabel } from "@parallel/components/petition-common/DowJonesRiskLabel";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   DowJonesFieldSearchResults_createDowJonesKycReplyDocument,
   DowJonesFieldSearchResults_deletePetitionFieldReplyDocument,
@@ -158,7 +158,7 @@ function DowJonesFieldSearchResults({
         </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
-      <Stack paddingX={6} paddingY={5} spacing={6} minHeight="100vh" backgroundColor="gray.50">
+      <Stack paddingX={6} paddingY={5} gap={6} minHeight="100vh" backgroundColor="gray.50">
         {result?.totalCount || !loading ? (
           <Heading size="md">
             <FormattedMessage
@@ -197,7 +197,7 @@ function DowJonesFieldSearchResults({
               paddingY={2}
               justifyContent={"space-between"}
             >
-              <HStack spacing={0} gridGap={3} wrap="wrap">
+              <HStack gap={0} gridGap={3} wrap="wrap">
                 <Text>
                   <Text as="span" fontWeight={600}>
                     <FormattedMessage

@@ -4,15 +4,11 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Box,
-  Flex,
   FormControl,
-  HStack,
   MenuButton,
   MenuDivider,
   MenuItem,
   MenuList,
-  Stack,
 } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import { BusinessIcon, ChevronDownIcon, DeleteIcon, UsersIcon } from "@parallel/chakra/icons";
@@ -30,7 +26,7 @@ import { UserAvatar } from "@parallel/components/common/UserAvatar";
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
 import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
 import { UserSelect, UserSelectInstance } from "@parallel/components/common/UserSelect";
-import { Avatar, Button, Text } from "@parallel/components/ui";
+import { Avatar, Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   ProfileTypeField,
   ProfileTypeFieldPermissionType,

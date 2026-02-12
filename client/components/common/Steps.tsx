@@ -1,5 +1,5 @@
-import { Box } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
+import { Box } from "@parallel/components/ui";
 import { Children } from "react";
 
 export interface StepsProps {

@@ -5,9 +5,7 @@ import {
   AlertDescription,
   AlertIcon,
   AlertTitle,
-  Box,
   Center,
-  Flex,
   SimpleGrid,
   Spacer,
   useToast,
@@ -21,7 +19,7 @@ import {
   PublicPetitionInitialFormData,
 } from "@parallel/components/public/public-petitions/PublicPetitionInitialForm";
 import { PublicPetitionReminder } from "@parallel/components/public/public-petitions/PublicPetitionReminder";
-import { Text } from "@parallel/components/ui";
+import { Box, Flex, Text } from "@parallel/components/ui";
 import {
   PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkDocument,
   PublicPetitionLink_publicPetitionLinkBySlugDocument,

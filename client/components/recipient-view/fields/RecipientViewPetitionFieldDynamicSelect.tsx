@@ -1,8 +1,8 @@
-import { Box, Center, Flex, FormControl, FormLabel, List, Stack } from "@chakra-ui/react";
+import { Center, FormControl, FormLabel, List } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { SimpleSelect, toSimpleSelectOption } from "@parallel/components/common/SimpleSelect";
-import { Text } from "@parallel/components/ui";
+import { Box, Flex, Stack, Text } from "@parallel/components/ui";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { DynamicSelectOption, FieldOptions } from "@parallel/utils/fieldOptions";
@@ -146,7 +146,7 @@ export function RecipientViewPetitionFieldDynamicSelect({
         </Text>
       ) : null}
       {filteredReplies.length ? (
-        <List as={Stack} marginTop={1} spacing={8}>
+        <List as={Stack} marginTop={1} gap={8}>
           <AnimatePresence initial={false}>
             {filteredReplies.map((reply) => (
               <motion.li

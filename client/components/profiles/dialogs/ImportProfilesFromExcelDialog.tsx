@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
-  Box,
   Center,
   ModalBody,
   ModalCloseButton,
@@ -10,7 +9,7 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { DownloadIcon } from "@parallel/chakra/icons";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Text } from "@parallel/components/ui";
 import {
   ImportProfilesFromExcelDialog_profileImportExcelModelDownloadLinkDocument,
   UserLocale,

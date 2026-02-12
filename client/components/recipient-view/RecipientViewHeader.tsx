@@ -1,7 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Box,
-  HStack,
   Img,
   PopoverArrow,
   PopoverBody,
@@ -13,7 +11,7 @@ import { Popover } from "@parallel/chakra/components";
 import { CloudOkIcon, DownloadIcon, HelpOutlineIcon, UserArrowIcon } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
 import { Logo } from "@parallel/components/common/Logo";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Text } from "@parallel/components/ui";
 import { RecipientViewHeader_PublicPetitionAccessFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { usePublicPrintPdfTask } from "@parallel/utils/tasks/usePublicPrintPdfTask";
@@ -98,7 +96,7 @@ export const RecipientViewHeader = chakraComponent<"section", RecipientViewHeade
         backgroundColor="white"
         {...props}
       >
-        <HStack spacing={3}>
+        <HStack gap={3}>
           {organization.logoUrl72 ? (
             <Img
               src={organization.logoUrl72}
@@ -201,7 +199,7 @@ export const RecipientViewHeader = chakraComponent<"section", RecipientViewHeade
             </PopoverContent>
           </Popover>
 
-          <HStack display={{ base: "none", md: "flex" }} spacing={0} gap={2}>
+          <HStack display={{ base: "none", md: "flex" }} gap={2}>
             <Button
               leftIcon={<UserArrowIcon />}
               colorPalette="primary"

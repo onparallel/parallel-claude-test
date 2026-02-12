@@ -1,4 +1,4 @@
-import { Box, Center, FormControl, List, Stack } from "@chakra-ui/react";
+import { Center, FormControl, List } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import {
@@ -6,7 +6,7 @@ import {
   UserSelectInstance,
   UserSelectSelection,
 } from "@parallel/components/common/UserSelect";
-import { Text } from "@parallel/components/ui";
+import { Box, Stack, Text } from "@parallel/components/ui";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { FieldOptions } from "@parallel/utils/fieldOptions";

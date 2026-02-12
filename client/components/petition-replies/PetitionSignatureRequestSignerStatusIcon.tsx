@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
-import { Stack } from "@chakra-ui/react";
+
 import { CheckIcon, CloseIcon, TimeIcon } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
-import { Text } from "@parallel/components/ui";
+import { Stack, Text } from "@parallel/components/ui";
 import {
   DatesList_SignerStatusFragment,
   PetitionSignatureRequestSignerStatusIcon_SignerStatusFragment,
@@ -21,7 +21,7 @@ function DatesList({
   bouncedAt,
 }: DatesList_SignerStatusFragment) {
   return (
-    <Stack as="ul" paddingStart={4} spacing={1}>
+    <Stack as="ul" paddingStart={4} gap={1}>
       {sentAt ? (
         <Text as="li" fontSize="sm">
           <FormattedMessage

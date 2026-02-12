@@ -1,4 +1,5 @@
-import { Box } from "@chakra-ui/react";
+import { Box } from "@parallel/components/ui";
+
 import { Collapsible, CollapsibleRootProps } from "../ui";
 
 export function PaddedCollapse({ children, ...props }: CollapsibleRootProps) {

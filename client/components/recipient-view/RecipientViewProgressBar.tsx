@@ -1,8 +1,6 @@
 import { gql } from "@apollo/client";
 import {
-  Flex,
   Heading,
-  HStack,
   PopoverArrow,
   PopoverBody,
   PopoverCloseButton,
@@ -11,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { Popover } from "@parallel/chakra/components";
 import { chakraComponent } from "@parallel/chakra/utils";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Flex, HStack, Text } from "@parallel/components/ui";
 import {
   RecipientViewProgressBar_PetitionFieldFragment,
   RecipientViewProgressBar_PetitionFragment,

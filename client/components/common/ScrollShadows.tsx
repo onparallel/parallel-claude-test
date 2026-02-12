@@ -1,8 +1,9 @@
-import { Box, useSafeLayoutEffect } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
+import { useSafeLayoutEffect } from "@chakra-ui/react";
 import { scrollBarSize } from "@parallel/utils/scrollBarSize";
 import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import { useResizeObserver } from "@parallel/utils/useResizeObserver";
+import { Box } from "@parallel/components/ui";
 import { useCallback, useRef } from "react";
 import { fromEntries } from "remeda";
 

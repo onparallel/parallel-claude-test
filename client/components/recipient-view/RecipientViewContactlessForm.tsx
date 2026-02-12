@@ -1,25 +1,22 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
-  Box,
   Center,
   FormControl,
   FormErrorMessage,
   FormLabel,
   Heading,
-  HStack,
   IconButton,
   Image,
   Input,
   ScaleFade,
-  Stack,
   useToast,
 } from "@chakra-ui/react";
 import { CheckIcon, QuestionOutlineIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
 import { RecipientViewPinForm } from "@parallel/components/recipient-view/RecipientViewPinForm";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   RecipientViewContactlessForm_publicCheckVerificationCodeDocument,
   RecipientViewContactlessForm_PublicOrganizationFragment,
@@ -270,7 +267,7 @@ export function RecipientViewContactlessForm({
       paddingBottom={organization.hasRemoveParallelBranding ? undefined : { base: 12, sm: 12 }}
       position="relative"
     >
-      <Stack spacing={8}>
+      <Stack gap={8}>
         <Box maxWidth="170px">
           {organization.logoUrl340x160 ? (
             <Image
@@ -287,7 +284,7 @@ export function RecipientViewContactlessForm({
         </Box>
 
         {state.step === "FORM" ? (
-          <Stack as="form" onSubmit={handleSubmit(handleSubmitForm)} spacing={6}>
+          <Stack as="form" onSubmit={handleSubmit(handleSubmitForm)} gap={6}>
             <Stack>
               <HStack alignItems="center">
                 <Heading fontSize="2xl">
@@ -376,7 +373,7 @@ export function RecipientViewContactlessForm({
             </Button>
           </Stack>
         ) : state.step === "EMAIL_EXISTS" ? (
-          <Stack spacing={4}>
+          <Stack gap={4}>
             <Heading fontSize="2xl">
               <FormattedMessage
                 id="component.recipient-view-contactless-form.existing-email"
@@ -406,7 +403,7 @@ export function RecipientViewContactlessForm({
                 values={{ tone }}
               />
             </Text>
-            <HStack wrap="wrap" gridGap={2} spacing={0}>
+            <HStack wrap="wrap" gridGap={2} gap={0}>
               <Box flex="1">
                 <Button variant="outline" width="full" onClick={handleChangeEmail}>
                   <FormattedMessage
@@ -432,7 +429,7 @@ export function RecipientViewContactlessForm({
           </Stack>
         ) : (
           <>
-            <Stack spacing={4}>
+            <Stack gap={4}>
               <Heading fontSize="2xl">
                 <FormattedMessage
                   id="recipient-view.verify-title"
@@ -471,7 +468,7 @@ export function RecipientViewContactlessForm({
                 </ScaleFade>
               </Center>
             ) : null}
-            <Stack spacing={4}>
+            <Stack gap={4}>
               <Text>
                 <FormattedMessage
                   id="recipient-view.cant-find-email-help"

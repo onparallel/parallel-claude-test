@@ -1,4 +1,5 @@
-import { Box, Flex } from "@chakra-ui/react";
+import { Box, Flex } from "@parallel/components/ui";
+
 import { DashboardNumberValue } from "./DashboardNumberValue";
 
 export function DashboardRatio({

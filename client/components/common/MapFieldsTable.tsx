@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
-import { HStack, Stack, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
+import { Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import { ArrowBackIcon, EyeOffIcon, ForbiddenIcon } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
 import { PetitionFieldSelect } from "@parallel/components/common/PetitionFieldSelect";
-import { Text } from "@parallel/components/ui";
+import { HStack, Stack, Text } from "@parallel/components/ui";
 import {
   MapFieldsTable_PetitionBaseFragment,
   MapFieldsTable_PetitionFieldDataFragment,
@@ -453,7 +453,7 @@ function TableRow({
       <Td>
         <HStack>
           {selectedField ? (
-            <Stack minWidth={0} flex="1" spacing={2}>
+            <Stack minWidth={0} flex="1" gap={2}>
               {selectedField.replies.length > 0 ? (
                 Object.values(groupedReplies).map((replies, i, groups) => {
                   return (

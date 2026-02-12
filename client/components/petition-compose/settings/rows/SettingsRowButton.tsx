@@ -1,6 +1,5 @@
-import { Box, HStack, Stack } from "@chakra-ui/react";
 import { DeleteIcon, SettingsIcon } from "@parallel/chakra/icons";
-import { Button } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack } from "@parallel/components/ui";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../../../common/IconButtonWithTooltip";
@@ -27,7 +26,7 @@ export function SettingsRowButton({
   const intl = useIntl();
 
   return (
-    <Stack spacing={0}>
+    <Stack gap={0}>
       <SettingsRow isActive={isActive} {...props}>
         {isActive ? (
           <HStack>

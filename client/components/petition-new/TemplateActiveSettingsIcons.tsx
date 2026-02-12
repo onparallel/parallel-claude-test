@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { HStack, StackProps } from "@chakra-ui/react";
+
 import { LinkIcon, LockClosedIcon } from "@parallel/chakra/icons";
 import { LocaleBadge } from "@parallel/components/common/LocaleBadge";
 import { TemplateActiveSettingsIcons_PetitionTemplateFragment } from "@parallel/graphql/__types";
@@ -9,7 +9,7 @@ import { TemplateIconCompliance } from "./TemplateIconCompliance";
 import { TemplateIconDefaultPermissions } from "./TemplateIconDefaultPermissions";
 import { TemplateIconReminders } from "./TemplateIconReminders";
 import { TemplateIconSignature } from "./TemplateIconSignature";
-import { Text } from "@parallel/components/ui";
+import { HStack, StackProps, Text } from "@parallel/components/ui";
 
 export interface TemplateActiveSettingsIconsProps extends StackProps {
   template: TemplateActiveSettingsIcons_PetitionTemplateFragment;
@@ -20,7 +20,7 @@ export function TemplateActiveSettingsIcons({
   ...props
 }: TemplateActiveSettingsIconsProps) {
   return (
-    <HStack spacing={4} {...props}>
+    <HStack gap={4} {...props}>
       <LocaleBadge locale={template.locale} gridGap={2} fontSize="sm" />
       {template.isRestricted ? (
         <SmallPopover

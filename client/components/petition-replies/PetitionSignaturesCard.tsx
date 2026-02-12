@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Center, Grid, HStack, useToast } from "@chakra-ui/react";
+import { Center, Grid, useToast } from "@chakra-ui/react";
 import { AddIcon, SignatureIcon } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
-import { Text } from "@parallel/components/ui";
+import { Box, HStack, Text } from "@parallel/components/ui";
 import {
   PetitionSignaturesCard_PetitionFragment,
   PetitionSignaturesCard_UserFragment,

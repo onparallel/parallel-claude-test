@@ -1,17 +1,7 @@
 import { gql } from "@apollo/client";
-import {
-  AlertDescription,
-  AlertIcon,
-  Box,
-  Center,
-  Heading,
-  HStack,
-  Image,
-  Spinner,
-  Stack,
-} from "@chakra-ui/react";
+import { AlertDescription, AlertIcon, Center, Heading, Image, Spinner } from "@chakra-ui/react";
 import { RepeatIcon, SparklesIcon } from "@parallel/chakra/icons";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionRepliesSummary_PetitionFragment,
   PetitionRepliesSummary_UserFragment,

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Stack } from "@chakra-ui/react";
-import { Button, Text } from "@parallel/components/ui";
+
+import { Box, Button, Flex, Stack, Text } from "@parallel/components/ui";
 import {
   SuggestedSigners_PetitionBaseFragment,
   SuggestedSigners_PetitionSignerFragment,

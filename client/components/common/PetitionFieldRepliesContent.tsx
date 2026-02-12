@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, HStack, List, ListItem, Stack } from "@chakra-ui/react";
+import { List, ListItem } from "@chakra-ui/react";
 import { BusinessIcon, SearchIcon, ShortSearchIcon, UserIcon } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
 import {
@@ -30,7 +30,7 @@ import { OverflownText } from "./OverflownText";
 import { SimpleFileButton } from "./SimpleFileButton";
 import { SmallPopover } from "./SmallPopover";
 import { UserReference } from "./UserReference";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 
 export interface PetitionFieldRepliesContentProps {
   petitionId: string;
@@ -311,7 +311,7 @@ function PetitionFieldBackgroundCheck({
           {isNullish(content.entity?.properties?.topics) ? null : (
             <>
               {content.entity.properties.topics.length > 3 ? (
-                <HStack spacing={1} marginStart={1}>
+                <HStack gap={1} marginStart={1}>
                   <EnumerateList
                     values={(content.entity?.properties?.topics as string[] | undefined) ?? []}
                     maxItems={1}
@@ -411,8 +411,8 @@ function PetitionFieldAdverseMediaSearch({
       onClick={handleClick}
       fontWeight={500}
     >
-      <Stack spacing={1} maxWidth="100%" width="100%">
-        <HStack spacing={1.5} minWidth={0} width="100%">
+      <Stack gap={1} maxWidth="100%" width="100%">
+        <HStack gap={1.5} minWidth={0} width="100%">
           <ShortSearchIcon />
           <OverflownText textAlign="start" width="100%">
             {intl.formatList(

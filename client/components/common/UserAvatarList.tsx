@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, useMultiStyleConfig } from "@chakra-ui/react";
+import { useMultiStyleConfig } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { UsersIcon } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
@@ -7,6 +7,7 @@ import {
   UserAvatarList_UserFragment,
   UserAvatarList_UserGroupFragment,
 } from "@parallel/graphql/__types";
+import { Box, Flex } from "@parallel/components/ui";
 import { Avatar, AvatarRootProps } from "../ui";
 import { UserAvatar } from "./UserAvatar";
 import { UserGroupReference } from "./UserGroupReference";

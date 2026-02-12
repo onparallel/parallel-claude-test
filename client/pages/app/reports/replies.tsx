@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Heading, HStack, Stack } from "@chakra-ui/react";
+import { Center, Heading } from "@chakra-ui/react";
 import { CheckIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { NakedHelpCenterLink } from "@parallel/components/common/HelpCenterLink";
@@ -11,7 +11,7 @@ import { ReportsSidebarLayout } from "@parallel/components/layout/ReportsSidebar
 import { DateRangePickerButton } from "@parallel/components/reports/common/DateRangePickerButton";
 import { ReportsLoadingMessage } from "@parallel/components/reports/common/ReportsLoadingMessage";
 import { ReportsReadyMessage } from "@parallel/components/reports/common/ReportsReadyMessage";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { ReportsReplies_userDocument } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
@@ -82,12 +82,12 @@ export function ReportsReplies() {
         </HStack>
       }
     >
-      <Stack spacing={2} padding={6}>
+      <Stack gap={2} padding={6}>
         <Text>
           <FormattedMessage id="generic.template" defaultMessage="Template" />:
         </Text>
 
-        <Stack direction={{ base: "column", lg: "row" }} spacing={0} gridGap={2} flex="1">
+        <Stack direction={{ base: "column", lg: "row" }} gap={0} gridGap={2} flex="1">
           <HStack
             data-section="reports-select-template"
             flex="1"
@@ -129,7 +129,7 @@ export function ReportsReplies() {
           </Button>
         </Stack>
         {showDownload ? (
-          <Center as={Stack} spacing={6} padding={6} paddingTop={16}>
+          <Center as={Stack} gap={6} padding={6} paddingTop={16}>
             <Center margin="auto" borderRadius="full" background="green.500" boxSize={10}>
               <CheckIcon color="white" role="presentation" boxSize={6} />
             </Center>

@@ -2,15 +2,11 @@ import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
   Badge,
-  Box,
   Center,
-  Flex,
   FormControl,
   FormLabel,
   Grid,
-  HStack,
   ListItem,
-  Stack,
   UnorderedList,
 } from "@chakra-ui/react";
 import { CircleCheckIcon, DashIcon, ForbiddenIcon } from "@parallel/chakra/icons";
@@ -25,7 +21,7 @@ import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider"
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import { withPermission } from "@parallel/components/common/withPermission";
 import { UserGroupLayout } from "@parallel/components/layout/UserGroupLayout";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   PermissionsGroup_updateUserGroupPermissionsDocument,
   PermissionsGroup_userDocument,
@@ -739,7 +735,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
               defaultMessage="Team permissions"
             />
           </CardHeader>
-          <Stack paddingX={6} paddingY={4} spacing={4}>
+          <Stack paddingX={6} paddingY={4} gap={4}>
             <SearchInput value={search ?? ""} onChange={(e) => setSearch(e.target.value)} />
             {permissionsCategories
               .filter(({ permissions }) => {
@@ -753,7 +749,7 @@ export function PermissionsGroup({ groupId }: PermissionsGroupProps) {
                 return (
                   <UnorderedList key={category} listStyleType="none" marginStart={0}>
                     <ListItem fontWeight={500}>{category}</ListItem>
-                    <UnorderedList listStyleType="none" marginStart={2} spacing={2}>
+                    <UnorderedList listStyleType="none" marginStart={2} gap={2}>
                       {permissions.map(({ name, title, description }) => {
                         const index = fields.findIndex((f) => f.name === name)!;
                         return (

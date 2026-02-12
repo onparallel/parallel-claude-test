@@ -1,7 +1,6 @@
-import { Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
 
 export function ConfirmReopenPetitionDialog(props: DialogProps) {
@@ -13,7 +12,7 @@ export function ConfirmReopenPetitionDialog(props: DialogProps) {
         </Text>
       }
       body={
-        <Stack spacing={4}>
+        <Stack gap={4}>
           <Text>
             <FormattedMessage
               id="petition.reopen.dialog-subheading"

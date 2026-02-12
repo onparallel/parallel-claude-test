@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
-import { Box, FormControl, FormErrorMessage, Grid, Heading, Stack } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, Grid, Heading } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { NoElement } from "@parallel/components/common/NoElement";
@@ -9,7 +9,7 @@ import { ProfileRelationshipTypeWithDirectionSelect } from "@parallel/components
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { MaybeWizardStepDialogProps } from "@parallel/components/common/dialogs/WizardDialog";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Stack, Text } from "@parallel/components/ui";
 import {
   UpdatePetitionFieldGroupRelationshipInput,
   useCreateOrUpdateFieldGroupRelationshipsDialog_PetitionBaseFragment,
@@ -210,7 +210,7 @@ export function CreateOrUpdateFieldGroupRelationshipsDialog({
         </Heading>
       }
       body={
-        <Stack spacing={0}>
+        <Stack gap={0}>
           {isSuggestingRelationships ? null : (
             <Text>
               <FormattedMessage

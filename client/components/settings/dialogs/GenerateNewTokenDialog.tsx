@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { FormControl, FormErrorMessage, Input, Stack } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, Input } from "@chakra-ui/react";
 import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboardButton";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import { GenerateNewTokenDialog_generateUserAuthTokenDocument } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useRef, useState } from "react";

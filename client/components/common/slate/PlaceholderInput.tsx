@@ -1,6 +1,6 @@
-import { Box, Center, useFormControl, useMultiStyleConfig } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
-import { Text } from "@parallel/components/ui";
+import { Center, useFormControl, useMultiStyleConfig } from "@chakra-ui/react";
+import { Box, Text } from "@parallel/components/ui";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import {
   ELEMENT_PLACEHOLDER_INPUT,

@@ -1,4 +1,5 @@
-import { Circle, HStack, SquareProps, StackProps } from "@chakra-ui/react";
+import { Circle, SquareProps } from "@chakra-ui/react";
+import { HStack, StackProps } from "@parallel/components/ui";
 import { motion } from "framer-motion";
 
 interface StepsIndicatorProps extends StackProps {

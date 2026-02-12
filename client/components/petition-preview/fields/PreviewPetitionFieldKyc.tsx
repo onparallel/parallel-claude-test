@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Flex, HStack, List, Progress, Stack } from "@chakra-ui/react";
+import { Center, List, Progress } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import {
   BusinessIcon,
@@ -14,7 +14,7 @@ import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { DowJonesRiskLabel } from "@parallel/components/petition-common/DowJonesRiskLabel";
 import { usePreviewDowJonesPermissionDeniedDialog } from "@parallel/components/petition-preview/dialogs/PreviewDowJonesPermissionDeniedDialog";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import { PreviewPetitionFieldKyc_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { FORMATS } from "@parallel/utils/dates";

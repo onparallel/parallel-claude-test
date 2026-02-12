@@ -1,21 +1,18 @@
 import { gql } from "@apollo/client";
 import { useApolloClient } from "@apollo/client/react";
 import {
-  Box,
   DrawerBody,
   DrawerFooter,
   FormControl,
   FormErrorMessage,
   Grid,
   GridItem,
-  HStack,
   Input,
   RadioProps,
-  Stack,
   useRadioGroup,
 } from "@chakra-ui/react";
 import { ScrollShadows } from "@parallel/components/common/ScrollShadows";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   DashboardModuleForm_createCreatePetitionButtonDashboardModuleDocument,
   DashboardModuleForm_createPetitionsNumberDashboardModuleDocument,
@@ -259,7 +256,7 @@ export function DashboardModuleForm({
     >
       <DrawerBody padding={0} overflow="hidden">
         <FormProvider {...form}>
-          <Stack as={ScrollShadows} padding={6} spacing={4} overflow="auto" height="100%">
+          <Stack as={ScrollShadows} padding={6} gap={4} overflow="auto" height="100%">
             <FormControl isInvalid={!!errors.name}>
               <DashboardModuleFormLabel field="name" isUpdating={isUpdating}>
                 <FormattedMessage

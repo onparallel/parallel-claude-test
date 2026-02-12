@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box } from "@chakra-ui/react";
+
 import { MultiCheckboxSimpleSelect } from "@parallel/components/common/MultiCheckboxSimpleSelect";
 import { SimpleSelect, useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { DocumentProcessingType } from "@parallel/graphql/__types";
@@ -7,6 +7,7 @@ import { FieldOptions, FileUploadAccepts } from "@parallel/utils/fieldOptions";
 import { UnwrapArray } from "@parallel/utils/types";
 import { useFileUploadFormats } from "@parallel/utils/useFileUploadFormats";
 import { ValueProps } from "@parallel/utils/ValueProps";
+import { Box } from "@parallel/components/ui";
 import { Children, useMemo } from "react";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
 import { ValueContainerProps, components } from "react-select";

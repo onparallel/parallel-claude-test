@@ -3,19 +3,15 @@ import { useMutation } from "@apollo/client/react";
 import { getOperationName } from "@apollo/client/utilities/internal";
 import {
   Badge,
-  Box,
   Center,
-  Flex,
   Grid,
   GridItem,
-  HStack,
   List,
   MenuDivider,
   MenuItem,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  Stack,
   useToast,
 } from "@chakra-ui/react";
 import {
@@ -38,7 +34,7 @@ import {
   usePetitionShouldConfirmNavigation,
   usePetitionState,
 } from "@parallel/components/layout/PetitionLayout";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionActivity_petitionDocument,
   PetitionHeader_PetitionBaseFragment,
@@ -469,7 +465,7 @@ export const PetitionHeader = chakraComponent<"div", PetitionHeaderProps, Petiti
               isDisabled={isNonNullish(petition.permanentDeletionAt)}
             />
           </Flex>
-          <HStack spacing={1}>
+          <HStack gap={1}>
             {petition.__typename === "Petition" ? (
               <Center
                 data-testid="petition-status"

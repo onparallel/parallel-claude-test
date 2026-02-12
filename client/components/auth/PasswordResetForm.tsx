@@ -1,6 +1,6 @@
-import { Box, Center, FormControl, FormErrorMessage, FormLabel } from "@chakra-ui/react";
+import { Center, FormControl, FormErrorMessage, FormLabel } from "@chakra-ui/react";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Text } from "@parallel/components/ui";
 import { PASSWORD_REGEX } from "@parallel/utils/validation";
 import { ReactElement, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";

@@ -1,15 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import {
-  Box,
-  Center,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Heading,
-  HStack,
-  Stack,
-} from "@chakra-ui/react";
+import { Center, FormControl, FormErrorMessage, FormLabel, Heading } from "@chakra-ui/react";
 import { DeleteIcon, DragHandleIcon, SettingsIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader, CardProps } from "@parallel/components/common/Card";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
@@ -21,7 +12,7 @@ import {
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { RestrictedFeaturePopover } from "@parallel/components/common/RestrictedFeaturePopover";
 import { PlaceholderInput } from "@parallel/components/common/slate/PlaceholderInput";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   ProfileTypeSettings_createProfileTypeProcessDocument,
   ProfileTypeSettings_editProfileTypeProcessDocument,
@@ -194,7 +185,7 @@ export function ProfileTypeSettings({ profileType, onSave, ...props }: ProfileTy
       <CardHeader headingSize="md" headingLevel="h2">
         <FormattedMessage id="component.profile-type-settings.settings" defaultMessage="Settings" />
       </CardHeader>
-      <Stack padding={4} spacing={3}>
+      <Stack padding={4} gap={3}>
         <FormControl id="pattern" isInvalid={!!errors.pattern}>
           <FormLabel
             whiteSpace="nowrap"
@@ -272,7 +263,7 @@ export function ProfileTypeSettings({ profileType, onSave, ...props }: ProfileTy
 
         <Stack>
           <HStack justify="space-between">
-            <HStack spacing={0}>
+            <HStack gap={0}>
               <Heading size="sm">
                 <FormattedMessage
                   id="component.profile-type-settings.processes-heading"
@@ -368,7 +359,7 @@ function ProfileTypeProccess({ process, onDragEnd, onEdit, onRemove }: ProfileTy
       dragControls={dragControls}
       onDragEnd={onDragEnd}
     >
-      <HStack justify="space-between" spacing={3}>
+      <HStack justify="space-between" gap={3}>
         <HStack minWidth={0}>
           <Center
             cursor="grab"

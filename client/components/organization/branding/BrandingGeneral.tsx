@@ -5,16 +5,13 @@ import {
   AlertIcon,
   Badge,
   Center,
-  Flex,
   FormControl,
   FormLabel,
-  HStack,
   Heading,
   Image,
   Radio,
   RadioGroup,
   Spinner,
-  Stack,
   Switch,
 } from "@chakra-ui/react";
 import { Select } from "@parallel/chakra/components";
@@ -28,7 +25,7 @@ import { FileSize } from "@parallel/components/common/FileSize";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { RestrictedFeatureAlert } from "@parallel/components/common/RestrictedFeatureAlert";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   BrandingGeneral_UserFragment,
   BrandingGeneral_updateOrgLogoDocument,
@@ -151,9 +148,9 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
       })}
       noValidate
     >
-      <Stack spacing={8} maxWidth={{ base: "100%", xl: "container.2xs" }} width="100%">
+      <Stack gap={8} maxWidth={{ base: "100%", xl: "container.2xs" }} width="100%">
         {!userCanEditBranding ? <RestrictedFeatureAlert /> : null}
-        <Stack spacing={4}>
+        <Stack gap={4}>
           <Stack>
             <Heading as="h4" size="md" fontWeight="semibold">
               <FormattedMessage id="organization.branding.brand" defaultMessage="Brand" />
@@ -235,7 +232,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
           />
         </Stack>
 
-        <Stack spacing={6}>
+        <Stack gap={6}>
           <FormControl isInvalid={!!errors.color}>
             <HStack>
               <FormLabel
@@ -333,7 +330,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
               render={({ field: { onChange, value } }) => (
                 <RadioGroup
                   as={Stack}
-                  spacing={2}
+                  gap={2}
                   isDisabled={!userCanEditBranding}
                   onChange={(value) => onChange(value as Tone)}
                   value={value}
@@ -427,9 +424,9 @@ function ParallelBrandingSwitch({
 }) {
   const intl = useIntl();
   return (
-    <Stack spacing={4}>
-      <HStack spacing={3}>
-        <Stack flex="1" spacing={2}>
+    <Stack gap={4}>
+      <HStack gap={3}>
+        <Stack flex="1" gap={2}>
           <HStack alignItems="center">
             <Heading as="h4" size="md" fontWeight="semibold">
               <FormattedMessage

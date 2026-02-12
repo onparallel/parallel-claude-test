@@ -1,12 +1,4 @@
-import {
-  Flex,
-  Grid,
-  Input,
-  NumberInput,
-  NumberInputField,
-  Switch,
-  Textarea,
-} from "@chakra-ui/react";
+import { Grid, Input, NumberInput, NumberInputField, Switch, Textarea } from "@chakra-ui/react";
 import { Select } from "@parallel/chakra/components";
 import { unCamelCase } from "@parallel/utils/strings";
 import {
@@ -17,7 +9,7 @@ import {
   IntrospectionType,
 } from "graphql";
 import { findNamedTypeRef } from "./helpers";
-import { Text } from "@parallel/components/ui";
+import { Flex, Text } from "@parallel/components/ui";
 
 interface SupportMethodArgumentInputProps {
   arg: IntrospectionInputValue;

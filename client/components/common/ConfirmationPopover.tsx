@@ -1,14 +1,12 @@
 import {
-  HStack,
   PopoverArrow,
   PopoverBody,
   PopoverContent,
   PopoverTrigger,
   Portal,
-  Stack,
 } from "@chakra-ui/react";
 import { Popover } from "@parallel/chakra/components";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   MouseEvent,
   PropsWithChildren,

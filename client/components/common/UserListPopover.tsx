@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Flex,
   List,
   ListItem,
   PopoverArrow,
@@ -8,11 +7,10 @@ import {
   PopoverContent,
   PopoverTrigger,
   Portal,
-  Stack,
 } from "@chakra-ui/react";
 import { Popover } from "@parallel/chakra/components";
 import { UsersIcon } from "@parallel/chakra/icons";
-import { Text } from "@parallel/components/ui";
+import { Flex, Stack, Text } from "@parallel/components/ui";
 import {
   UserListPopover_UserFragment,
   UserListPopover_UserGroupFragment,

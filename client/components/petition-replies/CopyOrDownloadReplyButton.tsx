@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Stack } from "@chakra-ui/react";
+
 import { DownloadIcon, EyeIcon } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
 import {
@@ -11,6 +11,7 @@ import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFil
 import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
 import { useMergeRefs } from "@parallel/utils/useMergeRefs";
+import { Stack } from "@parallel/components/ui";
 import { useRef } from "react";
 import { useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
@@ -48,7 +49,7 @@ export function CopyOrDownloadReplyButton({
         : content;
 
   return (
-    <Stack spacing={1}>
+    <Stack gap={1}>
       {petitionFieldType === "BACKGROUND_CHECK" ? (
         <IconButtonWithTooltip
           disabled={isDisabled}

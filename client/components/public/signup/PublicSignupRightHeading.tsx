@@ -1,4 +1,5 @@
-import { Box, BoxProps, Heading, Image } from "@chakra-ui/react";
+import { Heading, Image } from "@chakra-ui/react";
+import { Box, BoxProps } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
 
 export function PublicSignupRightHeading(props: BoxProps) {

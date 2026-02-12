@@ -1,17 +1,8 @@
-import {
-  ButtonGroup,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  Grid,
-  HStack,
-  IconButton,
-  Stack,
-} from "@chakra-ui/react";
+import { ButtonGroup, FormControl, FormErrorMessage, Grid, IconButton } from "@chakra-ui/react";
 import { CloseIcon, PlusCircleFilledIcon } from "@parallel/chakra/icons";
 import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionApprovalsFilterInput,
   PetitionApprovalsFilterLogicalOperator,
@@ -110,7 +101,7 @@ export function PetitionListApprovalsFilter() {
         )}
 
         <Spacer />
-        <ButtonGroup spacing={2}>
+        <ButtonGroup gap={2}>
           <Button size="sm" onClick={() => setValue("filter.filters", [])}>
             <FormattedMessage id="generic.clear" defaultMessage="Clear" />
           </Button>

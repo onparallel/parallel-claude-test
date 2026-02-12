@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
-import { Box, HStack, Img } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
+import { Img } from "@chakra-ui/react";
 import { Logo } from "@parallel/components/common/Logo";
 import {
   RecipientPortalHeader_PublicContactFragment,
@@ -8,7 +8,7 @@ import {
 } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { RecipientViewMenuButton } from "./RecipientViewMenuButton";
-import { Text } from "@parallel/components/ui";
+import { Box, HStack, Text } from "@parallel/components/ui";
 
 interface RecipientPortalHeaderProps {
   organization: RecipientPortalHeader_PublicOrganizationFragment;
@@ -42,7 +42,7 @@ export const RecipientPortalHeader = chakraComponent<"section", RecipientPortalH
           <Logo width="152px" height="36px" />
         )}
 
-        <HStack spacing={3}>
+        <HStack gap={3}>
           <Text>
             <FormattedMessage
               id="component.recipient-portal-header.hello-name"

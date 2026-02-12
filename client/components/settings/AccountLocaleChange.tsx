@@ -1,7 +1,8 @@
 import { gql } from "@apollo/client";
-import { Heading, Radio, RadioGroup, Stack, StackProps } from "@chakra-ui/react";
+import { Heading, Radio, RadioGroup } from "@chakra-ui/react";
 import { AccountLocaleChange_UserFragment, UserLocale } from "@parallel/graphql/__types";
 import { useSupportedUserLocales } from "@parallel/utils/locales";
+import { Stack, StackProps } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
 
 interface AccountLocaleChangeProps extends Omit<StackProps, "onChange"> {

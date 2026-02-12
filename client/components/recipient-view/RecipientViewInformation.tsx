@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Heading, HStack, Stack } from "@chakra-ui/react";
+import { Heading } from "@chakra-ui/react";
 import { InfoCircleIcon, UserArrowIcon } from "@parallel/chakra/icons";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   RecipientViewInformation_PublicContactFragment,
   RecipientViewInformation_PublicPetitionAccessFragment,
@@ -57,7 +57,7 @@ export function RecipientViewInformation({
         </Heading>
         <CloseButton size="sm" onClick={onClose} />
       </HStack>
-      <Stack padding={4} spacing={4} overflow="auto" height="100%">
+      <Stack padding={4} gap={4} overflow="auto" height="100%">
         {sender ? (
           <Box>
             <Text fontSize="sm">
@@ -79,7 +79,7 @@ export function RecipientViewInformation({
           <Text fontSize="sm">
             <FormattedMessage id="recipient-view.in-order-to" defaultMessage="To" />:
           </Text>
-          <Stack spacing={0}>
+          <Stack gap={0}>
             {recipients.map((recipient, index) => {
               return <Contact key={index} contact={recipient} />;
             })}

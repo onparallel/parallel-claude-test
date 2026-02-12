@@ -6,7 +6,7 @@ import {
   RadioGroupProps,
   RadioProps,
 } from "@chakra-ui/react";
-import { ReactNode, forwardRef } from "react";
+import { ReactNode, RefAttributes } from "react";
 
 // Docs: https://chakra-ui.com/docs/components/radio
 
@@ -32,54 +32,71 @@ export interface ExtendedRadioGroupProps
 }
 
 // Single Radio component
-export const RadioSingle = forwardRef<HTMLInputElement, ExtendedRadioProps>(
-  ({ invalid, disabled, readOnly, checked, colorPalette, ...props }, ref) => {
-    return (
-      <ChakraRadio
-        ref={ref}
-        isInvalid={invalid}
-        isDisabled={disabled}
-        isReadOnly={readOnly}
-        isChecked={checked}
-        colorScheme={colorPalette}
-        {...props}
-      />
-    );
-  },
-);
+export function RadioSingle({
+  invalid,
+  disabled,
+  readOnly,
+  checked,
+  colorPalette,
+  ref,
+  ...props
+}: ExtendedRadioProps & RefAttributes<HTMLInputElement>) {
+  return (
+    <ChakraRadio
+      ref={ref}
+      isInvalid={invalid}
+      isDisabled={disabled}
+      isReadOnly={readOnly}
+      isChecked={checked}
+      colorScheme={colorPalette}
+      {...props}
+    />
+  );
+}
 
 // RadioGroup.Root component for v3 compatibility
-export const RadioGroupRoot = forwardRef<HTMLDivElement, ExtendedRadioGroupProps>(
-  ({ invalid, disabled, readOnly, colorPalette, ...props }, ref) => {
-    return (
-      <ChakraRadioGroup
-        ref={ref}
-        isInvalid={invalid}
-        isDisabled={disabled}
-        isReadOnly={readOnly}
-        colorScheme={colorPalette}
-        {...props}
-      />
-    );
-  },
-);
+export function RadioGroupRoot({
+  invalid,
+  disabled,
+  readOnly,
+  colorPalette,
+  ref,
+  ...props
+}: ExtendedRadioGroupProps & RefAttributes<HTMLDivElement>) {
+  return (
+    <ChakraRadioGroup
+      ref={ref}
+      isInvalid={invalid}
+      isDisabled={disabled}
+      isReadOnly={readOnly}
+      colorScheme={colorPalette}
+      {...props}
+    />
+  );
+}
 
 // RadioGroup.Item component - wraps individual Radio
-export const RadioGroupItem = forwardRef<HTMLInputElement, ExtendedRadioProps>(
-  ({ invalid, disabled, readOnly, checked, colorPalette, ...props }, ref) => {
-    return (
-      <ChakraRadio
-        ref={ref}
-        isInvalid={invalid}
-        isDisabled={disabled}
-        isReadOnly={readOnly}
-        isChecked={checked}
-        colorScheme={colorPalette}
-        {...props}
-      />
-    );
-  },
-);
+export function RadioGroupItem({
+  invalid,
+  disabled,
+  readOnly,
+  checked,
+  colorPalette,
+  ref,
+  ...props
+}: ExtendedRadioProps & RefAttributes<HTMLInputElement>) {
+  return (
+    <ChakraRadio
+      ref={ref}
+      isInvalid={invalid}
+      isDisabled={disabled}
+      isReadOnly={readOnly}
+      isChecked={checked}
+      colorScheme={colorPalette}
+      {...props}
+    />
+  );
+}
 
 // For v3, these would be separate components, but for v2 compatibility
 // we'll make them aliases to the standard Radio
@@ -104,11 +121,3 @@ export const RadioGroup = {
 
 // Default Radio export
 export const Radio = RadioSingle;
-
-// Display names
-RadioSingle.displayName = "Radio";
-RadioGroupRoot.displayName = "RadioGroup.Root";
-RadioGroupItem.displayName = "RadioGroup.Item";
-RadioGroupItemHiddenInput.displayName = "RadioGroup.ItemHiddenInput";
-RadioGroupItemIndicator.displayName = "RadioGroup.ItemIndicator";
-RadioGroupItemText.displayName = "RadioGroup.ItemText";

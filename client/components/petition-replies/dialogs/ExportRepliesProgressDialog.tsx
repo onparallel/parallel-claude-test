@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 import {
-  Box,
   Center,
   ModalBody,
   ModalContent,
@@ -9,7 +8,6 @@ import {
   ModalHeader,
   Progress,
   Spinner,
-  Stack,
 } from "@chakra-ui/react";
 import { CheckIcon, CloudUploadIcon } from "@parallel/chakra/icons";
 import {
@@ -22,7 +20,7 @@ import {
   CuatrecasasExportError,
   useCuatrecasasExport,
 } from "@parallel/components/petition-common/useCuatrecasasExport";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Stack, Text } from "@parallel/components/ui";
 import { ExportRepliesProgressDialog_petitionDocument } from "@parallel/graphql/__types";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { withError } from "@parallel/utils/promises/withError";
@@ -233,7 +231,7 @@ export function ExportRepliesProgressDialog({
             </Text>
           </ModalHeader>
           <ModalBody>
-            <Stack spacing={6} marginBottom={6} alignItems="center">
+            <Stack gap={6} marginBottom={6} alignItems="center">
               <Text textAlign="center">
                 <FormattedMessage
                   id="component.export-replies-progress-dialog.exported-text"
@@ -248,7 +246,7 @@ export function ExportRepliesProgressDialog({
         </ModalContent>
       ) : state === "UPLOADING" ? (
         <ModalContent>
-          <ModalHeader as={Stack} spacing={4} alignItems="center" paddingTop={8} paddingBottom={3}>
+          <ModalHeader as={Stack} gap={4} alignItems="center" paddingTop={8} paddingBottom={3}>
             <CloudUploadIcon fontSize="32px" color="gray.400" />
             <Text>
               <FormattedMessage

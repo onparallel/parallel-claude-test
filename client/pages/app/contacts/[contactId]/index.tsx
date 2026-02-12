@@ -1,15 +1,12 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
-  Box,
   Center,
-  Flex,
   FormControl,
   FormControlOptions,
   FormErrorMessage,
   FormLabel,
   Input,
-  Stack,
   ThemingProps,
 } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
@@ -28,7 +25,7 @@ import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withPermission } from "@parallel/components/common/withPermission";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, Stack, Text } from "@parallel/components/ui";
 import {
   Contact_contactDocument,
   Contact_PetitionAccessFragment,

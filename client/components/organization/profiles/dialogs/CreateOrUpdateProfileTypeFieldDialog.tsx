@@ -4,19 +4,16 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Box,
   Center,
   Checkbox,
   FormControl,
   FormErrorMessage,
   FormHelperText,
   FormLabel,
-  HStack,
   Input,
   List,
   ListItem,
   Spinner,
-  Stack,
   Switch,
 } from "@chakra-ui/react";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
@@ -32,7 +29,7 @@ import {
   useDialog,
 } from "@parallel/components/common/dialogs/DialogProvider";
 import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-common/alerts/RestrictedPetitionFieldAlert";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   CreateProfileTypeFieldInput,
   ProfileTypeFieldType,
@@ -523,7 +520,7 @@ function CreateOrUpdateProfileTypeFieldDialog({
         )
       }
       body={
-        <Stack spacing={4}>
+        <Stack gap={4}>
           {isStandard ? (
             <Alert status="info" rounded="md">
               <AlertIcon />
@@ -684,9 +681,9 @@ function CreateOrUpdateProfileTypeFieldDialog({
             {selectedType === "USER_ASSIGNMENT" ? <ProfileFieldUserAssignmentSettings /> : null}
           </FormProvider>
 
-          <Stack spacing={2}>
+          <Stack gap={2}>
             <FormControl as={HStack} isInvalid={!!errors.isExpirable}>
-              <Stack flex={1} spacing={1}>
+              <Stack flex={1} gap={1}>
                 <FormLabel margin={0}>
                   <FormattedMessage
                     id="component.create-or-update-property-dialog.expiration"
@@ -876,7 +873,7 @@ function ProfilesWithSameContentDialog({
               <Spinner />
             </Center>
           ) : (
-            <List spacing={2}>
+            <List gap={2}>
               {data!.profilesWithSameContent.map((item, i) => (
                 <ListItem key={i}>
                   <List listStyleType="disc" paddingInlineStart={5}>

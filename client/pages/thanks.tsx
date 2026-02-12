@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import { Box, Center, Divider, Flex, Heading, Image, Stack } from "@chakra-ui/react";
+import { Center, Divider, Heading, Image } from "@chakra-ui/react";
 import { CheckIcon, LinkedInSimpleIcon, TwitterIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { Link, NormalLink } from "@parallel/components/common/Link";
@@ -17,7 +17,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
-import { Text } from "@parallel/components/ui";
+import { Box, Flex, Stack, Text } from "@parallel/components/ui";
 
 function ThanksForSigning() {
   const { query } = useRouter();
@@ -42,7 +42,7 @@ function ThanksForSigning() {
       </Head>
       <Flex flex="1" paddingX={4} justifyContent="center">
         <Stack
-          spacing={8}
+          gap={8}
           minHeight="100vh"
           alignItems="stretch"
           maxWidth="container.xs"
@@ -61,7 +61,7 @@ function ThanksForSigning() {
             brandTheme={organization.brandTheme}
           >
             <Card id="thanks-card" paddingY={8} paddingX={10} textAlign="center">
-              <Stack spacing={4}>
+              <Stack gap={4}>
                 <Center margin="auto" borderRadius="full" background="primary.500" boxSize={10}>
                   <CheckIcon color="white" role="presentation" boxSize={6} />
                 </Center>

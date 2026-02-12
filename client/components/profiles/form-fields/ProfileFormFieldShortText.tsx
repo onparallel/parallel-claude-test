@@ -1,6 +1,7 @@
-import { FormErrorMessage, Stack } from "@chakra-ui/react";
+import { FormErrorMessage } from "@chakra-ui/react";
 import { FormatFormErrorMessage, ShortTextInput } from "@parallel/components/common/ShortTextInput";
 import { useShortTextFormats } from "@parallel/utils/useShortTextFormats";
+import { Stack } from "@parallel/components/ui";
 import { Controller, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";

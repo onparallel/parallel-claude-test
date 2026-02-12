@@ -1,4 +1,3 @@
-import { Box } from "@chakra-ui/react";
 import {
   PetitionApprovalRequestStatus,
   PetitionSignatureStatusFilter,
@@ -7,6 +6,7 @@ import {
   SignatureConfigSigningMode,
   Tone,
 } from "@parallel/graphql/__types";
+import { Box } from "@parallel/components/ui";
 import { Meta, StoryObj } from "@storybook/react";
 import { RecipientViewPetitionAlerts } from "../components/recipient-view/alerts/RecipientViewPetitionAlerts";
 

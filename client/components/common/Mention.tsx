@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client";
-import { Box } from "@chakra-ui/react";
+
 import { Tooltip } from "@parallel/chakra/components";
 import { chakraComponent } from "@parallel/chakra/utils";
 import { Mention_PetitionFieldCommentMentionFragment } from "@parallel/graphql/__types";
+import { Box } from "@parallel/components/ui";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
 import { UserGroupMembersPopover } from "./UserGroupMembersPopover";

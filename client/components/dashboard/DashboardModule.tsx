@@ -1,9 +1,10 @@
 import { gql } from "@apollo/client";
-import { BoxProps } from "@chakra-ui/react";
+
 import { DraggableAttributes } from "@dnd-kit/core";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { DashboardModule_DashboardModuleFragment } from "@parallel/graphql/__types";
 import { RefAttributes } from "react";
+import { BoxProps } from "@parallel/components/ui";
 import { DashboardCreatePetitionButtonModule } from "./modules/petitions/DashboardCreatePetitionButtonModule";
 import { DashboardPetitionsNumberModule } from "./modules/petitions/DashboardPetitionsNumberModule";
 import { DashboardPetitionsPieChartModule } from "./modules/petitions/DashboardPetitionsPieChartModule";

@@ -9,10 +9,9 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Stack,
 } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import { SupportMethodResponse } from "@parallel/graphql/__types";
 import { unCamelCase } from "@parallel/utils/strings";
 import { Maybe } from "@parallel/utils/types";

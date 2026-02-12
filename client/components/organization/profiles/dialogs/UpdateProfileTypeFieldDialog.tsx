@@ -1,17 +1,9 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  Checkbox,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  HStack,
-  Stack,
-} from "@chakra-ui/react";
+import { Checkbox, FormControl, FormErrorMessage, FormLabel } from "@chakra-ui/react";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack } from "@parallel/components/ui";
 import { useUpdateProfileTypeFieldDialog_ProfileTypeFieldFragment } from "@parallel/graphql/__types";
 import {
   ExpirationOption,
@@ -97,7 +89,7 @@ function UpdateProfileTypeFieldDialog({
         <Stack>
           <FormControl isInvalid={!!errors.isExpirable}>
             <HStack>
-              <Stack as={FormLabel} spacing={1} margin={0}>
+              <Stack as={FormLabel} gap={1} margin={0}>
                 <Box>
                   <FormattedMessage
                     id="component.update-profile-type-field-dialog.is-expirable-label"
@@ -133,7 +125,7 @@ function UpdateProfileTypeFieldDialog({
           </FormControl>
           {_isExpirable !== false ? (
             <FormControl isInvalid={!!errors.expiryAlertAheadTime}>
-              <HStack spacing={4}>
+              <HStack gap={4}>
                 <FormLabel fontSize="sm" whiteSpace="nowrap" fontWeight="normal" margin={0}>
                   <FormattedMessage
                     id="component.create-or-update-property-dialog.expiry-alert-ahead-time-label"

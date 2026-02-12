@@ -1,7 +1,7 @@
-import { Box, Checkbox, Stack } from "@chakra-ui/react";
+import { Checkbox } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Stack, Text } from "@parallel/components/ui";
 import { useLocalStorage } from "@parallel/utils/useLocalStorage";
 import { useCallback } from "react";
 import { useForm } from "react-hook-form";
@@ -37,7 +37,7 @@ function PetitionFromTemplateDialog({
         </Text>
       }
       body={
-        <Stack spacing={4}>
+        <Stack gap={4}>
           <Box>
             <Text>
               <FormattedMessage

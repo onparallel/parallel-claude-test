@@ -3,15 +3,12 @@ import {
   AlertDescription,
   AlertIcon,
   AlertProps,
-  Box,
-  Flex,
-  HStack,
   MenuItem,
   MenuList,
 } from "@chakra-ui/react";
 import { TimeIcon } from "@parallel/chakra/icons";
 import { ButtonWithMoreOptions } from "@parallel/components/common/ButtonWithMoreOptions";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Text } from "@parallel/components/ui";
 import {
   PetitionApprovalRequestStatus,
   PetitionSignatureStatusFilter,

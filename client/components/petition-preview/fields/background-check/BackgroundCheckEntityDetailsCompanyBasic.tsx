@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, HStack, Image, Stack } from "@chakra-ui/react";
+import { Image } from "@chakra-ui/react";
 import {
   BusinessIcon,
   CheckIcon,
@@ -11,7 +11,7 @@ import {
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { BackgroundCheckRiskLabel } from "@parallel/components/petition-common/BackgroundCheckRiskLabel";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import { BackgroundCheckEntityDetailsCompanyBasic_BackgroundCheckEntityDetailsCompanyFragment } from "@parallel/graphql/__types";
 import { formatPartialDate } from "@parallel/utils/formatPartialDate";
 import {
@@ -62,7 +62,7 @@ export function BackgroundCheckEntityDetailsCompanyBasic({
   return (
     <Card>
       <CardHeader headingLevel="h2" minHeight="65px">
-        <Stack direction={{ base: "column", md: "row" }} spacing={4}>
+        <Stack direction={{ base: "column", md: "row" }} gap={4}>
           <Stack
             direction={{ base: "column", md: "row" }}
             alignItems={{ base: "start", md: "center" }}
@@ -128,7 +128,7 @@ export function BackgroundCheckEntityDetailsCompanyBasic({
         </Stack>
       </CardHeader>
 
-      <HStack paddingX={6} paddingY={4} gridGap={{ base: 4, md: 8 }} spacing={0} wrap="wrap">
+      <HStack paddingX={6} paddingY={4} gridGap={{ base: 4, md: 8 }} gap={0} wrap="wrap">
         <Stack>
           <Text {...detailsSpanProps}>
             <FormattedMessage

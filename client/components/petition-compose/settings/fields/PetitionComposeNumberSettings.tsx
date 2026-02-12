@@ -1,10 +1,8 @@
 import { gql } from "@apollo/client";
 import {
-  Box,
   FormControl,
   FormErrorMessage,
   FormLabel,
-  HStack,
   Image,
   Input,
   NumberDecrementStepper,
@@ -12,12 +10,11 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
-  Stack,
 } from "@chakra-ui/react";
 import { Select } from "@parallel/chakra/components";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
-import { Text } from "@parallel/components/ui";
+import { Box, HStack, Stack, Text } from "@parallel/components/ui";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useState } from "react";
@@ -160,10 +157,7 @@ export function PetitionComposeNumberSettings({
           </HelpPopover>
         </FormLabel>
 
-        <Stack
-          spacing={{ base: 4, md: 2, lg: 4 }}
-          direction={{ base: "row", md: "column", lg: "row" }}
-        >
+        <Stack gap={{ base: 4, md: 2, lg: 4 }} direction={{ base: "row", md: "column", lg: "row" }}>
           <FormControl
             flex={1}
             as={HStack}

@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Box,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
@@ -9,7 +8,6 @@ import {
   DrawerOverlay,
   Icon,
   Image,
-  Stack,
   Tab,
   TabList,
   TabPanel,
@@ -19,7 +17,7 @@ import {
 import { AddIcon, ArrowBackIcon, SettingsIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { ScrollShadows } from "@parallel/components/common/ScrollShadows";
-import { Button, HStack, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { DashboardModuleDrawer_DashboardModuleFragment } from "@parallel/graphql/__types";
 import { RefObject, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -90,7 +88,7 @@ export function DashboardModuleDrawer({
             isUpdating ? (
               <HStack paddingY={2}>
                 <SettingsIcon marginEnd={2} />
-                <Stack spacing={0}>
+                <Stack gap={0}>
                   <Box>{selectedModule.name}</Box>
                   <Box color="gray.500" fontSize="sm" fontWeight={500}>
                     {selectedCategory!.name}
@@ -129,7 +127,7 @@ export function DashboardModuleDrawer({
                 {categories.map((category) => {
                   return (
                     <Tab paddingY={3} key={category.category}>
-                      <Stack align="center" spacing={1}>
+                      <Stack align="center" gap={1}>
                         <Icon as={category.icon} boxSize={5} />
                         <Box textTransform="uppercase" fontSize="xs" fontWeight={500}>
                           {category.name}
@@ -148,7 +146,7 @@ export function DashboardModuleDrawer({
                       {...extendFlexColumn}
                       overflow="auto"
                     >
-                      <Stack spacing={3}>
+                      <Stack gap={3}>
                         {modules
                           .filter((module) => module.category === category.category)
                           .map((module) => {
@@ -156,7 +154,7 @@ export function DashboardModuleDrawer({
                               <Stack
                                 key={module.type}
                                 padding={4}
-                                spacing={3}
+                                gap={3}
                                 border="1px solid"
                                 borderColor="gray.200"
                                 borderRadius="md"

@@ -1,13 +1,9 @@
 import { gql } from "@apollo/client";
 import { useLazyQuery, useMutation } from "@apollo/client/react";
 import {
-  Box,
   Center,
-  Flex,
   Heading,
-  HStack,
   Input,
-  Stack,
   Tab,
   TabList,
   TabPanel,
@@ -28,7 +24,7 @@ import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   ProfileSearch_conflictCheckProfileSearchDocument,
   ProfileSearch_conflictCheckProfileSearchQuery,
@@ -149,7 +145,7 @@ function ProfileSearch({ fieldId, petitionId, profileTypeIds, parentReplyId }: P
       <Stack
         paddingX={6}
         paddingY={5}
-        spacing={6}
+        gap={6}
         height="100vh"
         maxWidth="100vw"
         backgroundColor="gray.50"

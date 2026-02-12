@@ -1,16 +1,6 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import {
-  Box,
-  Center,
-  Heading,
-  HStack,
-  Image,
-  Skeleton,
-  Spinner,
-  Stack,
-  UnorderedList,
-} from "@chakra-ui/react";
+import { Center, Heading, Image, Skeleton, Spinner, UnorderedList } from "@chakra-ui/react";
 import { InfoCircleFilledIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
@@ -25,7 +15,7 @@ import {
 import { useRef } from "react";
 import { FormattedDate, FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 
 export function useStandardListDetailsDialog() {
   return useDialog(StandardListDetailsDialog);
@@ -58,7 +48,7 @@ export function StandardListDetailsDialog({
       header={
         <HStack>
           <InfoCircleFilledIcon color="blue.500" boxSize={6} />
-          <Stack spacing={0}>
+          <Stack gap={0}>
             {loading ? (
               <Skeleton width="150px" height="20px" />
             ) : (

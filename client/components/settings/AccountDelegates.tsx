@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
-import { FormControl, FormLabel, Heading, Stack, StackProps } from "@chakra-ui/react";
+import { FormControl, FormLabel, Heading } from "@chakra-ui/react";
 import { UserSelect, UserSelectInstance } from "@parallel/components/common/UserSelect";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, StackProps, Text } from "@parallel/components/ui";
 import { AccountDelegates_UserFragment, UserSelect_UserFragment } from "@parallel/graphql/__types";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { useCallback, useRef } from "react";
@@ -60,10 +60,10 @@ export function AccountDelegates({ user, onSubmit, ...props }: AccountDelegatesP
           onSubmit(values.delegates.map((d) => d.id));
           reset(values);
         })}
-        spacing={4}
+        gap={4}
       >
         <FormControl id="delegates" isDisabled={!user.hasOnBehalfOf}>
-          <Stack spacing={4} paddingBottom={2}>
+          <Stack gap={4} paddingBottom={2}>
             <Text>
               <FormattedMessage
                 id="component.account-delegates.delegates-description"

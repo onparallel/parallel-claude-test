@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Stack } from "@chakra-ui/react";
+
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { useAskContactDetailsDialog } from "@parallel/components/common/dialogs/AskContactDetailsDialog";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
@@ -10,7 +10,7 @@ import {
   isDialogError,
   useDialog,
 } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import { useCreateContact_createContactDocument } from "@parallel/graphql/__types";
 import { useCallback } from "react";
 import { FormattedMessage } from "react-intl";
@@ -79,7 +79,7 @@ function ForceCreateContactDialog({ ...props }: DialogProps<{}>) {
     <ConfirmDialog
       {...props}
       header={
-        <Stack direction={"row"} spacing={2} align="center">
+        <Stack direction={"row"} gap={2} align="center">
           <AlertCircleIcon role="presentation" />
           <Text>
             <FormattedMessage

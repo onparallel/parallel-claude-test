@@ -1,4 +1,4 @@
-import { Box, Grid, Stack } from "@chakra-ui/react";
+import { Grid } from "@chakra-ui/react";
 import { Divider } from "@parallel/components/common/Divider";
 import {
   LocalizableUserText,
@@ -13,7 +13,7 @@ import {
   PetitionRepliesMetadataGender,
   PetitionRepliesMetadataText,
 } from "./PetitionRepliesMetadata";
-import { Text } from "@parallel/components/ui";
+import { Box, Stack, Text } from "@parallel/components/ui";
 
 interface Schema {
   type: "object" | "array" | "string" | "number";
@@ -88,7 +88,7 @@ export function PetitionRepliesFieldFileSchema({
           <Text as="span" fontWeight={500} color="gray.800">
             {title}
           </Text>
-          <Stack paddingX={3} spacing={3} divider={<Divider />}>
+          <Stack paddingX={3} gap={3} divider={<Divider />}>
             {(value as any[]).map((item: any, index: number) => (
               <Fragment key={`${key}-${index}`}>{renderContent(fieldSchema.items!, item)}</Fragment>
             ))}
@@ -175,7 +175,7 @@ export function PetitionRepliesFieldFileSchema({
   return (
     <Stack
       divider={<Divider />}
-      spacing={3}
+      gap={3}
       border={SHOW_DEBUG_BORDER ? "2px solid green" : undefined}
       marginBottom={3}
     >

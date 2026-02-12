@@ -1,31 +1,43 @@
+/* eslint-disable no-restricted-imports */
 import {
   HStack as ChakraHStack,
   Stack as ChakraStack,
+  StackProps as ChakraStackProps,
   VStack as ChakraVStack,
-  StackProps,
 } from "@chakra-ui/react";
-import { forwardRef } from "react";
+import { chakraComponent } from "@parallel/chakra/utils";
 
 // Docs: https://chakra-ui.com/docs/components/stack
 
-// Stack v3 API - uses gap instead of spacing
-export interface ExtendedStackProps extends Omit<StackProps, "spacing"> {
-  gap?: StackProps["spacing"];
+// Stack v3 migration shim: accepts v3 API (gap) but uses v2 behavior (spacing).
+// Code uses gap={X} → wrapper passes spacing={X} to v2 Stack.
+// When migrating to Chakra v3, remove this wrapper and re-export directly.
+export interface ExtendedStackProps extends Omit<ChakraStackProps, "spacing"> {
+  gap?: ChakraStackProps["spacing"];
 }
 
-export const Stack = forwardRef<HTMLDivElement, ExtendedStackProps>(({ gap, ...props }, ref) => {
-  // Map v3 gap to v2 spacing
+export type StackProps = ExtendedStackProps;
+
+export const Stack = chakraComponent<"div", ExtendedStackProps>(function Stack({
+  gap,
+  ref,
+  ...props
+}) {
   return <ChakraStack ref={ref} spacing={gap} {...props} />;
 });
 
-export const HStack = forwardRef<HTMLDivElement, ExtendedStackProps>(({ gap, ...props }, ref) => {
+export const HStack = chakraComponent<"div", ExtendedStackProps>(function HStack({
+  gap,
+  ref,
+  ...props
+}) {
   return <ChakraHStack ref={ref} spacing={gap} {...props} />;
 });
 
-export const VStack = forwardRef<HTMLDivElement, ExtendedStackProps>(({ gap, ...props }, ref) => {
+export const VStack = chakraComponent<"div", ExtendedStackProps>(function VStack({
+  gap,
+  ref,
+  ...props
+}) {
   return <ChakraVStack ref={ref} spacing={gap} {...props} />;
 });
-
-Stack.displayName = "Stack";
-HStack.displayName = "HStack";
-VStack.displayName = "VStack";

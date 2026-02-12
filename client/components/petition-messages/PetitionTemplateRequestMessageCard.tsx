@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
-import { Box, FormControl, FormLabel, HStack, Stack } from "@chakra-ui/react";
+import { FormControl, FormLabel } from "@chakra-ui/react";
 import { EmailIcon } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
-import { Text } from "@parallel/components/ui";
+import { Box, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionTemplateRequestMessageCard_PetitionTemplateFragment,
   PetitionTemplateRequestMessageCard_UserFragment,
@@ -84,7 +84,7 @@ export const PetitionTemplateRequestMessageCard = chakraComponent<
         />
       </CardHeader>
 
-      <Stack padding={4} spacing={3}>
+      <Stack padding={4} gap={3}>
         <Text>
           <FormattedMessage
             id="component.petition-template-request-message.card-explainer"

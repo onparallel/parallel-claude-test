@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
-import { Center, Heading, HStack, Stack } from "@chakra-ui/react";
+import { Center, Heading } from "@chakra-ui/react";
 import { AddIcon, CloseIconSmall } from "@parallel/chakra/icons";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { TableColumn } from "@parallel/components/common/Table";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   ProfileRelationshipsTable_createProfileRelationshipDocument,
   ProfileRelationshipsTable_profileDocument,

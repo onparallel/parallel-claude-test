@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 import {
-  Box,
   Center,
   Checkbox,
   FormControl,
@@ -11,7 +10,6 @@ import {
   Radio,
   RadioGroup,
   Spinner,
-  Stack,
 } from "@chakra-ui/react";
 import { ArrowForwardIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
@@ -24,7 +22,7 @@ import {
   PlaceholderInput,
   PlaceholderInputInstance,
 } from "@parallel/components/common/slate/PlaceholderInput";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Stack, Text } from "@parallel/components/ui";
 import {
   ExportRepliesDialog_meDocument,
   ExportRepliesDialog_petitionDocument,
@@ -268,7 +266,7 @@ function ExportRepliesDialogContent({
         />
       }
       body={
-        <Stack spacing={4}>
+        <Stack gap={4}>
           {options.length > 1 || selectedOption === "EXPORT_CUATRECASAS" ? (
             <Stack>
               {options.length > 1 ? (

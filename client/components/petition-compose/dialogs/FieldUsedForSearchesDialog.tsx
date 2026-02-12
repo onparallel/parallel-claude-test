@@ -1,7 +1,6 @@
-import { Box } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Text } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";
 

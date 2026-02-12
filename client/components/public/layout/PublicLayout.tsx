@@ -1,6 +1,6 @@
-import { Box, Flex } from "@chakra-ui/react";
 import { resolveUrl } from "@parallel/utils/next";
 import { Maybe } from "@parallel/utils/types";
+import { Box, Flex } from "@parallel/components/ui";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import Script from "next/script";

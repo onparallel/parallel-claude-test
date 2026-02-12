@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Flex, FormControl, MenuButton, MenuItem, MenuList, Stack } from "@chakra-ui/react";
+import { FormControl, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
 import { UserAvatar } from "@parallel/components/common/UserAvatar";
@@ -11,7 +11,7 @@ import {
 } from "@parallel/components/common/UserSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, Stack, Text } from "@parallel/components/ui";
 import {
   useProfileSubscribersDialog_UserFragment,
   useProfileSubscribersDialog_subscribeToProfileDocument,

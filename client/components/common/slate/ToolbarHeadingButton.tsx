@@ -1,9 +1,10 @@
-import { Box, MenuButton, MenuItemOption, MenuList, MenuOptionGroup } from "@chakra-ui/react";
+import { MenuButton, MenuItemOption, MenuList, MenuOptionGroup } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import { CheckIcon, FontSizeIcon } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
 import { assignRef } from "@parallel/utils/assignRef";
 import { getPreventDefaultHandler } from "@parallel/utils/events";
+import { Box } from "@parallel/components/ui";
 import {
   focusEditor,
   select,

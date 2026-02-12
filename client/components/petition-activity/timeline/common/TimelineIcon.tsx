@@ -1,4 +1,5 @@
-import { BoxProps, ComponentWithAs, Flex, Icon, IconProps } from "@chakra-ui/react";
+import { ComponentWithAs, Icon, IconProps } from "@chakra-ui/react";
+import { BoxProps, Flex } from "@parallel/components/ui";
 
 export function TimelineIcon({
   icon,

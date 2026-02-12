@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
-import { Box, Circle, Flex, LinkBox, LinkOverlay, Stack } from "@chakra-ui/react";
+import { Circle, LinkBox, LinkOverlay } from "@chakra-ui/react";
 import { EmailIcon, EmailOpenedIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { Text } from "@parallel/components/ui";
+import { Box, Flex, Stack, Text } from "@parallel/components/ui";
 import { PetitionUserNotification_PetitionUserNotificationFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
@@ -72,7 +72,7 @@ export function PetitionUserNotification({
       ref={ref as any}
       direction="row"
       background={isRead ? "white" : "primary.50"}
-      spacing={0}
+      gap={0}
       paddingY={2}
       _hover={{
         background: "gray.75",
@@ -93,7 +93,7 @@ export function PetitionUserNotification({
 
         {icon}
       </Flex>
-      <Stack flex="1 1 auto" minWidth="0" spacing={0} ref={bodyRef}>
+      <Stack flex="1 1 auto" minWidth="0" gap={0} ref={bodyRef}>
         <LinkOverlay
           as={NextLink}
           href={`/${intl.locale}/app/petitions/${petition.id}${path}`}

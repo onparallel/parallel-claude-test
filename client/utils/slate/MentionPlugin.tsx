@@ -1,6 +1,6 @@
 /** no-recipient */
 import { gql } from "@apollo/client";
-import { Box } from "@chakra-ui/react";
+
 import {
   ComboboxItemProps,
   ComboboxProps,
@@ -10,6 +10,7 @@ import { UserDropdownEmpty } from "@parallel/components/common/UserDropdownEmpty
 import { userGroupReferenceText } from "@parallel/components/common/UserGroupReference";
 import { UserSelectOption } from "@parallel/components/common/UserSelectOption";
 import { UserLocale, createMentionPlugin_UserOrUserGroupFragment } from "@parallel/graphql/__types";
+import { Box } from "@parallel/components/ui";
 import {
   PlateEditor,
   TRenderElementProps,

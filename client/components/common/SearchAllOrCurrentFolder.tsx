@@ -1,6 +1,7 @@
-import { Box, ButtonGroup, HStack, RadioProps, useRadioGroup } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
+import { ButtonGroup, RadioProps, useRadioGroup } from "@chakra-ui/react";
 import { PetitionBaseType } from "@parallel/graphql/__types";
+import { Box, HStack } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
 import { OverflownText } from "./OverflownText";
 import { PathName } from "./PathName";

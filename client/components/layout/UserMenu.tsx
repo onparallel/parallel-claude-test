@@ -1,13 +1,10 @@
 import { gql } from "@apollo/client";
 import {
-  Box,
-  HStack,
   MenuButton,
   MenuDivider,
   MenuItem,
   MenuList,
   Portal,
-  Stack,
   useBreakpointValue,
   UsePopperProps,
 } from "@chakra-ui/react";
@@ -30,7 +27,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import NextLink from "next/link";
 import { UserAvatar } from "../common/UserAvatar";
 import { Avatar } from "../ui";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 
 export interface UserMenuProps extends UserMenu_QueryFragment {
   placement?: UsePopperProps["placement"];
@@ -93,7 +90,7 @@ export function UserMenu({ extended, placement, me, realMe, onToggle }: UserMenu
                   </Avatar.Badge>
                 ) : null}
               </UserAvatar>
-              <Stack spacing={1} minWidth={0}>
+              <Stack gap={1} minWidth={0}>
                 <Text
                   as="span"
                   fontWeight={500}
@@ -164,7 +161,7 @@ export function UserMenu({ extended, placement, me, realMe, onToggle }: UserMenu
           </Box>
           <HStack paddingX={3.5} paddingY={1}>
             <UserAvatar user={me} size="sm" />
-            <Stack spacing={0}>
+            <Stack gap={0}>
               <Text as="div" fontWeight="semibold" data-testid="account-name">
                 {me.fullName}
               </Text>

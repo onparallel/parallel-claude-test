@@ -1,5 +1,5 @@
-import { Link, Stack, VStack } from "@chakra-ui/react";
-import { Radio, RadioGroup, Text } from "@parallel/components/ui";
+import { Link } from "@chakra-ui/react";
+import { Radio, RadioGroup, Stack, Text, VStack } from "@parallel/components/ui";
 import { untranslated } from "@parallel/utils/untranslated";
 import { Meta, StoryObj } from "@storybook/react";
 

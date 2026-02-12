@@ -1,9 +1,7 @@
 import {
-  Box,
   FormControl,
   FormErrorMessage,
   FormLabel,
-  HStack,
   IconButton,
   Img,
   Input,
@@ -14,12 +12,11 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Stack,
 } from "@chakra-ui/react";
 import { QuestionOutlineIcon } from "@parallel/chakra/icons";
 import { NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
-import { Button, Collapsible, Text } from "@parallel/components/ui";
+import { Box, Button, Collapsible, HStack, Stack, Text } from "@parallel/components/ui";
 import { isValidEmail } from "@parallel/utils/validation";
 import { useResizeObserver } from "@parallel/utils/useResizeObserver";
 import { useRef, useState } from "react";
@@ -77,13 +74,7 @@ export function PublicPetitionInitialForm({
 
   return (
     <>
-      <Stack
-        spacing={4}
-        maxWidth="container.sm"
-        width="100%"
-        margin="0 auto"
-        alignItems="flex-start"
-      >
+      <Stack gap={4} maxWidth="container.sm" width="100%" margin="0 auto" alignItems="flex-start">
         {logoUrl ? (
           <Box maxWidth="170px">
             <Img
@@ -99,7 +90,7 @@ export function PublicPetitionInitialForm({
           <Logo width="152px" height="40px" />
         )}
 
-        <Stack spacing={0} maxWidth={{ base: "auto", md: "25rem" }}>
+        <Stack gap={0} maxWidth={{ base: "auto", md: "25rem" }}>
           <Text fontSize="sm" color="gray.500" fontWeight="600">
             {organizationName}
           </Text>
@@ -138,7 +129,7 @@ export function PublicPetitionInitialForm({
         </Box>
       </Stack>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <Stack spacing={6} width="100%" margin="0 auto" maxWidth="container.sm">
+        <Stack gap={6} width="100%" margin="0 auto" maxWidth="container.sm">
           <Text fontWeight="bold" fontSize="xl">
             <FormattedMessage
               id="public-petition.help.form-title"
@@ -268,7 +259,7 @@ export function PublicPetitionInitialForm({
             />
 
             <ModalBody>
-              <Stack spacing={4}>
+              <Stack gap={4}>
                 <Text>
                   <FormattedMessage
                     id="public-petition.help.explanation-1"

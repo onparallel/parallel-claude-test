@@ -9,14 +9,13 @@ import {
   FormErrorMessage,
   FormLabel,
   Heading,
-  Stack,
   useToast,
 } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { UserSettingsLayout } from "@parallel/components/layout/UserSettingsLayout";
-import { Button } from "@parallel/components/ui";
+import { Button, Stack } from "@parallel/components/ui";
 import { Security_updatePasswordDocument, Security_userDocument } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
@@ -85,8 +84,8 @@ function Security() {
 
   return (
     <UserSettingsLayout queryObject={queryObject}>
-      <Stack padding={6} spacing={8} maxWidth="container.2xs" width="100%" paddingBottom={16}>
-        <Stack spacing={4}>
+      <Stack padding={6} gap={8} maxWidth="container.2xs" width="100%" paddingBottom={16}>
+        <Stack gap={4}>
           <Heading as="h4" size="md" fontWeight="semibold">
             <FormattedMessage id="page.security.password-header" defaultMessage="Change password" />
           </Heading>
@@ -101,7 +100,7 @@ function Security() {
               </AlertDescription>
             </Alert>
           ) : null}
-          <Stack as="form" onSubmit={handleSubmit(onChangePassword)} spacing={4}>
+          <Stack as="form" onSubmit={handleSubmit(onChangePassword)} gap={4}>
             <FormControl id="password" isInvalid={!!errors.password} isDisabled={me.isSsoUser}>
               <FormLabel fontWeight="semibold">
                 <FormattedMessage id="generic.old-password-label" defaultMessage="Old password" />

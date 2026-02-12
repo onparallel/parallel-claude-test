@@ -1,10 +1,10 @@
-import { Box } from "@chakra-ui/react";
 import { PetitionComposeAndPreviewAlerts } from "@parallel/components/petition-common/alerts/PetitionComposeAndPreviewAlerts";
 import {
   PetitionApprovalRequestStatus,
   PetitionSignatureStatusFilter,
   PetitionStatus,
 } from "@parallel/graphql/__types";
+import { Box } from "@parallel/components/ui";
 import { Meta, StoryObj } from "@storybook/react";
 
 export default {

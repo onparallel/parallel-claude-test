@@ -1,19 +1,11 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import {
-  Box,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  HStack,
-  Input,
-  Stack,
-} from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel, Input } from "@chakra-ui/react";
 import { UserArrowIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   Tone,
   useDelegateAccessDialog_publicDelegateAccessToContactDocument,
@@ -111,7 +103,7 @@ function DelegateAccessDialog({
         },
       }}
       header={
-        <HStack spacing={2.5}>
+        <HStack gap={2.5}>
           <UserArrowIcon />
           <Text as="div" flex="1">
             <FormattedMessage id="generic.share" defaultMessage="Share" />
@@ -119,7 +111,7 @@ function DelegateAccessDialog({
         </HStack>
       }
       body={
-        <Stack spacing={4}>
+        <Stack gap={4}>
           <Box>
             <Text>
               <FormattedMessage

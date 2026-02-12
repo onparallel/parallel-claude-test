@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Alert, AlertDescription, AlertIcon, Stack } from "@chakra-ui/react";
+import { Alert, AlertDescription, AlertIcon } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import { useCloseProfile_closeProfileDocument } from "@parallel/graphql/__types";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";

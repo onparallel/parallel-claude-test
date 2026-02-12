@@ -1,10 +1,10 @@
-import { HStack, Input, InputGroup, InputRightAddon, Stack } from "@chakra-ui/react";
+import { Input, InputGroup, InputRightAddon } from "@chakra-ui/react";
 import { CircleCheckFilledIcon } from "@parallel/chakra/icons";
 import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboardButton";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { Link } from "@parallel/components/common/Link";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
 
 export interface ContactlessLinkDialogProps {
@@ -31,7 +31,7 @@ export function ContactlessLinkDialog({
         </HStack>
       }
       body={
-        <Stack spacing={4}>
+        <Stack gap={4}>
           <Text>
             <FormattedMessage
               id="component.petition-link-dialog.body-1"

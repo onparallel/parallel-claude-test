@@ -1,11 +1,11 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Flex, HStack, Stack } from "@chakra-ui/react";
+import { Center } from "@chakra-ui/react";
 import { Dropzone } from "@parallel/components/common/Dropzone";
 import { FileAttachment } from "@parallel/components/common/FileAttachment";
 import { FileSize } from "@parallel/components/common/FileSize";
 import { SuggestionsButton } from "@parallel/components/common/SuggestionsButton";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import { Text } from "@parallel/components/ui";
+import { Box, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import { discriminator } from "@parallel/utils/discriminator";
 import { downloadLocalFile } from "@parallel/utils/downloadLocalFile";
 import { useDownloadProfileFieldFile } from "@parallel/utils/useDownloadProfileFieldFile";

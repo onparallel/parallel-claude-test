@@ -1,7 +1,7 @@
-import { Image, Link, Stack } from "@chakra-ui/react";
+import { Image, Link } from "@chakra-ui/react";
 import { ErrorPage } from "@parallel/components/public/ErrorPage";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
+import { Stack, Text } from "@parallel/components/ui";
 
 export default function UpdateBrowser() {
   const browsers = [
@@ -29,14 +29,14 @@ export default function UpdateBrowser() {
       }
       imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL ?? ""}/static/images/undraw_back_in_the_day.svg`}
     >
-      <Stack spacing={6}>
+      <Stack gap={6}>
         <Text>
           <FormattedMessage
             id="page.update-browser.text-1"
             defaultMessage="You are using an old browser. We recommend updating your browser or download the latest version of one of the following:"
           />
         </Text>
-        <Stack direction="row" justifyContent="center" spacing={{ base: 4, sm: 8, md: 12 }}>
+        <Stack direction="row" justifyContent="center" gap={{ base: 4, sm: 8, md: 12 }}>
           {browsers.map((browser) => (
             <Link
               key={browser.code}

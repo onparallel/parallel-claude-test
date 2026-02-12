@@ -1,6 +1,6 @@
-import { Img, Stack } from "@chakra-ui/react";
+import { Img } from "@chakra-ui/react";
 import { Logo } from "@parallel/components/common/Logo";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
 
 interface PublicPetitionEmailExistsProps {
@@ -22,7 +22,7 @@ export function PublicPetitionEmailExists({
 }: PublicPetitionEmailExistsProps) {
   return (
     <Stack
-      spacing={{ base: 6, md: 8 }}
+      gap={{ base: 6, md: 8 }}
       maxWidth="container.sm"
       width="100%"
       margin="0 auto"
@@ -42,7 +42,7 @@ export function PublicPetitionEmailExists({
         <Logo width="152px" height="40px" />
       )}
 
-      <Stack spacing={4} width="100%">
+      <Stack gap={4} width="100%">
         <Text fontSize="2xl" fontWeight="bold">
           <FormattedMessage
             id="public-petition-email-exists.title"
@@ -56,7 +56,7 @@ export function PublicPetitionEmailExists({
           />
         </Text>
 
-        <Stack spacing={4} paddingTop={4} direction={{ base: "column", md: "row" }}>
+        <Stack gap={4} paddingTop={4} direction={{ base: "column", md: "row" }}>
           <Button
             width="100%"
             variant="outline"

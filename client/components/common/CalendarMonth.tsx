@@ -1,5 +1,5 @@
-import { Box, BoxProps, ButtonProps, chakra } from "@chakra-ui/react";
-import { Button } from "@parallel/components/ui";
+import { ButtonProps, chakra } from "@chakra-ui/react";
+import { Box, BoxProps, Button } from "@parallel/components/ui";
 import { FORMATS } from "@parallel/utils/dates";
 import {
   addDays,

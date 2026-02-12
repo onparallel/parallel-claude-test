@@ -1,6 +1,6 @@
-import { Center, HStack, Stack, Switch } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
-import { Text } from "@parallel/components/ui";
+import { Center, Switch } from "@chakra-ui/react";
+import { HStack, Stack, Text } from "@parallel/components/ui";
 import { ReactNode } from "react";
 import { Card } from "../common/Card";
 import { RestrictedFeaturePopover } from "../common/RestrictedFeaturePopover";
@@ -38,8 +38,8 @@ export const IntegrationSwitchCard = chakraComponent<"div", IntegrationSwitchCar
         content={disabledMessage}
       >
         <Card ref={ref} paddingX={6} paddingY={4} disabled={isDisabled} {...props}>
-          <HStack spacing={6}>
-            <Stack direction={{ base: "column", md: "row" }} flex="1" spacing={{ base: 4, md: 6 }}>
+          <HStack gap={6}>
+            <Stack direction={{ base: "column", md: "row" }} flex="1" gap={{ base: 4, md: 6 }}>
               <Center width={{ base: "auto", md: "120px" }}>{logo}</Center>
               <Stack flex="1">
                 <HStack>

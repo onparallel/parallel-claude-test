@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Flex, Image, Stack } from "@chakra-ui/react";
+import { Center, Image } from "@chakra-ui/react";
 import { Fonts } from "@parallel/components/organization/branding/DocumentFont";
 import { DocumentThemePreview_OrganizationFragment } from "@parallel/graphql/__types";
 import { untranslated } from "@parallel/utils/untranslated";
@@ -7,7 +7,7 @@ import { CSSProperties } from "react";
 import { FormattedMessage } from "react-intl";
 import { unique } from "remeda";
 import { DocumentThemeEditorData } from "./DocumentThemeEditor";
-import { Text } from "@parallel/components/ui";
+import { Box, Flex, Stack, Text } from "@parallel/components/ui";
 
 interface DocumentThemePreviewProps {
   organization: DocumentThemePreview_OrganizationFragment;
@@ -142,7 +142,7 @@ export function DocumentThemePreview({ organization, theme }: DocumentThemePrevi
               borderColor="gray.200"
               borderRadius={mm(1.5)}
               padding={mm(4.2)}
-              spacing={mm(2)}
+              gap={mm(2)}
               marginTop={mm(5)}
             >
               <Text fontWeight="bold" style={styles.text}>
@@ -163,7 +163,7 @@ export function DocumentThemePreview({ organization, theme }: DocumentThemePrevi
               borderColor="gray.200"
               borderRadius={mm(1.5)}
               padding={mm(4.2)}
-              spacing={mm(2)}
+              gap={mm(2)}
               marginTop={mm(5)}
             >
               <Text fontWeight="bold" style={styles.text}>

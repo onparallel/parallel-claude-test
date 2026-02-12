@@ -1,14 +1,4 @@
-import {
-  Box,
-  Center,
-  Flex,
-  Grid,
-  GridItem,
-  HStack,
-  ListItem,
-  OrderedList,
-  Stack,
-} from "@chakra-ui/react";
+import { Center, Grid, GridItem, ListItem, OrderedList } from "@chakra-ui/react";
 import {
   CheckIcon,
   DoubleCheckIcon,
@@ -25,7 +15,7 @@ import { downloadSpreadsheet } from "@parallel/utils/downloadSpreadsheet";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { TimeSpan } from "../common/TimeSpan";
-import { Text } from "@parallel/components/ui";
+import { Box, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 
 export function ReportsStatisticsAverage({
   report,
@@ -88,7 +78,7 @@ export function ReportsStatisticsAverage({
       paddingTop={4}
     >
       <GridItem gridArea="petitions">
-        <Card height="100%" padding={6} as={Stack} spacing={3}>
+        <Card height="100%" padding={6} as={Stack} gap={3}>
           <HStack height={8}>
             <Center>
               <PaperPlaneIcon />
@@ -122,7 +112,7 @@ export function ReportsStatisticsAverage({
         </Card>
       </GridItem>
       <GridItem gridArea="signatures">
-        <Card height="100%" padding={6} as={Stack} spacing={3}>
+        <Card height="100%" padding={6} as={Stack} gap={3}>
           <HStack height={8}>
             <Center>
               <SignatureIcon />
@@ -165,7 +155,7 @@ export function ReportsStatisticsAverage({
         </Card>
       </GridItem>
       <GridItem gridArea="petitions-time">
-        <Card height="100%" padding={6} as={Stack} spacing={3}>
+        <Card height="100%" padding={6} as={Stack} gap={3}>
           <HStack height={8}>
             <Text fontWeight={500}>
               <FormattedMessage
@@ -269,7 +259,7 @@ export function ReportsStatisticsAverage({
         </Card>
       </GridItem>
       <GridItem gridArea="signatures-time">
-        <Card height="100%" padding={6} as={Stack} spacing={3}>
+        <Card height="100%" padding={6} as={Stack} gap={3}>
           <HStack height={8}>
             <Text fontWeight={500}>
               <FormattedMessage

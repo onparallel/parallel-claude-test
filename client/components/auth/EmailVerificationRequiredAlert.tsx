@@ -1,5 +1,5 @@
-import { AlertDescription, AlertIcon, AlertTitle, Flex, Stack, useToast } from "@chakra-ui/react";
-import { Button, Text } from "@parallel/components/ui";
+import { AlertDescription, AlertIcon, AlertTitle, useToast } from "@chakra-ui/react";
+import { Button, Flex, Stack, Text } from "@parallel/components/ui";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -62,7 +62,7 @@ export function EmailVerificationRequiredAlert({
         paddingEnd={12}
       >
         <AlertIcon />
-        <Stack spacing={1}>
+        <Stack gap={1}>
           <AlertTitle>
             <FormattedMessage
               id="component.email-verification-required-alert.title"

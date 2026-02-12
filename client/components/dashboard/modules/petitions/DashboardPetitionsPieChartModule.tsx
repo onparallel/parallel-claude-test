@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Grid, GridItem, Square, Stack } from "@chakra-ui/react";
+import { Center, Grid, GridItem, Square } from "@chakra-ui/react";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { ScrollShadows } from "@parallel/components/common/ScrollShadows";
 import { DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModuleFragment } from "@parallel/graphql/__types";
@@ -14,7 +14,7 @@ import { DashboardLinkToResults } from "../../shared/DashboardLinkToResults";
 import { DashboardModuleAlertIncongruent } from "../../shared/DashboardModuleAlertIncongruent";
 import { DashboardModuleCard } from "../../shared/DashboardModuleCard";
 import { DashboardModuleSpinner } from "../../shared/DashboardModuleSpinner";
-import { Text } from "@parallel/components/ui";
+import { Box, Stack, Text } from "@parallel/components/ui";
 
 export function DashboardPetitionsPieChartModule({
   module,
@@ -88,7 +88,7 @@ export function DashboardPetitionsPieChartModule({
         <Stack
           direction={{ base: "column", md: "row" }}
           alignItems="stretch"
-          spacing={{ base: 2, md: 4 }}
+          gap={{ base: 2, md: 4 }}
           flex="1"
           minHeight={0}
         >

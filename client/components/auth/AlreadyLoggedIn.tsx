@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
-import { Box } from "@chakra-ui/react";
+
 import { NormalLink } from "@parallel/components/common/Link";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Text } from "@parallel/components/ui";
 import { AlreadyLoggedIn_UserFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { UserAvatar } from "../common/UserAvatar";

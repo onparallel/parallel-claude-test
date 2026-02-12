@@ -1,7 +1,7 @@
-import { Box, HStack } from "@chakra-ui/react";
 import { EditSimpleIcon } from "@parallel/chakra/icons";
 import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
 import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
+import { Box, HStack } from "@parallel/components/ui";
 import { useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import NextLink from "next/link";

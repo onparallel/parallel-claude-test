@@ -1,7 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Flex,
-  HStack,
   Img,
   List,
   ListItem,
@@ -22,7 +20,7 @@ import { HtmlBlock } from "@parallel/components/common/HtmlBlock";
 import { Link, NormalLink } from "@parallel/components/common/Link";
 import NextLink from "next/link";
 import { Logo } from "@parallel/components/common/Logo";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Flex, HStack, Text } from "@parallel/components/ui";
 import { Tone, useCompletingMessageDialog_PublicPetitionFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 

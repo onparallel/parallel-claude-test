@@ -1,7 +1,7 @@
-import { Box, BoxProps } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { usePetitionFieldTypeColor } from "@parallel/utils/petitionFields";
+import { Box, BoxProps } from "@parallel/components/ui";
 import { PetitionFieldTypeIcon } from "../petition-common/PetitionFieldTypeIcon";
 import { PetitionFieldTypeText } from "./PetitionFieldTypeText";
 

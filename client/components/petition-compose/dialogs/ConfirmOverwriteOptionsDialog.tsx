@@ -1,7 +1,6 @@
-import { Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
 
 function ConfirmOverwriteOptionsDialog(props: DialogProps) {
@@ -14,7 +13,7 @@ function ConfirmOverwriteOptionsDialog(props: DialogProps) {
         />
       }
       body={
-        <Stack spacing={1}>
+        <Stack gap={1}>
           <Text>
             <FormattedMessage
               id="component.confirm-overwrite-options-dialog.body"

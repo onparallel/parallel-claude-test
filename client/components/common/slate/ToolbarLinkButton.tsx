@@ -1,7 +1,7 @@
-import { FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel, Input } from "@chakra-ui/react";
 import { LinkIcon } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
-import { Button } from "@parallel/components/ui";
+import { Button, Stack } from "@parallel/components/ui";
 import { getPreventDefaultHandler } from "@parallel/utils/events";
 import { withError } from "@parallel/utils/promises/withError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";

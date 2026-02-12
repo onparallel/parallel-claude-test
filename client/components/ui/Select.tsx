@@ -4,7 +4,7 @@ import {
   SelectProps,
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
-import { forwardRef } from "react";
+import { RefAttributes } from "react";
 
 // Docs: https://chakra-ui.com/docs/components/select
 
@@ -18,30 +18,24 @@ export interface ExtendedSelectProps
 }
 
 // Apply default props from components.tsx
-export const Select = forwardRef<HTMLSelectElement, ExtendedSelectProps>(
-  (
-    {
-      invalid,
-      disabled,
-      readOnly,
-      colorPalette,
-      icon = <ChevronDownIcon fontSize="16px" />,
-      ...props
-    },
-    ref,
-  ) => {
-    return (
-      <ChakraSelect
-        ref={ref}
-        isInvalid={invalid}
-        isDisabled={disabled}
-        isReadOnly={readOnly}
-        colorScheme={colorPalette}
-        icon={icon}
-        {...props}
-      />
-    );
-  },
-);
-
-Select.displayName = "Select";
+export function Select({
+  invalid,
+  disabled,
+  readOnly,
+  colorPalette,
+  icon = <ChevronDownIcon fontSize="16px" />,
+  ref,
+  ...props
+}: ExtendedSelectProps & RefAttributes<HTMLSelectElement>) {
+  return (
+    <ChakraSelect
+      ref={ref}
+      isInvalid={invalid}
+      isDisabled={disabled}
+      isReadOnly={readOnly}
+      colorScheme={colorPalette}
+      icon={icon}
+      {...props}
+    />
+  );
+}

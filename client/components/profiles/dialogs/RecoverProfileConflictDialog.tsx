@@ -1,11 +1,11 @@
-import { List, ListItem, Stack } from "@chakra-ui/react";
+import { List, ListItem } from "@chakra-ui/react";
 import {
   LocalizableUserText,
   LocalizableUserTextRender,
 } from "@parallel/components/common/LocalizableUserTextRender";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { ErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import { Text } from "@parallel/components/ui";
+import { Stack, Text } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
 
 export interface RecoverProfileConflict {

@@ -1,20 +1,8 @@
 import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
-import {
-  Badge,
-  Box,
-  Center,
-  Flex,
-  Heading,
-  HStack,
-  LinkBox,
-  LinkOverlay,
-  Spinner,
-  Stack,
-} from "@chakra-ui/react";
-import { usePrevious } from "@parallel/utils/use-previous";
+import { Badge, Center, Heading, LinkBox, LinkOverlay, Spinner } from "@chakra-ui/react";
 import { ChevronLeftIcon, CommentIcon, EditIcon } from "@parallel/chakra/icons";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   RecipientViewComments_accessDocument,
   RecipientViewComments_markPetitionFieldCommentsAsReadDocument,
@@ -28,6 +16,7 @@ import {
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { isMetaReturn } from "@parallel/utils/keys";
+import { usePrevious } from "@parallel/utils/use-previous";
 import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
 import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
 import { useTimeoutEffect } from "@parallel/utils/useTimeoutEffect";
@@ -291,7 +280,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
 
         <CloseButton size="sm" onClick={onClose} />
       </HStack>
-      <Stack padding={0} overflow="auto" height="100%" spacing={0}>
+      <Stack padding={0} overflow="auto" height="100%" gap={0}>
         {isNullish(fieldId) ? (
           fieldsWithComments.length === 0 && isLoadingAccess ? (
             <LoadingSpinner />
@@ -320,13 +309,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
               />
             ) : (
               <>
-                <Stack
-                  spacing={0}
-                  divider={<Divider />}
-                  overflow="auto"
-                  width="100%"
-                  ref={commentsRef}
-                >
+                <Stack gap={0} divider={<Divider />} overflow="auto" width="100%" ref={commentsRef}>
                   {comments.map((comment) => (
                     <PublicPetitionFieldComment
                       key={comment.id}
@@ -344,7 +327,7 @@ export function RecipientViewComments({ keycode, access, onClose }: RecipientVie
 
             <Divider />
             <HStack padding={2} alignItems="flex-start">
-              <Stack flex={1} spacing={1} minWidth={0}>
+              <Stack flex={1} gap={1} minWidth={0}>
                 <GrowingTextarea
                   id={`comment-editor-${fieldId}`}
                   ref={editorRef}
@@ -698,7 +681,7 @@ function LastFieldComment({
     <LinkBox
       as={Stack}
       key={field.id}
-      spacing={1}
+      gap={1}
       paddingX={4}
       paddingY={2}
       backgroundColor={unreadCount > 0 ? "primary.50" : "white"}

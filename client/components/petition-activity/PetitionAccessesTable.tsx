@@ -1,16 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  BoxProps,
-  Center,
-  Flex,
-  HStack,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Portal,
-  Stack,
-} from "@chakra-ui/react";
+import { Center, MenuButton, MenuItem, MenuList, Portal } from "@chakra-ui/react";
 import { Menu, Tooltip } from "@parallel/chakra/components";
 import {
   BellIcon,
@@ -23,7 +12,7 @@ import {
   UserPlusIcon,
   UserXIcon,
 } from "@parallel/chakra/icons";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, BoxProps, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionAccessTable_PetitionAccessFragment,
   PetitionAccessTable_PetitionFragment,
@@ -173,7 +162,7 @@ export function PetitionAccessesTable({
           />
         ) : (
           <Center minHeight="60px" textAlign="center" padding={4} color="gray.400">
-            <Stack spacing={1}>
+            <Stack gap={1}>
               <Text>
                 <FormattedMessage
                   id="petition-access.havent-sent-parallel"
@@ -365,7 +354,7 @@ function usePetitionAccessesColumns(): TableColumn<
             );
 
             return (
-              <Stack direction="row" spacing={2} justifyContent="flex-end">
+              <Stack direction="row" gap={2} justifyContent="flex-end">
                 <IconButtonWithTooltip
                   label={intl.formatMessage({
                     id: "component.petition-accesses-table.activate-access",
@@ -382,7 +371,7 @@ function usePetitionAccessesColumns(): TableColumn<
           }
 
           return (
-            <Stack direction="row" spacing={2} justifyContent="flex-end">
+            <Stack direction="row" gap={2} justifyContent="flex-end">
               {isContactless && isNonNullish(recipientUrl) ? (
                 <CopyToClipboardButton
                   copyLabel={intl.formatMessage({

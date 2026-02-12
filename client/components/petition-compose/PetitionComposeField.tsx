@@ -1,16 +1,12 @@
 import { ApolloCache, gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
-  Box,
   Center,
-  Flex,
   FormControl,
   FormLabel,
-  HStack,
   Heading,
   IconButton,
   Input,
-  Stack,
   Switch,
 } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
@@ -94,7 +90,7 @@ import {
 } from "./PetitionFieldOptionsListEditor";
 import { PetitionFieldMathEditor } from "./logic/PetitionFieldMathEditor";
 
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import { PetitionComposeVisibilityAccordion } from "../petition-common/PetitionComposeVisibilityAccordion";
 import { PetitionVisibilityEditor } from "./logic/PetitionVisibilityEditor";
 
@@ -538,7 +534,7 @@ const _PetitionComposeField = chakraComponent<
               </Box>
             )}
 
-            <Stack spacing={1} flex="1">
+            <Stack gap={1} flex="1">
               <Box position="relative">
                 <PetitionComposeFieldInner
                   ref={ref}
@@ -777,8 +773,8 @@ const _PetitionComposeFieldInner = chakraComponent<
     (field.type === "ADVERSE_MEDIA_SEARCH" && !hasAdverseMediaSearch);
 
   return (
-    <Stack spacing={1} ref={elementRef} {...props}>
-      <Stack direction="row" spacing={2.5} alignItems="center">
+    <Stack gap={1} ref={elementRef} {...props}>
+      <Stack direction="row" gap={2.5} alignItems="center">
         <PetitionFieldTypeIndicator
           type={field.type}
           fieldIndex={fieldIndex}
@@ -1084,7 +1080,7 @@ const _PetitionComposeFieldInner = chakraComponent<
                     defaultMessage="Uploaded lists:"
                   />
                 </Text>
-                <Stack as="ol" spacing={1} marginTop={1}>
+                <Stack as="ol" gap={1} marginTop={1}>
                   {((field.options.labels ?? []) as string[]).map((label, index) => (
                     <HStack as="li" key={index} alignItems="center">
                       <Center
@@ -1750,7 +1746,7 @@ const PetitionComposeFieldVariablesAccordion = chakraComponent<
             <>
               <Heading position="relative">
                 <Accordion.ItemTrigger borderRadius="md" backgroundColor="purple.75" paddingY={3}>
-                  <HStack as="span" flex="1" textAlign="left" fontSize="sm" spacing={1}>
+                  <HStack as="span" flex="1" textAlign="left" fontSize="sm" gap={1}>
                     <ChevronFilledIcon
                       color="gray.500"
                       fontSize="xs"

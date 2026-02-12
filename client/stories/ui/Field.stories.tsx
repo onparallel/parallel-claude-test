@@ -1,5 +1,16 @@
-import { HStack, Link, Stack, VStack } from "@chakra-ui/react";
-import { Button, Checkbox, Field, Input, NumberInput, Select, Text } from "@parallel/components/ui";
+import { Link } from "@chakra-ui/react";
+import {
+  Button,
+  Checkbox,
+  Field,
+  HStack,
+  Input,
+  NumberInput,
+  Select,
+  Stack,
+  Text,
+  VStack,
+} from "@parallel/components/ui";
 import { untranslated } from "@parallel/utils/untranslated";
 import { Meta, StoryObj } from "@storybook/react";
 

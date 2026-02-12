@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Flex, HStack, Stack, useToast } from "@chakra-ui/react";
+import { useToast } from "@chakra-ui/react";
 import { VariablesOf } from "@graphql-typed-document-node/core";
 import {
   CheckIcon,
@@ -38,7 +38,7 @@ import { ProfileDrawer } from "@parallel/components/petition-replies/ProfileDraw
 import { useArchiveRepliesIntoProfileDialog } from "@parallel/components/petition-replies/dialogs/ArchiveRepliesIntoProfileDialog";
 import { useExportRepliesDialog } from "@parallel/components/petition-replies/dialogs/ExportRepliesDialog";
 import { useExportRepliesProgressDialog } from "@parallel/components/petition-replies/dialogs/ExportRepliesProgressDialog";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   AdverseMediaArticle,
   PetitionFieldReplyStatus,
@@ -750,7 +750,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               finalVariables={fieldLogic[0].finalVariables}
             />
           ) : null}
-          <Stack flex="2" spacing={4} data-section="replies-fields">
+          <Stack flex="2" gap={4} data-section="replies-fields">
             <ToneProvider value={petition.organization.brandTheme.preferredTone}>
               <LiquidPetitionScopeProvider petition={petition}>
                 {filterPetitionFields(fieldsWithIndices, fieldLogic, filter).map((x, index) =>

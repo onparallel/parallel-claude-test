@@ -1,14 +1,11 @@
 import { gql } from "@apollo/client";
 import {
-  Box,
   Center,
   Grid,
   Heading,
-  HStack,
   Image,
   ListItem,
   OrderedList,
-  Stack,
   UnorderedList,
 } from "@chakra-ui/react";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -21,7 +18,7 @@ import { PetitionFieldTitleContent } from "@parallel/components/petition-common/
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { LandingTemplateCard } from "@parallel/components/public/templates/LandingTemplateCard";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   LandingTemplateCard_LandingTemplateFragment,
   LandingTemplateDetails_landingTemplateBySlugDocument,
@@ -110,8 +107,8 @@ function LandingTemplateDetails({
           backgroundColor: "gray.50",
         }}
       >
-        <Stack spacing={{ base: 20, md: 28 }}>
-          <Stack spacing={12} direction={{ base: "column", md: "row" }}>
+        <Stack gap={{ base: 20, md: 28 }}>
+          <Stack gap={12} direction={{ base: "column", md: "row" }}>
             <Grid templateRows="auto 1fr auto" width="100%" flex="1" gap={1}>
               <Text fontSize="sm" color="gray.600">
                 <FormattedMessage
@@ -128,7 +125,7 @@ function LandingTemplateDetails({
                   }}
                 />
               </Text>
-              <Stack spacing={4}>
+              <Stack gap={4}>
                 <Heading size="xl" as="h1">
                   {name}
                 </Heading>
@@ -170,7 +167,7 @@ function LandingTemplateDetails({
                   ) : null}
                 </HStack>
                 <Spacer />
-                <HStack spacing={2}>
+                <HStack gap={2}>
                   <UserAvatar showImage boxSize="40px" user={owner} />
                   <Text>
                     <FormattedMessage
@@ -207,7 +204,7 @@ function LandingTemplateDetails({
               />
             </Center>
           </Stack>
-          <Stack spacing={20} direction={{ base: "column", md: "row" }}>
+          <Stack gap={20} direction={{ base: "column", md: "row" }}>
             <Box
               borderRadius="lg"
               backgroundColor="gray.75"
@@ -221,7 +218,7 @@ function LandingTemplateDetails({
                   defaultMessage="This template includes"
                 />
               </Text>
-              <UnorderedList paddingX={3} spacing={2} paddingTop={5}>
+              <UnorderedList paddingX={3} gap={2} paddingTop={5}>
                 <ListItem>
                   <FormattedMessage
                     id="public.template-details.list-number-fields"
@@ -251,7 +248,7 @@ function LandingTemplateDetails({
                 </ListItem>
               </UnorderedList>
             </Box>
-            <Stack flex="1" spacing={2}>
+            <Stack flex="1" gap={2}>
               <Text fontSize="x-large" fontWeight="bold" paddingBottom={4}>
                 <FormattedMessage
                   id="component.template-details-modal.about"
@@ -341,7 +338,7 @@ function LandingTemplateDetails({
               ) : null}
             </Stack>
           </Stack>
-          <Stack spacing={12}>
+          <Stack gap={12}>
             <Text fontSize="x-large" fontWeight="bold" textAlign={{ base: "left", md: "center" }}>
               <FormattedMessage
                 id="public.template-details.other-similar-templates"

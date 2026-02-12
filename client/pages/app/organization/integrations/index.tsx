@@ -6,11 +6,9 @@ import {
   AlertIcon,
   AlertTitle,
   Badge,
-  Box,
   Center,
   Heading,
   Image,
-  Stack,
   Switch,
 } from "@chakra-ui/react";
 import { AlertCircleFilledIcon } from "@parallel/chakra/icons";
@@ -29,7 +27,7 @@ import {
   IntegrationSwitchCard,
   IntegrationSwitchCardProps,
 } from "@parallel/components/organization/IntegrationSwitchCard";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Stack, Text } from "@parallel/components/ui";
 import {
   OrganizationIntegrations_deleteDowJonesKycIntegrationDocument,
   OrganizationIntegrations_userDocument,
@@ -401,7 +399,7 @@ function OrganizationIntegrations() {
           direction={{ base: "column", md: "row" }}
           flex="1"
           justifyContent="space-between"
-          spacing={4}
+          gap={4}
         >
           <Box flex={1}>
             <AlertTitle>
@@ -439,7 +437,7 @@ function OrganizationIntegrations() {
           </Center>
         </Stack>
       </Alert>
-      <Stack padding={4} spacing={5} maxWidth="container.sm" paddingBottom={16}>
+      <Stack padding={4} gap={5} maxWidth="container.sm" paddingBottom={16}>
         {integrations.map((integration, index) => {
           if (
             isNonNullish((integration as IntegrationSwitchCardProps).onChange) ||

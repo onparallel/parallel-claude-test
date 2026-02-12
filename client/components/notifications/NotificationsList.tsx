@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { AbsoluteCenterProps, Center, Circle, Flex, Spinner, Stack } from "@chakra-ui/react";
+import { AbsoluteCenterProps, Center, Circle, Spinner } from "@chakra-ui/react";
 import { NotificationsDrawer_PetitionUserNotificationFragment } from "@parallel/graphql/__types";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
@@ -18,7 +18,7 @@ import { RemindersOptOutNotification } from "./flavor/RemindersOptOutNotificatio
 import { SignatureCancelledUserNotification } from "./flavor/SignatureCancelledUserNotification";
 import { SignatureCompletedUserNotification } from "./flavor/SignatureCompletedUserNotification";
 import { EmptyNotificationsIcon } from "./icons/EmptyNotificationsIcon";
-import { Text } from "@parallel/components/ui";
+import { Flex, Stack, Text } from "@parallel/components/ui";
 
 interface NotificationListProps {
   notifications: NotificationsDrawer_PetitionUserNotificationFragment[];
@@ -138,7 +138,7 @@ export function NotificationsList({
         }
         endMessage={
           notifications.length === 0 ? (
-            <Stack height="100%" alignItems="center" justifyContent="center" spacing={10}>
+            <Stack height="100%" alignItems="center" justifyContent="center" gap={10}>
               <EmptyNotificationsIcon width="300px" height="200px" />
               <Text>
                 <FormattedMessage

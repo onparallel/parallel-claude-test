@@ -1,6 +1,7 @@
-import { Alert, AlertDescription, AlertIcon, HStack, ThemingProps } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
+import { Alert, AlertDescription, AlertIcon, ThemingProps } from "@chakra-ui/react";
 import { SupportButton } from "@parallel/components/common/SupportButton";
+import { HStack } from "@parallel/components/ui";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 
@@ -14,7 +15,7 @@ export const ContactSupportAlert = chakraComponent<"div", ContactSupportAlertPro
     return (
       <Alert status="info" rounded="md" {...props} ref={ref}>
         <AlertIcon />
-        <HStack spacing={4} width="100%">
+        <HStack gap={4} width="100%">
           <AlertDescription flex="1">{body}</AlertDescription>
           <SupportButton
             variant="outline"

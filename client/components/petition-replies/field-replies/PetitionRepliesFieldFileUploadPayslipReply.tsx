@@ -1,10 +1,9 @@
-import { HStack, Stack } from "@chakra-ui/react";
 import { Divider } from "@parallel/components/common/Divider";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { PetitionRepliesMetadataText } from "./PetitionRepliesMetadata";
-import { Text } from "@parallel/components/ui";
+import { HStack, Stack, Text } from "@parallel/components/ui";
 
 interface CurrencyAmount {
   value: number;

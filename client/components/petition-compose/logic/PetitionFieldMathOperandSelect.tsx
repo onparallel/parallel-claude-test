@@ -1,9 +1,9 @@
-import { Badge, Box, Flex, HStack, StackProps } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
+import { Badge } from "@chakra-ui/react";
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
-import { Text } from "@parallel/components/ui";
+import { Box, Flex, HStack, StackProps, Text } from "@parallel/components/ui";
 import { PetitionFieldLogicContext_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
@@ -156,7 +156,7 @@ export function PetitionFieldMathOperandSelect({
         position="relative"
         fontWeight="semibold"
         top="2.5px"
-        spacing={1}
+        gap={1}
       />
     )
   ) : value?.type === "NUMBER" ? (

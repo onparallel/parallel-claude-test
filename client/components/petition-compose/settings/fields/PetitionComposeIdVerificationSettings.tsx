@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
-import { Box, Stack } from "@chakra-ui/react";
+
 import { MultiCheckboxSimpleSelect } from "@parallel/components/common/MultiCheckboxSimpleSelect";
 import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
-import { Text } from "@parallel/components/ui";
+import { Box, Stack, Text } from "@parallel/components/ui";
 import { UnwrapArray } from "@parallel/utils/types";
 import { Children, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -210,7 +210,7 @@ function useTypesOfVerification() {
 function Option(props: OptionProps<TypesOfVerificationSelectOption>) {
   return (
     <components.Option {...props}>
-      <Stack spacing={0}>
+      <Stack gap={0}>
         <Box>{props.data.label}</Box>
         <Box fontSize="xs" opacity={0.6}>
           {props.data.description}

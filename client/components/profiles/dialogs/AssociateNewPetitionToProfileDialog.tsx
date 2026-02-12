@@ -8,10 +8,8 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  HStack,
   Radio,
   RadioGroup,
-  Stack,
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
@@ -24,7 +22,7 @@ import { PetitionFieldReference } from "@parallel/components/common/PetitionFiel
 import { PetitionSelect, PetitionSelectInstance } from "@parallel/components/common/PetitionSelect";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import { usePreviewImportFromProfileFormatErrorDialog } from "@parallel/components/petition-preview/dialogs/PreviewImportFromProfileFormatErrorDialog";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   CreatePetitionFromProfilePrefillInput,
   useAssociateNewPetitionToProfileDialog_createPetitionFromProfileDocument,
@@ -65,10 +63,10 @@ type AssociateNewPetitionToProfileDialogSteps = {
   };
 };
 
-/* 
+/*
   Dialog that is called from the related parallels table in the profile or from the key process cards.
   It has a maximum of 3 steps
-  Step 1 "SELECT_TEMPLATE" - select the template to create the parallel, 
+  Step 1 "SELECT_TEMPLATE" - select the template to create the parallel,
         depending on the template group fields and user options all the following steps can be omitted or not
   Step 2 "SELECT_FIELD_GROUP" - only if you have more than one compatible group to choose from
   Step 3 "PREFILL_FIELD_GROUPS" - only if you have more than one group compatible with the current profile relationships
@@ -459,7 +457,7 @@ function AssociateNewPetitionToProfileDialogSelectFieldGroup({
               render={({ field: { onChange, value } }) => (
                 <RadioGroup
                   as={Stack}
-                  spacing={2}
+                  gap={2}
                   onChange={(value) => onChange(value as string)}
                   value={value}
                   colorScheme="primary"

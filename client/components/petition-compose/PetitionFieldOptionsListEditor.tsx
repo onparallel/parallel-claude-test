@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
-import { Box, List, ListItem } from "@chakra-ui/react";
+import { List, ListItem } from "@chakra-ui/react";
 import { SettingsIcon } from "@parallel/chakra/icons";
-import { Text } from "@parallel/components/ui";
+import { Box, Text } from "@parallel/components/ui";
 import {
   PetitionFieldOptionsListEditor_PetitionFieldFragment,
   UpdatePetitionFieldInput,

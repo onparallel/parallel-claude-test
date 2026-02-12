@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
-import { Box, Stack } from "@chakra-ui/react";
+
 import { ShortTextFormatSelect } from "@parallel/components/common/ShortTextFormatSelect";
-import { Text } from "@parallel/components/ui";
+import { Box, Stack, Text } from "@parallel/components/ui";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { useShortTextFormatsSelectOptions } from "@parallel/utils/useShortTextFormats";
 import { FormattedMessage } from "react-intl";
@@ -21,7 +21,7 @@ export function PetitionComposeShortTextSettings({
 
   return (
     <>
-      <Stack spacing={1}>
+      <Stack gap={1}>
         <SettingsRow
           controlId="short-text-format"
           textStyle={isReadOnly ? "muted" : undefined}

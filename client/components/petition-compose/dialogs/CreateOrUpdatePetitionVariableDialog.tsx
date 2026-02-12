@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
-  Box,
   Center,
   FormControl,
   FormErrorMessage,
@@ -37,7 +36,7 @@ import {
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
-import { Button, HStack, Input, Stack, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Input, Stack, Text } from "@parallel/components/ui";
 import {
   CreatePetitionVariableInput,
   PetitionVariableType,

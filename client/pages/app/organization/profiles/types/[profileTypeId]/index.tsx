@@ -4,21 +4,16 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Box,
-  BoxProps,
   ButtonProps,
   Center,
   Checkbox,
   Divider,
-  Flex,
   Grid,
   GridItem,
-  HStack,
   Heading,
   MenuDivider,
   MenuItem,
   MenuList,
-  Stack,
   useToast,
 } from "@chakra-ui/react";
 import {
@@ -58,7 +53,7 @@ import { useProfileTypeFieldsInPatternDialog } from "@parallel/components/organi
 import { useUpdateProfileTypeFieldDialog } from "@parallel/components/organization/profiles/dialogs/UpdateProfileTypeFieldDialog";
 import { useProfileTypeFieldReferencedAutoSearchConfigDialog } from "@parallel/components/profiles/dialogs/ProfileTypeFieldReferencedAutoSearchConfigDialog";
 import { useProfileTypeFieldReferencedMonitoringDialog } from "@parallel/components/profiles/dialogs/ProfileTypeFieldReferencedMonitoringDialog";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, BoxProps, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   OrganizationProfileType_ProfileTypeFieldFragment,
   OrganizationProfileType_cloneProfileTypeDocument,
@@ -481,7 +476,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
       }
       header={
         <HStack width="100%" justifyContent="space-between" alignItems="center">
-          <HStack spacing={3}>
+          <HStack gap={3}>
             <ProfileTypeIconSelect value={profileType.icon} onChange={handleChangeIcon} />
             <HStack alignItems="baseline">
               <Heading as="h3" size="md" noOfLines={1} wordBreak="break-all">
@@ -592,7 +587,7 @@ function OrganizationProfileType({ profileTypeId }: OrganizationProfileTypeProps
             />
           </GridItem>
           <GridItem order={{ base: 2, xl: 1 }}>
-            <Stack spacing={6}>
+            <Stack gap={6}>
               <DraggableList
                 key={profileType.id}
                 width="full"
@@ -725,7 +720,7 @@ function DraggableList({
           axis="y"
           values={list}
           onReorder={setList as any}
-          spacing={0}
+          gap={0}
           borderBottom="1px"
           borderColor="gray.200"
         >

@@ -1,12 +1,12 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Flex, Heading } from "@chakra-ui/react";
+import { Center, Heading } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { AddIcon } from "@parallel/chakra/icons";
 import { FieldDescription } from "@parallel/components/common/FieldDescription";
 import { FileAttachmentButton } from "@parallel/components/common/FileAttachmentButton";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { InternalFieldBadge } from "@parallel/components/common/InternalFieldBadge";
-import { Text } from "@parallel/components/ui";
+import { Box, Flex, Text } from "@parallel/components/ui";
 import {
   RecipientViewPetitionFieldLayout_PetitionFieldFragment,
   RecipientViewPetitionFieldLayout_PetitionFieldReplyFragment,

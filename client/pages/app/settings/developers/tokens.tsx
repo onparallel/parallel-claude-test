@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Center, Stack } from "@chakra-ui/react";
+import { Center } from "@chakra-ui/react";
 import { DeleteIcon, RepeatIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -15,7 +15,7 @@ import { WithApolloDataContext, withApolloData } from "@parallel/components/comm
 import { withPermission } from "@parallel/components/common/withPermission";
 import { DevelopersLayout } from "@parallel/components/layout/DevelopersLayout";
 import { useGenerateNewTokenDialog } from "@parallel/components/settings/dialogs/GenerateNewTokenDialog";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Stack, Text } from "@parallel/components/ui";
 import {
   Tokens_UserAuthenticationTokenFragment,
   Tokens_revokeUserAuthTokenDocument,
@@ -72,7 +72,7 @@ function Tokens() {
 
   return (
     <DevelopersLayout currentTabKey="tokens" queryObject={queryObject}>
-      <Stack padding={6} spacing={6} paddingBottom={24}>
+      <Stack padding={6} gap={6} paddingBottom={24}>
         <Text>
           <FormattedMessage
             id="page.tokens.explanation"

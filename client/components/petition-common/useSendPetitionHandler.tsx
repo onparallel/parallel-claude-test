@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Progress, Stack, useToast } from "@chakra-ui/react";
+import { Progress, useToast } from "@chakra-ui/react";
 import { useBlockingDialog } from "@parallel/components/common/dialogs/BlockingDialog";
 import { useAddPetitionAccessDialog } from "@parallel/components/petition-activity/dialogs/AddPetitionAccessDialog";
 import { useHandledTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
@@ -21,7 +21,7 @@ import { useRouter } from "next/router";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
-import { Text } from "@parallel/components/ui";
+import { Stack, Text } from "@parallel/components/ui";
 
 export function useSendPetitionHandler(
   user: useSendPetitionHandler_UserFragment,
@@ -99,7 +99,7 @@ export function useSendPetitionHandler(
             ),
 
             body: (
-              <Stack spacing={4}>
+              <Stack gap={4}>
                 <Text>
                   <FormattedMessage
                     id="petition.long-batch-send-dialog.message"

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
-import { Box } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
+import { Box } from "@parallel/components/ui";
 import { PublicPetitionFieldCommentExcerpt_PetitionFieldCommentFragment } from "@parallel/graphql/__types";
 import { sanitizeHtml } from "@parallel/utils/sanitizeHtml";
 import parse from "html-react-parser";

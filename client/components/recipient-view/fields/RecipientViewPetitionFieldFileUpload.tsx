@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, BoxProps, Center, Flex, List, ListItem, Progress, Stack } from "@chakra-ui/react";
+import { Center, List, ListItem, Progress } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { CheckIcon, CloseIcon, DeleteIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -10,7 +10,7 @@ import { FileSize } from "@parallel/components/common/FileSize";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { useTone } from "@parallel/components/common/ToneProvider";
 import { EsTaxDocumentsContentErrorMessage } from "@parallel/components/petition-common/EsTaxDocumentsContentErrorMessage";
-import { Text } from "@parallel/components/ui";
+import { Box, BoxProps, Flex, Stack, Text } from "@parallel/components/ui";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";

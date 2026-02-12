@@ -3,7 +3,6 @@ import { useMutation } from "@apollo/client/react";
 import {
   Center,
   Circle,
-  Flex,
   FormControl,
   FormErrorMessage,
   Grid,
@@ -12,13 +11,12 @@ import {
   Input,
   Radio,
   RadioGroup,
-  Stack,
 } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
 import { Logo } from "@parallel/components/common/Logo";
 import { withApolloData } from "@parallel/components/common/withApolloData";
 import { RecipientViewPageNotAvailableError } from "@parallel/components/recipient-view/RecipientViewPageNotAvailableError";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Flex, Stack, Text } from "@parallel/components/ui";
 import {
   OptOut_publicRemindersOptOutDocument,
   OptOut_remindersOptOutDocument,
@@ -103,7 +101,7 @@ function OptOut(props: OptOutProps) {
               textAlign="center"
               justifyContent="center"
               alignItems="center"
-              spacing={6}
+              gap={6}
               maxWidth={"container.xs"}
             >
               <Circle size="88px" background="green.500">
@@ -121,7 +119,7 @@ function OptOut(props: OptOutProps) {
             </Stack>
           ) : (
             <form onSubmit={handleOptOut}>
-              <Stack spacing={6} maxWidth={"container.sm"}>
+              <Stack gap={6} maxWidth={"container.sm"}>
                 <Heading>
                   <FormattedMessage
                     id="page.opt-out.feedback-title"
@@ -180,7 +178,7 @@ function OptOut(props: OptOutProps) {
           <Stack
             direction={{ base: "column", md: "row" }}
             alignItems="center"
-            spacing={{ base: 4, md: 6 }}
+            gap={{ base: 4, md: 6 }}
             padding={4}
           >
             <Text as="div">

@@ -1,14 +1,6 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  HStack,
-  Icon,
-  Image,
-  Stack,
-  useBreakpointValue,
-  useDisclosure,
-} from "@chakra-ui/react";
-import { Button, Text } from "@parallel/components/ui";
+import { Icon, Image, useBreakpointValue, useDisclosure } from "@chakra-ui/react";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionComposeNewFieldDrawer_UserFragment,
   PetitionComposeNewFieldDrawerPetitionFields_ProfileTypeFragment,
@@ -227,7 +219,7 @@ export function PetitionComposeNewFieldDrawerPetitionFields({
       </Box>
       {filteredFieldCategories.length ? (
         <Box {...extendFlexColumn} overflow="auto" tabIndex={-1}>
-          <Stack as="ul" spacing={2} paddingBottom={4}>
+          <Stack as="ul" gap={2} paddingBottom={4}>
             {filteredFieldCategories.map(({ category, fields, profileTypes }, index) => {
               return (
                 <Stack
@@ -237,7 +229,7 @@ export function PetitionComposeNewFieldDrawerPetitionFields({
                   display="flex"
                   position="relative"
                   flex="none"
-                  spacing={2}
+                  gap={2}
                 >
                   <Text
                     fontWeight={500}
@@ -248,7 +240,7 @@ export function PetitionComposeNewFieldDrawerPetitionFields({
                   >
                     {category}
                   </Text>
-                  <Stack as="ul" spacing={1}>
+                  <Stack as="ul" gap={1}>
                     {isNonNullish(fields)
                       ? fields.map(({ type, label, description }) => (
                           <Box as="li" key={type} paddingX={2}>
@@ -290,7 +282,7 @@ export function PetitionComposeNewFieldDrawerPetitionFields({
           </Stack>
         </Box>
       ) : (
-        <Stack {...extendFlexColumn} justifyContent="center" alignItems="center" spacing={4}>
+        <Stack {...extendFlexColumn} justifyContent="center" alignItems="center" gap={4}>
           <Image
             maxWidth="135px"
             height="64px"

@@ -1,6 +1,6 @@
-import { Flex, HStack } from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@parallel/chakra/icons";
 import { ValueProps } from "@parallel/utils/ValueProps";
+import { Flex, HStack } from "@parallel/components/ui";
 import { addMonths, subMonths } from "date-fns";
 import { FormattedDate, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "./IconButtonWithTooltip";

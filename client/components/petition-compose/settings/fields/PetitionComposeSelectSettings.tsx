@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
-import { Box, Stack } from "@chakra-ui/react";
+
 import { StandardListSelect } from "@parallel/components/common/StandardListSelect";
-import { Text } from "@parallel/components/ui";
+import { Box, Stack, Text } from "@parallel/components/ui";
 import { UpdatePetitionFieldInput } from "@parallel/graphql/__types";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { FormattedMessage } from "react-intl";

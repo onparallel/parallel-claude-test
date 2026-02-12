@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
-import { Box } from "@chakra-ui/react";
+
 import { PetitionActivityTimeline_PetitionEventFragment } from "@parallel/graphql/__types";
+import { Box } from "@parallel/components/ui";
 import { TimelineAccessActivatedEvent } from "./timeline/events/TimelineAccessActivatedEvent";
 import { TimelineAccessActivatedFromLinkEvent } from "./timeline/events/TimelineAccessActivatedFromLinkEvent";
 import { TimelineAccessDeactivatedEvent } from "./timeline/events/TimelineAccessDeactivatedEvent";

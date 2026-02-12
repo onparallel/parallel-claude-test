@@ -3,7 +3,7 @@ import {
   Tooltip as ChakraTooltip,
   TooltipProps,
 } from "@chakra-ui/react";
-import { forwardRef } from "react";
+import { RefAttributes } from "react";
 
 // Docs: https://chakra-ui.com/docs/components/tooltip
 
@@ -14,34 +14,28 @@ export interface ExtendedTooltipProps extends Omit<TooltipProps, "isOpen" | "isD
 }
 
 // Apply default props from components.tsx
-export const Tooltip = forwardRef<HTMLElement, ExtendedTooltipProps>(
-  (
-    {
-      open,
-      disabled,
-      hasArrow = true,
-      openDelay = 250,
-      closeDelay = 150,
-      arrowSize = 8,
-      borderRadius = 4,
-      ...props
-    },
-    ref,
-  ) => {
-    return (
-      <ChakraTooltip
-        ref={ref}
-        isOpen={open}
-        isDisabled={disabled}
-        hasArrow={hasArrow}
-        openDelay={openDelay}
-        closeDelay={closeDelay}
-        arrowSize={arrowSize}
-        borderRadius={borderRadius}
-        {...props}
-      />
-    );
-  },
-);
-
-Tooltip.displayName = "Tooltip";
+export function Tooltip({
+  open,
+  disabled,
+  hasArrow = true,
+  openDelay = 250,
+  closeDelay = 150,
+  arrowSize = 8,
+  borderRadius = 4,
+  ref,
+  ...props
+}: ExtendedTooltipProps & RefAttributes<HTMLElement>) {
+  return (
+    <ChakraTooltip
+      ref={ref}
+      isOpen={open}
+      isDisabled={disabled}
+      hasArrow={hasArrow}
+      openDelay={openDelay}
+      closeDelay={closeDelay}
+      arrowSize={arrowSize}
+      borderRadius={borderRadius}
+      {...props}
+    />
+  );
+}

@@ -1,9 +1,10 @@
 import { gql } from "@apollo/client";
-import { Flex, List, ListItem, Stack } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
+import { List, ListItem } from "@chakra-ui/react";
 import { Link, NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { RecipientViewFooter_PublicPetitionFragment } from "@parallel/graphql/__types";
+import { Flex, Stack } from "@parallel/components/ui";
 import { FormattedMessage, useIntl } from "react-intl";
 
 export interface RecipientViewFooterProps {
@@ -47,7 +48,7 @@ export const RecipientViewFooter = chakraComponent<"div", RecipientViewFooterPro
           textAlign="center"
           marginY={4}
           direction={{ base: "column", sm: "row" }}
-          spacing={{ base: 4, sm: 8 }}
+          gap={{ base: 4, sm: 8 }}
         >
           <ListItem>
             <NormalLink

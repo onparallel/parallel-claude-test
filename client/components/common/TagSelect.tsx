@@ -1,17 +1,8 @@
 import { gql } from "@apollo/client";
 import { useApolloClient, useMutation } from "@apollo/client/react";
-import {
-  Box,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Grid,
-  Input,
-  Stack,
-} from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel, Grid, Input } from "@chakra-ui/react";
 import { EditIcon } from "@parallel/chakra/icons";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, Stack, Text } from "@parallel/components/ui";
 import {
   ManageTagsDialog_updateTagDocument,
   TagSelect_TagFragment,
@@ -277,7 +268,7 @@ function NoOptionsMessage(props: NoticeProps & { selectProps: ReactSelectExtraPr
   return (
     <Stack
       direction="column"
-      spacing={1}
+      gap={1}
       textStyle="hint"
       fontSize="sm"
       paddingX={2}

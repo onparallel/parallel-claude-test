@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
-import { Badge, Box, Center, Flex, Grid, HStack, IconButton, Stack } from "@chakra-ui/react";
+import { Badge, Center, Grid, IconButton } from "@chakra-ui/react";
 import { DeleteIcon, PlusCircleIcon } from "@parallel/chakra/icons";
 import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
-import { Button } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack } from "@parallel/components/ui";
 import {
   PetitionFieldMathEditor_PetitionBaseFragment,
   PetitionFieldMathEditor_PetitionFieldFragment,
@@ -114,7 +114,7 @@ export function PetitionFieldMathEditor({
 
   return (
     <PetitionFieldLogicContext petition={petition} field={field} includeSelf>
-      <Stack spacing={isReadOnly ? 0 : undefined}>
+      <Stack gap={isReadOnly ? 0 : undefined}>
         {math.map((row, index) =>
           isReadOnly ? (
             <PetitionFieldMathRowReadOnly key={index} row={row} />
@@ -209,7 +209,7 @@ function PetitionFieldMathRow({
   );
 
   return (
-    <Stack spacing={2} padding={2} borderRadius="md" backgroundColor="purple.75">
+    <Stack gap={2} padding={2} borderRadius="md" backgroundColor="purple.75">
       <Grid
         templateColumns={{
           base: "auto minmax(160px, 1fr)",
@@ -471,7 +471,7 @@ export function PetitionFieldMathRowReadOnly({
 }) {
   const { variables } = usePetitionFieldLogicContext();
   return (
-    <Stack spacing={2} padding={2} borderRadius="md" backgroundColor="purple.75">
+    <Stack gap={2} padding={2} borderRadius="md" backgroundColor="purple.75">
       <Grid templateColumns="auto 1fr" alignItems="start" columnGap={2} rowGap={2}>
         {row.conditions.map((condition, index) => {
           return (

@@ -1,4 +1,4 @@
-import { Flex, PlacementWithLogical } from "@chakra-ui/react";
+import { PlacementWithLogical } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import {
   SignatureCancelledIcon,
@@ -14,7 +14,7 @@ import {
 import { usePetitionSignatureStatusLabels } from "@parallel/utils/usePetitionSignatureStatusLabels";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
+import { Flex, Text } from "@parallel/components/ui";
 
 interface PetitionSignatureStatusIconProps {
   status: PetitionSignatureStatusFilter;

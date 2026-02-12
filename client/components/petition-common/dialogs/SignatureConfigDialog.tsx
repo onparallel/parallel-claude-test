@@ -5,10 +5,8 @@ import {
   AlertIcon,
   Center,
   Checkbox,
-  Flex,
   FormControl,
   FormLabel,
-  HStack,
   Input,
   NumberDecrementStepper,
   NumberIncrementStepper,
@@ -19,7 +17,6 @@ import {
   Radio,
   RadioGroup,
   Spinner,
-  Stack,
   UnorderedList,
 } from "@chakra-ui/react";
 import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
@@ -33,7 +30,7 @@ import {
   useWizardDialog,
   WizardStepDialogProps,
 } from "@parallel/components/common/dialogs/WizardDialog";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   SignatureConfigDialog_meDocument,
   SignatureConfigDialog_PetitionBaseFragment,
@@ -333,8 +330,8 @@ function SignatureConfigDialogStep1({
         </Flex>
       }
       body={
-        <Stack spacing={4}>
-          <Stack spacing={2}>
+        <Stack gap={4}>
+          <Stack gap={2}>
             <Text>
               <FormattedMessage
                 id="component.signature-config-dialog.header-subtitle"
@@ -393,7 +390,7 @@ function SignatureConfigDialogStep1({
               render={({ field: { onChange, value } }) => (
                 <RadioGroup
                   as={Stack}
-                  spacing={2}
+                  gap={2}
                   onChange={(value) => onChange(value === "CUSTOM")}
                   value={value ? "CUSTOM" : "REPLIES"}
                 >
@@ -577,7 +574,7 @@ function SignatureConfigDialogStep2({
         </Flex>
       }
       body={
-        <Stack spacing={3}>
+        <Stack gap={3}>
           <FormControl id="minSigners">
             <Controller
               name="minSigners"
@@ -632,12 +629,12 @@ function SignatureConfigDialogStep2({
               render={({ field: { onChange, value } }) => (
                 <RadioGroup
                   as={HStack}
-                  spacing={3}
+                  gap={3}
                   onChange={onChange}
                   value={value}
                   colorScheme="purple"
                 >
-                  <HStack spacing={0}>
+                  <HStack gap={0}>
                     <Radio backgroundColor="white" value="PARALLEL">
                       <FormattedMessage
                         id="component.signature-config-dialog.sending-same-time-label"
@@ -652,7 +649,7 @@ function SignatureConfigDialogStep2({
                     </HelpPopover>
                   </HStack>
 
-                  <HStack spacing={0}>
+                  <HStack gap={0}>
                     <Radio backgroundColor="white" value="SEQUENTIAL">
                       <FormattedMessage
                         id="component.signature-config-dialog.sending-sequential-label"
@@ -677,7 +674,7 @@ function SignatureConfigDialogStep2({
             <FormControl id="allowAdditionalSigners">
               <FormLabel margin={0}>
                 <Checkbox {...register("allowAdditionalSigners")}>
-                  <HStack alignContent="center" fontWeight="normal" spacing={0}>
+                  <HStack alignContent="center" fontWeight="normal" gap={0}>
                     <Text as="span">
                       <FormattedMessage
                         id="component.signature-config-dialog.allow-additional-signers-label"
@@ -698,7 +695,7 @@ function SignatureConfigDialogStep2({
           <FormControl id="showInstructions">
             <FormLabel fontWeight="normal" margin={0}>
               <Checkbox {...register("showInstructions")}>
-                <HStack alignContent="center" fontWeight="normal" spacing={0}>
+                <HStack alignContent="center" fontWeight="normal" gap={0}>
                   <Text as="span">
                     <FormattedMessage
                       id="component.signature-config-dialog.add-instructions-label"
@@ -849,7 +846,7 @@ function SignatureConfigDialogStep3({
             </Text>
           ) : null}
           <ListElement
-            spacing={0}
+            gap={0}
             paddingY={1}
             margin={0}
             maxH="210px"

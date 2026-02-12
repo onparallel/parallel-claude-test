@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Grid, Heading, HStack, Stack } from "@chakra-ui/react";
+import { Grid, Heading } from "@chakra-ui/react";
 import { EditIcon, SaveIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
@@ -14,7 +14,7 @@ import { DocumentThemePreview } from "@parallel/components/organization/branding
 import { DocumentThemeSelect } from "@parallel/components/organization/branding/DocumentThemeSelect";
 import { useConfirmDeleteThemeDialog } from "@parallel/components/organization/dialogs/ConfirmDeleteThemeDialog";
 import { useCreateOrUpdateDocumentThemeDialog } from "@parallel/components/organization/dialogs/CreateOrUpdateDocumentThemeDialog";
-import { Button } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack } from "@parallel/components/ui";
 import {
   BrandingDocumentTheme_createOrganizationPdfDocumentThemeDocument,
   BrandingDocumentTheme_deleteOrganizationPdfDocumentThemeDocument,
@@ -228,7 +228,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
           />
         </Button>
       </Box>
-      <Stack spacing={8} gridArea="c">
+      <Stack gap={8} gridArea="c">
         {!userHasPermission ? <RestrictedFeatureAlert /> : null}
         <FormProvider {...form}>
           <DocumentThemeEditor

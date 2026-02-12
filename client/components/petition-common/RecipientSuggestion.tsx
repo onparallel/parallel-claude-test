@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
-import { HStack, Stack } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { RecipientSuggestion_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { PropsWithChildren } from "react";
@@ -37,7 +36,7 @@ export const RecipientSuggestion = chakraComponent<
       width="auto"
       maxWidth="container.xs"
       content={
-        <Stack spacing={0.5}>
+        <Stack gap={0.5}>
           <Text fontSize="sm">
             <Text as="span" textStyle={name ? undefined : "hint"}>
               {name || (

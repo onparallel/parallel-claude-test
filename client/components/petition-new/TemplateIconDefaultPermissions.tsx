@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
-import { Flex, List, ListItem, PopoverProps, Stack } from "@chakra-ui/react";
+import { List, ListItem, PopoverProps } from "@chakra-ui/react";
 import { ArrowShortRightIcon, UsersIcon } from "@parallel/chakra/icons";
-import { Text } from "@parallel/components/ui";
+import { Flex, Stack, Text } from "@parallel/components/ui";
 import { TemplateIconDefaultPermissions_PetitionTemplateFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { SmallPopover } from "../common/SmallPopover";

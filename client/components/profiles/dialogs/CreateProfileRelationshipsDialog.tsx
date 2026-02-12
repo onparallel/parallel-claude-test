@@ -1,15 +1,6 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import {
-  Box,
-  FormControl,
-  FormErrorMessage,
-  Grid,
-  Heading,
-  List,
-  ListItem,
-  Stack,
-} from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, Grid, Heading, List, ListItem } from "@chakra-ui/react";
 import { DeleteIcon, RelationshipIcon } from "@parallel/chakra/icons";
 import { ContactSupportAlert } from "@parallel/components/common/ContactSupportAlert";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -20,7 +11,7 @@ import { ProfileRelationshipTypeWithDirectionSelect } from "@parallel/components
 import { ProfileSelect, ProfileSelectSelection } from "@parallel/components/common/ProfileSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Stack, Text } from "@parallel/components/ui";
 import {
   CreateProfileRelationshipInput,
   useCreateProfileRelationshipsDialog_ProfileFragment,

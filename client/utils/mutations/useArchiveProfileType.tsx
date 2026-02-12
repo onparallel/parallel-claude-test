@@ -1,13 +1,13 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Stack } from "@chakra-ui/react";
+
 import {
   LocalizableUserText,
   LocalizableUserTextRender,
 } from "@parallel/components/common/LocalizableUserTextRender";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import {
   useArchiveProfileType_ProfileTypeFragment,
   useArchiveProfileType_archiveProfileTypeDocument,

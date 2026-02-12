@@ -1,5 +1,6 @@
-import { Box, BoxProps, Placement, TextProps } from "@chakra-ui/react";
+import { Placement, TextProps } from "@chakra-ui/react";
 import { SparklesIcon } from "@parallel/chakra/icons";
+import { Box, BoxProps } from "@parallel/components/ui";
 import { chakraComponent } from "@parallel/chakra/utils";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";

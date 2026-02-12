@@ -1,7 +1,8 @@
-import { HStack, SystemStyleObject } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
+import { SystemStyleObject } from "@chakra-ui/react";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { ProfileTypeField } from "@parallel/graphql/__types";
+import { HStack } from "@parallel/components/ui";
 import { useIntl } from "react-intl";
 import { ProfileTypeFieldTypeIndicator } from "../organization/profiles/ProfileTypeFieldTypeIndicator";
 import { LocalizableUserTextRender } from "./LocalizableUserTextRender";

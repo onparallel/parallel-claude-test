@@ -1,9 +1,9 @@
-import { Center, Flex } from "@chakra-ui/react";
+import { Center } from "@chakra-ui/react";
 import { EyeOffIcon } from "@parallel/chakra/icons";
 import { Divider } from "@parallel/components/common/Divider";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
+import { Flex, Text } from "@parallel/components/ui";
 
 export function PetitionRepliesFilteredFields({ count }: { count: number }) {
   return (

@@ -2,7 +2,6 @@ import {
   chakra,
   FormControl,
   FormControlOptions,
-  HStack,
   omitThemingProps,
   ThemingProps,
   useFormControl,
@@ -11,6 +10,7 @@ import {
 import { cx } from "@chakra-ui/utils";
 import { chakraComponent } from "@parallel/chakra/utils";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { HStack } from "@parallel/components/ui";
 import { IMaskInput } from "react-imask";
 import { omit } from "remeda";
 import { noop } from "ts-essentials";

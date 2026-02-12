@@ -1,11 +1,7 @@
 import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
 import {
-  Box,
-  Flex,
   Heading,
-  HStack,
-  Stack,
   Tab,
   TabIndicator,
   TabList,
@@ -21,7 +17,7 @@ import { withApolloData, WithApolloDataContext } from "@parallel/components/comm
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { AdverseMediaArticleCard } from "@parallel/components/petition-preview/fields/adverse-media-search/AdverseMediaArticleCard";
 import { AdverseMediaSearchInput } from "@parallel/components/petition-preview/fields/adverse-media-search/AdverseMediaSearchInput";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   AdverseMediaArticleRelevance,
   AdverseMediaSearch_adverseMediaAlternativeSearchSuggestionsDocument,
@@ -230,7 +226,7 @@ function AdverseMediaSearch({
       <Stack
         paddingX={6}
         paddingY={5}
-        spacing={6}
+        gap={6}
         height="100vh"
         minHeight="0"
         overflow="hidden"
@@ -243,7 +239,7 @@ function AdverseMediaSearch({
               defaultMessage="Adverse media search"
             />
           </Heading>
-          <HStack spacing={4}>
+          <HStack gap={4}>
             {createdAt && (
               <Text>
                 {intl.formatMessage(
@@ -269,7 +265,7 @@ function AdverseMediaSearch({
             gap={4}
             variant="unstyled"
           >
-            <HStack spacing={0} overflowX="auto" overflowY="hidden" alignItems="flex-end">
+            <HStack gap={0} overflowX="auto" overflowY="hidden" alignItems="flex-end">
               <TabList position="relative" borderBottom="1px solid" borderColor="gray.200" flex="1">
                 <ArticleTab>
                   <FormattedMessage id="page.adverse-media-search.search" defaultMessage="Search" />
@@ -484,7 +480,7 @@ function SearchInputWithSuggestions({
               </Button>
             </HStack>
             {filteredSuggestions.length > 0 ? (
-              <HStack flexWrap="wrap" gap={2} spacing={0}>
+              <HStack flexWrap="wrap" gap={2}>
                 <SparklesIcon color="purple.400" boxSize={6} />
                 {filteredSuggestions.map((suggestion, index) => (
                   <Button

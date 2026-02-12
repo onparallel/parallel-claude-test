@@ -1,8 +1,8 @@
-import { Center, Flex, List, Stack } from "@chakra-ui/react";
+import { Center, List } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { PhoneInputLazy } from "@parallel/components/common/PhoneInputLazy";
-import { Text } from "@parallel/components/ui";
+import { Flex, Stack, Text } from "@parallel/components/ui";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { isMetaReturn } from "@parallel/utils/keys";

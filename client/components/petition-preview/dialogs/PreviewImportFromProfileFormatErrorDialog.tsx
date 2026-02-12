@@ -1,11 +1,11 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import { List, ListItem, Stack } from "@chakra-ui/react";
+import { List, ListItem } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { ProfileTypeFieldReference } from "@parallel/components/common/ProfileTypeFieldReference";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import { PreviewImportFromProfileFormatErrorDialog_profilesDocument } from "@parallel/graphql/__types";
 import { useRef } from "react";
 import { FormattedMessage } from "react-intl";
@@ -48,7 +48,7 @@ export function PreviewImportFromProfileFormatErrorDialog({
       closeOnEsc={true}
       closeOnOverlayClick={true}
       header={
-        <Stack direction="row" spacing={2} align="center">
+        <Stack direction="row" gap={2} align="center">
           <AlertCircleIcon role="presentation" />
           <Text>
             <FormattedMessage
@@ -59,7 +59,7 @@ export function PreviewImportFromProfileFormatErrorDialog({
         </Stack>
       }
       body={
-        <Stack spacing={4}>
+        <Stack gap={4}>
           <Text>
             <FormattedMessage
               id="component.preview-import-from-profile-format-error-dialog.body"

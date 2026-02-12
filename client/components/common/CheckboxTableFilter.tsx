@@ -1,7 +1,8 @@
-import { Center, Checkbox, Flex } from "@chakra-ui/react";
+import { Center, Checkbox } from "@chakra-ui/react";
 import { CloseIcon } from "@parallel/chakra/icons";
 import { TableColumnFilterProps } from "@parallel/components/common/Table";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
+import { Flex } from "@parallel/components/ui";
 import {
   KeyboardEvent,
   MouseEvent,

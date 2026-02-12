@@ -1,9 +1,10 @@
-import { Box, Flex, Heading, HStack, Stack } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
+import { Heading } from "@chakra-ui/react";
 import { FieldDescription } from "@parallel/components/common/FieldDescription";
 import { FileAttachmentButton } from "@parallel/components/common/FileAttachmentButton";
 import { InternalFieldBadge } from "@parallel/components/common/InternalFieldBadge";
 import { useFieldCommentsQueryState } from "@parallel/utils/useFieldCommentsQueryState";
+import { Box, Flex, HStack, Stack } from "@parallel/components/ui";
 import { isNonNullish } from "remeda";
 import { CommentsButton } from "../CommentsButton";
 import { RecipientViewPetitionFieldLayout_PetitionFieldSelection } from "./RecipientViewPetitionFieldLayout";
@@ -32,7 +33,7 @@ export const RecipientViewPetitionFieldHeading = chakraComponent<
   const title = field.title ? field.title : "";
 
   return (
-    <Stack as="header" id={`field-${field.id}`} spacing={1} padding={2} {...props} ref={ref}>
+    <Stack as="header" id={`field-${field.id}`} gap={1} padding={2} {...props} ref={ref}>
       <HStack alignItems="flex-start">
         <Box flex="1">
           <Heading size="md">

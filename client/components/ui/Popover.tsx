@@ -17,7 +17,7 @@ import {
   PopoverProps,
   PopoverTrigger,
 } from "@chakra-ui/react";
-import { ReactNode, forwardRef } from "react";
+import { ReactNode, RefAttributes } from "react";
 
 // Docs: https://chakra-ui.com/docs/components/popover
 
@@ -53,19 +53,28 @@ export const PopoverTriggerWrapper = ({ children }: { children: ReactNode }) => 
 };
 
 // Popover.Content component
-export const PopoverContentWrapper = forwardRef<HTMLElement, PopoverContentProps>((props, ref) => {
+export function PopoverContentWrapper({
+  ref,
+  ...props
+}: PopoverContentProps & RefAttributes<HTMLDivElement>) {
   return <PopoverContent ref={ref} {...props} />;
-});
+}
 
 // Popover.Header component
-export const PopoverHeaderWrapper = forwardRef<HTMLElement, PopoverHeaderProps>((props, ref) => {
+export function PopoverHeaderWrapper({
+  ref,
+  ...props
+}: PopoverHeaderProps & RefAttributes<HTMLDivElement>) {
   return <PopoverHeader ref={ref} {...props} />;
-});
+}
 
 // Popover.Body component
-export const PopoverBodyWrapper = forwardRef<HTMLElement, PopoverBodyProps>((props, ref) => {
+export function PopoverBodyWrapper({
+  ref,
+  ...props
+}: PopoverBodyProps & RefAttributes<HTMLDivElement>) {
   return <PopoverBody ref={ref} {...props} />;
-});
+}
 
 // Popover.Footer component
 export const PopoverFooterWrapper = (props: PopoverFooterProps) => {
@@ -73,11 +82,12 @@ export const PopoverFooterWrapper = (props: PopoverFooterProps) => {
 };
 
 // Popover.CloseButton component
-export const PopoverCloseButtonWrapper = forwardRef<HTMLElement, PopoverCloseButtonProps>(
-  (props, ref) => {
-    return <PopoverCloseButton ref={ref} {...props} />;
-  },
-);
+export function PopoverCloseButtonWrapper({
+  ref,
+  ...props
+}: PopoverCloseButtonProps & RefAttributes<HTMLButtonElement>) {
+  return <PopoverCloseButton ref={ref} {...props} />;
+}
 
 // Popover.Arrow component
 export const PopoverArrowWrapper = (props: PopoverArrowProps) => {
@@ -101,14 +111,3 @@ export const Popover = {
   Arrow: PopoverArrowWrapper,
   Anchor: PopoverAnchorWrapper,
 };
-
-// Assign display names for debugging
-PopoverRoot.displayName = "Popover.Root";
-PopoverTriggerWrapper.displayName = "Popover.Trigger";
-PopoverContentWrapper.displayName = "Popover.Content";
-PopoverHeaderWrapper.displayName = "Popover.Header";
-PopoverBodyWrapper.displayName = "Popover.Body";
-PopoverFooterWrapper.displayName = "Popover.Footer";
-PopoverCloseButtonWrapper.displayName = "Popover.CloseButton";
-PopoverArrowWrapper.displayName = "Popover.Arrow";
-PopoverAnchorWrapper.displayName = "Popover.Anchor";

@@ -1,12 +1,9 @@
 import { gql } from "@apollo/client";
 import {
-  Box,
   Center,
   Drawer,
   DrawerContent,
   DrawerOverlay,
-  Flex,
-  HStack,
   Icon,
   IconButton,
   Image,
@@ -18,8 +15,6 @@ import {
   MenuItem,
   MenuList,
   Portal,
-  Stack,
-  StackProps,
   useBreakpointValue,
   useMenuItem,
 } from "@chakra-ui/react";
@@ -41,7 +36,7 @@ import {
   UserIcon,
   UsersIcon,
 } from "@parallel/chakra/icons";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, StackProps, Text } from "@parallel/components/ui";
 import {
   AppLayoutNavBar_ProfileTypeFragment,
   AppLayoutNavBar_QueryFragment,
@@ -237,7 +232,7 @@ export function AppLayoutNavBar({ queryObject, onHelpCenterClick }: AppLayoutNav
             sm: [`min-width`, `box-shadow`].join(", "),
           }}
         >
-          <Stack spacing={4} flex="1" minHeight={0}>
+          <Stack gap={4} flex="1" minHeight={0}>
             <HStack
               paddingTop={4}
               paddingX={3}
@@ -340,14 +335,14 @@ export function AppLayoutNavBar({ queryObject, onHelpCenterClick }: AppLayoutNav
               />
             </Box>
             <Stack
-              spacing={4}
+              gap={4}
               overflowY="auto"
               overflowX="hidden"
               minHeight={0}
               paddingBottom={4}
               flex={1}
             >
-              <Stack flex={1} spacing={4} paddingX={3}>
+              <Stack flex={1} gap={4} paddingX={3}>
                 <SectionsAndProfilesList
                   onToggle={handleSubMenuToggle}
                   isMobile={isMobile}
@@ -622,7 +617,7 @@ function SectionsAndProfilesList({
 
   return (
     <>
-      <List spacing={2}>
+      <List gap={2}>
         {items.map(({ section, href, isActive, icon, text, warning, onClick }) => (
           <ListItem key={section}>
             <Wrap
@@ -660,7 +655,7 @@ function SectionsAndProfilesList({
       </List>
       {userCanViewProfiles ? (
         <>
-          <HStack spacing={0} className="show-on-expand">
+          <HStack gap={0} className="show-on-expand">
             <Text fontSize="sm" fontWeight={500} flex="1">
               <FormattedMessage
                 id="component.app-layout-nav-bar.profiles"
@@ -723,7 +718,7 @@ function SectionsAndProfilesList({
             ) : null}
           </HStack>
           {me.hasProfilesAccess ? (
-            <List spacing={2}>
+            <List gap={2}>
               {me.pinnedProfileTypes.length ? (
                 me.pinnedProfileTypes.map((profileType) => {
                   const icon = getProfileTypeIcon(profileType.icon);
@@ -753,7 +748,7 @@ function SectionsAndProfilesList({
               )}
             </List>
           ) : (
-            <List spacing={2}>
+            <List gap={2}>
               <ListItem>
                 <NavBarButton
                   as="a"
@@ -1024,7 +1019,7 @@ function NotificationsSection({ onHelpCenterClick, ...rest }: NotificationsSecti
   const intl = useIntl();
   return (
     <Stack {...rest}>
-      <List spacing={2}>
+      <List gap={2}>
         <ListItem>
           <NotificationsButton extended />
         </ListItem>

@@ -1,5 +1,6 @@
-import { Box, BoxProps, Center, ListItem } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
+import { Box, BoxProps } from "@parallel/components/ui";
+import { Center, ListItem } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import NextLink from "next/link";
 import { ReactNode, Ref } from "react";

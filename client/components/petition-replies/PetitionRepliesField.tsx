@@ -1,17 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import {
-  Box,
-  BoxProps,
-  ButtonOptions,
-  Center,
-  Grid,
-  HStack,
-  Heading,
-  IconButton,
-  Stack,
-  ThemingProps,
-} from "@chakra-ui/react";
+import { ButtonOptions, Center, Grid, Heading, IconButton, ThemingProps } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import {
   ArrowForwardIcon,
@@ -22,7 +11,7 @@ import {
 import { chakraComponent } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, BoxProps, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionFieldReplyStatus,
   PetitionRepliesField_PetitionFieldFragment,
@@ -297,7 +286,7 @@ export function PetitionRepliesField({
           ) : null}
         </Box>
       </Grid>
-      <Stack paddingStart={10} spacing={3}>
+      <Stack paddingStart={10} gap={3}>
         {field.replies.length > 0 ? (
           field.replies.map((reply, index) => {
             const filteredFields = filterPetitionFields(
@@ -340,7 +329,7 @@ export function PetitionRepliesField({
                     } ${index + 1}`}
                   </Text>
                 ) : null}
-                <Stack spacing={3}>
+                <Stack gap={3}>
                   {filteredFields.map((x, filteredFieldIndex) => {
                     return x.type === "FIELD" ? (
                       <LiquidPetitionVariableProvider
@@ -425,7 +414,7 @@ export function PetitionRepliesField({
                             </Box>
                           </Box>
                           {x.field.type === "HEADING" ? null : (
-                            <Stack spacing={4}>
+                            <Stack gap={4}>
                               {x.field.replies.length ? (
                                 x.field.replies.map((reply) => (
                                   <PetitionRepliesFieldReply
@@ -613,7 +602,7 @@ export function PetitionRepliesField({
                 ))}
             </Stack>
           ) : null}
-          <Stack spacing={4}>
+          <Stack gap={4}>
             {field.replies.map((reply) => (
               <PetitionRepliesFieldReply
                 key={reply.id}

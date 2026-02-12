@@ -5,13 +5,11 @@ import {
   AlertIcon,
   AlertTitle,
   Center,
-  Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
   Heading,
   Input,
-  Stack,
 } from "@chakra-ui/react";
 import { FieldDateIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
@@ -22,7 +20,7 @@ import { SupportLink } from "@parallel/components/common/SupportLink";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { BackgroundCheckEntityTypeSelect } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityTypeSelect";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Flex, Stack, Text } from "@parallel/components/ui";
 import {
   BackgroundCheckEntitySearchType,
   BackgroundCheckFieldSearch_userDocument,
@@ -163,14 +161,14 @@ function BackgroundCheckFieldSearch({
             paddingX={8}
             paddingY={10}
           >
-            <Stack spacing={6}>
+            <Stack gap={6}>
               <Heading size="lg">
                 <FormattedMessage
                   id="page.background-check.fill-in-data"
                   defaultMessage="Run background check"
                 />
               </Heading>
-              <Stack spacing={4}>
+              <Stack gap={4}>
                 <FormControl>
                   <FormLabel fontWeight={400}>
                     <FormattedMessage

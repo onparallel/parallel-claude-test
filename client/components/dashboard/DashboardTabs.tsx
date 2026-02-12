@@ -1,11 +1,12 @@
 import { gql } from "@apollo/client";
-import { Flex, MenuDivider, MenuItem, MenuList, Square } from "@chakra-ui/react";
+import { MenuDivider, MenuItem, MenuList, Square } from "@chakra-ui/react";
 import { AddIcon, CopyIcon, DeleteIcon, EditIcon, UserArrowIcon } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
 import { DashboardTabs_DashboardFragment } from "@parallel/graphql/__types";
 import { DashboardQueryState } from "@parallel/pages/app/home";
 import { SetQueryState } from "@parallel/utils/queryState";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
+import { Flex } from "@parallel/components/ui";
 import { Reorder } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";

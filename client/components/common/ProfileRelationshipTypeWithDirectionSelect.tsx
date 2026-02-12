@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
-import { Box, IconButton } from "@chakra-ui/react";
+import { IconButton } from "@chakra-ui/react";
 import { RelationshipIcon } from "@parallel/chakra/icons";
-import { Text } from "@parallel/components/ui";
+import { Box, Text } from "@parallel/components/ui";
 import { ProfileRelationshipTypeWithDirectionSelect_ProfileRelationshipTypeWithDirectionFragment } from "@parallel/graphql/__types";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomSelectProps } from "@parallel/utils/react-select/types";

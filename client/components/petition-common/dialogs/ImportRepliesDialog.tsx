@@ -1,15 +1,6 @@
 import { ApolloLink, gql } from "@apollo/client";
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client/react";
-import {
-  Box,
-  Checkbox,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  Stack,
-} from "@chakra-ui/react";
+import { Checkbox, FormControl, FormErrorMessage, FormLabel, Input } from "@chakra-ui/react";
 import {
   MapFieldsTable,
   excludedFieldsOrigin,
@@ -21,7 +12,7 @@ import {
   WizardStepDialogProps,
   useWizardDialog,
 } from "@parallel/components/common/dialogs/WizardDialog";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, Stack, Text } from "@parallel/components/ui";
 import {
   CreatePetitionFieldReplyInput,
   ImportRepliesDialog_PetitionFragment,
@@ -497,7 +488,7 @@ function ImportRepliesMappingDialog({
         </Flex>
       }
       body={
-        <Stack spacing={4}>
+        <Stack gap={4}>
           <Text>
             <FormattedMessage
               id="component.import-replies-dialog.mapping-despcription"

@@ -1,6 +1,6 @@
-import { Box, MenuItem, MenuList, Stack } from "@chakra-ui/react";
+import { MenuItem, MenuList } from "@chakra-ui/react";
 import { RepeatIcon, UploadIcon, UserPlusIcon } from "@parallel/chakra/icons";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Stack, Text } from "@parallel/components/ui";
 import { Focusable } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, RefObject, useCallback, useRef, useState } from "react";

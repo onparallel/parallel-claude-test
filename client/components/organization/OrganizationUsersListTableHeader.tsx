@@ -1,6 +1,5 @@
-import { Box, Stack } from "@chakra-ui/react";
 import { RepeatIcon, UserPlusIcon } from "@parallel/chakra/icons";
-import { Button } from "@parallel/components/ui";
+import { Box, Button, Stack } from "@parallel/components/ui";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";

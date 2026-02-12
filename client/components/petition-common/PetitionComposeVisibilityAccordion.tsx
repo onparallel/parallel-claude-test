@@ -1,6 +1,7 @@
-import { HStack, Heading } from "@chakra-ui/react";
+import { Heading } from "@chakra-ui/react";
 import { ChevronFilledIcon, ConditionIcon } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
+import { HStack } from "@parallel/components/ui";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { HelpPopover } from "../common/HelpPopover";
@@ -31,7 +32,7 @@ export const PetitionComposeVisibilityAccordion = chakraComponent<
             <>
               <Heading>
                 <Accordion.ItemTrigger borderRadius="md" paddingY={3}>
-                  <HStack as="span" flex="1" textAlign="left" fontSize="sm" spacing={1}>
+                  <HStack as="span" flex="1" textAlign="left" fontSize="sm" gap={1}>
                     <ChevronFilledIcon
                       color="gray.500"
                       fontSize="xs"

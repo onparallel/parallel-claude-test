@@ -1,17 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import {
-  Badge,
-  Box,
-  Center,
-  Divider,
-  Heading,
-  HStack,
-  Image,
-  Input,
-  Spinner,
-  Stack,
-} from "@chakra-ui/react";
+import { Badge, Center, Divider, Heading, Image, Input, Spinner } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
 import { ContactSupportAlert } from "@parallel/components/common/ContactSupportAlert";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -23,7 +12,7 @@ import { RestrictedFeatureAlert } from "@parallel/components/common/RestrictedFe
 import { SupportButton } from "@parallel/components/common/SupportButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   OrganizationGeneral_updateOrgLogoDocument,
   OrganizationGeneral_userDocument,
@@ -88,9 +77,9 @@ function OrganizationGeneral() {
         gridGap={{ base: 8, xl: 16 }}
         paddingBottom={16}
       >
-        <Stack spacing={8} maxWidth={{ base: "100%", xl: "container.xs" }} width="100%">
+        <Stack gap={8} maxWidth={{ base: "100%", xl: "container.xs" }} width="100%">
           {!userCanEditOrganization ? <RestrictedFeatureAlert /> : null}
-          <Stack spacing={4}>
+          <Stack gap={4}>
             <Stack>
               <Text>
                 <FormattedMessage
@@ -169,7 +158,7 @@ function OrganizationGeneral() {
             )}
           </Stack>
           <Divider borderColor="gray.300" />
-          <Stack spacing={4}>
+          <Stack gap={4}>
             <Heading as="h4" size="md" fontWeight="semibold">
               <FormattedMessage
                 id="organization.general.icon-header"
@@ -177,7 +166,7 @@ function OrganizationGeneral() {
               />
             </Heading>
             <Card padding={4}>
-              <HStack spacing={4}>
+              <HStack gap={4}>
                 <Dropzone
                   ref={dropzoneRef}
                   as={Center}
@@ -223,7 +212,7 @@ function OrganizationGeneral() {
                     <Logo width="74px" hideText={true} color="gray.800" />
                   )}
                 </Dropzone>
-                <Stack spacing={4}>
+                <Stack gap={4}>
                   <Text fontSize="sm">
                     <FormattedMessage
                       id="organization.branding.square-logo-description"

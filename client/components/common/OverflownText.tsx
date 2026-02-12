@@ -1,9 +1,10 @@
-import { Box, PlacementWithLogical } from "@chakra-ui/react";
+import { PlacementWithLogical } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { chakraComponent } from "@parallel/chakra/utils";
 import { assignRef } from "@parallel/utils/assignRef";
 import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import { useResizeObserver } from "@parallel/utils/useResizeObserver";
+import { Box } from "@parallel/components/ui";
 import { ReactNode, useRef, useState } from "react";
 
 export interface OverflownTextProps {

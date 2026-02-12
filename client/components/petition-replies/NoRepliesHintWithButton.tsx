@@ -1,4 +1,3 @@
-import { Box, HStack, StackProps } from "@chakra-ui/react";
 import { EditSimpleIcon } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
 import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
@@ -6,7 +5,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import NextLink from "next/link";
 import { PetitionRepliesPopoverField } from "./PetitionRepliesPopoverField";
-import { Text } from "@parallel/components/ui";
+import { Box, HStack, StackProps, Text } from "@parallel/components/ui";
 
 export const NoRepliesHintWithButton = chakraComponent<
   "div",

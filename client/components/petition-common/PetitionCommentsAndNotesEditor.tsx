@@ -1,6 +1,5 @@
-import { Box, HStack, Stack } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { KeyboardEvent, useImperativeHandle, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -134,7 +133,7 @@ export const PetitionCommentsAndNotesEditor = chakraComponent<
         backgroundColor={tabIsNotes ? "yellow.100" : undefined}
         alignItems="flex-start"
       >
-        <Stack flex={1} spacing={1} minWidth={0}>
+        <Stack flex={1} gap={1} minWidth={0}>
           <CommentEditor
             id={`comment-editor-${id}`}
             ref={editorRef}

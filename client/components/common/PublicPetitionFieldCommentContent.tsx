@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client";
-import { Box, Link } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
+import { Link } from "@chakra-ui/react";
 import { PublicPetitionFieldCommentContent_PetitionFieldCommentFragment } from "@parallel/graphql/__types";
 import { sanitizeHtml } from "@parallel/utils/sanitizeHtml";
+import { Box } from "@parallel/components/ui";
 import parse, { Element, HTMLReactParserOptions, domToReact } from "html-react-parser";
 import { useMemo } from "react";
 

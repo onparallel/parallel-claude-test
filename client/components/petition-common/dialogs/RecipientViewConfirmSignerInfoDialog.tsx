@@ -7,11 +7,10 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
-  Stack,
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import { Tone } from "@parallel/graphql/__types";
 import { fullName } from "@parallel/utils/fullName";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
@@ -90,7 +89,7 @@ function RecipientViewConfirmSignerInfoDialog({
               </Text>
               <Alert status="warning" rounded="md">
                 <AlertIcon />
-                <Stack spacing={1}>
+                <Stack gap={1}>
                   <AlertTitle fontSize="14px">
                     <FormattedMessage
                       id="component.recipient-view-confirm-signer-info-dialog.alert-title"

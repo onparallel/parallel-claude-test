@@ -1,9 +1,10 @@
 import { gql } from "@apollo/client";
-import { Box, Stack } from "@chakra-ui/react";
+
 import { UserGroupSelect } from "@parallel/components/common/UserGroupSelect";
 import { UserSelect_UserGroupFragment } from "@parallel/graphql/__types";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { useSearchUserGroups } from "@parallel/utils/useSearchUserGroups";
+import { Box, Stack } from "@parallel/components/ui";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ActionMeta } from "react-select";
@@ -50,7 +51,7 @@ export function PetitionComposeUserAssignmentSettings({
   };
 
   return (
-    <Stack spacing={4}>
+    <Stack gap={4}>
       <SettingsRow
         controlId="allowed-user-group"
         label={

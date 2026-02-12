@@ -85,7 +85,7 @@ export function ProfileTypeIconSelect({ value, onChange }: ValueProps<ProfileTyp
 
 function MenuOptionGroup(props: Pick<UseMenuOptionGroupProps, "value" | "onChange" | "children">) {
   const ownProps = useMenuOptionGroup({ ...props, type: "radio" });
-  return <SimpleGrid justifyItems="center" columns={4} spacing={2} {...ownProps} />;
+  return <SimpleGrid justifyItems="center" columns={4} gap={2} {...ownProps} />;
 }
 
 function MenuItemOption({

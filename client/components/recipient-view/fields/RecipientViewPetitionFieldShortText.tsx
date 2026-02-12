@@ -1,8 +1,8 @@
-import { Center, Flex, FormControl, HStack, List, Stack } from "@chakra-ui/react";
+import { Center, FormControl, List } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { FormatFormErrorMessage, ShortTextInput } from "@parallel/components/common/ShortTextInput";
-import { Text } from "@parallel/components/ui";
+import { Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { isMetaReturn } from "@parallel/utils/keys";

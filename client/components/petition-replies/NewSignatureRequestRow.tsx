@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
-import { Box, GridItem, Heading, Stack } from "@chakra-ui/react";
+import { GridItem, Heading } from "@chakra-ui/react";
 import { TimeIcon } from "@parallel/chakra/icons";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Stack, Text } from "@parallel/components/ui";
 import { NewSignatureRequestRow_PetitionFragment } from "@parallel/graphql/__types";
 import { useStartSignatureRequest } from "@parallel/utils/useStartSignatureRequest";
 import { FormattedList, FormattedMessage } from "react-intl";

@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 import { useApolloClient, useQuery } from "@apollo/client/react";
-import { Box, HStack } from "@chakra-ui/react";
+
 import { UsersIcon } from "@parallel/chakra/icons";
-import { Text } from "@parallel/components/ui";
+import { Box, HStack, Text } from "@parallel/components/ui";
 import {
   ApprovalFlowConfigApproverSelect_PetitionBaseFragment,
   UserLocale,
@@ -549,7 +549,7 @@ function MultiValueLabel<T extends ApprovalFlowConfigApproverSelect_PetitionBase
           </OverflownText>
         </UserGroupMembersPopover>
       ) : data.__typename === "PetitionField" ? (
-        <HStack spacing={2}>
+        <HStack gap={2}>
           <PetitionFieldTypeIndicator
             as="div"
             type={data.field.type}
@@ -647,7 +647,7 @@ function ApprovalFlowConfigApproverSelectOption<
   } else if (data.__typename === "PetitionField") {
     const fieldOption = data as PetitionFieldOption<T>;
     return (
-      <HStack spacing={2}>
+      <HStack gap={2}>
         <PetitionFieldTypeIndicator
           as="div"
           type={fieldOption.field.type}

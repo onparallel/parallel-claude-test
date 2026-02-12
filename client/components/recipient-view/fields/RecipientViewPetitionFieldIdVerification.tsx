@@ -1,4 +1,4 @@
-import { Box, Center, Flex, HStack, Progress, Stack } from "@chakra-ui/react";
+import { Center, Progress } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import {
   AlertCircleIcon,
@@ -10,7 +10,7 @@ import {
 import { DateTime } from "@parallel/components/common/DateTime";
 import { useTone } from "@parallel/components/common/ToneProvider";
 import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-common/alerts/RestrictedPetitionFieldAlert";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { FORMATS } from "@parallel/utils/dates";
 import { centeredPopup, isWindowBlockedError, openNewWindow } from "@parallel/utils/openNewWindow";
@@ -173,7 +173,7 @@ export function RecipientViewPetitionFieldIdVerification({
     >
       <Box marginTop={2}>
         {state === "FETCHING" ? (
-          <Stack spacing={0} flex="1">
+          <Stack gap={0} flex="1">
             <Text fontSize="sm">
               <FormattedMessage
                 id="component.recipient-view-petition-field-id-verification.verifying-documentation"
@@ -210,7 +210,7 @@ export function RecipientViewPetitionFieldIdVerification({
                 <FormattedMessage id="generic.start" defaultMessage="Start" />
               </Button>
             ) : (
-              <Stack spacing={2}>
+              <Stack gap={2}>
                 {filteredReplies.map((reply) => (
                   <RecipientViewIdVerificationReplyContent
                     key={reply.id}
@@ -283,7 +283,7 @@ export function RecipientViewIdVerificationReplyContent({
         {hasError ? <AlertCircleIcon color="red.600" /> : <CloudOkIcon color="green.600" />}
       </Center>
       {hasError ? (
-        <Stack spacing={0} flex="1">
+        <Stack gap={0} flex="1">
           <Text fontSize="sm">
             <FormattedMessage
               id="component.recipient-view-petition-field-id-verification.verification-not-completed"
@@ -302,7 +302,7 @@ export function RecipientViewIdVerificationReplyContent({
         </Stack>
       ) : (
         <>
-          <Stack spacing={0} flex="1">
+          <Stack gap={0} flex="1">
             <Text fontSize="sm">
               {isVideo ? (
                 <FormattedMessage

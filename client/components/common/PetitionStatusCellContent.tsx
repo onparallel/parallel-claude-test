@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
-import { Center, Stack } from "@chakra-ui/react";
+import { Center } from "@chakra-ui/react";
 import { PetitionStatusCellContent_PetitionFragment } from "@parallel/graphql/__types";
+import { Stack } from "@parallel/components/ui";
 import { PetitionProgressBar } from "./PetitionProgressBar";
 import { PetitionStatusIcon } from "./PetitionStatusIcon";
 

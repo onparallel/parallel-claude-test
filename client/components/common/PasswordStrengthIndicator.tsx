@@ -1,7 +1,7 @@
-import { Box, SimpleGrid } from "@chakra-ui/react";
+import { SimpleGrid } from "@chakra-ui/react";
 import { useMemo } from "react";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
+import { Box, Text } from "@parallel/components/ui";
 
 export const PasswordStrengthIndicator = ({ password }: { password: string }) => {
   const strength = useMemo(() => {

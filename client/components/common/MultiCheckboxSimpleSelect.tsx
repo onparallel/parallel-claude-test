@@ -1,5 +1,6 @@
-import { Box, Checkbox, ThemeTypings } from "@chakra-ui/react";
 import { RefAttributes, useMemo } from "react";
+import { Box } from "@parallel/components/ui";
+import { Checkbox, ThemeTypings } from "@chakra-ui/react";
 import { CSSObjectWithLabel, OptionProps, components, mergeStyles } from "react-select";
 import { isNonNullish, omit } from "remeda";
 import {

@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Flex, HStack, List, Progress, Stack } from "@chakra-ui/react";
+import { Center, List, Progress } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import {
   BookOpenIcon,
@@ -19,7 +19,7 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
   RecipientViewPetitionFieldLayoutProps,
 } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldLayout";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   AdverseMediaArticle,
   AdverseMediaSearchTermInput,

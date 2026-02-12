@@ -1,15 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
-import {
-  Box,
-  Center,
-  Flex,
-  HStack,
-  Skeleton,
-  SkeletonCircle,
-  SkeletonText,
-  Stack,
-} from "@chakra-ui/react";
+import { Center, Skeleton, SkeletonCircle, SkeletonText } from "@chakra-ui/react";
 import { Divider } from "@parallel/components/common/Divider";
 import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
 import { Spacer } from "@parallel/components/common/Spacer";
@@ -41,7 +32,7 @@ import {
 import { useRecipientViewReviewBeforeSignDialog } from "@parallel/components/recipient-view/dialogs/RecipientViewReviewBeforeSignDialog";
 import { useSignatureStatusDialog } from "@parallel/components/recipient-view/dialogs/SignatureStatusDialog";
 import { RecipientViewPetitionField } from "@parallel/components/recipient-view/fields/RecipientViewPetitionField";
-import { Button } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack } from "@parallel/components/ui";
 import {
   RecipientView_accessDocument,
   RecipientView_accessesDocument,
@@ -319,7 +310,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
             </Head>
             <Flex direction="column" height="100vh">
               {/* Header  */}
-              <Stack spacing={0} divider={<Divider />}>
+              <Stack gap={0} divider={<Divider />}>
                 {/* Navbar with logo  */}
                 <RecipientViewHeader
                   keycode={keycode}
@@ -343,7 +334,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
                 overflow="hidden"
                 borderTop="1px solid "
                 borderTopColor="gray.200"
-                spacing={0}
+                gap={0}
                 divider={<Divider />}
               >
                 <Flex
@@ -381,7 +372,7 @@ function RecipientView({ keycode, currentPage }: RecipientViewProps) {
                   {/* Content */}
                   <Flex flex="1" width="100%" padding={4} justify="center">
                     <Flex flexDirection="column" minWidth={0} maxWidth="container.sm" width="100%">
-                      <Stack spacing={4} key={currentPage}>
+                      <Stack gap={4} key={currentPage}>
                         <LiquidPetitionScopeProvider petition={petition}>
                           <AnimatePresence initial={false}>
                             {fieldsWithLogic.map(({ field, logic }) => {
@@ -631,7 +622,7 @@ export default compose(
     IfLoading: () => (
       <Stack
         padding={0}
-        spacing={0}
+        gap={0}
         align="stretch"
         divider={<Divider />}
         width="100%"
@@ -639,7 +630,7 @@ export default compose(
         overflow="hidden"
       >
         {/* Header */}
-        <Stack spacing={0} divider={<Divider />}>
+        <Stack gap={0} divider={<Divider />}>
           <HStack justify="space-between" align="center" paddingX={4} paddingY={2}>
             <Skeleton height="36px" width="150px" />
             <HStack>
@@ -660,7 +651,7 @@ export default compose(
           divider={<Divider />}
           width="100%"
           height="100%"
-          spacing={0}
+          gap={0}
           minHeight={0}
         >
           {/* Form Content */}
@@ -673,42 +664,42 @@ export default compose(
             height="100%"
             overflow="hidden"
           >
-            <Stack maxWidth="container.md" width="100%" spacing={8}>
-              <Stack spacing={4}>
+            <Stack maxWidth="container.md" width="100%" gap={8}>
+              <Stack gap={4}>
                 <Skeleton height="20px" width="40%" />
                 <SkeletonText height="40px" />
                 <Skeleton height="40px" />
               </Stack>
 
-              <Stack spacing={4}>
+              <Stack gap={4}>
                 <Skeleton height="20px" width="50%" />
                 <Skeleton height="40px" />
                 <Skeleton height="40px" />
               </Stack>
 
-              <Stack spacing={4}>
+              <Stack gap={4}>
                 <Skeleton height="20px" width="20%" />
                 <SkeletonText height="40px" />
               </Stack>
 
-              <Stack spacing={4}>
+              <Stack gap={4}>
                 <Skeleton height="20px" width="70%" />
                 <Skeleton height="40px" />
                 <Skeleton height="40px" />
               </Stack>
 
-              <Stack spacing={4}>
+              <Stack gap={4}>
                 <Skeleton height="20px" width="50%" />
                 <Skeleton height="40px" />
                 <Skeleton height="40px" />
               </Stack>
 
-              <Stack spacing={4}>
+              <Stack gap={4}>
                 <Skeleton height="20px" width="20%" />
                 <SkeletonText height="40px" />
               </Stack>
 
-              <Stack spacing={4}>
+              <Stack gap={4}>
                 <Skeleton height="20px" width="70%" />
                 <Skeleton height="40px" />
                 <Skeleton height="40px" />
@@ -719,7 +710,7 @@ export default compose(
           <Stack
             direction={{ base: "row", md: "column" }}
             padding={4}
-            spacing={6}
+            gap={6}
             justify={{ base: "space-between", md: "inherit" }}
           >
             <Skeleton height="24px" width="24px" />

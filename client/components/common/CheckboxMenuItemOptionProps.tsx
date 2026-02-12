@@ -1,5 +1,6 @@
-import { Checkbox, Flex, MenuItemOption } from "@chakra-ui/react";
+import { Checkbox, MenuItemOption } from "@chakra-ui/react";
 import { ValueProps } from "@parallel/utils/ValueProps";
+import { Flex } from "@parallel/components/ui";
 import { ReactElement } from "react";
 
 export interface CheckboxMenuItemOptionProps extends ValueProps<boolean, false> {

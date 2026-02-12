@@ -1,7 +1,7 @@
-import { HStack, Icon } from "@chakra-ui/react";
+import { Icon } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { chakraComponent } from "@parallel/chakra/utils";
-import { Text } from "@parallel/components/ui";
+import { HStack, Text } from "@parallel/components/ui";
 import { ProfileTypeFieldType } from "@parallel/graphql/__types";
 import { PROFILE_TYPE_FIELD_CONFIG } from "@parallel/utils/profileFields";
 import { useIntl } from "react-intl";
@@ -37,7 +37,7 @@ export const ProfileTypeFieldTypeIndicator = chakraComponent<
         minWidth={fieldIndex ? 8 : undefined}
         borderRadius="sm"
         paddingX={1}
-        spacing={0.5}
+        gap={0.5}
         minH={5}
         justifyContent={hideIcon ? "center" : "space-between"}
         {...props}

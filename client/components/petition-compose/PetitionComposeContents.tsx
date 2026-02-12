@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
-import { Box, Center, LinkBox, LinkOverlay, Stack } from "@chakra-ui/react";
+import { Center, LinkBox, LinkOverlay } from "@chakra-ui/react";
 import { ProfilesIcon } from "@parallel/chakra/icons";
-import { Text } from "@parallel/components/ui";
+import { Box, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionComposeContents_PetitionFieldFragment,
   PetitionComposeContents_PetitionFieldFragmentDoc,
@@ -39,7 +39,7 @@ export function PetitionComposeContents<T extends PetitionComposeContents_Petiti
     [onFieldClick],
   );
   return (
-    <Stack as="ol" spacing={1} padding={4}>
+    <Stack as="ol" gap={1} padding={4}>
       {fieldsWithIndices.map(([field, fieldIndex]) => {
         return (
           <PetitionComposeContentsItem

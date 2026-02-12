@@ -1,7 +1,6 @@
 import {
   ButtonGroup,
   FocusLock,
-  HStack,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -15,14 +14,13 @@ import {
   PopoverHeader,
   PopoverTrigger,
   Portal,
-  Stack,
   useBreakpointValue,
   useDisclosure,
   useOutsideClick,
 } from "@chakra-ui/react";
 import { Popover } from "@parallel/chakra/components";
 import { CloseIcon, FieldDateIcon } from "@parallel/chakra/icons";
-import { Button } from "@parallel/components/ui";
+import { Button, HStack, Stack } from "@parallel/components/ui";
 import { FORMATS } from "@parallel/utils/dates";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { endOfDay, startOfDay } from "date-fns";

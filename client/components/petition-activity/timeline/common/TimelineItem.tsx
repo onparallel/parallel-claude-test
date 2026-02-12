@@ -1,4 +1,5 @@
-import { Box, BoxProps, Flex, useTheme } from "@chakra-ui/react";
+import { useTheme } from "@chakra-ui/react";
+import { Box, BoxProps, Flex } from "@parallel/components/ui";
 import { ReactNode } from "react";
 
 interface TimelineItemProps extends BoxProps {

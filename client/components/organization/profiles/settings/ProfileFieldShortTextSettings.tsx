@@ -1,6 +1,6 @@
-import { Center, FormControl, FormHelperText, FormLabel, HStack } from "@chakra-ui/react";
+import { Center, FormControl, FormHelperText, FormLabel } from "@chakra-ui/react";
 import { ShortTextFormatSelect } from "@parallel/components/common/ShortTextFormatSelect";
-import { Stack, Switch } from "@parallel/components/ui";
+import { HStack, Stack, Switch } from "@parallel/components/ui";
 import { Controller, useFormContext } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { CreateOrUpdateProfileTypeFieldDialogFormData } from "../dialogs/CreateOrUpdateProfileTypeFieldDialog";

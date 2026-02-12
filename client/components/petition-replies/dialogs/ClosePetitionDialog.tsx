@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client";
-import { Checkbox, FormControl, FormLabel, Input, Stack } from "@chakra-ui/react";
+import { Checkbox, FormControl, FormLabel, Input } from "@chakra-ui/react";
 import { DoubleCheckIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { PETITION_CLOSING_DEFAULT_MESSAGE } from "@parallel/components/petition-messages/PetitionTemplateClosingMessageCard";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import { useClosePetitionDialog_PetitionFragment } from "@parallel/graphql/__types";
 import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
@@ -68,7 +68,7 @@ export function ClosePetitionDialog({
     <ConfirmDialog
       size="xl"
       header={
-        <Stack direction="row" spacing={4} alignItems="center">
+        <Stack direction="row" gap={4} alignItems="center">
           <DoubleCheckIcon boxSize={6} color="green.500" />
           <Text>
             <FormattedMessage
@@ -79,7 +79,7 @@ export function ClosePetitionDialog({
         </Stack>
       }
       body={
-        <Stack spacing={4}>
+        <Stack gap={4}>
           <Text>
             {hasLinkedToProfileTypeFields ? (
               <FormattedMessage

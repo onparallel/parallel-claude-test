@@ -1,12 +1,9 @@
 import {
-  Box,
-  BoxProps,
   ButtonProps,
   Center,
   Table as ChakraTable,
   Checkbox,
   FocusLock,
-  HStack,
   HTMLChakraProps,
   PopoverBody,
   PopoverCloseButton,
@@ -29,7 +26,7 @@ import {
   ChevronUpIcon,
   FilterIcon,
 } from "@parallel/chakra/icons";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, BoxProps, Button, HStack, Text } from "@parallel/components/ui";
 import { getKey, KeyProp } from "@parallel/utils/keyProp";
 import { MaybeFunction, unMaybeFunction } from "@parallel/utils/types";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
@@ -563,7 +560,7 @@ export function DefaultHeader<TRow, TContext = unknown, TFilter = unknown>({
       {...props}
     >
       <HStack
-        spacing={1}
+        gap={1}
         alignItems="center"
         justifyContent={toFlexAlignment(column.align) ?? "flex-start"}
       >

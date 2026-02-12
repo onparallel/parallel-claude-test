@@ -1,7 +1,6 @@
 import {
   Badge,
   ButtonProps,
-  HStack,
   Image,
   Input,
   InputGroup,
@@ -17,7 +16,7 @@ import {
 import { Menu } from "@parallel/chakra/components";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Text } from "@parallel/components/ui";
 import { UserLocale } from "@parallel/graphql/__types";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { asSupportedUserLocale, useSupportedUserLocales } from "@parallel/utils/locales";

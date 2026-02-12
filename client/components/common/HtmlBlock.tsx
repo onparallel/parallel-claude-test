@@ -1,6 +1,7 @@
-import { Box, Link } from "@chakra-ui/react";
+import { Link } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
 import { sanitizeHtml } from "@parallel/utils/sanitizeHtml";
+import { Box } from "@parallel/components/ui";
 import parse, { domToReact, Element, HTMLReactParserOptions } from "html-react-parser";
 import { useMemo } from "react";
 

@@ -1,7 +1,7 @@
-import { Box } from "@chakra-ui/react";
 import { UserSelect, UserSelectSelection } from "@parallel/components/common/UserSelect";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
+import { Box } from "@parallel/components/ui";
 import { useCallback } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { IndicatorsContainerProps, ValueContainerProps, components } from "react-select";

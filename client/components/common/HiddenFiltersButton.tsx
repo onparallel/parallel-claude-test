@@ -1,15 +1,7 @@
-import {
-  Box,
-  Heading,
-  HStack,
-  PopoverBody,
-  PopoverContent,
-  PopoverTrigger,
-  Portal,
-  Stack,
-} from "@chakra-ui/react";
+import { Heading, PopoverBody, PopoverContent, PopoverTrigger, Portal } from "@chakra-ui/react";
 import { Popover } from "@parallel/chakra/components";
 import { CloseIcon, EyeIcon, FilterIcon } from "@parallel/chakra/icons";
+import { Box, HStack, Stack } from "@parallel/components/ui";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { IconButtonWithTooltip } from "./IconButtonWithTooltip";

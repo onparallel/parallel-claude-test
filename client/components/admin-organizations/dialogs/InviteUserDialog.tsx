@@ -1,9 +1,9 @@
-import { FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel, Input } from "@chakra-ui/react";
 import { Select } from "@parallel/chakra/components";
 import { UserPlusIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import { UserLocale } from "@parallel/graphql/__types";
 import { asSupportedUserLocale, useSupportedUserLocales } from "@parallel/utils/locales";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
@@ -54,7 +54,7 @@ export function InviteUserDialog({ ...props }: DialogProps<{}, InviteUserDialogD
       }}
       initialFocusRef={emailRef}
       header={
-        <Stack direction={"row"} spacing={2} align="center">
+        <Stack direction={"row"} gap={2} align="center">
           <UserPlusIcon role="presentation" />
           <Text>
             <FormattedMessage id="generic.invite-user" defaultMessage="Invite user" />

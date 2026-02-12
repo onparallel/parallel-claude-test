@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
-import { Alert, AlertDescription, AlertIcon, AlertTitle, HStack, Stack } from "@chakra-ui/react";
+import { Alert, AlertDescription, AlertIcon, AlertTitle } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
-import { Button } from "@parallel/components/ui";
+import { Button, HStack, Stack } from "@parallel/components/ui";
 import { BackgroundCheckSearchDifferencesAlert_BackgroundCheckEntitySearchReviewDiffFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 

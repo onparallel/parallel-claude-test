@@ -4,12 +4,8 @@ import {
   AlertDescription,
   AlertIcon,
   Badge,
-  Box,
   Center,
-  Flex,
-  HStack,
   Spinner,
-  Stack,
   useToast,
 } from "@chakra-ui/react";
 import { ExternalLinkIcon, SearchIcon } from "@parallel/chakra/icons";
@@ -17,7 +13,7 @@ import { chakraComponent } from "@parallel/chakra/utils";
 import { Divider } from "@parallel/components/common/Divider";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { OverflownText } from "@parallel/components/common/OverflownText";
-import { Button } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack } from "@parallel/components/ui";
 import {
   ProfileForm_PetitionBaseFragment,
   ProfileForm_ProfileFragment,
@@ -164,7 +160,7 @@ export const ProfileForm = chakraComponent<"div", ProfileFormProps>(function Pro
       })}
     >
       <Stack
-        spacing={0}
+        gap={0}
         paddingX={4}
         paddingY={2}
         borderBottom="1px solid"
@@ -266,7 +262,7 @@ export const ProfileForm = chakraComponent<"div", ProfileFormProps>(function Pro
           divider={<Divider />}
           padding={4}
           paddingBottom={overlapsIntercomBadge ? 24 : 4}
-          spacing={4}
+          gap={4}
           overflow="auto"
         >
           <ProfileFormInner

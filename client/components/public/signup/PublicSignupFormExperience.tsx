@@ -1,14 +1,6 @@
-import {
-  Box,
-  Center,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  Stack,
-} from "@chakra-ui/react";
+import { Center, FormControl, FormErrorMessage, FormLabel, Input } from "@chakra-ui/react";
 import { Select } from "@parallel/chakra/components";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Stack, Text } from "@parallel/components/ui";
 import { useMemo } from "react";
 import ReCaptcha from "react-google-recaptcha";
 import { Controller, useForm } from "react-hook-form";
@@ -281,7 +273,7 @@ export function PublicSignupFormExperience({
       <Text color="gray.500" fontSize="sm">
         3/3
       </Text>
-      <Stack spacing={4}>
+      <Stack gap={4}>
         <Text as="h1" fontSize="2xl" fontWeight="bold" marginTop={0}>
           <FormattedMessage
             id="component.public-signup-form-experience.heading"
@@ -386,7 +378,7 @@ export function PublicSignupFormExperience({
           </FormErrorMessage>
         </Stack>
       </FormControl>
-      <Stack spacing={4} marginTop={8} direction={{ base: "column-reverse", md: "row" }}>
+      <Stack gap={4} marginTop={8} direction={{ base: "column-reverse", md: "row" }}>
         <Button width="100%" variant="outline" onClick={onBack}>
           <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
         </Button>

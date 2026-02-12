@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
-import { Badge, Box, Circle, HStack, MenuItem, MenuList, Spacer, Stack } from "@chakra-ui/react";
+import { Badge, Circle, MenuItem, MenuList, Spacer } from "@chakra-ui/react";
 import { ThumbsDownIcon, ThumbsUpIcon } from "@parallel/chakra/icons";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { PetitionFieldComment_PetitionFieldCommentFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { isMetaReturn } from "@parallel/utils/keys";
@@ -182,7 +182,7 @@ export function PetitionFieldComment({
         <HStack fontSize="sm" fontWeight={500}>
           <Text as="span">{approvalMetadata.stepName}:</Text>
           {approvalMetadata.status === "APPROVED" ? (
-            <HStack color="green.600" spacing={1}>
+            <HStack color="green.600" gap={1}>
               <ThumbsUpIcon />
               <Text as="span">
                 <FormattedMessage
@@ -192,7 +192,7 @@ export function PetitionFieldComment({
               </Text>
             </HStack>
           ) : approvalMetadata.status === "REJECTED" ? (
-            <HStack color="red.600" spacing={1}>
+            <HStack color="red.600" gap={1}>
               <ThumbsDownIcon />
               <Text as="span">
                 {approvalMetadata.rejectionType === "TEMPORARY" ? (
@@ -209,7 +209,7 @@ export function PetitionFieldComment({
               </Text>
             </HStack>
           ) : approvalMetadata.status === "SKIPPED" ? (
-            <HStack color="green.600" spacing={1}>
+            <HStack color="green.600" gap={1}>
               <ThumbsUpIcon />
               <Text as="span">
                 <FormattedMessage

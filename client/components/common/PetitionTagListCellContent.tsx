@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Circle, Flex, List, ListItem, Stack } from "@chakra-ui/react";
+import { Circle, List, ListItem } from "@chakra-ui/react";
 import { AddIcon } from "@parallel/chakra/icons";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { Tag } from "@parallel/components/common/Tag";
@@ -16,7 +16,7 @@ import { ActionMeta } from "react-select";
 import { omit } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { TagSelect, TagSelectInstance } from "./TagSelect";
-import { Text } from "@parallel/components/ui";
+import { Box, Flex, Stack, Text } from "@parallel/components/ui";
 
 type TagSelection = PetitionTagListCellContent_TagFragment;
 
@@ -122,7 +122,7 @@ export function PetitionTagListCellContent({
       ) : (
         <Stack
           as={List}
-          spacing={1.5}
+          gap={1.5}
           direction="row"
           flex="1"
           paddingX={2}

@@ -1,7 +1,8 @@
 import { gql } from "@apollo/client";
-import { Center, Flex, FlexProps, Spinner } from "@chakra-ui/react";
+import { Center, Spinner } from "@chakra-ui/react";
 import { DashboardSimpleModuleCard_DashboardModuleFragment } from "@parallel/graphql/__types";
 import { PropsWithChildren, RefAttributes } from "react";
+import { Flex, FlexProps } from "@parallel/components/ui";
 import { isNonNullish } from "remeda";
 import { DashboardModuleCard, DashboardModuleCardProps } from "../shared/DashboardModuleCard";
 

@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Image, ListItem, SkeletonText, Stack, UnorderedList } from "@chakra-ui/react";
+import { Center, Image, ListItem, SkeletonText, UnorderedList } from "@chakra-ui/react";
 import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Stack, Text } from "@parallel/components/ui";
 import {
   BrandingGeneralPreview_OrganizationBrandThemeDataFragment,
   BrandingGeneralPreview_UserFragment,
@@ -54,7 +54,7 @@ export function BrandingGeneralPreview({ user, brand, logo }: BrandingGeneralPre
           </Text>
         </Box>
 
-        <Stack padding={8} spacing={5} id="branding-preview" fontFamily="body">
+        <Stack padding={8} gap={5} id="branding-preview" fontFamily="body">
           <OverrideWithOrganizationTheme cssVarsRoot="#branding-preview" brandTheme={brand}>
             <Stack>
               <Center minHeight="100px">
@@ -82,7 +82,7 @@ export function BrandingGeneralPreview({ user, brand, logo }: BrandingGeneralPre
               </Text>
             </Stack>
 
-            <Stack padding={4} spacing={2.5} backgroundColor="gray.100" borderRadius="md">
+            <Stack padding={4} gap={2.5} backgroundColor="gray.100" borderRadius="md">
               <SkeletonText noOfLines={1} width="20%" speed={0} startColor="gray.400" />
               <SkeletonText noOfLines={1} width="100%" speed={0} startColor="gray.400" />
               <SkeletonText
@@ -106,13 +106,7 @@ export function BrandingGeneralPreview({ user, brand, logo }: BrandingGeneralPre
               </ListItem>
             </UnorderedList>
 
-            <Stack
-              width="100%"
-              justifyContent="center"
-              align="center"
-              spacing={2.5}
-              paddingBottom={6}
-            >
+            <Stack width="100%" justifyContent="center" align="center" gap={2.5} paddingBottom={6}>
               <Button colorPalette="primary" marginY={3}>
                 <FormattedMessage
                   id="component.branding-general-preview.complete-information"

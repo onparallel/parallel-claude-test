@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Badge, Box, HStack, MenuDivider, MenuItem, MenuList, Stack } from "@chakra-ui/react";
+import { Badge, MenuDivider, MenuItem, MenuList } from "@chakra-ui/react";
 import {
   MediaIcon,
   RepeatIcon,
@@ -12,7 +12,7 @@ import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMe
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-common/alerts/RestrictedPetitionFieldAlert";
 import { useConfirmDeleteAdverseMediaSearchDialog } from "@parallel/components/petition-preview/dialogs/ConfirmDeleteAdverseMediaSearchDialog";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   AdverseMediaArticle,
   AdverseMediaSearchTermInput,
@@ -275,7 +275,7 @@ export function ProfileFormFieldAdverseMediaSearch({
           <Stack border="1px solid" borderColor="gray.200" borderRadius="md" padding={2}>
             <HStack alignItems="flex-start">
               <MediaIcon marginTop={2} />
-              <Stack flex="1" spacing={1}>
+              <Stack flex="1" gap={1}>
                 <HStack justifyContent="space-between" minHeight="32px">
                   <Button
                     ref={contentButtonRef}
@@ -404,7 +404,7 @@ export function ProfileFormFieldAdverseMediaSearch({
             />
           </Stack>
         ) : (
-          <Stack width="100%" spacing={3}>
+          <Stack width="100%" gap={3}>
             <Box>
               <Button
                 size="sm"

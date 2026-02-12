@@ -1,8 +1,6 @@
 import { gql } from "@apollo/client";
 import {
   AspectRatio,
-  Box,
-  HStack,
   Heading,
   Image,
   MenuGroup,
@@ -24,7 +22,7 @@ import smoothScrollIntoView from "smooth-scroll-into-view-if-needed";
 import { PaidBadge } from "../common/PaidBadge";
 import { PetitionFieldTypeLabel } from "./PetitionFieldTypeLabel";
 import { PetitionFieldTypeText } from "./PetitionFieldTypeText";
-import { Text } from "@parallel/components/ui";
+import { Box, HStack, Text } from "@parallel/components/ui";
 
 export interface PetitionFieldTypeSelectDropdownProps {
   showHeader?: boolean;

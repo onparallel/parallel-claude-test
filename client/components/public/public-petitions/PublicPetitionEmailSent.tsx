@@ -1,7 +1,7 @@
-import { Img, Stack } from "@chakra-ui/react";
+import { Img } from "@chakra-ui/react";
 import { Logo } from "@parallel/components/common/Logo";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
+import { Stack, Text } from "@parallel/components/ui";
 
 interface PublicPetitionEmailSentProps {
   organizationName: string;
@@ -18,7 +18,7 @@ export function PublicPetitionEmailSent({
 }: PublicPetitionEmailSentProps) {
   return (
     <Stack
-      spacing={{ base: 6, md: 8 }}
+      gap={{ base: 6, md: 8 }}
       maxWidth="container.sm"
       width="100%"
       margin="0 auto"
@@ -38,14 +38,14 @@ export function PublicPetitionEmailSent({
         <Logo width="152px" height="40px" />
       )}
 
-      <Stack spacing={4} width="100%">
+      <Stack gap={4} width="100%">
         <Text fontSize="2xl" fontWeight="bold">
           <FormattedMessage
             id="public-petition-email-sent.title"
             defaultMessage="Check your inbox"
           />
         </Text>
-        <Stack spacing={4}>
+        <Stack gap={4}>
           <Text>
             {hasExistingProcess ? (
               <FormattedMessage

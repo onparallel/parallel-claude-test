@@ -4,12 +4,11 @@ import {
   AlertIcon,
   Center,
   Circle,
-  Flex,
   PortalManager,
   Spinner,
 } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
-import { Button } from "@parallel/components/ui";
+import { Button, Flex } from "@parallel/components/ui";
 import { AppLayout_QueryFragment } from "@parallel/graphql/__types";
 import { useCheckForNewVersion } from "@parallel/utils/useCheckForNewVersion";
 import { useCookie } from "@parallel/utils/useCookie";

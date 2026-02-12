@@ -2,17 +2,15 @@ import { gql } from "@apollo/client";
 import {
   AlertDescription,
   AlertIcon,
-  Box,
   FormControl,
   FormLabel,
-  HStack,
   Image,
   Input,
   Switch,
 } from "@chakra-ui/react";
 import { AppWindowIcon } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
-import { Text } from "@parallel/components/ui";
+import { Box, HStack, Text } from "@parallel/components/ui";
 import {
   PetitionLocale,
   PetitionTemplateCompletingMessageCard_PetitionTemplateFragment,

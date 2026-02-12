@@ -4,15 +4,11 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Box,
   Center,
-  Flex,
-  HStack,
   Heading,
   Icon,
   MenuItem,
   MenuList,
-  Stack,
   useToast,
 } from "@chakra-ui/react";
 import {
@@ -53,7 +49,7 @@ import { useAskNameDialog } from "@parallel/components/petition-list/AskNameDial
 import { useCreateProfileDialog } from "@parallel/components/profiles/dialogs/CreateProfileDialog";
 import { useImportProfilesFromExcelDialog } from "@parallel/components/profiles/dialogs/ImportProfilesFromExcelDialog";
 import { useProfileSubscribersDialog } from "@parallel/components/profiles/dialogs/ProfileSubscribersDialog";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   ProfileListViewDataInput,
   ProfileStatus,
@@ -457,7 +453,7 @@ function Profiles() {
       title={intl.formatMessage({ id: "page.profiles.title", defaultMessage: "Profiles" })}
       queryObject={queryObject}
     >
-      <Stack flex={1} minHeight={0} paddingX={4} paddingTop={6} spacing={4}>
+      <Stack flex={1} minHeight={0} paddingX={4} paddingTop={6} gap={4}>
         <Flex alignItems="center">
           <HStack padding={2}>
             <Icon as={icon} boxSize={5} />

@@ -1,5 +1,5 @@
-import { HStack, Stack } from "@chakra-ui/react";
 import { SettingsIcon } from "@parallel/chakra/icons";
+import { HStack, Stack } from "@parallel/components/ui";
 import { ReactNode } from "react";
 import { useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../../../common/IconButtonWithTooltip";
@@ -19,7 +19,7 @@ export function SettingsRowConfigButton({
   const intl = useIntl();
 
   return (
-    <Stack spacing={0}>
+    <Stack gap={0}>
       <SettingsRow {...props}>
         <HStack>
           {children}

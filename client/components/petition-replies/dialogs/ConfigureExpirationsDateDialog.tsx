@@ -4,13 +4,10 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Box,
   Center,
-  Flex,
   FormControl,
   FormLabel,
   Spinner,
-  Stack,
 } from "@chakra-ui/react";
 import { FieldDateIcon } from "@parallel/chakra/icons";
 import { DateInput } from "@parallel/components/common/DateInput";
@@ -36,7 +33,7 @@ import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFil
 import { isPast, sub } from "date-fns";
 import { useEffect, useState } from "react";
 
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, Stack, Text } from "@parallel/components/ui";
 import { FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
@@ -168,7 +165,7 @@ function ConfigureExpirationsDateDialog({
         />
       }
       body={
-        <Stack spacing={4}>
+        <Stack gap={4}>
           <Text>
             <FormattedMessage
               id="component.configure-expirations-date-dialog.body"
@@ -178,7 +175,7 @@ function ConfigureExpirationsDateDialog({
               }}
             />
           </Text>
-          <Stack spacing={4}>
+          <Stack gap={4}>
             <FormProvider {...form}>
               {fields.map((field, index) => {
                 const property = profile.properties.find(

@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client";
-import { Box, Center } from "@chakra-ui/react";
+import { Center } from "@chakra-ui/react";
 import { CloseIcon } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
 import { Tag_TagFragment } from "@parallel/graphql/__types";
+import { Box } from "@parallel/components/ui";
 import { useIntl } from "react-intl";
 import { OverflownText } from "./OverflownText";
 

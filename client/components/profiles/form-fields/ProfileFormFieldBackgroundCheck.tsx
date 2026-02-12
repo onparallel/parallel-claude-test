@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Flex, HStack, MenuDivider, MenuItem, MenuList, Stack } from "@chakra-ui/react";
+import { MenuDivider, MenuItem, MenuList } from "@chakra-ui/react";
 import { BusinessIcon, SearchIcon, ShortSearchIcon, UserIcon } from "@parallel/chakra/icons";
 import {
   FalsePositivesBadge,
@@ -10,7 +10,7 @@ import {
 import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
 import { BackgroundCheckRiskLabel } from "@parallel/components/petition-common/BackgroundCheckRiskLabel";
 import { RestrictedPetitionFieldAlert } from "@parallel/components/petition-common/alerts/RestrictedPetitionFieldAlert";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   ProfileFormFieldBackgroundCheck_copyReplyContentToProfileFieldValueDocument,
   ProfileFormFieldBackgroundCheck_updateProfileFieldValueDocument,
@@ -380,7 +380,7 @@ export function ProfileFormFieldBackgroundCheck({
                   wrap="wrap"
                   flex="1"
                   lineHeight={1.5}
-                  spacing={isSearch ? 1 : 2}
+                  gap={isSearch ? 1 : 2}
                   paddingTop={0.5}
                 >
                   <Button
@@ -478,7 +478,7 @@ export function ProfileFormFieldBackgroundCheck({
             />
           </Stack>
         ) : (
-          <Stack width="100%" spacing={3}>
+          <Stack width="100%" gap={3}>
             <Box>
               <Button
                 size="sm"

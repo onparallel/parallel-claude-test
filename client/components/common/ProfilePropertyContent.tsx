@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, HStack, List, ListItem, Stack } from "@chakra-ui/react";
+import { List, ListItem } from "@chakra-ui/react";
 import { BusinessIcon, SearchIcon, ShortSearchIcon, UserIcon } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
 import { Link } from "@parallel/components/common/Link";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   AdverseMediaArticle,
   AdverseMediaSearchTermInput,
@@ -378,7 +378,7 @@ const ProfileFieldBackgroundCheckValue = chakraComponent<"div", ProfilePropertyC
                 {content.entity.name}
               </OverflownText>
               {topics.length > 3 ? (
-                <HStack spacing={1} marginStart={1}>
+                <HStack gap={1} marginStart={1}>
                   <EnumerateList
                     values={topics as string[]}
                     maxItems={1}
@@ -413,7 +413,7 @@ const ProfileFieldBackgroundCheckValue = chakraComponent<"div", ProfilePropertyC
           ) : (
             <>
               <SearchIcon boxSize={3} />
-              <HStack marginStart={1} spacing={1} display="inline-flex">
+              <HStack marginStart={1} gap={1} display="inline-flex">
                 {content.query.type === "PERSON" ? (
                   <UserIcon boxSize={4} />
                 ) : content.query.type === "COMPANY" ? (
@@ -489,8 +489,8 @@ const ProfileFieldAdverseMediaSearchValue = chakraComponent<"div", ProfileProper
           onClick={handleClick}
           fontWeight={500}
         >
-          <Stack spacing={1} maxWidth="100%" width="100%" textAlign="start">
-            <HStack spacing={1.5} minWidth={0} width="100%">
+          <Stack gap={1} maxWidth="100%" width="100%" textAlign="start">
+            <HStack gap={1.5} minWidth={0} width="100%">
               <ShortSearchIcon />
               <OverflownText textAlign="start" width="100%">
                 {intl.formatList(

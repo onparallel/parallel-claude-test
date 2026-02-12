@@ -1,17 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import {
-  Badge,
-  Box,
-  Flex,
-  Grid,
-  Heading,
-  HStack,
-  Image,
-  Spinner,
-  Stack,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { Badge, Grid, Heading, Image, Spinner, useDisclosure } from "@chakra-ui/react";
 import {
   closestCorners,
   DndContext,
@@ -42,7 +31,7 @@ import { useConfirmDeleteDashboardDialog } from "@parallel/components/dashboard/
 import { DashboardModuleDrawer } from "@parallel/components/dashboard/drawer/DashboardModuleDrawer";
 import { SortableDashboardModule } from "@parallel/components/dashboard/SortableDashboardModule";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   Home_cloneDashboardDocument,
   Home_createDashboardDocument,
@@ -277,7 +266,7 @@ function Home() {
       })}
       queryObject={queryObject}
     >
-      <Stack minHeight={0} paddingX={4} paddingTop={6} spacing={4}>
+      <Stack minHeight={0} paddingX={4} paddingTop={6} gap={4}>
         <Stack maxWidth="container.xl" width="100%" margin="0 auto">
           <HStack justify="space-between" padding={2} className="no-print">
             <HStack>
@@ -412,7 +401,7 @@ function Home() {
               ) : null}
             </>
           ) : (
-            <Stack alignItems="center" justifyContent="center" spacing={6} paddingY={10}>
+            <Stack alignItems="center" justifyContent="center" gap={6} paddingY={10}>
               <Image
                 maxWidth="420px"
                 width="100%"

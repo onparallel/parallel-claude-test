@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Flex, Grid, Heading, Stack } from "@chakra-ui/react";
+import { Grid, Heading } from "@chakra-ui/react";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { LandingTemplateCard } from "@parallel/components/public/templates/LandingTemplateCard";
 import { PublicTemplatesContainer } from "@parallel/components/public/templates/PublicTemplatesContainer";
@@ -13,6 +13,7 @@ import {
 } from "@parallel/graphql/__types";
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
+import { Flex, Stack } from "@parallel/components/ui";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { FormattedMessage, useIntl } from "react-intl";
 import { indexBy, isNonNullish } from "remeda";
@@ -48,7 +49,7 @@ function LandingTemplatesCategory({
     >
       <PublicTemplatesHero />
       <PublicTemplatesContainer categories={filteredCategories}>
-        <Stack spacing={6}>
+        <Stack gap={6}>
           <Flex height="40px" alignItems="center">
             <Heading as="h1" size="lg">
               <FormattedMessage

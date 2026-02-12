@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { useLazyQuery } from "@apollo/client/react";
 import {
   Center,
-  Flex,
   List,
   ListItem,
   PopoverArrow,
@@ -12,10 +11,9 @@ import {
   PopoverTrigger,
   Portal,
   Spinner,
-  Stack,
 } from "@chakra-ui/react";
 import { Popover } from "@parallel/chakra/components";
-import { Text } from "@parallel/components/ui";
+import { Flex, Stack, Text } from "@parallel/components/ui";
 import {
   UserGroupMembersPopover_UserGroupFragment,
   UserGroupMembersPopover_getMembersDocument,

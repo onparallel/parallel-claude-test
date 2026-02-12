@@ -1,8 +1,8 @@
-import { Badge, HStack } from "@chakra-ui/react";
+import { Badge } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { BusinessIcon, LinkIcon, UserIcon } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
-import { Text } from "@parallel/components/ui";
+import { HStack, Text } from "@parallel/components/ui";
 import { isNullish } from "remeda";
 import { BACKGROUND_CHECK_TOPICS } from "../../utils/backgroundCheckTopics";
 
@@ -22,7 +22,7 @@ export const BackgroundCheckRiskLabel = chakraComponent<"span", { risk: string }
         <Badge
           as={HStack}
           display="inline-flex"
-          spacing={1}
+          gap={1}
           colorScheme={
             risk === "role.pep"
               ? "green"

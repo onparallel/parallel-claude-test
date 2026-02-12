@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
-import { Box, Circle, MenuItem, MenuList, Spacer, Stack } from "@chakra-ui/react";
-import { Button, Text } from "@parallel/components/ui";
+import { Circle, MenuItem, MenuList, Spacer } from "@chakra-ui/react";
+import { Box, Button, Stack, Text } from "@parallel/components/ui";
 import { PublicPetitionFieldComment_PublicPetitionFieldCommentFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { isMetaReturn } from "@parallel/utils/keys";

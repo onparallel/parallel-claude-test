@@ -1,7 +1,7 @@
-import { chakra, Flex, ThemingProps } from "@chakra-ui/react";
+import { chakra, ThemingProps } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { chakraComponent } from "@parallel/chakra/utils";
-import { Text } from "@parallel/components/ui";
+import { Flex, Text } from "@parallel/components/ui";
 import { Maybe } from "@parallel/graphql/__types";
 import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import { useEffect, useRef, useState } from "react";

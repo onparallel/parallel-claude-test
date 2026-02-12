@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useApolloClient } from "@apollo/client/react";
-import { Box, Center, Circle, Flex, Grid, Heading, Image, Stack } from "@chakra-ui/react";
+import { Center, Circle, Grid, Heading, Image } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
 import {
@@ -18,6 +18,7 @@ import { compose } from "@parallel/utils/compose";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useRoleButton } from "@parallel/utils/useRoleButton";
+import { Box, Flex, Stack } from "@parallel/components/ui";
 import Head from "next/head";
 import Router from "next/router";
 import { MouseEvent, MouseEventHandler } from "react";
@@ -67,7 +68,7 @@ function ChooseOrg({ organizations }: ChooseOrgProps) {
           <Logo width="152px" />
         </Box>
         <Stack
-          spacing={{ base: 6, md: 8, lg: 10 }}
+          gap={{ base: 6, md: 8, lg: 10 }}
           flex="1"
           justifyContent="center"
           marginBottom="120px"

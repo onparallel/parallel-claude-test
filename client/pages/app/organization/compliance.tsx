@@ -4,19 +4,16 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Box,
   Center,
   Checkbox,
   FormControl,
   FormErrorMessage,
   Heading,
-  HStack,
   NumberDecrementStepper,
   NumberIncrementStepper,
   NumberInput,
   NumberInputField,
   NumberInputStepper,
-  Stack,
   Table,
   TableContainer,
   Tbody,
@@ -33,7 +30,7 @@ import { SupportLink } from "@parallel/components/common/SupportLink";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withPermission } from "@parallel/components/common/withPermission";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   OrganizationCompliance_updateOrganizationAutoAnonymizePeriodDocument,
   OrganizationCompliance_userDocument,
@@ -116,7 +113,7 @@ function OrganizationCompliance() {
       }
     >
       <Box padding={6}>
-        <Stack spacing={6} maxWidth="container.xs" width="100%">
+        <Stack gap={6} maxWidth="container.xs" width="100%">
           {me.hasAutoAnonymize ? null : (
             <Alert status="info" rounded="md">
               <AlertIcon />
@@ -163,7 +160,7 @@ function OrganizationCompliance() {
           </Box>
           <Stack
             as="form"
-            spacing={4}
+            gap={4}
             onSubmit={handleSubmit(({ period, isActive }) => {
               onPeriodChange({ isActive, period: Number(period) });
             })}

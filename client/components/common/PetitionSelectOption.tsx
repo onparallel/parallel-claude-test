@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
-import { Box } from "@chakra-ui/react";
+
 import { PetitionSelectOption_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { HighlightText } from "./HighlightText";
-import { Text } from "@parallel/components/ui";
+import { Box, Text } from "@parallel/components/ui";
 
 interface PetitionSelectOptionProps {
   data: PetitionSelectOption_PetitionBaseFragment;

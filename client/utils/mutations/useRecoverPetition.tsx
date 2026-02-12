@@ -1,11 +1,11 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Stack } from "@chakra-ui/react";
+
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { PathName } from "@parallel/components/common/PathName";
 import { PetitionNameWithPath } from "@parallel/components/common/PetitionNameWithPath";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionBaseType,
   useRecoverPetition_PetitionBaseOrFolderFragment,

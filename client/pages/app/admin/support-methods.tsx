@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Heading, Stack } from "@chakra-ui/react";
+import { Heading } from "@chakra-ui/react";
 import { ChevronRightIcon } from "@parallel/chakra/icons";
 import { SupportMethodModal } from "@parallel/components/admin-support/SupportMethodModal";
 import { Card } from "@parallel/components/common/Card";
@@ -15,7 +15,7 @@ import { unCamelCase } from "@parallel/utils/strings";
 import { Maybe, UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
+import { Box, Flex, Stack, Text } from "@parallel/components/ui";
 
 type AdminSupportMethodsProps = Exclude<
   UnwrapPromise<ReturnType<typeof AdminSupportMethods.getInitialProps>>,

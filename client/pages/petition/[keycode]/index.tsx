@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Container, Flex } from "@chakra-ui/react";
+import { Container } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
@@ -14,6 +14,7 @@ import {
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { compose } from "@parallel/utils/compose";
+import { Flex } from "@parallel/components/ui";
 import { serialize as serializeCookie } from "cookie";
 import { GetServerSidePropsContext } from "next";
 import Head from "next/head";

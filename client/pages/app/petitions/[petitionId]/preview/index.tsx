@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Center, Flex, Stack, useToast } from "@chakra-ui/react";
+import { Center, useToast } from "@chakra-ui/react";
 import { ChevronRightIcon, EditSimpleIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import NextLink from "next/link";
@@ -37,7 +37,7 @@ import { RecipientViewPagination } from "@parallel/components/recipient-view/Rec
 import { RecipientViewProgressBar } from "@parallel/components/recipient-view/RecipientViewProgressBar";
 import { RecipientViewSidebarContextProvider } from "@parallel/components/recipient-view/RecipientViewSidebarContextProvider";
 import { RecipientViewRefreshRepliesAlert } from "@parallel/components/recipient-view/alerts/RecipientViewRefreshRepliesAlert";
-import { Button } from "@parallel/components/ui";
+import { Box, Button, Flex, Stack } from "@parallel/components/ui";
 import {
   PetitionPreview_PetitionBaseFragment,
   PetitionPreview_cancelSignatureRequestDocument,
@@ -745,7 +745,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                   flex="2"
                   minWidth={0}
                 >
-                  <Stack spacing={4} key={0}>
+                  <Stack gap={4} key={0}>
                     <LiquidPetitionScopeProvider
                       petition={petition}
                       usePreviewReplies={petition.__typename === "PetitionTemplate"}

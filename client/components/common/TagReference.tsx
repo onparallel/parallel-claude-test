@@ -1,7 +1,8 @@
 import { gql } from "@apollo/client";
-import { Box } from "@chakra-ui/react";
+
 import { TagReference_TagFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
+import { Box } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
 import { Tag } from "./Tag";
 

@@ -1,19 +1,8 @@
 import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
-import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  Box,
-  Center,
-  Flex,
-  Heading,
-  HStack,
-  Spinner,
-  Stack,
-} from "@chakra-ui/react";
+import { Alert, AlertDescription, AlertIcon, Center, Heading, Spinner } from "@chakra-ui/react";
 import { ChevronLeftIcon, CommentIcon, NoteIcon } from "@parallel/chakra/icons";
-import { Text } from "@parallel/components/ui";
+import { Box, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionRepliesFieldComments_PetitionBaseFragment,
   PetitionRepliesFieldComments_petitionCommentAttachmentDownloadLinkDocument,
@@ -328,7 +317,7 @@ export function PetitionRepliesFieldComments({
           </Flex>
         ) : (
           <>
-            <Stack spacing={0} divider={<Divider />}>
+            <Stack gap={0} divider={<Divider />}>
               {comments.map((comment) => (
                 <PetitionFieldComment
                   key={comment.id}

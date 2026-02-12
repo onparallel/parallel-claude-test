@@ -1,6 +1,6 @@
-import { Box } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
+import { Box } from "@parallel/components/ui";
 import { useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { NormalLink } from "./Link";

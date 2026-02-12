@@ -1,5 +1,4 @@
-import { Box, Flex } from "@chakra-ui/react";
-import { Button } from "@parallel/components/ui";
+import { Box, Button, Flex } from "@parallel/components/ui";
 import { chakraComponent } from "@parallel/chakra/utils";
 import { FormattedMessage } from "react-intl";
 import { Card, CardHeader } from "../common/Card";

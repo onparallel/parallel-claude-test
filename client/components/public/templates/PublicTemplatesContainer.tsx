@@ -1,5 +1,5 @@
-import { Box, Grid, MenuButton, MenuItem, MenuList, Portal, Stack } from "@chakra-ui/react";
-import { Button } from "@parallel/components/ui";
+import { Grid, MenuButton, MenuItem, MenuList, Portal } from "@chakra-ui/react";
+import { Box, Button, Stack } from "@parallel/components/ui";
 import { Menu } from "@parallel/chakra/components";
 import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon } from "@parallel/chakra/icons";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
@@ -41,7 +41,7 @@ export function PublicTemplatesContainer({
           borderEnd="1px solid"
           borderColor="gray.200"
           paddingY={12}
-          spacing={0}
+          gap={0}
         >
           <Button
             as={NextLink}
@@ -164,7 +164,7 @@ export function PublicTemplatesContainer({
             )}
           </Menu>
         </Box>
-        <Stack paddingY={{ base: 6, md: 16 }} spacing={10} paddingBottom={{ base: 6, md: 28 }}>
+        <Stack paddingY={{ base: 6, md: 16 }} gap={10} paddingBottom={{ base: 6, md: 28 }}>
           {children}
         </Stack>
       </Grid>

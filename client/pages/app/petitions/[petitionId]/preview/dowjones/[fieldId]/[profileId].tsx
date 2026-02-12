@@ -1,16 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
-import {
-  Box,
-  Center,
-  Flex,
-  HStack,
-  Heading,
-  Image,
-  Skeleton,
-  Spinner,
-  Stack,
-} from "@chakra-ui/react";
+import { Center, Heading, Image, Skeleton, Spinner } from "@chakra-ui/react";
 import {
   ArrowBackIcon,
   BusinessIcon,
@@ -28,7 +18,7 @@ import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider"
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { DowJonesRiskLabel } from "@parallel/components/petition-common/DowJonesRiskLabel";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   DowJonesFieldProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultEntity_Fragment,
   DowJonesFieldProfileDetails_DowJonesKycEntityProfileResult_DowJonesKycEntityProfileResultPerson_Fragment,
@@ -169,7 +159,7 @@ function DowJonesFieldProfileDetails({
         </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
-      <Stack paddingX={6} paddingY={5} spacing={6} minHeight="100vh" backgroundColor="gray.50">
+      <Stack paddingX={6} paddingY={5} gap={6} minHeight="100vh" backgroundColor="gray.50">
         <HStack>
           <IconButtonWithTooltip
             icon={<ArrowBackIcon />}
@@ -190,7 +180,7 @@ function DowJonesFieldProfileDetails({
         </HStack>
         <Card>
           <CardHeader headingLevel="h2" minHeight="65px">
-            <Stack direction={{ base: "column", sm: "row" }} spacing={4}>
+            <Stack direction={{ base: "column", sm: "row" }} gap={4}>
               <Stack
                 direction={{ base: "column", md: "row" }}
                 alignItems={{ base: "start", md: "center" }}
@@ -329,7 +319,7 @@ function DowJonesFieldProfileDetails({
         </Card>
 
         {loading || !details ? null : (
-          <HStack justifyContent="space-between" flexWrap="wrap" spacing={0} gridGap={2}>
+          <HStack justifyContent="space-between" flexWrap="wrap" gap={0} gridGap={2}>
             <Text>
               <FormattedMessage
                 id="component.dow-jones-profile-details.results-obtained-on"
@@ -429,7 +419,7 @@ function ProfileResultPerson({
       paddingX={6}
       paddingY={4}
       gridGap={{ base: 4, md: 8 }}
-      spacing={0}
+      gap={0}
       wrap="wrap"
       alignItems="start"
     >
@@ -556,7 +546,7 @@ function ProfileResultEntity({
   };
 
   return (
-    <HStack paddingX={6} paddingY={4} gridGap={{ base: 4, md: 8 }} spacing={0} wrap="wrap">
+    <HStack paddingX={6} paddingY={4} gridGap={{ base: 4, md: 8 }} gap={0} wrap="wrap">
       <Stack>
         <Text {...detailsSpanProps}>
           <FormattedMessage id="component.dow-jones-profile-details.type" defaultMessage="Type" />:

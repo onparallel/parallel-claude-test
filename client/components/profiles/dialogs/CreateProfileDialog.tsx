@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
-import { FormControl, FormErrorMessage, FormLabel, Stack } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
@@ -9,7 +9,7 @@ import {
   LocalizableUserTextRender,
 } from "@parallel/components/common/LocalizableUserTextRender";
 import { ProfileTypeSelect } from "@parallel/components/common/ProfileTypeSelect";
-import { Button } from "@parallel/components/ui";
+import { Button, Stack } from "@parallel/components/ui";
 import {
   CreateProfileFieldValueInput,
   useCreateProfileDialog_createProfileDocument,
@@ -206,7 +206,7 @@ function CreateProfileDialog({
         )
       }
       body={
-        <Stack spacing={4}>
+        <Stack gap={4}>
           {isFixedTypeMode ? null : (
             <FormControl
               isInvalid={!!errors.profileTypeId}

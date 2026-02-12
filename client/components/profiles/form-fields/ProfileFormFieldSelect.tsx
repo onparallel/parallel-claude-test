@@ -1,10 +1,10 @@
-import { Box } from "@chakra-ui/react";
 import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { ProfileFormField_ProfileTypeFieldFragment, UserLocale } from "@parallel/graphql/__types";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { UseReactSelectProps, useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { UnwrapArray } from "@parallel/utils/types";
+import { Box } from "@parallel/components/ui";
 import { PropsWithChildren, RefAttributes, useMemo } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { useIntl } from "react-intl";

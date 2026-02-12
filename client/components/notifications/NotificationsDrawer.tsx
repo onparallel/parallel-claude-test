@@ -9,10 +9,9 @@ import {
   DrawerHeader,
   DrawerOverlay,
   ModalFooterProps,
-  Stack,
 } from "@chakra-ui/react";
 import { BellIcon, EmailOpenedIcon } from "@parallel/chakra/icons";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import {
   NotificationsDrawer_notificationsDocument,
   PetitionUserNotificationFilter,
@@ -131,7 +130,7 @@ export function NotificationsDrawer() {
           borderBottom="1px solid"
           borderColor="gray.200"
         >
-          <Stack direction="row" marginBottom={6} spacing={2} align="center">
+          <Stack direction="row" marginBottom={6} gap={2} align="center">
             <BellIcon fontSize="20px" role="presentation" />
             <Text>
               <FormattedMessage

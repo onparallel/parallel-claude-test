@@ -1,9 +1,7 @@
 import {
-  Box,
   Center,
   Checkbox,
   CheckboxGroup,
-  HStack,
   Radio,
   RadioGroup,
   SystemStyleObject,
@@ -11,6 +9,7 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
+import { Box, HStack } from "@parallel/components/ui";
 import { createContext, useContext } from "react";
 import { isNonNullish } from "remeda";
 import { assert } from "ts-essentials";

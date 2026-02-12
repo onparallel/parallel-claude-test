@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Badge, Center, Flex, Stack, useToast } from "@chakra-ui/react";
+import { Badge, Center, useToast } from "@chakra-ui/react";
 import { KeyIcon, LogInIcon, UsersIcon } from "@parallel/chakra/icons";
 import { AdminOrganizationMembersListTableHeader } from "@parallel/components/admin-organizations/AdminOrganizationMembersListTableHeader";
 import { AdminOrganizationsLayout } from "@parallel/components/admin-organizations/AdminOrganizationsLayout";
@@ -15,7 +15,7 @@ import { TablePage } from "@parallel/components/common/TablePage";
 import { UserReference } from "@parallel/components/common/UserReference";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdminAccess";
-import { Text } from "@parallel/components/ui";
+import { Flex, Stack, Text } from "@parallel/components/ui";
 import {
   AdminOrganizationsMembers_inviteUserToOrganizationDocument,
   AdminOrganizationsMembers_organizationDocument,
@@ -386,7 +386,7 @@ function useOrganizationMembersTableColumns() {
                     id="other-groups"
                     width="auto"
                     content={
-                      <Stack width="auto" spacing={1}>
+                      <Stack width="auto" gap={1}>
                         {remaining
                           .sort((a, b) => (a.name && b.name ? a.name.localeCompare(b.name) : 1))
                           .map((userGroup, index) => {

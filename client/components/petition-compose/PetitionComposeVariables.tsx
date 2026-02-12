@@ -1,17 +1,6 @@
 import { CombinedGraphQLErrors, gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import {
-  Box,
-  Flex,
-  Heading,
-  HStack,
-  MenuButton,
-  MenuDivider,
-  MenuItem,
-  MenuList,
-  Portal,
-  Stack,
-} from "@chakra-ui/react";
+import { Heading, MenuButton, MenuDivider, MenuItem, MenuList, Portal } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import {
   AddIcon,
@@ -23,7 +12,7 @@ import {
   MoreVerticalIcon,
 } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionComposeVariables_deletePetitionVariableDocument,
   PetitionComposeVariables_PetitionBaseFragment,
@@ -128,7 +117,7 @@ export function PetitionComposeVariables({
       if (isApolloError(error, "VARIABLE_IS_REFERENCED_IN_PETITION_ATTACHMENTS_VISIBILITY")) {
         await showErrorDialog.ignoringDialogErrors({
           header: (
-            <Stack direction="row" spacing={2} align="center">
+            <Stack direction="row" gap={2} align="center">
               <AlertCircleIcon role="presentation" />
               <Text>
                 <FormattedMessage
@@ -150,7 +139,7 @@ export function PetitionComposeVariables({
       } else if (isApolloError(error, "VARIABLE_IS_REFERENCED_IN_APPROVAL_FLOW_CONFIG")) {
         await showErrorDialog.ignoringDialogErrors({
           header: (
-            <Stack direction="row" spacing={2} align="center">
+            <Stack direction="row" gap={2} align="center">
               <AlertCircleIcon role="presentation" />
               <Text>
                 <FormattedMessage
@@ -202,7 +191,7 @@ export function PetitionComposeVariables({
                   }}
                 />
               </Text>
-              <Stack spacing={1} paddingTop={2} paddingX={1}>
+              <Stack gap={1} paddingTop={2} paddingX={1}>
                 {fieldGroups.map(([f, fieldIndex]) => (
                   <HStack key={f.id} alignItems="flex-start">
                     <PetitionFieldTypeIndicator
@@ -351,8 +340,8 @@ export function PetitionComposeVariables({
   };
 
   return (
-    <Stack padding={4} spacing={2}>
-      <Stack spacing={1} paddingBottom={2}>
+    <Stack padding={4} gap={2}>
+      <Stack gap={1} paddingBottom={2}>
         <Text>
           <FormattedMessage
             id="component.petition-compose-variables.description"
@@ -379,7 +368,7 @@ export function PetitionComposeVariables({
       ) : (
         petition.variables.map((variable) => {
           return (
-            <HStack key={variable.name} spacing={4}>
+            <HStack key={variable.name} gap={4}>
               <IconButtonWithTooltip
                 icon={<BracesIcon />}
                 fontSize="16px"
@@ -586,7 +575,7 @@ const MoreLiquidVariablesButton = chakraComponent<"button", MoreLiquidVariablesB
                 }}
                 key={index}
               >
-                <Stack spacing={1}>
+                <Stack gap={1}>
                   <Text fontSize="md" fontWeight="bold">
                     {title}
                   </Text>

@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Heading, HStack, Image, Stack } from "@chakra-ui/react";
+import { Heading, Image } from "@chakra-ui/react";
 import { DocumentIcon, FileImageIcon, MessageSquareIcon } from "@parallel/chakra/icons";
 import { Divider } from "@parallel/components/common/Divider";
 import { NormalLink } from "@parallel/components/common/Link";
@@ -7,7 +7,7 @@ import { AdverseMediaArticleDetails_AdverseMediaArticleFragment } from "@paralle
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
-import { Text } from "@parallel/components/ui";
+import { Box, HStack, Stack, Text } from "@parallel/components/ui";
 
 export function AdverseMediaArticleDetails({
   article,
@@ -33,7 +33,7 @@ export function AdverseMediaArticleDetails({
       flex="1"
       width="100%"
       paddingY={4}
-      spacing={8}
+      gap={8}
     >
       <Box>
         {timestamp || source ? (
@@ -60,7 +60,7 @@ export function AdverseMediaArticleDetails({
               <FormattedMessage id="page.adverse-media-search.mentions" defaultMessage="Mentions" />
             </Heading>
           </HStack>
-          <Stack spacing={4}>
+          <Stack gap={4}>
             {article.quotes.map((quote, index) => (
               <Box key={index} padding={2} backgroundColor="yellow.100">
                 <Text
@@ -77,7 +77,7 @@ export function AdverseMediaArticleDetails({
         </Box>
       )}
 
-      <Stack spacing={4}>
+      <Stack gap={4}>
         <HStack>
           <DocumentIcon boxSize={5} />
           <Heading size="md">
@@ -134,7 +134,7 @@ export function AdverseMediaArticleDetails({
         )}
       </Stack>
       {otherImages && otherImages.length > 0 ? (
-        <Stack spacing={4}>
+        <Stack gap={4}>
           <HStack>
             <FileImageIcon boxSize={5} />
             <Heading size="md">
@@ -144,7 +144,7 @@ export function AdverseMediaArticleDetails({
               />
             </Heading>
           </HStack>
-          <HStack flexWrap="wrap" gap={2} spacing={0}>
+          <HStack flexWrap="wrap" gap={2}>
             {otherImages.map((image, index) => (
               <Image
                 key={index}

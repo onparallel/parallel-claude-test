@@ -3,10 +3,8 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  HStack,
   Radio,
   RadioGroup,
-  Stack,
   Switch,
   Tab,
   TabList,
@@ -20,7 +18,7 @@ import { ColorInput } from "@parallel/components/common/ColorInput";
 import { Divider } from "@parallel/components/common/Divider";
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
 import { RichTextEditor } from "@parallel/components/common/slate/RichTextEditor";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { DocumentThemeEditor_UserFragment, PetitionLocale } from "@parallel/graphql/__types";
 import { useAvailablePetitionLocales } from "@parallel/utils/locales";
 import { untranslated } from "@parallel/utils/untranslated";
@@ -103,9 +101,9 @@ export function DocumentThemeEditor({ user, isDisabled, themeId }: DocumentTheme
   }
 
   return (
-    <Stack spacing={8}>
-      <Stack spacing={4}>
-        <Stack spacing={2}>
+    <Stack gap={8}>
+      <Stack gap={4}>
+        <Stack gap={2}>
           <Text as="h4" id="layout-label" fontSize="lg" fontWeight="semibold">
             <FormattedMessage
               id="component.document-theme-editor.layout-header"
@@ -121,7 +119,7 @@ export function DocumentThemeEditor({ user, isDisabled, themeId }: DocumentTheme
                 onChange={(value) => onChange(value === "double")}
                 aria-labelledby="layout-label"
               >
-                <Stack spacing={5} direction="row">
+                <Stack gap={5} direction="row">
                   <Radio value="single" flex={1}>
                     <FormattedMessage
                       id="component.document-theme-editor.layout-single-column"
@@ -140,14 +138,14 @@ export function DocumentThemeEditor({ user, isDisabled, themeId }: DocumentTheme
           />
         </Stack>
 
-        <Stack spacing={2}>
+        <Stack gap={2}>
           <Text as="h4" fontSize="lg" fontWeight="semibold">
             <FormattedMessage
               id="component.document-theme-editor.margins-header"
               defaultMessage="Margins"
             />
           </Text>
-          <HStack spacing={4}>
+          <HStack gap={4}>
             {[
               {
                 key: "marginTop" as const,
@@ -214,7 +212,7 @@ export function DocumentThemeEditor({ user, isDisabled, themeId }: DocumentTheme
             </FormErrorMessage>
           </FormControl>
         </Stack>
-        <Stack spacing={2}>
+        <Stack gap={2}>
           <Text as="h4" fontSize="lg" fontWeight="semibold">
             <FormattedMessage
               id="component.document-theme-editor.show-logo-header"
@@ -236,14 +234,14 @@ export function DocumentThemeEditor({ user, isDisabled, themeId }: DocumentTheme
             <Switch {...register("showLogo")} />
           </FormControl>
         </Stack>
-        <Stack spacing={2}>
+        <Stack gap={2}>
           <Text as="h4" fontSize="lg" fontWeight="semibold">
             <FormattedMessage
               id="component.document-theme-editor.fonts-header"
               defaultMessage="Fonts"
             />
           </Text>
-          <Stack spacing={4}>
+          <Stack gap={4}>
             {(
               [
                 {
@@ -269,7 +267,7 @@ export function DocumentThemeEditor({ user, isDisabled, themeId }: DocumentTheme
                 },
               ] as { title: string; key: "text" | "title1" | "title2" }[]
             ).map(({ key, title }, i) => (
-              <HStack align="center" spacing={4} key={key}>
+              <HStack align="center" gap={4} key={key}>
                 <FormControl isDisabled={isDisabled}>
                   <FormLabel fontWeight="normal">{title}</FormLabel>
                   <Select {...register(`${key}FontFamily`)} backgroundColor="white">
@@ -332,7 +330,7 @@ export function DocumentThemeEditor({ user, isDisabled, themeId }: DocumentTheme
         </HStack>
       </Stack>
       <Divider borderColor="gray.300" />
-      <Stack spacing={2}>
+      <Stack gap={2}>
         <Text as="h4" fontSize="lg" fontWeight="semibold">
           <FormattedMessage
             id="component.document-theme-editor.legal-disclaimer"

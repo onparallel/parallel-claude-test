@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Grid, Heading, Stack } from "@chakra-ui/react";
+import { Grid, Heading } from "@chakra-ui/react";
 import { AppSumoLicenseAlert } from "@parallel/components/common/AppSumoLicenseAlert";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
@@ -9,6 +9,7 @@ import { UsageCard } from "@parallel/components/organization/UsageCard";
 import { OrganizationUsage_userDocument } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
+import { Box, Stack } from "@parallel/components/ui";
 import { FormattedMessage, useIntl } from "react-intl";
 
 function OrganizationUsage() {
@@ -34,7 +35,7 @@ function OrganizationUsage() {
         </Heading>
       }
     >
-      <Stack padding={8} width="100%" spacing={8}>
+      <Stack padding={8} width="100%" gap={8}>
         {license && license.source === "APPSUMO" ? (
           <Box maxWidth="container.lg">
             <AppSumoLicenseAlert license={license} />

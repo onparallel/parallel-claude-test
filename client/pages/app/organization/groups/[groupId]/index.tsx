@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Badge, Center, Flex, useToast } from "@chakra-ui/react";
+import { Badge, Center, useToast } from "@chakra-ui/react";
 import { UserXIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TableColumn } from "@parallel/components/common/Table";
@@ -12,7 +12,7 @@ import { UserGroupLayout } from "@parallel/components/layout/UserGroupLayout";
 import { OrganizationGroupListTableHeader } from "@parallel/components/organization/OrganizationGroupListTableHeader";
 import { useAddMemberGroupDialog } from "@parallel/components/organization/dialogs/AddMemberGroupDialog";
 import { useConfirmRemoveMemberDialog } from "@parallel/components/organization/dialogs/ConfirmRemoveMemberDialog";
-import { Text } from "@parallel/components/ui";
+import { Flex, Text } from "@parallel/components/ui";
 import {
   OrganizationGroup_UserGroupMemberFragment,
   OrganizationGroup_addUsersToUserGroupDocument,

@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Flex } from "@chakra-ui/react";
+
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
@@ -15,6 +15,7 @@ import {
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { UnwrapPromise } from "@parallel/utils/types";
+import { Flex } from "@parallel/components/ui";
 type ProfileDetailProps = UnwrapPromise<ReturnType<typeof ProfileDetail.getInitialProps>>;
 
 function ProfileDetail({ profileId, section }: ProfileDetailProps) {

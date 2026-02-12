@@ -1,12 +1,11 @@
-import { Stack } from "@chakra-ui/react";
 import { SupportLink } from "@parallel/components/common/SupportLink";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
+import { Stack, Text } from "@parallel/components/ui";
 
 export function PublicSignupFormInbox({ email }: { email: string }) {
   const intl = useIntl();
   return (
-    <Stack spacing={6}>
+    <Stack gap={6}>
       <Text as="h1" fontSize="2xl" fontWeight="bold" marginTop={0}>
         <FormattedMessage
           id="component.public-signup-form-inbox.heading"

@@ -1,15 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  ButtonGroup,
-  Center,
-  Grid,
-  Heading,
-  HStack,
-  RadioProps,
-  Stack,
-  useRadioGroup,
-} from "@chakra-ui/react";
+import { ButtonGroup, Center, Grid, Heading, RadioProps, useRadioGroup } from "@chakra-ui/react";
 import { DownloadIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -30,7 +20,7 @@ import { ReportsErrorMessage } from "@parallel/components/reports/common/Reports
 import { ReportsLoadingMessage } from "@parallel/components/reports/common/ReportsLoadingMessage";
 import { ReportsReadyMessage } from "@parallel/components/reports/common/ReportsReadyMessage";
 import { TimeSpan } from "@parallel/components/reports/common/TimeSpan";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { Maybe, Overview_userDocument } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
@@ -212,8 +202,8 @@ export function Overview() {
         </Heading>
       }
     >
-      <Stack spacing={6} padding={6} paddingBottom={20}>
-        <Stack direction={{ base: "column", md: "row" }} spacing={0} gridGap={2} flex="1">
+      <Stack gap={6} padding={6} paddingBottom={20}>
+        <Stack direction={{ base: "column", md: "row" }} gap={0} gridGap={2} flex="1">
           <DateRangePickerButton
             value={queryState.range as [Date, Date] | null}
             onChange={handleDateRangeChange}
@@ -635,7 +625,7 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
                           pendingStatus: (
                             <PetitionStatusLabel
                               as="span"
-                              spacing={1}
+                              gap={1}
                               display="inline-flex"
                               height="21px"
                               verticalAlign="bottom"
@@ -646,7 +636,7 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
                           closedStatus: (
                             <PetitionStatusLabel
                               as="span"
-                              spacing={1}
+                              gap={1}
                               display="inline-flex"
                               height="21px"
                               verticalAlign="bottom"
@@ -694,7 +684,7 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
                           completedStatus: (
                             <PetitionStatusLabel
                               as="span"
-                              spacing={1}
+                              gap={1}
                               display="inline-flex"
                               height="21px"
                               verticalAlign="bottom"
@@ -766,7 +756,7 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
                       completedStatus: (
                         <PetitionStatusLabel
                           as="span"
-                          spacing={1}
+                          gap={1}
                           display="inline-flex"
                           height="21px"
                           verticalAlign="bottom"
@@ -777,7 +767,7 @@ function useOverviewColumns(tableType: OverviewTableType): TableColumn<TemplateS
                       closedStatus: (
                         <PetitionStatusLabel
                           as="span"
-                          spacing={1}
+                          gap={1}
                           display="inline-flex"
                           height="21px"
                           verticalAlign="bottom"

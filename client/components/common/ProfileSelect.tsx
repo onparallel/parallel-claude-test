@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { useApolloClient, useQuery } from "@apollo/client/react";
-import { Box } from "@chakra-ui/react";
-import { Text } from "@parallel/components/ui";
+
+import { Box, Text } from "@parallel/components/ui";
 import {
   ProfileSelect_ProfileFragment,
   ProfileSelect_ProfileFragmentDoc,

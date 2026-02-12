@@ -1,16 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import {
-  Box,
-  Flex,
-  Grid,
-  Heading,
-  HStack,
-  Image,
-  Skeleton,
-  Stack,
-  useToast,
-} from "@chakra-ui/react";
+import { Grid, Heading, Image, Skeleton, useToast } from "@chakra-ui/react";
 import {
   BusinessIcon,
   CheckIcon,
@@ -37,7 +27,7 @@ import { usePreviewPetitionFieldBackgroundCheckReplaceReplyDialog } from "@paral
 import { BackgroundCheckSearchDifferencesAlert } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckSearchDifferencesAlert";
 import { useBackgroundCheckContentsNotUpdatedDialog } from "@parallel/components/profiles/dialogs/BackgroundCheckContentsNotUpdatedDialog";
 import { useConfirmModifyBackgroundCheckSearch } from "@parallel/components/profiles/dialogs/ConfirmModifyBackgroundCheckSearchDialog";
-import { Button, Text, Tooltip } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text, Tooltip } from "@parallel/components/ui";
 import {
   BackgroundCheckEntitySearchType,
   BackgroundCheckFieldSearchResults_backgroundCheckEntitySearchDocument,
@@ -433,7 +423,7 @@ function BackgroundCheckFieldSearchResults({
         </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
-      <Stack paddingX={6} paddingY={5} spacing={6} minHeight="100vh" backgroundColor="gray.50">
+      <Stack paddingX={6} paddingY={5} gap={6} minHeight="100vh" backgroundColor="gray.50">
         <HStack justify="space-between" flexWrap="wrap">
           {result && (totalCount || !loading) ? (
             <>
@@ -594,7 +584,7 @@ function BackgroundCheckFieldSearchResults({
           }
           body={
             result?.items.length === 0 && !loading ? (
-              <Stack flex="1" alignItems="center" justifyContent="center" spacing={4}>
+              <Stack flex="1" alignItems="center" justifyContent="center" gap={4}>
                 <Image
                   maxWidth="166px"
                   height="77px"

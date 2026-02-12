@@ -1,6 +1,7 @@
-import { Box, BoxProps, Placement, TextProps } from "@chakra-ui/react";
+import { Placement, TextProps } from "@chakra-ui/react";
 import { QuestionIcon } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
+import { Box, BoxProps } from "@parallel/components/ui";
 import { ReactNode } from "react";
 import { SmallPopover } from "../common/SmallPopover";
 

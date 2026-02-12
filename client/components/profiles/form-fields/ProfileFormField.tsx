@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Badge, FormControl, FormLabel, HStack } from "@chakra-ui/react";
+import { Badge, FormControl, FormLabel } from "@chakra-ui/react";
 import { FieldDateIcon, HistoryIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import {
@@ -7,7 +7,7 @@ import {
   LocalizableUserTextRender,
   localizableUserTextRender,
 } from "@parallel/components/common/LocalizableUserTextRender";
-import { Text } from "@parallel/components/ui";
+import { HStack, Text } from "@parallel/components/ui";
 import {
   ProfileFormField_PetitionFieldFragment,
   ProfileFormField_ProfileFieldFileFragment,
@@ -476,7 +476,7 @@ export function ProfileFormField(props: ProfileFormFieldProps) {
           <ProfileFormFieldUserAssignment {...commonProps} />
         ) : null}
         {expiryDate && (field.type !== "DATE" || !field.options?.useReplyAsExpiryDate) ? (
-          <HStack marginTop={1} marginStart={1} color="gray.700" spacing={1.5}>
+          <HStack marginTop={1} marginStart={1} color="gray.700" gap={1.5}>
             <FieldDateIcon marginBottom={0.5} />
             <Text fontSize="sm">
               <FormattedMessage

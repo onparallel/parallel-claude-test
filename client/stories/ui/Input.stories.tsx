@@ -1,5 +1,5 @@
-import { Link, Stack } from "@chakra-ui/react";
-import { Input, Text } from "@parallel/components/ui";
+import { Link } from "@chakra-ui/react";
+import { Input, Stack, Text } from "@parallel/components/ui";
 import { untranslated } from "@parallel/utils/untranslated";
 import { Meta, StoryObj } from "@storybook/react";
 

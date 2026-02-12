@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, BoxProps, Flex, chakra, useBreakpointValue } from "@chakra-ui/react";
+import { chakra, useBreakpointValue } from "@chakra-ui/react";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
   PetitionHeader,
@@ -15,6 +15,7 @@ import { Focusable } from "@parallel/utils/types";
 import { useStateSlice } from "@parallel/utils/useStateSlice";
 import { useTempQueryParam } from "@parallel/utils/useTempQueryParam";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
+import { Box, BoxProps, Flex } from "@parallel/components/ui";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ComponentType,

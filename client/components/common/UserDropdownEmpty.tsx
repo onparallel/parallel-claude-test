@@ -1,5 +1,5 @@
-import { Image, Stack } from "@chakra-ui/react";
-import { Button, Text } from "@parallel/components/ui";
+import { Image } from "@chakra-ui/react";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { FormattedMessage } from "react-intl";
 import { Link } from "./Link";
@@ -18,7 +18,7 @@ export function UserDropdownEmpty({
 }: UserDropdownEmptyProps) {
   const userCanListOrgUsers = useHasPermission("USERS:LIST_USERS");
   return (
-    <Stack alignItems="center" textAlign="center" padding={4} spacing={4} fontSize="sm">
+    <Stack alignItems="center" textAlign="center" padding={4} gap={4} fontSize="sm">
       {search ? (
         <>
           <Image

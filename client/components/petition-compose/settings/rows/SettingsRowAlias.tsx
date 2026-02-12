@@ -1,17 +1,10 @@
 import { gql } from "@apollo/client";
-import {
-  AlertDescription,
-  AlertIcon,
-  FormErrorMessage,
-  HStack,
-  Input,
-  Stack,
-} from "@chakra-ui/react";
+import { AlertDescription, AlertIcon, FormErrorMessage, Input } from "@chakra-ui/react";
 import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
 import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { CopyLiquidReferenceButton } from "@parallel/components/petition-common/CopyLiquidReferenceButton";
 import { MoreLiquidReferencesButton } from "@parallel/components/petition-common/MoreLiquidReferencesButton";
-import { Text } from "@parallel/components/ui";
+import { HStack, Stack, Text } from "@parallel/components/ui";
 import {
   SettingsRowAlias_PetitionFieldFragment,
   UpdatePetitionFieldInput,

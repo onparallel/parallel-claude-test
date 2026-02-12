@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
-import { Box, BoxProps, Center, Flex, Stack } from "@chakra-ui/react";
+import { Center } from "@chakra-ui/react";
 import { AddIcon, CloseIconSmall } from "@parallel/chakra/icons";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, BoxProps, Button, Flex, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionProfilesTable_PetitionFragment,
   PetitionProfilesTable_ProfileFragment,
@@ -111,7 +111,7 @@ export function PetitionProfilesTable({
           />
         ) : (
           <Center minHeight="60px" textAlign="center" padding={4} color="gray.400">
-            <Stack spacing={1}>
+            <Stack gap={1}>
               <Text>
                 <FormattedMessage
                   id="component.petition-profiles-table.no-profiles-associated"

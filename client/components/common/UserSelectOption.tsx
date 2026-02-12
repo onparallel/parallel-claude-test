@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex } from "@chakra-ui/react";
+
 import { UsersIcon } from "@parallel/chakra/icons";
 import {
   UserLocale,
@@ -9,7 +9,7 @@ import {
 import { FormattedMessage, useIntl } from "react-intl";
 import { HighlightText } from "./HighlightText";
 import { userGroupReferenceText } from "./UserGroupReference";
-import { Text } from "@parallel/components/ui";
+import { Box, Flex, Text } from "@parallel/components/ui";
 
 interface UserSelectOptionProps {
   data: UserSelectOption_UserFragment | UserSelectOption_UserGroupFragment;

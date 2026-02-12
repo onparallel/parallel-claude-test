@@ -1,5 +1,5 @@
-import { Box, BoxProps, Flex } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
+import { Box, BoxProps, Flex } from "@parallel/components/ui";
 
 export interface ProgressIndicatorProps extends BoxProps {
   min: number;

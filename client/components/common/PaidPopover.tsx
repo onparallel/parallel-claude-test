@@ -1,5 +1,6 @@
-import { Box, BoxProps, Placement, TextProps } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
+import { Placement, TextProps } from "@chakra-ui/react";
+import { Box, BoxProps } from "@parallel/components/ui";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { PaidBadge } from "./PaidBadge";

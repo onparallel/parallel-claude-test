@@ -1,7 +1,6 @@
-import { Box, HStack, Stack } from "@chakra-ui/react";
 import { Select } from "@parallel/chakra/components";
 import { FieldDateIcon } from "@parallel/chakra/icons";
-import { Button } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack } from "@parallel/components/ui";
 import { FORMATS } from "@parallel/utils/dates";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import {
@@ -212,8 +211,8 @@ export function DateRangePicker({
   );
 
   return (
-    <Stack spacing={6} width="100%">
-      <Stack direction={{ base: "column", md: "row" }} spacing={{ base: 2, md: 4 }}>
+    <Stack gap={6} width="100%">
+      <Stack direction={{ base: "column", md: "row" }} gap={{ base: 2, md: 4 }}>
         <Box>
           <Stack display={{ base: "none", md: "flex" }}>
             {quickRanges.map(({ key, range, text }) => {
@@ -258,7 +257,7 @@ export function DateRangePicker({
             ))}
           </Select>
         </Box>
-        <Stack spacing={3} flex={1}>
+        <Stack gap={3} flex={1}>
           <HStack>
             <Button
               size="sm"

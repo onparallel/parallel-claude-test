@@ -1,4 +1,5 @@
-import { Box, BoxProps, VisuallyHidden } from "@chakra-ui/react";
+import { VisuallyHidden } from "@chakra-ui/react";
+import { Box, BoxProps } from "@parallel/components/ui";
 
 export interface LogoProps extends BoxProps {
   hideText?: boolean;

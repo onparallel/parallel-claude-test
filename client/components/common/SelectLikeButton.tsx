@@ -1,5 +1,4 @@
 import {
-  Box,
   ButtonOptions,
   omitThemingProps,
   ThemingProps,
@@ -7,6 +6,7 @@ import {
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
+import { Box } from "@parallel/components/ui";
 import { omit } from "remeda";
 
 interface SelectLikeButtonProps extends ButtonOptions, ThemingProps<"Button"> {}

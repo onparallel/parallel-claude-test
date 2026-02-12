@@ -1,8 +1,8 @@
-import { Badge, HStack } from "@chakra-ui/react";
+import { Badge } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { BusinessIcon, UserIcon } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
-import { Text } from "@parallel/components/ui";
+import { HStack, Text } from "@parallel/components/ui";
 import { isNullish } from "remeda";
 
 const LABELS = {
@@ -59,7 +59,7 @@ export const DowJonesRiskLabel = chakraComponent<"span", { risk: string }>(
         <Badge
           as={HStack}
           display="inline-flex"
-          spacing={1}
+          gap={1}
           colorScheme={
             risk === "PEP"
               ? "green"

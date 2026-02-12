@@ -1,4 +1,3 @@
-import { Stack } from "@chakra-ui/react";
 import {
   BoldIcon,
   ItalicIcon,
@@ -7,6 +6,7 @@ import {
   UnderlineIcon,
 } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
+import { Stack } from "@parallel/components/ui";
 import { useIntl } from "react-intl";
 import { ToolbarHeadingButton } from "./ToolbarHeadingButton";
 import { ToolbarLinkButton } from "./ToolbarLinkButton";

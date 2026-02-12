@@ -1,7 +1,7 @@
-import { Center, Image, Stack } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
+import { Center, Image } from "@chakra-ui/react";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
+import { Stack, Text } from "@parallel/components/ui";
 
 interface NewPetitionEmptySearchProps {
   onClickPublicTemplates?: () => void;

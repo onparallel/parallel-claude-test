@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { HStack, Stack } from "@chakra-ui/react";
+
 import { CameraIcon } from "@parallel/chakra/icons";
 import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboardButton";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
@@ -16,7 +16,7 @@ import {
   PetitionRepliesMetadataText,
   ValidIcon,
 } from "./PetitionRepliesMetadata";
-import { Text } from "@parallel/components/ui";
+import { HStack, Stack, Text } from "@parallel/components/ui";
 
 interface PetitionRepliesFieldIdVerificationReplyProps {
   reply: PetitionRepliesFieldIdVerificationReply_PetitionFieldReplyFragment;
@@ -115,7 +115,7 @@ function IDCardView({
   const hasName = isNonNullish(firstName) || isNonNullish(surname);
   const fullName = `${surname}, ${firstName}`;
   return (
-    <HStack paddingBottom={3} flexWrap="wrap-reverse" width="100%" spacing={6}>
+    <HStack paddingBottom={3} flexWrap="wrap-reverse" width="100%" gap={6}>
       <Stack marginEnd={{ base: 0, xl: 10 }}>
         <HStack>
           <Text fontWeight={600}>{hasName ? fullName : " - "}</Text>

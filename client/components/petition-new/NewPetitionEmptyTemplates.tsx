@@ -1,8 +1,8 @@
-import { Center, Stack } from "@chakra-ui/react";
 import { chakraComponent } from "@parallel/chakra/utils";
+import { Center } from "@chakra-ui/react";
 import { FormattedMessage } from "react-intl";
 import { EmptyTemplatesIcon } from "./icons/EmptyTemplatesIcon";
-import { Text } from "@parallel/components/ui";
+import { Stack, Text } from "@parallel/components/ui";
 
 interface NewPetitionEmptyTemplatesProps {
   onClickPublicTemplates: () => void;

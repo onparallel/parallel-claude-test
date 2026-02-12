@@ -17,7 +17,7 @@ import {
   MenuOptionGroupProps,
   MenuProps,
 } from "@chakra-ui/react";
-import { ElementType, forwardRef, isValidElement, ReactNode } from "react";
+import { ElementType, isValidElement, ReactNode, RefAttributes } from "react";
 
 // Docs: https://chakra-ui.com/docs/components/menu
 
@@ -43,26 +43,29 @@ interface MenuTriggerProps extends MenuButtonProps {
   asChild?: boolean;
 }
 
-export const MenuTrigger = forwardRef<HTMLButtonElement, MenuTriggerProps>(
-  ({ asChild, children, ...props }, ref) => {
-    if (asChild && isValidElement(children)) {
-      // Render MenuButton with child's props but use child's element type and styling
-      return (
-        <MenuButton
-          ref={ref}
-          as={children.type as ElementType}
-          {...(children.props as any)}
-          {...props}
-        />
-      );
-    }
+export function MenuTrigger({
+  asChild,
+  children,
+  ref,
+  ...props
+}: MenuTriggerProps & RefAttributes<HTMLButtonElement>) {
+  if (asChild && isValidElement(children)) {
+    // Render MenuButton with child's props but use child's element type and styling
     return (
-      <MenuButton ref={ref} {...props}>
-        {children}
-      </MenuButton>
+      <MenuButton
+        ref={ref}
+        as={children.type as ElementType}
+        {...(children.props as any)}
+        {...props}
+      />
     );
-  },
-);
+  }
+  return (
+    <MenuButton ref={ref} {...props}>
+      {children}
+    </MenuButton>
+  );
+}
 
 // Menu.Positioner component (v3 wrapper for positioning)
 interface MenuPositionerProps {
@@ -70,28 +73,29 @@ interface MenuPositionerProps {
   [key: string]: any;
 }
 
-export const MenuPositioner = forwardRef<HTMLDivElement, MenuPositionerProps>(
-  ({ children, ...props }, ref) => {
-    // For now, let's keep it simple as a passthrough to test if this works
-    // In the future, we might conditionally use Portal based on some prop
-    return <>{children}</>;
-  },
-);
+export function MenuPositioner({ children }: MenuPositionerProps) {
+  // For now, let's keep it simple as a passthrough to test if this works
+  // In the future, we might conditionally use Portal based on some prop
+  return <>{children}</>;
+}
 
 // Menu.Content component (v3 name for MenuList)
-export const MenuContent = forwardRef<HTMLDivElement, MenuListProps>((props, ref) => {
+export function MenuContent({ ref, ...props }: MenuListProps & RefAttributes<HTMLDivElement>) {
   return <MenuList ref={ref} {...props} />;
-});
+}
 
 // Menu.Item component
-export const MenuItemWrapper = forwardRef<HTMLButtonElement, MenuItemProps>((props, ref) => {
+export function MenuItemWrapper({
+  ref,
+  ...props
+}: MenuItemProps & RefAttributes<HTMLButtonElement>) {
   return <MenuItem ref={ref} {...props} />;
-});
+}
 
 // Menu.ItemGroup component (v3 name for MenuGroup)
-export const MenuItemGroup = forwardRef<HTMLDivElement, MenuGroupProps>((props, ref) => {
+export function MenuItemGroup({ ref, ...props }: MenuGroupProps & RefAttributes<HTMLDivElement>) {
   return <MenuGroup ref={ref} {...props} />;
-});
+}
 
 // Menu.ItemGroupLabel component (for group labels in v3)
 interface MenuItemGroupLabelProps {
@@ -99,26 +103,28 @@ interface MenuItemGroupLabelProps {
   [key: string]: any;
 }
 
-export const MenuItemGroupLabel = forwardRef<HTMLDivElement, MenuItemGroupLabelProps>(
-  ({ children, ...props }, ref) => {
-    // In v2, this is handled by MenuGroup's title prop
-    // For v3 compatibility, we render a styled div
-    return (
-      <div
-        ref={ref}
-        style={{
-          fontSize: "0.875rem",
-          fontWeight: "600",
-          color: "var(--chakra-colors-gray-600)",
-          padding: "0.5rem 0.75rem 0.25rem",
-        }}
-        {...props}
-      >
-        {children}
-      </div>
-    );
-  },
-);
+export function MenuItemGroupLabel({
+  children,
+  ref,
+  ...props
+}: MenuItemGroupLabelProps & RefAttributes<HTMLDivElement>) {
+  // In v2, this is handled by MenuGroup's title prop
+  // For v3 compatibility, we render a styled div
+  return (
+    <div
+      ref={ref}
+      style={{
+        fontSize: "0.875rem",
+        fontWeight: "600",
+        color: "var(--chakra-colors-gray-600)",
+        padding: "0.5rem 0.75rem 0.25rem",
+      }}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+}
 
 // Menu.Separator component (v3 name for MenuDivider)
 export const MenuSeparator = (props: MenuDividerProps) => {
@@ -131,11 +137,11 @@ interface MenuArrowProps {
   [key: string]: any;
 }
 
-export const MenuArrow = forwardRef<HTMLDivElement, MenuArrowProps>((props, ref) => {
+export function MenuArrow({ ref, ...props }: MenuArrowProps & RefAttributes<HTMLDivElement>) {
   // In v2 compatibility mode, arrows are not supported by default
   // This is a placeholder for v3 compatibility
   return <div ref={ref} data-menu-arrow {...props} />;
-});
+}
 
 // Menu.ItemCommand component (for keyboard shortcuts)
 interface MenuItemCommandProps {
@@ -143,23 +149,25 @@ interface MenuItemCommandProps {
   [key: string]: any;
 }
 
-export const MenuItemCommand = forwardRef<HTMLSpanElement, MenuItemCommandProps>(
-  ({ children, ...props }, ref) => {
-    return (
-      <span
-        ref={ref}
-        style={{
-          marginLeft: "auto",
-          fontSize: "0.75rem",
-          color: "var(--chakra-colors-gray-500)",
-        }}
-        {...props}
-      >
-        {children}
-      </span>
-    );
-  },
-);
+export function MenuItemCommand({
+  children,
+  ref,
+  ...props
+}: MenuItemCommandProps & RefAttributes<HTMLSpanElement>) {
+  return (
+    <span
+      ref={ref}
+      style={{
+        marginLeft: "auto",
+        fontSize: "0.75rem",
+        color: "var(--chakra-colors-gray-500)",
+      }}
+      {...props}
+    >
+      {children}
+    </span>
+  );
+}
 
 // Menu.CheckboxItem component (new in v3)
 interface MenuCheckboxItemProps extends Omit<MenuItemProps, "type"> {
@@ -168,15 +176,19 @@ interface MenuCheckboxItemProps extends Omit<MenuItemProps, "type"> {
   value?: string;
 }
 
-export const MenuCheckboxItem = forwardRef<HTMLButtonElement, MenuCheckboxItemProps>(
-  ({ checked, onCheckedChange, children, ...props }, ref) => {
-    return (
-      <MenuItem ref={ref} onClick={() => onCheckedChange?.(!checked)} {...props}>
-        {children}
-      </MenuItem>
-    );
-  },
-);
+export function MenuCheckboxItem({
+  checked,
+  onCheckedChange,
+  children,
+  ref,
+  ...props
+}: MenuCheckboxItemProps & RefAttributes<HTMLButtonElement>) {
+  return (
+    <MenuItem ref={ref} onClick={() => onCheckedChange?.(!checked)} {...props}>
+      {children}
+    </MenuItem>
+  );
+}
 
 // Menu.RadioItemGroup component (v3 name for MenuOptionGroup with type="radio")
 interface MenuRadioItemGroupProps extends MenuOptionGroupProps {
@@ -184,26 +196,33 @@ interface MenuRadioItemGroupProps extends MenuOptionGroupProps {
   onValueChange?: (details: { value: string }) => void;
 }
 
-export const MenuRadioItemGroup = forwardRef<HTMLDivElement, MenuRadioItemGroupProps>(
-  ({ value, onValueChange, onChange, ...props }, ref) => {
-    return (
-      <MenuOptionGroup
-        type="radio"
-        value={value}
-        onChange={(val) => {
-          onChange?.(val);
-          onValueChange?.({ value: val as string });
-        }}
-        {...props}
-      />
-    );
-  },
-);
+export function MenuRadioItemGroup({
+  value,
+  onValueChange,
+  onChange,
+  ref,
+  ...props
+}: MenuRadioItemGroupProps & RefAttributes<HTMLDivElement>) {
+  return (
+    <MenuOptionGroup
+      type="radio"
+      value={value}
+      onChange={(val) => {
+        onChange?.(val);
+        onValueChange?.({ value: val as string });
+      }}
+      {...props}
+    />
+  );
+}
 
 // Menu.RadioItem component (v3 name for MenuItemOption with radio)
-export const MenuRadioItem = forwardRef<HTMLButtonElement, MenuItemOptionProps>((props, ref) => {
+export function MenuRadioItem({
+  ref,
+  ...props
+}: MenuItemOptionProps & RefAttributes<HTMLButtonElement>) {
   return <MenuItemOption ref={ref} {...props} />;
-});
+}
 
 // Menu.ItemIndicator component (for radio/checkbox indicators)
 interface MenuItemIndicatorProps {
@@ -211,21 +230,23 @@ interface MenuItemIndicatorProps {
   [key: string]: any;
 }
 
-export const MenuItemIndicator = forwardRef<HTMLSpanElement, MenuItemIndicatorProps>(
-  ({ children, ...props }, ref) => {
-    return (
-      <span
-        ref={ref}
-        style={{
-          marginLeft: "auto",
-        }}
-        {...props}
-      >
-        {children || "✓"}
-      </span>
-    );
-  },
-);
+export function MenuItemIndicator({
+  children,
+  ref,
+  ...props
+}: MenuItemIndicatorProps & RefAttributes<HTMLSpanElement>) {
+  return (
+    <span
+      ref={ref}
+      style={{
+        marginLeft: "auto",
+      }}
+      {...props}
+    >
+      {children || "✓"}
+    </span>
+  );
+}
 
 // Keep old components for backward compatibility
 export const MenuButtonWrapper = MenuTrigger;
@@ -260,19 +281,3 @@ export const Menu = {
   OptionGroup: MenuOptionGroupWrapper,
   ItemOption: MenuItemOptionWrapper,
 };
-
-// Assign display names for debugging
-MenuRoot.displayName = "Menu.Root";
-MenuTrigger.displayName = "Menu.Trigger";
-MenuPositioner.displayName = "Menu.Positioner";
-MenuContent.displayName = "Menu.Content";
-MenuItemWrapper.displayName = "Menu.Item";
-MenuItemGroup.displayName = "Menu.ItemGroup";
-MenuItemGroupLabel.displayName = "Menu.ItemGroupLabel";
-MenuSeparator.displayName = "Menu.Separator";
-MenuArrow.displayName = "Menu.Arrow";
-MenuItemCommand.displayName = "Menu.ItemCommand";
-MenuCheckboxItem.displayName = "Menu.CheckboxItem";
-MenuRadioItemGroup.displayName = "Menu.RadioItemGroup";
-MenuRadioItem.displayName = "Menu.RadioItem";
-MenuItemIndicator.displayName = "Menu.ItemIndicator";

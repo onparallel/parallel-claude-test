@@ -3,14 +3,11 @@ import { useMutation } from "@apollo/client/react";
 import {
   AlertDescription,
   AlertIcon,
-  Box,
-  HStack,
   MenuButton,
   MenuItem,
   MenuList,
   Portal,
   Progress,
-  Stack,
 } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import {
@@ -28,7 +25,7 @@ import {
 import { chakraComponent } from "@parallel/chakra/utils";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { FileSize } from "@parallel/components/common/FileSize";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionAttachmentType,
   PetitionComposeAttachments_createPetitionAttachmentUploadLinkDocument,
@@ -414,7 +411,7 @@ export const PetitionComposeAttachments = chakraComponent<"div", PetitionCompose
           <input type="file" {...getInputProps()} />
           {allAttachments.length > 0 ? (
             <MotionConfig reducedMotion="always">
-              <Stack spacing={2} divider={<Divider />}>
+              <Stack gap={2} divider={<Divider />}>
                 {[
                   ["FRONT", front, setFront] as const,
                   ["ANNEX", annex, setAnnex] as const,
@@ -764,7 +761,7 @@ const AttachmentItem = chakraComponent<"div", AttachmentItemProps>(function Atta
     >
       <Stack
         shadow={isAnimated ? "short" : undefined}
-        spacing={0}
+        gap={0}
         backgroundColor="white"
         _hover={{ backgroundColor: "gray.50" }}
         borderRadius="md"

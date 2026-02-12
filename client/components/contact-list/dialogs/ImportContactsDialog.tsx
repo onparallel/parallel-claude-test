@@ -1,19 +1,17 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
-  Box,
   Center,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalHeader,
   Spinner,
-  Stack,
 } from "@chakra-ui/react";
 import { AlertCircleIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Stack, Text } from "@parallel/components/ui";
 import { ImportContactsDialog_bulkCreateContactsDocument } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { withError } from "@parallel/utils/promises/withError";
@@ -201,7 +199,7 @@ function ImportErrorResolveDomainDialog({ emails, ...props }: DialogProps<{ emai
     <ConfirmDialog
       {...props}
       header={
-        <Stack direction={"row"} spacing={2} align="center">
+        <Stack direction={"row"} gap={2} align="center">
           <AlertCircleIcon role="presentation" />
           <Text>
             <FormattedMessage id="generic.import-error" defaultMessage="Import error" />

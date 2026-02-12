@@ -6,12 +6,9 @@ import {
   AlertIcon,
   Center,
   Checkbox,
-  Flex,
   FormControl,
   FormLabel,
-  HStack,
   Spinner,
-  Stack,
 } from "@chakra-ui/react";
 import { LinkIcon } from "@parallel/chakra/icons";
 import {
@@ -27,7 +24,7 @@ import { useConfirmPetitionSignersDialog } from "@parallel/components/petition-c
 import { PetitionRemindersConfig } from "@parallel/components/petition-compose/PetitionRemindersConfig";
 import { useCopySignatureConfigDialog } from "@parallel/components/petition-compose/dialogs/CopySignatureConfigDialog";
 import { useScheduleMessageDialog } from "@parallel/components/petition-compose/dialogs/ScheduleMessageDialog";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   AddPetitionAccessDialog_DelegateUserFragment,
   AddPetitionAccessDialog_PetitionFragment,
@@ -322,7 +319,7 @@ export function AddPetitionAccessDialog({
         isReady ? (
           (assert(isNonNullish(petition)),
           (
-            <Stack spacing={4}>
+            <Stack gap={4}>
               {!petitionsPeriod || petitionsPeriod.limit - petitionsPeriod.used <= 10 ? (
                 <Alert status="warning" rounded="md">
                   <AlertIcon />

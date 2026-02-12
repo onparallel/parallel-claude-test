@@ -1,18 +1,10 @@
 import { gql } from "@apollo/client";
 import { useApolloClient } from "@apollo/client/react";
-import {
-  Box,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  InputGroup,
-  Stack,
-} from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel, Input, InputGroup } from "@chakra-ui/react";
 import { NormalLink } from "@parallel/components/common/Link";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { PasswordStrengthIndicator } from "@parallel/components/common/PasswordStrengthIndicator";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Stack, Text } from "@parallel/components/ui";
 import { PublicSignupForm_emailIsAvailableDocument } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
@@ -90,7 +82,7 @@ export function PublicSignupForm({ onNext, email, source }: PublicSignupFormProp
         onNext({ email, password });
       })}
     >
-      <Stack spacing={4}>
+      <Stack gap={4}>
         <Text as="h1" fontSize="2xl" fontWeight="bold" marginTop={0}>
           {source && source === "AppSumo" ? (
             <FormattedMessage

@@ -1,12 +1,12 @@
 import { gql } from "@apollo/client";
-import { Box, FormControl, FormErrorMessage, Grid, HStack, Stack } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, Grid } from "@chakra-ui/react";
 import { AddIcon, CloseIcon, PlusCircleFilledIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { MultiCheckboxSimpleSelect } from "@parallel/components/common/MultiCheckboxSimpleSelect";
 import { ProfileQueryFilterSubjectSelect } from "@parallel/components/common/ProfileQueryFilterSubjectSelect";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   ProfileQueryFilterInput,
   ProfileQueryFilterProperty,
@@ -42,7 +42,7 @@ export function ProfilesModuleFilterEditor({
   const { control } = useFormContext();
 
   return (
-    <Stack spacing={4}>
+    <Stack gap={4}>
       <Controller
         control={control}
         name={`${field}.status`}
@@ -168,7 +168,7 @@ function FilterGroupComponent({
       flex="1"
       width="100%"
     >
-      <Stack spacing={4}>
+      <Stack gap={4}>
         {fields.length > 1 || depth > 0 ? (
           <HStack>
             {fields.length > 1 ? (
@@ -203,7 +203,7 @@ function FilterGroupComponent({
         ) : null}
         {fields.length > 0 ? (
           fields.map((field, index) => (
-            <Stack key={field.id} align="flex-start" spacing={2} width="100%">
+            <Stack key={field.id} align="flex-start" gap={2} width="100%">
               {"logicalOperator" in field ? (
                 <FilterGroupComponent
                   path={`${path}.conditions.${index}`}
@@ -347,7 +347,7 @@ function ConditionComponent({ path, onRemove, profileTypeFields }: ConditionComp
   const profileTypeField = profileTypeFields.find((f) => f.id === profileTypeFieldId);
 
   return (
-    <Stack spacing={2} width="100%">
+    <Stack gap={2} width="100%">
       <HStack flex="1">
         <IconButtonWithTooltip
           variant="ghost"

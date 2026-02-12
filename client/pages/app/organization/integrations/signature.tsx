@@ -1,15 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import {
-  Badge,
-  Heading,
-  HStack,
-  IconButton,
-  Image,
-  Spacer,
-  Stack,
-  useToast,
-} from "@chakra-ui/react";
+import { Badge, Heading, IconButton, Image, Spacer, useToast } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { AlertCircleFilledIcon, DeleteIcon, RepeatIcon, StarIcon } from "@parallel/chakra/icons";
 import { ContactSupportAlert } from "@parallel/components/common/ContactSupportAlert";
@@ -25,7 +16,7 @@ import { OrganizationSettingsLayout } from "@parallel/components/layout/Organiza
 import { useAddSignatureCredentialsDialog } from "@parallel/components/organization/dialogs/AddSignatureCredentialsDialog";
 import { useDeleteSignatureErrorConfirmationDialog } from "@parallel/components/organization/dialogs/DeleteSignatureErrorConfirmationDialog";
 import { useDeleteSignatureTokenDialog } from "@parallel/components/organization/dialogs/DeleteSignatureTokenDialog";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   IntegrationsSignature_deleteSignatureIntegrationDocument,
   IntegrationsSignature_markSignatureIntegrationAsDefaultDocument,
@@ -209,7 +200,7 @@ function IntegrationsSignature() {
       }
       showBackButton={true}
     >
-      <Stack padding={4} spacing={5} flex="1" paddingBottom={16}>
+      <Stack padding={4} gap={5} flex="1" paddingBottom={16}>
         <TablePage
           flex="0 1 auto"
           isHighlightable
