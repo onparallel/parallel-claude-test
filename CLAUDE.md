@@ -18,6 +18,10 @@
 
 ## Agent Behavior Guidelines
 
+### Code Formatting
+
+Do not worry about code formatting when editing files. After finishing edits, run `yarn prettier --write <file>` on each modified file to auto-format it.
+
 ### Documentation
 
 When editing README files or other documentation markdown files, **always use the `crafting-effective-readmes` skill**. This ensures documentation follows best practices and is tailored to the appropriate audience.
