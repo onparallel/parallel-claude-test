@@ -15,7 +15,7 @@ import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomSelectProps } from "@parallel/utils/react-select/types";
 import { If, MaybeArray, unMaybeArray } from "@parallel/utils/types";
 import { useAsyncMemo } from "@parallel/utils/useAsyncMemo";
-import { ForwardedRef, ReactElement, RefAttributes, forwardRef, useCallback, useMemo } from "react";
+import { RefAttributes, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, {
   MultiValueGenericProps,
@@ -63,25 +63,24 @@ export interface UserSelectProps<
       ) => Promise<OptionType[]>;
 }
 
-export const UserSelect = forwardRef(function UserSelect<
+export function UserSelect<
   IsMulti extends boolean = false,
   IncludeGroups extends boolean = false,
   IsSync extends boolean = false,
   OptionType extends UserSelectSelection<IncludeGroups> = UserSelectSelection<IncludeGroups>,
->(
-  {
-    value,
-    onSearch,
-    isSync,
-    onChange,
-    options,
-    isMulti,
-    includeGroups,
-    placeholder: _placeholder,
-    ...props
-  }: UserSelectProps<IsMulti, IncludeGroups, IsSync, OptionType>,
-  ref: ForwardedRef<UserSelectInstance<IsMulti, IncludeGroups, OptionType>>,
-) {
+>({
+  ref,
+  value,
+  onSearch,
+  isSync,
+  onChange,
+  options,
+  isMulti,
+  includeGroups,
+  placeholder: _placeholder,
+  ...props
+}: UserSelectProps<IsMulti, IncludeGroups, IsSync, OptionType> &
+  RefAttributes<UserSelectInstance<IsMulti, IncludeGroups, OptionType>>) {
   const needsLoading =
     typeof value === "string" || (Array.isArray(value) && typeof value[0] === "string");
   const getUsersOrGroups = useGetUsersOrGroups();
@@ -198,15 +197,7 @@ export const UserSelect = forwardRef(function UserSelect<
       {...(extensions as any)}
     />
   );
-}) as <
-  IsMulti extends boolean = false,
-  IncludeGroups extends boolean = false,
-  IsSync extends boolean = false,
-  OptionType extends UserSelectSelection<IncludeGroups> = UserSelectSelection<IncludeGroups>,
->(
-  props: UserSelectProps<IsMulti, IncludeGroups, IsSync, OptionType> &
-    RefAttributes<UserSelectInstance<IsMulti, IncludeGroups, OptionType>>,
-) => ReactElement;
+}
 
 function useGetUsersOrGroups() {
   const client = useApolloClient();

@@ -20,12 +20,9 @@ import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import { useRerender } from "@parallel/utils/useRerender";
 import pMap from "p-map";
 import {
-  ForwardedRef,
-  ReactElement,
   ReactNode,
   RefAttributes,
   createContext,
-  forwardRef,
   useCallback,
   useContext,
   useEffect,
@@ -73,27 +70,26 @@ export interface ProfileSelectProps<
   hideProfileType?: boolean;
 }
 
-export const ProfileSelect = forwardRef(function ProfileSelect<
+export function ProfileSelect<
   IsMulti extends boolean = false,
   IsSync extends boolean = false,
   OptionType extends ProfileSelectSelection = ProfileSelectSelection,
->(
-  {
-    value,
-    isSync,
-    onChange,
-    options,
-    isMulti,
-    placeholder,
-    profileTypeId,
-    defaultCreateProfileName,
-    defaultCreateProfileFieldValues,
-    excludeProfiles,
-    canCreateProfiles,
-    ...props
-  }: ProfileSelectProps<IsMulti, IsSync, OptionType>,
-  ref: ForwardedRef<ProfileSelectInstance<IsMulti, OptionType>>,
-) {
+>({
+  ref,
+  value,
+  isSync,
+  onChange,
+  options,
+  isMulti,
+  placeholder,
+  profileTypeId,
+  defaultCreateProfileName,
+  defaultCreateProfileFieldValues,
+  excludeProfiles,
+  canCreateProfiles,
+  ...props
+}: ProfileSelectProps<IsMulti, IsSync, OptionType> &
+  RefAttributes<ProfileSelectInstance<IsMulti, OptionType>>) {
   const innerRef = useRef<ProfileSelectInstance<IsMulti, OptionType>>(undefined);
   const _ref = useMergeRefs(ref, innerRef);
   const intl = useIntl();
@@ -339,14 +335,7 @@ export const ProfileSelect = forwardRef(function ProfileSelect<
       {...rsProps}
     />
   );
-}) as <
-  IsMulti extends boolean = false,
-  IsSync extends boolean = false,
-  OptionType extends ProfileSelectSelection = ProfileSelectSelection,
->(
-  props: ProfileSelectProps<IsMulti, IsSync, OptionType> &
-    RefAttributes<ProfileSelectInstance<IsMulti, OptionType>>,
-) => ReactElement;
+}
 
 function useGetProfiles() {
   const client = useApolloClient();

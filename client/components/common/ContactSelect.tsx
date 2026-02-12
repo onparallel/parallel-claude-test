@@ -8,16 +8,7 @@ import { CustomAsyncCreatableSelectProps } from "@parallel/utils/react-select/ty
 import { Maybe, MaybePromise, unMaybeArray } from "@parallel/utils/types";
 import { isValidEmail } from "@parallel/utils/validation";
 import { useMergeRefs } from "@parallel/utils/useMergeRefs";
-import {
-  ClipboardEvent,
-  ForwardedRef,
-  KeyboardEvent,
-  ReactElement,
-  RefAttributes,
-  forwardRef,
-  useRef,
-  useState,
-} from "react";
+import { ClipboardEvent, KeyboardEvent, RefAttributes, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
   InputActionMeta,
@@ -58,19 +49,17 @@ export type ContactSelectInstance<IsMulti extends boolean = false> = SelectInsta
   never
 >;
 
-export const ContactSelect = forwardRef(function ContactSelect<IsMulti extends boolean = false>(
-  {
-    value,
-    isMulti,
-    onSearchContacts,
-    onCreateContact,
-    onPasteEmails,
-    onChange,
-    onFocus,
-    ...props
-  }: ContactSelectProps<IsMulti>,
-  ref: ForwardedRef<ContactSelectInstance<IsMulti>>,
-) {
+export function ContactSelect<IsMulti extends boolean = false>({
+  ref,
+  value,
+  isMulti,
+  onSearchContacts,
+  onCreateContact,
+  onPasteEmails,
+  onChange,
+  onFocus,
+  ...props
+}: ContactSelectProps<IsMulti> & RefAttributes<ContactSelectInstance<IsMulti>>) {
   const [isCreating, _setIsCreating] = useState(false);
   // we need this because the create handler is called twice when clicking on the create menu option,
   // one because of the click and another one from the input blur
@@ -216,9 +205,7 @@ export const ContactSelect = forwardRef(function ContactSelect<IsMulti extends b
       {...rsProps}
     />
   );
-}) as <IsMulti extends boolean = false>(
-  props: ContactSelectProps<IsMulti> & RefAttributes<ContactSelectInstance<IsMulti>>,
-) => ReactElement;
+}
 
 const _fragments = {
   // firstName and lastName are needed for converting from Contact to PetitionSigner in some dialogs
