@@ -20,7 +20,7 @@
 
 ### Code Formatting
 
-Do not worry about code formatting when editing files. After finishing edits, run `yarn prettier --write <file>` on each modified file to auto-format it.
+Do not worry about code formatting when editing files. After editing a file, run `yarn prettier --write <file>` on it to auto-format it.
 
 ### Documentation
 
