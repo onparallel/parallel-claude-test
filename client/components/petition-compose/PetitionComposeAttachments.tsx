@@ -223,7 +223,7 @@ export const PetitionComposeAttachments = chakraComponent<"div", PetitionCompose
         if (allAttachments.length + files.length > 10) {
           // on drop event already shows a message on the dropzone, if its not type="drop" means the
           // file is coming from the "Add attachment" button which doesn't provide any feedback
-          if (event?.type !== "drop") {
+          if (!("type" in event) || event.type !== "drop") {
             await withError(
               showErrorDialog({
                 header: (
