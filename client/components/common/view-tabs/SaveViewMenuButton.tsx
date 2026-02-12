@@ -11,7 +11,7 @@ import { Menu, Tooltip } from "@parallel/chakra/components";
 import { ChevronDownIcon, SaveIcon } from "@parallel/chakra/icons";
 import { chakraComponent } from "@parallel/chakra/utils";
 import { Button } from "@parallel/components/ui";
-import { ForwardedRef, forwardRef } from "react";
+import { RefAttributes } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 interface SaveViewTabsMenuProps {
@@ -20,10 +20,12 @@ interface SaveViewTabsMenuProps {
   onSaveAsNewView: () => void;
 }
 
-export const SaveViewTabsMenu = forwardRef(function SaveViewTabsMenu(
-  { isViewDirty, onSaveCurrentView, onSaveAsNewView }: SaveViewTabsMenuProps,
-  ref: ForwardedRef<HTMLButtonElement>,
-) {
+export function SaveViewTabsMenu({
+  ref,
+  isViewDirty,
+  onSaveCurrentView,
+  onSaveAsNewView,
+}: SaveViewTabsMenuProps & RefAttributes<HTMLButtonElement>) {
   return (
     <Menu placement="bottom-end">
       <SaveViewMenuButton ref={ref} isDirty={isViewDirty} />
@@ -45,7 +47,7 @@ export const SaveViewTabsMenu = forwardRef(function SaveViewTabsMenu(
       </Portal>
     </Menu>
   );
-});
+}
 
 const SaveViewMenuButton = chakraComponent<"button", { isDirty?: boolean }>(
   function SaveViewMenuButton({ ref, isDirty }) {

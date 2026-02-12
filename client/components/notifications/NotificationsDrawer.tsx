@@ -142,7 +142,7 @@ export function NotificationsDrawer() {
           </Stack>
           <NotificationsFilterSelect
             data-testid="notifications-filter-select"
-            ref={filterRef}
+            ref={filterRef as any}
             value={filter}
             onChange={handleFilterChange}
           />

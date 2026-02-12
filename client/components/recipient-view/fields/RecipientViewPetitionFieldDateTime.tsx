@@ -16,9 +16,9 @@ import { isValidDateString } from "@parallel/utils/validation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ChangeEvent,
-  forwardRef,
   KeyboardEvent,
   MouseEvent,
+  RefAttributes,
   useEffect,
   useRef,
   useState,
@@ -283,13 +283,15 @@ interface RecipientViewPetitionFieldReplyDateProps {
   onAddNewReply: () => void;
 }
 
-export const RecipientViewPetitionFieldReplyDate = forwardRef<
-  HTMLInputElement,
-  RecipientViewPetitionFieldReplyDateProps
->(function RecipientViewPetitionFieldReplyDate(
-  { field, reply, isDisabled, onUpdate, onDelete, onAddNewReply },
+export function RecipientViewPetitionFieldReplyDate({
   ref,
-) {
+  field,
+  reply,
+  isDisabled,
+  onUpdate,
+  onDelete,
+  onAddNewReply,
+}: RecipientViewPetitionFieldReplyDateProps & RefAttributes<HTMLInputElement>) {
   const intl = useIntl();
   const [value, setValue] = useState(reply.content.datetime ?? "");
   const [isSaving, setIsSaving] = useState(false);
@@ -470,4 +472,4 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
       </HStack>
     </Stack>
   );
-});
+}

@@ -11,7 +11,14 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
-import { ComponentPropsWithRef, forwardRef, MouseEvent, useEffect, useRef, useState } from "react";
+import {
+  ComponentPropsWithRef,
+  MouseEvent,
+  RefAttributes,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
 import {
@@ -361,13 +368,16 @@ interface RecipientViewPetitionFieldReplyNumberProps {
   onInvalid: (replyId: string, value: boolean) => void;
 }
 
-export const RecipientViewPetitionFieldReplyNumber = forwardRef<
-  HTMLInputElement,
-  RecipientViewPetitionFieldReplyNumberProps
->(function RecipientViewPetitionFieldReplyNumber(
-  { field, reply, isDisabled, onUpdate, onDelete, onAddNewReply, onInvalid },
+export function RecipientViewPetitionFieldReplyNumber({
   ref,
-) {
+  field,
+  reply,
+  isDisabled,
+  onUpdate,
+  onDelete,
+  onAddNewReply,
+  onInvalid,
+}: RecipientViewPetitionFieldReplyNumberProps & RefAttributes<HTMLInputElement>) {
   const { range, placeholder, decimals, prefix, suffix } = field.options as FieldOptions["NUMBER"];
 
   const hasPrefix = isNonNullish(prefix) || isNonNullish(suffix) ? true : false;
@@ -474,7 +484,7 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
       />
     </Stack>
   );
-});
+}
 
 function isBetweenLimits(range: FieldOptions["NUMBER"]["range"], value: number) {
   return value >= (range.min ?? -Infinity) && value <= (range.max ?? Infinity);

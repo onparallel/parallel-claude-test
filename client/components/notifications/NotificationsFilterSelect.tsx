@@ -1,19 +1,17 @@
-import { Focusable } from "@parallel/utils/types";
-import { forwardRef, useImperativeHandle, useRef } from "react";
-import { SelectInstance } from "react-select";
+import { RefAttributes } from "react";
 import {
-  SimpleOption,
   SimpleSelect,
+  SimpleSelectInstance,
   SimpleSelectProps,
   useSimpleSelectOptions,
 } from "../common/SimpleSelect";
 
 type NotificationsFilter = "ALL" | "UNREAD" | "COMMENTS" | "COMPLETED" | "SHARED" | "OTHER";
 
-export const NotificationsFilterSelect = forwardRef<
-  Focusable,
-  Omit<SimpleSelectProps<NotificationsFilter, false>, "options">
->(function NotificationsFilterSelect(props, ref) {
+export function NotificationsFilterSelect(
+  props: Omit<SimpleSelectProps<NotificationsFilter, false>, "options"> &
+    RefAttributes<SimpleSelectInstance<NotificationsFilter, false>>,
+) {
   const options = useSimpleSelectOptions(
     (intl) => [
       {
@@ -61,13 +59,5 @@ export const NotificationsFilterSelect = forwardRef<
     ],
     [],
   );
-
-  const _ref = useRef<SelectInstance<SimpleOption<NotificationsFilter>, false>>(null);
-  useImperativeHandle(ref, () => ({
-    focus: () => {
-      _ref.current?.focus();
-    },
-  }));
-
-  return <SimpleSelect ref={_ref} options={options} isSearchable={false} {...props} />;
-});
+  return <SimpleSelect options={options} isSearchable={false} {...props} />;
+}

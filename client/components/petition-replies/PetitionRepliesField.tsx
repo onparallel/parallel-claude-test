@@ -37,7 +37,8 @@ import { useBuildUrlToPetitionSection } from "@parallel/utils/goToPetition";
 import { LiquidPetitionVariableProvider } from "@parallel/utils/liquid/LiquidPetitionVariableProvider";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
-import { forwardRef } from "react";
+import NextLink from "next/link";
+import { RefAttributes } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish, zip } from "remeda";
 import { assert } from "ts-essentials";
@@ -45,7 +46,6 @@ import { FieldDescription } from "../common/FieldDescription";
 import { FileAttachmentButton } from "../common/FileAttachmentButton";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
-import NextLink from "next/link";
 import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
 import { Accordion } from "../ui";
 import { NoRepliesHintWithButton } from "./NoRepliesHintWithButton";
@@ -69,73 +69,140 @@ export interface PetitionRepliesFieldProps extends Omit<BoxProps, "filter"> {
   isDisabled?: boolean;
 }
 
-export const PetitionRepliesField = forwardRef<HTMLElement, PetitionRepliesFieldProps>(
-  function PetitionRepliesField(
-    {
-      petition,
-      field,
-      fieldIndex,
-      childrenFieldIndices,
-      isActive: isShowingComments,
-      filter,
-      fieldLogic,
-      onAction,
-      onToggleComments,
-      onUpdateReplyStatus,
-      isDisabled,
-      ...props
-    },
-    ref,
-  ) {
-    const intl = useIntl();
-    const [petitionFieldAttachmentDownloadLink] = useMutation(
-      PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument,
+export function PetitionRepliesField({
+  ref,
+  petition,
+  field,
+  fieldIndex,
+  childrenFieldIndices,
+  isActive: isShowingComments,
+  filter,
+  fieldLogic,
+  onAction,
+  onToggleComments,
+  onUpdateReplyStatus,
+  isDisabled,
+  ...props
+}: PetitionRepliesFieldProps & RefAttributes<HTMLElement>) {
+  const intl = useIntl();
+  const [petitionFieldAttachmentDownloadLink] = useMutation(
+    PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument,
+  );
+  const handleAttachmentClick = (fieldId: string) => async (attachmentId: string) => {
+    await withError(
+      openNewWindow(async () => {
+        const { data } = await petitionFieldAttachmentDownloadLink({
+          variables: { petitionId: petition.id, fieldId, attachmentId },
+        });
+        const { url } = data!.petitionFieldAttachmentDownloadLink;
+        return url!;
+      }),
     );
-    const handleAttachmentClick = (fieldId: string) => async (attachmentId: string) => {
-      await withError(
-        openNewWindow(async () => {
-          const { data } = await petitionFieldAttachmentDownloadLink({
-            variables: { petitionId: petition.id, fieldId, attachmentId },
-          });
-          const { url } = data!.petitionFieldAttachmentDownloadLink;
-          return url!;
-        }),
-      );
-    };
+  };
 
-    const buildUrlToSection = useBuildUrlToPetitionSection();
+  const buildUrlToSection = useBuildUrlToPetitionSection();
 
-    const goToComposeButton = (
-      <IconButtonWithTooltip
-        as={NextLink}
-        href={buildUrlToSection("compose", { field: field.id })}
-        opacity={0}
-        className="edit-field-button"
-        size="xs"
-        variant="ghost"
-        icon={<EditSimpleIcon />}
-        label={intl.formatMessage({
-          id: "component.petition-replies-field.edit-field",
-          defaultMessage: "Edit field",
-        })}
-      />
-    );
+  const goToComposeButton = (
+    <IconButtonWithTooltip
+      as={NextLink}
+      href={buildUrlToSection("compose", { field: field.id })}
+      opacity={0}
+      className="edit-field-button"
+      size="xs"
+      variant="ghost"
+      icon={<EditSimpleIcon />}
+      label={intl.formatMessage({
+        id: "component.petition-replies-field.edit-field",
+        defaultMessage: "Edit field",
+      })}
+    />
+  );
 
-    const headerNumber = fieldLogic.headerNumber ? `${fieldLogic.headerNumber}. ` : "";
-    const fieldTitle =
-      field.title ||
-      intl.formatMessage({ id: "generic.empty-heading", defaultMessage: "Untitled heading" });
+  const headerNumber = fieldLogic.headerNumber ? `${fieldLogic.headerNumber}. ` : "";
+  const fieldTitle =
+    field.title ||
+    intl.formatMessage({ id: "generic.empty-heading", defaultMessage: "Untitled heading" });
 
-    return field.type === "HEADING" ? (
+  return field.type === "HEADING" ? (
+    <Grid
+      ref={ref}
+      paddingStart={{ base: 4, md: 6 }}
+      paddingEnd={4}
+      paddingY={2}
+      as="section"
+      templateColumns="32px 10px 1fr 8px auto"
+      gridTemplateAreas={`"index . heading . comments" ". . desc desc desc"`}
+      {...props}
+      sx={{
+        "&:focus-within, &:hover": {
+          ".edit-field-button": {
+            opacity: 1,
+          },
+        },
+      }}
+    >
+      <Box gridArea="comments">
+        <CommentsButton
+          data-action="see-field-comments"
+          isActive={isShowingComments}
+          commentCount={field.commentCount}
+          hasUnreadComments={field.unreadCommentCount > 0}
+          onClick={onToggleComments}
+        />
+      </Box>
+      <Center gridArea="index">
+        <PetitionFieldTypeIndicator as="span" type={field.type} fieldIndex={fieldIndex} hideIcon />
+      </Center>
+      <HStack gridArea="heading" alignItems="center" minWidth={0}>
+        <Heading
+          size="md"
+          noOfLines={1}
+          wordBreak="break-all"
+          {...(field.title ? {} : { textStyle: "hint" })}
+        >
+          {field.isInternal ? (
+            <InternalFieldBadge marginEnd={1.5} position="relative" top="-2px" />
+          ) : null}
+          {`${headerNumber}${fieldTitle}`}
+        </Heading>
+        {goToComposeButton}
+      </HStack>
+
+      <Box gridArea="desc">
+        {field.description ? (
+          <FieldDescription
+            description={field.description}
+            color="gray.600"
+            fontSize="sm"
+            overflowWrap="anywhere"
+            marginTop={1.5}
+          />
+        ) : null}
+        {field.attachments.length ? (
+          <Box paddingY={1}>
+            <PetitionRepliesFieldAttachments
+              attachments={field.attachments}
+              onAttachmentClick={handleAttachmentClick(field.id)}
+            />
+          </Box>
+        ) : null}
+      </Box>
+    </Grid>
+  ) : field.type === "FIELD_GROUP" ? (
+    <Box
+      display="flex"
+      position="relative"
+      flexDirection="column"
+      as="section"
+      ref={ref as any}
+      {...props}
+    >
       <Grid
-        ref={ref as any}
         paddingStart={{ base: 4, md: 6 }}
         paddingEnd={4}
         paddingY={2}
-        as="section"
         templateColumns="32px 10px 1fr 8px auto"
         gridTemplateAreas={`"index . heading . comments" ". . desc desc desc"`}
-        {...props}
         sx={{
           "&:focus-within, &:hover": {
             ".edit-field-button": {
@@ -153,25 +220,59 @@ export const PetitionRepliesField = forwardRef<HTMLElement, PetitionRepliesField
             onClick={onToggleComments}
           />
         </Box>
-        <Center gridArea="index">
+        <Box position="relative" gridArea="index">
+          {!field.optional ? (
+            <Tooltip
+              placement="bottom"
+              label={intl.formatMessage({
+                id: "generic.required-field",
+                defaultMessage: "Required field",
+              })}
+            >
+              <Box
+                paddingStart={{ base: 2.5, md: 0 }}
+                width={4}
+                height={4}
+                textAlign="center"
+                fontSize="xl"
+                color="red.600"
+                userSelect="none"
+                position="absolute"
+                insetStart={0}
+                top={0}
+                transform={{
+                  base: "translate(-1.25rem, 50%)",
+                  md: "translate(-1.125rem, 50%)",
+                }}
+              >
+                <Box position="relative" bottom={2} pointerEvents="none">
+                  *
+                </Box>
+              </Box>
+            </Tooltip>
+          ) : null}
           <PetitionFieldTypeIndicator
             as="span"
+            marginTop="2px"
             type={field.type}
             fieldIndex={fieldIndex}
             hideIcon
           />
-        </Center>
-        <HStack gridArea="heading" alignItems="center" minWidth={0}>
+        </Box>
+        <HStack gridArea="heading" alignItems="center">
           <Heading
-            size="md"
-            noOfLines={1}
-            wordBreak="break-all"
-            {...(field.title ? {} : { textStyle: "hint" })}
+            fontSize="md"
+            as="h4"
+            {...(field.title
+              ? { overflowWrap: "anywhere", fontWeight: 600 }
+              : { textStyle: "hint", whiteSpace: "nowrap" })}
           >
             {field.isInternal ? (
               <InternalFieldBadge marginEnd={1.5} position="relative" top="-2px" />
             ) : null}
-            {`${headerNumber}${fieldTitle}`}
+            {field.title || (
+              <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
+            )}
           </Heading>
           {goToComposeButton}
         </HStack>
@@ -180,14 +281,14 @@ export const PetitionRepliesField = forwardRef<HTMLElement, PetitionRepliesField
           {field.description ? (
             <FieldDescription
               description={field.description}
+              marginTop={1}
               color="gray.600"
               fontSize="sm"
               overflowWrap="anywhere"
-              marginTop={1.5}
             />
           ) : null}
           {field.attachments.length ? (
-            <Box paddingY={1}>
+            <Box marginTop={2} paddingY={1}>
               <PetitionRepliesFieldAttachments
                 attachments={field.attachments}
                 onAttachmentClick={handleAttachmentClick(field.id)}
@@ -196,449 +297,179 @@ export const PetitionRepliesField = forwardRef<HTMLElement, PetitionRepliesField
           ) : null}
         </Box>
       </Grid>
-    ) : field.type === "FIELD_GROUP" ? (
-      <Box
-        display="flex"
-        position="relative"
-        flexDirection="column"
-        as="section"
-        ref={ref as any}
-        {...props}
-      >
-        <Grid
-          paddingStart={{ base: 4, md: 6 }}
-          paddingEnd={4}
-          paddingY={2}
-          templateColumns="32px 10px 1fr 8px auto"
-          gridTemplateAreas={`"index . heading . comments" ". . desc desc desc"`}
-          sx={{
-            "&:focus-within, &:hover": {
-              ".edit-field-button": {
-                opacity: 1,
-              },
-            },
-          }}
-        >
-          <Box gridArea="comments">
-            <CommentsButton
-              data-action="see-field-comments"
-              isActive={isShowingComments}
-              commentCount={field.commentCount}
-              hasUnreadComments={field.unreadCommentCount > 0}
-              onClick={onToggleComments}
-            />
-          </Box>
-          <Box position="relative" gridArea="index">
-            {!field.optional ? (
-              <Tooltip
-                placement="bottom"
-                label={intl.formatMessage({
-                  id: "generic.required-field",
-                  defaultMessage: "Required field",
-                })}
+      <Stack paddingStart={10} spacing={3}>
+        {field.replies.length > 0 ? (
+          field.replies.map((reply, index) => {
+            const filteredFields = filterPetitionFields(
+              zip(
+                reply.children!.map(({ field: _childField, replies }) => {
+                  const childrenField = field.children?.find((f) => f.id === _childField.id);
+                  assert(isNonNullish(childrenField), `Petition field ${_childField.id} not found`);
+                  return {
+                    ...(childrenField as PetitionRepliesField_PetitionFieldFragment),
+                    replies,
+                  };
+                }),
+                childrenFieldIndices!,
+              ),
+              fieldLogic.groupChildrenLogic![index],
+              filter,
+            );
+
+            if (filteredFields.length === 0) {
+              return null;
+            }
+
+            return (
+              <Card
+                id={`reply-${reply.id}`}
+                key={reply.id}
+                padding={4}
+                paddingStart={6}
+                as={Stack}
+                layerStyle="highlightable"
               >
-                <Box
-                  paddingStart={{ base: 2.5, md: 0 }}
-                  width={4}
-                  height={4}
-                  textAlign="center"
-                  fontSize="xl"
-                  color="red.600"
-                  userSelect="none"
-                  position="absolute"
-                  insetStart={0}
-                  top={0}
-                  transform={{
-                    base: "translate(-1.25rem, 50%)",
-                    md: "translate(-1.125rem, 50%)",
-                  }}
-                >
-                  <Box position="relative" bottom={2} pointerEvents="none">
-                    *
-                  </Box>
-                </Box>
-              </Tooltip>
-            ) : null}
-            <PetitionFieldTypeIndicator
-              as="span"
-              marginTop="2px"
-              type={field.type}
-              fieldIndex={fieldIndex}
-              hideIcon
-            />
-          </Box>
-          <HStack gridArea="heading" alignItems="center">
-            <Heading
-              fontSize="md"
-              as="h4"
-              {...(field.title
-                ? { overflowWrap: "anywhere", fontWeight: 600 }
-                : { textStyle: "hint", whiteSpace: "nowrap" })}
-            >
-              {field.isInternal ? (
-                <InternalFieldBadge marginEnd={1.5} position="relative" top="-2px" />
-              ) : null}
-              {field.title || (
-                <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
-              )}
-            </Heading>
-            {goToComposeButton}
-          </HStack>
-
-          <Box gridArea="desc">
-            {field.description ? (
-              <FieldDescription
-                description={field.description}
-                marginTop={1}
-                color="gray.600"
-                fontSize="sm"
-                overflowWrap="anywhere"
-              />
-            ) : null}
-            {field.attachments.length ? (
-              <Box marginTop={2} paddingY={1}>
-                <PetitionRepliesFieldAttachments
-                  attachments={field.attachments}
-                  onAttachmentClick={handleAttachmentClick(field.id)}
-                />
-              </Box>
-            ) : null}
-          </Box>
-        </Grid>
-        <Stack paddingStart={10} spacing={3}>
-          {field.replies.length > 0 ? (
-            field.replies.map((reply, index) => {
-              const filteredFields = filterPetitionFields(
-                zip(
-                  reply.children!.map(({ field: _childField, replies }) => {
-                    const childrenField = field.children?.find((f) => f.id === _childField.id);
-                    assert(
-                      isNonNullish(childrenField),
-                      `Petition field ${_childField.id} not found`,
-                    );
-                    return {
-                      ...(childrenField as PetitionRepliesField_PetitionFieldFragment),
-                      replies,
-                    };
-                  }),
-                  childrenFieldIndices!,
-                ),
-                fieldLogic.groupChildrenLogic![index],
-                filter,
-              );
-
-              if (filteredFields.length === 0) {
-                return null;
-              }
-
-              return (
-                <Card
-                  id={`reply-${reply.id}`}
-                  key={reply.id}
-                  padding={4}
-                  paddingStart={6}
-                  as={Stack}
-                  layerStyle="highlightable"
-                >
-                  {field.multiple ? (
-                    <Text>
-                      {`${
-                        field.options.groupName ??
-                        intl.formatMessage({
-                          id: "generic.group-name-fallback-reply",
-                          defaultMessage: "Reply",
-                        })
-                      } ${index + 1}`}
-                    </Text>
-                  ) : null}
-                  <Stack spacing={3}>
-                    {filteredFields.map((x, filteredFieldIndex) => {
-                      return x.type === "FIELD" ? (
-                        <LiquidPetitionVariableProvider
-                          key={x.field.id}
-                          logic={x.fieldLogic}
-                          variables={petition.variables}
-                        >
-                          <Stack>
-                            <Box>
-                              <Box position="relative">
-                                {x.field.optional ? null : (
-                                  <Tooltip
-                                    placement="bottom"
-                                    label={intl.formatMessage({
-                                      id: "generic.required-field",
-                                      defaultMessage: "Required field",
-                                    })}
-                                  >
-                                    <Box
-                                      paddingStart={{ base: 2.5, md: 0 }}
-                                      width={4}
-                                      height={4}
-                                      textAlign="center"
-                                      fontSize="xl"
-                                      color="red.600"
-                                      userSelect="none"
-                                      position="absolute"
-                                      insetStart={0}
-                                      top={0}
-                                      transform={{
-                                        base: "translate(-1.25rem, 25%)",
-                                        md: "translate(-1rem, 25%)",
-                                      }}
-                                    >
-                                      <Box position="relative" bottom={2} pointerEvents="none">
-                                        *
-                                      </Box>
-                                    </Box>
-                                  </Tooltip>
-                                )}
-
-                                <Heading
-                                  fontSize="md"
-                                  as="h4"
-                                  {...(x.field.title
-                                    ? { overflowWrap: "anywhere", fontWeight: 500 }
-                                    : { textStyle: "hint", whiteSpace: "nowrap" })}
+                {field.multiple ? (
+                  <Text>
+                    {`${
+                      field.options.groupName ??
+                      intl.formatMessage({
+                        id: "generic.group-name-fallback-reply",
+                        defaultMessage: "Reply",
+                      })
+                    } ${index + 1}`}
+                  </Text>
+                ) : null}
+                <Stack spacing={3}>
+                  {filteredFields.map((x, filteredFieldIndex) => {
+                    return x.type === "FIELD" ? (
+                      <LiquidPetitionVariableProvider
+                        key={x.field.id}
+                        logic={x.fieldLogic}
+                        variables={petition.variables}
+                      >
+                        <Stack>
+                          <Box>
+                            <Box position="relative">
+                              {x.field.optional ? null : (
+                                <Tooltip
+                                  placement="bottom"
+                                  label={intl.formatMessage({
+                                    id: "generic.required-field",
+                                    defaultMessage: "Required field",
+                                  })}
                                 >
-                                  {x.field.isInternal ? (
-                                    <InternalFieldBadge
-                                      marginEnd={1.5}
-                                      position="relative"
-                                      top="-2px"
-                                    />
-                                  ) : null}
-                                  {x.field.title || (
-                                    <FormattedMessage
-                                      id="generic.untitled-field"
-                                      defaultMessage="Untitled field"
-                                    />
-                                  )}
-                                </Heading>
-                              </Box>
-                              <Box>
-                                {x.field.description ? (
-                                  <FieldDescription
-                                    description={x.field.description}
-                                    marginTop={1}
-                                    color="gray.600"
-                                    fontSize="sm"
-                                    overflowWrap="anywhere"
+                                  <Box
+                                    paddingStart={{ base: 2.5, md: 0 }}
+                                    width={4}
+                                    height={4}
+                                    textAlign="center"
+                                    fontSize="xl"
+                                    color="red.600"
+                                    userSelect="none"
+                                    position="absolute"
+                                    insetStart={0}
+                                    top={0}
+                                    transform={{
+                                      base: "translate(-1.25rem, 25%)",
+                                      md: "translate(-1rem, 25%)",
+                                    }}
+                                  >
+                                    <Box position="relative" bottom={2} pointerEvents="none">
+                                      *
+                                    </Box>
+                                  </Box>
+                                </Tooltip>
+                              )}
+
+                              <Heading
+                                fontSize="md"
+                                as="h4"
+                                {...(x.field.title
+                                  ? { overflowWrap: "anywhere", fontWeight: 500 }
+                                  : { textStyle: "hint", whiteSpace: "nowrap" })}
+                              >
+                                {x.field.isInternal ? (
+                                  <InternalFieldBadge
+                                    marginEnd={1.5}
+                                    position="relative"
+                                    top="-2px"
                                   />
                                 ) : null}
-                                {x.field.attachments.length ? (
-                                  <Box marginTop={2} paddingY={1}>
-                                    <PetitionRepliesFieldAttachments
-                                      attachments={x.field.attachments}
-                                      onAttachmentClick={handleAttachmentClick(x.field.id)}
-                                    />
-                                  </Box>
-                                ) : null}
-                              </Box>
-                            </Box>
-                            {x.field.type === "HEADING" ? null : (
-                              <Stack spacing={4}>
-                                {x.field.replies.length ? (
-                                  x.field.replies.map((reply) => (
-                                    <PetitionRepliesFieldReply
-                                      key={reply.id}
-                                      petition={petition}
-                                      petitionField={x.field}
-                                      reply={reply}
-                                      fieldLogic={x.fieldLogic}
-                                      onAction={(action) => onAction(action, reply)}
-                                      onUpdateStatus={(status) =>
-                                        onUpdateReplyStatus(x.field.id, reply.id, status)
-                                      }
-                                      isDisabled={isDisabled}
-                                    />
-                                  ))
-                                ) : (
-                                  <NoRepliesHintWithButton
-                                    paddingTop={3}
-                                    paddingBottom={3}
-                                    href={buildUrlToSection("preview", {
-                                      field: x.field.id,
-                                      parentReply: reply.id,
-                                    })}
-                                    petitionId={petition.id}
-                                    petitionFieldId={x.field.id}
-                                    fieldLogic={x.fieldLogic}
-                                    parentReplyId={reply.id}
+                                {x.field.title || (
+                                  <FormattedMessage
+                                    id="generic.untitled-field"
+                                    defaultMessage="Untitled field"
                                   />
                                 )}
-                              </Stack>
-                            )}
-                          </Stack>
-                        </LiquidPetitionVariableProvider>
-                      ) : (
-                        <PetitionRepliesFilteredFields
-                          key={`filtered-${filteredFieldIndex}`}
-                          count={x.count}
-                        />
-                      );
-                    })}
-                  </Stack>
-                </Card>
-              );
-            })
-          ) : (
-            <NoRepliesHintWithButton
-              paddingY={4}
-              href={buildUrlToSection("preview", {
-                field: field.id,
-              })}
-              petitionId={petition.id}
-              petitionFieldId={field.id}
-              fieldLogic={fieldLogic}
-            />
-          )}
-        </Stack>
-      </Box>
-    ) : (
-      <Card
-        ref={ref}
-        layerStyle="highlightable"
-        display="flex"
-        backgroundColor="white"
-        flexDirection="column"
-        position="relative"
-        paddingY={4}
-        paddingStart={{ base: 4, md: 6 }}
-        paddingEnd={4}
-        {...props}
-      >
-        <Grid
-          templateColumns="32px 10px 1fr 8px auto"
-          gridTemplateAreas={`"index . heading . comments" ". . desc desc desc"`}
-          sx={{
-            "&:focus-within, &:hover": {
-              ".edit-field-button": {
-                opacity: 1,
-              },
-            },
-          }}
-        >
-          <Box gridArea="comments">
-            <CommentsButton
-              data-action="see-field-comments"
-              isActive={isShowingComments}
-              commentCount={field.commentCount}
-              hasUnreadComments={field.unreadCommentCount > 0}
-              onClick={onToggleComments}
-            />
-          </Box>
-          <Box position="relative" gridArea="index">
-            {!field.optional ? (
-              <Tooltip
-                placement="bottom"
-                label={intl.formatMessage({
-                  id: "generic.required-field",
-                  defaultMessage: "Required field",
-                })}
-              >
-                <Box
-                  paddingStart={{ base: 2.5, md: 0 }}
-                  width={4}
-                  height={4}
-                  textAlign="center"
-                  fontSize="xl"
-                  color="red.600"
-                  userSelect="none"
-                  position="absolute"
-                  insetStart={0}
-                  top={0}
-                  transform={{
-                    base: "translate(-1.25rem, 50%)",
-                    md: "translate(-1.125rem, 50%)",
-                  }}
-                >
-                  <Box position="relative" bottom={2} pointerEvents="none">
-                    *
-                  </Box>
-                </Box>
-              </Tooltip>
-            ) : null}
-            <PetitionFieldTypeIndicator
-              as="span"
-              marginTop="2px"
-              type={field.type}
-              fieldIndex={fieldIndex}
-              hideIcon
-            />
-          </Box>
-          <HStack gridArea="heading" alignItems="center">
-            <Heading
-              fontSize="md"
-              as="h4"
-              {...(field.title
-                ? { overflowWrap: "anywhere", fontWeight: 600 }
-                : { textStyle: "hint", whiteSpace: "nowrap" })}
-            >
-              {field.isInternal ? (
-                <InternalFieldBadge marginEnd={1.5} position="relative" top="-2px" />
-              ) : null}
-              {field.title || (
-                <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
-              )}
-            </Heading>
-            {goToComposeButton}
-          </HStack>
-
-          <Box gridArea="desc">
-            {field.description ? (
-              <FieldDescription
-                description={field.description}
-                marginTop={1}
-                color="gray.600"
-                fontSize="sm"
-                overflowWrap="anywhere"
-              />
-            ) : null}
-            {field.attachments.length ? (
-              <Box marginTop={2} paddingY={1}>
-                <PetitionRepliesFieldAttachments
-                  attachments={field.attachments}
-                  onAttachmentClick={handleAttachmentClick(field.id)}
-                />
-              </Box>
-            ) : null}
-          </Box>
-        </Grid>
-        {field.replies.length ? (
-          <Box marginTop={3}>
-            {field.type === "DYNAMIC_SELECT" ? (
-              <Stack
-                as="ol"
-                listStyleType="none"
-                direction="row"
-                alignItems="center"
-                fontSize="sm"
-                divider={<ArrowForwardIcon border="none" />}
-                marginBottom={2}
-              >
-                {field.replies.length > 0 &&
-                  (field.options.labels as string[]).map((label, index) => (
-                    <Box key={index} as="li">
-                      {label}
-                    </Box>
-                  ))}
-              </Stack>
-            ) : null}
-            <Stack spacing={4}>
-              {field.replies.map((reply) => (
-                <PetitionRepliesFieldReply
-                  key={reply.id}
-                  petition={petition}
-                  petitionField={field}
-                  reply={reply}
-                  fieldLogic={fieldLogic}
-                  onAction={(action) => onAction(action, reply)}
-                  onUpdateStatus={(status) => onUpdateReplyStatus(field.id, reply.id, status)}
-                  isDisabled={isDisabled}
-                />
-              ))}
-            </Stack>
-          </Box>
+                              </Heading>
+                            </Box>
+                            <Box>
+                              {x.field.description ? (
+                                <FieldDescription
+                                  description={x.field.description}
+                                  marginTop={1}
+                                  color="gray.600"
+                                  fontSize="sm"
+                                  overflowWrap="anywhere"
+                                />
+                              ) : null}
+                              {x.field.attachments.length ? (
+                                <Box marginTop={2} paddingY={1}>
+                                  <PetitionRepliesFieldAttachments
+                                    attachments={x.field.attachments}
+                                    onAttachmentClick={handleAttachmentClick(x.field.id)}
+                                  />
+                                </Box>
+                              ) : null}
+                            </Box>
+                          </Box>
+                          {x.field.type === "HEADING" ? null : (
+                            <Stack spacing={4}>
+                              {x.field.replies.length ? (
+                                x.field.replies.map((reply) => (
+                                  <PetitionRepliesFieldReply
+                                    key={reply.id}
+                                    petition={petition}
+                                    petitionField={x.field}
+                                    reply={reply}
+                                    fieldLogic={x.fieldLogic}
+                                    onAction={(action) => onAction(action, reply)}
+                                    onUpdateStatus={(status) =>
+                                      onUpdateReplyStatus(x.field.id, reply.id, status)
+                                    }
+                                    isDisabled={isDisabled}
+                                  />
+                                ))
+                              ) : (
+                                <NoRepliesHintWithButton
+                                  paddingTop={3}
+                                  paddingBottom={3}
+                                  href={buildUrlToSection("preview", {
+                                    field: x.field.id,
+                                    parentReply: reply.id,
+                                  })}
+                                  petitionId={petition.id}
+                                  petitionFieldId={x.field.id}
+                                  fieldLogic={x.fieldLogic}
+                                  parentReplyId={reply.id}
+                                />
+                              )}
+                            </Stack>
+                          )}
+                        </Stack>
+                      </LiquidPetitionVariableProvider>
+                    ) : (
+                      <PetitionRepliesFilteredFields
+                        key={`filtered-${filteredFieldIndex}`}
+                        count={x.count}
+                      />
+                    );
+                  })}
+                </Stack>
+              </Card>
+            );
+          })
         ) : (
           <NoRepliesHintWithButton
             paddingY={4}
@@ -650,10 +481,167 @@ export const PetitionRepliesField = forwardRef<HTMLElement, PetitionRepliesField
             fieldLogic={fieldLogic}
           />
         )}
-      </Card>
-    );
-  },
-);
+      </Stack>
+    </Box>
+  ) : (
+    <Card
+      ref={ref}
+      layerStyle="highlightable"
+      display="flex"
+      backgroundColor="white"
+      flexDirection="column"
+      position="relative"
+      paddingY={4}
+      paddingStart={{ base: 4, md: 6 }}
+      paddingEnd={4}
+      {...props}
+    >
+      <Grid
+        templateColumns="32px 10px 1fr 8px auto"
+        gridTemplateAreas={`"index . heading . comments" ". . desc desc desc"`}
+        sx={{
+          "&:focus-within, &:hover": {
+            ".edit-field-button": {
+              opacity: 1,
+            },
+          },
+        }}
+      >
+        <Box gridArea="comments">
+          <CommentsButton
+            data-action="see-field-comments"
+            isActive={isShowingComments}
+            commentCount={field.commentCount}
+            hasUnreadComments={field.unreadCommentCount > 0}
+            onClick={onToggleComments}
+          />
+        </Box>
+        <Box position="relative" gridArea="index">
+          {!field.optional ? (
+            <Tooltip
+              placement="bottom"
+              label={intl.formatMessage({
+                id: "generic.required-field",
+                defaultMessage: "Required field",
+              })}
+            >
+              <Box
+                paddingStart={{ base: 2.5, md: 0 }}
+                width={4}
+                height={4}
+                textAlign="center"
+                fontSize="xl"
+                color="red.600"
+                userSelect="none"
+                position="absolute"
+                insetStart={0}
+                top={0}
+                transform={{
+                  base: "translate(-1.25rem, 50%)",
+                  md: "translate(-1.125rem, 50%)",
+                }}
+              >
+                <Box position="relative" bottom={2} pointerEvents="none">
+                  *
+                </Box>
+              </Box>
+            </Tooltip>
+          ) : null}
+          <PetitionFieldTypeIndicator
+            as="span"
+            marginTop="2px"
+            type={field.type}
+            fieldIndex={fieldIndex}
+            hideIcon
+          />
+        </Box>
+        <HStack gridArea="heading" alignItems="center">
+          <Heading
+            fontSize="md"
+            as="h4"
+            {...(field.title
+              ? { overflowWrap: "anywhere", fontWeight: 600 }
+              : { textStyle: "hint", whiteSpace: "nowrap" })}
+          >
+            {field.isInternal ? (
+              <InternalFieldBadge marginEnd={1.5} position="relative" top="-2px" />
+            ) : null}
+            {field.title || (
+              <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
+            )}
+          </Heading>
+          {goToComposeButton}
+        </HStack>
+
+        <Box gridArea="desc">
+          {field.description ? (
+            <FieldDescription
+              description={field.description}
+              marginTop={1}
+              color="gray.600"
+              fontSize="sm"
+              overflowWrap="anywhere"
+            />
+          ) : null}
+          {field.attachments.length ? (
+            <Box marginTop={2} paddingY={1}>
+              <PetitionRepliesFieldAttachments
+                attachments={field.attachments}
+                onAttachmentClick={handleAttachmentClick(field.id)}
+              />
+            </Box>
+          ) : null}
+        </Box>
+      </Grid>
+      {field.replies.length ? (
+        <Box marginTop={3}>
+          {field.type === "DYNAMIC_SELECT" ? (
+            <Stack
+              as="ol"
+              listStyleType="none"
+              direction="row"
+              alignItems="center"
+              fontSize="sm"
+              divider={<ArrowForwardIcon border="none" />}
+              marginBottom={2}
+            >
+              {field.replies.length > 0 &&
+                (field.options.labels as string[]).map((label, index) => (
+                  <Box key={index} as="li">
+                    {label}
+                  </Box>
+                ))}
+            </Stack>
+          ) : null}
+          <Stack spacing={4}>
+            {field.replies.map((reply) => (
+              <PetitionRepliesFieldReply
+                key={reply.id}
+                petition={petition}
+                petitionField={field}
+                reply={reply}
+                fieldLogic={fieldLogic}
+                onAction={(action) => onAction(action, reply)}
+                onUpdateStatus={(status) => onUpdateReplyStatus(field.id, reply.id, status)}
+                isDisabled={isDisabled}
+              />
+            ))}
+          </Stack>
+        </Box>
+      ) : (
+        <NoRepliesHintWithButton
+          paddingY={4}
+          href={buildUrlToSection("preview", {
+            field: field.id,
+          })}
+          petitionId={petition.id}
+          petitionFieldId={field.id}
+          fieldLogic={fieldLogic}
+        />
+      )}
+    </Card>
+  );
+}
 
 const _fragments = {
   Petition: gql`

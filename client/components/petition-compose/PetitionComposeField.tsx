@@ -53,13 +53,13 @@ import { withError } from "@parallel/utils/promises/withError";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { Assert, UnwrapArray } from "@parallel/utils/types";
 import { UploadFileError, uploadFile } from "@parallel/utils/uploadFile";
+import { usePrevious } from "@parallel/utils/use-previous";
 import { useConstant } from "@parallel/utils/useConstant";
 import { useHasAdverseMediaSearch } from "@parallel/utils/useHasAdverseMediaSearch";
 import { useHasBackgroundCheck } from "@parallel/utils/useHasBackgroundCheck";
 import { useHasIdVerification } from "@parallel/utils/useHasIdVerification";
-import { MultipleRefObject } from "@parallel/utils/useMultipleRefs";
 import { useMergeRefs } from "@parallel/utils/useMergeRefs";
-import { usePrevious } from "@parallel/utils/use-previous";
+import { MultipleRefObject } from "@parallel/utils/useMultipleRefs";
 import { fromEvent } from "file-selector";
 import NextLink from "next/link";
 import pMap from "p-map";
@@ -90,7 +90,7 @@ import { PetitionComposeFieldAttachment } from "./PetitionComposeFieldAttachment
 import { PetitionComposeFieldGroupChildren } from "./PetitionComposeFieldGroupChildren";
 import {
   PetitionFieldOptionsListEditor,
-  PetitionFieldOptionsListEditorRef,
+  PetitionFieldOptionsListEditorInstance,
 } from "./PetitionFieldOptionsListEditor";
 import { PetitionFieldMathEditor } from "./logic/PetitionFieldMathEditor";
 
@@ -742,7 +742,7 @@ const _PetitionComposeFieldInner = chakraComponent<
     }
   }, []);
 
-  const fieldOptionsRef = useRef<PetitionFieldOptionsListEditorRef>(null);
+  const fieldOptionsRef = useRef<PetitionFieldOptionsListEditorInstance>(null);
   const focusFieldOptions = useCallback((atStart?: boolean) => {
     fieldOptionsRef.current?.focus(atStart ? "START" : undefined);
   }, []);

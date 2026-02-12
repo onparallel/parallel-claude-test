@@ -7,23 +7,21 @@ import {
   ShortTextFormat,
   useShortTextFormatsSelectOptions,
 } from "@parallel/utils/useShortTextFormats";
-import { forwardRef } from "react";
+import { RefAttributes } from "react";
 import { useIntl } from "react-intl";
 import { SelectInstance, components } from "react-select";
 import { Text } from "@parallel/components/ui";
 
 export type ShortTextFormatSelectProps = Omit<SimpleSelectProps<string>, "options">;
 
-export const ShortTextFormatSelect = forwardRef<
-  SelectInstance<SimpleOption<string>, false>,
-  ShortTextFormatSelectProps
->(function ShortTextFormatSelect(props, ref) {
+export function ShortTextFormatSelect(
+  props: ShortTextFormatSelectProps & RefAttributes<SelectInstance<SimpleOption<string>, false>>,
+) {
   const intl = useIntl();
 
   const { grouped } = useShortTextFormatsSelectOptions();
   return (
     <SimpleSelect
-      ref={ref}
       singleLineOptions
       placeholder={intl.formatMessage({
         id: "component.petition-compose-text-settings.format-placeholder",
@@ -43,7 +41,7 @@ export const ShortTextFormatSelect = forwardRef<
       {...props}
     />
   );
-});
+}
 
 const FormatSingleValue: typeof components.SingleValue = function FormatSingleValue(props) {
   const { label, countryName } = props.data as unknown as ShortTextFormat;

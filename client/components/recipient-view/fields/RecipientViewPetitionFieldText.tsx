@@ -15,7 +15,7 @@ import {
   ChangeEvent,
   KeyboardEvent,
   MouseEvent,
-  forwardRef,
+  RefAttributes,
   useEffect,
   useRef,
   useState,
@@ -294,13 +294,15 @@ interface RecipientViewPetitionFieldReplyTextProps {
   onAddNewReply: () => void;
 }
 
-export const RecipientViewPetitionFieldReplyText = forwardRef<
-  HTMLTextAreaElement,
-  RecipientViewPetitionFieldReplyTextProps
->(function RecipientViewPetitionFieldReplyText(
-  { field, reply, isDisabled, onUpdate, onDelete, onAddNewReply },
+export function RecipientViewPetitionFieldReplyText({
   ref,
-) {
+  field,
+  reply,
+  isDisabled,
+  onUpdate,
+  onDelete,
+  onAddNewReply,
+}: RecipientViewPetitionFieldReplyTextProps & RefAttributes<HTMLTextAreaElement>) {
   const intl = useIntl();
   const [value, setValue] = useState(reply.content.value ?? "");
   const [isSaving, setIsSaving] = useState(false);
@@ -320,7 +322,7 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
 
   const props = {
     id: `reply-${field.id}${reply.parent ? `-${reply.parent.id}` : ""}-${reply.id}`,
-    ref: ref as any,
+    ref,
     paddingEnd: 10,
     value,
     maxLength: field.options.maxLength ?? undefined,
@@ -385,4 +387,4 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
       />
     </Stack>
   );
-});
+}

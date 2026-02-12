@@ -15,7 +15,7 @@ import { If, MaybeArray, unMaybeArray } from "@parallel/utils/types";
 import { useAsyncMemo } from "@parallel/utils/useAsyncMemo";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import pMap from "p-map";
-import { ForwardedRef, ReactElement, RefAttributes, forwardRef, useCallback, useMemo } from "react";
+import { RefAttributes, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, {
   MultiValueGenericProps,
@@ -49,23 +49,21 @@ export interface ProfileTypeSelectProps<
   showOnlyCreatable?: boolean;
 }
 
-export const ProfileTypeSelect = forwardRef(function ProfileTypeSelect<
+export function ProfileTypeSelect<
   IsMulti extends boolean = false,
   IsSync extends boolean = false,
   OptionType extends ProfileTypeSelectSelection = ProfileTypeSelectSelection,
->(
-  {
-    value,
-    isSync,
-    onChange,
-    options,
-    isMulti,
-    placeholder: _placeholder,
-    showOnlyCreatable,
-    ...props
-  }: ProfileTypeSelectProps<IsMulti, IsSync, OptionType>,
-  ref: ForwardedRef<ProfileTypeSelectInstance<IsMulti, OptionType>>,
-) {
+>({
+  value,
+  isSync,
+  onChange,
+  options,
+  isMulti,
+  placeholder: _placeholder,
+  showOnlyCreatable,
+  ...props
+}: ProfileTypeSelectProps<IsMulti, IsSync, OptionType> &
+  RefAttributes<ProfileTypeSelectInstance<IsMulti, OptionType>>) {
   const intl = useIntl();
   const needsLoading =
     typeof value === "string" || (Array.isArray(value) && typeof value[0] === "string");
@@ -164,7 +162,6 @@ export const ProfileTypeSelect = forwardRef(function ProfileTypeSelect<
 
   return isSync ? (
     <Select<OptionType, IsMulti, never>
-      ref={ref as any}
       value={_value as any}
       onChange={onChange as any}
       isMulti={isMulti}
@@ -178,7 +175,6 @@ export const ProfileTypeSelect = forwardRef(function ProfileTypeSelect<
     />
   ) : (
     <AsyncSelect<OptionType, IsMulti, never>
-      ref={ref as any}
       value={_value as any}
       onChange={onChange as any}
       isMulti={isMulti}
@@ -191,14 +187,7 @@ export const ProfileTypeSelect = forwardRef(function ProfileTypeSelect<
       {...rsProps}
     />
   );
-}) as <
-  IsMulti extends boolean = false,
-  IsSync extends boolean = false,
-  OptionType extends ProfileTypeSelectSelection = ProfileTypeSelectSelection,
->(
-  props: ProfileTypeSelectProps<IsMulti, IsSync, OptionType> &
-    RefAttributes<ProfileTypeSelectInstance<IsMulti, OptionType>>,
-) => ReactElement;
+}
 
 function useGetProfileTypes() {
   const client = useApolloClient();

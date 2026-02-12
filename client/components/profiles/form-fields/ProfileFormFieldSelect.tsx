@@ -5,7 +5,7 @@ import { ValueProps } from "@parallel/utils/ValueProps";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { UseReactSelectProps, useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { UnwrapArray } from "@parallel/utils/types";
-import { ForwardedRef, PropsWithChildren, ReactElement, forwardRef, useMemo } from "react";
+import { PropsWithChildren, RefAttributes, useMemo } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { useIntl } from "react-intl";
 import Select, {
@@ -124,10 +124,13 @@ interface ProfileFormFieldSelectInnerProps<IsMulti extends boolean = false>
   field: ProfileFormField_ProfileTypeFieldFragment;
 }
 
-function _ProfileFieldSelectInner<IsMulti extends boolean = false>(
-  { field, value, onChange, ...props }: ProfileFormFieldSelectInnerProps<IsMulti>,
-  ref: ForwardedRef<SelectInstance<SelectOptionValue, IsMulti, never>>,
-) {
+export function ProfileFormFieldSelectInner<IsMulti extends boolean = false>({
+  field,
+  value,
+  onChange,
+  ...props
+}: ProfileFormFieldSelectInnerProps<IsMulti> &
+  RefAttributes<SelectInstance<SelectOptionValue, IsMulti, never>>) {
   const intl = useIntl();
 
   const { values, showOptionsWithColors, standardList } =
@@ -174,7 +177,6 @@ function _ProfileFieldSelectInner<IsMulti extends boolean = false>(
 
   return (
     <Select<SelectOptionValue, boolean, never>
-      ref={ref}
       value={_value}
       options={valuesOrderedByLocale}
       getOptionLabel={getOptionLabel}
@@ -197,13 +199,6 @@ function _ProfileFieldSelectInner<IsMulti extends boolean = false>(
     />
   );
 }
-
-export const ProfileFormFieldSelectInner = forwardRef<
-  SelectInstance<SelectOptionValue, boolean, never>,
-  ProfileFormFieldSelectInnerProps
->(_ProfileFieldSelectInner as any) as <IsMulti extends boolean = false>(
-  props: ProfileFormFieldSelectInnerProps<IsMulti>,
-) => ReactElement;
 
 interface ReactSelectExtraProps {
   showOptionsWithColors?: boolean;

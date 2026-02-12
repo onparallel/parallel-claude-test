@@ -15,7 +15,7 @@ import {
   ComponentProps,
   KeyboardEvent,
   MouseEvent,
-  forwardRef,
+  RefAttributes,
   useEffect,
   useRef,
   useState,
@@ -294,13 +294,15 @@ interface RecipientViewPetitionFieldReplyPhoneProps {
   onAddNewReply: () => void;
 }
 
-export const RecipientViewPetitionFieldReplyPhone = forwardRef<
-  HTMLInputElement,
-  RecipientViewPetitionFieldReplyPhoneProps
->(function RecipientViewPetitionFieldReplyPhone(
-  { field, reply, isDisabled, onUpdate, onDelete, onAddNewReply },
+export function RecipientViewPetitionFieldReplyPhone({
   ref,
-) {
+  field,
+  reply,
+  isDisabled,
+  onUpdate,
+  onDelete,
+  onAddNewReply,
+}: RecipientViewPetitionFieldReplyPhoneProps & RefAttributes<HTMLInputElement>) {
   const intl = useIntl();
   const [value, setValue] = useState(reply.content.value ?? "");
   const [isSaving, setIsSaving] = useState(false);
@@ -384,4 +386,4 @@ export const RecipientViewPetitionFieldReplyPhone = forwardRef<
       />
     </Stack>
   );
-});
+}

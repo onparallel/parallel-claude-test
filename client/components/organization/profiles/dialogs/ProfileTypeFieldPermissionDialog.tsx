@@ -22,6 +22,7 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
   SimpleSelect,
+  SimpleSelectInstance,
   SimpleSelectProps,
   useSimpleSelectOptions,
 } from "@parallel/components/common/SimpleSelect";
@@ -42,10 +43,9 @@ import {
   useProfileTypeFieldPermissionDialog_usersDocument,
 } from "@parallel/graphql/__types";
 import { assertTypename, isTypename } from "@parallel/utils/apollo/typename";
-import { Focusable } from "@parallel/utils/types";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { nanoid } from "nanoid";
-import { forwardRef, useRef } from "react";
+import { RefAttributes, useRef } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";
@@ -501,10 +501,10 @@ const _queries = [
 interface ProfileTypeFieldPermissionTypeSelectProps
   extends Omit<SimpleSelectProps<ProfileTypeFieldPermissionType, false>, "options"> {}
 
-const ProfileTypeFieldPermissionTypeSelect = forwardRef<
-  Focusable,
-  ProfileTypeFieldPermissionTypeSelectProps
->(function ProfileTypeFieldPermissionTypeSelect({ ...props }, ref) {
+function ProfileTypeFieldPermissionTypeSelect(
+  props: ProfileTypeFieldPermissionTypeSelectProps &
+    RefAttributes<SimpleSelectInstance<ProfileTypeFieldPermissionType, false>>,
+) {
   const options = useSimpleSelectOptions(
     (intl) => [
       {
@@ -526,8 +526,8 @@ const ProfileTypeFieldPermissionTypeSelect = forwardRef<
     [],
   );
 
-  return <SimpleSelect ref={ref as any} options={options} {...props} />;
-});
+  return <SimpleSelect options={options} {...props} />;
+}
 
 const ProfileTypeFieldPermissionTypeText = chakraComponent<
   "span",

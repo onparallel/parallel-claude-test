@@ -14,7 +14,7 @@ import { Text } from "@parallel/components/ui";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { OptimizedMenuList } from "@parallel/utils/react-select/OptimizedMenuList";
-import { ChangeEvent, forwardRef, useCallback, useEffect, useState } from "react";
+import { ChangeEvent, RefAttributes, useCallback, useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
   components,
@@ -335,13 +335,11 @@ export function RecipientViewPetitionFieldCheckbox({
 
 interface PetitionFieldCheckboxStandardListProps extends MultiCheckboxSimpleSelectProps {}
 
-const PetitionFieldCheckboxMultiSelect = forwardRef<
-  MultiCheckboxSimpleSelectInstance,
-  PetitionFieldCheckboxStandardListProps
->(function ProfileFieldSelectInner(props, ref) {
+function PetitionFieldCheckboxMultiSelect(
+  props: PetitionFieldCheckboxStandardListProps & RefAttributes<MultiCheckboxSimpleSelectInstance>,
+) {
   return (
     <MultiCheckboxSimpleSelect
-      ref={ref}
       {...props}
       isClearable={false}
       filterOption={createFilter({
@@ -420,7 +418,7 @@ const PetitionFieldCheckboxMultiSelect = forwardRef<
       checkboxColorScheme="blue"
     />
   );
-});
+}
 
 function Placeholder(props: PlaceholderProps<SelectOptionValue, true, never>) {
   return (

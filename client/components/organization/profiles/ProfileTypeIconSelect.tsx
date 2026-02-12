@@ -32,7 +32,7 @@ import {
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { ProfileTypeIcon } from "@parallel/graphql/__types";
 import { ValueProps } from "@parallel/utils/ValueProps";
-import { ComponentType, forwardRef, useMemo } from "react";
+import { ComponentType, useMemo } from "react";
 import { useIntl } from "react-intl";
 
 export function ProfileTypeIconSelect({ value, onChange }: ValueProps<ProfileTypeIcon, false>) {
@@ -88,11 +88,12 @@ function MenuOptionGroup(props: Pick<UseMenuOptionGroupProps, "value" | "onChang
   return <SimpleGrid justifyItems="center" columns={4} spacing={2} {...ownProps} />;
 }
 
-const MenuItemOption = forwardRef<
-  HTMLElement,
-  UseMenuOptionProps & { icon: ComponentType; alt: string }
->(function MenuItemOption({ alt, icon, ...props }, ref) {
-  const optionProps = useMenuOption(props, ref);
+function MenuItemOption({
+  alt,
+  icon,
+  ...props
+}: UseMenuOptionProps & { icon: ComponentType; alt: string }) {
+  const optionProps = useMenuOption(props);
   return (
     <IconButton
       variant="ghost"
@@ -106,7 +107,7 @@ const MenuItemOption = forwardRef<
       aria-label={alt}
     />
   );
-});
+}
 
 (MenuItemOption as any).id = "MenuItemOption"; // this is needed to make internal menu chakra work correctly
 
