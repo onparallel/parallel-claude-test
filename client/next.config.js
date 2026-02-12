@@ -147,7 +147,7 @@ const config = {
 };
 
 module.exports = [
-  require("@next/bundle-analyzer")({ enabled: Boolean(process.env.ANALYZE) }),
+  ...(process.env.ANALYZE ? [require("@next/bundle-analyzer")({ enabled: true })] : []),
   require("next-plugin-graphql"),
   ...(process.env.SENTRY_AUTH_TOKEN
     ? [
