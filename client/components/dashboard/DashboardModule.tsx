@@ -23,7 +23,10 @@ export interface DashboardModuleProps extends BoxProps {
   listeners?: SyntheticListenerMap;
 }
 
-export function DashboardModule({ module, ...rest }: DashboardModuleProps & RefAttributes<HTMLDivElement>) {
+export function DashboardModule({
+  module,
+  ...rest
+}: DashboardModuleProps & RefAttributes<HTMLDivElement>) {
   return (
     <>
       {module.__typename === "DashboardPetitionsNumberModule" && (

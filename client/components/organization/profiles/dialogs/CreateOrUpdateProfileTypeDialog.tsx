@@ -337,7 +337,11 @@ interface ProfileTypeRadioProps {
   onChange: (value: ProfileTypeStandardType | "CUSTOM") => void;
 }
 
-function ProfileTypeRadioGroup({ value, onChange, ref }: ProfileTypeRadioProps & RefAttributes<HTMLInputElement>) {
+function ProfileTypeRadioGroup({
+  value,
+  onChange,
+  ref,
+}: ProfileTypeRadioProps & RefAttributes<HTMLInputElement>) {
   const intl = useIntl();
   const { getRootProps, getRadioProps } = useRadioGroup({
     name: "standardType",

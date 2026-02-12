@@ -1140,7 +1140,11 @@ interface PetitionVariableTypeRadioProps {
   onChange: (value: PetitionVariableType) => void;
 }
 
-function PetitionVariableTypeRadio({ value, onChange, ref }: PetitionVariableTypeRadioProps & RefAttributes<HTMLInputElement>) {
+function PetitionVariableTypeRadio({
+  value,
+  onChange,
+  ref,
+}: PetitionVariableTypeRadioProps & RefAttributes<HTMLInputElement>) {
   const intl = useIntl();
   const { getRootProps, getRadioProps } = useRadioGroup({
     name: "type",
