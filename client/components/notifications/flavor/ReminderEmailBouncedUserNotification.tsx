@@ -3,7 +3,7 @@ import { Circle } from "@chakra-ui/react";
 import { EmailXIcon } from "@parallel/chakra/icons";
 import { ContactReference } from "@parallel/components/common/ContactReference";
 import { ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotificationFragment } from "@parallel/graphql/__types";
-import { forwardRef } from "react";
+import { RefAttributes } from "react";
 import { FormattedMessage } from "react-intl";
 import { PetitionUserNotification } from "./PetitionUserNotification";
 
@@ -12,10 +12,11 @@ export interface ReminderEmailBouncedUserNotificationProps {
   notification: ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotificationFragment;
 }
 
-export const ReminderEmailBouncedUserNotification = forwardRef<
-  HTMLElement,
-  ReminderEmailBouncedUserNotificationProps
->(function ReminderEmailBouncedUserNotification({ isFirst, notification }, ref) {
+export function ReminderEmailBouncedUserNotification({
+  isFirst,
+  notification,
+  ref,
+}: ReminderEmailBouncedUserNotificationProps & RefAttributes<HTMLElement>) {
   return (
     <PetitionUserNotification
       ref={ref}
@@ -44,7 +45,7 @@ export const ReminderEmailBouncedUserNotification = forwardRef<
       />
     </PetitionUserNotification>
   );
-});
+}
 
 const _fragments = {
   ReminderEmailBouncedUserNotification: gql`

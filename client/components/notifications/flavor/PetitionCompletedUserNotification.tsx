@@ -3,7 +3,7 @@ import { Circle } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
 import { UserOrContactReference } from "@parallel/components/common/UserOrContactReference";
 import { PetitionCompletedUserNotification_PetitionCompletedUserNotificationFragment } from "@parallel/graphql/__types";
-import { forwardRef } from "react";
+import { RefAttributes } from "react";
 import { FormattedMessage } from "react-intl";
 import { PetitionUserNotification } from "./PetitionUserNotification";
 
@@ -12,10 +12,11 @@ export interface PetitionCompletedUserNotificationProps {
   notification: PetitionCompletedUserNotification_PetitionCompletedUserNotificationFragment;
 }
 
-export const PetitionCompletedUserNotification = forwardRef<
-  HTMLElement,
-  PetitionCompletedUserNotificationProps
->(function PetitionCompletedUserNotification({ isFirst, notification }, ref) {
+export function PetitionCompletedUserNotification({
+  isFirst,
+  notification,
+  ref,
+}: PetitionCompletedUserNotificationProps & RefAttributes<HTMLElement>) {
   return (
     <PetitionUserNotification
       ref={ref}
@@ -43,7 +44,7 @@ export const PetitionCompletedUserNotification = forwardRef<
       />
     </PetitionUserNotification>
   );
-});
+}
 
 const _fragments = {
   PetitionCompletedUserNotification: gql`

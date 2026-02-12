@@ -7,7 +7,7 @@ import {
   ReminderOptOutReason,
   useReminderOptOutReasons,
 } from "@parallel/utils/useReminderOptOutReasons";
-import { forwardRef } from "react";
+import { RefAttributes } from "react";
 import { FormattedMessage } from "react-intl";
 import { PetitionUserNotification } from "./PetitionUserNotification";
 import { Text } from "@parallel/components/ui";
@@ -17,10 +17,11 @@ export interface RemindersOptOutNotificationProps {
   notification: RemindersOptOutNotification_RemindersOptOutNotificationFragment;
 }
 
-export const RemindersOptOutNotification = forwardRef<
-  HTMLElement,
-  RemindersOptOutNotificationProps
->(function RemindersOptOutNotification({ isFirst, notification }, ref) {
+export function RemindersOptOutNotification({
+  isFirst,
+  notification,
+  ref,
+}: RemindersOptOutNotificationProps & RefAttributes<HTMLElement>) {
   const answers = useReminderOptOutReasons();
   const { other, access } = notification;
   const reason = notification.reason as ReminderOptOutReason;
@@ -57,7 +58,7 @@ export const RemindersOptOutNotification = forwardRef<
       />
     </PetitionUserNotification>
   );
-});
+}
 
 const _fragments = {
   RemindersOptOutNotification: gql`

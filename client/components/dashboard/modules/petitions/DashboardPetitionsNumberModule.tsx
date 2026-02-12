@@ -2,24 +2,24 @@ import { gql } from "@apollo/client";
 import { DashboardPetitionsNumberModule_DashboardPetitionsNumberModuleFragment } from "@parallel/graphql/__types";
 import { removeTypenames } from "@parallel/utils/apollo/removeTypenames";
 import { buildPetitionsQueryStateUrl } from "@parallel/utils/petitionsQueryState";
-import { forwardRef, useMemo } from "react";
+import { RefAttributes, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { DashboardLinkToResults } from "../../shared/DashboardLinkToResults";
 import { DashboardNumberValue } from "../../shared/DashboardNumberValue";
 import { DashboardSimpleModuleCard } from "../../shared/DashboardSimpleModuleCard";
 
-export const DashboardPetitionsNumberModule = forwardRef<
-  HTMLDivElement,
-  {
-    module: DashboardPetitionsNumberModule_DashboardPetitionsNumberModuleFragment;
-    isEditing: boolean;
-    isDragging: boolean;
-    isReadOnly: boolean;
-    onEdit: () => void;
-    onDelete: () => void;
-  }
->(function DashboardPetitionsNumberModule({ module, ...rest }, ref) {
+export function DashboardPetitionsNumberModule({
+  module,
+  ...rest
+}: {
+  module: DashboardPetitionsNumberModule_DashboardPetitionsNumberModuleFragment;
+  isEditing: boolean;
+  isDragging: boolean;
+  isReadOnly: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+} & RefAttributes<HTMLDivElement>) {
   const intl = useIntl();
   const resultsUrls = useMemo(() => {
     const { tags, ...filters } = removeTypenames(module.settings.filters);
@@ -42,7 +42,6 @@ export const DashboardPetitionsNumberModule = forwardRef<
 
   return (
     <DashboardSimpleModuleCard
-      ref={ref}
       module={module}
       headerAddon={
         <DashboardLinkToResults
@@ -63,7 +62,7 @@ export const DashboardPetitionsNumberModule = forwardRef<
       ) : null}
     </DashboardSimpleModuleCard>
   );
-});
+}
 
 const _fragments = {
   DashboardPetitionsNumberModule: gql`

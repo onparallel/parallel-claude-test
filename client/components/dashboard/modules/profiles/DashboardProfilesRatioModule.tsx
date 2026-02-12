@@ -5,7 +5,7 @@ import {
   simplifyProfileQueryFilter,
 } from "@parallel/utils/ProfileQueryFilter";
 import { buildProfilesQueryStateUrl } from "@parallel/utils/profilesQueryState";
-import { forwardRef, useMemo } from "react";
+import { RefAttributes, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { cleanDashboardModuleProfileFilter } from "../../drawer/utils/moduleUtils";
@@ -14,17 +14,17 @@ import { DashboardModuleAlertIncongruent } from "../../shared/DashboardModuleAle
 import { DashboardRatio } from "../../shared/DashboardRatio";
 import { DashboardSimpleModuleCard } from "../../shared/DashboardSimpleModuleCard";
 
-export const DashboardProfilesRatioModule = forwardRef<
-  HTMLDivElement,
-  {
-    module: DashboardProfilesRatioModule_DashboardProfilesRatioModuleFragment;
-    isEditing: boolean;
-    isDragging: boolean;
-    isReadOnly: boolean;
-    onEdit: () => void;
-    onDelete: () => void;
-  }
->(function DashboardProfilesRatioModule({ module, ...rest }, ref) {
+export function DashboardProfilesRatioModule({
+  module,
+  ...rest
+}: {
+  module: DashboardProfilesRatioModule_DashboardProfilesRatioModuleFragment;
+  isEditing: boolean;
+  isDragging: boolean;
+  isReadOnly: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+} & RefAttributes<HTMLDivElement>) {
   const intl = useIntl();
   const values =
     module.profilesRatioSettings.type === "COUNT"
@@ -60,7 +60,6 @@ export const DashboardProfilesRatioModule = forwardRef<
 
   return (
     <DashboardSimpleModuleCard
-      ref={ref}
       module={module}
       headerAddon={
         <>
@@ -88,7 +87,7 @@ export const DashboardProfilesRatioModule = forwardRef<
       ) : null}
     </DashboardSimpleModuleCard>
   );
-});
+}
 
 const _fragments = {
   DashboardProfilesRatioModule: gql`

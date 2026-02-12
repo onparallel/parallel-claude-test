@@ -1,4 +1,3 @@
-import { forwardRef } from "react";
 import { MenuListProps, components } from "react-select";
 import { FixedSizeList } from "react-window";
 const itemSize = 32;
@@ -43,15 +42,11 @@ export function OptimizedMenuList(props: MenuListProps) {
   );
 }
 
-const InnerElementType = forwardRef<HTMLDivElement, any>(function InnerElementType(
-  { style, ...props },
-  ref,
-) {
+function InnerElementType({ style, ...props }: any) {
   const height = typeof style?.height === "number" ? style.height : itemSize;
 
   return (
     <div
-      ref={ref}
       style={{
         ...style,
         overflow: "hidden",
@@ -60,4 +55,4 @@ const InnerElementType = forwardRef<HTMLDivElement, any>(function InnerElementTy
       {...props}
     />
   );
-});
+}

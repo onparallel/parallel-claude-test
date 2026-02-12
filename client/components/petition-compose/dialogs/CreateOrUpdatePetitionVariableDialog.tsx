@@ -52,7 +52,7 @@ import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterW
 import { useSetFocusRef } from "@parallel/utils/react-form-hook/useSetFocusRef";
 import { REFERENCE_REGEX } from "@parallel/utils/validation";
 import { MotionConfig, Reorder, useDragControls } from "framer-motion";
-import { forwardRef, Fragment, KeyboardEvent, ReactNode, Ref, useMemo, useRef } from "react";
+import { Fragment, KeyboardEvent, ReactNode, Ref, RefAttributes, useMemo, useRef } from "react";
 import {
   Controller,
   FieldArrayWithId,
@@ -1140,75 +1140,72 @@ interface PetitionVariableTypeRadioProps {
   onChange: (value: PetitionVariableType) => void;
 }
 
-const PetitionVariableTypeRadio = forwardRef<HTMLInputElement, PetitionVariableTypeRadioProps>(
-  function PetitionVariableTypeRadio({ value, onChange }, ref) {
-    const intl = useIntl();
-    const { getRootProps, getRadioProps } = useRadioGroup({
-      name: "type",
-      value,
-      defaultValue: "NUMBER",
-      onChange,
-    });
+function PetitionVariableTypeRadio({ value, onChange, ref }: PetitionVariableTypeRadioProps & RefAttributes<HTMLInputElement>) {
+  const intl = useIntl();
+  const { getRootProps, getRadioProps } = useRadioGroup({
+    name: "type",
+    value,
+    defaultValue: "NUMBER",
+    onChange,
+  });
 
-    const variableTypes = useMemo(
-      () =>
-        [
-          {
-            key: "NUMBER",
-            icon: <CalculatorIcon color="blue.800" boxSize={6} />,
-            background: "blue.100",
-            title: intl.formatMessage({
-              id: "component.create-or-update-petition-variable-dialog.variable-type-number",
-              defaultMessage: "Number",
-            }),
-            description: intl.formatMessage({
-              id: "component.create-or-update-petition-variable-dialog.variable-type-number-description",
+  const variableTypes = useMemo(
+    () =>
+      [
+        {
+          key: "NUMBER",
+          icon: <CalculatorIcon color="blue.800" boxSize={6} />,
+          background: "blue.100",
+          title: intl.formatMessage({
+            id: "component.create-or-update-petition-variable-dialog.variable-type-number",
+            defaultMessage: "Number",
+          }),
+          description: intl.formatMessage({
+            id: "component.create-or-update-petition-variable-dialog.variable-type-number-description",
 
-              defaultMessage:
-                "A number variable that can be used to do calculations and comparisons.",
-            }),
-          },
-          {
-            key: "ENUM",
-            icon: <ListIcon color="green.800" boxSize={6} />,
-            background: "green.100",
-            title: intl.formatMessage({
-              id: "component.create-or-update-petition-variable-dialog.variable-type-enum",
-              defaultMessage: "Options list",
-            }),
-            description: intl.formatMessage({
-              id: "component.create-or-update-petition-variable-dialog.variable-type-enum-description",
-              defaultMessage:
-                "A variable that can be used to select a value from a list of options.",
-            }),
-          },
-        ] as VariableTypeRadioElement[],
-      [intl.locale],
-    );
+            defaultMessage:
+              "A number variable that can be used to do calculations and comparisons.",
+          }),
+        },
+        {
+          key: "ENUM",
+          icon: <ListIcon color="green.800" boxSize={6} />,
+          background: "green.100",
+          title: intl.formatMessage({
+            id: "component.create-or-update-petition-variable-dialog.variable-type-enum",
+            defaultMessage: "Options list",
+          }),
+          description: intl.formatMessage({
+            id: "component.create-or-update-petition-variable-dialog.variable-type-enum-description",
+            defaultMessage: "A variable that can be used to select a value from a list of options.",
+          }),
+        },
+      ] as VariableTypeRadioElement[],
+    [intl.locale],
+  );
 
-    return (
-      <Stack {...getRootProps()}>
-        {variableTypes.map(({ key, icon, background, title, description }) => (
-          <PetitionVariableTypeRadioButton
-            key={key}
-            inputRef={key === value ? ref : undefined}
-            {...(getRadioProps({ value: key }) as RadioProps)}
-          >
-            <Center padding={2} borderRadius="md" backgroundColor={background}>
-              {icon}
-            </Center>
-            <Stack gap={0}>
-              <Text fontWeight="bold">{title}</Text>
-              <Text fontSize="sm" whiteSpace="break-spaces" fontWeight="normal">
-                {description}
-              </Text>
-            </Stack>
-          </PetitionVariableTypeRadioButton>
-        ))}
-      </Stack>
-    );
-  },
-);
+  return (
+    <Stack {...getRootProps()}>
+      {variableTypes.map(({ key, icon, background, title, description }) => (
+        <PetitionVariableTypeRadioButton
+          key={key}
+          inputRef={key === value ? ref : undefined}
+          {...(getRadioProps({ value: key }) as RadioProps)}
+        >
+          <Center padding={2} borderRadius="md" backgroundColor={background}>
+            {icon}
+          </Center>
+          <Stack gap={0}>
+            <Text fontWeight="bold">{title}</Text>
+            <Text fontSize="sm" whiteSpace="break-spaces" fontWeight="normal">
+              {description}
+            </Text>
+          </Stack>
+        </PetitionVariableTypeRadioButton>
+      ))}
+    </Stack>
+  );
+}
 
 interface PetitionVariableTypeRadioButtonProps extends RadioProps {
   inputRef?: Ref<HTMLInputElement>;

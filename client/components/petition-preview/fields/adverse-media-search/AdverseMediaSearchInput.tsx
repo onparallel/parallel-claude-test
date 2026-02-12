@@ -3,6 +3,7 @@ import { useApolloClient } from "@apollo/client/react";
 import { HStack } from "@chakra-ui/react";
 import { UserIcon } from "@parallel/chakra/icons";
 import { CloseButton } from "@parallel/components/common/CloseButton";
+import { Text } from "@parallel/components/ui";
 import {
   AdverseMediaSearchInput_adverseMediaEntitySuggestDocument,
   AdverseMediaSearchTermInput,
@@ -12,10 +13,9 @@ import { CustomAsyncCreatableSelectProps } from "@parallel/utils/react-select/ty
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import {
   ComponentType,
-  ForwardedRef,
   KeyboardEventHandler,
   MouseEvent,
-  forwardRef,
+  RefAttributes,
   useCallback,
   useState,
 } from "react";
@@ -23,7 +23,6 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { ActionMeta, GroupBase, MultiValue, MultiValueProps, SelectInstance } from "react-select";
 import AsyncCreatableSelect from "react-select/async-creatable";
 import { isNonNullish } from "remeda";
-import { Text } from "@parallel/components/ui";
 
 const MAX_TERMS_ALLOWED = 10;
 
@@ -82,10 +81,13 @@ const MultiValueComponent: ComponentType<MultiValueProps<Option, true, OptionGro
   );
 };
 
-export const AdverseMediaSearchInput = forwardRef(function AdverseMediaSearchInput(
-  { value, onChange, placeholder, ...props }: AdverseMediaSearchInputProps,
-  ref: ForwardedRef<AdverseMediaSearchInputInstance>,
-) {
+export function AdverseMediaSearchInput({
+  value,
+  onChange,
+  placeholder,
+  ref,
+  ...props
+}: AdverseMediaSearchInputProps & RefAttributes<AdverseMediaSearchInputInstance>) {
   const intl = useIntl();
   const apollo = useApolloClient();
   const [inputValue, setInputValue] = useState("");
@@ -200,7 +202,7 @@ export const AdverseMediaSearchInput = forwardRef(function AdverseMediaSearchInp
       {...reactSelectProps}
     />
   );
-});
+}
 
 const _mutations = [
   gql`

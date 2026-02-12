@@ -3,7 +3,7 @@ import { Circle } from "@chakra-ui/react";
 import { LinkIcon } from "@parallel/chakra/icons";
 import { ContactReference } from "@parallel/components/common/ContactReference";
 import { AccessActivatedFromLinkNotification_AccessActivatedFromPublicPetitionLinkUserNotificationFragment } from "@parallel/graphql/__types";
-import { forwardRef } from "react";
+import { RefAttributes } from "react";
 import { FormattedMessage } from "react-intl";
 import { PetitionUserNotification } from "./PetitionUserNotification";
 
@@ -12,10 +12,11 @@ interface AccessActivatedFromLinkNotificationProps {
   notification: AccessActivatedFromLinkNotification_AccessActivatedFromPublicPetitionLinkUserNotificationFragment;
 }
 
-export const AccessActivatedFromLinkNotification = forwardRef<
-  HTMLElement,
-  AccessActivatedFromLinkNotificationProps
->(function AccessActivatedFromLinkNotification({ isFirst, notification }, ref) {
+export function AccessActivatedFromLinkNotification({
+  isFirst,
+  notification,
+  ref,
+}: AccessActivatedFromLinkNotificationProps & RefAttributes<HTMLElement>) {
   return (
     <PetitionUserNotification
       ref={ref}
@@ -43,7 +44,7 @@ export const AccessActivatedFromLinkNotification = forwardRef<
       />
     </PetitionUserNotification>
   );
-});
+}
 
 const _fragments = {
   AccessActivatedFromPublicPetitionLinkUserNotification: gql`

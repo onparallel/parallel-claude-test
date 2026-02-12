@@ -5,7 +5,7 @@ import { ScrollShadows } from "@parallel/components/common/ScrollShadows";
 import { DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModuleFragment } from "@parallel/graphql/__types";
 import { removeTypenames } from "@parallel/utils/apollo/removeTypenames";
 import { buildPetitionsQueryStateUrl } from "@parallel/utils/petitionsQueryState";
-import { forwardRef, Fragment, useMemo } from "react";
+import { Fragment, RefAttributes, useMemo } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { isNonNullish, sumBy, zip } from "remeda";
 import { DashboardDoughnutChart } from "../../charts/DashboardDoughnutChart";
@@ -16,17 +16,17 @@ import { DashboardModuleCard } from "../../shared/DashboardModuleCard";
 import { DashboardModuleSpinner } from "../../shared/DashboardModuleSpinner";
 import { Text } from "@parallel/components/ui";
 
-export const DashboardPetitionsPieChartModule = forwardRef<
-  HTMLDivElement,
-  {
-    module: DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModuleFragment;
-    isEditing: boolean;
-    isDragging: boolean;
-    isReadOnly: boolean;
-    onEdit: () => void;
-    onDelete: () => void;
-  }
->(function DashboardPetitionsPieChartModule({ module, ...rest }, ref) {
+export function DashboardPetitionsPieChartModule({
+  module,
+  ...rest
+}: {
+  module: DashboardPetitionsPieChartModule_DashboardPetitionsPieChartModuleFragment;
+  isEditing: boolean;
+  isDragging: boolean;
+  isReadOnly: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+} & RefAttributes<HTMLDivElement>) {
   const intl = useIntl();
 
   const data = useMemo(
@@ -71,7 +71,6 @@ export const DashboardPetitionsPieChartModule = forwardRef<
 
   return (
     <DashboardModuleCard
-      ref={ref}
       module={module}
       headerAddon={
         module.petitionsPieChartResult?.isIncongruent ? (
@@ -175,7 +174,7 @@ export const DashboardPetitionsPieChartModule = forwardRef<
       )}
     </DashboardModuleCard>
   );
-});
+}
 
 const _fragments = {
   DashboardPetitionsPieChartModule: gql`
