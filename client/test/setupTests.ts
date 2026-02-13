@@ -1,32 +1,34 @@
-import "@testing-library/jest-dom";
+/// <reference types="vitest/globals" />
+import "@testing-library/jest-dom/vitest";
+import { vi } from "vitest";
 import { ReactNode, createElement } from "react";
 
 // Mock Next.js router
-jest.mock("next/router", () => ({
+vi.mock("next/router", () => ({
   useRouter() {
     return {
       route: "/",
       pathname: "/",
       query: {},
       asPath: "/",
-      push: jest.fn(),
-      pop: jest.fn(),
-      reload: jest.fn(),
-      back: jest.fn(),
-      prefetch: jest.fn().mockResolvedValue(undefined),
-      beforePopState: jest.fn(),
+      push: vi.fn(),
+      pop: vi.fn(),
+      reload: vi.fn(),
+      back: vi.fn(),
+      prefetch: vi.fn().mockResolvedValue(undefined),
+      beforePopState: vi.fn(),
       events: {
-        on: jest.fn(),
-        off: jest.fn(),
-        emit: jest.fn(),
+        on: vi.fn(),
+        off: vi.fn(),
+        emit: vi.fn(),
       },
     };
   },
 }));
 
 // Mock Next.js Link component
-jest.mock("next/link", () => {
-  return ({ children, href }: { children: ReactNode; href: string }) => {
+vi.mock("next/link", () => ({
+  default: ({ children, href }: { children: ReactNode; href: string }) => {
     return createElement("a", { href }, children);
-  };
-});
+  },
+}));
