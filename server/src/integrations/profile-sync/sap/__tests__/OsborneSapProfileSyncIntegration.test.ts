@@ -1,8 +1,7 @@
 import { Container } from "inversify";
 import { Knex } from "knex";
-import { createTestContainer } from "../../../../../test/testContainer";
-
 import { indexBy, omit, range } from "remeda";
+import { createTestContainer } from "../../../../../test/testContainer";
 import {
   Organization,
   ProfileRelationshipType,
@@ -119,9 +118,15 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
       for (const profileTypeId of [individual.id, legalEntity.id]) {
         await mocks.createProfileTypeFields(organization.id, profileTypeId, [
           {
-            name: { en: "Client partner", es: "Cliente" },
+            name: { en: "Client partner", es: "Socio Cliente" },
             alias: "client_partner",
             type: "USER_ASSIGNMENT",
+          },
+          {
+            name: { en: "Client partner (Text)", es: "Socio Cliente (Text)" },
+            alias: "client_partner_text",
+            type: "SHORT_TEXT",
+            options: { format: "EMAIL" },
           },
           {
             name: { en: "External ID", es: "ID externo" },
@@ -269,6 +274,12 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
           type: "USER_ASSIGNMENT",
         },
         {
+          name: { en: "Matter supervisor (Text)", es: "Supervisor del expediente (Text)" },
+          alias: "matter_supervisor_text",
+          type: "SHORT_TEXT",
+          options: { format: "EMAIL" },
+        },
+        {
           name: { en: "List of legal advice", es: "Lista de asesorías legales" },
           alias: "aml_subject_matters",
           type: "CHECKBOX",
@@ -376,6 +387,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
           clientStatus: individualFields["oc_client_status"].id,
           isNewClient: individualFields["is_new_client"].id,
           clientPartner: individualFields["client_partner"].id,
+          clientPartnerText: individualFields["client_partner_text"].id,
           externalId: individualFields["external_id"].id,
           relationship: individualFields["p_relationship"].id,
           nonFaceToFaceCustomer: individualFields["non_face_to_face_customer"].id,
@@ -400,6 +412,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
           email: legalEntityFields["email"].id,
           isNewClient: legalEntityFields["is_new_client"].id,
           clientPartner: legalEntityFields["client_partner"].id,
+          clientPartnerText: legalEntityFields["client_partner_text"].id,
           externalId: legalEntityFields["external_id"].id,
           entityType: legalEntityFields["p_entity_type"].id,
           relationship: legalEntityFields["p_relationship"].id,
@@ -421,6 +434,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
           subpracticeGroup: matterFields["subpractice_group"].id,
           projectId: matterFields["p_matter_id"].id,
           matterSupervisor: matterFields["matter_supervisor"].id,
+          matterSupervisorText: matterFields["matter_supervisor_text"].id,
           amlSubjectMatters: matterFields["aml_subject_matters"].id,
           transactionVolume: matterFields["transaction_volume"].id,
           countriesInvolved: matterFields["p_countries_involved"].id,
@@ -462,7 +476,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
         );
     }
 
-    it("initialSync", async () => {
+    it.only("initialSync", async () => {
       // These BP should not be edited, or the test may fail
       const customers = ["1505312", "1505315"];
 
@@ -525,6 +539,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
               p_email: "bla@bla.com",
               p_phone_number: "+34666666666",
               client_partner: users["javier.ares@osborneclarke.com"],
+              client_partner_text: "javier.ares@osborneclarke.com",
               non_face_to_face_customer: "NO",
               language: "ES",
             },
@@ -533,12 +548,17 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
             {
               profile_type_id: matter.id,
               values: {
+                aml_subject_matters: ["_001", "_003", "_005"],
+                matter_status: "_02",
+                matter_supervisor: users["javier.ares@osborneclarke.com"],
+                matter_supervisor_text: "javier.ares@osborneclarke.com",
+                p_countries_involved: ["AD", "AM", "BF", "CM"],
                 p_matter_description: "Descripción del expediente",
                 p_matter_name: "Prueba expediente Parallel",
                 practice_group: "_01",
                 p_matter_id: "4591",
                 subpractice_group: "_0103",
-                matter_supervisor: users["javier.ares@osborneclarke.com"],
+                temp_active_until: "2026-02-13",
               },
             },
           ],
@@ -548,6 +568,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
             profile_type_id: legalEntity.id,
             values: {
               client_partner: users["javier.ares@osborneclarke.com"],
+              client_partner_text: "javier.ares@osborneclarke.com",
               external_id: "1505315",
               is_new_client: "YES",
               oc_client_status: "_05",
@@ -561,6 +582,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
               non_face_to_face_customer: "NO",
               language: "CA",
               activity: "_02",
+              kyc_refresh_date: "2026-06-01",
             },
           },
           matters: [
@@ -574,12 +596,14 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
                 subpractice_group: "_0102",
                 transaction_volume: "_100K_500K",
                 p_countries_involved: ["ES", "AD"],
+                temp_active_until: "2026-01-14",
               },
             },
             {
               profile_type_id: matter.id,
               values: {
                 matter_supervisor: users["eduard.arruga@fakemail.com"],
+                matter_supervisor_text: "eduard.arruga@fakemail.com",
                 p_matter_description: "",
                 p_matter_name: "Prueba Parallel 08/01/2026",
                 practice_group: "_01",
@@ -591,14 +615,16 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
               profile_type_id: matter.id,
               values: {
                 aml_subject_matters: ["_001", "_002", "_003"],
-                p_countries_involved: ["ES"],
                 matter_status: "_01",
                 matter_supervisor: users["lluisglt@gmail.com"],
+                matter_supervisor_text: "lluisglt@gmail.com",
+                p_countries_involved: ["ES"],
                 p_matter_description: "Hola que tal!!!!!",
                 p_matter_name: "Prueba 19/1",
                 practice_group: "_10",
                 p_matter_id: "4641",
                 subpractice_group: "_1001",
+                temp_active_until: "2026-01-19",
                 transaction_volume: "_1M_20M",
               },
             },
