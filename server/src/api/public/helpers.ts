@@ -344,11 +344,9 @@ function mapPetitionReplies<T extends Pick<PetitionFragment, "replies">>(petitio
   };
 }
 
-function mapPetitionBase<T extends Pick<PetitionFragment, "fromTemplate" | "signatureConfig">>(
-  petition: T,
-) {
+function mapPetitionBase<T extends PetitionFragment>(petition: T) {
   return {
-    ...omit(petition, ["fromTemplate", "signatureConfig"]),
+    ...omit(petition, ["__typename", "fromTemplate", "signatureConfig"]),
     fromTemplateId: petition.fromTemplate?.id ?? null,
     signers: !petition.signatureConfig?.isEnabled
       ? undefined // signers not included in response
@@ -356,18 +354,7 @@ function mapPetitionBase<T extends Pick<PetitionFragment, "fromTemplate" | "sign
   };
 }
 
-export function mapPetition<
-  T extends Pick<
-    PetitionFragment,
-    | "fromTemplate"
-    | "tags"
-    | "fields"
-    | "replies"
-    | "signatureConfig"
-    | "signatures"
-    | "isAnonymized"
-  >,
->(petition: T) {
+export function mapPetition<T extends PetitionFragment>(petition: T) {
   return pipe(
     petition,
     mapPetitionBase,
@@ -378,8 +365,8 @@ export function mapPetition<
   );
 }
 
-export function mapTemplate<T extends Pick<TemplateFragment, "tags" | "fields">>(petition: T) {
-  return pipe(petition, mapTemplateFields, mapPetitionTags);
+export function mapTemplate<T extends TemplateFragment>(petition: T) {
+  return pipe(petition, omit(["__typename"]), mapTemplateFields, mapPetitionTags);
 }
 
 function mapPetitionSignatures<T extends Pick<PetitionFragment, "signatures">>(petition: T) {

@@ -154,6 +154,7 @@ export const PetitionSignatureRequestFragment = gql`
 
 export const PetitionFragment = gql`
   fragment Petition on Petition {
+    __typename
     id
     path
     name
@@ -242,6 +243,7 @@ export const PetitionFragment = gql`
 
 export const TemplateFragment = gql`
   fragment Template on PetitionTemplate {
+    __typename
     id
     path
     name
