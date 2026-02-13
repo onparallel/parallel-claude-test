@@ -27,7 +27,6 @@ export const Button = chakraComponent<"button", ExtendedButtonProps>(function Bu
       colorScheme={colorPalette}
       isDisabled={disabled}
       isLoading={loading}
-      data-active={dataActive === "true" ? true : dataActive === "false" ? false : dataActive}
       isActive={dataActive === "true" ? true : dataActive === "false" ? false : dataActive}
       cursor="pointer" // Ensure pointer cursor for v3
       {...props}

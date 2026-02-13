@@ -617,7 +617,7 @@ function SectionsAndProfilesList({
 
   return (
     <>
-      <List gap={2}>
+      <List spacing={2}>
         {items.map(({ section, href, isActive, icon, text, warning, onClick }) => (
           <ListItem key={section}>
             <Wrap
@@ -718,7 +718,7 @@ function SectionsAndProfilesList({
             ) : null}
           </HStack>
           {me.hasProfilesAccess ? (
-            <List gap={2}>
+            <List spacing={2}>
               {me.pinnedProfileTypes.length ? (
                 me.pinnedProfileTypes.map((profileType) => {
                   const icon = getProfileTypeIcon(profileType.icon);
@@ -748,7 +748,7 @@ function SectionsAndProfilesList({
               )}
             </List>
           ) : (
-            <List gap={2}>
+            <List spacing={2}>
               <ListItem>
                 <NavBarButton
                   as="a"
@@ -1019,7 +1019,7 @@ function NotificationsSection({ onHelpCenterClick, ...rest }: NotificationsSecti
   const intl = useIntl();
   return (
     <Stack {...rest}>
-      <List gap={2}>
+      <List spacing={2}>
         <ListItem>
           <NotificationsButton extended />
         </ListItem>

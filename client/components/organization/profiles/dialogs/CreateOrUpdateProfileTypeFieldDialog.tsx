@@ -873,7 +873,7 @@ function ProfilesWithSameContentDialog({
               <Spinner />
             </Center>
           ) : (
-            <List gap={2}>
+            <List spacing={2}>
               {data!.profilesWithSameContent.map((item, i) => (
                 <ListItem key={i}>
                   <List listStyleType="disc" paddingInlineStart={5}>

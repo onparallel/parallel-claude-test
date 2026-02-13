@@ -140,7 +140,7 @@ export function AvatarGroupWrapper({
   ref,
   ...props
 }: AvatarGroupWrapperProps & RefAttributes<HTMLDivElement>) {
-  return <AvatarGroup ref={ref} gap={spaceX || gap} {...props} />;
+  return <AvatarGroup ref={ref} spacing={spaceX || gap} {...props} />;
 }
 
 // Namespace for using as Avatar.XXX (without Group)
