@@ -72,7 +72,7 @@ function extractFieldIds<T extends { [key: string]: string }>(
 
 async function main() {
   const opts = await yargs
-    .usage("Usage: $0 --orgId [orgId]")
+    .usage('Usage: NODE_ENV=production ENV=staging OSBORNE_CREDENTIALS="x:x" $0 --orgId [orgId]')
     .option("orgId", {
       required: true,
       type: "number",
@@ -299,7 +299,7 @@ async function main() {
     },
   };
 
-  console.log(settings);
+  console.log(JSON.stringify(settings));
 }
 
 main().then(() => {
