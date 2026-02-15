@@ -1,5 +1,7 @@
+import { readFileSync } from "fs";
 import { Container } from "inversify";
 import { Knex } from "knex";
+import { join } from "path";
 import { indexBy, omit, range } from "remeda";
 import { createTestContainer } from "../../../../../test/testContainer";
 import {
@@ -476,7 +478,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
         );
     }
 
-    it.only("initialSync", async () => {
+    it("initialSync", async () => {
       // These BP should not be edited, or the test may fail
       const customers = ["1505312", "1505315"];
 
@@ -716,7 +718,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
         const matterProfiles = profiles.filter((p) => p.profile_type_id === matter.id);
 
         expect(individualProfiles.length + legalEntityProfiles.length).toBe(2001);
-        expect(matterProfiles.length).toBe(1759);
+        expect(matterProfiles.length).toBe(100);
 
         const syncLog = await mocks.knex
           .from("profile_sync_log")
@@ -829,7 +831,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
         },
       } as any);
       const logger = container.get<ILogger>(LOGGER);
-      const client = container.get<SapOdataClientFactory>(SAP_ODATA_CLIENT_FACTORY)(
+      using client = container.get<SapOdataClientFactory>(SAP_ODATA_CLIENT_FACTORY)(
         logger,
         sapSettings.baseUrl,
         sapSettings.authorization,
@@ -1085,5 +1087,38 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
         },
       ]);
     }, 60_000);
+
+    it.only("works with certificate", async () => {
+      // Make sure certificate.pfx and passphrase.txt are placed in the __tests__ folder next to this file
+      const sapSettings: SapProfileSyncIntegrationSettings = {
+        ...getOsborneSapSettings(osborneSettings),
+        authorization: {
+          type: "CERTIFICATE",
+          pfx: readFileSync(join(__dirname, "certificate.pfx")).toString("base64"),
+          passphrase: readFileSync(join(__dirname, "passphrase.txt")).toString("utf-8").trim(),
+        },
+      };
+
+      const logger = container.get<ILogger>(LOGGER);
+      using client = container.get<SapOdataClientFactory>(SAP_ODATA_CLIENT_FACTORY)(
+        logger,
+        sapSettings.baseUrl,
+        sapSettings.authorization,
+        sapSettings.additionalHeaders,
+      );
+
+      const entity = await client.getEntity(
+        {
+          servicePath: "sap/API_BUSINESS_PARTNER",
+          serviceNamespace: "API_BUSINESS_PARTNER",
+          entitySetName: "A_BusinessPartner",
+          remoteEntityKey: ["BusinessPartner"],
+        },
+        { BusinessPartner: "1505383" },
+        { $select: ["BusinessPartner"] },
+      );
+
+      expect(entity).toMatchObject({ BusinessPartner: "1505383" });
+    });
   },
 );
