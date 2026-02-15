@@ -9,7 +9,7 @@ Incrementally update dependencies in this Yarn v1 monorepo. The goal is to keep 
 
 ## Philosophy
 
-- **Incremental**: Update one dependency or a small related group at a time, never all at once.
+- **Incremental**: Update one dependency or a small related group at a time, never all at once. Prefer thematic batches (e.g., all AWS SDK packages, all Storybook-related packages, all Babel packages). For non-thematic updates, keep to a maximum of 3–4 packages (5 absolute max) per PR.
 - **Safe first**: Prefer patch and minor bumps. Avoid major version bumps unless explicitly requested.
 - **Verify after each change**: Run `yarn check-types` in the affected workspace(s) after every update.
 - **No unnecessary resolutions**: Avoid adding `resolutions` to `package.json` unless absolutely necessary (they are hard to maintain and can mask real issues).
@@ -105,6 +105,10 @@ Changing a version range back in `package.json` does NOT downgrade in the lockfi
 The project uses `patch-package`. Before updating any of these, verify the patch still applies:
 
 `@apollo/client`, `body-parser`, `eslint-plugin-formatjs`, `ip-location-api`, `knex`, `mjml-core`, `postgres-interval`
+
+### @types/* packages must match their parent
+
+Only update a `@types/xx` package to the latest version if the corresponding `xx` package is also being updated to its latest version. Bumping a type package ahead of its runtime counterpart can introduce type mismatches and subtle breakage.
 
 ### ESM-only exclusions
 
