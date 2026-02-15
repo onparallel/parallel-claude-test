@@ -30,14 +30,14 @@ grep -E '^"?[a-z@]' yarn.lock | sed 's/"//g' | sed 's/,.*$//' | sed 's/@[^@]*$//
 
 Categorize by risk:
 
-| Risk | Type | Examples |
-|------|------|---------|
-| **Low** | `@types/*` patch bumps | `@types/node` 22.5.0 -> 22.5.1 |
-| **Low** | Patch bumps of stable libs | `storybook` 10.2.3 -> 10.2.8 |
-| **Medium** | Minor bumps | `winston` 3.14.2 -> 3.19.0 |
-| **Medium** | Babel ecosystem bumps | `@babel/core` 7.25.x -> 7.29.x |
-| **High** | Major bumps | `react-hook-form` 7.x -> 8.x |
-| **High** | ESM-only migrations | `chalk`, `p-map`, etc. (excluded in `ncux`) |
+| Risk       | Type                       | Examples                                    |
+| ---------- | -------------------------- | ------------------------------------------- |
+| **Low**    | `@types/*` patch bumps     | `@types/node` 22.5.0 -> 22.5.1              |
+| **Low**    | Patch bumps of stable libs | `storybook` 10.2.3 -> 10.2.8                |
+| **Medium** | Minor bumps                | `winston` 3.14.2 -> 3.19.0                  |
+| **Medium** | Babel ecosystem bumps      | `@babel/core` 7.25.x -> 7.29.x              |
+| **High**   | Major bumps                | `react-hook-form` 7.x -> 8.x                |
+| **High**   | ESM-only migrations        | `chalk`, `p-map`, etc. (excluded in `ncux`) |
 
 Optionally, check if updating a package would reduce lockfile duplications:
 
@@ -52,6 +52,7 @@ Prioritize updates that align versions across workspaces or reduce transitive du
 Before applying any update, run `check-types` on the workspace(s) you are about to touch. This tells you which errors already exist vs which ones your change introduces.
 
 **Scope rule:**
+
 - Updating a dependency in **one workspace** (client, server, bin, e2e): check only that workspace.
 - Updating the **root `package.json`** (resolutions, shared devDependencies): check **all 4 workspaces**, since root changes can affect any of them.
 
@@ -79,7 +80,31 @@ SKIP_UPDATE_IP_DB=1 yarn install
 yarn workspace @parallel/server run check-types
 ```
 
-### Step 5: Handle type errors
+### Step 5: Verify yarn.lock
+
+After `yarn install`, check that the lockfile hasn't grown unexpectedly. Yarn v1 frequently introduces duplicate resolutions when transitive dependencies declare slightly different semver ranges for the same internal package (common with AWS SDK, Babel, etc.).
+
+```bash
+# Compare lockfile line count against develop
+echo "develop: $(git show develop:yarn.lock | wc -l) lines"
+echo "current: $(wc -l < yarn.lock) lines"
+
+# Check for new duplications in the updated scope
+npx yarn-deduplicate --list --scopes @aws-sdk   # adjust scope to match the batch
+```
+
+**If new duplications are found**, deduplicate before proceeding:
+
+```bash
+npx yarn-deduplicate --scopes <scope>
+SKIP_UPDATE_IP_DB=1 yarn install
+```
+
+Then re-run `check-types` on the affected workspaces to confirm nothing broke.
+
+**If deduplication doesn't resolve the growth** (i.e., there are genuinely new transitive packages that can't be collapsed), verify the increase is explainable (e.g., a new sub-package was added upstream). Unexplained lockfile growth is a reason to abort the update.
+
+### Step 6: Handle type errors
 
 If `check-types` shows **new** errors (not in the baseline):
 
@@ -97,6 +122,7 @@ yarn prettier --write <file>
 ### Yarn v1 lockfile and downgrades
 
 Changing a version range back in `package.json` does NOT downgrade in the lockfile if the currently locked version still satisfies the range. To truly downgrade:
+
 - Edit `yarn.lock` directly to set the old resolved version and integrity hash, or
 - Run `yarn workspace <workspace> add <package>@<exact-old-version>`, then restore the caret range in `package.json`.
 
@@ -106,7 +132,7 @@ The project uses `patch-package`. Before updating any of these, verify the patch
 
 `@apollo/client`, `body-parser`, `eslint-plugin-formatjs`, `ip-location-api`, `knex`, `mjml-core`, `postgres-interval`
 
-### @types/* packages must match their parent
+### @types/\* packages must match their parent
 
 Only update a `@types/xx` package to the latest version if the corresponding `xx` package is also being updated to its latest version. Bumping a type package ahead of its runtime counterpart can introduce type mismatches and subtle breakage.
 
