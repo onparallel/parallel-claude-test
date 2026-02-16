@@ -13,6 +13,7 @@ Incrementally update dependencies in this Yarn v1 monorepo. The goal is to keep 
 - **Safe first**: Prefer patch and minor bumps. Avoid major version bumps unless explicitly requested.
 - **Verify after each change**: Run `yarn check-types` in the affected workspace(s) after every update.
 - **No unnecessary resolutions**: Avoid adding `resolutions` to `package.json` unless absolutely necessary (they are hard to maintain and can mask real issues).
+- **Yarn only**: This is a Yarn v1 monorepo. Always use `yarn` commands — never use `npm` for installing or managing dependencies.
 
 ## Process
 
@@ -134,7 +135,7 @@ The project uses `patch-package`. Before updating any of these, verify the patch
 
 ### @types/\* packages must match their parent
 
-Only update a `@types/xx` package to the latest version if the corresponding `xx` package is also being updated to its latest version. Bumping a type package ahead of its runtime counterpart can introduce type mismatches and subtle breakage.
+Only update a `@types/xx` package to the latest version if the corresponding `xx` package is at its latest version. Bumping a type package ahead of its runtime counterpart can introduce type mismatches and subtle breakage.
 
 ### ESM-only exclusions
 
