@@ -1,5 +1,4 @@
 import { inject, injectable } from "inversify";
-import { isNonNullish } from "remeda";
 import { IntegrationRepository } from "../db/repositories/IntegrationRepository";
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import {
@@ -9,28 +8,6 @@ import {
 import { LOGGER_FACTORY, LoggerFactory } from "../services/Logger";
 import { IRedis, REDIS } from "../services/Redis";
 import { createCronWorker, CronWorker } from "./helpers/createCronWorker";
-
-async function withRedisLock(
-  client: IRedis,
-): Promise<AsyncDisposable & { alreadyLocked: boolean }> {
-  const redisLockKey = `sap-profile-polling:lock`;
-  const lock = await client.get(redisLockKey);
-  const alreadyLocked = isNonNullish(lock);
-
-  if (!alreadyLocked) {
-    await client.set(redisLockKey, "true", 60 * 60); // 1 hour lock
-  }
-
-  return {
-    alreadyLocked,
-    [Symbol.asyncDispose]: async () => {
-      // Only delete the lock if we actually acquired it
-      if (!alreadyLocked) {
-        await client.delete(redisLockKey);
-      }
-    },
-  };
-}
 
 @injectable()
 export class SapProfilePollingCronWorker extends CronWorker<"sap-profile-polling"> {
@@ -46,16 +23,6 @@ export class SapProfilePollingCronWorker extends CronWorker<"sap-profile-polling
   }
 
   async handler() {
-    await using _ = await this.redis.withConnection();
-
-    // use a lock to make sure this job does not run concurrently
-    // this lock will be released automatically when the job finishes, or after 1 hour if it is not released for any reason
-    await using lock = await withRedisLock(this.redis);
-    if (lock.alreadyLocked) {
-      // if the cron is triggered again while the job is running (lock is already set), it will early return here
-      return;
-    }
-
     const organizations = await this.organizations.getOrganizationsWithFeatureFlag([
       "PROFILES",
       "PROFILE_SYNC",
@@ -68,6 +35,15 @@ export class SapProfilePollingCronWorker extends CronWorker<"sap-profile-polling
     ).flat();
 
     for (const integration of orgIntegrations) {
+      // use a lock to make sure this job does not run concurrently
+      await using lock = await this.redis.withLock({
+        key: `sap-profile-sync:${integration.id}`,
+        maxTime: 60 * 60,
+      });
+      if (lock.alreadyLocked) {
+        // either previous cron still running or full sync in progress
+        continue;
+      }
       const logger = this.loggerFactory(`SapProfilePolling:${integration.id}`);
       const syncLogs = await this.integrations.loadProfileSyncLogByIntegrationId(integration.id);
 

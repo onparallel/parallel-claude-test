@@ -9,6 +9,7 @@ import {
   SapProfileSyncIntegrationFactory,
 } from "../../../integrations/profile-sync/sap/SapProfileSyncIntegration";
 import { ILogger, LOGGER } from "../../../services/Logger";
+import { IRedis, REDIS } from "../../../services/Redis";
 import { IStorageService, STORAGE_SERVICE } from "../../../services/StorageService";
 import { TaskRunner } from "../../helpers/TaskRunner";
 
@@ -18,6 +19,7 @@ export class ProfileSyncRunner extends TaskRunner<"PROFILE_SYNC"> {
     @inject(SAP_PROFILE_SYNC_INTEGRATION_FACTORY)
     private sapProfileSyncIntegrationFactory: SapProfileSyncIntegrationFactory,
     @inject(IntegrationRepository) private integrations: IntegrationRepository,
+    @inject(REDIS) private redis: IRedis,
     // ---- EXTENDS ---- //
     @inject(LOGGER) logger: ILogger,
     @inject(CONFIG) config: Config,
@@ -35,6 +37,13 @@ export class ProfileSyncRunner extends TaskRunner<"PROFILE_SYNC"> {
 
       switch (type) {
         case "INITIAL":
+          await using lock = await this.redis.withLock({
+            key: `sap-profile-sync:${integrationId}`,
+            maxTime: 60 * 60,
+          });
+          if (lock.alreadyLocked) {
+            return { success: false, error: { message: "Sync already in progress" } };
+          }
           await integration.initialSync();
           break;
         default:

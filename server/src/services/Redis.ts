@@ -34,6 +34,18 @@ export interface IRedis {
    * @param keys The keys to delete
    */
   delete(...keys: string[]): Promise<number>;
+
+  /**
+   * Acquire a lock with the specified key. If the lock is already held, returns `{ alreadyLocked: true }`.
+   * The lock is released automatically when the returned disposable is disposed, or after `maxTime` seconds.
+   */
+  withLock(options: WithLockOptions): Promise<AsyncDisposable & { alreadyLocked: boolean }>;
+}
+
+export interface WithLockOptions {
+  key: string;
+  /** Maximum lock duration in seconds */
+  maxTime: number;
 }
 
 export const REDIS = Symbol.for("REDIS");
@@ -63,6 +75,9 @@ export class Redis implements IRedis {
     await this.client.disconnect();
   }
 
+  /**
+   * @deprecated
+   */
   async withConnection(): Promise<AsyncDisposable> {
     if (this.client.isOpen) {
       return {
@@ -91,5 +106,19 @@ export class Redis implements IRedis {
 
   async delete(...keys: string[]): Promise<number> {
     return await this.client.del(keys);
+  }
+
+  async withLock({ key, maxTime }: WithLockOptions) {
+    const acquired = await this.client.set(`lock:${key}`, "true", { EX: maxTime, NX: true });
+    const alreadyLocked = acquired === null;
+
+    return {
+      alreadyLocked,
+      [Symbol.asyncDispose]: async () => {
+        if (!alreadyLocked) {
+          await this.delete(key);
+        }
+      },
+    };
   }
 }
