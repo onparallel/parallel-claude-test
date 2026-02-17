@@ -64,6 +64,7 @@ import {
   SapEntitySetFilterRootExpression,
   SapEntitySetOrderBy,
   SapFieldTransform,
+  SapLocalIdBinding,
 } from "./types";
 
 export interface ToLocalProfileData {
@@ -151,39 +152,82 @@ export class SapProfileSyncIntegration extends GenericIntegration<
 
       for (const mapping of pollingMappings) {
         const index = pollingMappings.indexOf(mapping);
-        const results = await pMap(
-          await this.fetchEntitySet(
-            client,
-            mapping,
-            {
-              operator: "and",
-              conditions: [
-                ...(isNonNullish(mapping.filter) ? [mapping.filter] : []),
-                buildPollingLastChangeFilter(
-                  mapping.changeDetection.remoteLastChange,
-                  changedAfter,
-                ),
-              ],
-            },
-            buildPollingLastChangeOrderBy(mapping.changeDetection.remoteLastChange),
-            context,
-          ),
+        const entities = await this.fetchEntitySet(
+          client,
+          mapping,
+          {
+            operator: "and",
+            conditions: [
+              ...(isNonNullish(mapping.filter) ? [mapping.filter] : []),
+              buildPollingLastChangeFilter(mapping.changeDetection.remoteLastChange, changedAfter),
+            ],
+          },
+          buildPollingLastChangeOrderBy(mapping.changeDetection.remoteLastChange),
+          context,
+        );
+        const profileData = await pMap(
+          entities,
           async (item) => await this.buildProfileData(item, mapping, context),
           { concurrency: 100 },
         );
 
-        await context.onSyncDataFetched(results, index);
+        await context.onSyncDataFetched(profileData, index);
 
         if (this.output === "DATABASE") {
+          const dbContext = outputContext as OutputContext<"DATABASE">;
           await this.profileSyncService.writeIntoDatabase(
-            results,
+            profileData,
             context.orgId,
             this.integrationId,
-            outputContext as OutputContext<"DATABASE">,
+            dbContext,
           );
+
+          if (isNonNullish(mapping.localIdBinding)) {
+            const profiles = profileData.map((d) => {
+              const profile = dbContext.alreadySyncedProfiles.find((p) =>
+                isDeepEqual(p.matchBy, d.matchBy),
+              );
+              assert(isNonNullish(profile), "Profile must be found by matchBy");
+              return pick(profile, ["id"]);
+            });
+
+            await pMap(
+              zip(entities, profiles),
+              async ([entity, profile], i) => {
+                const remoteLocalIdValues = await this.applyFieldTransforms(
+                  [toGlobalId("Profile", profile.id)],
+                  mapping.localIdBinding!.toRemoteTransforms,
+                );
+                const currentRemoteLocalIdValues = mapping.localIdBinding!.remoteEntityFields.map(
+                  (f) => entity[f],
+                );
+
+                // Skip update if the remote entity already has the correct local ID
+                // to avoid an infinite polling loop (PATCH updates lastChanged, triggering another poll)
+                if (isDeepEqual(currentRemoteLocalIdValues, remoteLocalIdValues)) {
+                  return;
+                }
+
+                const key = fromEntries(
+                  mapping.entityDefinition.remoteEntityKey
+                    .map((k) => (typeof k === "string" ? k : k.name))
+                    .map((k) => [k, entity[k]]),
+                );
+                if (i % 100 === 0) {
+                  this.logger.info(`Updating local ID binding ${i}/${entities.length}`);
+                }
+                await client.updateEntity(
+                  mapping.entityDefinition,
+                  key,
+                  fromEntries(zip(mapping.localIdBinding!.remoteEntityFields, remoteLocalIdValues)),
+                );
+              },
+              { concurrency: 10 },
+            );
+          }
         } else if (this.output === "EXCEL") {
           await this.profileSyncService.writeIntoExcelFile(
-            results,
+            profileData,
             context.orgId,
             outputContext as OutputContext<"EXCEL">,
           );
@@ -244,6 +288,19 @@ export class SapProfileSyncIntegration extends GenericIntegration<
             await pMap(
               zip(entities, profiles),
               async ([entity, profile], i) => {
+                const remoteLocalIdValues = await this.applyFieldTransforms(
+                  [toGlobalId("Profile", profile.id)],
+                  mapping.localIdBinding!.toRemoteTransforms,
+                );
+                const currentRemoteLocalIdValues = mapping.localIdBinding!.remoteEntityFields.map(
+                  (f) => entity[f],
+                );
+
+                // Skip update if the remote entity already has the correct local ID
+                if (isDeepEqual(currentRemoteLocalIdValues, remoteLocalIdValues)) {
+                  return;
+                }
+
                 const key = fromEntries(
                   mapping.entityDefinition.remoteEntityKey
                     .map((k) => (typeof k === "string" ? k : k.name))
@@ -255,15 +312,7 @@ export class SapProfileSyncIntegration extends GenericIntegration<
                 await client.updateEntity(
                   mapping.entityDefinition,
                   key,
-                  fromEntries(
-                    zip(
-                      mapping.localIdBinding!.remoteEntityFields,
-                      await this.applyFieldTransforms(
-                        [toGlobalId("Profile", profile.id)],
-                        mapping.localIdBinding!.toRemoteTransforms,
-                      ),
-                    ),
-                  ),
+                  fromEntries(zip(mapping.localIdBinding!.remoteEntityFields, remoteLocalIdValues)),
                 );
               },
               { concurrency: 10 },
@@ -602,12 +651,12 @@ export class SapProfileSyncIntegration extends GenericIntegration<
     context: SapProfileSyncIntegrationContext,
   ) {
     const entity = await client.getEntity(mapping.entityDefinition, key, {
-      ...this.buildEntitySelectAndExpandParams(
-        mapping.entityDefinition,
-        mapping.fieldMappings,
-        mapping.relationshipMappings,
+      ...this.buildEntitySelectAndExpandParams({
+        entityDefinition: mapping.entityDefinition,
+        fieldMappings: mapping.fieldMappings,
+        relationshipMappings: mapping.relationshipMappings,
         context,
-      ),
+      }),
     });
 
     if (!entity) {
@@ -639,12 +688,15 @@ export class SapProfileSyncIntegration extends GenericIntegration<
     const { results: items } = await client.getEntitySet(mapping.entityDefinition, {
       $filter: filter,
       $orderby: orderBy,
-      ...this.buildEntitySelectAndExpandParams(
-        mapping.entityDefinition,
-        mapping.fieldMappings,
-        mapping.relationshipMappings,
+      ...this.buildEntitySelectAndExpandParams({
+        ...pick(mapping, [
+          "entityDefinition",
+          "fieldMappings",
+          "relationshipMappings",
+          "localIdBinding",
+        ]),
         context,
-      ),
+      }),
     });
     await pMap(
       items,
@@ -948,20 +1000,17 @@ export class SapProfileSyncIntegration extends GenericIntegration<
         }
       } else if (fetchStrategy.type === "FROM_ENTITY_SET") {
         const { filter, orderBy, filterParams } = fetchStrategy;
-        const { fieldMappings, relationshipMappings } =
-          this.getFieldAndRelationshipMappingsFromRelationshipMapping(syncStrategy, context);
         relationshipEntityDefinition = fetchStrategy.entityDefinition;
         relationshipData = await client.getEntitySet(relationshipEntityDefinition, {
           $filter: isNonNullish(filter)
             ? await this.replaceParamsInFilter(filter, filterParams, entity)
             : undefined,
           $orderby: orderBy,
-          ...this.buildEntitySelectAndExpandParams(
-            relationshipEntityDefinition,
-            fieldMappings,
-            relationshipMappings,
+          ...this.buildEntitySelectAndExpandParams({
+            entityDefinition: relationshipEntityDefinition,
+            ...this.getRelationshipMappings(syncStrategy, context),
             context,
-          ),
+          }),
         });
       } else if (fetchStrategy.type === "FROM_ENTITY") {
         const entityKey = await pObject(
@@ -980,27 +1029,20 @@ export class SapProfileSyncIntegration extends GenericIntegration<
         if (Object.values(entityKey).some(isNullish)) {
           return [];
         }
-
-        const { fieldMappings, relationshipMappings } =
-          this.getFieldAndRelationshipMappingsFromRelationshipMapping(syncStrategy, context);
         relationshipEntityDefinition = fetchStrategy.entityDefinition;
         relationshipData = await client.getEntity(relationshipEntityDefinition, entityKey, {
-          ...this.buildEntitySelectAndExpandParams(
-            relationshipEntityDefinition,
-            fieldMappings,
-            relationshipMappings,
+          ...this.buildEntitySelectAndExpandParams({
+            entityDefinition: relationshipEntityDefinition,
+            ...this.getRelationshipMappings(syncStrategy, context),
             context,
-          ),
+          }),
         });
       } else {
         never("Unimplemented fetch strategy");
       }
       const items = this.getRelationshipItems(fetchStrategy, relationshipData);
       // check nested relationship mappings
-      const { relationshipMappings } = this.getFieldAndRelationshipMappingsFromRelationshipMapping(
-        syncStrategy,
-        context,
-      );
+      const { relationshipMappings } = this.getRelationshipMappings(syncStrategy, context);
       await pMap(items, async (item) => {
         await this.rehydrateDeferredRelationships(
           client,
@@ -1020,16 +1062,28 @@ export class SapProfileSyncIntegration extends GenericIntegration<
    * Builds the $select and $expand params for the SAP OData request in order to eagerly fetch as much data as possible.
    * Anything that is not fetched eagerly will be fetched later with the rehydrateDeferredRelationships method.
    */
-  private buildEntitySelectAndExpandParams(
-    entityDefinition: SapEntityDefinition,
-    fieldMappings: SapEntityFieldMapping[] | undefined,
-    relationshipMappings: SapEntityRelationshipMapping[] | undefined,
-    context: SapProfileSyncIntegrationContext,
-  ) {
+  private buildEntitySelectAndExpandParams({
+    entityDefinition,
+    fieldMappings,
+    localIdBinding,
+    relationshipMappings,
+    context,
+  }: {
+    entityDefinition: SapEntityDefinition;
+    fieldMappings?: SapEntityFieldMapping[];
+    localIdBinding?: SapLocalIdBinding;
+    relationshipMappings?: SapEntityRelationshipMapping[];
+    context: SapProfileSyncIntegrationContext;
+  }) {
     const select = new Set<string>();
     const expand = new Set<string>();
     for (const field of entityDefinition.remoteEntityKey) {
       select.add(typeof field === "string" ? field : field.name);
+    }
+    if (isNonNullish(localIdBinding)) {
+      for (const field of localIdBinding.remoteEntityFields) {
+        select.add(field);
+      }
     }
     for (const fieldMapping of fieldMappings ?? []) {
       if (fieldMapping.direction === "TO_LOCAL" || fieldMapping.direction === "BOTH") {
@@ -1111,14 +1165,21 @@ export class SapProfileSyncIntegration extends GenericIntegration<
       select.add(`${prefix}${typeof field === "string" ? field : field.name}`);
     }
 
-    const { fieldMappings, relationshipMappings } =
-      this.getFieldAndRelationshipMappingsFromRelationshipMapping(syncStrategy, context);
+    const { fieldMappings, relationshipMappings, localIdBinding } = this.getRelationshipMappings(
+      syncStrategy,
+      context,
+    );
 
     for (const fieldMapping of fieldMappings ?? []) {
       if (fieldMapping.direction === "TO_LOCAL" || fieldMapping.direction === "BOTH") {
         for (const field of fieldMapping.remoteEntityFields) {
           select.add(`${prefix}${field}`);
         }
+      }
+    }
+    if (isNonNullish(localIdBinding)) {
+      for (const field of localIdBinding.remoteEntityFields) {
+        select.add(`${prefix}${field}`);
       }
     }
     for (const childRelationshipMapping of relationshipMappings ?? []) {
@@ -1137,23 +1198,22 @@ export class SapProfileSyncIntegration extends GenericIntegration<
     }
   }
 
-  private getFieldAndRelationshipMappingsFromRelationshipMapping(
+  private getRelationshipMappings(
     syncStrategy: SapEntityRelationshipSyncStrategy,
     context: SapProfileSyncIntegrationContext,
-  ) {
-    let fieldMappings: SapEntityFieldMapping[] | undefined;
-    let relationshipMappings: SapEntityRelationshipMapping[] | undefined;
+  ): {
+    fieldMappings?: SapEntityFieldMapping[];
+    relationshipMappings?: SapEntityRelationshipMapping[];
+    localIdBinding?: SapLocalIdBinding;
+  } {
     if (syncStrategy.type === "EMBED_INTO_PARENT") {
-      fieldMappings = syncStrategy.fieldMappings;
-      relationshipMappings = syncStrategy.relationshipMappings;
+      return pick(syncStrategy, ["fieldMappings", "relationshipMappings"]);
     } else if (syncStrategy.type === "REPLICATE_RELATIONSHIP") {
       const mapping = context.mappings[syncStrategy.entityMappingIndex];
-      fieldMappings = mapping.fieldMappings;
-      relationshipMappings = mapping.relationshipMappings;
+      return pick(mapping, ["fieldMappings", "relationshipMappings", "localIdBinding"]);
     } else {
       never("Unimplemented sync strategy");
     }
-    return { fieldMappings, relationshipMappings };
   }
 
   private getRelationshipItems(

@@ -30,7 +30,7 @@ import {
   PROFILE_SYNC_LISTENER,
   ProfileSyncListener,
 } from "../../../../workers/queues/event-listeners/ProfileSyncListener";
-import { dateToSapDatetime } from "../helpers";
+import { buildPollingLastChangeFilter, dateToSapDatetime } from "../helpers";
 import { getOsborneSapSettings } from "../osborne";
 import {
   ISapOdataClient,
@@ -43,7 +43,11 @@ import {
   SAP_PROFILE_SYNC_INTEGRATION_FACTORY,
   SapProfileSyncIntegrationFactory,
 } from "../SapProfileSyncIntegration";
-import { SapEntitySetFilter, SapProfileSyncIntegrationSettings } from "../types";
+import {
+  SapEntitySetFilter,
+  SapPollingChangeDetectionStrategy,
+  SapProfileSyncIntegrationSettings,
+} from "../types";
 import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from "./utils";
 
 // these tests are meant to be run manually and not by the CI as they depend on real external SAP data
@@ -1088,7 +1092,147 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
       ]);
     }, 60_000);
 
-    it.only("works with certificate", async () => {
+    it.only("polling with localIdBinding writes IDs and stabilizes", async () => {
+      const customer = "1505315";
+      const sapSettings = getOsborneSapSettings({
+        ...osborneSettings,
+        businessPartnerFilter: {
+          left: { type: "property", name: "BusinessPartner" },
+          operator: "eq",
+          right: { type: "literal", value: `'${customer}'` },
+        },
+        projectFilter: {
+          left: { type: "property", name: "Customer" },
+          operator: "eq",
+          right: { type: "literal", value: `'${customer}'` },
+        },
+      });
+
+      const orgIntegration = await createSapIntegration(sapSettings);
+
+      const integration = container.get<SapProfileSyncIntegrationFactory>(
+        SAP_PROFILE_SYNC_INTEGRATION_FACTORY,
+      )(orgIntegration.id);
+
+      const logger = container.get<ILogger>(LOGGER);
+      using client = container.get<SapOdataClientFactory>(SAP_ODATA_CLIENT_FACTORY)(
+        logger,
+        sapSettings.baseUrl,
+        sapSettings.authorization,
+        sapSettings.additionalHeaders,
+      );
+
+      const projectsMapping = sapSettings.mappings.find((x) => x.name === "Projects to Matters")!;
+
+      const projectEntityDefinition = projectsMapping.entityDefinition;
+
+      // Step 1: Clear project localId fields to simulate "new" projects
+      const { results: projects } = await client.getEntitySet(projectEntityDefinition, {
+        $filter: {
+          left: { type: "property", name: "Customer" },
+          operator: "eq",
+          right: { type: "literal", value: `'${customer}'` },
+        },
+        $select: ["ProjectID", "YY1_EP_id_Parallel_Cpr"],
+        $orderby: [["ProjectID", "asc"]],
+      });
+
+      expect(projects.length).toBeGreaterThan(0);
+
+      for (const project of projects) {
+        await client.updateEntity(
+          projectEntityDefinition,
+          { ProjectID: project.ProjectID },
+          { YY1_EP_id_Parallel_Cpr: "" },
+        );
+      }
+
+      await waitFor(1_000);
+
+      // Step 2: initialSync - writes localIds to all entities
+      const dateBeforeSync = new Date();
+      await waitFor(1_000);
+      await integration.initialSync();
+
+      async function fetchChangedProjects(date: Date) {
+        const { results } = await client.getEntitySet(projectEntityDefinition, {
+          $filter: {
+            operator: "and",
+            conditions: [
+              {
+                left: { type: "property", name: "Customer" },
+                operator: "eq",
+                right: { type: "literal", value: `'${customer}'` },
+              },
+              buildPollingLastChangeFilter(
+                (projectsMapping.changeDetection as SapPollingChangeDetectionStrategy)
+                  .remoteLastChange,
+                date,
+              ),
+            ],
+          },
+          $orderby: [["ChangedOn", "desc"]],
+          $select: ["ProjectID", "ChangedOn", "YY1_EP_id_Parallel_Cpr"],
+        });
+        return results;
+      }
+      await waitFor(1_000);
+      expect(await fetchChangedProjects(dateBeforeSync)).toHaveLength(projects.length);
+
+      const dateAfterSync = new Date();
+      const profilesAfterSync = await loadProfiles(knex, organization.id);
+
+      // Step 3: First poll - detects changes from localId writes, but IDs match → no updateEntity
+      await integration.pollForChangedEntities(dateBeforeSync);
+
+      expect(await fetchChangedProjects(dateAfterSync)).toHaveLength(0);
+
+      const profilesAfterPoll1 = await loadProfiles(knex, organization.id);
+      expect(profilesAfterPoll1).toEqual(profilesAfterSync);
+
+      // Step 4: Simulate a "new" project by clearing localId on one project
+      const dateBeforeClear = new Date();
+      const targetProject = projects[0];
+      await client.updateEntity(
+        projectEntityDefinition,
+        { ProjectID: targetProject.ProjectID },
+        { YY1_EP_id_Parallel_Cpr: "" },
+      );
+
+      await waitFor(1_000);
+      expect(await fetchChangedProjects(dateBeforeClear)).toHaveLength(1);
+
+      // Step 5: Second poll - detects the cleared project, localId doesn't match → writes it back
+      await integration.pollForChangedEntities(dateBeforeClear);
+      const dateAfterPoll2 = new Date();
+
+      const profilesAfterPoll2 = await loadProfiles(knex, organization.id);
+      expect(profilesAfterPoll2).toEqual(profilesAfterSync);
+
+      // Step 6: Third poll - detects change from the write, but IDs now match → no updateEntity
+      await waitFor(1_000);
+      expect(await fetchChangedProjects(dateAfterPoll2)).toHaveLength(0);
+      await integration.pollForChangedEntities(dateAfterPoll2);
+      const dateAfterPoll3 = new Date();
+
+      const profilesAfterPoll3 = await loadProfiles(knex, organization.id);
+      expect(profilesAfterPoll3).toEqual(profilesAfterSync);
+
+      // Step 7: Fourth poll - no changes, verify stability
+      await waitFor(1_000);
+      expect(await fetchChangedProjects(dateAfterPoll3)).toHaveLength(0);
+      await integration.pollForChangedEntities(dateAfterPoll3);
+      const dateAfterPoll4 = new Date();
+
+      const profilesAfterPoll4 = await loadProfiles(knex, organization.id);
+      expect(profilesAfterPoll4).toEqual(profilesAfterSync);
+
+      await waitFor(1_000);
+      // Step 8: Verify no pending changes via manual getEntitySet with polling params
+      expect(await fetchChangedProjects(dateAfterPoll4)).toHaveLength(0);
+    }, 120_000);
+
+    it("works with certificate", async () => {
       // Make sure certificate.pfx and passphrase.txt are placed in the __tests__ folder next to this file
       const sapSettings: SapProfileSyncIntegrationSettings = {
         ...getOsborneSapSettings(osborneSettings),
