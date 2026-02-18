@@ -36,15 +36,16 @@ export class SapProfilePollingCronWorker extends CronWorker<"sap-profile-polling
 
     for (const integration of orgIntegrations) {
       // use a lock to make sure this job does not run concurrently
+      const logger = this.loggerFactory(`SapProfilePolling:${integration.id}`);
       await using lock = await this.redis.withLock({
         key: `sap-profile-sync:${integration.id}`,
         maxTime: 60 * 60,
       });
       if (lock.alreadyLocked) {
+        logger.info(`Integration ${integration.id} already syncing, wait for next execution`);
         // either previous cron still running or full sync in progress
         continue;
       }
-      const logger = this.loggerFactory(`SapProfilePolling:${integration.id}`);
       const syncLogs = await this.integrations.loadProfileSyncLogByIntegrationId(integration.id);
 
       const latestLocalSync = syncLogs.findLast(
