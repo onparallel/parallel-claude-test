@@ -5,6 +5,7 @@ import { join } from "path";
 import { indexBy, pick, range } from "remeda";
 import { MockSapOdataClient } from "../../../../../test/mocks";
 import { createTestContainer } from "../../../../../test/testContainer";
+import { ILogger, LOGGER } from "../../../../services/Logger";
 
 import {
   Organization,
@@ -54,6 +55,11 @@ describe("SapProfileSyncIntegration", () => {
 
   beforeAll(async () => {
     container = await createTestContainer();
+
+    const noopLogger: ILogger = { log() {}, info() {}, warn() {}, error() {}, debug() {} };
+    await container.unbind(LOGGER);
+    container.bind<ILogger>(LOGGER).toConstantValue(noopLogger);
+
     knex = container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
