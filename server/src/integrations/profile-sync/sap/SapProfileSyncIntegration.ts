@@ -245,7 +245,7 @@ export class SapProfileSyncIntegration extends GenericIntegration<
   }
 
   async initialSync() {
-    await this.withSapOdataClient("INITIAL", async (client, context) => {
+    return await this.withSapOdataClient("INITIAL", async (client, context) => {
       const outputContext = this.profileSyncService.createOutputContext(this.output);
 
       for (const mapping of context.mappings) {
@@ -1287,7 +1287,7 @@ export class SapProfileSyncIntegration extends GenericIntegration<
           authorization,
           context.additionalHeaders,
         );
-        return await handler(client, { ...context, ...loggingContext });
+        await handler(client, { ...context, ...loggingContext });
       });
     });
   }
@@ -1350,6 +1350,7 @@ export class SapProfileSyncIntegration extends GenericIntegration<
         `SapProfileSyncIntegration:${this.integrationId}`,
       );
     }
+    return log;
   }
 
   protected override getContext(

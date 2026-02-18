@@ -46,13 +46,8 @@ export class SapProfilePollingCronWorker extends CronWorker<"sap-profile-polling
         // either previous cron still running or full sync in progress
         continue;
       }
-      const syncLogs = await this.integrations.loadProfileSyncLogByIntegrationId(integration.id);
-
-      const latestLocalSync = syncLogs.findLast(
-        (l) =>
-          ["INITIAL", "TO_LOCAL"].includes(l.sync_type) &&
-          l.status === "COMPLETED" &&
-          l.output?.output === "DATABASE",
+      const latestLocalSync = await this.integrations.loadLatestCompletedLocalSyncByIntegrationId(
+        integration.id,
       );
 
       if (latestLocalSync) {

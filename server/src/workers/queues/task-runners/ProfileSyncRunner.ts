@@ -11,6 +11,7 @@ import {
 import { ILogger, LOGGER } from "../../../services/Logger";
 import { IRedis, REDIS } from "../../../services/Redis";
 import { IStorageService, STORAGE_SERVICE } from "../../../services/StorageService";
+import { never } from "../../../util/never";
 import { TaskRunner } from "../../helpers/TaskRunner";
 
 @injectable()
@@ -34,9 +35,8 @@ export class ProfileSyncRunner extends TaskRunner<"PROFILE_SYNC"> {
     const { type, integration_id: integrationId, output } = task.input;
     try {
       const integration = this.sapProfileSyncIntegrationFactory(integrationId, output);
-
       switch (type) {
-        case "INITIAL":
+        case "INITIAL": {
           await using lock = await this.redis.withLock({
             key: `sap-profile-sync:${integrationId}`,
             maxTime: 60 * 60,
@@ -44,19 +44,14 @@ export class ProfileSyncRunner extends TaskRunner<"PROFILE_SYNC"> {
           if (lock.alreadyLocked) {
             return { success: false, error: { message: "Sync already in progress" } };
           }
-          await integration.initialSync();
-          break;
-        default:
-          throw new Error(`Unimplemented sync type: ${type}`);
+          const syncLog = await integration.initialSync();
+          return {
+            success: syncLog.status === "COMPLETED",
+            profile_sync_log_id: syncLog.id,
+          };
+        }
       }
-
-      const logs = await this.integrations.loadProfileSyncLogByIntegrationId(integrationId);
-      const latestLog = logs.at(-1);
-
-      return {
-        success: latestLog?.status === "COMPLETED",
-        profile_sync_log_id: latestLog?.id,
-      };
+      never(`Unimplemented sync type: ${type}`);
     } catch (error) {
       return {
         success: false,

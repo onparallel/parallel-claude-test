@@ -540,10 +540,16 @@ export class IntegrationRepository extends BaseRepository {
       });
   }
 
-  readonly loadProfileSyncLogByIntegrationId = this.buildLoadMultipleBy(
+  readonly loadLatestCompletedLocalSyncByIntegrationId = this.buildLoadBy(
     "profile_sync_log",
     "integration_id",
-    (q) => q.orderBy("created_at", "asc"),
+    (q) =>
+      q
+        .whereIn("sync_type", ["INITIAL", "TO_LOCAL"])
+        .where({ status: "COMPLETED" })
+        .whereRaw(/* sql */ `output->>'output' = 'DATABASE'`)
+        .distinctOn("integration_id")
+        .orderBy([{ column: "integration_id" }, { column: "created_at", order: "desc" }]),
   );
 
   async createProfileSyncLog(data: CreateProfileSyncLog, createdBy: string) {
