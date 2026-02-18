@@ -116,7 +116,7 @@ export class Redis implements IRedis {
       alreadyLocked,
       [Symbol.asyncDispose]: async () => {
         if (!alreadyLocked) {
-          await this.delete(key);
+          await this.delete(`lock:${key}`);
         }
       },
     };
