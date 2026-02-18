@@ -4,26 +4,35 @@ import { RateLimitGuard } from "../helpers/RateLimitGuard";
 
 describe("RateLimitGuard", () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    // Must include "hrtime" so that process.hrtime.bigint() is faked.
+    // Unlike Jest, Vitest does not fake hrtime by default.
+    vi.useFakeTimers({
+      toFake: ["setTimeout", "clearTimeout", "Date", "hrtime"],
+    });
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it("ratelimits acccordingly on burst calls", async () => {
     const rateLimit = 14;
     const guard = new RateLimitGuard(rateLimit);
     const start = process.hrtime.bigint();
-    const spy = jest.fn();
+    const spy = vi.fn();
     await Promise.all([
       ...range(0, 100).map(async () => {
         await guard.waitUntilAllowed();
         spy();
       }),
       (async () => {
-        while (jest.getTimerCount() > 0) {
-          await jest.advanceTimersToNextTimerAsync();
+        // Use advanceTimersByTimeAsync(1) instead of advanceTimersToNextTimerAsync()
+        // to guarantee at least 1ms clock advancement per iteration. RateLimitGuard
+        // uses nanosecond-precision hrtime but creates millisecond-precision timers
+        // via waitFor, so sub-ms remainders can produce 0ms timers that never
+        // advance the faked clock enough.
+        while (spy.mock.calls.length < 100) {
+          await vi.advanceTimersByTimeAsync(1);
         }
       })(),
     ]);
@@ -34,7 +43,7 @@ describe("RateLimitGuard", () => {
   it("ratelimits acccordingly on random calls", async () => {
     const rateLimit = 14;
     const guard = new RateLimitGuard(rateLimit);
-    const spy = jest.fn();
+    const spy = vi.fn();
     let lastCall = 0n;
     await Promise.all([
       (async () => {
@@ -50,8 +59,8 @@ describe("RateLimitGuard", () => {
         }
       })(),
       (async () => {
-        while (jest.getTimerCount() > 0) {
-          await jest.advanceTimersToNextTimerAsync();
+        while (spy.mock.calls.length < 100) {
+          await vi.advanceTimersByTimeAsync(1);
         }
       })(),
     ]);

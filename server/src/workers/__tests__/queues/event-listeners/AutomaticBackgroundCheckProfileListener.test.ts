@@ -28,10 +28,7 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
   let organization: Organization;
   let user: User;
 
-  let queueSpy: jest.SpyInstance<
-    ReturnType<IQueuesService["enqueueMessages"]>,
-    Parameters<IQueuesService["enqueueMessages"]>
-  >;
+  let queueSpy: ReturnType<typeof vi.spyOn>;
 
   let backgroundCheckProfileQueue: BackgroundCheckProfileSearchQueue;
 
@@ -104,7 +101,7 @@ describe("Worker - Automatic Background Check Profile Listener", () => {
   });
 
   beforeEach(async () => {
-    queueSpy = jest.spyOn(
+    queueSpy = vi.spyOn(
       testClient.container.get<IQueuesService>(QUEUES_SERVICE),
       "enqueueMessages",
     );

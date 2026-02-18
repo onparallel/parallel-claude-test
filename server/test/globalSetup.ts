@@ -6,21 +6,15 @@ const SETUP_DOCKER_ENVIRONMENT = "docker environment ok";
 const SETUP_MIGRATIONS_TIME = "migrations ok";
 const SETUP_SEEDS_TIME = "seeds ok";
 const SETUP_TOTAL_TIME = "Setup done!";
-let SETUP_DONE = false;
 
 export default async function () {
-  // this is for the --watch flag to work properly. (this function is called every time a file changes)
-  if (SETUP_DONE) {
-    return;
-  }
-
   console.time(SETUP_TOTAL_TIME);
 
   console.log("starting environment...");
   console.time(SETUP_DOCKER_ENVIRONMENT);
-  const containers = await Promise.all([
+  const [postgres, redis] = await Promise.all([
     new GenericContainer("postgres:16.8")
-      .withExposedPorts({ container: 5432, host: 5433 })
+      .withExposedPorts(5432)
       .withWaitStrategy(Wait.forLogMessage("database system is ready to accept connections", 2))
       .withEnvironment({
         POSTGRES_USER: "test",
@@ -29,10 +23,12 @@ export default async function () {
       })
       .start(),
     new GenericContainer("redis:7.2")
-      .withExposedPorts({ container: 6379, host: 6378 })
+      .withExposedPorts(6379)
       .withWaitStrategy(Wait.forLogMessage("Ready to accept connections"))
       .start(),
   ]);
+  process.env.DB_PORT = process.env.READONLY_DB_PORT = `${postgres.getMappedPort(5432)}`;
+  process.env.REDIS_PORT = `${redis.getMappedPort(6379)}`;
 
   console.timeEnd(SETUP_DOCKER_ENVIRONMENT);
 
@@ -47,8 +43,11 @@ export default async function () {
   console.timeEnd(SETUP_SEEDS_TIME);
 
   console.timeEnd(SETUP_TOTAL_TIME);
-  SETUP_DONE = true;
-  (globalThis as any).shutdownContainers = async function () {
-    await Promise.all(containers.map((c) => c.stop()));
+
+  return async function () {
+    await Promise.all([
+      postgres.stop().catch((err) => console.error("Failed to stop postgres:", err)),
+      redis.stop().catch((err) => console.error("Failed to stop redis:", err)),
+    ]);
   };
 }

@@ -18,15 +18,9 @@ describe("WebhooksWorker", () => {
 
   let user: User;
 
-  let fetchSpy: jest.SpyInstance<
-    ReturnType<IFetchService["fetch"]>,
-    Parameters<IFetchService["fetch"]>
-  >;
-  let emailSpy: jest.SpyInstance;
-  let queueSpy: jest.SpyInstance<
-    ReturnType<IQueuesService["enqueueMessages"]>,
-    Parameters<IQueuesService["enqueueMessages"]>
-  >;
+  let fetchSpy: ReturnType<typeof vi.spyOn>;
+  let emailSpy: ReturnType<typeof vi.spyOn>;
+  let queueSpy: ReturnType<typeof vi.spyOn>;
 
   let webhooksWorker: WebhooksWorker;
 
@@ -39,9 +33,9 @@ describe("WebhooksWorker", () => {
 
     ({ user } = await mocks.createSessionUserAndOrganization());
 
-    emailSpy = jest.spyOn(container.get<IEmailsService>(EMAILS), "sendDeveloperWebhookFailedEmail");
-    fetchSpy = jest.spyOn(container.get<IFetchService>(FETCH_SERVICE), "fetch");
-    queueSpy = jest.spyOn(container.get<IQueuesService>(QUEUES_SERVICE), "enqueueMessages");
+    emailSpy = vi.spyOn(container.get<IEmailsService>(EMAILS), "sendDeveloperWebhookFailedEmail");
+    fetchSpy = vi.spyOn(container.get<IFetchService>(FETCH_SERVICE), "fetch");
+    queueSpy = vi.spyOn(container.get<IQueuesService>(QUEUES_SERVICE), "enqueueMessages");
 
     webhooksWorker = container.get<WebhooksWorker>(WebhooksWorker);
     encryptionService = container.get<IEncryptionService>(ENCRYPTION_SERVICE);
@@ -59,7 +53,7 @@ describe("WebhooksWorker", () => {
   });
 
   it("reenqueues event when it can not be delivered", async () => {
-    fetchSpy.mockImplementation(async (url) => {
+    fetchSpy.mockImplementation(async (url: string) => {
       if (url === "https://users.0.com/events") {
         return new Response(null, { status: 418, statusText: "I'm a teapot" });
       } else {
@@ -110,7 +104,7 @@ describe("WebhooksWorker", () => {
   });
 
   it("sends email and sets subscription as failing when event can not be delivered on the 5th try", async () => {
-    fetchSpy.mockImplementation(async (url) => {
+    fetchSpy.mockImplementation(async (url: string) => {
       if (url === "https://users.0.com/events") {
         return new Response(null, { status: 418, statusText: "I'm a teapot" });
       } else {

@@ -84,7 +84,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
       | "clientMatterRelationshipTypeId"
     >;
 
-    let fileUploadSpy: jest.SpyInstance;
+    let fileUploadSpy: ReturnType<typeof vi.spyOn>;
 
     beforeEach(async () => {
       container = await createTestContainer();
@@ -99,7 +99,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
       mocks = new Mocks(knex);
 
       const storageService = container.get<IStorageService>(STORAGE_SERVICE);
-      fileUploadSpy = jest.spyOn(storageService.temporaryFiles, "uploadFile");
+      fileUploadSpy = vi.spyOn(storageService.temporaryFiles, "uploadFile");
 
       [organization] = await mocks.createRandomOrganizations(1);
       await mocks.createFeatureFlags([{ name: "PROFILE_SYNC", default_value: true }]);
@@ -452,7 +452,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
     });
 
     afterEach(async () => {
-      jest.restoreAllMocks();
+      vi.restoreAllMocks();
       await deleteAllData(knex);
       await knex.destroy();
     });

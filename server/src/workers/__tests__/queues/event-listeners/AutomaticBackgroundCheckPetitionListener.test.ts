@@ -40,7 +40,7 @@ describe("Worker - Automatic Background Check Petition Listener", () => {
   let access: PetitionAccess;
   let contact: Contact;
 
-  let backgroundCheckServiceSpy: jest.SpyInstance;
+  let backgroundCheckServiceSpy: ReturnType<typeof vi.spyOn>;
 
   beforeAll(async () => {
     testClient = await initServer();
@@ -69,7 +69,7 @@ describe("Worker - Automatic Background Check Petition Listener", () => {
       AUTOMATIC_BACKGROUND_CHECK_PETITION_LISTENER,
     );
 
-    backgroundCheckServiceSpy = jest.spyOn(
+    backgroundCheckServiceSpy = vi.spyOn(
       testClient.container.get<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE),
       "entitySearch",
     );

@@ -66,7 +66,7 @@ describe("GraphQL/Petition Permissions", () => {
 
   afterEach(async () => {
     await mocks.clearSharedPetitions();
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   afterAll(async () => {
@@ -764,7 +764,7 @@ describe("GraphQL/Petition Permissions", () => {
     });
 
     it("sends notification email to users after adding permissions", async () => {
-      const sendPetitionSharedEmailSpy = jest.spyOn(
+      const sendPetitionSharedEmailSpy = vi.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
         "sendPetitionSharedEmail",
       );
@@ -796,7 +796,7 @@ describe("GraphQL/Petition Permissions", () => {
     });
 
     it("doesn't send notification email to users if notify arg is false or undefined", async () => {
-      const sendPetitionSharedEmailSpy = jest.spyOn(
+      const sendPetitionSharedEmailSpy = vi.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
         "sendPetitionSharedEmail",
       );
@@ -898,7 +898,7 @@ describe("GraphQL/Petition Permissions", () => {
     });
 
     it("should send notification email only to users that didn't have previous permissions", async () => {
-      const sendPetitionSharedEmailSpy = jest.spyOn(
+      const sendPetitionSharedEmailSpy = vi.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
         "sendPetitionSharedEmail",
       );
@@ -989,7 +989,7 @@ describe("GraphQL/Petition Permissions", () => {
     });
 
     it("notifies only once per user and petition", async () => {
-      const sendPetitionSharedEmailSpy = jest.spyOn(
+      const sendPetitionSharedEmailSpy = vi.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
         "sendPetitionSharedEmail",
       );
@@ -1039,7 +1039,7 @@ describe("GraphQL/Petition Permissions", () => {
     });
 
     it("should not send notification to user with previous permissions", async () => {
-      const sendPetitionSharedEmailSpy = jest.spyOn(
+      const sendPetitionSharedEmailSpy = vi.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
         "sendPetitionSharedEmail",
       );
@@ -1072,7 +1072,7 @@ describe("GraphQL/Petition Permissions", () => {
     });
 
     it("notifies group members when sharing a petition with a group", async () => {
-      const sendPetitionSharedEmailSpy = jest.spyOn(
+      const sendPetitionSharedEmailSpy = vi.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
         "sendPetitionSharedEmail",
       );

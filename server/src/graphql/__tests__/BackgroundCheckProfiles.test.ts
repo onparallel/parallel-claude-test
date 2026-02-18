@@ -55,13 +55,13 @@ describe("Background Check - Profiles", () => {
   });
 
   describe("backgroundCheckEntitySearch", () => {
-    let backgroundCheckServiceSpy: jest.SpyInstance;
+    let backgroundCheckServiceSpy: ReturnType<typeof vi.spyOn>;
     let profileType: ProfileType;
     let profileTypeField: ProfileTypeField;
     let profile: Profile;
 
     beforeEach(async () => {
-      backgroundCheckServiceSpy = jest.spyOn(
+      backgroundCheckServiceSpy = vi.spyOn(
         container.get<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE),
         "entitySearch",
       );
@@ -1794,13 +1794,13 @@ describe("Background Check - Profiles", () => {
   });
 
   describe("backgroundCheckEntityDetails", () => {
-    let backgroundCheckServiceSpy: jest.SpyInstance;
+    let backgroundCheckServiceSpy: ReturnType<typeof vi.spyOn>;
     let profileType: ProfileType;
     let profileTypeField: ProfileTypeField;
     let profile: Profile;
 
     beforeEach(async () => {
-      backgroundCheckServiceSpy = jest.spyOn(
+      backgroundCheckServiceSpy = vi.spyOn(
         container.get<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE),
         "entityProfileDetails",
       );
@@ -2207,7 +2207,7 @@ describe("Background Check - Profiles", () => {
   });
 
   describe("updateBackgroundCheckEntity", () => {
-    let backgroundCheckServiceSpy: jest.SpyInstance;
+    let backgroundCheckServiceSpy: ReturnType<typeof vi.spyOn>;
     let profileType: ProfileType;
     let profileTypeField: ProfileTypeField;
     let profile: Profile;
@@ -2215,7 +2215,7 @@ describe("Background Check - Profiles", () => {
     let profileFieldValue: ProfileFieldValue;
 
     beforeEach(async () => {
-      backgroundCheckServiceSpy = jest.spyOn(
+      backgroundCheckServiceSpy = vi.spyOn(
         container.get<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE),
         "entityProfileDetails",
       );

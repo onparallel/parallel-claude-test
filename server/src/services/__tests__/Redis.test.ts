@@ -1,7 +1,7 @@
 import { Container } from "inversify";
 import { createTestContainer } from "../../../test/testContainer";
-import { IRedis, REDIS } from "../Redis";
 import { waitFor } from "../../util/promises/waitFor";
+import { IRedis, REDIS } from "../Redis";
 
 describe("Redis", () => {
   let container: Container;

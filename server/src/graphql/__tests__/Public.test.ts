@@ -138,7 +138,7 @@ describe("GraphQL/Public", () => {
       // assume already existing contact authentication from previous test
       expect(await contactRepository.hasContactAuthentication(access.contact_id!)).toBe(true);
 
-      const emailSpy = jest.spyOn(
+      const emailSpy = vi.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
         "sendContactAuthenticationRequestEmail",
       );
@@ -169,7 +169,7 @@ describe("GraphQL/Public", () => {
         },
       };
 
-      const cookieSpy = jest.spyOn(req.res, "cookie");
+      const cookieSpy = vi.spyOn(req.res, "cookie");
       testClient.setNextReq(req);
 
       const res2 = await testClient.execute(
@@ -282,7 +282,7 @@ describe("GraphQL/Public", () => {
       expect(res0.data!.verifyPublicAccess.isContactlessAccess).toBe(true);
       expect(res0.data!.verifyPublicAccess.cookieValue).toBeNull();
 
-      const emailSpy = jest.spyOn(
+      const emailSpy = vi.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
         "sendContactAuthenticationRequestEmail",
       );
