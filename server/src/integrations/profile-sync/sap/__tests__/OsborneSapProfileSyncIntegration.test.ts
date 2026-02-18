@@ -75,6 +75,8 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
 
     let osborneSettings: Pick<
       Parameters<typeof getOsborneSapSettings>[0],
+      | "environment"
+      | "authorization"
       | "individualProfileTypeId"
       | "individualProfileTypeFieldIds"
       | "legalEntityProfileTypeId"
@@ -379,7 +381,14 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
         })
         .select("*");
 
+      const credentials = process.env.OSBORNE_CREDENTIALS!.split(":");
       osborneSettings = {
+        environment: "SANDBOX",
+        authorization: {
+          type: "BASIC",
+          user: credentials[0],
+          password: credentials[1],
+        },
         individualProfileTypeId: individual.id,
         individualProfileTypeFieldIds: {
           addressId: individualFields["p_address"].id,

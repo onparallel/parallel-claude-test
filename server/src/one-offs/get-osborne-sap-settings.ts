@@ -10,8 +10,12 @@ import { createContainer } from "../container";
 import { ProfileRelationshipType, ProfileType, ProfileTypeField } from "../db/__types";
 import { KNEX } from "../db/knex";
 import { getOsborneSapSettings } from "../integrations/profile-sync/sap/osborne";
-import { SapProfileSyncIntegrationSettings } from "../integrations/profile-sync/sap/types";
+import {
+  SapEntitySetFilter,
+  SapProfileSyncIntegrationSettings,
+} from "../integrations/profile-sync/sap/types";
 import { loadEnv } from "../util/loadEnv";
+import { never } from "../util/never";
 
 const STAGING_BPS = ["1505412", "1505422"];
 
@@ -199,6 +203,18 @@ async function main() {
 
   const settings: SapProfileSyncIntegrationSettings = {
     ...getOsborneSapSettings({
+      environment:
+        process.env.ENV === "staging"
+          ? "SANDBOX"
+          : process.env.ENV === "production"
+            ? process.env.OSBORNE_SANDBOX
+              ? "SANDBOX"
+              : "PRODUCTION"
+            : never(),
+      authorization: {
+        type: "CERTIFICATE",
+        ...secret,
+      },
       individualProfileTypeId: individualPT,
       individualProfileTypeFieldIds: extractFieldIds(
         {
@@ -314,11 +330,21 @@ async function main() {
             ? {
                 projectFilter: {
                   operator: "and",
-                  conditions: STAGING_BPS.map((customer) => ({
-                    left: { type: "property", name: "Customer" },
-                    operator: "ne",
-                    right: { type: "literal", value: `'${customer}'` },
-                  })),
+                  conditions: [
+                    {
+                      left: { type: "property", name: "CreatedOn" },
+                      operator: "ge",
+                      right: { type: "literal", value: "datetime'2025-01-01T00:00:00'" },
+                    },
+                    ...STAGING_BPS.map(
+                      (customer) =>
+                        ({
+                          left: { type: "property", name: "Customer" },
+                          operator: "ne",
+                          right: { type: "literal", value: `'${customer}'` },
+                        }) as SapEntitySetFilter,
+                    ),
+                  ],
                 },
                 businessPartnerFilter: {
                   operator: "and",
@@ -332,10 +358,6 @@ async function main() {
             : {}
           : {}),
     }),
-    authorization: {
-      type: "CERTIFICATE",
-      ...secret,
-    },
   };
 
   console.log(JSON.stringify(settings));

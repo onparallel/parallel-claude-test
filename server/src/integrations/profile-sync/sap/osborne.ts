@@ -1,8 +1,10 @@
+import { never } from "../../../util/never";
 import {
   SapEntityMapping,
   SapEntityRelationshipMapping,
   SapEntitySetFilter,
   SapProfileSyncIntegrationSettings,
+  SapProfileSyncIntegrationSettingsAuthorization,
 } from "./types";
 
 interface BusinessPartnerMappedProfileTypeFieldIds {
@@ -32,6 +34,8 @@ interface BusinessPartnerMappedProfileTypeFieldIds {
 }
 
 export function getOsborneSapSettings({
+  environment,
+  authorization,
   individualProfileTypeId,
   individualProfileTypeFieldIds,
   legalEntityProfileTypeId,
@@ -42,6 +46,8 @@ export function getOsborneSapSettings({
   businessPartnerFilter,
   projectFilter,
 }: {
+  environment: "SANDBOX" | "PRODUCTION";
+  authorization: SapProfileSyncIntegrationSettingsAuthorization;
   individualProfileTypeId: number;
   individualProfileTypeFieldIds: BusinessPartnerMappedProfileTypeFieldIds;
   legalEntityProfileTypeId: number;
@@ -66,17 +72,15 @@ export function getOsborneSapSettings({
   businessPartnerFilter?: SapEntitySetFilter;
   projectFilter?: SapEntitySetFilter;
 }): SapProfileSyncIntegrationSettings {
-  const [user, password] = process.env.OSBORNE_CREDENTIALS!.split(":");
   return {
-    baseUrl: "https://my303668-api.s4hana.ondemand.com/sap/opu/odata",
+    baseUrl:
+      environment === "SANDBOX"
+        ? "https://my303668-api.s4hana.ondemand.com/sap/opu/odata"
+        : never(),
     additionalHeaders: {
       "sap-language": "es",
     },
-    authorization: {
-      type: "BASIC",
-      user,
-      password,
-    },
+    authorization,
     mappings: [
       ...[
         {
