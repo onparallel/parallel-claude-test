@@ -13,6 +13,8 @@ import { getOsborneSapSettings } from "../integrations/profile-sync/sap/osborne"
 import { SapProfileSyncIntegrationSettings } from "../integrations/profile-sync/sap/types";
 import { loadEnv } from "../util/loadEnv";
 
+const STAGING_BPS = ["1505412", "1505422"];
+
 function findProfileTypeById(id: number | undefined, options: ProfileType[], key: string) {
   let result = id;
   if (isNullish(result)) {
@@ -288,10 +290,47 @@ async function main() {
                   operator: "ge",
                   right: { type: "literal", value: "datetime'2025-01-01T00:00:00'" },
                 },
+                {
+                  operator: "or",
+                  conditions: STAGING_BPS.map((customer) => ({
+                    left: { type: "property", name: "Customer" },
+                    operator: "eq",
+                    right: { type: "literal", value: `'${customer}'` },
+                  })),
+                },
               ],
             },
+            businessPartnerFilter: {
+              operator: "or",
+              conditions: STAGING_BPS.map((customer) => ({
+                left: { type: "property", name: "BusinessPartner" },
+                operator: "eq",
+                right: { type: "literal", value: `'${customer}'` },
+              })),
+            },
           }
-        : {}),
+        : process.env.ENV === "production"
+          ? process.env.OSBORNE_SANDBOX
+            ? {
+                projectFilter: {
+                  operator: "and",
+                  conditions: STAGING_BPS.map((customer) => ({
+                    left: { type: "property", name: "Customer" },
+                    operator: "ne",
+                    right: { type: "literal", value: `'${customer}'` },
+                  })),
+                },
+                businessPartnerFilter: {
+                  operator: "and",
+                  conditions: STAGING_BPS.map((customer) => ({
+                    left: { type: "property", name: "BusinessPartner" },
+                    operator: "ne",
+                    right: { type: "literal", value: `'${customer}'` },
+                  })),
+                },
+              }
+            : {}
+          : {}),
     }),
     authorization: {
       type: "CERTIFICATE",
