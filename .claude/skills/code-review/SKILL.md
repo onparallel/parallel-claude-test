@@ -40,20 +40,13 @@ git diff --cached
 
 ### Step 2: Analyze the changes
 
-**CRITICAL (should block):**
+Look for real issues in the diff. Examples of things to watch for (only mention if actually present — do not list these categories if no issues are found):
 
-- SQL injection (string concatenation in queries)
-- Security vulnerabilities (XSS, command injection)
-- Multi-tenancy violations (missing `org_id` filters)
-- Data loss risks (destructive operations without confirmation)
-- Hardcoded secrets or credentials
+**CRITICAL (should block):** SQL injection, XSS, command injection, multi-tenancy violations (missing `org_id` filters), data loss risks, hardcoded secrets.
 
-**CODE QUALITY (suggestions):**
+**CODE QUALITY (suggestions):** Missing error handling in critical paths, race conditions, incorrect transaction handling, N+1 query patterns.
 
-- Missing error handling in critical paths
-- Race conditions or concurrency issues
-- Incorrect transaction handling
-- N+1 query patterns
+**LOCKFILE (if `yarn.lock` changed):** Review `yarn.lock` changes against `package.json` files. Flag unnecessary package duplications (same package resolved to multiple versions when one would suffice) or changes that don't make sense given the `package.json` updates.
 
 ### Step 3: Report findings
 
