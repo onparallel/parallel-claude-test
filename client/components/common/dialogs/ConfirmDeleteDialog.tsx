@@ -1,10 +1,10 @@
-import { FormControl, FormLabel, Input, Stack } from "@chakra-ui/react";
+import { FormControl, FormLabel, Input } from "@chakra-ui/react";
 import {
   ConfirmDialog,
   ConfirmDialogProps,
 } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { ReactNode, useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -58,7 +58,7 @@ function ConfirmDeleteDialog({
         },
       }}
       body={
-        <Stack spacing={2}>
+        <Stack gap={2}>
           {description}
           <FormControl isInvalid={!!errors.confirmation}>
             <FormLabel fontWeight="normal" _invalid={{ color: "red.500" }}>

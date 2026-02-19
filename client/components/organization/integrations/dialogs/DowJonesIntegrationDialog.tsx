@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { FormControl, FormErrorMessage, FormLabel, HStack, Input, Stack } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel, Input } from "@chakra-ui/react";
 import { ArrowForwardIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { useDowJonesIntegrationDialog_createDowJonesKycIntegrationDocument } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { isNotEmptyText } from "@parallel/utils/strings";
@@ -72,14 +72,14 @@ export function DowJonesIntegrationDialog({ ...props }: DialogProps) {
       }}
       initialFocusRef={clientIdRef}
       header={
-        <HStack spacing={2} align="center">
+        <HStack gap={2} align="center">
           <Text>Parallel</Text>
           <ArrowForwardIcon role="presentation" />
           <Text>Dow Jones</Text>
         </HStack>
       }
       body={
-        <Stack spacing={4}>
+        <Stack gap={4}>
           <Text>
             <FormattedMessage
               id="component.dow-jones-integration-dialog.description"

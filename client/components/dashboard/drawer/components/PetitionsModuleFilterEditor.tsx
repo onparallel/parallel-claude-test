@@ -1,4 +1,4 @@
-import { Grid, HStack, Stack } from "@chakra-ui/react";
+import { Grid } from "@chakra-ui/react";
 import { PlusCircleFilledIcon } from "@parallel/chakra/icons";
 import { MultiCheckboxSimpleSelect } from "@parallel/components/common/MultiCheckboxSimpleSelect";
 import { PetitionSelect } from "@parallel/components/common/PetitionSelect";
@@ -6,7 +6,7 @@ import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { PetitionListApprovalsFilterLine } from "@parallel/components/petition-list/filters/PetitionListApprovalsFilter";
 import { PetitionListSharedWithFilterLine } from "@parallel/components/petition-list/filters/PetitionListSharedWithFilter";
 import { PetitionListTagFilterLine } from "@parallel/components/petition-list/filters/PetitionListTagFilter";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { useLogicalOperators } from "@parallel/utils/useLogicalOperators";
 import { usePetitionSignatureStatusLabels } from "@parallel/utils/usePetitionSignatureStatusLabels";
 import { usePetitionStatusLabels } from "@parallel/utils/usePetitionStatusLabels";

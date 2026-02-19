@@ -4,7 +4,7 @@ import { CommentIcon, MentionIcon, NoteIcon } from "@parallel/chakra/icons";
 import { PetitionFieldReference } from "@parallel/components/common/PetitionFieldReference";
 import { UserOrContactReference } from "@parallel/components/common/UserOrContactReference";
 import { CommentCreatedUserNotification_CommentCreatedUserNotificationFragment } from "@parallel/graphql/__types";
-import { forwardRef } from "react";
+import { RefAttributes } from "react";
 import { FormattedMessage } from "react-intl";
 import { PetitionUserNotification } from "./PetitionUserNotification";
 
@@ -13,10 +13,11 @@ export interface CommentCreatedUserNotificationProps {
   notification: CommentCreatedUserNotification_CommentCreatedUserNotificationFragment;
 }
 
-export const CommentCreatedUserNotification = forwardRef<
-  HTMLElement,
-  CommentCreatedUserNotificationProps
->(function CommentCreatedUserNotification({ isFirst, notification }, ref) {
+export function CommentCreatedUserNotification({
+  isFirst,
+  notification,
+  ref,
+}: CommentCreatedUserNotificationProps & RefAttributes<HTMLElement>) {
   const {
     comment: { author, isInternal: isNote },
     isMention,
@@ -98,7 +99,7 @@ export const CommentCreatedUserNotification = forwardRef<
       )}
     </PetitionUserNotification>
   );
-});
+}
 
 const _fragments = {
   CommentCreatedUserNotification: gql`

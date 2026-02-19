@@ -1,6 +1,5 @@
-import { Box, HStack, Stack } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
-import { Button, Text } from "@parallel/components/ui";
+import { chakraComponent } from "@parallel/chakra/utils";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { KeyboardEvent, useImperativeHandle, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -30,24 +29,22 @@ export interface PetitionCommentsAndNotesEditorInstance {
   focus: () => void;
 }
 
-export const PetitionCommentsAndNotesEditor = chakraForwardRef<
+export const PetitionCommentsAndNotesEditor = chakraComponent<
   "div",
   PetitionCommentsAndNotesEditorProps,
   PetitionCommentsAndNotesEditorInstance
->(function PetitionCommentsAndNotesEditor(
-  {
-    id,
-    onSubmit,
-    defaultMentionables,
-    onSearchMentionables,
-    hasCommentsEnabled,
-    isDisabled,
-    isTemplate,
-    tabIsNotes,
-    onTabChange,
-  },
+>(function PetitionCommentsAndNotesEditor({
   ref,
-) {
+  id,
+  onSubmit,
+  defaultMentionables,
+  onSearchMentionables,
+  hasCommentsEnabled,
+  isDisabled,
+  isTemplate,
+  tabIsNotes,
+  onTabChange,
+}) {
   const intl = useIntl();
   const [draft, setDraft] = useState(emptyCommentEditorValue());
   const isEmpty = isEmptyCommentEditorValue(draft);
@@ -136,7 +133,7 @@ export const PetitionCommentsAndNotesEditor = chakraForwardRef<
         backgroundColor={tabIsNotes ? "yellow.100" : undefined}
         alignItems="flex-start"
       >
-        <Stack flex={1} spacing={1} minWidth={0}>
+        <Stack flex={1} gap={1} minWidth={0}>
           <CommentEditor
             id={`comment-editor-${id}`}
             ref={editorRef}

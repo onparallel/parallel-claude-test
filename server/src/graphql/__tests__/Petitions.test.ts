@@ -3584,7 +3584,7 @@ describe("GraphQL/Petitions", () => {
       });
     });
     afterEach(() => {
-      jest.clearAllMocks();
+      vi.clearAllMocks();
     });
 
     it.each([true, false])(

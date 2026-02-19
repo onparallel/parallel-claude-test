@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
-import { Box, HStack } from "@chakra-ui/react";
+
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { isDialogError } from "@parallel/components/common/dialogs/DialogProvider";
-import { Text } from "@parallel/components/ui";
+import { Box, HStack, Text } from "@parallel/components/ui";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
@@ -64,7 +64,7 @@ export function PetitionComposeBackgroundCheckSettings({
   return (
     <>
       {providers.length > 1 ? (
-        <HStack spacing={4}>
+        <HStack gap={4}>
           <Text textStyle={isReadOnly ? "muted" : undefined}>
             <FormattedMessage
               id="component.petition-compose-background-check-settings.provider"

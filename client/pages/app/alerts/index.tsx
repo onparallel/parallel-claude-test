@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Flex, Heading, HStack, Image, Stack } from "@chakra-ui/react";
+import { Center, Heading, Image } from "@chakra-ui/react";
 import { RepeatIcon, TimeAlarmIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -40,7 +40,7 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { isPast, sub } from "date-fns";
 import { ChangeEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
+import { Box, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
@@ -86,7 +86,7 @@ function Alerts() {
       title={intl.formatMessage({ id: "page.alerts.title", defaultMessage: "Alerts" })}
       queryObject={queryObject}
     >
-      <Stack minHeight={0} paddingX={4} paddingTop={6} spacing={4}>
+      <Stack minHeight={0} paddingX={4} paddingTop={6} gap={4}>
         <HStack padding={2}>
           <TimeAlarmIcon boxSize={5} />
           <Heading as="h2" size="lg">

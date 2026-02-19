@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Badge, Box, Flex, Grid, GridItem, HStack, Stack, VisuallyHidden } from "@chakra-ui/react";
+import { Badge, Grid, GridItem, VisuallyHidden } from "@chakra-ui/react";
 import {
   BusinessIcon,
   CheckIcon,
@@ -9,7 +9,7 @@ import {
   ShortSearchIcon,
   UserIcon,
 } from "@parallel/chakra/icons";
-import { Text } from "@parallel/components/ui";
+import { Box, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionFieldReplyStatus,
   PetitionFieldType,
@@ -121,7 +121,7 @@ export function PetitionRepliesFieldReply({
                 paddingBottom={1}
                 paddingStart={2}
               >
-                <HStack alignItems={"center"} gridGap={2} spacing={0}>
+                <HStack alignItems={"center"} gridGap={2} gap={0}>
                   {reply.isAnonymized ? (
                     <ReplyNotAvailable type={type} />
                   ) : type === "ES_TAX_DOCUMENTS" && content.error ? (
@@ -144,7 +144,7 @@ export function PetitionRepliesFieldReply({
                       )) ? (
                     <PetitionRepliesFieldIdVerificationReply reply={reply} />
                   ) : type === "DOW_JONES_KYC" ? (
-                    <Stack spacing={1}>
+                    <Stack gap={1}>
                       <Flex flexWrap="wrap" gap={2} alignItems="center" minHeight={6}>
                         <VisuallyHidden>
                           {intl.formatMessage({
@@ -186,7 +186,7 @@ export function PetitionRepliesFieldReply({
                       </Flex>
                     </Stack>
                   ) : type === "BACKGROUND_CHECK" ? (
-                    <Stack spacing={1}>
+                    <Stack gap={1}>
                       <Flex flexWrap="wrap" gap={2} alignItems="center" minHeight={6}>
                         {content?.entity ? (
                           <>
@@ -258,7 +258,7 @@ export function PetitionRepliesFieldReply({
                       </Flex>
                     </Stack>
                   ) : type === "PROFILE_SEARCH" ? (
-                    <Stack spacing={content?.value.length === 0 ? 0.5 : 3}>
+                    <Stack gap={content?.value.length === 0 ? 0.5 : 3}>
                       <Flex flexWrap="wrap" gap={2} alignItems="baseline" minHeight={6}>
                         <VisuallyHidden>
                           {intl.formatMessage({
@@ -336,7 +336,7 @@ export function PetitionRepliesFieldReply({
                                 </Text>
                               </HStack>
 
-                              <Stack spacing={0.5} paddingStart={3}>
+                              <Stack gap={0.5} paddingStart={3}>
                                 {profile.fields.map((field: any) => (
                                   <Text key={field.id} as="span" fontWeight={500}>
                                     <LocalizableUserTextRender
@@ -543,13 +543,7 @@ export function PetitionRepliesFieldReply({
               />
             </Text>
           ) : (
-            <HStack
-              wrap={"wrap"}
-              spacing={0}
-              gap={{ base: 1.5, lg: 2 }}
-              lineHeight="1.2"
-              divider={<Text as="span">{"·"}</Text>}
-            >
+            <HStack wrap="wrap" gap={{ base: 1.5, lg: 2 }} lineHeight="1.2">
               <Text color="gray.500">
                 <UserOrContactReference
                   userOrAccess={reply.repliedBy}
@@ -561,36 +555,34 @@ export function PetitionRepliesFieldReply({
                 <DateTime as="span" value={reply.repliedAt!} format={FORMATS.LLL} />
               </Text>
               {reply.lastReviewedAt && reply.lastReviewedBy && reply.status !== "PENDING" ? (
-                <HStack>
-                  {reply.status === "APPROVED" ? (
-                    <CheckIcon color="gray.600" boxSize={3.5} />
-                  ) : (
-                    <CloseIcon color="gray.600" boxSize={3} />
-                  )}
+                <>
+                  <Text as="span">{"·"}</Text>
+                  <HStack>
+                    {reply.status === "APPROVED" ? (
+                      <CheckIcon color="gray.600" boxSize={3.5} />
+                    ) : (
+                      <CloseIcon color="gray.600" boxSize={3} />
+                    )}
 
-                  <Text color="gray.500">
-                    <UserOrContactReference
-                      userOrAccess={reply.lastReviewedBy}
-                      userUseYou
-                      contactAsLink={false}
-                    />
+                    <Text color="gray.500">
+                      <UserOrContactReference
+                        userOrAccess={reply.lastReviewedBy}
+                        userUseYou
+                        contactAsLink={false}
+                      />
 
-                    {", "}
-                    <DateTime as="span" value={reply.lastReviewedAt} format={FORMATS.LLL} />
-                  </Text>
-                </HStack>
+                      {", "}
+                      <DateTime as="span" value={reply.lastReviewedAt} format={FORMATS.LLL} />
+                    </Text>
+                  </HStack>
+                </>
               ) : null}
             </HStack>
           )}
         </GridItem>
       </Grid>
       {petitionField?.requireApproval && petition.isReviewFlowEnabled ? (
-        <Stack
-          direction="row"
-          spacing={1}
-          alignSelf="flex-start"
-          data-section="approve-reject-reply"
-        >
+        <Stack direction="row" gap={1} alignSelf="flex-start" data-section="approve-reject-reply">
           <IconButtonWithTooltip
             data-action="approve-reply"
             icon={<CheckIcon />}

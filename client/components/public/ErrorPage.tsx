@@ -1,6 +1,7 @@
-import { Box, Flex, Heading, Image } from "@chakra-ui/react";
+import { Heading, Image } from "@chakra-ui/react";
 import { Logo } from "@parallel/components/common/Logo";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
+import { Box, Flex } from "@parallel/components/ui";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { Spacer } from "../common/Spacer";

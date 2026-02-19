@@ -9,7 +9,7 @@ import {
   FileSpreadsheetIcon,
   FileZipIcon,
 } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Maybe } from "@parallel/graphql/__types";
 import match from "mime-match";
 import { IntlShape, useIntl } from "react-intl";
@@ -21,10 +21,13 @@ export interface FileIconProps {
   hasFailed?: boolean;
 }
 
-export const FileIcon = chakraForwardRef<"svg", FileIconProps>(function FileIcon(
-  { filename, contentType, hasFailed, ...props },
+export const FileIcon = chakraComponent<"svg", FileIconProps>(function FileIcon({
   ref,
-) {
+  filename,
+  contentType,
+  hasFailed,
+  ...props
+}) {
   const [Icon, label] = useGetIconAndLabelForFile({ filename, contentType, hasFailed });
   return (
     <Icon ref={ref} color={hasFailed ? "red.500" : "inherit"} alt={label} {...(props as any)} />

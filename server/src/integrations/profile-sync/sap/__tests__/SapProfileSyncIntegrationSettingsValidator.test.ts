@@ -6,6 +6,7 @@ import { join } from "path";
 import { indexBy } from "remeda";
 import { MockSapOdataClient } from "../../../../../test/mocks";
 import { createTestContainer } from "../../../../../test/testContainer";
+import { ILogger, LOGGER } from "../../../../services/Logger";
 import {
   Organization,
   ProfileRelationshipType,
@@ -47,6 +48,10 @@ describe("SapProfileSyncIntegrationSettingsValidator", () => {
 
   beforeAll(async () => {
     container = await createTestContainer();
+
+    const noopLogger: ILogger = { log() {}, info() {}, warn() {}, error() {}, debug() {} };
+    await container.unbind(LOGGER);
+    container.bind<ILogger>(LOGGER).toConstantValue(noopLogger);
 
     client = container.get<MockSapOdataClient>(SAP_ODATA_CLIENT);
 

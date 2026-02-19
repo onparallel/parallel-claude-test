@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 import { UsersIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Text } from "@parallel/components/ui";
 import { UserGroupReference_UserGroupFragment, UserLocale } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
@@ -14,8 +14,8 @@ interface UserGroupReferenceProps {
   disablePopover?: boolean;
 }
 
-export const UserGroupReference = chakraForwardRef<"span", UserGroupReferenceProps>(
-  function UserGroupReference({ userGroup, disablePopover, ...props }, ref) {
+export const UserGroupReference = chakraComponent<"span", UserGroupReferenceProps>(
+  function UserGroupReference({ ref, userGroup, disablePopover, ...props }) {
     if (userGroup) {
       return (
         <Text ref={ref} as="span" {...props}>

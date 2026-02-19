@@ -7,11 +7,9 @@ import {
   Center,
   Checkbox,
   FormControl,
-  HStack,
   ListItem,
   OrderedList,
   Progress,
-  Stack,
   UnorderedList,
 } from "@chakra-ui/react";
 import { DeleteIcon, DownloadIcon, SignatureIcon } from "@parallel/chakra/icons";
@@ -32,7 +30,7 @@ import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWit
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   ConfirmPetitionSignersDialog_PetitionSignerFragment,
   ConfirmPetitionSignersDialog_SignatureConfigFragment,
@@ -346,7 +344,7 @@ export function ConfirmPetitionSignersDialog(
                     />
                   </Center>
 
-                  <Stack flex="1" minWidth={0} whiteSpace="nowrap" spacing={0.5}>
+                  <Stack flex="1" minWidth={0} whiteSpace="nowrap" gap={0.5}>
                     <HStack>
                       <FileName value={customDocument.name} />
                       <Text as="span">-</Text>

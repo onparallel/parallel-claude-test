@@ -1,6 +1,6 @@
-import { Stack } from "@chakra-ui/react";
 import { PetitionSelect } from "@parallel/components/common/PetitionSelect";
 import { TableColumnFilterProps } from "@parallel/components/common/Table";
+import { Stack } from "@parallel/components/ui";
 
 export function PetitionTemplateFilter({
   value,

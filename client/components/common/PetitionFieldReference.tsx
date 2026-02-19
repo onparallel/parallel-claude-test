@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { PetitionFieldReference_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { FormattedMessage } from "react-intl";
@@ -10,8 +10,8 @@ interface PetitionFieldReferenceProps {
   field: Maybe<PetitionFieldReference_PetitionFieldFragment> | undefined;
 }
 
-export const PetitionFieldReference = chakraForwardRef<"span", PetitionFieldReferenceProps>(
-  function PetitionFieldReference({ field, ...props }, ref) {
+export const PetitionFieldReference = chakraComponent<"span", PetitionFieldReferenceProps>(
+  function PetitionFieldReference({ ref, field, ...props }) {
     return field ? (
       field.title ? (
         <Text ref={ref as any} as="strong" {...props}>

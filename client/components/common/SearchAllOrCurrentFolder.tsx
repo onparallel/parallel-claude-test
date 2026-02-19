@@ -1,6 +1,7 @@
-import { Box, ButtonGroup, HStack, RadioProps, useRadioGroup } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
+import { ButtonGroup, RadioProps, useRadioGroup } from "@chakra-ui/react";
 import { PetitionBaseType } from "@parallel/graphql/__types";
+import { Box, HStack } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
 import { OverflownText } from "./OverflownText";
 import { PathName } from "./PathName";
@@ -15,8 +16,8 @@ interface SearchAllOrCurrentFolderProps {
   type: PetitionBaseType;
 }
 
-export const SearchAllOrCurrentFolder = chakraForwardRef<"div", SearchAllOrCurrentFolderProps>(
-  function SearchAllOrCurrentFolder({ onChange, value, path, type, ...props }, ref) {
+export const SearchAllOrCurrentFolder = chakraComponent<"div", SearchAllOrCurrentFolderProps>(
+  function SearchAllOrCurrentFolder({ ref, onChange, value, path, type, ...props }) {
     const { getRootProps, getRadioProps } = useRadioGroup({
       name: "categories",
       value,

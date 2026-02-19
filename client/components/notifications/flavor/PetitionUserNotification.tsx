@@ -1,14 +1,14 @@
 import { gql } from "@apollo/client";
-import { Box, Circle, Flex, LinkBox, LinkOverlay, Stack } from "@chakra-ui/react";
+import { Circle, LinkBox, LinkOverlay } from "@chakra-ui/react";
 import { EmailIcon, EmailOpenedIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import NextLink from "next/link";
-import { Text } from "@parallel/components/ui";
+import { Box, Flex, Stack, Text } from "@parallel/components/ui";
 import { PetitionUserNotification_PetitionUserNotificationFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
-import { forwardRef, ReactNode, useEffect, useRef } from "react";
+import NextLink from "next/link";
+import { ReactNode, RefAttributes, useEffect, useRef } from "react";
 import { useIntl } from "react-intl";
 export interface PetitionUserNotificationProps {
   isFirst?: boolean;
@@ -18,160 +18,165 @@ export interface PetitionUserNotificationProps {
   children: ReactNode;
 }
 
-export const PetitionUserNotification = forwardRef<HTMLElement, PetitionUserNotificationProps>(
-  function PetitionUserNotification({ isFirst, icon, path, notification, children }, ref) {
-    const { isRead, petition, createdAt } = notification;
-    const intl = useIntl();
-    const markAsReadText = isRead
-      ? intl.formatMessage({
-          id: "component.petition-user-notification.mark-as-unread",
-          defaultMessage: "Mark as unread",
-        })
-      : intl.formatMessage({
-          id: "component.petition-user-notification.mark-as-read",
-          defaultMessage: "Mark as read",
-        });
-
-    const updateIsReadNotification = useUpdateIsReadNotification();
-
-    const handleMarkAsReadUnread = async () => {
-      await updateIsReadNotification({
-        petitionUserNotificationIds: [notification.id],
-        isRead: !isRead,
+export function PetitionUserNotification({
+  isFirst,
+  icon,
+  path,
+  notification,
+  children,
+  ref,
+}: PetitionUserNotificationProps & RefAttributes<HTMLElement>) {
+  const { isRead, petition, createdAt } = notification;
+  const intl = useIntl();
+  const markAsReadText = isRead
+    ? intl.formatMessage({
+        id: "component.petition-user-notification.mark-as-unread",
+        defaultMessage: "Mark as unread",
+      })
+    : intl.formatMessage({
+        id: "component.petition-user-notification.mark-as-read",
+        defaultMessage: "Mark as read",
       });
-    };
 
-    const linkRef = useRef<HTMLAnchorElement>(null);
-    const bodyRef = useRef<HTMLDivElement>(null);
-    useEffect(() => {
-      const content = bodyRef.current!.innerText.replace(/\n+/g, " - ");
-      if (isFirst) {
-        linkRef.current!.setAttribute(
-          "aria-label",
-          `${content} - ${intl.formatMessage({
-            id: "component.petition-user-notification.instructions",
-            defaultMessage:
-              "Use up and down arrows to navigate to other notifications. Use space to toggle read status.",
-          })}`,
-        );
-      } else {
-        linkRef.current!.setAttribute("aria-label", content);
-      }
-    }, [intl.locale]);
-    return (
-      <LinkBox
-        as={Stack}
-        data-notification-id={notification.id}
-        data-notification-type={notification.__typename}
-        ref={ref as any}
-        direction="row"
-        background={isRead ? "white" : "primary.50"}
-        spacing={0}
-        paddingY={2}
-        _hover={{
-          background: "gray.75",
-          ".mark-as": { display: "block" },
-        }}
-        borderBottom="1px solid"
-        borderColor="gray.200"
-      >
-        <Flex minWidth={16} paddingStart={4} alignItems="center" justifyContent="flex-end">
-          {isRead ? null : (
-            <Circle
-              data-testid="notification-circle"
-              size={2}
-              backgroundColor="primary.400"
-              marginEnd={1}
-            />
-          )}
+  const updateIsReadNotification = useUpdateIsReadNotification();
 
-          {icon}
-        </Flex>
-        <Stack flex="1 1 auto" minWidth="0" spacing={0} ref={bodyRef}>
-          <LinkOverlay
-            as={NextLink}
-            href={`/${intl.locale}/app/petitions/${petition.id}${path}`}
-            ref={linkRef}
-            draggable="false"
-            tabIndex={isFirst ? 0 : -1}
-            _focus={{
-              outline: "none",
-              _before: { boxShadow: "inline" },
-              ".mark-as": { display: "flex" },
-            }}
-            onKeyDown={(e) => {
-              if (e.code === "Space") {
-                handleMarkAsReadUnread();
-                e.preventDefault();
-              }
-            }}
-          >
-            <Text
-              data-testid="notification-title"
-              as="div"
-              position="relative"
-              paddingX={4}
-              lineClamp={1}
-              fontSize="sm"
-              minWidth="0"
-              fontWeight={petition.name ? "bold" : "normal"}
-              fontStyle={petition.name ? "normal" : "italic"}
-              color="gray.600"
-            >
-              {petition.name ??
-                (petition.__typename === "Petition"
-                  ? intl.formatMessage({
-                      id: "generic.unnamed-parallel",
-                      defaultMessage: "Unnamed parallel",
-                    })
-                  : intl.formatMessage({
-                      id: "generic.unnamed-template",
-                      defaultMessage: "Unnamed template",
-                    }))}
-            </Text>
-          </LinkOverlay>
-          <Text
-            data-testid="notification-text"
-            fontWeight={isRead ? "normal" : "medium"}
-            lineClamp={3}
-            paddingX={4}
-            paddingBottom={1}
-            paddingTop={0.5}
-          >
-            {children}
-          </Text>
-          <DateTime
-            paddingX={4}
-            fontSize="sm"
-            color="gray.500"
-            value={createdAt}
-            format={FORMATS.LLL}
-            whiteSpace="nowrap"
-            useRelativeTime
+  const handleMarkAsReadUnread = async () => {
+    await updateIsReadNotification({
+      petitionUserNotificationIds: [notification.id],
+      isRead: !isRead,
+    });
+  };
+
+  const linkRef = useRef<HTMLAnchorElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const content = bodyRef.current!.innerText.replace(/\n+/g, " - ");
+    if (isFirst) {
+      linkRef.current!.setAttribute(
+        "aria-label",
+        `${content} - ${intl.formatMessage({
+          id: "component.petition-user-notification.instructions",
+          defaultMessage:
+            "Use up and down arrows to navigate to other notifications. Use space to toggle read status.",
+        })}`,
+      );
+    } else {
+      linkRef.current!.setAttribute("aria-label", content);
+    }
+  }, [intl.locale]);
+  return (
+    <LinkBox
+      as={Stack}
+      data-notification-id={notification.id}
+      data-notification-type={notification.__typename}
+      ref={ref as any}
+      direction="row"
+      background={isRead ? "white" : "primary.50"}
+      gap={0}
+      paddingY={2}
+      _hover={{
+        background: "gray.75",
+        ".mark-as": { display: "block" },
+      }}
+      borderBottom="1px solid"
+      borderColor="gray.200"
+    >
+      <Flex minWidth={16} paddingStart={4} alignItems="center" justifyContent="flex-end">
+        {isRead ? null : (
+          <Circle
+            data-testid="notification-circle"
+            size={2}
+            backgroundColor="primary.400"
+            marginEnd={1}
           />
-        </Stack>
-        <Box display="none" className="mark-as" position="absolute" insetEnd={4} top={2}>
-          <IconButtonWithTooltip
-            tabIndex={-1}
-            label={markAsReadText}
-            icon={isRead ? <EmailIcon /> : <EmailOpenedIcon />}
-            fontSize="16px"
-            onClick={(e) => {
-              e.preventDefault();
+        )}
+
+        {icon}
+      </Flex>
+      <Stack flex="1 1 auto" minWidth="0" gap={0} ref={bodyRef}>
+        <LinkOverlay
+          as={NextLink}
+          href={`/${intl.locale}/app/petitions/${petition.id}${path}`}
+          ref={linkRef}
+          draggable="false"
+          tabIndex={isFirst ? 0 : -1}
+          _focus={{
+            outline: "none",
+            _before: { boxShadow: "inline" },
+            ".mark-as": { display: "flex" },
+          }}
+          onKeyDown={(e) => {
+            if (e.code === "Space") {
               handleMarkAsReadUnread();
-            }}
-            size="sm"
-            background="white"
-            boxShadow="md"
-            _hover={{
-              boxShadow: "lg",
-            }}
-          />
-        </Box>
-      </LinkBox>
-    );
-  },
-);
+              e.preventDefault();
+            }
+          }}
+        >
+          <Text
+            data-testid="notification-title"
+            as="div"
+            position="relative"
+            paddingX={4}
+            lineClamp={1}
+            fontSize="sm"
+            minWidth="0"
+            fontWeight={petition.name ? "bold" : "normal"}
+            fontStyle={petition.name ? "normal" : "italic"}
+            color="gray.600"
+          >
+            {petition.name ??
+              (petition.__typename === "Petition"
+                ? intl.formatMessage({
+                    id: "generic.unnamed-parallel",
+                    defaultMessage: "Unnamed parallel",
+                  })
+                : intl.formatMessage({
+                    id: "generic.unnamed-template",
+                    defaultMessage: "Unnamed template",
+                  }))}
+          </Text>
+        </LinkOverlay>
+        <Text
+          data-testid="notification-text"
+          fontWeight={isRead ? "normal" : "medium"}
+          lineClamp={3}
+          paddingX={4}
+          paddingBottom={1}
+          paddingTop={0.5}
+        >
+          {children}
+        </Text>
+        <DateTime
+          paddingX={4}
+          fontSize="sm"
+          color="gray.500"
+          value={createdAt}
+          format={FORMATS.LLL}
+          whiteSpace="nowrap"
+          useRelativeTime
+        />
+      </Stack>
+      <Box display="none" className="mark-as" position="absolute" insetEnd={4} top={2}>
+        <IconButtonWithTooltip
+          tabIndex={-1}
+          label={markAsReadText}
+          icon={isRead ? <EmailIcon /> : <EmailOpenedIcon />}
+          fontSize="16px"
+          onClick={(e) => {
+            e.preventDefault();
+            handleMarkAsReadUnread();
+          }}
+          size="sm"
+          background="white"
+          boxShadow="md"
+          _hover={{
+            boxShadow: "lg",
+          }}
+        />
+      </Box>
+    </LinkBox>
+  );
+}
 
 const _fragments = {
   PetitionUserNotification: gql`

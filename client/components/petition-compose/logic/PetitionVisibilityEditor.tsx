@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Grid, HStack, IconButton, Stack } from "@chakra-ui/react";
+import { Grid, IconButton } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
-import { Button } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack } from "@parallel/components/ui";
 import { PetitionVisibilityEditor_PetitionBaseFragment } from "@parallel/graphql/__types";
 import {
   defaultFieldCondition,
@@ -148,7 +148,7 @@ export function PetitionVisibilityEditor({
 
   return (
     <PetitionFieldLogicContext petition={petition} field={referenceField} includeSelf={includeSelf}>
-      <Stack spacing={2} padding={2} borderRadius="md" backgroundColor="gray.100">
+      <Stack gap={2} padding={2} borderRadius="md" backgroundColor="gray.100">
         <Grid
           templateColumns={
             isReadOnly

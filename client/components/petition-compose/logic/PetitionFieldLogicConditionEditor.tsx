@@ -1,13 +1,10 @@
 import {
-  Box,
-  HStack,
   Input,
   NumberDecrementStepper,
   NumberIncrementStepper,
   NumberInput,
   NumberInputField,
   NumberInputStepper,
-  Stack,
 } from "@chakra-ui/react";
 import { InfoCircleIcon } from "@parallel/chakra/icons";
 import { BackgroundCheckTopicSelect } from "@parallel/components/common/BackgroundCheckTopicSelect";
@@ -17,7 +14,7 @@ import {
   toSimpleSelectOption,
   useSimpleSelectOptions,
 } from "@parallel/components/common/SimpleSelect";
-import { Text } from "@parallel/components/ui";
+import { Box, HStack, Stack, Text } from "@parallel/components/ui";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { BACKGROUND_CHECK_TOPICS } from "@parallel/utils/backgroundCheckTopics";
 import { FORMATS, dateToDatetimeLocal, prettifyTimezone } from "@parallel/utils/dates";

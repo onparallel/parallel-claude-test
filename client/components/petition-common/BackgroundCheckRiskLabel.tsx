@@ -1,13 +1,13 @@
-import { Badge, HStack } from "@chakra-ui/react";
+import { Badge } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { BusinessIcon, LinkIcon, UserIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
-import { Text } from "@parallel/components/ui";
+import { chakraComponent } from "@parallel/chakra/utils";
+import { HStack, Text } from "@parallel/components/ui";
 import { isNullish } from "remeda";
 import { BACKGROUND_CHECK_TOPICS } from "../../utils/backgroundCheckTopics";
 
-export const BackgroundCheckRiskLabel = chakraForwardRef<"span", { risk: string }>(
-  function BackgroundCheckRiskLabel({ risk, ...props }, ref) {
+export const BackgroundCheckRiskLabel = chakraComponent<"span", { risk: string }>(
+  function BackgroundCheckRiskLabel({ ref, risk, ...props }) {
     const label = BACKGROUND_CHECK_TOPICS[risk];
     const text = risk.split(".")?.[1] ?? risk;
     const icon = ["sanction.linked"].includes(risk) ? (
@@ -22,7 +22,7 @@ export const BackgroundCheckRiskLabel = chakraForwardRef<"span", { risk: string 
         <Badge
           as={HStack}
           display="inline-flex"
-          spacing={1}
+          gap={1}
           colorScheme={
             risk === "role.pep"
               ? "green"

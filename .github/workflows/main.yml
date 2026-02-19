@@ -1,4 +1,4 @@
-name: Code linting
+name: CI
 
 on:
   push:
@@ -13,9 +13,58 @@ on:
       - "docs/**"
       - "ops/**"
 
+concurrency:
+  group: ${{ github.ref }}-main
+  cancel-in-progress: true
+
 jobs:
-  linting:
-    name: Code linting
+  detect-changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      server: ${{ steps.filter.outputs.server }}
+      client: ${{ steps.filter.outputs.client }}
+      bin: ${{ steps.filter.outputs.bin }}
+      e2e: ${{ steps.filter.outputs.e2e }}
+      root-config: ${{ steps.filter.outputs.root-config }}
+      any-project: ${{ steps.any.outputs.any-project }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            server:
+              - 'server/**'
+            client:
+              - 'client/**'
+            bin:
+              - 'bin/**'
+            e2e:
+              - 'e2e/**'
+            root-config:
+              - 'eslint.config.mjs'
+              - 'tsconfig.json'
+              - 'yarn.lock'
+              - 'package.json'
+              - '.nvmrc'
+      - name: Check if any project changed
+        id: any
+        run: |
+          if [[ "${{ steps.filter.outputs.server }}" == "true" || \
+                "${{ steps.filter.outputs.client }}" == "true" || \
+                "${{ steps.filter.outputs.bin }}" == "true" || \
+                "${{ steps.filter.outputs.e2e }}" == "true" || \
+                "${{ steps.filter.outputs.root-config }}" == "true" ]]; then
+            echo "any-project=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "any-project=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  lint:
+    name: Lint
+    needs: detect-changes
+    if: needs.detect-changes.outputs.any-project == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -33,19 +82,201 @@ jobs:
       - name: Install dependencies
         if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile --production=false
-      - name: Run linter
-        run: yarn lint
-      - name: Check translations
-        run: |
-          echo "Checking server translations..."
-          yarn workspace @parallel/server extract-i18n-terms
-          yarn workspace @parallel/server generate-i18n-files
-          echo "Checking client translations..."
-          yarn workspace @parallel/client extract-i18n-terms:recipient
-          yarn workspace @parallel/client generate-i18n-files:recipient
-          yarn workspace @parallel/client extract-i18n-terms:app
-          yarn workspace @parallel/client generate-i18n-files:app
+        env:
+          SKIP_UPDATE_IP_DB: "1"
 
-concurrency:
-  group: ${{ github.ref }}-main
-  cancel-in-progress: true
+      - name: Lint and check translations
+        run: |
+          # Start translations in background
+          (
+            if [[ "$SERVER_CHANGED" == "true" ]]; then
+              yarn workspace @parallel/server extract-i18n-terms && \
+              yarn workspace @parallel/server generate-i18n-files
+            fi
+            if [[ "$CLIENT_CHANGED" == "true" ]]; then
+              yarn workspace @parallel/client extract-i18n-terms:recipient && \
+              yarn workspace @parallel/client generate-i18n-files:recipient && \
+              yarn workspace @parallel/client extract-i18n-terms:app && \
+              yarn workspace @parallel/client generate-i18n-files:app
+            fi
+          ) &
+          TRANSLATIONS_PID=$!
+
+          # Run lint in foreground
+          LINT_FAILED=0
+          if [[ "$SERVER_CHANGED" == "true" ]]; then npx eslint --quiet server/ || LINT_FAILED=1; fi
+          if [[ "$CLIENT_CHANGED" == "true" ]]; then npx eslint --quiet client/ || LINT_FAILED=1; fi
+          if [[ "$BIN_CHANGED" == "true" ]]; then npx eslint --quiet bin/ || LINT_FAILED=1; fi
+          if [[ "$E2E_CHANGED" == "true" ]]; then npx eslint --quiet e2e/ || LINT_FAILED=1; fi
+
+          # Wait for translations and check results
+          wait $TRANSLATIONS_PID || exit 1
+          if [[ $LINT_FAILED -ne 0 ]]; then exit 1; fi
+        env:
+          SERVER_CHANGED: ${{ needs.detect-changes.outputs.server == 'true' || needs.detect-changes.outputs.root-config == 'true' }}
+          CLIENT_CHANGED: ${{ needs.detect-changes.outputs.client == 'true' || needs.detect-changes.outputs.root-config == 'true' }}
+          BIN_CHANGED: ${{ needs.detect-changes.outputs.bin == 'true' || needs.detect-changes.outputs.root-config == 'true' }}
+          E2E_CHANGED: ${{ needs.detect-changes.outputs.e2e == 'true' || needs.detect-changes.outputs.root-config == 'true' }}
+
+  check-types:
+    name: Check types
+    needs: detect-changes
+    if: needs.detect-changes.outputs.any-project == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+      - uses: actions/cache@v4
+        id: yarn-cache
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-yarn-cache-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-cache-
+      - name: Install dependencies
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile --production=false
+        env:
+          SKIP_UPDATE_IP_DB: "1"
+
+      - name: Check server types
+        if: needs.detect-changes.outputs.server == 'true' || needs.detect-changes.outputs.root-config == 'true'
+        run: yarn workspace @parallel/server check-types
+
+      - name: Check client types
+        if: needs.detect-changes.outputs.client == 'true' || needs.detect-changes.outputs.root-config == 'true'
+        run: yarn workspace @parallel/client check-types
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Check bin types
+        if: needs.detect-changes.outputs.bin == 'true' || needs.detect-changes.outputs.root-config == 'true'
+        run: yarn workspace @parallel/bin check-types
+
+      - name: Check e2e types
+        if: needs.detect-changes.outputs.e2e == 'true' || needs.detect-changes.outputs.root-config == 'true'
+        run: yarn workspace @parallel/e2e check-types
+
+  server-tests-1:
+    name: Server Tests (1/2)
+    needs: detect-changes
+    if: needs.detect-changes.outputs.server == 'true' || needs.detect-changes.outputs.root-config == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+      - uses: actions/cache@v4
+        id: yarn-cache
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-yarn-cache-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-cache-
+      - name: Install dependencies
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile --production=false
+        env:
+          SKIP_UPDATE_IP_DB: "1"
+      - name: Run server tests (shard 1/2)
+        timeout-minutes: 15
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+        run: yarn --cwd server/ test --silent --shard=1/2
+
+  server-tests-2:
+    name: Server Tests (2/2)
+    needs: detect-changes
+    if: needs.detect-changes.outputs.server == 'true' || needs.detect-changes.outputs.root-config == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+      - uses: actions/cache@v4
+        id: yarn-cache
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-yarn-cache-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-cache-
+      - name: Install dependencies
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile --production=false
+        env:
+          SKIP_UPDATE_IP_DB: "1"
+      - name: Run server tests (shard 2/2)
+        timeout-minutes: 15
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+        run: yarn --cwd server/ test --silent --shard=2/2
+
+  client-tests:
+    name: Client Tests
+    needs: detect-changes
+    if: needs.detect-changes.outputs.client == 'true' || needs.detect-changes.outputs.root-config == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+      - uses: actions/cache@v4
+        id: yarn-cache
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-yarn-cache-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-cache-
+      - name: Install dependencies
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile --production=false
+        env:
+          SKIP_UPDATE_IP_DB: "1"
+      - name: Run client tests
+        run: yarn workspace @parallel/client test
+
+  code-review:
+    name: Code Review
+    needs: [lint, check-types, server-tests-1, server-tests-2, client-tests]
+    if: |
+      always() &&
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.ref != 'develop' &&
+      github.event.pull_request.head.ref != 'staging' &&
+      github.event.pull_request.head.ref != 'master' &&
+      needs.lint.result != 'failure' && needs.lint.result != 'cancelled' &&
+      needs.check-types.result != 'failure' && needs.check-types.result != 'cancelled' &&
+      needs.server-tests-1.result != 'failure' && needs.server-tests-1.result != 'cancelled' &&
+      needs.server-tests-2.result != 'failure' && needs.server-tests-2.result != 'cancelled' &&
+      needs.client-tests.result != 'failure' && needs.client-tests.result != 'cancelled'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Code Review
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          claude_args: |
+            --allowedTools "Bash" "Skill"
+          prompt: |
+            You are running in GitHub Actions CI. PR number is ${{ github.event.pull_request.number }}.
+
+            Run the /code-review skill to analyze this PR for security vulnerabilities and code quality issues.
+            Use `git diff origin/${{ github.base_ref }}...HEAD` to get the changes.

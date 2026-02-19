@@ -1,5 +1,5 @@
 import { Badge, BadgeProps } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { unMaybeArray } from "@parallel/utils/types";
 import { get, useFormContext } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
@@ -8,10 +8,11 @@ interface EditedBadgeProps extends BadgeProps {
   field: string | string[];
 }
 
-export const EditedBadge = chakraForwardRef<"span", EditedBadgeProps>(function EditedBadge(
-  { field, ...props },
+export const EditedBadge = chakraComponent<"span", EditedBadgeProps>(function EditedBadge({
   ref,
-) {
+  field,
+  ...props
+}) {
   const {
     formState: { dirtyFields },
   } = useFormContext();

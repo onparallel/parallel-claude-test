@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
-import { Badge, Box, Center, Flex, HStack, LinkBox, LinkOverlay, Stack } from "@chakra-ui/react";
+import { Badge, Center, LinkBox, LinkOverlay } from "@chakra-ui/react";
 import { CommentIcon, EditIcon } from "@parallel/chakra/icons";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import { PetitionComments_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -91,7 +91,7 @@ export function PetitionComments({ petition, onSelectField }: PetitionCommentsPr
               <LinkBox
                 as={Stack}
                 key={field.id}
-                spacing={1}
+                gap={1}
                 paddingX={4}
                 paddingY={2}
                 backgroundColor={unreadCount > 0 ? "primary.50" : "white"}

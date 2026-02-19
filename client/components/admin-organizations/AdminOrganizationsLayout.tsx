@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Badge, HStack } from "@chakra-ui/react";
+import { Badge } from "@chakra-ui/react";
 import { AdminSettingsLayout } from "@parallel/components/layout/AdminSettingsLayout";
-import { Button } from "@parallel/components/ui";
+import { Button, HStack } from "@parallel/components/ui";
 import {
   AdminOrganizationsLayout_OrganizationFragment,
   AdminOrganizationsLayout_QueryFragment,

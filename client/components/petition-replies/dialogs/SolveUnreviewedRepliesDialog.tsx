@@ -1,8 +1,8 @@
-import { Box, Flex, Radio, RadioGroup, Stack, useTheme } from "@chakra-ui/react";
+import { Radio, RadioGroup, useTheme } from "@chakra-ui/react";
 import { CheckIcon, CloseIcon, ForbiddenIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, Stack, Text } from "@parallel/components/ui";
 import deepmerge from "deepmerge";
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";

@@ -1,5 +1,4 @@
 import { faker } from "@faker-js/faker/locale/af_ZA";
-import { RedisCommandRawReply } from "@redis/client/dist/lib/commands";
 import { IncomingMessage } from "http";
 import { inject, injectable } from "inversify";
 import { isDeepEqual, isNonNullish, keys, pick } from "remeda";
@@ -111,28 +110,6 @@ export class MockAuth implements IAuth {
     return `userId:${userId}`;
   }
   async resetTempPassword() {}
-}
-
-@injectable()
-export class MockRedis implements IRedis {
-  client: any;
-  async sendRawCommand<T = RedisCommandRawReply>(): Promise<T> {
-    return null as T;
-  }
-  async connect() {}
-  async disconnect() {}
-  async withConnection() {
-    return {
-      async [Symbol.asyncDispose]() {},
-    };
-  }
-  async get(): Promise<string | null> {
-    return null;
-  }
-  async set() {}
-  async delete(): Promise<number> {
-    return 0;
-  }
 }
 
 @injectable()

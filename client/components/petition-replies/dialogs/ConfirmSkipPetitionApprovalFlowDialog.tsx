@@ -1,8 +1,8 @@
-import { FormControl, Stack } from "@chakra-ui/react";
+import { FormControl } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";

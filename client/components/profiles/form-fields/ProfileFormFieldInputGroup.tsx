@@ -1,12 +1,13 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Flex, HStack, InputGroup, InputRightElement } from "@chakra-ui/react";
+import { Center, InputGroup, InputRightElement } from "@chakra-ui/react";
 import { EditIcon, TimeAlarmIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { SuggestionsButton } from "@parallel/components/common/SuggestionsButton";
 import { ProfileFormFieldInputGroup_ProfileTypeFieldFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
+import { Box, Flex, HStack } from "@parallel/components/ui";
 import { Duration, isPast, sub } from "date-fns";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -107,8 +108,8 @@ interface ProfileFieldExpiresAtIconProps {
   expiryAlertAheadTime?: Duration | null;
 }
 
-export const ProfileFieldExpiresAtIcon = chakraForwardRef<"div", ProfileFieldExpiresAtIconProps>(
-  function ProfileFieldExpiresAtIcon({ expiryDate, expiryAlertAheadTime, ...props }, ref) {
+export const ProfileFieldExpiresAtIcon = chakraComponent<"div", ProfileFieldExpiresAtIconProps>(
+  function ProfileFieldExpiresAtIcon({ ref, expiryDate, expiryAlertAheadTime, ...props }) {
     const intl = useIntl();
 
     const alertIsActive =

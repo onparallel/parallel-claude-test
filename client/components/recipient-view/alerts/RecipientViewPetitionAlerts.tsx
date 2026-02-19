@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Alert, AlertDescription, AlertIcon, Box, Flex } from "@chakra-ui/react";
+import { Alert, AlertDescription, AlertIcon } from "@chakra-ui/react";
 import { TimeIcon } from "@parallel/chakra/icons";
 import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
 import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
@@ -14,7 +14,7 @@ import {
 import { Maybe } from "@parallel/utils/types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, Text } from "@parallel/components/ui";
 
 interface RecipientViewPetitionAlertsProps {
   tone: Tone;

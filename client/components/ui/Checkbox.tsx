@@ -1,5 +1,5 @@
 import { Checkbox as ChakraCheckbox, CheckboxProps } from "@chakra-ui/react";
-import { forwardRef } from "react";
+import { RefAttributes } from "react";
 
 // Docs: https://chakra-ui.com/docs/components/checkbox
 
@@ -16,20 +16,24 @@ export interface ExtendedCheckboxProps
   colorPalette?: string;
 }
 
-export const Checkbox = forwardRef<HTMLInputElement, ExtendedCheckboxProps>(
-  ({ invalid, disabled, readOnly, checked, colorPalette, ...props }, ref) => {
-    return (
-      <ChakraCheckbox
-        ref={ref}
-        isInvalid={invalid}
-        isDisabled={disabled}
-        isReadOnly={readOnly}
-        isChecked={checked}
-        colorScheme={colorPalette}
-        {...props}
-      />
-    );
-  },
-);
-
-Checkbox.displayName = "Checkbox";
+export function Checkbox({
+  invalid,
+  disabled,
+  readOnly,
+  checked,
+  colorPalette,
+  ref,
+  ...props
+}: ExtendedCheckboxProps & RefAttributes<HTMLInputElement>) {
+  return (
+    <ChakraCheckbox
+      ref={ref}
+      isInvalid={invalid}
+      isDisabled={disabled}
+      isReadOnly={readOnly}
+      isChecked={checked}
+      colorScheme={colorPalette}
+      {...props}
+    />
+  );
+}

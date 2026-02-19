@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, BoxProps, Flex, HTMLChakraProps, IconButton } from "@chakra-ui/react";
+import { HTMLChakraProps, IconButton } from "@chakra-ui/react";
 import { AddIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import {
@@ -7,7 +7,7 @@ import {
   PetitionComposeFieldProps,
   PetitionComposeFieldRef,
 } from "@parallel/components/petition-compose/PetitionComposeField";
-import { Button } from "@parallel/components/ui";
+import { Box, BoxProps, Button, Flex } from "@parallel/components/ui";
 import {
   PetitionComposeFieldList_PetitionBaseFragment,
   UpdatePetitionFieldInput,

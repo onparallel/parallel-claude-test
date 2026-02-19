@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
-import { Stack } from "@chakra-ui/react";
+
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button } from "@parallel/components/ui";
+import { Button, Stack } from "@parallel/components/ui";
 import {
   HiddenFieldDialog_PetitionBaseFragment,
   HiddenFieldDialog_PetitionFieldFragment,
@@ -34,7 +34,7 @@ export function HiddenFieldDialog({
         <FormattedMessage id="generic.field-not-visible" defaultMessage="Field not visible" />
       }
       body={
-        <Stack gridGap={3} spacing={0}>
+        <Stack gridGap={3} gap={0}>
           <FormattedMessage
             id="component.hidden-field-dialog.body"
             defaultMessage="The field you are trying to preview is not visible right now. The following conditions must be met for it to be displayed:"

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import { Center, Checkbox, Flex, FormControl, Spinner, Stack } from "@chakra-ui/react";
+import { Center, Checkbox, FormControl, Spinner } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
@@ -10,7 +10,7 @@ import {
   UserSelectInstance,
   UserSelectSelection,
 } from "@parallel/components/common/UserSelect";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Flex, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionPermissionType,
   PetitionPermissionTypeRW,
@@ -217,7 +217,7 @@ export function TemplateDefaultPermissionsDialog({
             />
           </Center>
         ) : (
-          <Stack spacing={4}>
+          <Stack gap={4}>
             <Text>
               <FormattedMessage
                 id="component.template-default-permissions-dialog.description"

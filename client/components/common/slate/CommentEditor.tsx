@@ -1,4 +1,4 @@
-import { Box, useFormControl, useMultiStyleConfig } from "@chakra-ui/react";
+import { useFormControl, useMultiStyleConfig } from "@chakra-ui/react";
 import { UserLocale } from "@parallel/graphql/__types";
 import {
   createMentionPlugin,
@@ -27,13 +27,13 @@ import {
 import { createLinkPlugin, ELEMENT_LINK } from "@udecode/plate-link";
 import { ELEMENT_MENTION_INPUT } from "@udecode/plate-mention";
 import { createParagraphPlugin, ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
-import { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
+import { RefAttributes, useImperativeHandle, useMemo, useRef } from "react";
 import { useIntl } from "react-intl";
 import { isNonNullish, omit, pick } from "remeda";
 import { Editor, Transforms } from "slate";
 import { EditableProps } from "slate-react/dist/components/editable";
 import { PlateWithEditorRef } from "./PlateWithEditorRef";
-import { Text } from "@parallel/components/ui";
+import { Box, Text } from "@parallel/components/ui";
 
 const components = {
   [ELEMENT_PARAGRAPH]: withProps(RenderElement, { as: "p" }),
@@ -105,140 +105,136 @@ export interface CommentEditorInstance {
   focus(): void;
 }
 
-export const CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProps>(
-  function CommentEditor(
-    {
-      id,
-      placeholder,
-      value,
-      onChange,
-      isDisabled,
-      isInvalid,
-      isRequired,
-      isReadOnly,
-      defaultMentionables,
-      onSearchMentionables,
-      ...props
+export function CommentEditor({
+  ref,
+  id,
+  placeholder,
+  value,
+  onChange,
+  isDisabled,
+  isInvalid,
+  isRequired,
+  isReadOnly,
+  defaultMentionables,
+  onSearchMentionables,
+  ...props
+}: CommentEditorProps & RefAttributes<CommentEditorInstance>) {
+  const intl = useIntl();
+  const plugins = useMemo(
+    () =>
+      createPlugins<CommentEditorValue, CommentPEditor>(
+        [
+          createReactPlugin(),
+          createHistoryPlugin(),
+          createParagraphPlugin(),
+          createComboboxPlugin(),
+          createLinkPlugin(),
+          ...(isNonNullish(onSearchMentionables)
+            ? [createMentionPlugin<CommentEditorValue, CommentPEditor>(intl.locale as UserLocale)]
+            : []),
+        ],
+
+        {
+          components,
+          overrideByKey: {
+            [ELEMENT_PARAGRAPH]: { type: "paragraph" },
+            [ELEMENT_LINK]: { type: "link" },
+          },
+        },
+      ),
+    [isNonNullish(onSearchMentionables)],
+  );
+  const formControl = useFormControl({
+    id,
+    isDisabled,
+    isInvalid,
+    isRequired,
+    isReadOnly,
+  });
+  const editorRef = useRef<CommentPEditor>(null);
+
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      focusEditor(editorRef.current!, getEndPoint(editorRef.current!, []));
     },
-    ref,
-  ) {
-    const intl = useIntl();
-    const plugins = useMemo(
-      () =>
-        createPlugins<CommentEditorValue, CommentPEditor>(
-          [
-            createReactPlugin(),
-            createHistoryPlugin(),
-            createParagraphPlugin(),
-            createComboboxPlugin(),
-            createLinkPlugin(),
-            ...(isNonNullish(onSearchMentionables)
-              ? [createMentionPlugin<CommentEditorValue, CommentPEditor>(intl.locale as UserLocale)]
-              : []),
-          ],
+    clear: () => {
+      const editor = editorRef.current! as any;
+      Transforms.delete(editor, {
+        at: {
+          anchor: Editor.start(editor, []),
+          focus: Editor.end(editor, []),
+        },
+      });
+    },
+  }));
 
-          {
-            components,
-            overrideByKey: {
-              [ELEMENT_PARAGRAPH]: { type: "paragraph" },
-              [ELEMENT_LINK]: { type: "link" },
-            },
+  const { field: inputStyleConfig } = useMultiStyleConfig("Input", props);
+  const inputStyles = {
+    ...omit(inputStyleConfig as any, ["px", "height", "_focusVisible", "bg"]),
+    backgroundColor: "white",
+    _focusWithin: (inputStyleConfig as any)._focusVisible,
+  } as any;
+
+  const editableProps = {
+    readOnly: formControl.disabled,
+    "aria-disabled": formControl.disabled,
+    placeholder,
+    ...props,
+  };
+
+  // for some reason frozen objects from the apollo cache cause issues when typing
+  const initialValue = useConstant(() => structuredClone(value));
+
+  return (
+    <PlateProvider<CommentEditorValue, CommentPEditor>
+      id={formControl.id}
+      plugins={plugins}
+      initialValue={initialValue}
+      onChange={!isDisabled ? onChange : undefined}
+    >
+      <Box
+        overflow="hidden"
+        aria-disabled={formControl.disabled}
+        {...(pick(formControl, [
+          "aria-invalid",
+          "aria-required",
+          "aria-readonly",
+          "aria-describedby",
+        ]) as any)}
+        sx={{
+          ...inputStyles,
+          "[data-slate-editor]": {
+            outline: "none",
+            minHeight: "80px !important",
+            paddingX: 3,
+            paddingY: 2,
+            maxHeight: "250px",
+            overflow: "auto",
           },
-        ),
-      [isNonNullish(onSearchMentionables)],
-    );
-    const formControl = useFormControl({
-      id,
-      isDisabled,
-      isInvalid,
-      isRequired,
-      isReadOnly,
-    });
-    const editorRef = useRef<CommentPEditor>(null);
-
-    useImperativeHandle(ref, () => ({
-      focus: () => {
-        focusEditor(editorRef.current!, getEndPoint(editorRef.current!, []));
-      },
-      clear: () => {
-        const editor = editorRef.current! as any;
-        Transforms.delete(editor, {
-          at: {
-            anchor: Editor.start(editor, []),
-            focus: Editor.end(editor, []),
+          "[data-slate-placeholder]": {
+            top: "unset !important",
+            width: "auto !important",
+            opacity: "1 !important",
+            color: "gray.400",
           },
-        });
-      },
-    }));
-
-    const { field: inputStyleConfig } = useMultiStyleConfig("Input", props);
-    const inputStyles = {
-      ...omit(inputStyleConfig as any, ["px", "height", "_focusVisible", "bg"]),
-      backgroundColor: "white",
-      _focusWithin: (inputStyleConfig as any)._focusVisible,
-    } as any;
-
-    const editableProps = {
-      readOnly: formControl.disabled,
-      "aria-disabled": formControl.disabled,
-      placeholder,
-      ...props,
-    };
-
-    // for some reason frozen objects from the apollo cache cause issues when typing
-    const initialValue = useConstant(() => structuredClone(value));
-
-    return (
-      <PlateProvider<CommentEditorValue, CommentPEditor>
-        id={formControl.id}
-        plugins={plugins}
-        initialValue={initialValue}
-        onChange={!isDisabled ? onChange : undefined}
+        }}
       >
-        <Box
-          overflow="hidden"
-          aria-disabled={formControl.disabled}
-          {...(pick(formControl, [
-            "aria-invalid",
-            "aria-required",
-            "aria-readonly",
-            "aria-describedby",
-          ]) as any)}
-          sx={{
-            ...inputStyles,
-            "[data-slate-editor]": {
-              outline: "none",
-              minHeight: "80px !important",
-              paddingX: 3,
-              paddingY: 2,
-              maxHeight: "250px",
-              overflow: "auto",
-            },
-            "[data-slate-placeholder]": {
-              top: "unset !important",
-              width: "auto !important",
-              opacity: "1 !important",
-              color: "gray.400",
-            },
-          }}
+        <PlateWithEditorRef<CommentEditorValue, CommentPEditor>
+          id={formControl.id}
+          editorRef={editorRef}
+          editableProps={editableProps}
         >
-          <PlateWithEditorRef<CommentEditorValue, CommentPEditor>
-            id={formControl.id}
-            editorRef={editorRef}
-            editableProps={editableProps}
-          >
-            {onSearchMentionables ? (
-              <MentionCombobox
-                defaultMentionables={defaultMentionables}
-                onSearchMentionables={onSearchMentionables}
-              />
-            ) : null}
-          </PlateWithEditorRef>
-        </Box>
-      </PlateProvider>
-    );
-  },
-);
+          {onSearchMentionables ? (
+            <MentionCombobox
+              defaultMentionables={defaultMentionables}
+              onSearchMentionables={onSearchMentionables}
+            />
+          ) : null}
+        </PlateWithEditorRef>
+      </Box>
+    </PlateProvider>
+  );
+}
 
 function RenderElement({ attributes, nodeProps, styles, element, editor, ...props }: any) {
   return <Text {...attributes} {...props} />;

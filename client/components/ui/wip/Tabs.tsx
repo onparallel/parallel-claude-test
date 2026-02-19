@@ -10,7 +10,7 @@ import {
   TabProps,
   TabsProps,
 } from "@chakra-ui/react";
-import { forwardRef } from "react";
+import { RefAttributes } from "react";
 
 // Docs: https://chakra-ui.com/docs/components/tabs
 
@@ -22,31 +22,34 @@ export interface ExtendedTabsProps extends Omit<TabsProps, "isManual" | "isLazy"
 }
 
 // Tabs.Root component
-export const TabsRoot = forwardRef<HTMLDivElement, ExtendedTabsProps>(
-  ({ manual, lazy, ...props }, ref) => {
-    return <ChakraTabs ref={ref} isManual={manual} isLazy={lazy} {...props} />;
-  },
-);
+export function TabsRoot({
+  manual,
+  lazy,
+  ref,
+  ...props
+}: ExtendedTabsProps & RefAttributes<HTMLDivElement>) {
+  return <ChakraTabs ref={ref} isManual={manual} isLazy={lazy} {...props} />;
+}
 
 // Tabs.List component
-export const TabsList = forwardRef<HTMLDivElement, TabListProps>((props, ref) => {
+export function TabsList({ ref, ...props }: TabListProps & RefAttributes<HTMLDivElement>) {
   return <TabList ref={ref} {...props} />;
-});
+}
 
 // Tabs.Tab component
-export const TabsTab = forwardRef<HTMLButtonElement, TabProps>((props, ref) => {
+export function TabsTab({ ref, ...props }: TabProps & RefAttributes<HTMLButtonElement>) {
   return <Tab ref={ref} {...props} />;
-});
+}
 
 // Tabs.Panels component
-export const TabsPanels = forwardRef<HTMLDivElement, TabPanelsProps>((props, ref) => {
+export function TabsPanels({ ref, ...props }: TabPanelsProps & RefAttributes<HTMLDivElement>) {
   return <TabPanels ref={ref} {...props} />;
-});
+}
 
 // Tabs.Panel component
-export const TabsPanel = forwardRef<HTMLDivElement, TabPanelProps>((props, ref) => {
+export function TabsPanel({ ref, ...props }: TabPanelProps & RefAttributes<HTMLDivElement>) {
   return <TabPanel ref={ref} {...props} />;
-});
+}
 
 // Namespace to use as Tabs.XXX
 export const Tabs = {
@@ -56,10 +59,3 @@ export const Tabs = {
   Panels: TabsPanels,
   Panel: TabsPanel,
 };
-
-// Assign display names for debugging
-TabsRoot.displayName = "Tabs.Root";
-TabsList.displayName = "Tabs.List";
-TabsTab.displayName = "Tabs.Tab";
-TabsPanels.displayName = "Tabs.Panels";
-TabsPanel.displayName = "Tabs.Panel";

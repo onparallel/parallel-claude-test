@@ -1,16 +1,14 @@
 import { gql } from "@apollo/client";
 import {
-  Box,
   NumberDecrementStepper,
   NumberIncrementStepper,
   NumberInput,
   NumberInputField,
   NumberInputStepper,
-  Stack,
 } from "@chakra-ui/react";
 import { SimpleSelect, useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { StandardListSelect } from "@parallel/components/common/StandardListSelect";
-import { Text } from "@parallel/components/ui";
+import { Box, Stack, Text } from "@parallel/components/ui";
 import { UpdatePetitionFieldInput } from "@parallel/graphql/__types";
 import { getMinMaxCheckboxLimit } from "@parallel/utils/petitionFields";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";

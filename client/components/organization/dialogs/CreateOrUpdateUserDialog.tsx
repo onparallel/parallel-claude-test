@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
-import { FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel, Input } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { UserGroupSelect } from "@parallel/components/common/UserGroupSelect";
-import { Button } from "@parallel/components/ui";
+import { Button, Stack } from "@parallel/components/ui";
 import {
   useCreateOrUpdateUserDialog_UserFragment,
   UserSelect_UserGroupFragment,

@@ -1,7 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Box,
-  HStack,
   Img,
   PopoverArrow,
   PopoverBody,
@@ -11,9 +9,9 @@ import {
 } from "@chakra-ui/react";
 import { Popover } from "@parallel/chakra/components";
 import { CloudOkIcon, DownloadIcon, HelpOutlineIcon, UserArrowIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Logo } from "@parallel/components/common/Logo";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Text } from "@parallel/components/ui";
 import { RecipientViewHeader_PublicPetitionAccessFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { usePublicPrintPdfTask } from "@parallel/utils/tasks/usePublicPrintPdfTask";
@@ -38,20 +36,18 @@ interface RecipientViewHeaderProps {
   canFinalize: boolean;
 }
 
-export const RecipientViewHeader = chakraForwardRef<"section", RecipientViewHeaderProps>(
-  function RecipientViewHeader(
-    {
-      access,
-      hasSignature,
-      pendingPetitions,
-      keycode,
-      isClosed,
-      onFinalize,
-      canFinalize,
-      ...props
-    },
+export const RecipientViewHeader = chakraComponent<"section", RecipientViewHeaderProps>(
+  function RecipientViewHeader({
     ref,
-  ) {
+    access,
+    hasSignature,
+    pendingPetitions,
+    keycode,
+    isClosed,
+    onFinalize,
+    canFinalize,
+    ...props
+  }) {
     const intl = useIntl();
     const tone = useTone();
 
@@ -100,7 +96,7 @@ export const RecipientViewHeader = chakraForwardRef<"section", RecipientViewHead
         backgroundColor="white"
         {...props}
       >
-        <HStack spacing={3}>
+        <HStack gap={3}>
           {organization.logoUrl72 ? (
             <Img
               src={organization.logoUrl72}
@@ -203,7 +199,7 @@ export const RecipientViewHeader = chakraForwardRef<"section", RecipientViewHead
             </PopoverContent>
           </Popover>
 
-          <HStack display={{ base: "none", md: "flex" }} spacing={0} gap={2}>
+          <HStack display={{ base: "none", md: "flex" }} gap={2}>
             <Button
               leftIcon={<UserArrowIcon />}
               colorPalette="primary"

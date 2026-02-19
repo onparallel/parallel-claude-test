@@ -5,7 +5,7 @@ import {
   simplifyProfileQueryFilter,
 } from "@parallel/utils/ProfileQueryFilter";
 import { buildProfilesQueryStateUrl } from "@parallel/utils/profilesQueryState";
-import { forwardRef, useMemo } from "react";
+import { RefAttributes, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { cleanDashboardModuleProfileFilter } from "../../drawer/utils/moduleUtils";
@@ -13,17 +13,17 @@ import { DashboardLinkToResults } from "../../shared/DashboardLinkToResults";
 import { DashboardNumberValue } from "../../shared/DashboardNumberValue";
 import { DashboardSimpleModuleCard } from "../../shared/DashboardSimpleModuleCard";
 
-export const DashboardProfilesNumberModule = forwardRef<
-  HTMLDivElement,
-  {
-    module: DashboardProfilesNumberModule_DashboardProfilesNumberModuleFragment;
-    isEditing: boolean;
-    isDragging: boolean;
-    isReadOnly: boolean;
-    onEdit: () => void;
-    onDelete: () => void;
-  }
->(function DashboardProfilesNumberModule({ module, ...rest }, ref) {
+export function DashboardProfilesNumberModule({
+  module,
+  ...rest
+}: {
+  module: DashboardProfilesNumberModule_DashboardProfilesNumberModuleFragment;
+  isEditing: boolean;
+  isDragging: boolean;
+  isReadOnly: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+} & RefAttributes<HTMLDivElement>) {
   const intl = useIntl();
 
   const resultsUrls = useMemo(() => {
@@ -55,7 +55,6 @@ export const DashboardProfilesNumberModule = forwardRef<
 
   return (
     <DashboardSimpleModuleCard
-      ref={ref}
       module={module}
       headerAddon={
         <DashboardLinkToResults
@@ -80,7 +79,7 @@ export const DashboardProfilesNumberModule = forwardRef<
       ) : null}
     </DashboardSimpleModuleCard>
   );
-});
+}
 
 const _fragments = {
   DashboardProfilesNumberModule: gql`

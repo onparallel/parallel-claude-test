@@ -2,17 +2,15 @@ import { gql } from "@apollo/client";
 import {
   AlertDescription,
   AlertIcon,
-  Box,
   FormControl,
   FormLabel,
-  HStack,
   Image,
   Input,
   Switch,
 } from "@chakra-ui/react";
 import { AppWindowIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
-import { Text } from "@parallel/components/ui";
+import { chakraComponent } from "@parallel/chakra/utils";
+import { Box, HStack, Text } from "@parallel/components/ui";
 import {
   PetitionLocale,
   PetitionTemplateCompletingMessageCard_PetitionTemplateFragment,
@@ -52,13 +50,16 @@ const messagesBody: Record<PetitionLocale, string> = {
   pt: "Informámos {{ user-first-name }} de que completou a informação para continuar com o processo",
 };
 
-export const PetitionTemplateCompletingMessageCard = chakraForwardRef<
+export const PetitionTemplateCompletingMessageCard = chakraComponent<
   "section",
   PetitionTemplateCompletingMessageCardProps
->(function PetitionTemplateCompletingMessageCard(
-  { petition, onUpdatePetition, isDisabled, ...props },
+>(function PetitionTemplateCompletingMessageCard({
   ref,
-) {
+  petition,
+  onUpdatePetition,
+  isDisabled,
+  ...props
+}) {
   const intl = useIntl();
   const placeholders = usePetitionMessagePlaceholderOptions({ petition });
   const [isEnabled, setIsEnabled] = useState(petition.isCompletingMessageEnabled);

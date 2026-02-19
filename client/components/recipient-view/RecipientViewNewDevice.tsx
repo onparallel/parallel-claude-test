@@ -1,11 +1,11 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Center, Heading, Image, ScaleFade, Stack } from "@chakra-ui/react";
+import { Center, Heading, Image, ScaleFade } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
 import { RecipientViewPinForm } from "@parallel/components/recipient-view/RecipientViewPinForm";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Stack, Text } from "@parallel/components/ui";
 import {
   RecipientViewNewDevice_publicCheckVerificationCodeDocument,
   RecipientViewNewDevice_PublicOrganizationFragment,
@@ -115,7 +115,7 @@ export function RecipientViewNewDevice({ organization, email }: RecipientViewNew
       paddingBottom={organization.hasRemoveParallelBranding ? undefined : { base: 12, sm: 12 }}
       position="relative"
     >
-      <Stack spacing={8}>
+      <Stack gap={8}>
         <Box>
           {organization.logoUrl340x160 ? (
             <Image
@@ -131,7 +131,7 @@ export function RecipientViewNewDevice({ organization, email }: RecipientViewNew
             <Logo width="170px" />
           )}
         </Box>
-        <Stack spacing={4}>
+        <Stack gap={4}>
           <Heading fontSize="2xl">
             <FormattedMessage
               id="recipient-view.verify-title"

@@ -1,11 +1,11 @@
-import { Badge, Flex } from "@chakra-ui/react";
+import { Badge } from "@chakra-ui/react";
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import {
   SimpleOption,
   SimpleSelect,
   SimpleSelectProps,
 } from "@parallel/components/common/SimpleSelect";
-import { Text } from "@parallel/components/ui";
+import { Flex, Text } from "@parallel/components/ui";
 import { REFERENCE_REGEX } from "@parallel/utils/validation";
 import { FormattedMessage, useIntl } from "react-intl";
 import { CSSObjectWithLabel, OptionProps, SingleValueProps, components } from "react-select";

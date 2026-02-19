@@ -1,12 +1,9 @@
 import { gql } from "@apollo/client";
 import {
-  Box,
   Center,
   Drawer,
   DrawerContent,
   DrawerOverlay,
-  Flex,
-  HStack,
   Icon,
   IconButton,
   Image,
@@ -18,8 +15,6 @@ import {
   MenuItem,
   MenuList,
   Portal,
-  Stack,
-  StackProps,
   useBreakpointValue,
   useMenuItem,
 } from "@chakra-ui/react";
@@ -41,7 +36,7 @@ import {
   UserIcon,
   UsersIcon,
 } from "@parallel/chakra/icons";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, StackProps, Text } from "@parallel/components/ui";
 import {
   AppLayoutNavBar_ProfileTypeFragment,
   AppLayoutNavBar_QueryFragment,
@@ -56,22 +51,14 @@ import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
 import { useLocalStorage } from "@parallel/utils/useLocalStorage";
 import { usePinProfileType } from "@parallel/utils/usePinProfileType";
 import { useUnpinProfileType } from "@parallel/utils/useUnpinProfileType";
+import NextLink from "next/link";
 import { useRouter } from "next/router";
-import {
-  forwardRef,
-  MouseEvent,
-  MouseEventHandler,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { MouseEvent, MouseEventHandler, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import smoothScrollIntoView from "smooth-scroll-into-view-if-needed";
 import { CloseButton } from "../common/CloseButton";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import NextLink from "next/link";
 import {
   LocalizableUserText,
   localizableUserTextRender,
@@ -245,7 +232,7 @@ export function AppLayoutNavBar({ queryObject, onHelpCenterClick }: AppLayoutNav
             sm: [`min-width`, `box-shadow`].join(", "),
           }}
         >
-          <Stack spacing={4} flex="1" minHeight={0}>
+          <Stack gap={4} flex="1" minHeight={0}>
             <HStack
               paddingTop={4}
               paddingX={3}
@@ -348,14 +335,14 @@ export function AppLayoutNavBar({ queryObject, onHelpCenterClick }: AppLayoutNav
               />
             </Box>
             <Stack
-              spacing={4}
+              gap={4}
               overflowY="auto"
               overflowX="hidden"
               minHeight={0}
               paddingBottom={4}
               flex={1}
             >
-              <Stack flex={1} spacing={4} paddingX={3}>
+              <Stack flex={1} gap={4} paddingX={3}>
                 <SectionsAndProfilesList
                   onToggle={handleSubMenuToggle}
                   isMobile={isMobile}
@@ -668,7 +655,7 @@ function SectionsAndProfilesList({
       </List>
       {userCanViewProfiles ? (
         <>
-          <HStack spacing={0} className="show-on-expand">
+          <HStack gap={0} className="show-on-expand">
             <Text fontSize="sm" fontWeight={500} flex="1">
               <FormattedMessage
                 id="component.app-layout-nav-bar.profiles"
@@ -802,104 +789,107 @@ interface ProfileTypeButtonProps {
   onTogglePinned: () => void;
 }
 
-const ProfileTypeButton = forwardRef<HTMLAnchorElement, ProfileTypeButtonProps>(
-  function ProfileTypeButton({ profileType, isActive, onTogglePinned, ...rest }, ref) {
-    const intl = useIntl();
+function ProfileTypeButton({
+  profileType,
+  isActive,
+  onTogglePinned,
+  ...rest
+}: ProfileTypeButtonProps) {
+  const intl = useIntl();
 
-    const menuItemProps = useMenuItem(rest, ref);
-    const icon = getProfileTypeIcon(profileType.icon);
-    return (
-      <LinkBox
-        key={profileType.id}
-        sx={{
-          color: "gray.600",
-          background: "transparent",
-          minHeight: "40px",
-          rounded: "md",
-          display: "flex",
-          gap: 3,
-          paddingX: 2.5,
-          alignItems: "center",
-          "&:focus-within, &:hover": {
-            color: "gray.800",
-            background: "gray.100",
-            ".show-on-hover": {
-              opacity: 1,
-            },
-            '&:has(a[aria-current="page"])': {
-              color: "blue.900",
-            },
+  const menuItemProps = useMenuItem(rest);
+  const icon = getProfileTypeIcon(profileType.icon);
+  return (
+    <LinkBox
+      key={profileType.id}
+      sx={{
+        color: "gray.600",
+        background: "transparent",
+        minHeight: "40px",
+        rounded: "md",
+        display: "flex",
+        gap: 3,
+        paddingX: 2.5,
+        alignItems: "center",
+        "&:focus-within, &:hover": {
+          color: "gray.800",
+          background: "gray.100",
+          ".show-on-hover": {
+            opacity: 1,
           },
           '&:has(a[aria-current="page"])': {
-            color: "blue.700",
-            background: "blue.50",
+            color: "blue.900",
           },
-          "svg.custom-icon": {
-            transition: "transform 150ms ease",
-          },
-          "&:hover svg.custom-icon": {
-            transform: "scale(1.2)",
-          },
-        }}
+        },
+        '&:has(a[aria-current="page"])': {
+          color: "blue.700",
+          background: "blue.50",
+        },
+        "svg.custom-icon": {
+          transition: "transform 150ms ease",
+        },
+        "&:hover svg.custom-icon": {
+          transform: "scale(1.2)",
+        },
+      }}
+    >
+      <Icon className="custom-icon" as={icon} boxSize={5} />
+      <OverflownText
+        as={LinkOverlay}
+        href={`/app/profiles?type=${profileType.id}`}
+        aria-current={isActive ? "page" : undefined}
+        minWidth={0}
+        flex={1}
+        _focusVisible={{ outline: "none" }}
+        {...menuItemProps}
       >
-        <Icon className="custom-icon" as={icon} boxSize={5} />
-        <OverflownText
-          as={LinkOverlay}
-          href={`/app/profiles?type=${profileType.id}`}
-          aria-current={isActive ? "page" : undefined}
-          minWidth={0}
-          flex={1}
-          _focusVisible={{ outline: "none" }}
-          {...menuItemProps}
-        >
-          <ProfileTypeReference profileType={profileType} usePlural />
-        </OverflownText>
-        <IconButtonWithTooltip
-          variant="ghost"
-          rounded="full"
-          marginStart={1}
-          sx={{
-            "&:hover, &:focus": {
-              background: "gray.200",
-              opacity: 1,
-              "svg > g": {
-                stroke: "gray.600",
-                fill: "primary.600",
-              },
+        <ProfileTypeReference profileType={profileType} usePlural />
+      </OverflownText>
+      <IconButtonWithTooltip
+        variant="ghost"
+        rounded="full"
+        marginStart={1}
+        sx={{
+          "&:hover, &:focus": {
+            background: "gray.200",
+            opacity: 1,
+            "svg > g": {
+              stroke: "gray.600",
+              fill: "primary.600",
             },
-            ...(profileType.isPinned
-              ? {
-                  "svg > g": {
-                    stroke: "primary.600",
-                    fill: "primary.600",
-                  },
-                }
-              : {}),
-          }}
-          className="show-on-hover"
-          opacity={profileType.isPinned ? 1 : 0}
-          size="sm"
-          icon={<PinIcon boxSize={4} />}
-          label={
-            profileType.isPinned
-              ? intl.formatMessage({
-                  id: "component.app-layout-nav-bar.remove-from-menu",
-                  defaultMessage: "Remove from menu",
-                })
-              : intl.formatMessage({
-                  id: "component.app-layout-nav-bar.pin-to-menu",
-                  defaultMessage: "Pin to menu",
-                })
-          }
-          onClick={(e) => {
-            e.stopPropagation();
-            onTogglePinned();
-          }}
-        />
-      </LinkBox>
-    );
-  },
-);
+          },
+          ...(profileType.isPinned
+            ? {
+                "svg > g": {
+                  stroke: "primary.600",
+                  fill: "primary.600",
+                },
+              }
+            : {}),
+        }}
+        className="show-on-hover"
+        opacity={profileType.isPinned ? 1 : 0}
+        size="sm"
+        icon={<PinIcon boxSize={4} />}
+        label={
+          profileType.isPinned
+            ? intl.formatMessage({
+                id: "component.app-layout-nav-bar.remove-from-menu",
+                defaultMessage: "Remove from menu",
+              })
+            : intl.formatMessage({
+                id: "component.app-layout-nav-bar.pin-to-menu",
+                defaultMessage: "Pin to menu",
+              })
+        }
+        onClick={(e) => {
+          e.stopPropagation();
+          onTogglePinned();
+        }}
+      />
+    </LinkBox>
+  );
+}
 
 interface CreateMenuButtonSectionProps extends Pick<AppLayoutNavBar_QueryFragment, "me"> {
   onToggle: (isOpen: boolean) => void;

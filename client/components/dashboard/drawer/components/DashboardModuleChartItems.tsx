@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
-import { Box, FormControl, FormErrorMessage, HStack, Input, Stack } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, Input } from "@chakra-ui/react";
 import { AddIcon, DeleteIcon, PlusCircleFilledIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { DashboardModuleChartItems_ProfileTypeFragment } from "@parallel/graphql/__types";
 import { useRerender } from "@parallel/utils/useRerender";
 import { Fragment, useState } from "react";
@@ -91,7 +91,7 @@ export function DashboardModuleChartItems({
         </DashboardModuleFormLabel>
 
         {fields.length ? (
-          <HStack spacing={2}>
+          <HStack gap={2}>
             <Box flex="1">
               <SimpleSelect
                 key={key}
@@ -131,7 +131,7 @@ export function DashboardModuleChartItems({
           </HStack>
         ) : (
           <FormControl isInvalid={!!errors.settings?.items}>
-            <Stack spacing={3}>
+            <Stack gap={3}>
               <Text textStyle="hint">
                 <FormattedMessage
                   id="component.petitions-chart-module-settings.no-chart-items-added"

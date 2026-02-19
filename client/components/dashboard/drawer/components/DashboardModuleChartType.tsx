@@ -1,7 +1,7 @@
-import { HStack, Image, RadioProps, useRadio, useRadioGroup } from "@chakra-ui/react";
+import { Image, RadioProps, useRadio, useRadioGroup } from "@chakra-ui/react";
 import { DashboardPieChartModuleSettingsType } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Text } from "@parallel/components/ui";
 
 interface DashboardModuleChartTypeProps {
   value?: DashboardPieChartModuleSettingsType;
@@ -70,7 +70,7 @@ function ModuleSizeRadioButton(props: RadioProps) {
       {...getRadioProps()}
     >
       <input {...getInputProps()} />
-      <HStack flex="1" align="center" justify="center" spacing={3}>
+      <HStack flex="1" align="center" justify="center" gap={3}>
         {props.children}
       </HStack>
     </Button>

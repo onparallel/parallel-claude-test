@@ -1,13 +1,13 @@
 import { IManageIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip, IconButtonWithTooltipProps } from "./IconButtonWithTooltip";
 import { RestrictedFeaturePopover } from "./RestrictedFeaturePopover";
 
-export const FileExportAccessIconButton = chakraForwardRef<
+export const FileExportAccessIconButton = chakraComponent<
   "button",
   { url: string | null } & Omit<IconButtonWithTooltipProps, "label">
->(function FileExportAccessIconButton({ url, ...props }, ref) {
+>(function FileExportAccessIconButton({ ref, url, ...props }) {
   const intl = useIntl();
 
   const isRestricted = !url;

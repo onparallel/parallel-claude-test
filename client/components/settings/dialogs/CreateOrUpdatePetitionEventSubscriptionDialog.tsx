@@ -1,20 +1,16 @@
 import { gql } from "@apollo/client";
 import { useApolloClient, useQuery } from "@apollo/client/react";
 import {
-  Box,
   Checkbox,
-  Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
-  HStack,
   Input,
   InputGroup,
   InputRightAddon,
   Link,
   Radio,
   RadioGroup,
-  Stack,
   useCounter,
 } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
@@ -28,7 +24,7 @@ import { SimpleSelect, useSimpleSelectOptions } from "@parallel/components/commo
 import { Steps } from "@parallel/components/common/Steps";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   CreateOrUpdatePetitionEventSubscriptionDialog_EventSubscriptionSignatureKeyFragment,
   CreateOrUpdatePetitionEventSubscriptionDialog_PetitionBaseFragment,

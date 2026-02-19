@@ -1,6 +1,6 @@
 import { IconButton, IconButtonProps } from "@chakra-ui/react";
 import { CloseIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { useIntl } from "react-intl";
 
 interface CloseButtonProps
@@ -9,10 +9,11 @@ interface CloseButtonProps
   isClear?: boolean;
 }
 
-export const CloseButton = chakraForwardRef<"button", CloseButtonProps>(function CloseButton(
-  { isClear, ...props },
+export const CloseButton = chakraComponent<"button", CloseButtonProps>(function CloseButton({
   ref,
-) {
+  isClear,
+  ...props
+}) {
   const intl = useIntl();
   return (
     <IconButton

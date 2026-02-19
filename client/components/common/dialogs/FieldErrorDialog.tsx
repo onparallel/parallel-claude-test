@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, HStack, List, ListItem, Stack } from "@chakra-ui/react";
+import { List, ListItem } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import {
   ConfirmDialog,
@@ -8,7 +8,7 @@ import {
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { PetitionFieldReference } from "@parallel/components/common/PetitionFieldReference";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { FieldErrorDialog_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { ReactNode, useRef } from "react";
@@ -46,7 +46,7 @@ export function FieldErrorDialog({
       closeOnOverlayClick={true}
       header={
         header ?? (
-          <Stack direction="row" spacing={2} align="center">
+          <Stack direction="row" gap={2} align="center">
             <AlertCircleIcon role="presentation" />
             <Text>
               <FormattedMessage

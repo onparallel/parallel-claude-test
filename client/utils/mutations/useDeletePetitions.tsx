@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useApolloClient, useMutation, useQuery } from "@apollo/client/react";
-import { Center, ListItem, Spinner, Stack, UnorderedList } from "@chakra-ui/react";
+import { Center, ListItem, Spinner, UnorderedList } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
@@ -12,7 +12,7 @@ import {
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { PathName } from "@parallel/components/common/PathName";
 import { PetitionNameWithPath } from "@parallel/components/common/PetitionNameWithPath";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionBaseType,
   useDeletePetitions_deletePetitionsDocument,
@@ -127,7 +127,7 @@ export function useDeletePetitions({ modalProps } = {} as { modalProps?: BaseMod
           });
 
           const errorHeader = (
-            <Stack direction="row" spacing={2} align="center">
+            <Stack direction="row" gap={2} align="center">
               <AlertCircleIcon role="presentation" />
               <Text>
                 <FormattedMessage

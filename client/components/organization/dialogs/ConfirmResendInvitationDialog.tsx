@@ -1,7 +1,6 @@
-import { Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
 
 function ConfirmResendInvitationDialog({ fullName, ...props }: DialogProps<{ fullName: string }>) {
@@ -26,7 +25,7 @@ function ConfirmResendInvitationDialog({ fullName, ...props }: DialogProps<{ ful
         </Text>
       }
       body={
-        <Stack spacing={2}>
+        <Stack gap={2}>
           <Text>
             <FormattedMessage
               id="component.confirm-resend-invitation-dialog.user-not-yet-activated"

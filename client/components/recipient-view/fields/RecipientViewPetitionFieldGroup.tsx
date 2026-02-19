@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Flex, Heading, HStack, Stack } from "@chakra-ui/react";
+import { Center, Heading } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { AddIcon, DeleteIcon, EditSimpleIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
@@ -23,7 +23,7 @@ import { RecipientViewPetitionFieldSelect } from "@parallel/components/recipient
 import { RecipientViewPetitionFieldShortText } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldShortText";
 import { RecipientViewPetitionFieldTaxDocuments } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldTaxDocuments";
 import { RecipientViewPetitionFieldText } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldText";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   RecipientViewPetitionFieldGroup_PublicPetitionFieldFragment,
   RecipientViewPetitionFieldGroup_PublicPetitionFragment,
@@ -311,8 +311,8 @@ export function RecipientViewPetitionFieldGroupLayout({
     });
 
   return (
-    <Stack spacing={4} as="section" id={`field-${field.id}`}>
-      <Stack spacing={1} paddingX={2} position="relative">
+    <Stack gap={4} as="section" id={`field-${field.id}`}>
+      <Stack gap={1} paddingX={2} position="relative">
         <Flex alignItems="baseline">
           <Box flex="1" marginEnd={2}>
             <Heading flex="1" as="h2" fontSize="md" overflowWrap="anywhere">
@@ -402,7 +402,7 @@ export function RecipientViewPetitionFieldGroupLayout({
       </Stack>
       {children}
       {(field.replies.length > 0 && !field.multiple) || isNullish(onAddNewGroup) ? null : (
-        <HStack paddingX={4} spacing={4}>
+        <HStack paddingX={4} gap={4}>
           <Button onClick={onAddNewGroup} leftIcon={<AddIcon />}>
             <Text>
               {intl.formatMessage(
@@ -456,7 +456,7 @@ export function RecipientViewPetitionFieldGroupCard({
       defaultMessage: "Reply",
     });
   return (
-    <Card as={Stack} padding={4} spacing={4} position="relative" id={id}>
+    <Card as={Stack} padding={4} gap={4} position="relative" id={id}>
       {field.multiple || field.optional ? (
         <HStack minHeight="32px">
           {field.multiple ? (

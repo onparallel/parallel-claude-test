@@ -35,8 +35,8 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           trigger_phrase: "@claude"
-          # No prompt = interactive/conversational mode
-          # Claude will respond to whatever is asked in the @claude mention
+          claude_args: |
+            --allowedTools "Bash(git *)" "Bash(gh *)" "Bash(yarn *)" "Bash(npx *)" "Bash(echo *)" "Bash(ls *)" "Bash(cat *)" "Read" "Write" "Edit" "Glob" "Grep" "Skill"
 
 concurrency:
   group: ${{ github.ref }}-claude-assistant-${{ github.event.comment.id || github.event.review.id }}

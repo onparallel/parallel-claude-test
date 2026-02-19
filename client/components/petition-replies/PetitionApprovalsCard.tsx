@@ -1,15 +1,12 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
-  Box,
   Grid,
   GridItem,
   Heading,
-  HStack,
   ListItem,
   MenuItem,
   MenuList,
-  Stack,
   Tab,
   TabList,
   TabPanel,
@@ -29,8 +26,8 @@ import {
   ThumbsUpIcon,
   TimeIcon,
 } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
-import { Button, Text } from "@parallel/components/ui";
+import { chakraComponent } from "@parallel/chakra/utils";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionApprovalRequestStep,
   PetitionApprovalRequestStepStatus,
@@ -86,18 +83,16 @@ interface PetitionApprovalsCardProps {
   isDisabled: boolean;
 }
 
-export const PetitionApprovalsCard = chakraForwardRef<"section", PetitionApprovalsCardProps>(
-  function PetitionApprovalsCard(
-    {
-      petition,
-      user,
-      onToggleGeneralComments,
-      onRefetchPetition,
-      isShowingGeneralComments,
-      isDisabled,
-    },
+export const PetitionApprovalsCard = chakraComponent<"section", PetitionApprovalsCardProps>(
+  function PetitionApprovalsCard({
     ref,
-  ) {
+    petition,
+    user,
+    onToggleGeneralComments,
+    onRefetchPetition,
+    isShowingGeneralComments,
+    isDisabled,
+  }) {
     const intl = useIntl();
     const toast = useToast();
     const tabsRefs = useMultipleRefs<HTMLButtonElement>();
@@ -452,7 +447,7 @@ export const PetitionApprovalsCard = chakraForwardRef<"section", PetitionApprova
         ) : null}
         <Card ref={ref} padding={0} marginBottom={4} data-section="signature-card">
           <Tabs index={tabIndex} onChange={handleTabIndexChange} variant="enclosed">
-            <HStack spacing={0} overflowX="auto" overflowY="hidden">
+            <HStack gap={0} overflowX="auto" overflowY="hidden">
               <TabList marginX="-1px" marginTop="-1px" height="52px" flex="1">
                 {approvalStepsWithSignature.map((step, index) => {
                   const stepNotApplicable = step.status === "NOT_APPLICABLE";

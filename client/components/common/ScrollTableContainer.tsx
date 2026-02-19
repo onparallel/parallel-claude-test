@@ -1,7 +1,7 @@
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { ScrollShadows } from "./ScrollShadows";
 
-export const ScrollTableContainer = chakraForwardRef<"div", {}>((props, ref) => {
+export const ScrollTableContainer = chakraComponent<"div", {}>(({ ref, ...props }) => {
   return (
     <ScrollShadows
       ref={ref}

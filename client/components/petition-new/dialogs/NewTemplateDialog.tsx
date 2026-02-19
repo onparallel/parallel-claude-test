@@ -1,10 +1,10 @@
-import { Box, Center, HStack, Image, Stack } from "@chakra-ui/react";
+import { Center, Image } from "@chakra-ui/react";
 import { CheckedBoxIcon, ContractIcon, FileNewIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { ReactNode, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 
 type NewTemplateDialogData = string | null;
 
@@ -113,8 +113,8 @@ export function NewTemplateDialog({ ...props }: DialogProps<{}, NewTemplateDialo
         />
       }
       body={
-        <HStack spacing={4} alignItems="flex-start">
-          <Stack spacing={4} flex="1">
+        <HStack gap={4} alignItems="flex-start">
+          <Stack gap={4} flex="1">
             <Text fontSize="sm">
               <FormattedMessage
                 id="component.new-template-dialog.select-or-create"
@@ -137,11 +137,11 @@ export function NewTemplateDialog({ ...props }: DialogProps<{}, NewTemplateDialo
                     textAlign="left"
                     fontWeight="normal"
                   >
-                    <HStack spacing={4} paddingY={0.5}>
+                    <HStack gap={4} paddingY={0.5}>
                       <Center padding={2} borderRadius="md" backgroundColor={background}>
                         {icon}
                       </Center>
-                      <Stack spacing={1}>
+                      <Stack gap={1}>
                         <Text fontWeight="bold">{title}</Text>
                         <Text
                           fontSize="sm"

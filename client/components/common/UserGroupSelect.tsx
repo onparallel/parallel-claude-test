@@ -1,9 +1,9 @@
-import { Image, Stack } from "@chakra-ui/react";
+import { Image } from "@chakra-ui/react";
 import { UserSelect_UserGroupFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { NoticeProps } from "react-select";
 import { UserSelect, UserSelectProps } from "./UserSelect";
-import { Text } from "@parallel/components/ui";
+import { Stack, Text } from "@parallel/components/ui";
 
 interface UserGroupSelectProps<IsMulti extends boolean>
   extends UserSelectProps<IsMulti, true, false, UserSelect_UserGroupFragment> {}
@@ -33,7 +33,7 @@ function NoOptionsMessage(props: NoticeProps) {
     selectProps: { inputValue: search },
   } = props;
   return (
-    <Stack alignItems="center" textAlign="center" padding={4} spacing={4}>
+    <Stack alignItems="center" textAlign="center" padding={4} gap={4}>
       {search ? (
         <>
           <Image

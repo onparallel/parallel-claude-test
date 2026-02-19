@@ -4,9 +4,7 @@ import {
   AlertDescription,
   AlertIcon,
   Checkbox,
-  Flex,
   ListItem,
-  Stack,
   UnorderedList,
 } from "@chakra-ui/react";
 import { ContactReference } from "@parallel/components/common/ContactReference";
@@ -17,7 +15,7 @@ import {
   RichTextEditor,
   RichTextEditorInstance,
 } from "@parallel/components/common/slate/RichTextEditor";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Flex, Stack, Text } from "@parallel/components/ui";
 import { useConfirmSendReminderDialog_PetitionFragment } from "@parallel/graphql/__types";
 import { emptyRTEValue } from "@parallel/utils/slate/RichTextEditor/emptyRTEValue";
 import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
@@ -52,7 +50,7 @@ export function ConfirmSendReminderDialog({
         />
       }
       body={
-        <Stack spacing={4}>
+        <Stack gap={4}>
           {optedOut.length ? (
             <Alert status="warning" rounded="md">
               <Flex alignItems="center" justifyContent="flex-start">

@@ -5,11 +5,9 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Box,
   Center,
   Checkbox,
   Circle,
-  Flex,
   FormControl,
   ListItem,
   MenuButton,
@@ -17,7 +15,6 @@ import {
   MenuItem,
   MenuList,
   Spinner,
-  Stack,
   UnorderedList,
   useToast,
 } from "@chakra-ui/react";
@@ -30,7 +27,7 @@ import { SubscribedNotificationsIcon } from "@parallel/components/common/Subscri
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
 import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
 import { UserReference } from "@parallel/components/common/UserReference";
-import { Avatar, Button, Text } from "@parallel/components/ui";
+import { Avatar, Box, Button, Flex, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionActivity_petitionDocument,
   PetitionBaseType,

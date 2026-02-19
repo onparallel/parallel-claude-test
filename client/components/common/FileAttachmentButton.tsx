@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client";
-import { Flex } from "@chakra-ui/react";
+
 import { DownloadIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { FileAttachmentButton_FileUploadFragment } from "@parallel/graphql/__types";
 
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Flex, Text } from "@parallel/components/ui";
 import { useIntl } from "react-intl";
 import { FileIcon } from "./FileIcon";
 import { FileName } from "./FileName";
@@ -15,8 +15,8 @@ interface FileAttachmentButtonProps {
   showDownloadIcon?: boolean;
 }
 
-export const FileAttachmentButton = chakraForwardRef<"button", FileAttachmentButtonProps>(
-  function FileAttachmentButton({ file, showDownloadIcon, ...props }, ref) {
+export const FileAttachmentButton = chakraComponent<"button", FileAttachmentButtonProps>(
+  function FileAttachmentButton({ ref, file, showDownloadIcon, ...props }) {
     const intl = useIntl();
     return (
       <Button

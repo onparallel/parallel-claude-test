@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import { useToast } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import {
   PetitionViewTabs_createPetitionListViewDocument,
   PetitionViewTabs_deletePetitionListViewDocument,
@@ -21,8 +21,8 @@ interface PetitionViewTabsProps {
   views: PetitionViewTabs_PetitionListViewFragment[];
 }
 
-export const PetitionViewTabs = chakraForwardRef<"div", PetitionViewTabsProps>(
-  function PetitionViewTabs({ views }, ref) {
+export const PetitionViewTabs = chakraComponent<"div", PetitionViewTabsProps>(
+  function PetitionViewTabs({ ref, views }) {
     const [queryState, setQueryState] = usePetitionsQueryState();
     const intl = useIntl();
     const toast = useToast();

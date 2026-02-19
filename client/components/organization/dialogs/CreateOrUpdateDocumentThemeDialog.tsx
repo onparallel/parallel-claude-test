@@ -1,17 +1,9 @@
 import { gql } from "@apollo/client";
-import {
-  Checkbox,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  HStack,
-  Input,
-  Stack,
-} from "@chakra-ui/react";
+import { Checkbox, FormControl, FormErrorMessage, FormLabel, Input } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
-import { Button } from "@parallel/components/ui";
+import { Button, HStack, Stack } from "@parallel/components/ui";
 import { CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragment } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { Maybe } from "@parallel/utils/types";

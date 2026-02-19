@@ -1,4 +1,4 @@
-import { Box, BoxProps, Flex } from "@chakra-ui/react";
+import { Box, BoxProps, Flex } from "@parallel/components/ui";
 
 export interface PublicUserFormContainerProps extends BoxProps {
   wrapper?: BoxProps;

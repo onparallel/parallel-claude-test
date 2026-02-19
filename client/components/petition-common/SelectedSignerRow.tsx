@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client";
-import { Center, ListItem, ListItemProps, Stack } from "@chakra-ui/react";
+import { Center, ListItem, ListItemProps } from "@chakra-ui/react";
 import { DeleteIcon, EditIcon } from "@parallel/chakra/icons";
 import { SelectedSignerRow_PetitionSignerFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { Text } from "@parallel/components/ui";
+import { Stack, Text } from "@parallel/components/ui";
 
 interface SelectedSignerRowProps extends ListItemProps {
   signer: Pick<SelectedSignerRow_PetitionSignerFragment, "email" | "firstName" | "lastName">;
@@ -60,7 +60,7 @@ export function SelectedSignerRow({
       </Text>
       {isEditable ? (
         <Center position="absolute" insetEnd={2} top={0} height="100%">
-          <Stack direction="row" spacing={1}>
+          <Stack direction="row" gap={1}>
             <IconButtonWithTooltip
               variant="ghost"
               size="sm"

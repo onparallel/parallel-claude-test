@@ -1,5 +1,5 @@
-import { RadioProps, Stack, useRadio } from "@chakra-ui/react";
-import { Button } from "@parallel/components/ui";
+import { RadioProps, useRadio } from "@chakra-ui/react";
+import { Button, Stack } from "@parallel/components/ui";
 
 export function ModuleSettingsRadioButton(props: RadioProps) {
   const { getInputProps, getRadioProps } = useRadio(props);
@@ -30,7 +30,7 @@ export function ModuleSettingsRadioButton(props: RadioProps) {
       {...getRadioProps()}
     >
       <input {...getInputProps()} />
-      <Stack flex="1" align="center" justify="center" spacing={3}>
+      <Stack flex="1" align="center" justify="center" gap={3}>
         {props.children}
       </Stack>
     </Button>

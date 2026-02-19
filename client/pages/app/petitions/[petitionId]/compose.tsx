@@ -1,6 +1,6 @@
 import { CombinedGraphQLErrors, gql } from "@apollo/client";
 import { useApolloClient, useMutation } from "@apollo/client/react";
-import { Box, HStack, Stack } from "@chakra-ui/react";
+
 import { AlertCircleIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
 import { Link } from "@parallel/components/common/Link";
 import { OverflownText } from "@parallel/components/common/OverflownText";
@@ -48,7 +48,7 @@ import {
   cleanPreviewFieldReplies,
   updatePreviewFieldReplies,
 } from "@parallel/components/petition-preview/clientMutations";
-import { Text } from "@parallel/components/ui";
+import { Box, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   CreatePetitionFieldInput,
   PetitionCompose_PetitionFieldFragment,
@@ -456,7 +456,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     } else if (isApolloError(error, "FIELD_IS_REFERENCED_IN_APPROVAL_FLOW_CONFIG")) {
       await showErrorDialog.ignoringDialogErrors({
         header: (
-          <Stack direction="row" spacing={2} align="center">
+          <Stack direction="row" gap={2} align="center">
             <AlertCircleIcon role="presentation" />
             <Text>
               <FormattedMessage
@@ -485,7 +485,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     } else if (isApolloError(error, "FIELD_IS_REFERENCED_IN_PETITION_ATTACHMENTS_VISIBILITY")) {
       await showErrorDialog.ignoringDialogErrors({
         header: (
-          <Stack direction="row" spacing={2} align="center">
+          <Stack direction="row" gap={2} align="center">
             <AlertCircleIcon role="presentation" />
             <Text>
               <FormattedMessage
@@ -530,7 +530,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 }}
               />
             </Text>
-            <Stack spacing={1} paddingTop={2} paddingX={1}>
+            <Stack gap={1} paddingTop={2} paddingX={1}>
               {fieldGroups.map(([f, fieldIndex]) => (
                 <HStack key={f.id} alignItems="flex-start">
                   <PetitionFieldTypeIndicator

@@ -1,8 +1,8 @@
-import { Box, Center, Flex, FormControl, FormLabel, List, Stack } from "@chakra-ui/react";
+import { Center, FormControl, FormLabel, List } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { SimpleSelect, toSimpleSelectOption } from "@parallel/components/common/SimpleSelect";
-import { Text } from "@parallel/components/ui";
+import { Box, Flex, Stack, Text } from "@parallel/components/ui";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { DynamicSelectOption, FieldOptions } from "@parallel/utils/fieldOptions";
@@ -10,7 +10,7 @@ import { Maybe } from "@parallel/utils/types";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from "react";
+import { RefAttributes, useEffect, useImperativeHandle, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { SelectInstance as _SelectInstance } from "react-select";
 import {
@@ -146,7 +146,7 @@ export function RecipientViewPetitionFieldDynamicSelect({
         </Text>
       ) : null}
       {filteredReplies.length ? (
-        <List as={Stack} marginTop={1} spacing={8}>
+        <List as={Stack} marginTop={1} gap={8}>
           <AnimatePresence initial={false}>
             {filteredReplies.map((reply) => (
               <motion.li
@@ -195,13 +195,15 @@ interface RecipientViewPetitionFieldReplyDynamicSelectInstance {
   focus: (level?: number) => void;
 }
 
-const RecipientViewPetitionFieldReplyDynamicSelect = forwardRef<
-  RecipientViewPetitionFieldReplyDynamicSelectInstance,
-  RecipientViewPetitionFieldReplyDynamicSelectProps
->(function RecipientViewPetitionFieldReplyDynamicSelect(
-  { field, reply, isDisabled, onChange, onDelete },
+function RecipientViewPetitionFieldReplyDynamicSelect({
   ref,
-) {
+  field,
+  reply,
+  isDisabled,
+  onChange,
+  onDelete,
+}: RecipientViewPetitionFieldReplyDynamicSelectProps &
+  RefAttributes<RecipientViewPetitionFieldReplyDynamicSelectInstance>) {
   const fieldOptions = field.options as FieldOptions["DYNAMIC_SELECT"];
   const refs = useMultipleRefs<SelectInstance>();
   useImperativeHandle(
@@ -258,7 +260,7 @@ const RecipientViewPetitionFieldReplyDynamicSelect = forwardRef<
       ))}
     </Stack>
   );
-});
+}
 
 interface RecipientViewPetitionFieldReplyDynamicSelectLevelProps {
   label: string;
@@ -272,23 +274,18 @@ interface RecipientViewPetitionFieldReplyDynamicSelectLevelProps {
   parentReplyId?: string;
 }
 
-const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
-  SelectInstance,
-  RecipientViewPetitionFieldReplyDynamicSelectLevelProps
->(function RecipientViewPetitionFieldReplyDynamicSelectLevel(
-  {
-    label,
-    level,
-    field,
-    reply,
-    isDisabled,
-    onChange,
-    onDeleteReply,
-    isInvalid,
-    parentReplyId,
-  }: RecipientViewPetitionFieldReplyDynamicSelectLevelProps,
+function RecipientViewPetitionFieldReplyDynamicSelectLevel({
   ref,
-) {
+  label,
+  level,
+  field,
+  reply,
+  isDisabled,
+  onChange,
+  onDeleteReply,
+  isInvalid,
+  parentReplyId,
+}: RecipientViewPetitionFieldReplyDynamicSelectLevelProps & RefAttributes<SelectInstance>) {
   const intl = useIntl();
   const fieldOptions = field.options as FieldOptions["DYNAMIC_SELECT"];
   const [optimistic, setOptimistic] = useState<string | null>(null);
@@ -393,4 +390,4 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
       </Flex>
     </FormControl>
   );
-});
+}

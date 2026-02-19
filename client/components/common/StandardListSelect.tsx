@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import { RefAttributes } from "react";
 import { IntlShape, useIntl } from "react-intl";
 import { SelectInstance } from "react-select";
 import {
@@ -76,15 +76,13 @@ const useStandardListSelectOptions = () => {
   return options;
 };
 
-export const StandardListSelect = forwardRef<
-  SelectInstance<SimpleOption<string>, false>,
-  StandardListSelectProps
->(function StandardListSelect(props, ref) {
+export function StandardListSelect(
+  props: StandardListSelectProps & RefAttributes<SelectInstance<SimpleOption<string>, false>>,
+) {
   const intl = useIntl();
   const options = useStandardListSelectOptions();
   return (
     <SimpleSelect
-      ref={ref}
       options={options}
       placeholder={intl.formatMessage({
         id: "component.standard-list-select.no-list",
@@ -93,4 +91,4 @@ export const StandardListSelect = forwardRef<
       {...props}
     />
   );
-});
+}

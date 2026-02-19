@@ -1,9 +1,6 @@
 import { gql } from "@apollo/client";
 import {
-  Box,
-  BoxProps,
   Checkbox,
-  Flex,
   Input,
   NumberDecrementStepper,
   NumberIncrementStepper,
@@ -20,7 +17,7 @@ import { addDays, addWeeks, isWeekend, parse, startOfToday, startOfWeek } from "
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { DateTime } from "../common/DateTime";
-import { Text } from "@parallel/components/ui";
+import { Box, BoxProps, Flex, Text } from "@parallel/components/ui";
 
 export function PetitionRemindersConfig({
   value,

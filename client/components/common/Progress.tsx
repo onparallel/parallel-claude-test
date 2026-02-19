@@ -1,5 +1,5 @@
-import { Box, BoxProps, Flex } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
+import { Box, BoxProps, Flex } from "@parallel/components/ui";
 
 export interface ProgressIndicatorProps extends BoxProps {
   min: number;
@@ -25,10 +25,14 @@ export interface ProgressTrackProps {
   value: number;
 }
 
-export const ProgressTrack = chakraForwardRef<"div", ProgressTrackProps>(function ProgressTrack(
-  { size, min, max, value, ...rest },
+export const ProgressTrack = chakraComponent<"div", ProgressTrackProps>(function ProgressTrack({
   ref,
-) {
+  size,
+  min,
+  max,
+  value,
+  ...rest
+}) {
   return (
     <Flex
       ref={ref}

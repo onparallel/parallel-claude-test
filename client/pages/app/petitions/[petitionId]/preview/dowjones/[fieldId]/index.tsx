@@ -5,13 +5,11 @@ import {
   AlertIcon,
   AlertTitle,
   Center,
-  Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
   Heading,
   Input,
-  Stack,
 } from "@chakra-ui/react";
 import { FieldDateIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
@@ -19,7 +17,7 @@ import { DateInput } from "@parallel/components/common/DateInput";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { SupportLink } from "@parallel/components/common/SupportLink";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Flex, Stack, Text } from "@parallel/components/ui";
 import {
   DowJonesFieldSearch_petitionFieldDocument,
   DowJonesFieldSearch_userDocument,
@@ -118,14 +116,14 @@ function DowJonesFieldSearch() {
             width="100%"
             maxWidth={"500px"}
           >
-            <Stack spacing={6}>
+            <Stack gap={6}>
               <Heading size="lg">
                 <FormattedMessage
                   id="component.internal-field-kyc-research.fill-in-data"
                   defaultMessage="Fill in the data to start the search"
                 />
               </Heading>
-              <Stack spacing={4}>
+              <Stack gap={4}>
                 <FormControl id="name" isInvalid={!!errors.name} isDisabled={isDisabled}>
                   <FormLabel fontWeight="400">
                     <FormattedMessage

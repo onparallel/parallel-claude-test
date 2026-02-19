@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Center, Flex, HStack, Image, Stack } from "@chakra-ui/react";
+import { Center, Image } from "@chakra-ui/react";
 import { AddIcon, LockClosedIcon, PlusCircleIcon } from "@parallel/chakra/icons";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   ProfileKeyProcesses_associateProfileToPetitionDocument,
   ProfileKeyProcesses_createPetitionFromProfileDocument,
@@ -355,7 +355,7 @@ function KeyProcessCard({
               </Text>
             )}
 
-            <HStack spacing={0} rowGap={2} columnGap={3} flexWrap="wrap">
+            <HStack gap={0} rowGap={2} columnGap={3} flexWrap="wrap">
               {isNonNullish(latestPetition.status) ? (
                 <PetitionStatusLabel status={latestPetition.status} fontSize="md" />
               ) : null}
@@ -408,7 +408,7 @@ function KeyProcessCard({
             flexWrap="wrap"
             paddingX={8}
             justify="center"
-            spacing={0}
+            gap={0}
             rowGap={2}
             columnGap={4}
             minWidth={0}
@@ -521,7 +521,7 @@ function PlaceholderAddNewProcess({
   return (
     <Center
       as={Stack}
-      spacing={3}
+      gap={3}
       padding={6}
       border="2px dashed"
       borderColor="gray.200"

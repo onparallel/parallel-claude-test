@@ -1,6 +1,6 @@
-import { Box, BoxProps } from "@chakra-ui/react";
 import { CheckIcon, CheckShortIcon } from "@parallel/chakra/icons";
 import { FORMATS } from "@parallel/utils/dates";
+import { Box, BoxProps } from "@parallel/components/ui";
 import { useIntl } from "react-intl";
 
 export interface EmailEventsIndicatorProps extends BoxProps {

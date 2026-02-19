@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client";
-import { Flex, HStack, Stack, VisuallyHidden } from "@chakra-ui/react";
+import { VisuallyHidden } from "@chakra-ui/react";
 import { FolderIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { Text } from "@parallel/components/ui";
+import { Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import { FolderCard_PetitionFolderFragment } from "@parallel/graphql/__types";
 import { useRoleButton } from "@parallel/utils/useRoleButton";
 import { FormattedMessage } from "react-intl";
@@ -14,10 +14,12 @@ export interface FolderCardProps {
   onPress: () => void;
 }
 
-export const FolderCard = chakraForwardRef<"div", FolderCardProps>(function FolderCard(
-  { folder, onPress, ...props },
+export const FolderCard = chakraComponent<"div", FolderCardProps>(function FolderCard({
   ref,
-) {
+  folder,
+  onPress,
+  ...props
+}) {
   const buttonProps = useRoleButton(onPress);
 
   return (

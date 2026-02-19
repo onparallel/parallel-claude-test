@@ -7926,6 +7926,7 @@ export type PetitionSignatureRequestFragment = {
 };
 
 export type PetitionFragment = {
+  __typename: "Petition";
   id: string;
   path: string;
   name: string | null;
@@ -8059,6 +8060,7 @@ export type PetitionFragment = {
 };
 
 export type TemplateFragment = {
+  __typename: "PetitionTemplate";
   id: string;
   path: string;
   name: string | null;
@@ -8674,6 +8676,7 @@ export type GetPetitions_petitionsQuery = {
     totalCount: number;
     items: Array<
       | {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -8813,7 +8816,7 @@ export type GetPetitions_petitionsQuery = {
             };
           }>;
         }
-      | {}
+      | Record<PropertyKey, never>
     >;
   };
 };
@@ -8836,6 +8839,7 @@ export type CreatePetition_petitionMutationVariables = Exact<{
 export type CreatePetition_petitionMutation = {
   createPetition:
     | {
+        __typename: "Petition";
         id: string;
         path: string;
         name: string | null;
@@ -8975,7 +8979,7 @@ export type CreatePetition_petitionMutation = {
           };
         }>;
       }
-    | {};
+    | { __typename: "PetitionTemplate" };
 };
 
 export type GetPetition_petitionQueryVariables = Exact<{
@@ -8995,6 +8999,7 @@ export type GetPetition_petitionQueryVariables = Exact<{
 export type GetPetition_petitionQuery = {
   petition:
     | {
+        __typename: "Petition";
         permanentDeletionAt: string | null;
         id: string;
         path: string;
@@ -9393,6 +9398,7 @@ export type ClosePetition_closePetitionMutationVariables = Exact<{
 
 export type ClosePetition_closePetitionMutation = {
   closePetition: {
+    __typename: "Petition";
     id: string;
     path: string;
     name: string | null;
@@ -9542,6 +9548,7 @@ export type ReopenPetition_reopenPetitionMutationVariables = Exact<{
 
 export type ReopenPetition_reopenPetitionMutation = {
   reopenPetition: {
+    __typename: "Petition";
     id: string;
     path: string;
     name: string | null;
@@ -9691,6 +9698,7 @@ export type CompletePetition_completePetitionMutationVariables = Exact<{
 
 export type CompletePetition_completePetitionMutation = {
   completePetition: {
+    __typename: "Petition";
     id: string;
     path: string;
     name: string | null;
@@ -9857,6 +9865,7 @@ export type TagPetition_tagPetitionMutationVariables = Exact<{
 export type TagPetition_tagPetitionMutation = {
   tagPetition:
     | {
+        __typename: "Petition";
         id: string;
         path: string;
         name: string | null;
@@ -9996,7 +10005,7 @@ export type TagPetition_tagPetitionMutation = {
           };
         }>;
       }
-    | {};
+    | { __typename: "PetitionTemplate" };
 };
 
 export type UntagPetition_tagsByNameQueryVariables = Exact<{
@@ -10052,6 +10061,7 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
   sendPetition: Array<{
     result: Result;
     petition: {
+      __typename: "Petition";
       id: string;
       path: string;
       name: string | null;
@@ -10231,7 +10241,7 @@ export type GetPetitionRecipients_petitionAccessesQuery = {
           } | null;
         }>;
       }
-    | {}
+    | Record<PropertyKey, never>
     | null;
 };
 
@@ -11218,6 +11228,7 @@ export type GetTemplates_templatesQuery = {
     totalCount: number;
     items: Array<
       | {
+          __typename: "PetitionTemplate";
           id: string;
           path: string;
           name: string | null;
@@ -11250,7 +11261,7 @@ export type GetTemplates_templatesQuery = {
           }>;
           tags?: Array<{ id: string; name: string }>;
         }
-      | {}
+      | Record<PropertyKey, never>
     >;
   };
 };
@@ -11265,6 +11276,7 @@ export type GetTemplate_templateQuery = {
   template:
     | { permanentDeletionAt: string | null }
     | {
+        __typename: "PetitionTemplate";
         permanentDeletionAt: string | null;
         id: string;
         path: string;
@@ -11480,6 +11492,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -11626,6 +11639,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -11772,6 +11786,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -11918,6 +11933,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -12064,6 +12080,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -12210,6 +12227,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -12356,6 +12374,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -12502,6 +12521,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -12648,6 +12668,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -12794,6 +12815,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -12940,6 +12962,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -13086,6 +13109,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -13232,6 +13256,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -13378,6 +13403,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -13524,6 +13550,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -13670,6 +13697,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -13816,6 +13844,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -13962,6 +13991,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -14108,6 +14138,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -14254,6 +14285,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -14400,6 +14432,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -14546,6 +14579,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -14692,6 +14726,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -14838,6 +14873,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -14984,6 +15020,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -15130,6 +15167,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -15276,6 +15314,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -15422,6 +15461,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -15568,6 +15608,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -15714,6 +15755,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -15860,6 +15902,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -16006,6 +16049,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -16152,6 +16196,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -16298,6 +16343,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -16444,6 +16490,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -16590,6 +16637,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -16736,6 +16784,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -16882,6 +16931,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -17028,6 +17078,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -17174,6 +17225,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -17320,6 +17372,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -17466,6 +17519,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -17612,6 +17666,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -17758,6 +17813,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -17904,6 +17960,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -18050,6 +18107,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -18196,6 +18254,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -18342,6 +18401,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -18488,6 +18548,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -18634,6 +18695,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -18780,6 +18842,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -18926,6 +18989,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -19072,6 +19136,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -19218,6 +19283,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -19364,6 +19430,7 @@ export type GetPetitionEvents_PetitionEventsQuery = {
         type: PetitionEventType;
         createdAt: string;
         petition: {
+          __typename: "Petition";
           id: string;
           path: string;
           name: string | null;
@@ -20449,6 +20516,7 @@ export type GetProfilePetitions_profileQuery = {
     associatedPetitions: {
       totalCount: number;
       items: Array<{
+        __typename: "Petition";
         id: string;
         path: string;
         name: string | null;
@@ -20992,6 +21060,7 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutationVariables = Exact<{
 
 export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
   bulkCreatePetitionReplies: {
+    __typename: "Petition";
     id: string;
     path: string;
     name: string | null;
@@ -21338,6 +21407,7 @@ export const PetitionSignatureRequestFragmentDoc = gql`
 ` as unknown as DocumentNode<PetitionSignatureRequestFragment, unknown>;
 export const PetitionFragmentDoc = gql`
   fragment Petition on Petition {
+    __typename
     id
     path
     name
@@ -21424,6 +21494,7 @@ export const PetitionFragmentDoc = gql`
 ` as unknown as DocumentNode<PetitionFragment, unknown>;
 export const TemplateFragmentDoc = gql`
   fragment Template on PetitionTemplate {
+    __typename
     id
     path
     name
@@ -21873,6 +21944,7 @@ export const CreatePetition_petitionDocument = gql`
     $includeOwner: Boolean!
   ) {
     createPetition(name: $name, petitionId: $templateId) {
+      __typename
       ...Petition
     }
   }
@@ -22057,6 +22129,7 @@ export const TagPetition_tagPetitionDocument = gql`
     $includeOwner: Boolean!
   ) {
     tagPetition(petitionId: $petitionId, tagId: $tagId) {
+      __typename
       ...Petition
     }
   }

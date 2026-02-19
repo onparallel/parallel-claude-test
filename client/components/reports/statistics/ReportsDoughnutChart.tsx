@@ -1,9 +1,9 @@
-import { Center, Flex, HStack, Image, Square, Stack, useTheme } from "@chakra-ui/react";
+import { Center, Image, Square, useTheme } from "@chakra-ui/react";
 import { DownloadIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { Text } from "@parallel/components/ui";
+import { Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import { ArcElement, ChartData, Chart as ChartJS, ChartOptions, Legend, Tooltip } from "chart.js";
 import { useMemo } from "react";
 import { Doughnut } from "react-chartjs-2";
@@ -109,7 +109,7 @@ export function ReportsDoughnutChart({
       height="100%"
       padding={6}
       as={Stack}
-      spacing={6}
+      gap={6}
       justifyContent="center"
       maxWidth={{ base: "full", xl: "360px" }}
     >

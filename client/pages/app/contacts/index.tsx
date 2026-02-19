@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Heading, HStack, Stack, useToast } from "@chakra-ui/react";
+import { Center, Heading, useToast } from "@chakra-ui/react";
 import { DeleteIcon, UsersIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -10,7 +10,7 @@ import { withPermission } from "@parallel/components/common/withPermission";
 import { ContactListHeader } from "@parallel/components/contact-list/ContactListHeader";
 import { useImportContactsDialog } from "@parallel/components/contact-list/dialogs/ImportContactsDialog";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { Text } from "@parallel/components/ui";
+import { Box, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   Contacts_contactsDocument,
   Contacts_ContactsListFragment,
@@ -130,7 +130,7 @@ function Contacts() {
       })}
       queryObject={queryObject}
     >
-      <Stack minHeight={0} paddingX={4} paddingTop={6} spacing={4}>
+      <Stack minHeight={0} paddingX={4} paddingTop={6} gap={4}>
         <HStack padding={2}>
           <UsersIcon boxSize={5} />
           <Heading as="h2" size="lg">

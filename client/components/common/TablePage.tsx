@@ -1,10 +1,10 @@
-import { Box, Center, Flex, IconButton, Spinner, Stack } from "@chakra-ui/react";
+import { Center, IconButton, Spinner } from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@parallel/chakra/icons";
 import { WithChakraProps } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { Table, TableProps } from "@parallel/components/common/Table";
-import { Button } from "@parallel/components/ui";
+import { Box, Button, Flex, Stack } from "@parallel/components/ui";
 import { ComponentType, PropsWithChildren, ReactNode, useEffect, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ScrollTableContainer } from "./ScrollTableContainer";
@@ -110,7 +110,7 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
       </Box>
       <Spacer />
       <Box as="nav">
-        <Stack as="ul" direction="row" spacing={1} listStyleType="none">
+        <Stack as="ul" direction="row" gap={1} listStyleType="none">
           {pagination.map((item) => (
             <Box
               key={item.type === "PAGE" ? `page-${item.value}` : item.type}
@@ -205,7 +205,7 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
       <Stack
         flexShrink={0}
         direction={{ base: "column", md: "row" }}
-        spacing={{ base: 2, sm: 4 }}
+        gap={{ base: 2, sm: 4 }}
         paddingY={2}
         paddingX={3}
         borderTop="1px solid"

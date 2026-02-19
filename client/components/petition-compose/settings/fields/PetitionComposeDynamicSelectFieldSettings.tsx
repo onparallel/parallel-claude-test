@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Center, Flex, List, ListItem, Progress, Stack } from "@chakra-ui/react";
+import { Center, List, ListItem, Progress } from "@chakra-ui/react";
 import { DeleteIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { Dropzone } from "@parallel/components/common/Dropzone";
@@ -9,7 +9,7 @@ import { FileSize } from "@parallel/components/common/FileSize";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { NormalLink } from "@parallel/components/common/Link";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import { Text } from "@parallel/components/ui";
+import { Box, Flex, Stack, Text } from "@parallel/components/ui";
 import {
   DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkDocument,
   DynamicSelectSettings_uploadDynamicSelectFieldFileDocument,
@@ -230,7 +230,7 @@ function DynamicSelectLoadedOptions({
         isReadOnly={isReadOnly}
       />
 
-      <Stack fontSize="sm" color="gray.600" spacing={0}>
+      <Stack fontSize="sm" color="gray.600" gap={0}>
         <FormattedMessage
           id="component.petition-compose-dynamic-select-field-settings.example"
           defaultMessage="For example:"

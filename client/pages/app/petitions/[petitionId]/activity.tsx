@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Center, Spinner, Stack, useToast } from "@chakra-ui/react";
+import { Center, Spinner, useToast } from "@chakra-ui/react";
 import { ProfileReference } from "@parallel/components/common/ProfileReference";
 import { ShareButton } from "@parallel/components/common/ShareButton";
 import { SupportButton } from "@parallel/components/common/SupportButton";
@@ -50,6 +50,7 @@ import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdate
 import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
+import { Box, Stack } from "@parallel/components/ui";
 import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -447,7 +448,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
           <PetitionLimitReachedAlert limit={me.organization.petitionsPeriod?.limit ?? 0} />
         ) : null}
       </Box>
-      <Stack padding={4} spacing={4} zIndex={1}>
+      <Stack padding={4} gap={4} zIndex={1}>
         {petition.isInteractionWithRecipientsEnabled ? (
           <PetitionAccessesTable
             id="petition-accesses"

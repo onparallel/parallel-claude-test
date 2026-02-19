@@ -1,25 +1,23 @@
-import { ComponentType, createContext, forwardRef, ForwardedRef, useContext } from "react";
+import { ComponentType, createContext, useContext } from "react";
 
 export function withDynamicLoadingProps<Props extends Record<string, any> = {}>(
   loader: (useLoadingProps: () => Props) => ComponentType<Props>,
 ) {
-  const LoadingPropsContext = createContext({} as Props);
+  const LoadingPropsContext = createContext<Props | null>(null);
 
-  const useLoadingProps = () => useContext(LoadingPropsContext);
+  const useLoadingProps = () => useContext(LoadingPropsContext)!;
 
   const Dynamic = loader(useLoadingProps);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const WrappedComponent = forwardRef<any, any>(function (
-    props: Props,
-    ref: ForwardedRef<unknown>,
-  ) {
+  const WrappedComponent: ComponentType<Props> = function (props: Props) {
     return (
       <LoadingPropsContext.Provider value={props}>
-        <Dynamic ref={ref} {...props} />
+        <Dynamic {...props} />
       </LoadingPropsContext.Provider>
     );
-  }) as unknown as ComponentType<Props>;
+  };
+
+  WrappedComponent.displayName = `WithDynamicLoadingProps(${Dynamic.displayName || Dynamic.name || "Component"})`;
 
   return WrappedComponent;
 }

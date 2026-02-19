@@ -1,6 +1,6 @@
-import { CircularProgress, Flex, IconButton } from "@chakra-ui/react";
+import { CircularProgress, IconButton } from "@chakra-ui/react";
 import { CloseIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFiles";
 import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
@@ -10,7 +10,7 @@ import { isNonNullish } from "remeda";
 import { FileIcon } from "./FileIcon";
 import { FileName } from "./FileName";
 import { FileSize } from "./FileSize";
-import { Text } from "@parallel/components/ui";
+import { Flex, Text } from "@parallel/components/ui";
 
 interface FileAttachmentProps {
   filename: string;
@@ -24,21 +24,19 @@ interface FileAttachmentProps {
   progress?: number;
 }
 
-export const FileAttachment = chakraForwardRef<"div", FileAttachmentProps>(function FileAttachment(
-  {
-    filename,
-    contentType,
-    size,
-    isComplete,
-    isDisabled,
-    onDownload,
-    onRemove,
-    uploadHasFailed,
-    progress,
-    ...props
-  },
+export const FileAttachment = chakraComponent<"div", FileAttachmentProps>(function FileAttachment({
   ref,
-) {
+  filename,
+  contentType,
+  size,
+  isComplete,
+  isDisabled,
+  onDownload,
+  onRemove,
+  uploadHasFailed,
+  progress,
+  ...props
+}) {
   const intl = useIntl();
   const nameRef = useRef<HTMLSpanElement>(null);
   const isMouseOver = useIsMouseOver(nameRef);

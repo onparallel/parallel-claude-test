@@ -1,4 +1,3 @@
-import { HStack } from "@chakra-ui/react";
 import {
   SignatureCancelledIcon,
   SignatureCompletedIcon,
@@ -13,7 +12,7 @@ import {
 import { usePetitionSignatureStatusLabels } from "@parallel/utils/usePetitionSignatureStatusLabels";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
-import { Text } from "@parallel/components/ui";
+import { HStack, Text } from "@parallel/components/ui";
 
 interface PetitionSignatureStatusLabelProps {
   status: PetitionSignatureStatusFilter;

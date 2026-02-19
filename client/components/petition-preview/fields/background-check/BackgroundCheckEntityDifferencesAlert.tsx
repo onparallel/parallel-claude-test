@@ -4,14 +4,13 @@ import {
   AlertDescription,
   AlertIcon,
   AlertTitle,
-  HStack,
   List,
   ListItem,
   UnorderedList,
 } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
 import { BackgroundCheckRiskLabel } from "@parallel/components/petition-common/BackgroundCheckRiskLabel";
-import { Button, Stack } from "@parallel/components/ui";
+import { Button, HStack, Stack } from "@parallel/components/ui";
 import { BackgroundCheckEntityDifferencesAlert_BackgroundCheckEntityDetailsReviewDiffFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";

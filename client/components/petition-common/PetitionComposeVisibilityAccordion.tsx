@@ -1,6 +1,7 @@
-import { HStack, Heading } from "@chakra-ui/react";
+import { Heading } from "@chakra-ui/react";
 import { ChevronFilledIcon, ConditionIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
+import { HStack } from "@parallel/components/ui";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { HelpPopover } from "../common/HelpPopover";
@@ -11,10 +12,10 @@ interface PetitionComposeVisibilityAccordionProps {
   popoverContent?: ReactNode;
 }
 
-export const PetitionComposeVisibilityAccordion = chakraForwardRef<
+export const PetitionComposeVisibilityAccordion = chakraComponent<
   "div",
   PetitionComposeVisibilityAccordionProps
->(function PetitionComposeVisibilityAccordion({ isOpen, children, popoverContent }, ref) {
+>(function PetitionComposeVisibilityAccordion({ ref, isOpen, children, popoverContent }) {
   return (
     <Accordion.Root
       defaultValue={isOpen ? ["0"] : undefined}
@@ -31,7 +32,7 @@ export const PetitionComposeVisibilityAccordion = chakraForwardRef<
             <>
               <Heading>
                 <Accordion.ItemTrigger borderRadius="md" paddingY={3}>
-                  <HStack as="span" flex="1" textAlign="left" fontSize="sm" spacing={1}>
+                  <HStack as="span" flex="1" textAlign="left" fontSize="sm" gap={1}>
                     <ChevronFilledIcon
                       color="gray.500"
                       fontSize="xs"

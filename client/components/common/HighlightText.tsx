@@ -1,4 +1,4 @@
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import escapeStringRegexp from "escape-string-regexp";
 import { Fragment } from "react";
 import { isNullish } from "remeda";
@@ -9,10 +9,12 @@ export interface HighlightTextProps {
   search?: string;
 }
 
-export const HighlightText = chakraForwardRef<"p", HighlightTextProps>(function HighlightText(
-  { children, search, ...props },
+export const HighlightText = chakraComponent<"p", HighlightTextProps>(function HighlightText({
   ref,
-) {
+  children,
+  search,
+  ...props
+}) {
   if (search === "" || isNullish(search) || isNullish(children)) {
     return (
       <Text ref={ref} {...props}>

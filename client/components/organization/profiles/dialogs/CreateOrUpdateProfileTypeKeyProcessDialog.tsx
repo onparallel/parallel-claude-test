@@ -1,10 +1,10 @@
-import { FormControl, FormErrorMessage, FormLabel, Stack } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { LocalizableUserTextInput } from "@parallel/components/common/LocalizableUserTextInput";
 import { LocalizableUserText } from "@parallel/components/common/LocalizableUserTextRender";
 import { PetitionSelect } from "@parallel/components/common/PetitionSelect";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import { UserLocale } from "@parallel/graphql/__types";
 import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";

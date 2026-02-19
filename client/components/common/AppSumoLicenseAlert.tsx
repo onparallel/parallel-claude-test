@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
-import { Alert, AlertDescription, AlertIcon, HStack, Stack } from "@chakra-ui/react";
-import { Button, Text } from "@parallel/components/ui";
+import { Alert, AlertDescription, AlertIcon } from "@chakra-ui/react";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { AppSumoLicenseAlert_OrgLicenseFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { SupportButton } from "./SupportButton";
@@ -20,7 +20,7 @@ export function AppSumoLicenseAlert({ license }: AppSumoLicenseAlertProps) {
   return (
     <Alert status="info" rounded="md">
       <AlertIcon />
-      <HStack spacing={4} width="100%">
+      <HStack gap={4} width="100%">
         <AlertDescription>
           <Stack flex="1">
             <Text fontWeight="bold">

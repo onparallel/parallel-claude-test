@@ -1,18 +1,14 @@
 import { gql } from "@apollo/client";
 import {
-  Box,
   Center,
   Circle,
-  Flex,
   Grid,
   Heading,
-  HStack,
   Image,
   LinkBox,
   LinkOverlay,
   RadioProps,
   Spinner,
-  Stack,
   useRadio,
   useRadioGroup,
 } from "@chakra-ui/react";
@@ -44,7 +40,7 @@ import {
   RecipientPortalStatusFilter,
   RecipientPortalStatusFilterValue,
 } from "@parallel/components/recipient-view/RecipientPortalStatusFilter";
-import { Text } from "@parallel/components/ui";
+import { Box, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   RecipientPortal_accessDocument,
   RecipientPortal_accessesDocument,
@@ -194,7 +190,7 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
           />
 
           <Flex width="100%" justifyContent="center">
-            <Stack maxWidth="container.lg" width="100%" spacing={4} paddingY={4} paddingX={4}>
+            <Stack maxWidth="container.lg" width="100%" gap={4} paddingY={4} paddingX={4}>
               <HStack>
                 <IconButtonWithTooltip
                   as={NextLink}
@@ -214,7 +210,7 @@ function RecipientPortal({ keycode }: RecipientPortalProps) {
                   />
                 </Heading>
               </HStack>
-              <Stack direction={{ base: "column", sm: "row" }} spacing={2}>
+              <Stack direction={{ base: "column", sm: "row" }} gap={2}>
                 <HStack width="100%">
                   <IconButtonWithTooltip
                     onClick={async () => {
@@ -330,7 +326,7 @@ function Petitions({
 
   if (!items.length) {
     return (
-      <Stack alignItems="center" textAlign="center" padding={4} spacing={4}>
+      <Stack alignItems="center" textAlign="center" padding={4} gap={4}>
         <Image
           maxWidth="166px"
           height="77px"
@@ -395,7 +391,6 @@ function PetitionCard({ access }: { access: RecipientPortal_PublicPetitionAccess
     <LinkBox>
       <HStack
         padding={4}
-        spacing={0}
         gap={4}
         cursor="pointer"
         _hover={{
@@ -424,7 +419,7 @@ function PetitionCard({ access }: { access: RecipientPortal_PublicPetitionAccess
           gap={{ base: 1, md: 4 }}
           width="100%"
         >
-          <Stack spacing={0}>
+          <Stack gap={0}>
             <LinkOverlay
               as={NextLink}
               href={`/petition/${keycode}`}
@@ -524,7 +519,7 @@ function RadioCard(props: RadioProps) {
       }}
     >
       <input {...getInputProps()} />
-      <Stack alignItems="center" textAlign="center" spacing={0}>
+      <Stack alignItems="center" textAlign="center" gap={0}>
         {props.children}
       </Stack>
     </Card>

@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Heading, HStack, Stack } from "@chakra-ui/react";
+import { Heading } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { NakedHelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { PetitionSelect } from "@parallel/components/common/PetitionSelect";
@@ -13,7 +13,7 @@ import { ReportsReadyMessage } from "@parallel/components/reports/common/Reports
 import { ReportsStatisticsAverage } from "@parallel/components/reports/statistics/ReportsStatisticsAverage";
 import { ReportsStatisticsConversion } from "@parallel/components/reports/statistics/ReportsStatisticsConversion";
 import { ReportsStatisticsTime } from "@parallel/components/reports/statistics/ReportsStatisticsTime";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { ReportsTemplates_userDocument } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
@@ -172,11 +172,11 @@ export function ReportsTemplates() {
         </HStack>
       }
     >
-      <Stack spacing={2} padding={6}>
+      <Stack gap={2} padding={6}>
         <Text>
           <FormattedMessage id="generic.template" defaultMessage="Template" />:
         </Text>
-        <Stack direction={{ base: "column", lg: "row" }} spacing={0} gridGap={2}>
+        <Stack direction={{ base: "column", lg: "row" }} gap={0} gridGap={2}>
           <HStack
             data-section="reports-select-template"
             flex="1"
@@ -220,7 +220,7 @@ export function ReportsTemplates() {
           </Button>
         </Stack>
         {isNonNullish(report) && (status === "IDLE" || status === "LOADED") ? (
-          <Stack spacing={6}>
+          <Stack gap={6}>
             <ReportsStatisticsAverage
               report={report}
               range={activeRange}

@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Flex, HStack, IconButton, Stack, VisuallyHidden } from "@chakra-ui/react";
+import { IconButton, VisuallyHidden } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import {
   AlertCircleIcon,
@@ -30,7 +30,7 @@ import { PetitionListSharedWithFilter } from "@parallel/components/petition-list
 import { PetitionListTagFilter } from "@parallel/components/petition-list/filters/PetitionListTagFilter";
 import { PetitionTemplateFilter } from "@parallel/components/petition-list/filters/PetitionTemplateFilter";
 import { TemplateActiveSettingsIcons } from "@parallel/components/petition-new/TemplateActiveSettingsIcons";
-import { Text } from "@parallel/components/ui";
+import { Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionApprovalRequestStepStatus,
   PetitionBaseType,
@@ -694,7 +694,7 @@ export const TEMPLATES_COLUMNS: PetitionsTableColumns_PetitionTemplateOrFolder[]
     },
     CellContent: ({ row }) =>
       row.__typename === "PetitionTemplate" ? (
-        <TemplateActiveSettingsIcons template={row} spacing={4} />
+        <TemplateActiveSettingsIcons template={row} gap={4} />
       ) : (
         <></>
       ),
@@ -769,7 +769,7 @@ function ApprovalStatusIcon({ status }: { status: PetitionApprovalRequestStepSta
       return <TimeIcon color="yellow.600" />;
     case "SKIPPED":
       return (
-        <HStack spacing={0.5}>
+        <HStack gap={0.5}>
           <ThumbsUpIcon color="green.600" />
           <AlertCircleIcon color="yellow.600" />
         </HStack>

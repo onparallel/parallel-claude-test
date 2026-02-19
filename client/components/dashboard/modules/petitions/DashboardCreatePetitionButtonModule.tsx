@@ -4,21 +4,21 @@ import { Button } from "@parallel/components/ui";
 import { DashboardCreatePetitionButtonModule_DashboardCreatePetitionButtonModuleFragment } from "@parallel/graphql/__types";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
-import { forwardRef } from "react";
+import { RefAttributes } from "react";
 import { isNullish } from "remeda";
 import { DashboardSimpleModuleCard } from "../../shared/DashboardSimpleModuleCard";
 
-export const DashboardCreatePetitionButtonModule = forwardRef<
-  HTMLDivElement,
-  {
-    module: DashboardCreatePetitionButtonModule_DashboardCreatePetitionButtonModuleFragment;
-    isEditing: boolean;
-    isDragging: boolean;
-    isReadOnly: boolean;
-    onEdit: () => void;
-    onDelete: () => void;
-  }
->(function DashboardCreatePetitionButtonModule({ module, ...rest }, ref) {
+export function DashboardCreatePetitionButtonModule({
+  module,
+  ...rest
+}: {
+  module: DashboardCreatePetitionButtonModule_DashboardCreatePetitionButtonModuleFragment;
+  isEditing: boolean;
+  isDragging: boolean;
+  isReadOnly: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+} & RefAttributes<HTMLDivElement>) {
   const template = module.petitionButtonSettings.template;
   const createPetition = useCreatePetition();
   const goToPetition = useGoToPetition();
@@ -32,7 +32,7 @@ export const DashboardCreatePetitionButtonModule = forwardRef<
     }
   };
   return (
-    <DashboardSimpleModuleCard ref={ref} module={module} {...rest} alignment="center">
+    <DashboardSimpleModuleCard module={module} {...rest} alignment="center">
       <Button
         colorPalette="primary"
         disabled={isNullish(template?.myEffectivePermission)}
@@ -42,7 +42,7 @@ export const DashboardCreatePetitionButtonModule = forwardRef<
       </Button>
     </DashboardSimpleModuleCard>
   );
-});
+}
 
 const _fragments = {
   DashboardCreatePetitionButtonModule: gql`

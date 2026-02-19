@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client";
-import { Badge, Box, HStack, Stack } from "@chakra-ui/react";
-import { Button, Text } from "@parallel/components/ui";
+import { Badge } from "@chakra-ui/react";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { DocumentThemeSelect_OrganizationThemeFragment } from "@parallel/graphql/__types";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomSelectProps } from "@parallel/utils/react-select/types";
-import { ForwardedRef, forwardRef, ReactElement, RefAttributes } from "react";
+import { RefAttributes } from "react";
 import { FormattedMessage } from "react-intl";
 import Select, {
   components,
@@ -23,18 +23,15 @@ export interface DocumentThemeSelectProps<T extends Selection>
   isCreateNewThemeDisabled?: boolean;
 }
 
-export const DocumentThemeSelect = forwardRef(function DocumentThemeSelect<T extends Selection>(
-  {
-    value,
-    onChange,
-    options,
-    placeholder,
-    onCreateNewTheme,
-    isCreateNewThemeDisabled,
-    ...props
-  }: DocumentThemeSelectProps<T>,
-  ref: ForwardedRef<DocumentThemeSelectInstance>,
-) {
+export function DocumentThemeSelect<T extends Selection>({
+  value,
+  onChange,
+  options,
+  placeholder,
+  onCreateNewTheme,
+  isCreateNewThemeDisabled,
+  ...props
+}: DocumentThemeSelectProps<T> & RefAttributes<DocumentThemeSelectInstance>) {
   const rsProps = useReactSelectProps({
     ...props,
     components: {
@@ -49,20 +46,18 @@ export const DocumentThemeSelect = forwardRef(function DocumentThemeSelect<T ext
 
   return (
     <Select<Selection, false, never>
-      ref={ref as any}
       value={value}
       onChange={onChange}
       options={options}
       getOptionLabel={(o) => o.name}
       getOptionValue={(o) => o.id}
       placeholder={placeholder}
+      {...props}
       {...rsProps}
       {...(extensions as any)}
     />
   );
-}) as <T extends Selection>(
-  props: DocumentThemeSelectProps<T> & RefAttributes<DocumentThemeSelectInstance>,
-) => ReactElement;
+}
 
 const _fragments = {
   OrganizationTheme: gql`

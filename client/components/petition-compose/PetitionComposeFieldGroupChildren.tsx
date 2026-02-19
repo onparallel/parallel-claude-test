@@ -1,6 +1,6 @@
-import { Box, Center, IconButton, Stack } from "@chakra-ui/react";
+import { Center, IconButton } from "@chakra-ui/react";
 import { AddIcon, PlusCircleIcon } from "@parallel/chakra/icons";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionComposeField_PetitionFieldFragment,
   PetitionFieldType,
@@ -101,7 +101,7 @@ export function PetitionComposeFieldGroupChildren({
         borderRadius="md"
         outline={isOver || !hasChildren ? "2px dashed" : "1px solid"}
         outlineColor={hasDropErrors || (!hasChildren && showError) ? "red.500" : "gray.200"}
-        spacing={0}
+        gap={0}
         position="relative"
         ref={drop as any}
       >

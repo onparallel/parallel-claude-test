@@ -1,19 +1,16 @@
 import {
-  Box,
   Center,
   FormControl,
   FormErrorMessage,
   FormLabel,
-  HStack,
   IconButton,
   Image,
   Input,
-  Stack,
 } from "@chakra-ui/react";
 import { CloseIcon } from "@parallel/chakra/icons";
 import { fileSize } from "@parallel/components/common/FileSize";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { Maybe } from "@parallel/utils/types";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -55,7 +52,7 @@ export function PublicSignupFormOrganization({
       <Text color="gray.500" fontSize="sm">
         2/3
       </Text>
-      <Stack spacing={4}>
+      <Stack gap={4}>
         <Text as="h1" fontSize="2xl" fontWeight="bold" marginTop={0}>
           <FormattedMessage
             id="component.public-signup-form-organization.heading"
@@ -99,7 +96,7 @@ export function PublicSignupFormOrganization({
         </FormControl>
         <SelectLogoInput logo={organizationLogo} onChangeLogo={setOrganizationLogo} />
       </Stack>
-      <Stack spacing={4} marginTop={8} direction={{ base: "column-reverse", md: "row" }}>
+      <Stack gap={4} marginTop={8} direction={{ base: "column-reverse", md: "row" }}>
         <Button width="100%" variant="outline" onClick={onBack}>
           <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
         </Button>

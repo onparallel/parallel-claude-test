@@ -10,12 +10,21 @@ export interface SapProfileSyncIntegrationSettings {
 }
 
 export type SapProfileSyncIntegrationSettingsAuthorization =
-  SapProfileSyncIntegrationSettingsAuthorizationBasic;
+  | SapProfileSyncIntegrationSettingsAuthorizationBasic
+  | SapProfileSyncIntegrationSettingsAuthorizationCertificate;
 
 export interface SapProfileSyncIntegrationSettingsAuthorizationBasic {
   type: "BASIC";
   user: string;
   password: string;
+}
+
+export interface SapProfileSyncIntegrationSettingsAuthorizationCertificate {
+  type: "CERTIFICATE";
+  /** PFX certificate content encoded as base64 string */
+  pfx: string;
+  /** Passphrase for the PFX certificate */
+  passphrase: string;
 }
 
 export interface SapEntityMapping {

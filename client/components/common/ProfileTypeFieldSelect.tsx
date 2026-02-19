@@ -1,18 +1,10 @@
 import { gql } from "@apollo/client";
-import { Box, Flex } from "@chakra-ui/react";
+
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import { ProfileTypeFieldSelect_ProfileTypeFieldFragment } from "@parallel/graphql/__types";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomSelectProps } from "@parallel/utils/react-select/types";
-import {
-  ForwardedRef,
-  ReactElement,
-  RefAttributes,
-  forwardRef,
-  memo,
-  useCallback,
-  useMemo,
-} from "react";
+import { RefAttributes, memo, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, {
   ActionMeta,
@@ -29,7 +21,7 @@ import CreatableSelect from "react-select/creatable";
 import { isNonNullish } from "remeda";
 import { ProfileTypeFieldTypeIndicator } from "../organization/profiles/ProfileTypeFieldTypeIndicator";
 import { localizableUserTextRender } from "./LocalizableUserTextRender";
-import { Text } from "@parallel/components/ui";
+import { Box, Flex, Text } from "@parallel/components/ui";
 
 type ProfileTypeFieldSelection = ProfileTypeFieldSelect_ProfileTypeFieldFragment;
 
@@ -50,22 +42,21 @@ export interface ProfileTypeFieldSelectProps<
   isTooltipDisabled?: boolean;
 }
 
-export const ProfileTypeFieldSelect = forwardRef(function ProfileTypeFieldSelect<
+export function ProfileTypeFieldSelect<
   OptionType extends ProfileTypeFieldSelection,
   IsMulti extends boolean = false,
->(
-  {
-    value,
-    onChange,
-    fields,
-    isMulti,
-    filterFields,
-    onCreateProperty,
-    suggestedPropertyName,
-    ...props
-  }: ProfileTypeFieldSelectProps<OptionType, IsMulti>,
-  ref: ForwardedRef<ProfileTypeFieldSelectInstance<IsMulti, OptionType>>,
-) {
+>({
+  ref,
+  value,
+  onChange,
+  fields,
+  isMulti,
+  filterFields,
+  onCreateProperty,
+  suggestedPropertyName,
+  ...props
+}: ProfileTypeFieldSelectProps<OptionType, IsMulti> &
+  RefAttributes<ProfileTypeFieldSelectInstance<IsMulti, OptionType>>) {
   const intl = useIntl();
   const rsProps = useReactSelectProps<ProfileTypeFieldSelectOption<OptionType>, IsMulti, never>({
     ...(props as any),
@@ -208,13 +199,7 @@ export const ProfileTypeFieldSelect = forwardRef(function ProfileTypeFieldSelect
       {...rsProps}
     />
   );
-}) as <
-  IsMulti extends boolean = false,
-  OptionType extends ProfileTypeFieldSelection = ProfileTypeFieldSelection,
->(
-  props: ProfileTypeFieldSelectProps<OptionType, IsMulti> &
-    RefAttributes<ProfileTypeFieldSelectInstance<IsMulti, OptionType>>,
-) => ReactElement;
+}
 
 interface ProfileTypeFieldSelectOption<T extends ProfileTypeFieldSelection> {
   field: T;

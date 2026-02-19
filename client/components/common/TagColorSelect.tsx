@@ -1,15 +1,13 @@
-import { Box, Stack } from "@chakra-ui/react";
-import { forwardRef, useMemo } from "react";
+import { Box, Stack, Text } from "@parallel/components/ui";
+import { RefAttributes, useMemo } from "react";
 import { useIntl } from "react-intl";
+import { CSSObjectWithLabel, OptionProps, SingleValueProps, components } from "react-select";
 import {
-  CSSObjectWithLabel,
-  OptionProps,
-  SelectInstance,
-  SingleValueProps,
-  components,
-} from "react-select";
-import { SimpleOption, SimpleSelect, SimpleSelectProps } from "./SimpleSelect";
-import { Text } from "@parallel/components/ui";
+  SimpleOption,
+  SimpleSelect,
+  SimpleSelectInstance,
+  SimpleSelectProps,
+} from "./SimpleSelect";
 
 export const DEFAULT_COLORS = [
   "#E2E8F0",
@@ -85,29 +83,29 @@ export type TagColorSelectProps = Omit<
   "options" | "components" | "styles"
 >;
 
-export const TagColorSelect = forwardRef<SelectInstance<string, false>, TagColorSelectProps>(
-  function TagColorSelect(props, ref) {
-    const options = useTagColors();
-    return (
-      <SimpleSelect
-        options={options}
-        components={{ SingleValue, Option } as any}
-        styles={{
-          valueContainer: (styles: CSSObjectWithLabel) => ({
-            ...styles,
-            flexWrap: "nowrap",
-          }),
-          option: (styles: CSSObjectWithLabel) => ({
-            ...styles,
-            display: "flex",
-            padding: "0.25rem 1rem",
-          }),
-        }}
-        {...props}
-      />
-    );
-  },
-);
+export function TagColorSelect(
+  props: TagColorSelectProps & RefAttributes<SimpleSelectInstance<string, false>>,
+) {
+  const options = useTagColors();
+  return (
+    <SimpleSelect
+      options={options}
+      components={{ SingleValue, Option } as any}
+      styles={{
+        valueContainer: (styles: CSSObjectWithLabel) => ({
+          ...styles,
+          flexWrap: "nowrap",
+        }),
+        option: (styles: CSSObjectWithLabel) => ({
+          ...styles,
+          display: "flex",
+          padding: "0.25rem 1rem",
+        }),
+      }}
+      {...props}
+    />
+  );
+}
 
 function TagColorOption({ color }: { color: SimpleOption }) {
   return (

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import { FormControl, FormHelperText, FormLabel, Stack } from "@chakra-ui/react";
+import { FormControl, FormHelperText, FormLabel } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
@@ -8,7 +8,7 @@ import { localizableUserTextRender } from "@parallel/components/common/Localizab
 import { ProfileTypeFieldSelect } from "@parallel/components/common/ProfileTypeFieldSelect";
 import { SimpleSelect, useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { BackgroundCheckEntityTypeSelect } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityTypeSelect";
-import { Box, Button, Checkbox, HStack, Text } from "@parallel/components/ui";
+import { Box, Button, Checkbox, HStack, Stack, Text } from "@parallel/components/ui";
 import { ConfigureProfileBackgroundCheckAutomateSearchDialog_profileTypeDocument } from "@parallel/graphql/__types";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { Controller, useForm } from "react-hook-form";

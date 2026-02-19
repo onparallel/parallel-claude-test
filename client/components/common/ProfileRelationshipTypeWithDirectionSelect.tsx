@@ -1,10 +1,11 @@
 import { gql } from "@apollo/client";
-import { Box, IconButton } from "@chakra-ui/react";
+import { IconButton } from "@chakra-ui/react";
 import { RelationshipIcon } from "@parallel/chakra/icons";
+import { Box, Text } from "@parallel/components/ui";
 import { ProfileRelationshipTypeWithDirectionSelect_ProfileRelationshipTypeWithDirectionFragment } from "@parallel/graphql/__types";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomSelectProps } from "@parallel/utils/react-select/types";
-import { ForwardedRef, forwardRef, useCallback } from "react";
+import { RefAttributes, useCallback } from "react";
 import { useIntl } from "react-intl";
 import Select, {
   OptionProps,
@@ -17,7 +18,6 @@ import { isNonNullish } from "remeda";
 import { HighlightText } from "./HighlightText";
 import { LocalizableUserTextRender, localizableUserTextRender } from "./LocalizableUserTextRender";
 import { OverflownText } from "./OverflownText";
-import { Text } from "@parallel/components/ui";
 
 export type ProfileRelationshipTypeWithDirectionSelectSelection =
   ProfileRelationshipTypeWithDirectionSelect_ProfileRelationshipTypeWithDirectionFragment;
@@ -31,92 +31,87 @@ export type ProfileRelationshipTypeWithDirectionSelectSelectionInstance = Select
 export interface ProfileRelationshipTypeWithDirectionSelectProps
   extends CustomSelectProps<ProfileRelationshipTypeWithDirectionSelectSelection, false, never> {}
 
-export const ProfileRelationshipTypeWithDirectionSelect = forwardRef(
-  function ProfileRelationshipTypeWithDirectionSelect(
-    {
-      value,
-      onChange,
-      options,
-      isMulti,
-      placeholder,
-      ...props
-    }: ProfileRelationshipTypeWithDirectionSelectProps,
-    ref: ForwardedRef<ProfileRelationshipTypeWithDirectionSelectSelectionInstance>,
-  ) {
-    const intl = useIntl();
-    const rsProps = useReactSelectProps<
+export function ProfileRelationshipTypeWithDirectionSelect({
+  value,
+  onChange,
+  options,
+  isMulti,
+  placeholder,
+  ...props
+}: ProfileRelationshipTypeWithDirectionSelectProps &
+  RefAttributes<ProfileRelationshipTypeWithDirectionSelectSelectionInstance>) {
+  const intl = useIntl();
+  const rsProps = useReactSelectProps<
+    ProfileRelationshipTypeWithDirectionSelectSelection,
+    false,
+    never
+  >({
+    ...props,
+    components: {
+      SingleValue,
+      Option,
+      IndicatorsContainer,
+      ...props.components,
+    } as unknown as SelectComponentsConfig<
       ProfileRelationshipTypeWithDirectionSelectSelection,
       false,
       never
-    >({
-      ...props,
-      components: {
-        SingleValue,
-        Option,
-        IndicatorsContainer,
-        ...props.components,
-      } as unknown as SelectComponentsConfig<
-        ProfileRelationshipTypeWithDirectionSelectSelection,
-        false,
-        never
-      >,
-    });
+    >,
+  });
 
-    const getOptionLabel = useCallback(
-      (option: ProfileRelationshipTypeWithDirectionSelectSelection) => {
-        return (
-          (option.direction === "LEFT_RIGHT"
-            ? localizableUserTextRender({
-                intl,
-                value: option.profileRelationshipType.leftRightName,
-                default: "",
-              })
-            : localizableUserTextRender({
-                intl,
-                value: option.profileRelationshipType.rightLeftName,
-                default: "",
-              })) +
-          " / " +
-          (option.direction === "LEFT_RIGHT"
-            ? localizableUserTextRender({
-                intl,
-                value: option.profileRelationshipType.rightLeftName,
-                default: "",
-              })
-            : localizableUserTextRender({
-                intl,
-                value: option.profileRelationshipType.leftRightName,
-                default: "",
-              }))
-        );
-      },
-      [],
-    );
+  const getOptionLabel = useCallback(
+    (option: ProfileRelationshipTypeWithDirectionSelectSelection) => {
+      return (
+        (option.direction === "LEFT_RIGHT"
+          ? localizableUserTextRender({
+              intl,
+              value: option.profileRelationshipType.leftRightName,
+              default: "",
+            })
+          : localizableUserTextRender({
+              intl,
+              value: option.profileRelationshipType.rightLeftName,
+              default: "",
+            })) +
+        " / " +
+        (option.direction === "LEFT_RIGHT"
+          ? localizableUserTextRender({
+              intl,
+              value: option.profileRelationshipType.rightLeftName,
+              default: "",
+            })
+          : localizableUserTextRender({
+              intl,
+              value: option.profileRelationshipType.leftRightName,
+              default: "",
+            }))
+      );
+    },
+    [],
+  );
 
-    const getOptionValue = (option: ProfileRelationshipTypeWithDirectionSelectSelection) => {
-      return option.profileRelationshipType.id + "|" + option.direction;
-    };
+  const getOptionValue = (option: ProfileRelationshipTypeWithDirectionSelectSelection) => {
+    return option.profileRelationshipType.id + "|" + option.direction;
+  };
 
-    return (
-      <Select<ProfileRelationshipTypeWithDirectionSelectSelection, false, never>
-        ref={ref as any}
-        value={value}
-        onChange={onChange}
-        isMulti={isMulti}
-        options={options}
-        getOptionLabel={getOptionLabel}
-        getOptionValue={getOptionValue}
-        isClearable={props.isClearable}
-        placeholder={intl.formatMessage({
-          id: "component.profile-relationship-type-with-direction-select.placeholder",
-          defaultMessage: "Select a relationship type",
-        })}
-        {...props}
-        {...rsProps}
-      />
-    );
-  },
-);
+  return (
+    <Select<ProfileRelationshipTypeWithDirectionSelectSelection, false, never>
+      value={value}
+      onChange={onChange}
+      isMulti={isMulti}
+      options={options}
+      getOptionLabel={getOptionLabel}
+      getOptionValue={getOptionValue}
+      isClearable={props.isClearable}
+      placeholder={intl.formatMessage({
+        id: "component.profile-relationship-type-with-direction-select.placeholder",
+        defaultMessage: "Select a relationship type",
+      })}
+      {...props}
+      {...rsProps}
+    />
+  );
+}
 
 function SingleValue(props: SingleValueProps<ProfileRelationshipTypeWithDirectionSelectSelection>) {
   return (

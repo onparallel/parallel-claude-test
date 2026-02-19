@@ -1,14 +1,14 @@
-import { HStack, IconProps, Image, Stack } from "@chakra-ui/react";
+import { IconProps, Image } from "@chakra-ui/react";
 import { AlertCircleFilledIcon, CircleCheckFilledIcon } from "@parallel/chakra/icons";
 import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboardButton";
 import { FORMATS } from "@parallel/utils/dates";
 import { useLoadCountryNames } from "@parallel/utils/useLoadCountryNames";
 import * as Sentry from "@sentry/nextjs";
 import { isValid } from "date-fns";
-import { ReactNode, forwardRef } from "react";
+import { ReactNode } from "react";
 import { FormattedDate, useIntl } from "react-intl";
 import { isNonNullish, isNullish } from "remeda";
-import { Text } from "@parallel/components/ui";
+import { HStack, Stack, Text } from "@parallel/components/ui";
 
 export function PetitionRepliesMetadataDate({
   label,
@@ -160,19 +160,13 @@ export function PetitionRepliesMetadataGender({
   );
 }
 
-export const InvalidIcon = forwardRef<SVGSVGElement, IconProps>(function InvalidIcon(
-  { ...props },
-  ref,
-) {
-  return <AlertCircleFilledIcon ref={ref} {...props} color="yellow.500" />;
-});
+export function InvalidIcon(props: IconProps) {
+  return <AlertCircleFilledIcon {...props} color="yellow.500" />;
+}
 
-export const ValidIcon = forwardRef<SVGSVGElement, IconProps>(function ValidIcon(
-  { ...props },
-  ref,
-) {
-  return <CircleCheckFilledIcon ref={ref} {...props} color="green.500" />;
-});
+export function ValidIcon(props: IconProps) {
+  return <CircleCheckFilledIcon {...props} color="green.500" />;
+}
 
 export function PetitionRepliesMetadataScore({
   label,
@@ -207,14 +201,14 @@ export function PetitionRepliesMetadataScoreIcon({
   if (isNullish(score)) return <Text>{"-"}</Text>;
 
   return score >= threshold ? (
-    <HStack spacing={1}>
+    <HStack gap={1}>
       <ValidIcon />
       <Text as="span" color="green.500">
         {Math.trunc(score)}/{maxScore}
       </Text>
     </HStack>
   ) : (
-    <HStack spacing={1}>
+    <HStack gap={1}>
       <InvalidIcon />
       <Text as="span">
         {Math.trunc(score)}/{maxScore}

@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-imports */
-import { Text as ChakraText, forwardRef, TextProps } from "@chakra-ui/react";
+import { Text as ChakraText, TextProps } from "@chakra-ui/react";
+import { chakraComponent } from "@parallel/chakra/utils";
 
 // Docs: https://chakra-ui.com/docs/components/text
 
@@ -11,8 +12,11 @@ export interface ExtendedTextProps extends Omit<TextProps, "noOfLines" | "isTrun
   truncate?: boolean;
 }
 
-export const Text = forwardRef<ExtendedTextProps, "p">(({ lineClamp, truncate, ...props }, ref) => {
+export const Text = chakraComponent<"p" | "span", ExtendedTextProps>(function Text({
+  lineClamp,
+  truncate,
+  ref,
+  ...props
+}) {
   return <ChakraText ref={ref} noOfLines={lineClamp} isTruncated={truncate} {...props} />;
 });
-
-Text.displayName = "Text";

@@ -1,16 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  Checkbox,
-  CheckboxGroup,
-  HStack,
-  Stack,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
+import { Checkbox, CheckboxGroup, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import { RadioButtonSelected } from "@parallel/chakra/icons";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { OverflownText } from "@parallel/components/common/OverflownText";
@@ -30,6 +19,7 @@ import {
   generatePrefillData,
 } from "@parallel/utils/petitions/profilePrefill";
 import { Assert, UnwrapArray } from "@parallel/utils/types";
+import { HStack, Stack } from "@parallel/components/ui";
 import { useEffect, useMemo } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import { Box, Center, FormControl, FormErrorMessage, Grid, Spinner, Stack } from "@chakra-ui/react";
+import { Center, FormControl, FormErrorMessage, Grid, Spinner } from "@chakra-ui/react";
 import { PlusCircleIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
@@ -15,7 +15,7 @@ import {
   PetitionUpdateProfileOnCloseSourceSelect,
   PetitionUpdateProfileOnCloseSourceSelectOptionValue,
 } from "@parallel/components/petition-compose/PetitionUpdateProfileOnCloseSourceSelect";
-import { Button, Input, Text } from "@parallel/components/ui";
+import { Box, Button, Input, Stack, Text } from "@parallel/components/ui";
 import {
   ConfigureUpdateProfileOnCloseDialog_petitionDocument,
   ConfigureUpdateProfileOnCloseDialog_profileTypeDocument,
@@ -259,7 +259,7 @@ function ConfigureUpdateProfileOnCloseDialogStep1({
         />
       }
       body={
-        <Stack spacing={2}>
+        <Stack gap={2}>
           <Text paddingBottom={2}>
             <FormattedMessage
               id="component.configure-update-profile-on-close-dialog.body"

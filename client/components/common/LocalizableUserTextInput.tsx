@@ -1,7 +1,6 @@
 import {
   Badge,
   ButtonProps,
-  HStack,
   Image,
   Input,
   InputGroup,
@@ -16,8 +15,8 @@ import {
 } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
-import { Button, Text } from "@parallel/components/ui";
+import { chakraComponent } from "@parallel/chakra/utils";
+import { Button, HStack, Text } from "@parallel/components/ui";
 import { UserLocale } from "@parallel/graphql/__types";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { asSupportedUserLocale, useSupportedUserLocales } from "@parallel/utils/locales";
@@ -37,21 +36,19 @@ interface LocalizableUserTextInputProps extends ValueProps<LocalizableUserText, 
   onChangeLocale?: (locale: UserLocale) => void;
 }
 
-export const LocalizableUserTextInput = chakraForwardRef<"div", LocalizableUserTextInputProps>(
-  function (
-    {
-      value,
-      onChange,
-      onBlur,
-      inputRef: _inputRef,
-      inputProps,
-      placeholder,
-      locale,
-      onChangeLocale,
-      ...props
-    },
+export const LocalizableUserTextInput = chakraComponent<"div", LocalizableUserTextInputProps>(
+  function ({
     ref,
-  ) {
+    value,
+    onChange,
+    onBlur,
+    inputRef: _inputRef,
+    inputProps,
+    placeholder,
+    locale,
+    onChangeLocale,
+    ...props
+  }) {
     const intl = useIntl();
     const inputRef = useRef<HTMLInputElement>(null);
     const mergedInputRef = useMergeRefs(inputRef, _inputRef);

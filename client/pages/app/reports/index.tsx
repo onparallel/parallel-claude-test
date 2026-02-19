@@ -5,14 +5,12 @@ import {
   Container,
   Grid,
   Heading,
-  HStack,
   Image,
   LinkBox,
   LinkOverlay,
-  Stack,
 } from "@chakra-ui/react";
 import { ReportsIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { NakedHelpCenterLink } from "@parallel/components/common/HelpCenterLink";
@@ -20,7 +18,7 @@ import NextLink from "next/link";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withPermission } from "@parallel/components/common/withPermission";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { Reports_userDocument } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
@@ -115,7 +113,7 @@ export function Reports() {
             <FormattedMessage id="generic.help-question" defaultMessage="Help?" />
           </Button>
         </HStack>
-        <Stack spacing={6}>
+        <Stack gap={6}>
           <Text>
             <FormattedMessage
               id="page.reports.choose-report"
@@ -147,10 +145,15 @@ interface ReportsCardProps {
   isPending?: boolean;
 }
 
-const ReportsCard = chakraForwardRef<"div", ReportsCardProps>(function ReportsCard(
-  { imgSrc, title, description, href, isPending, ...props },
+const ReportsCard = chakraComponent<"div", ReportsCardProps>(function ReportsCard({
   ref,
-) {
+  imgSrc,
+  title,
+  description,
+  href,
+  isPending,
+  ...props
+}) {
   return (
     <LinkBox
       ref={ref}
@@ -163,7 +166,7 @@ const ReportsCard = chakraForwardRef<"div", ReportsCardProps>(function ReportsCa
       cursor={isPending ? "default" : "pointer"}
       {...props}
     >
-      <Stack spacing={0} height="100%">
+      <Stack gap={0} height="100%">
         <Center
           position="relative"
           _before={
@@ -191,7 +194,7 @@ const ReportsCard = chakraForwardRef<"div", ReportsCardProps>(function ReportsCa
           />
         </Center>
         <Stack padding={4} paddingTop={2} paddingBottom={6} minHeight="124px">
-          <HStack align="center" wrap="wrap" spacing={0} gap={2}>
+          <HStack align="center" wrap="wrap" gap={2}>
             {isPending ? (
               <>
                 <Text as="h2" fontSize="2xl" fontWeight="bold">

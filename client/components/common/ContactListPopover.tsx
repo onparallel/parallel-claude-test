@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Box,
   List,
   ListItem,
   PopoverArrow,
@@ -15,6 +14,7 @@ import {
   ContactListPopover_PetitionSignerFragment,
   ContactListPopover_PublicContactFragment,
 } from "@parallel/graphql/__types";
+import { Box } from "@parallel/components/ui";
 import { ReactNode } from "react";
 
 type ContactSelection =

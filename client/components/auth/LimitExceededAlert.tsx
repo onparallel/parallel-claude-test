@@ -1,7 +1,7 @@
-import { AlertDescription, AlertIcon, AlertTitle, Stack } from "@chakra-ui/react";
+import { AlertDescription, AlertIcon, AlertTitle } from "@chakra-ui/react";
 import { FormattedMessage } from "react-intl";
 import { CloseableAlert, CloseableAlertProps } from "../common/CloseableAlert";
-import { Text } from "@parallel/components/ui";
+import { Stack, Text } from "@parallel/components/ui";
 
 export function LimitExceededAlert(props: CloseableAlertProps) {
   return (

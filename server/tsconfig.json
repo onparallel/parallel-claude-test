@@ -6,7 +6,8 @@
     "module": "commonjs",
     "jsx": "react-jsxdev",
     "experimentalDecorators": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "types": ["node", "vitest/globals"]
   },
   "include": ["**/*.ts", "**/*.tsx"]
 }

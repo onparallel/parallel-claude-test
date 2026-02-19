@@ -1,8 +1,8 @@
-import { Box, BoxProps, HStack } from "@chakra-ui/react";
 import { LinkedInIcon, TwitterIcon, YoutubeIcon } from "@parallel/chakra/icons";
 import { NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { untranslated } from "@parallel/utils/untranslated";
+import { Box, BoxProps, HStack } from "@parallel/components/ui";
 import { PublicContainer } from "./PublicContainer";
 
 export function PublicFooter(props: BoxProps) {
@@ -20,7 +20,7 @@ export function PublicFooter(props: BoxProps) {
         <Box as="a" href="/">
           <Logo width="152px" />
         </Box>
-        <HStack spacing={6}>
+        <HStack gap={6}>
           <NormalLink
             href="https://www.linkedin.com/company/onparallel"
             aria-label={untranslated("LinkedIn")}

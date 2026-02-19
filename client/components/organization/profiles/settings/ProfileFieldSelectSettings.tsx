@@ -3,18 +3,15 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Box,
   Checkbox,
   FormControl,
   FormErrorMessage,
   FormLabel,
-  HStack,
   Input,
   List,
   ListItem,
   Radio,
   RadioGroup,
-  Stack,
   Table,
   Tbody,
   Td,
@@ -40,7 +37,7 @@ import {
 import { StandardListSelect } from "@parallel/components/common/StandardListSelect";
 import { TagColorSelect } from "@parallel/components/common/TagColorSelect";
 import { useImportSelectOptionsDialog } from "@parallel/components/common/dialogs/ImportSelectOptionsDialog";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   ProfileFieldSelectSettings_ProfileTypeFieldFragment,
   ProfileFieldSelectSettings_ProfileTypeFragment,
@@ -196,7 +193,7 @@ export function ProfileFieldSelectSettings({
   };
 
   return (
-    <Stack spacing={4}>
+    <Stack gap={4}>
       <FormControl>
         <FormLabel fontWeight={400}>
           <FormattedMessage
@@ -208,7 +205,7 @@ export function ProfileFieldSelectSettings({
           <Alert status="warning" rounded="md" marginBottom={2}>
             <AlertIcon />
             <AlertDescription>
-              <Stack spacing={2}>
+              <Stack gap={2}>
                 <FormattedMessage
                   id="component.property-referenced-alert.referenced-by-monitored-fields-1"
                   defaultMessage="This options of this property cannot be changed as it is currently referenced by the monitoring configuration of the following {count, plural, =1{property} other {properties}}:"
@@ -234,7 +231,7 @@ export function ProfileFieldSelectSettings({
           <Alert status="warning" rounded="md" marginBottom={2}>
             <AlertIcon />
             <AlertDescription>
-              <Stack spacing={2}>
+              <Stack gap={2}>
                 <FormattedMessage
                   id="component.property-referenced-alert.referenced-by-auto-search-config-1"
                   defaultMessage="This options of this property cannot be changed as it is currently referenced by the auto search configuration of the following {count, plural, =1{property} other {properties}}:"
@@ -265,7 +262,7 @@ export function ProfileFieldSelectSettings({
               onChange={(value) => onChange(value)}
               value={value}
               as={HStack}
-              spacing={2}
+              gap={2}
               isDisabled={isReferenced || isStandard}
             >
               <Radio value="CUSTOM">
@@ -305,7 +302,7 @@ export function ProfileFieldSelectSettings({
       ) : (
         <>
           {profileFieldType === "CHECKBOX" ? null : (
-            <FormControl as={HStack} spacing={0} isDisabled={isReferenced || isStandard}>
+            <FormControl as={HStack} gap={0} isDisabled={isReferenced || isStandard}>
               <Checkbox {...register("options.showOptionsWithColors")}>
                 <FormattedMessage
                   id="component.create-or-update-property-dialog.enable-colored-options"
@@ -356,7 +353,7 @@ export function ProfileFieldSelectSettings({
                   ) : null}
                   <Th paddingInline={1} paddingBlock={2} display="flex" justifyContent="center">
                     <HelpPopover position="relative" margin="0" top="3px" popoverWidth="280px">
-                      <Stack spacing={2}>
+                      <Stack gap={2}>
                         <Text>
                           <FormattedMessage
                             id="component.create-or-update-property-dialog.hidden-options-help"

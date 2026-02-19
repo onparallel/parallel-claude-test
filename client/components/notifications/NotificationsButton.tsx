@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 import { Center, Circle } from "@chakra-ui/react";
 import { BellIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { NotificationsButton_UnreadPetitionUserNotificationIdsDocument } from "@parallel/graphql/__types";
 import { useNotificationsState } from "@parallel/utils/useNotificationsState";
 import { usePageVisibility } from "@parallel/utils/usePageVisibility";
@@ -15,8 +15,8 @@ import { Text } from "@parallel/components/ui";
 
 const POLL_INTERVAL = 30_000;
 
-export const NotificationsButton = chakraForwardRef<"button", { extended?: boolean }>(
-  function NotificationsBell(props, ref) {
+export const NotificationsButton = chakraComponent<"button", { extended?: boolean }>(
+  function NotificationsBell({ ref, ...props }) {
     const intl = useIntl();
     const isPageVisible = usePageVisibility();
     const { data, startPolling, stopPolling } = useQuery(

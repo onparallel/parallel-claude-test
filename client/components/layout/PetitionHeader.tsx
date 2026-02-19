@@ -3,19 +3,15 @@ import { useMutation } from "@apollo/client/react";
 import { getOperationName } from "@apollo/client/utilities/internal";
 import {
   Badge,
-  Box,
   Center,
-  Flex,
   Grid,
   GridItem,
-  HStack,
   List,
   MenuDivider,
   MenuItem,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  Stack,
   useToast,
 } from "@chakra-ui/react";
 import {
@@ -33,12 +29,12 @@ import {
   TagIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import {
   usePetitionShouldConfirmNavigation,
   usePetitionState,
 } from "@parallel/components/layout/PetitionLayout";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionActivity_petitionDocument,
   PetitionHeader_PetitionBaseFragment,
@@ -93,8 +89,8 @@ export interface PetitionHeaderInstance {
   focusName(): void;
 }
 
-export const PetitionHeader = chakraForwardRef<"div", PetitionHeaderProps, PetitionHeaderInstance>(
-  function PetitionHeader({ petition, me, section: current, actions, onRefetch, ...props }, ref) {
+export const PetitionHeader = chakraComponent<"div", PetitionHeaderProps, PetitionHeaderInstance>(
+  function PetitionHeader({ ref, petition, me, section: current, actions, onRefetch, ...props }) {
     const intl = useIntl();
     const router = useRouter();
     const toast = useToast();
@@ -469,7 +465,7 @@ export const PetitionHeader = chakraForwardRef<"div", PetitionHeaderProps, Petit
               isDisabled={isNonNullish(petition.permanentDeletionAt)}
             />
           </Flex>
-          <HStack spacing={1}>
+          <HStack gap={1}>
             {petition.__typename === "Petition" ? (
               <Center
                 data-testid="petition-status"

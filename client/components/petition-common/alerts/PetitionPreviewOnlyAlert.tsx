@@ -1,4 +1,5 @@
-import { Alert, AlertDescription, AlertIcon, HStack } from "@chakra-ui/react";
+import { Alert, AlertDescription, AlertIcon } from "@chakra-ui/react";
+import { HStack } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
 
 export function PetitionPreviewOnlyAlert() {

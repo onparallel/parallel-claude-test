@@ -1,25 +1,22 @@
 import {
-  Box,
   ButtonGroup,
   FormControl,
-  HStack,
   Input,
   layoutPropNames,
   Radio,
   RadioGroup,
   RadioProps,
-  Stack,
   useRadio,
   useRadioGroup,
 } from "@chakra-ui/react";
 import { ThumbsDownIcon, ThumbsUpIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { LocalFileAttachments } from "@parallel/components/common/LocalFileAttachments";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { PetitionApprovalRequestStepRejectionType } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useRef } from "react";
@@ -121,7 +118,7 @@ export function ApproveOrRejectPetitionApprovalFlowDialog({
                 render={({ field: { onChange, value } }) => (
                   <RadioGroup
                     as={HStack}
-                    spacing={4}
+                    gap={4}
                     onChange={(value) =>
                       onChange(value as PetitionApprovalRequestStepRejectionType)
                     }
@@ -136,7 +133,7 @@ export function ApproveOrRejectPetitionApprovalFlowDialog({
                       </Text>
                     </Radio>
                     <Radio value="DEFINITIVE">
-                      <HStack spacing={0}>
+                      <HStack gap={0}>
                         <Text>
                           <FormattedMessage
                             id="component.approve-or-reject-petition-approval-flow-dialog.final-rejection"
@@ -239,8 +236,8 @@ interface ApproveOrRejectRadioProps {
   value: ApproveOrRejectAction;
 }
 
-export const ApproveOrRejectRadio = chakraForwardRef<"div", ApproveOrRejectRadioProps>(
-  function ApproveOrRejectRadio({ onChange, value, ...props }, ref) {
+export const ApproveOrRejectRadio = chakraComponent<"div", ApproveOrRejectRadioProps>(
+  function ApproveOrRejectRadio({ ref, onChange, value, ...props }) {
     const { getRootProps, getRadioProps } = useRadioGroup({
       name: "action",
       value,

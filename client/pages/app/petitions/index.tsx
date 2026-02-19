@@ -4,16 +4,13 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Box,
   Center,
-  Flex,
   MenuButton,
   MenuItem,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
   Portal,
-  Stack,
 } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import {
@@ -49,7 +46,7 @@ import { usePetitionSharingDialog } from "@parallel/components/petition-common/d
 import { useRenameDialog } from "@parallel/components/petition-common/dialogs/RenameDialog";
 import { PetitionListHeader } from "@parallel/components/petition-list/PetitionListHeader";
 import { useNewTemplateDialog } from "@parallel/components/petition-new/dialogs/NewTemplateDialog";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionBaseType,
   PetitionPermissionType,
@@ -503,7 +500,7 @@ function Petitions() {
       }
       queryObject={queryObject}
     >
-      <Stack flex={1} minHeight={0} paddingX={4} paddingTop={6} spacing={4}>
+      <Stack flex={1} minHeight={0} paddingX={4} paddingTop={6} gap={4}>
         <Flex alignItems="center">
           <Box minWidth="0" width="fit-content">
             <Menu matchWidth>

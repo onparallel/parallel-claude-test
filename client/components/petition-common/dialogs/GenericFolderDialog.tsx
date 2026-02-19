@@ -1,14 +1,6 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import {
-  Box,
-  Center,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  Spinner,
-} from "@chakra-ui/react";
+import { Center, FormControl, FormErrorMessage, FormLabel, Input, Spinner } from "@chakra-ui/react";
 import { FolderIcon, FolderOpenIcon } from "@parallel/chakra/icons";
 import {
   ConfirmDialog,
@@ -16,7 +8,7 @@ import {
 } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { OverflownText } from "@parallel/components/common/OverflownText";
-import { Button } from "@parallel/components/ui";
+import { Box, Button } from "@parallel/components/ui";
 import { GenericFolderDialog_foldersDocument, PetitionBaseType } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { isNotEmptyText } from "@parallel/utils/strings";

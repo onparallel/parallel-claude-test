@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
-import { Box } from "@chakra-ui/react";
+
 import { EmailIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import {
   PetitionLocale,
   PetitionTemplateClosingMessageCard_PetitionTemplateFragment,
@@ -16,7 +16,7 @@ import { useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { Card, CardHeader } from "../common/Card";
 import { MessageClosingEmailEditor } from "../petition-common/MessageClosingEmailEditor";
-import { Text } from "@parallel/components/ui";
+import { Box, Text } from "@parallel/components/ui";
 
 interface PetitionTemplateClosingMessageCardProps {
   petition: PetitionTemplateClosingMessageCard_PetitionTemplateFragment;
@@ -27,11 +27,11 @@ interface PetitionTemplateClosingMessageCardProps {
 export const PETITION_CLOSING_DEFAULT_MESSAGE: Record<PetitionLocale, string> = {
   ca: outdent`
     Estimat/da {{contact-first-name}},
-    
+
     Us comuniquem que hem revisat tota la informació que us vam requerir i us confirmem que està tot correcte.
-    
+
     Quedem a la vostra completa disposició per aclarir o comentar qualsevol aspecte que considereu oportú.
-    
+
     Rebeu una cordial salutació.
  `,
   en: outdent`
@@ -40,45 +40,48 @@ export const PETITION_CLOSING_DEFAULT_MESSAGE: Record<PetitionLocale, string> = 
     We have reviewed all the information that we requested, and we can confirm that everything is correct.
 
     Let us know if you have any questions or comments.
-    
+
     Best regards.
   `,
   es: outdent`
     Apreciado/a {{contact-first-name}},
 
     Le comunicamos que hemos revisado toda la información que le requerimos y le confirmamos que está todo correcto.
-    
+
     Quedamos a su entera disposición para aclarar o comentar cualquier aspecto que considere oportuno.
-    
+
     Reciba un cordial saludo.
   `,
   it: outdent`
     Gentile {{contact-first-name}},
-  
+
     La informiamo che abbiamo esaminato tutte le informazioni che le abbiamo richiesto e le confermiamo che è tutto corretto.
-    
+
     Siamo a sua completa disposizione per chiarire o commentare qualsiasi aspetto che ritenga opportuno.
-    
+
     Cordiali saluti.
   `,
   pt: outdent`
     Caro(a) {{contact-first-name}},
-  
+
     Informamos que revimos todas as informações que lhe solicitamos e confirmamos que está tudo correto.
-    
+
     Estamos à sua inteira disposição para esclarecer ou comentar qualquer aspeto que considere oportuno.
-    
+
     Com os melhores cumprimentos.
   `,
 };
 
-export const PetitionTemplateClosingMessageCard = chakraForwardRef<
+export const PetitionTemplateClosingMessageCard = chakraComponent<
   "section",
   PetitionTemplateClosingMessageCardProps
->(function PetitionTemplateClosingMessageCard(
-  { petition, onUpdatePetition, isDisabled, ...props },
+>(function PetitionTemplateClosingMessageCard({
   ref,
-) {
+  petition,
+  onUpdatePetition,
+  isDisabled,
+  ...props
+}) {
   const placeholders = usePetitionMessagePlaceholderOptions({ petition });
   const [closingEmailBody, setClosingEmailBody] = useState<RichTextEditorValue>(
     petition.closingEmailBody ??

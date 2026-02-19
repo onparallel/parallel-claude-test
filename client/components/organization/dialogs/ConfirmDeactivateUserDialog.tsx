@@ -1,12 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  Checkbox,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  HStack,
-  Stack,
-} from "@chakra-ui/react";
+import { Checkbox, FormControl, FormErrorMessage, FormLabel } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
@@ -16,7 +9,7 @@ import {
   UserSelectInstance,
   UserSelectSelection,
 } from "@parallel/components/common/UserSelect";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { useConfirmDeactivateUserDialog_UserFragment } from "@parallel/graphql/__types";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { useCallback, useRef } from "react";
@@ -96,7 +89,7 @@ function ConfirmDeactivateUserDialog({
         )
       }
       body={
-        <Stack spacing={4}>
+        <Stack gap={4}>
           {showTransferText ? (
             <Stack>
               <Text>

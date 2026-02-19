@@ -1,15 +1,8 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  ListItem,
-  Stack,
-  UnorderedList,
-} from "@chakra-ui/react";
+import { Alert, AlertDescription, AlertIcon, ListItem, UnorderedList } from "@chakra-ui/react";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import {
   useDeleteContacts_ContactFragment,
   useDeleteContacts_deleteContactsDocument,

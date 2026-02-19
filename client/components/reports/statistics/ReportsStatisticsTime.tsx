@@ -1,11 +1,7 @@
 import {
-  Box,
   Center,
-  Flex,
-  HStack,
   Radio,
   RadioGroup,
-  Stack,
   Table,
   TableContainer,
   Tbody,
@@ -21,7 +17,7 @@ import { Card } from "@parallel/components/common/Card";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { Text } from "@parallel/components/ui";
+import { Box, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import { ReportTypeStatistics } from "@parallel/pages/app/reports/statistics";
 import { dateToFilenameFormat } from "@parallel/utils/dates";
 import { downloadSpreadsheet } from "@parallel/utils/downloadSpreadsheet";

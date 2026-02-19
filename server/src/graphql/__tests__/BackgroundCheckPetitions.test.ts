@@ -67,10 +67,10 @@ describe("Background Check - Petitions", () => {
   });
 
   describe("backgroundCheckEntitySearch", () => {
-    let backgroundCheckServiceSpy: jest.SpyInstance;
+    let backgroundCheckServiceSpy: ReturnType<typeof vi.spyOn>;
 
     beforeEach(async () => {
-      backgroundCheckServiceSpy = jest.spyOn(
+      backgroundCheckServiceSpy = vi.spyOn(
         container.get<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE),
         "entitySearch",
       );
@@ -630,9 +630,9 @@ describe("Background Check - Petitions", () => {
   });
 
   describe("backgroundCheckEntityDetails", () => {
-    let backgroundCheckServiceSpy: jest.SpyInstance;
+    let backgroundCheckServiceSpy: ReturnType<typeof vi.spyOn>;
     beforeEach(async () => {
-      backgroundCheckServiceSpy = jest.spyOn(
+      backgroundCheckServiceSpy = vi.spyOn(
         container.get<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE),
         "entityProfileDetails",
       );
@@ -797,11 +797,11 @@ describe("Background Check - Petitions", () => {
   });
 
   describe("updateBackgroundCheckEntity", () => {
-    let backgroundCheckServiceSpy: jest.SpyInstance;
+    let backgroundCheckServiceSpy: ReturnType<typeof vi.spyOn>;
 
     let reply: PetitionFieldReply;
     beforeEach(async () => {
-      backgroundCheckServiceSpy = jest.spyOn(
+      backgroundCheckServiceSpy = vi.spyOn(
         container.get<IBackgroundCheckService>(BACKGROUND_CHECK_SERVICE),
         "entityProfileDetails",
       );

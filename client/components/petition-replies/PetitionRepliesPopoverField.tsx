@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 import {
-  Box,
   FocusLock,
   PopoverArrow,
   PopoverBody,
@@ -17,6 +16,7 @@ import { PetitionRepliesPopoverField_dataDocument } from "@parallel/graphql/__ty
 import { assertTypename } from "@parallel/utils/apollo/typename";
 import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
 import { MouseEvent, ReactNode } from "react";
+import { Box } from "@parallel/components/ui";
 import { isNonNullish } from "remeda";
 import { Wrap } from "../common/Wrap";
 import { PreviewPetitionField } from "../petition-preview/PreviewPetitionField";

@@ -1,7 +1,7 @@
-import { FormControl, FormLabel, Radio, RadioGroup, Stack } from "@chakra-ui/react";
+import { FormControl, FormLabel, Radio, RadioGroup } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button } from "@parallel/components/ui";
+import { Button, Stack } from "@parallel/components/ui";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 

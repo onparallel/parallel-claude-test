@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { SystemStyleObject } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { UserOrContactReference_UserOrPetitionAccessFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { ContactReference } from "./ContactReference";
@@ -12,11 +12,15 @@ interface UserOrContactReferenceProps {
   userOrAccess?: Maybe<UserOrContactReference_UserOrPetitionAccessFragment>;
   _activeContact?: SystemStyleObject;
 }
-export const UserOrContactReference = chakraForwardRef<"span", UserOrContactReferenceProps>(
-  function UserOrContactReference(
-    { userOrAccess, contactAsLink, userUseYou, _activeContact, ...props },
+export const UserOrContactReference = chakraComponent<"span", UserOrContactReferenceProps>(
+  function UserOrContactReference({
     ref,
-  ) {
+    userOrAccess,
+    contactAsLink,
+    userUseYou,
+    _activeContact,
+    ...props
+  }) {
     return userOrAccess?.__typename === "PetitionAccess" ? (
       <ContactReference
         ref={ref}

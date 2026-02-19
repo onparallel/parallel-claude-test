@@ -1778,13 +1778,26 @@ export const createSapProfileSyncIntegration = mutationField("createSapProfileSy
             baseUrl: { type: "string" },
             authorization: {
               type: "object",
-              required: ["type", "user", "password"],
-              additionalProperties: false,
-              properties: {
-                type: { type: "string", enum: ["BASIC"] },
-                user: { type: "string" },
-                password: { type: "string" },
-              },
+              oneOf: [
+                {
+                  required: ["type", "user", "password"],
+                  additionalProperties: false,
+                  properties: {
+                    type: { type: "string", enum: ["BASIC"] },
+                    user: { type: "string" },
+                    password: { type: "string" },
+                  },
+                },
+                {
+                  required: ["type", "pfx", "passphrase"],
+                  additionalProperties: false,
+                  properties: {
+                    type: { type: "string", enum: ["CERTIFICATE"] },
+                    pfx: { type: "string" },
+                    passphrase: { type: "string" },
+                  },
+                },
+              ],
             },
             mappings: { type: "array", minItems: 1, items: { type: "object" } },
             additionalHeaders: { type: "object" },

@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
-import { Box, List, ListItem } from "@chakra-ui/react";
+import { List, ListItem } from "@chakra-ui/react";
 import { SettingsIcon } from "@parallel/chakra/icons";
+import { Box, Text } from "@parallel/components/ui";
 import {
   PetitionFieldOptionsListEditor_PetitionFieldFragment,
   UpdatePetitionFieldInput,
@@ -12,7 +13,7 @@ import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { isSelectionExpanded } from "@udecode/plate-common";
 import {
   KeyboardEvent,
-  forwardRef,
+  RefAttributes,
   useCallback,
   useEffect,
   useImperativeHandle,
@@ -35,7 +36,6 @@ import {
 } from "slate-react";
 import { EditableProps } from "slate-react/dist/components/editable";
 import { getStandardListLabel } from "../common/StandardListSelect";
-import { Text } from "@parallel/components/ui";
 
 type PetitionFieldOptionsListEditorValue = PetitionFieldOptionsListEditorBlock[];
 
@@ -50,7 +50,7 @@ export interface PetitionFieldOptionsListEditorProps extends EditableProps {
   isReadOnly?: boolean;
 }
 
-export interface PetitionFieldOptionsListEditorRef {
+export interface PetitionFieldOptionsListEditorInstance {
   focus: (position?: "START" | "END") => void;
 }
 
@@ -61,13 +61,16 @@ function valuesToSlateNodes(values: string[]): PetitionFieldOptionsListEditorVal
   }));
 }
 
-export const PetitionFieldOptionsListEditor = forwardRef<
-  PetitionFieldOptionsListEditorRef,
-  PetitionFieldOptionsListEditorProps
->(function PetitionFieldOptionsListEditor(
-  { field, showError, onFieldEdit, onFocusNextField, onFocusDescription, isReadOnly, ...props },
+export function PetitionFieldOptionsListEditor({
   ref,
-) {
+  field,
+  showError,
+  onFieldEdit,
+  onFocusNextField,
+  onFocusDescription,
+  isReadOnly,
+  ...props
+}: PetitionFieldOptionsListEditorProps & RefAttributes<PetitionFieldOptionsListEditorInstance>) {
   const intl = useIntl();
   const editor = useMemo(() => pipe(createEditor(), withHistory, withReact), []);
   const editorRef = useUpdatingRef(editor);
@@ -193,7 +196,7 @@ export const PetitionFieldOptionsListEditor = forwardRef<
             );
           }
         },
-      }) as PetitionFieldOptionsListEditorRef,
+      }) as PetitionFieldOptionsListEditorInstance,
     [isNotEditable],
   );
 
@@ -252,7 +255,7 @@ export const PetitionFieldOptionsListEditor = forwardRef<
       </Box>
     </Slate>
   );
-});
+}
 
 const _fragments = {
   PetitionField: gql`

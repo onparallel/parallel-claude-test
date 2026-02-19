@@ -1,9 +1,8 @@
-import { Stack } from "@chakra-ui/react";
 import { UserXIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { UserSelectSelection } from "@parallel/components/common/UserSelect";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import { OrganizationGroup_UserGroupMemberFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 
@@ -24,7 +23,7 @@ function ConfirmRemoveMemberDialog({
         },
       }}
       header={
-        <Stack direction={"row"} spacing={2} align="center">
+        <Stack direction={"row"} gap={2} align="center">
           <UserXIcon role="presentation" />
           <Text>
             <FormattedMessage
@@ -35,7 +34,7 @@ function ConfirmRemoveMemberDialog({
         </Stack>
       }
       body={
-        <Stack spacing={4}>
+        <Stack gap={4}>
           <Text>
             <FormattedMessage
               id="component.confirm-remove-member-dialog.body"

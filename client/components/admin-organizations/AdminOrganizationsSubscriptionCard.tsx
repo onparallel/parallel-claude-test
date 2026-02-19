@@ -1,6 +1,5 @@
-import { Box, Flex } from "@chakra-ui/react";
-import { Button } from "@parallel/components/ui";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Box, Button, Flex } from "@parallel/components/ui";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { FormattedMessage } from "react-intl";
 import { Card, CardHeader } from "../common/Card";
 
@@ -10,13 +9,17 @@ interface AdminOrganizationsSubscriptionCardProps {
   onAction: () => void;
 }
 
-export const AdminOrganizationsSubscriptionCard = chakraForwardRef<
+export const AdminOrganizationsSubscriptionCard = chakraComponent<
   "div",
   AdminOrganizationsSubscriptionCardProps
->(function AdminOrganizationsSubscriptionCard(
-  { headerLabel, buttonLabel, onAction, children, ...props },
+>(function AdminOrganizationsSubscriptionCard({
   ref,
-) {
+  headerLabel,
+  buttonLabel,
+  onAction,
+  children,
+  ...props
+}) {
   return (
     <Card display="flex" flexDirection="column" ref={ref} {...props}>
       <CardHeader>{headerLabel}</CardHeader>

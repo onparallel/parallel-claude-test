@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
-import { Stack } from "@chakra-ui/react";
+
 import { AlertCircleIcon, CheckIcon, PaperPlaneIcon, TimeIcon } from "@parallel/chakra/icons";
 import { PetitionSignatureRequestStatusText_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
+import { Stack, Text } from "@parallel/components/ui";
 
 export function PetitionSignatureRequestStatusText({
   signature,

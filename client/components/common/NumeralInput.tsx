@@ -1,5 +1,5 @@
 import { FormControlOptions, Input, ThemingProps } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { assignRef } from "@parallel/utils/assignRef";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useIntl } from "react-intl";
@@ -15,10 +15,16 @@ interface NumeralInputProps extends ThemingProps<"Input">, FormControlOptions {
   suffix?: string;
 }
 
-export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(function NumeralInput(
-  { decimals, onlyPositive, value, prefix, suffix, onChange, ...props },
+export const NumeralInput = chakraComponent<"input", NumeralInputProps>(function NumeralInput({
   ref,
-) {
+  decimals,
+  onlyPositive,
+  value,
+  prefix,
+  suffix,
+  onChange,
+  ...props
+}) {
   const intl = useIntl();
   const [_value, setValue] = useState(value);
 

@@ -1,4 +1,4 @@
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { getPreventDefaultHandler } from "@parallel/utils/events";
 import { someNode, usePlateEditorRef } from "@udecode/plate-common";
 import { toggleList } from "@udecode/plate-list";
@@ -8,8 +8,8 @@ export interface ToolbarListButtonProps extends Omit<ToolbarButtonProps, "isTogg
   type: string;
 }
 
-export const ToolbarListButton = chakraForwardRef<"button", ToolbarListButtonProps>(
-  function ToolbarListButton({ type, ...props }, ref) {
+export const ToolbarListButton = chakraComponent<"button", ToolbarListButtonProps>(
+  function ToolbarListButton({ ref, type, ...props }) {
     const editor = usePlateEditorRef();
     const isActive = someNode(editor as any, { match: { type } });
     return (

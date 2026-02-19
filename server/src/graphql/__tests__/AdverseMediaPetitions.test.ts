@@ -48,7 +48,7 @@ describe("Adverse Media - Petitions", () => {
   describe("adverseMediaArticleSearch", () => {
     let petition: Petition;
     let field: PetitionField;
-    let searchArticlesSpy: jest.SpyInstance;
+    let searchArticlesSpy: ReturnType<typeof vi.spyOn>;
 
     beforeEach(async () => {
       [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
@@ -59,7 +59,7 @@ describe("Adverse Media - Petitions", () => {
         type: "ADVERSE_MEDIA_SEARCH",
       }));
 
-      searchArticlesSpy = jest.spyOn(
+      searchArticlesSpy = vi.spyOn(
         testClient.container.get<IAdverseMediaSearchService>(ADVERSE_MEDIA_SEARCH_SERVICE),
         "searchArticles",
       );

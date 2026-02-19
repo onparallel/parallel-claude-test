@@ -6,6 +6,7 @@ import {
   MockSapProfileSyncIntegrationSettingsValidator,
 } from "../../../../../test/mocks";
 import { createTestContainer } from "../../../../../test/testContainer";
+import { ILogger, LOGGER } from "../../../../services/Logger";
 
 import {
   Organization,
@@ -54,6 +55,11 @@ describe("BasicSapProfileSyncIntegration", () => {
 
   beforeAll(async () => {
     container = await createTestContainer();
+
+    const noopLogger: ILogger = { log() {}, info() {}, warn() {}, error() {}, debug() {} };
+    await container.unbind(LOGGER);
+    container.bind<ILogger>(LOGGER).toConstantValue(noopLogger);
+
     knex = container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 

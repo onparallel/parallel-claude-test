@@ -1,16 +1,16 @@
-import { Center, Stack } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
+import { Center } from "@chakra-ui/react";
 import { FormattedMessage } from "react-intl";
 import { EmptyTemplatesIcon } from "./icons/EmptyTemplatesIcon";
-import { Text } from "@parallel/components/ui";
+import { Stack, Text } from "@parallel/components/ui";
 
 interface NewPetitionEmptyTemplatesProps {
   onClickPublicTemplates: () => void;
   onClickNewTemplate: () => void;
 }
 
-export const NewPetitionEmptyTemplates = chakraForwardRef<"div", NewPetitionEmptyTemplatesProps>(
-  function ({ onClickPublicTemplates, onClickNewTemplate, ...props }, ref) {
+export const NewPetitionEmptyTemplates = chakraComponent<"div", NewPetitionEmptyTemplatesProps>(
+  function ({ ref, onClickPublicTemplates, onClickNewTemplate, ...props }) {
     return (
       <Center ref={ref} {...props}>
         <Stack justifyContent="center" alignItems="center" minHeight="300px" paddingX={4}>

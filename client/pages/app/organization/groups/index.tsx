@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Center, Flex, Heading, useToast } from "@chakra-ui/react";
+import { Center, Heading, useToast } from "@chakra-ui/react";
 import { CopyIcon, DeleteIcon, KeyIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { OverflownText } from "@parallel/components/common/OverflownText";
@@ -20,7 +20,7 @@ import { withPermission } from "@parallel/components/common/withPermission";
 import { OrganizationSettingsLayout } from "@parallel/components/layout/OrganizationSettingsLayout";
 import { OrganizationGroupsListTableHeader } from "@parallel/components/organization/OrganizationGroupsListTableHeader";
 import { useCreateGroupDialog } from "@parallel/components/organization/dialogs/CreateGroupDialog";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Flex, Text } from "@parallel/components/ui";
 import {
   OrganizationGroups_UserGroupFragment,
   OrganizationGroups_cloneUserGroupsDocument,

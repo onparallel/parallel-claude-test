@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
-import { Badge, Box, Flex, HStack } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
+import { Badge } from "@chakra-ui/react";
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
-import { Text } from "@parallel/components/ui";
+import { Box, Flex, HStack, Text } from "@parallel/components/ui";
 import {
   PetitionUpdateProfileOnCloseSourceSelect_PetitionBaseFragment,
   PetitionUpdateProfileOnCloseSourceSelect_PetitionFieldFragment,
@@ -338,14 +338,14 @@ const _fragments = {
   `,
 };
 
-const PetitionUpdateProfileOnCloseSourceSelectItem = chakraForwardRef<
+const PetitionUpdateProfileOnCloseSourceSelectItem = chakraComponent<
   "div",
   {
     option: PetitionUpdateProfileOnCloseSourceSelectOption<PetitionUpdateProfileOnCloseSourceSelect_PetitionBaseFragment>;
     highlight?: string;
     indent?: boolean;
   }
->(function PetitionUpdateProfileOnCloseSourceSelectItem({ option, highlight }, ref) {
+>(function PetitionUpdateProfileOnCloseSourceSelectItem({ ref, option, highlight }) {
   const intl = useIntl();
   const { value, fieldIndex } = option;
 
@@ -353,7 +353,7 @@ const PetitionUpdateProfileOnCloseSourceSelectItem = chakraForwardRef<
     const { field } = value;
     const label = field.title ?? "";
     return (
-      <HStack ref={ref} spacing={2}>
+      <HStack ref={ref} gap={2}>
         <PetitionFieldTypeIndicator type={field.type} fieldIndex={fieldIndex} isTooltipDisabled />
         <Box
           paddingEnd={1}
@@ -399,7 +399,7 @@ const PetitionUpdateProfileOnCloseSourceSelectItem = chakraForwardRef<
       defaultMessage: "Parallel close date",
     });
     return (
-      <HStack ref={ref} spacing={2}>
+      <HStack ref={ref} gap={2}>
         <PetitionFieldTypeIndicator type="DATE" isTooltipDisabled isFixedWidth={false} />
         <Box flex="1" minWidth="0" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
           <HighlightText as="span" search={highlight}>

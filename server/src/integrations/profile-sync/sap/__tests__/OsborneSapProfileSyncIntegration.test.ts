@@ -1,8 +1,9 @@
+import { readFileSync } from "fs";
 import { Container } from "inversify";
 import { Knex } from "knex";
-import { createTestContainer } from "../../../../../test/testContainer";
-
+import { join } from "path";
 import { indexBy, omit, range } from "remeda";
+import { createTestContainer } from "../../../../../test/testContainer";
 import {
   Organization,
   ProfileRelationshipType,
@@ -29,7 +30,7 @@ import {
   PROFILE_SYNC_LISTENER,
   ProfileSyncListener,
 } from "../../../../workers/queues/event-listeners/ProfileSyncListener";
-import { dateToSapDatetime } from "../helpers";
+import { buildPollingLastChangeFilter, dateToSapDatetime } from "../helpers";
 import { getOsborneSapSettings } from "../osborne";
 import {
   ISapOdataClient,
@@ -42,7 +43,11 @@ import {
   SAP_PROFILE_SYNC_INTEGRATION_FACTORY,
   SapProfileSyncIntegrationFactory,
 } from "../SapProfileSyncIntegration";
-import { SapEntitySetFilter, SapProfileSyncIntegrationSettings } from "../types";
+import {
+  SapEntitySetFilter,
+  SapPollingChangeDetectionStrategy,
+  SapProfileSyncIntegrationSettings,
+} from "../types";
 import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from "./utils";
 
 // these tests are meant to be run manually and not by the CI as they depend on real external SAP data
@@ -70,6 +75,8 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
 
     let osborneSettings: Pick<
       Parameters<typeof getOsborneSapSettings>[0],
+      | "environment"
+      | "authorization"
       | "individualProfileTypeId"
       | "individualProfileTypeFieldIds"
       | "legalEntityProfileTypeId"
@@ -79,7 +86,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
       | "clientMatterRelationshipTypeId"
     >;
 
-    let fileUploadSpy: jest.SpyInstance;
+    let fileUploadSpy: ReturnType<typeof vi.spyOn>;
 
     beforeEach(async () => {
       container = await createTestContainer();
@@ -94,7 +101,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
       mocks = new Mocks(knex);
 
       const storageService = container.get<IStorageService>(STORAGE_SERVICE);
-      fileUploadSpy = jest.spyOn(storageService.temporaryFiles, "uploadFile");
+      fileUploadSpy = vi.spyOn(storageService.temporaryFiles, "uploadFile");
 
       [organization] = await mocks.createRandomOrganizations(1);
       await mocks.createFeatureFlags([{ name: "PROFILE_SYNC", default_value: true }]);
@@ -119,9 +126,15 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
       for (const profileTypeId of [individual.id, legalEntity.id]) {
         await mocks.createProfileTypeFields(organization.id, profileTypeId, [
           {
-            name: { en: "Client partner", es: "Cliente" },
+            name: { en: "Client partner", es: "Socio Cliente" },
             alias: "client_partner",
             type: "USER_ASSIGNMENT",
+          },
+          {
+            name: { en: "Client partner (Text)", es: "Socio Cliente (Text)" },
+            alias: "client_partner_text",
+            type: "SHORT_TEXT",
+            options: { format: "EMAIL" },
           },
           {
             name: { en: "External ID", es: "ID externo" },
@@ -269,6 +282,12 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
           type: "USER_ASSIGNMENT",
         },
         {
+          name: { en: "Matter supervisor (Text)", es: "Supervisor del expediente (Text)" },
+          alias: "matter_supervisor_text",
+          type: "SHORT_TEXT",
+          options: { format: "EMAIL" },
+        },
+        {
           name: { en: "List of legal advice", es: "Lista de asesorías legales" },
           alias: "aml_subject_matters",
           type: "CHECKBOX",
@@ -362,7 +381,14 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
         })
         .select("*");
 
+      const credentials = process.env.OSBORNE_CREDENTIALS!.split(":");
       osborneSettings = {
+        environment: "SANDBOX",
+        authorization: {
+          type: "BASIC",
+          user: credentials[0],
+          password: credentials[1],
+        },
         individualProfileTypeId: individual.id,
         individualProfileTypeFieldIds: {
           addressId: individualFields["p_address"].id,
@@ -376,6 +402,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
           clientStatus: individualFields["oc_client_status"].id,
           isNewClient: individualFields["is_new_client"].id,
           clientPartner: individualFields["client_partner"].id,
+          clientPartnerText: individualFields["client_partner_text"].id,
           externalId: individualFields["external_id"].id,
           relationship: individualFields["p_relationship"].id,
           nonFaceToFaceCustomer: individualFields["non_face_to_face_customer"].id,
@@ -400,6 +427,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
           email: legalEntityFields["email"].id,
           isNewClient: legalEntityFields["is_new_client"].id,
           clientPartner: legalEntityFields["client_partner"].id,
+          clientPartnerText: legalEntityFields["client_partner_text"].id,
           externalId: legalEntityFields["external_id"].id,
           entityType: legalEntityFields["p_entity_type"].id,
           relationship: legalEntityFields["p_relationship"].id,
@@ -421,6 +449,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
           subpracticeGroup: matterFields["subpractice_group"].id,
           projectId: matterFields["p_matter_id"].id,
           matterSupervisor: matterFields["matter_supervisor"].id,
+          matterSupervisorText: matterFields["matter_supervisor_text"].id,
           amlSubjectMatters: matterFields["aml_subject_matters"].id,
           transactionVolume: matterFields["transaction_volume"].id,
           countriesInvolved: matterFields["p_countries_involved"].id,
@@ -432,7 +461,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
     });
 
     afterEach(async () => {
-      jest.restoreAllMocks();
+      vi.restoreAllMocks();
       await deleteAllData(knex);
       await knex.destroy();
     });
@@ -448,11 +477,14 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
             name: "SAP",
             settings: {
               ...omit(settings, ["authorization"]),
-              CREDENTIALS: {
-                password: settings.authorization.password,
-                type: "BASIC",
-                user: settings.authorization.user,
-              },
+              CREDENTIALS:
+                settings.authorization.type === "BASIC"
+                  ? {
+                      type: "BASIC" as const,
+                      password: settings.authorization.password,
+                      user: settings.authorization.user,
+                    }
+                  : settings.authorization,
             },
           },
           "TEST",
@@ -522,6 +554,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
               p_email: "bla@bla.com",
               p_phone_number: "+34666666666",
               client_partner: users["javier.ares@osborneclarke.com"],
+              client_partner_text: "javier.ares@osborneclarke.com",
               non_face_to_face_customer: "NO",
               language: "ES",
             },
@@ -530,12 +563,17 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
             {
               profile_type_id: matter.id,
               values: {
+                aml_subject_matters: ["_001", "_003", "_005"],
+                matter_status: "_02",
+                matter_supervisor: users["javier.ares@osborneclarke.com"],
+                matter_supervisor_text: "javier.ares@osborneclarke.com",
+                p_countries_involved: ["AD", "AM", "BF", "CM"],
                 p_matter_description: "Descripción del expediente",
                 p_matter_name: "Prueba expediente Parallel",
                 practice_group: "_01",
                 p_matter_id: "4591",
                 subpractice_group: "_0103",
-                matter_supervisor: users["javier.ares@osborneclarke.com"],
+                temp_active_until: "2026-02-13",
               },
             },
           ],
@@ -545,6 +583,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
             profile_type_id: legalEntity.id,
             values: {
               client_partner: users["javier.ares@osborneclarke.com"],
+              client_partner_text: "javier.ares@osborneclarke.com",
               external_id: "1505315",
               is_new_client: "YES",
               oc_client_status: "_05",
@@ -558,6 +597,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
               non_face_to_face_customer: "NO",
               language: "CA",
               activity: "_02",
+              kyc_refresh_date: "2026-06-01",
             },
           },
           matters: [
@@ -571,12 +611,14 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
                 subpractice_group: "_0102",
                 transaction_volume: "_100K_500K",
                 p_countries_involved: ["ES", "AD"],
+                temp_active_until: "2026-01-14",
               },
             },
             {
               profile_type_id: matter.id,
               values: {
                 matter_supervisor: users["eduard.arruga@fakemail.com"],
+                matter_supervisor_text: "eduard.arruga@fakemail.com",
                 p_matter_description: "",
                 p_matter_name: "Prueba Parallel 08/01/2026",
                 practice_group: "_01",
@@ -588,14 +630,16 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
               profile_type_id: matter.id,
               values: {
                 aml_subject_matters: ["_001", "_002", "_003"],
-                p_countries_involved: ["ES"],
                 matter_status: "_01",
                 matter_supervisor: users["lluisglt@gmail.com"],
+                matter_supervisor_text: "lluisglt@gmail.com",
+                p_countries_involved: ["ES"],
                 p_matter_description: "Hola que tal!!!!!",
                 p_matter_name: "Prueba 19/1",
                 practice_group: "_10",
                 p_matter_id: "4641",
                 subpractice_group: "_1001",
+                temp_active_until: "2026-01-19",
                 transaction_volume: "_1M_20M",
               },
             },
@@ -687,7 +731,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
         const matterProfiles = profiles.filter((p) => p.profile_type_id === matter.id);
 
         expect(individualProfiles.length + legalEntityProfiles.length).toBe(2001);
-        expect(matterProfiles.length).toBe(1759);
+        expect(matterProfiles.length).toBe(100);
 
         const syncLog = await mocks.knex
           .from("profile_sync_log")
@@ -800,7 +844,7 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
         },
       } as any);
       const logger = container.get<ILogger>(LOGGER);
-      const client = container.get<SapOdataClientFactory>(SAP_ODATA_CLIENT_FACTORY)(
+      using client = container.get<SapOdataClientFactory>(SAP_ODATA_CLIENT_FACTORY)(
         logger,
         sapSettings.baseUrl,
         sapSettings.authorization,
@@ -1056,5 +1100,178 @@ import { expectProfilesAndRelationships, loadProfiles, ProfileWithValues } from 
         },
       ]);
     }, 60_000);
+
+    it.only("polling with localIdBinding writes IDs and stabilizes", async () => {
+      const customer = "1505315";
+      const sapSettings = getOsborneSapSettings({
+        ...osborneSettings,
+        businessPartnerFilter: {
+          left: { type: "property", name: "BusinessPartner" },
+          operator: "eq",
+          right: { type: "literal", value: `'${customer}'` },
+        },
+        projectFilter: {
+          left: { type: "property", name: "Customer" },
+          operator: "eq",
+          right: { type: "literal", value: `'${customer}'` },
+        },
+      });
+
+      const orgIntegration = await createSapIntegration(sapSettings);
+
+      const integration = container.get<SapProfileSyncIntegrationFactory>(
+        SAP_PROFILE_SYNC_INTEGRATION_FACTORY,
+      )(orgIntegration.id);
+
+      const logger = container.get<ILogger>(LOGGER);
+      using client = container.get<SapOdataClientFactory>(SAP_ODATA_CLIENT_FACTORY)(
+        logger,
+        sapSettings.baseUrl,
+        sapSettings.authorization,
+        sapSettings.additionalHeaders,
+      );
+
+      const projectsMapping = sapSettings.mappings.find((x) => x.name === "Projects to Matters")!;
+
+      const projectEntityDefinition = projectsMapping.entityDefinition;
+
+      // Step 1: Clear project localId fields to simulate "new" projects
+      const { results: projects } = await client.getEntitySet(projectEntityDefinition, {
+        $filter: {
+          left: { type: "property", name: "Customer" },
+          operator: "eq",
+          right: { type: "literal", value: `'${customer}'` },
+        },
+        $select: ["ProjectID", "YY1_EP_id_Parallel_Cpr"],
+        $orderby: [["ProjectID", "asc"]],
+      });
+
+      expect(projects.length).toBeGreaterThan(0);
+
+      for (const project of projects) {
+        await client.updateEntity(
+          projectEntityDefinition,
+          { ProjectID: project.ProjectID },
+          { YY1_EP_id_Parallel_Cpr: "" },
+        );
+      }
+
+      await waitFor(1_000);
+
+      // Step 2: initialSync - writes localIds to all entities
+      const dateBeforeSync = new Date();
+      await waitFor(1_000);
+      await integration.initialSync();
+
+      async function fetchChangedProjects(date: Date) {
+        const { results } = await client.getEntitySet(projectEntityDefinition, {
+          $filter: {
+            operator: "and",
+            conditions: [
+              {
+                left: { type: "property", name: "Customer" },
+                operator: "eq",
+                right: { type: "literal", value: `'${customer}'` },
+              },
+              buildPollingLastChangeFilter(
+                (projectsMapping.changeDetection as SapPollingChangeDetectionStrategy)
+                  .remoteLastChange,
+                date,
+              ),
+            ],
+          },
+          $orderby: [["ChangedOn", "desc"]],
+          $select: ["ProjectID", "ChangedOn", "YY1_EP_id_Parallel_Cpr"],
+        });
+        return results;
+      }
+      await waitFor(1_000);
+      expect(await fetchChangedProjects(dateBeforeSync)).toHaveLength(projects.length);
+
+      const dateAfterSync = new Date();
+      const profilesAfterSync = await loadProfiles(knex, organization.id);
+
+      // Step 3: First poll - detects changes from localId writes, but IDs match → no updateEntity
+      await integration.pollForChangedEntities(dateBeforeSync);
+
+      expect(await fetchChangedProjects(dateAfterSync)).toHaveLength(0);
+
+      const profilesAfterPoll1 = await loadProfiles(knex, organization.id);
+      expect(profilesAfterPoll1).toEqual(profilesAfterSync);
+
+      // Step 4: Simulate a "new" project by clearing localId on one project
+      const dateBeforeClear = new Date();
+      const targetProject = projects[0];
+      await client.updateEntity(
+        projectEntityDefinition,
+        { ProjectID: targetProject.ProjectID },
+        { YY1_EP_id_Parallel_Cpr: "" },
+      );
+
+      await waitFor(1_000);
+      expect(await fetchChangedProjects(dateBeforeClear)).toHaveLength(1);
+
+      // Step 5: Second poll - detects the cleared project, localId doesn't match → writes it back
+      await integration.pollForChangedEntities(dateBeforeClear);
+      const dateAfterPoll2 = new Date();
+
+      const profilesAfterPoll2 = await loadProfiles(knex, organization.id);
+      expect(profilesAfterPoll2).toEqual(profilesAfterSync);
+
+      // Step 6: Third poll - detects change from the write, but IDs now match → no updateEntity
+      await waitFor(1_000);
+      expect(await fetchChangedProjects(dateAfterPoll2)).toHaveLength(0);
+      await integration.pollForChangedEntities(dateAfterPoll2);
+      const dateAfterPoll3 = new Date();
+
+      const profilesAfterPoll3 = await loadProfiles(knex, organization.id);
+      expect(profilesAfterPoll3).toEqual(profilesAfterSync);
+
+      // Step 7: Fourth poll - no changes, verify stability
+      await waitFor(1_000);
+      expect(await fetchChangedProjects(dateAfterPoll3)).toHaveLength(0);
+      await integration.pollForChangedEntities(dateAfterPoll3);
+      const dateAfterPoll4 = new Date();
+
+      const profilesAfterPoll4 = await loadProfiles(knex, organization.id);
+      expect(profilesAfterPoll4).toEqual(profilesAfterSync);
+
+      await waitFor(1_000);
+      // Step 8: Verify no pending changes via manual getEntitySet with polling params
+      expect(await fetchChangedProjects(dateAfterPoll4)).toHaveLength(0);
+    }, 120_000);
+
+    it("works with certificate", async () => {
+      // Make sure certificate.pfx and passphrase.txt are placed in the __tests__ folder next to this file
+      const sapSettings: SapProfileSyncIntegrationSettings = {
+        ...getOsborneSapSettings(osborneSettings),
+        authorization: {
+          type: "CERTIFICATE",
+          pfx: readFileSync(join(__dirname, "certificate.pfx")).toString("base64"),
+          passphrase: readFileSync(join(__dirname, "passphrase.txt")).toString("utf-8").trim(),
+        },
+      };
+
+      const logger = container.get<ILogger>(LOGGER);
+      using client = container.get<SapOdataClientFactory>(SAP_ODATA_CLIENT_FACTORY)(
+        logger,
+        sapSettings.baseUrl,
+        sapSettings.authorization,
+        sapSettings.additionalHeaders,
+      );
+
+      const entity = await client.getEntity(
+        {
+          servicePath: "sap/API_BUSINESS_PARTNER",
+          serviceNamespace: "API_BUSINESS_PARTNER",
+          entitySetName: "A_BusinessPartner",
+          remoteEntityKey: ["BusinessPartner"],
+        },
+        { BusinessPartner: "1505383" },
+        { $select: ["BusinessPartner"] },
+      );
+
+      expect(entity).toMatchObject({ BusinessPartner: "1505383" });
+    });
   },
 );

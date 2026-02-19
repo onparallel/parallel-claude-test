@@ -1,5 +1,6 @@
-import { Box, Heading, HeadingProps, HStack } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Box, HStack } from "@parallel/components/ui";
+import { Heading, HeadingProps } from "@chakra-ui/react";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { ReactNode } from "react";
 import { CloseButton } from "./CloseButton";
 import { Divider } from "./Divider";
@@ -9,10 +10,13 @@ export interface CardProps {
   isDisabled?: boolean;
 }
 
-export const Card = chakraForwardRef<"section", CardProps>(function Card(
-  { children, isInteractive, isDisabled, ...props },
+export const Card = chakraComponent<"section", CardProps>(function Card({
   ref,
-) {
+  children,
+  isInteractive,
+  isDisabled,
+  ...props
+}) {
   return (
     <Box
       ref={ref as any}
@@ -53,8 +57,8 @@ export interface CloseableCardHeaderProps extends Omit<CardHeaderProps, "rightAc
   onClose?: () => void;
 }
 
-export const CloseableCardHeader = chakraForwardRef<"header", CloseableCardHeaderProps>(
-  function CloseableCardHeader({ isCloseable = true, onClose, ...props }, ref) {
+export const CloseableCardHeader = chakraComponent<"header", CloseableCardHeaderProps>(
+  function CloseableCardHeader({ ref, isCloseable = true, onClose, ...props }) {
     return (
       <CardHeader
         ref={ref}
@@ -74,19 +78,17 @@ export interface CardHeaderProps {
   headingMinWidth?: HeadingProps["minWidth"];
 }
 
-export const CardHeader = chakraForwardRef<"header", CardHeaderProps>(function CardHeader(
-  {
-    headingLevel,
-    headingSize,
-    headingMinWidth,
-    rightAction,
-    omitDivider,
-    leftIcon,
-    children,
-    ...props
-  },
+export const CardHeader = chakraComponent<"header", CardHeaderProps>(function CardHeader({
   ref,
-) {
+  headingLevel,
+  headingSize,
+  headingMinWidth,
+  rightAction,
+  omitDivider,
+  leftIcon,
+  children,
+  ...props
+}) {
   return (
     <>
       <HStack

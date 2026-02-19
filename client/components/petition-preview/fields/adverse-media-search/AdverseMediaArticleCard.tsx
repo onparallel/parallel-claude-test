@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Center, Grid, Spinner, Stack, useBreakpointValue } from "@chakra-ui/react";
+import { Center, Grid, Spinner, useBreakpointValue } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import {
   BookOpenIcon,
@@ -13,7 +13,7 @@ import { Card } from "@parallel/components/common/Card";
 import { Divider } from "@parallel/components/common/Divider";
 import { AdverseMediaArticleDetails } from "@parallel/components/petition-preview/fields/adverse-media-search/AdverseMediaArticleDetails";
 import { AdverseMediaArticleHeader } from "@parallel/components/petition-preview/fields/adverse-media-search/AdverseMediaArticleHeader";
-import { Text } from "@parallel/components/ui";
+import { Stack, Text } from "@parallel/components/ui";
 import {
   AdverseMediaArticleCard_adverseMediaArticleDetailsDocument,
   AdverseMediaArticleCard_AdverseMediaArticleFragment,
@@ -121,7 +121,7 @@ export function AdverseMediaArticleCard({
           borderEnd="1px solid"
           borderColor="gray.200"
           overflow="auto"
-          spacing={0}
+          gap={0}
           display={isMobile && showArticleDetail ? "none" : "flex"}
         >
           {articles.length > 0 && !isLoadingList ? (
@@ -244,7 +244,7 @@ export function AdverseMediaArticleCard({
             </Center>
           ) : (
             <Center flex="1">
-              <Stack alignItems="center" spacing={4}>
+              <Stack alignItems="center" gap={4}>
                 <ShortSearchIcon boxSize={20} color="gray.400" />
                 <Text textStyle="hint" fontSize="lg">
                   <FormattedMessage
@@ -258,12 +258,12 @@ export function AdverseMediaArticleCard({
         </Stack>
         <Stack
           {...extendFlexColumn}
-          spacing={0}
+          gap={0}
           display={isMobile && !showArticleDetail ? "none" : "flex"}
         >
           {isNullish(selectedArticleId) ? (
             <Center flex="1" padding={6}>
-              <Stack alignItems="center" spacing={4}>
+              <Stack alignItems="center" gap={4}>
                 <BookOpenIcon boxSize={20} color="gray.400" />
                 <Text textStyle="hint" fontSize="lg">
                   <FormattedMessage
@@ -304,7 +304,7 @@ export function AdverseMediaArticleCard({
             </>
           ) : (
             <Center flex="1" padding={6}>
-              <Stack alignItems="center" spacing={4}>
+              <Stack alignItems="center" gap={4}>
                 <ShortSearchIcon boxSize={20} color="gray.400" />
                 <Text textStyle="hint" fontSize="lg">
                   <FormattedMessage

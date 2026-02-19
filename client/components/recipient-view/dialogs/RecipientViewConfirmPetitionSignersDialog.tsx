@@ -5,9 +5,7 @@ import {
   AlertIcon,
   Checkbox,
   FormControl,
-  HStack,
   OrderedList,
-  Stack,
   UnorderedList,
 } from "@chakra-ui/react";
 import { PlusCircleFilledIcon, SignatureIcon } from "@parallel/chakra/icons";
@@ -20,7 +18,7 @@ import { SelectedSignerRow } from "@parallel/components/petition-common/Selected
 import { SuggestedSigners } from "@parallel/components/petition-common/SuggestedSigners";
 import type { SignerSelectSelection } from "@parallel/components/petition-common/dialogs/ConfirmPetitionSignersDialog";
 import { useRecipientViewConfirmSignerInfoDialog } from "@parallel/components/petition-common/dialogs/RecipientViewConfirmSignerInfoDialog";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   PublicPetitionSignerDataInput,
   Tone,
@@ -222,7 +220,7 @@ function RecipientViewConfirmPetitionSignersDialog({
                 render={({ field: { onChange, value: signers } }) => (
                   <>
                     <ListElement
-                      spacing={0}
+                      gap={0}
                       paddingY={1}
                       margin={0}
                       maxH="210px"
@@ -343,7 +341,7 @@ function RecipientViewConfirmPetitionSignersDialog({
             )}
 
             <ListElement
-              spacing={0}
+              gap={0}
               paddingY={1}
               margin={0}
               maxH="210px"

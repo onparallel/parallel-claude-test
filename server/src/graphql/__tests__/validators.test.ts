@@ -8,7 +8,7 @@ import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { toGlobalId } from "../../util/globalId";
 import { deleteAllData } from "../../util/knexUtils";
 import { random } from "../../util/token";
-import { ApolloError } from "../helpers/errors";
+import { ApolloError, ArgValidationError } from "../helpers/errors";
 import { emailDomainIsNotSSO } from "../helpers/validators/emailDomainIsNotSSO";
 import { emailIsAvailable } from "../helpers/validators/emailIsAvailable";
 import { notEmptyString } from "../helpers/validators/notEmptyString";
@@ -598,12 +598,13 @@ describe("GraphQL custom validators", () => {
           fieldName: "test",
         } as any),
       ).toThrow(
-        new ApolloError(
-          'Validation error on argument "value" for "Mutation.test": Value can\'t be empty.',
-          "ARG_VALIDATION_ERROR",
+        new ArgValidationError(
+          { parentType: "Mutation", fieldName: "test" } as any,
+          "value",
+          "Value can't be empty.",
           {
             error_code: "VALUE_IS_EMPTY_ERROR",
-            error_message: `value can't be empty.`,
+            error_message: "value can't be empty.",
           },
         ),
       );

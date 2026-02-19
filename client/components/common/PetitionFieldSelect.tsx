@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex } from "@chakra-ui/react";
+
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import { PetitionFieldSelect_PetitionBaseFragment } from "@parallel/graphql/__types";
@@ -20,7 +20,7 @@ import Select, {
   components,
 } from "react-select";
 import { isNonNullish, zip } from "remeda";
-import { Text } from "@parallel/components/ui";
+import { Box, Flex, Text } from "@parallel/components/ui";
 
 type FieldOf<T extends PetitionFieldSelect_PetitionBaseFragment> = UnwrapArray<
   Exclude<T["fields"], null | undefined>

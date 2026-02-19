@@ -1,8 +1,8 @@
-import { Center, Flex, FormControl, HStack, List, Stack } from "@chakra-ui/react";
+import { Center, FormControl, List } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { FormatFormErrorMessage, ShortTextInput } from "@parallel/components/common/ShortTextInput";
-import { Text } from "@parallel/components/ui";
+import { Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { isMetaReturn } from "@parallel/utils/keys";
@@ -17,7 +17,7 @@ import {
   ComponentProps,
   KeyboardEvent,
   MouseEvent,
-  forwardRef,
+  RefAttributes,
   useEffect,
   useRef,
   useState,
@@ -357,13 +357,17 @@ interface RecipientViewPetitionFieldReplyShortTextProps {
   onInvalid: (invalid: boolean) => void;
 }
 
-export const RecipientViewPetitionFieldReplyShortText = forwardRef<
-  HTMLInputElement,
-  RecipientViewPetitionFieldReplyShortTextProps
->(function RecipientViewPetitionFieldReplyShortText(
-  { field, reply, isDisabled, isInvalid, onInvalid, onUpdate, onDelete, onAddNewReply },
+export function RecipientViewPetitionFieldReplyShortText({
   ref,
-) {
+  field,
+  reply,
+  isDisabled,
+  isInvalid,
+  onInvalid,
+  onUpdate,
+  onDelete,
+  onAddNewReply,
+}: RecipientViewPetitionFieldReplyShortTextProps & RefAttributes<HTMLInputElement>) {
   const intl = useIntl();
   const [value, setValue] = useState(reply.content.value ?? "");
   const [isSaving, setIsSaving] = useState(false);
@@ -481,4 +485,4 @@ export const RecipientViewPetitionFieldReplyShortText = forwardRef<
       {isInvalid && isNonNullish(format) ? <FormatFormErrorMessage format={format} /> : null}
     </FormControl>
   );
-});
+}

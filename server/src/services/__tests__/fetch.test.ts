@@ -1,14 +1,15 @@
 import { waitFor } from "../../util/promises/waitFor";
 import { FetchService, IFetchService, TimeoutError } from "../FetchService";
 
-function flushPromises() {
-  return new Promise(jest.requireActual("timers").setImmediate);
+async function flushPromises() {
+  const { setImmediate } = await vi.importActual<typeof import("timers")>("timers");
+  return new Promise(setImmediate);
 }
 
 describe("FetchService", () => {
   let fetchService: IFetchService;
   const _fetch = fetch;
-  const fetchMock = jest.fn<Promise<Response>, Parameters<typeof fetch>>();
+  const fetchMock = vi.fn<typeof fetch>();
 
   beforeAll(async () => {
     fetchService = new FetchService();
@@ -17,12 +18,12 @@ describe("FetchService", () => {
   beforeEach(() => {
     global.fetch = fetchMock as any;
     fetchMock.mockReset();
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
     global.fetch = _fetch;
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it("does a simple fetch", async () => {
@@ -42,7 +43,7 @@ describe("FetchService", () => {
     });
 
     const promise = fetchService.fetch("https://www.example.com", {}, { timeout: 1_000 });
-    jest.advanceTimersByTime(2_000);
+    vi.advanceTimersByTime(2_000);
     await expect(promise).rejects.toThrow(TimeoutError);
   });
 
@@ -75,13 +76,13 @@ describe("FetchService", () => {
     );
     waitFor(2_500).then(() => controller.abort());
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    jest.advanceTimersByTime(1_000);
+    vi.advanceTimersByTime(1_000);
     await flushPromises();
     expect(fetchMock).toHaveBeenCalledTimes(2);
-    jest.advanceTimersByTime(1_000);
+    vi.advanceTimersByTime(1_000);
     await flushPromises();
     expect(fetchMock).toHaveBeenCalledTimes(3);
-    jest.advanceTimersByTime(600);
+    vi.advanceTimersByTime(600);
     await expect(promise).rejects.toThrow();
     await flushPromises();
     expect(fetchMock).toHaveBeenCalledTimes(3);

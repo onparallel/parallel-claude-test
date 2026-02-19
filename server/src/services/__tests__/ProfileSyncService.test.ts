@@ -1073,7 +1073,7 @@ describe("ProfileSyncService", () => {
       });
 
       it("logs error and skips the value if a validation error occurs", async () => {
-        const logger = jest.spyOn(profileSync["logger"], "warn");
+        const logger = vi.spyOn(profileSync["logger"], "warn");
 
         await expect(
           profileSync.writeIntoDatabase(

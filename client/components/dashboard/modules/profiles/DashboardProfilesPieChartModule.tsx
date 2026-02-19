@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Grid, GridItem, Square, Stack } from "@chakra-ui/react";
+import { Center, Grid, GridItem, Square } from "@chakra-ui/react";
 import { localizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { ScrollShadows } from "@parallel/components/common/ScrollShadows";
@@ -9,7 +9,7 @@ import {
   simplifyProfileQueryFilter,
 } from "@parallel/utils/ProfileQueryFilter";
 import { buildProfilesQueryStateUrl } from "@parallel/utils/profilesQueryState";
-import { forwardRef, Fragment, useMemo } from "react";
+import { Fragment, RefAttributes, useMemo } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { isNonNullish, sumBy, zip } from "remeda";
 import { DashboardDoughnutChart } from "../../charts/DashboardDoughnutChart";
@@ -19,19 +19,19 @@ import { DashboardLinkToResults } from "../../shared/DashboardLinkToResults";
 import { DashboardModuleAlertIncongruent } from "../../shared/DashboardModuleAlertIncongruent";
 import { DashboardModuleCard } from "../../shared/DashboardModuleCard";
 import { DashboardModuleSpinner } from "../../shared/DashboardModuleSpinner";
-import { Text } from "@parallel/components/ui";
+import { Box, Stack, Text } from "@parallel/components/ui";
 
-export const DashboardProfilesPieChartModule = forwardRef<
-  HTMLDivElement,
-  {
-    module: DashboardProfilesPieChartModule_DashboardProfilesPieChartModuleFragment;
-    isEditing: boolean;
-    isDragging: boolean;
-    isReadOnly: boolean;
-    onEdit: () => void;
-    onDelete: () => void;
-  }
->(function DashboardProfilesPieChartModule({ module, ...rest }, ref) {
+export function DashboardProfilesPieChartModule({
+  module,
+  ...rest
+}: {
+  module: DashboardProfilesPieChartModule_DashboardProfilesPieChartModuleFragment;
+  isEditing: boolean;
+  isDragging: boolean;
+  isReadOnly: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+} & RefAttributes<HTMLDivElement>) {
   const intl = useIntl();
   const data = useMemo(
     () => ({
@@ -143,7 +143,6 @@ export const DashboardProfilesPieChartModule = forwardRef<
 
   return (
     <DashboardModuleCard
-      ref={ref}
       module={module}
       headerAddon={
         module.profilesPieChartResult?.isIncongruent ? (
@@ -161,7 +160,7 @@ export const DashboardProfilesPieChartModule = forwardRef<
         <Stack
           direction={{ base: "column", md: "row" }}
           alignItems="stretch"
-          spacing={{ base: 2, md: 4 }}
+          gap={{ base: 2, md: 4 }}
           flex="1"
           minHeight={0}
         >
@@ -275,7 +274,7 @@ export const DashboardProfilesPieChartModule = forwardRef<
       )}
     </DashboardModuleCard>
   );
-});
+}
 
 const _fragments = {
   DashboardProfilesPieChartModule: gql`

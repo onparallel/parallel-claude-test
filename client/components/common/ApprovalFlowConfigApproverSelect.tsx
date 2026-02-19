@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 import { useApolloClient, useQuery } from "@apollo/client/react";
-import { Box, HStack } from "@chakra-ui/react";
+
 import { UsersIcon } from "@parallel/chakra/icons";
-import { Text } from "@parallel/components/ui";
+import { Box, HStack, Text } from "@parallel/components/ui";
 import {
   ApprovalFlowConfigApproverSelect_PetitionBaseFragment,
   UserLocale,
@@ -20,7 +20,7 @@ import { MaybeArray, UnwrapArray, unMaybeArray } from "@parallel/utils/types";
 import { useAsyncMemo } from "@parallel/utils/useAsyncMemo";
 import { useSearchUserGroups } from "@parallel/utils/useSearchUserGroups";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
-import { ForwardedRef, ReactElement, RefAttributes, forwardRef, useCallback, useMemo } from "react";
+import { RefAttributes, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
   ActionMeta,
@@ -87,303 +87,290 @@ export interface ApprovalFlowConfigApproverSelectProps<
   petition: T;
 }
 
-export const ApprovalFlowConfigApproverSelect = forwardRef(
-  function ApprovalFlowConfigApproverSelect<
-    T extends
-      ApprovalFlowConfigApproverSelect_PetitionBaseFragment = ApprovalFlowConfigApproverSelect_PetitionBaseFragment,
-    OptionType extends
-      ApprovalFlowConfigApproverSelection<T> = ApprovalFlowConfigApproverSelection<T>,
-  >(
-    {
-      value,
-      onChange,
-      petition,
-      placeholder: _placeholder,
-      ...props
-    }: ApprovalFlowConfigApproverSelectProps<T, OptionType>,
-    ref: ForwardedRef<ApprovalFlowConfigApproverSelectInstance<T, OptionType>>,
-  ) {
-    const searchUsers = useSearchUsers();
-    const searchUserGroups = useSearchUserGroups();
-
-    const handleSearchUsersAndGroups = useCallback(
-      async (search: string, excludeUsers: string[], excludeUserGroups: string[]) => {
-        const [users, groups] = await Promise.all([
-          searchUsers(search, { excludeIds: [...excludeUsers] }),
-          searchUserGroups(search, {
-            excludeIds: [...excludeUserGroups],
-          }),
-        ]);
-
-        return [...groups, ...users];
-      },
-      [searchUsers, searchUserGroups],
-    );
-
-    const needsLoading =
-      typeof value === "string" || (Array.isArray(value) && typeof value[0] === "string");
-    const getUsersOrGroups = useGetUsersOrGroups();
-    const allFieldsWithIndices = useAllFieldsWithIndices(petition);
-
-    // Build petition field options
-    const petitionFieldOptions = useMemo(() => {
-      const options: PetitionFieldOption<T>[] = allFieldsWithIndices
-        .flatMap(([field, fieldIndex]) => {
-          return {
-            field,
-            fieldIndex,
-            __typename: "PetitionField" as const,
-            id: field.id,
-          };
-        })
-        .filter(({ field }) => field.type === "USER_ASSIGNMENT");
-
-      return options;
-    }, [allFieldsWithIndices]);
-
-    const petitionFieldIds = useMemo(
-      () => new Set(petitionFieldOptions.map((opt) => opt.field.id)),
-      [petitionFieldOptions],
-    );
-    const petitionFieldMap = useMemo(
-      () => new Map(petitionFieldOptions.map((opt) => [opt.field.id, opt])),
-      [petitionFieldOptions],
-    );
-
-    const _value = useAsyncMemo(async () => {
-      if (value === null || value.length === 0) {
-        return [];
-      }
-      if (needsLoading) {
-        const valueArray = value as string[];
-
-        // Separate field IDs from user/group IDs
-        const userGroupIds = valueArray.filter((id) => !petitionFieldIds.has(id));
-
-        // Load user/group IDs if any
-        let loadedUsersOrGroups: (UserSelect_UserFragment | UserSelect_UserGroupFragment)[] = [];
-        if (userGroupIds.length > 0) {
-          const loaded = await getUsersOrGroups(userGroupIds);
-          loadedUsersOrGroups = unMaybeArray(loaded) as (
-            | UserSelect_UserFragment
-            | UserSelect_UserGroupFragment
-          )[];
-        }
-
-        // Combine results maintaining order
-        const result: OptionType[] = [];
-        for (const id of valueArray) {
-          if (petitionFieldIds.has(id)) {
-            const field = petitionFieldMap.get(id);
-            if (field) {
-              result.push(field as OptionType);
-            }
-          } else {
-            const userOrGroup = loadedUsersOrGroups.find((item) => item.id === id);
-            if (userOrGroup) {
-              result.push(userOrGroup as OptionType);
-            }
-          }
-        }
-
-        return result;
-      } else {
-        // Value is already loaded, but we need to convert PetitionField objects back to PetitionFieldOption
-        const valueArray = value as OptionType[] | AnyFieldOf<T>[];
-        const result: OptionType[] = [];
-
-        for (const item of valueArray) {
-          // Check if it's a PetitionField (has type, title, etc. but not __typename "PetitionField")
-          if (
-            typeof item === "object" &&
-            item !== null &&
-            "type" in item &&
-            "title" in item &&
-            "id" in item &&
-            (!("__typename" in item) ||
-              (item as { __typename?: string }).__typename !== "PetitionField") &&
-            petitionFieldIds.has((item as { id: string }).id)
-          ) {
-            // It's a PetitionField, convert it to PetitionFieldOption
-            const fieldOption = petitionFieldMap.get((item as { id: string }).id);
-            if (fieldOption) {
-              result.push(fieldOption as OptionType);
-            }
-          } else if (typeof item === "object" && item !== null && "__typename" in item) {
-            // It's already a User, UserGroup, or PetitionFieldOption
-            result.push(item as OptionType);
-          }
-        }
-
-        return result;
-      }
-    }, [
-      needsLoading,
-      petitionFieldIds,
-      petitionFieldMap,
-      getUsersOrGroups,
-      // Rerun when value changes
-      value === null || value.length === 0
-        ? null
-        : needsLoading
-          ? // value is string[]
-            (value as string[]).join(",")
-          : // value is OptionType[] or PetitionField[]
-            JSON.stringify(
-              (value as OptionType[] | AnyFieldOf<T>[])
-                .map((x) => (typeof x === "object" && x !== null && "id" in x ? String(x.id) : ""))
-                .filter(Boolean),
-            ),
-    ]);
-
-    const intl = useIntl();
-    const placeholder = useMemo(() => {
-      return (
-        _placeholder ??
-        intl.formatMessage({
-          id: "component.user-select.placeholder-multi-with-groups",
-          defaultMessage: "Select users or teams from your organization",
-        })
-      );
-    }, [_placeholder, intl.locale]);
-
-    const loadOptions = useMemo(
-      () => async (search: string) => {
-        const items = unMaybeArray(_value ?? []) as OptionType[];
-        const groups: GroupBase<OptionType>[] = [];
-
-        // If search is empty, show all fields. Otherwise, filter matching fields
-        const fieldsToShow =
-          search.trim() === ""
-            ? petitionFieldOptions
-            : petitionFieldOptions.filter((opt) =>
-                (opt.field.title ?? "").toLowerCase().includes(search.toLowerCase()),
-              );
-
-        // Always show fields group if there are fields to show
-        if (fieldsToShow.length > 0) {
-          groups.push({
-            label: intl.formatMessage({
-              id: "component.user-select.fields-group-label",
-              defaultMessage: "Fields",
-            }),
-            options: fieldsToShow as OptionType[],
-          });
-        }
-
-        // Only search for users/groups if there's a search query
-        if (search.trim() !== "") {
-          const asyncResults = await handleSearchUsersAndGroups(
-            search,
-            items
-              .filter((item) => "__typename" in item && item.__typename === "User")
-              .map((item) => (item as UserSelect_UserFragment).id),
-            items
-              .filter((item) => "__typename" in item && item.__typename === "UserGroup")
-              .map((item) => (item as UserSelect_UserGroupFragment).id),
-          );
-
-          // Add async results group first if there are results
-          if (asyncResults.length > 0) {
-            groups.unshift({
-              label: intl.formatMessage({
-                id: "component.user-select.users-and-teams-group-label",
-                defaultMessage: "Users and teams",
-              }),
-              options: asyncResults as OptionType[],
-            });
-          }
-        }
-
-        // If no groups were created, return empty array to show placeholder
-        if (groups.length === 0) {
-          return [];
-        }
-
-        return groups.length > 0 ? groups : [];
-      },
-      [_value, petitionFieldOptions, intl],
-    );
-
-    const { data } = useQuery(UserSelect_canCreateUsersDocument);
-
-    const handleChange = useCallback(
-      (newValue: OnChangeValue<OptionType, true>, actionMeta: ActionMeta<OptionType>) => {
-        const values = (newValue as OptionType[]) ?? [];
-        onChange(
-          values.map((item) => {
-            if (item.__typename === "PetitionField") {
-              return (item as PetitionFieldOption<T>).field;
-            }
-            return item;
-          }) as OptionType[],
-          actionMeta,
-        );
-      },
-      [onChange],
-    );
-
-    const customComponents = useMemo(() => {
-      const baseComponents = {
-        NoOptionsMessage,
-        SingleValue,
-        MultiValueLabel,
-        Option,
-        GroupHeading: GroupHeading,
-        MenuList: MenuListWithPlaceholder,
-        ...props.components,
-      };
-      return baseComponents as unknown as SelectComponentsConfig<
-        OptionType,
-        true,
-        GroupBase<OptionType>
-      >;
-    }, [props.components]);
-
-    const rsProps = useReactSelectProps<OptionType, true, GroupBase<OptionType>>({
-      ...props,
-      components: customComponents,
-    });
-
-    const extensions = {
-      canCreateUsers: data?.me.canCreateUsers ?? false,
-    };
-
-    // When petition fields are provided, use defaultOptions to show them initially
-    const defaultOptions = useMemo(() => {
-      if (petitionFieldOptions.length > 0) {
-        return true; // This will call loadOptions with empty string to show all fields
-      }
-      return false;
-    }, [petitionFieldOptions.length]);
-
-    return (
-      <AsyncSelect<OptionType, true, GroupBase<OptionType>>
-        ref={ref}
-        value={_value}
-        onChange={handleChange}
-        isMulti={true}
-        loadOptions={loadOptions}
-        defaultOptions={defaultOptions}
-        getOptionLabel={getOptionLabel<T>(intl.locale as UserLocale)}
-        getOptionValue={getOptionValue<T>}
-        placeholder={placeholder}
-        isClearable={props.isClearable}
-        {...props}
-        {...rsProps}
-        {...extensions}
-      />
-    );
-  },
-) as <
+export function ApprovalFlowConfigApproverSelect<
   T extends
     ApprovalFlowConfigApproverSelect_PetitionBaseFragment = ApprovalFlowConfigApproverSelect_PetitionBaseFragment,
   OptionType extends
     ApprovalFlowConfigApproverSelection<T> = ApprovalFlowConfigApproverSelection<T>,
->(
-  props: ApprovalFlowConfigApproverSelectProps<T, OptionType> &
-    RefAttributes<ApprovalFlowConfigApproverSelectInstance<T, OptionType>>,
-) => ReactElement;
+>({
+  value,
+  onChange,
+  petition,
+  placeholder: _placeholder,
+  ...props
+}: ApprovalFlowConfigApproverSelectProps<T, OptionType> &
+  RefAttributes<ApprovalFlowConfigApproverSelectInstance<T, OptionType>>) {
+  const searchUsers = useSearchUsers();
+  const searchUserGroups = useSearchUserGroups();
+
+  const handleSearchUsersAndGroups = useCallback(
+    async (search: string, excludeUsers: string[], excludeUserGroups: string[]) => {
+      const [users, groups] = await Promise.all([
+        searchUsers(search, { excludeIds: [...excludeUsers] }),
+        searchUserGroups(search, {
+          excludeIds: [...excludeUserGroups],
+        }),
+      ]);
+
+      return [...groups, ...users];
+    },
+    [searchUsers, searchUserGroups],
+  );
+
+  const needsLoading =
+    typeof value === "string" || (Array.isArray(value) && typeof value[0] === "string");
+  const getUsersOrGroups = useGetUsersOrGroups();
+  const allFieldsWithIndices = useAllFieldsWithIndices(petition);
+
+  // Build petition field options
+  const petitionFieldOptions = useMemo(() => {
+    const options: PetitionFieldOption<T>[] = allFieldsWithIndices
+      .flatMap(([field, fieldIndex]) => {
+        return {
+          field,
+          fieldIndex,
+          __typename: "PetitionField" as const,
+          id: field.id,
+        };
+      })
+      .filter(({ field }) => field.type === "USER_ASSIGNMENT");
+
+    return options;
+  }, [allFieldsWithIndices]);
+
+  const petitionFieldIds = useMemo(
+    () => new Set(petitionFieldOptions.map((opt) => opt.field.id)),
+    [petitionFieldOptions],
+  );
+  const petitionFieldMap = useMemo(
+    () => new Map(petitionFieldOptions.map((opt) => [opt.field.id, opt])),
+    [petitionFieldOptions],
+  );
+
+  const _value = useAsyncMemo(async () => {
+    if (value === null || value.length === 0) {
+      return [];
+    }
+    if (needsLoading) {
+      const valueArray = value as string[];
+
+      // Separate field IDs from user/group IDs
+      const userGroupIds = valueArray.filter((id) => !petitionFieldIds.has(id));
+
+      // Load user/group IDs if any
+      let loadedUsersOrGroups: (UserSelect_UserFragment | UserSelect_UserGroupFragment)[] = [];
+      if (userGroupIds.length > 0) {
+        const loaded = await getUsersOrGroups(userGroupIds);
+        loadedUsersOrGroups = unMaybeArray(loaded) as (
+          | UserSelect_UserFragment
+          | UserSelect_UserGroupFragment
+        )[];
+      }
+
+      // Combine results maintaining order
+      const result: OptionType[] = [];
+      for (const id of valueArray) {
+        if (petitionFieldIds.has(id)) {
+          const field = petitionFieldMap.get(id);
+          if (field) {
+            result.push(field as OptionType);
+          }
+        } else {
+          const userOrGroup = loadedUsersOrGroups.find((item) => item.id === id);
+          if (userOrGroup) {
+            result.push(userOrGroup as OptionType);
+          }
+        }
+      }
+
+      return result;
+    } else {
+      // Value is already loaded, but we need to convert PetitionField objects back to PetitionFieldOption
+      const valueArray = value as OptionType[] | AnyFieldOf<T>[];
+      const result: OptionType[] = [];
+
+      for (const item of valueArray) {
+        // Check if it's a PetitionField (has type, title, etc. but not __typename "PetitionField")
+        if (
+          typeof item === "object" &&
+          item !== null &&
+          "type" in item &&
+          "title" in item &&
+          "id" in item &&
+          (!("__typename" in item) ||
+            (item as { __typename?: string }).__typename !== "PetitionField") &&
+          petitionFieldIds.has((item as { id: string }).id)
+        ) {
+          // It's a PetitionField, convert it to PetitionFieldOption
+          const fieldOption = petitionFieldMap.get((item as { id: string }).id);
+          if (fieldOption) {
+            result.push(fieldOption as OptionType);
+          }
+        } else if (typeof item === "object" && item !== null && "__typename" in item) {
+          // It's already a User, UserGroup, or PetitionFieldOption
+          result.push(item as OptionType);
+        }
+      }
+
+      return result;
+    }
+  }, [
+    needsLoading,
+    petitionFieldIds,
+    petitionFieldMap,
+    getUsersOrGroups,
+    // Rerun when value changes
+    value === null || value.length === 0
+      ? null
+      : needsLoading
+        ? // value is string[]
+          (value as string[]).join(",")
+        : // value is OptionType[] or PetitionField[]
+          JSON.stringify(
+            (value as OptionType[] | AnyFieldOf<T>[])
+              .map((x) => (typeof x === "object" && x !== null && "id" in x ? String(x.id) : ""))
+              .filter(Boolean),
+          ),
+  ]);
+
+  const intl = useIntl();
+  const placeholder = useMemo(() => {
+    return (
+      _placeholder ??
+      intl.formatMessage({
+        id: "component.user-select.placeholder-multi-with-groups",
+        defaultMessage: "Select users or teams from your organization",
+      })
+    );
+  }, [_placeholder, intl.locale]);
+
+  const loadOptions = useMemo(
+    () => async (search: string) => {
+      const items = unMaybeArray(_value ?? []) as OptionType[];
+      const groups: GroupBase<OptionType>[] = [];
+
+      // If search is empty, show all fields. Otherwise, filter matching fields
+      const fieldsToShow =
+        search.trim() === ""
+          ? petitionFieldOptions
+          : petitionFieldOptions.filter((opt) =>
+              (opt.field.title ?? "").toLowerCase().includes(search.toLowerCase()),
+            );
+
+      // Always show fields group if there are fields to show
+      if (fieldsToShow.length > 0) {
+        groups.push({
+          label: intl.formatMessage({
+            id: "component.user-select.fields-group-label",
+            defaultMessage: "Fields",
+          }),
+          options: fieldsToShow as OptionType[],
+        });
+      }
+
+      // Only search for users/groups if there's a search query
+      if (search.trim() !== "") {
+        const asyncResults = await handleSearchUsersAndGroups(
+          search,
+          items
+            .filter((item) => "__typename" in item && item.__typename === "User")
+            .map((item) => (item as UserSelect_UserFragment).id),
+          items
+            .filter((item) => "__typename" in item && item.__typename === "UserGroup")
+            .map((item) => (item as UserSelect_UserGroupFragment).id),
+        );
+
+        // Add async results group first if there are results
+        if (asyncResults.length > 0) {
+          groups.unshift({
+            label: intl.formatMessage({
+              id: "component.user-select.users-and-teams-group-label",
+              defaultMessage: "Users and teams",
+            }),
+            options: asyncResults as OptionType[],
+          });
+        }
+      }
+
+      // If no groups were created, return empty array to show placeholder
+      if (groups.length === 0) {
+        return [];
+      }
+
+      return groups.length > 0 ? groups : [];
+    },
+    [_value, petitionFieldOptions, intl],
+  );
+
+  const { data } = useQuery(UserSelect_canCreateUsersDocument);
+
+  const handleChange = useCallback(
+    (newValue: OnChangeValue<OptionType, true>, actionMeta: ActionMeta<OptionType>) => {
+      const values = (newValue as OptionType[]) ?? [];
+      onChange(
+        values.map((item) => {
+          if (item.__typename === "PetitionField") {
+            return (item as PetitionFieldOption<T>).field;
+          }
+          return item;
+        }) as OptionType[],
+        actionMeta,
+      );
+    },
+    [onChange],
+  );
+
+  const customComponents = useMemo(() => {
+    const baseComponents = {
+      NoOptionsMessage,
+      SingleValue,
+      MultiValueLabel,
+      Option,
+      GroupHeading: GroupHeading,
+      MenuList: MenuListWithPlaceholder,
+      ...props.components,
+    };
+    return baseComponents as unknown as SelectComponentsConfig<
+      OptionType,
+      true,
+      GroupBase<OptionType>
+    >;
+  }, [props.components]);
+
+  const rsProps = useReactSelectProps<OptionType, true, GroupBase<OptionType>>({
+    ...props,
+    components: customComponents,
+  });
+
+  const extensions = {
+    canCreateUsers: data?.me.canCreateUsers ?? false,
+  };
+
+  // When petition fields are provided, use defaultOptions to show them initially
+  const defaultOptions = useMemo(() => {
+    if (petitionFieldOptions.length > 0) {
+      return true; // This will call loadOptions with empty string to show all fields
+    }
+    return false;
+  }, [petitionFieldOptions.length]);
+
+  return (
+    <AsyncSelect<OptionType, true, GroupBase<OptionType>>
+      value={_value}
+      onChange={handleChange}
+      isMulti={true}
+      loadOptions={loadOptions}
+      defaultOptions={defaultOptions}
+      getOptionLabel={getOptionLabel<T>(intl.locale as UserLocale)}
+      getOptionValue={getOptionValue<T>}
+      placeholder={placeholder}
+      isClearable={props.isClearable}
+      {...props}
+      {...rsProps}
+      {...extensions}
+    />
+  );
+}
 
 function useGetUsersOrGroups() {
   const client = useApolloClient();
@@ -562,7 +549,7 @@ function MultiValueLabel<T extends ApprovalFlowConfigApproverSelect_PetitionBase
           </OverflownText>
         </UserGroupMembersPopover>
       ) : data.__typename === "PetitionField" ? (
-        <HStack spacing={2}>
+        <HStack gap={2}>
           <PetitionFieldTypeIndicator
             as="div"
             type={data.field.type}
@@ -660,7 +647,7 @@ function ApprovalFlowConfigApproverSelectOption<
   } else if (data.__typename === "PetitionField") {
     const fieldOption = data as PetitionFieldOption<T>;
     return (
-      <HStack spacing={2}>
+      <HStack gap={2}>
         <PetitionFieldTypeIndicator
           as="div"
           type={fieldOption.field.type}

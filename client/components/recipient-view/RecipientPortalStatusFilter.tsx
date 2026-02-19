@@ -2,7 +2,7 @@ import { MenuButton, MenuItemOption, MenuList, MenuOptionGroup, Portal } from "@
 import { Button } from "@parallel/components/ui";
 import { Menu } from "@parallel/chakra/components";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { ValueProps } from "@parallel/utils/ValueProps";
 
@@ -10,10 +10,10 @@ export type RecipientPortalStatusFilterValue = "ALL" | "PENDING" | "COMPLETED";
 
 interface RecipientPortalStatusFilterProps extends ValueProps<RecipientPortalStatusFilterValue> {}
 
-export const RecipientPortalStatusFilter = chakraForwardRef<
+export const RecipientPortalStatusFilter = chakraComponent<
   "button",
   RecipientPortalStatusFilterProps
->(function RecipientPortalStatusFilter({ value, onChange, ...props }, ref) {
+>(function RecipientPortalStatusFilter({ ref, value, onChange, ...props }) {
   const options = useSimpleSelectOptions(
     (intl) => [
       {

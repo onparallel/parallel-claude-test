@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Heading, HStack, Image, Stack } from "@chakra-ui/react";
+import { Heading, Image } from "@chakra-ui/react";
 import { ProfilesIcon, SettingsIcon } from "@parallel/chakra/icons";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionComposeNewFieldDrawerProfileTypeFields_linkFieldGroupToProfileTypeDocument,
   PetitionComposeNewFieldDrawerProfileTypeFields_PetitionBaseFragment,
@@ -115,7 +115,7 @@ export function PetitionComposeNewFieldDrawerProfileTypeFields({
           textAlign="center"
           paddingX={2}
           paddingY={4}
-          spacing={4}
+          gap={4}
           alignItems="center"
           justifyContent="center"
         >
@@ -183,7 +183,7 @@ export function PetitionComposeNewFieldDrawerProfileTypeFields({
           </HStack>
           {filteredFields?.length ? (
             <Box {...extendFlexColumn} tabIndex={-1} overflow="auto">
-              <Stack as="ul" spacing={1} paddingBottom={4}>
+              <Stack as="ul" gap={1} paddingBottom={4}>
                 {filteredFields.map((field) => {
                   const isDisabled = children.some(
                     (petitionField) =>
@@ -209,13 +209,7 @@ export function PetitionComposeNewFieldDrawerProfileTypeFields({
               </Stack>
             </Box>
           ) : (
-            <Stack
-              justifyContent="center"
-              alignItems="center"
-              paddingX={4}
-              paddingY={6}
-              spacing={4}
-            >
+            <Stack justifyContent="center" alignItems="center" paddingX={4} paddingY={6} gap={4}>
               <Image
                 maxWidth="135px"
                 height="64px"
@@ -279,7 +273,7 @@ function NewFieldProfileTypeFieldItem({
       data-action="add-petition-field"
       data-profile-type-field-type={field.type}
     >
-      <HStack flex={1} spacing={1} minWidth={0}>
+      <HStack flex={1} gap={1} minWidth={0}>
         <ProfileTypeFieldReference
           flex={1}
           field={field}

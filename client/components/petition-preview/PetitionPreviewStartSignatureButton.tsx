@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { ButtonOptions, ThemingProps } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Button } from "@parallel/components/ui";
 import { PetitionPreviewStartSignatureButton_PetitionFragment } from "@parallel/graphql/__types";
 import { useStartSignatureRequest } from "@parallel/utils/useStartSignatureRequest";
@@ -9,10 +9,10 @@ interface PetitionPreviewStartSignatureButtonProps extends ButtonOptions, Themin
   petition: PetitionPreviewStartSignatureButton_PetitionFragment;
 }
 
-export const PetitionPreviewStartSignatureButton = chakraForwardRef<
+export const PetitionPreviewStartSignatureButton = chakraComponent<
   "button",
   PetitionPreviewStartSignatureButtonProps
->(function PetitionPreviewStartSignatureButton({ petition, ...props }, ref) {
+>(function PetitionPreviewStartSignatureButton({ ref, petition, ...props }) {
   const { handleStartSignature, buttonLabel } = useStartSignatureRequest({
     petition,
   });

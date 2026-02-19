@@ -1,20 +1,11 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  Checkbox,
-  FormControl,
-  HStack,
-  Input,
-  ListItem,
-  Stack,
-  UnorderedList,
-} from "@chakra-ui/react";
+import { Checkbox, FormControl, Input, ListItem, UnorderedList } from "@chakra-ui/react";
 import { ThumbsUpIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
 import { LocalFileAttachments } from "@parallel/components/common/LocalFileAttachments";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { useStartPetitionApprovalFlowDialog_PetitionApprovalRequestStepFragment } from "@parallel/graphql/__types";
 import { useRef } from "react";
 import { Controller, useForm } from "react-hook-form";

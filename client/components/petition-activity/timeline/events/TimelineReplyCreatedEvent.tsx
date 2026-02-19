@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { HStack } from "@chakra-ui/react";
+
 import { PlusCircleIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineReplyCreatedEvent_ReplyCreatedEventFragment } from "@parallel/graphql/__types";
@@ -11,7 +11,7 @@ import { UserOrContactReference } from "../../../common/UserOrContactReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
 import { TimelineSeeReplyButton } from "../common/TimelineSeeReplyButton";
-import { Text } from "@parallel/components/ui";
+import { HStack, Text } from "@parallel/components/ui";
 
 export interface TimelineReplyCreatedEventProps {
   event: TimelineReplyCreatedEvent_ReplyCreatedEventFragment;
@@ -110,7 +110,7 @@ export function TimelineReplyCreatedEvent({
       icon={<TimelineIcon icon={PlusCircleIcon} color="gray.600" size="18px" />}
       paddingY={2}
     >
-      <HStack spacing={2}>
+      <HStack gap={2}>
         <Text>{message}</Text>
         <TimelineSeeReplyButton field={field} replyId={reply?.id} />
       </HStack>

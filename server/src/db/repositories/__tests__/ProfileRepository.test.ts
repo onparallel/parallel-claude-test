@@ -13,6 +13,7 @@ import {
   User,
 } from "../../__types";
 import { KNEX } from "../../knex";
+import { waitFor } from "../../../util/promises/waitFor";
 import { ProfileRepository } from "../ProfileRepository";
 import { Mocks } from "./mocks";
 
@@ -644,6 +645,114 @@ describe("repositories/ProfileRepository", () => {
         .select("*");
 
       expect(pfvs).toHaveLength(1);
+    });
+
+    it("does not update profile updated_at when SHORT_TEXT field has same content", async () => {
+      const [profile] = await repo.createProfiles(
+        { org_id: organization.id, profile_type_id: profileType.id, status: "OPEN" },
+        {
+          source: "MANUAL",
+          userId: user.id,
+        },
+      );
+
+      // First call: creates the value
+      await repo.updateProfileFieldValues(
+        [
+          {
+            profileId: profile.id,
+            profileTypeFieldId: fields[0].id,
+            type: "SHORT_TEXT",
+            content: { value: "test" },
+          },
+        ],
+        organization.id,
+        { userId: user.id, source: "MANUAL" },
+      );
+
+      const profileAfterFirstUpdate = await mocks.knex
+        .from("profile")
+        .where("id", profile.id)
+        .first("updated_at");
+
+      // Wait a bit to ensure timestamp difference
+      await waitFor(50);
+
+      // Second call: same content, should not change anything
+      const events2 = await repo.updateProfileFieldValues(
+        [
+          {
+            profileId: profile.id,
+            profileTypeFieldId: fields[0].id,
+            type: "SHORT_TEXT",
+            content: { value: "test" },
+          },
+        ],
+        organization.id,
+        { userId: user.id, source: "MANUAL" },
+      );
+
+      expect(events2).toEqual([]);
+
+      const profileAfterSecondUpdate = await mocks.knex
+        .from("profile")
+        .where("id", profile.id)
+        .first("updated_at");
+
+      // Profile updated_at should NOT have changed since nothing was modified
+      expect(profileAfterSecondUpdate.updated_at).toEqual(profileAfterFirstUpdate.updated_at);
+    });
+
+    it("does not update profile updated_at when CHECKBOX field has same content", async () => {
+      const [profile] = await repo.createProfiles(
+        { org_id: organization.id, profile_type_id: profileType.id, status: "OPEN" },
+        {
+          source: "MANUAL",
+          userId: user.id,
+        },
+      );
+
+      await repo.updateProfileFieldValues(
+        [
+          {
+            profileId: profile.id,
+            profileTypeFieldId: fields[1].id,
+            type: "CHECKBOX",
+            content: { value: ["A", "C"] },
+          },
+        ],
+        organization.id,
+        { userId: user.id, source: "MANUAL" },
+      );
+
+      const profileAfterFirstUpdate = await mocks.knex
+        .from("profile")
+        .where("id", profile.id)
+        .first("updated_at");
+
+      await waitFor(50);
+
+      const events2 = await repo.updateProfileFieldValues(
+        [
+          {
+            profileId: profile.id,
+            profileTypeFieldId: fields[1].id,
+            type: "CHECKBOX",
+            content: { value: ["C", "A"] },
+          },
+        ],
+        organization.id,
+        { userId: user.id, source: "MANUAL" },
+      );
+
+      expect(events2).toEqual([]);
+
+      const profileAfterSecondUpdate = await mocks.knex
+        .from("profile")
+        .where("id", profile.id)
+        .first("updated_at");
+
+      expect(profileAfterSecondUpdate.updated_at).toEqual(profileAfterFirstUpdate.updated_at);
     });
 
     it("does nothing if updating CHECKBOX field with exactly same content", async () => {

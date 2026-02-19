@@ -48,7 +48,7 @@ export function validProfileListViewDataInput<TypeName extends string, FieldName
             `Invalid column value: ${column}`,
           );
         }
-      } else if (!["subscribers", "createdAt"].includes(column)) {
+      } else if (!["subscribers", "createdAt", "updatedAt"].includes(column)) {
         throw new ArgValidationError(info, `${argName}.columns`, `Invalid column value: ${column}`);
       }
     }

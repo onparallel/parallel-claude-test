@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Badge, HStack, Heading, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
+import { Badge, Heading, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { CommentIcon, ListIcon, SparklesIcon } from "@parallel/chakra/icons";
 import { PetitionComments } from "@parallel/components/petition-replies/PetitionComments";
 import { PetitionRepliesContents } from "@parallel/components/petition-replies/PetitionRepliesContents";
@@ -15,6 +15,7 @@ import { FieldLogicResult } from "@parallel/utils/fieldLogic/types";
 import { PetitionFieldFilter } from "@parallel/utils/filterPetitionFields";
 import { getPetitionSignatureEnvironment } from "@parallel/utils/getPetitionSignatureEnvironment";
 import { getPetitionSignatureStatus } from "@parallel/utils/getPetitionSignatureStatus";
+import { HStack } from "@parallel/components/ui";
 import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { sumBy } from "remeda";

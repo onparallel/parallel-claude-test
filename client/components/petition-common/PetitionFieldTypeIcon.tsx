@@ -20,7 +20,7 @@ import {
   ShortSearchIcon,
   UserIcon,
 } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { ElementType } from "react";
 
@@ -28,8 +28,8 @@ export interface PetitionFieldTypeIconProps {
   type: PetitionFieldType;
 }
 
-export const PetitionFieldTypeIcon = chakraForwardRef<"svg", PetitionFieldTypeIconProps>(
-  function PetitionFieldTypeIcon({ type, ...props }, ref) {
+export const PetitionFieldTypeIcon = chakraComponent<"svg", PetitionFieldTypeIconProps>(
+  function PetitionFieldTypeIcon({ ref, type, ...props }) {
     const icon = (
       {
         FILE_UPLOAD: FieldFileUploadIcon,

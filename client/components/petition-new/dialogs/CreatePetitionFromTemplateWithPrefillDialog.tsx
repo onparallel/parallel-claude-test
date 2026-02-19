@@ -1,14 +1,6 @@
 import { gql } from "@apollo/client";
 import { useLazyQuery, useMutation } from "@apollo/client/react";
-import {
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  HStack,
-  Radio,
-  RadioGroup,
-  Stack,
-} from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel, Radio, RadioGroup } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
   useWizardDialog,
@@ -21,7 +13,7 @@ import { ProfileTypeReference } from "@parallel/components/common/ProfileTypeRef
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import { usePreviewImportFromProfileFormatErrorDialog } from "@parallel/components/petition-preview/dialogs/PreviewImportFromProfileFormatErrorDialog";
 import { AssociateNewPetitionToProfileDialogPrefillFieldGroups } from "@parallel/components/profiles/dialogs/AssociateNewPetitionToProfileDialog";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   useCreatePetitionFromTemplateWithPrefillDialog_createPetitionFromProfileDocument,
   useCreatePetitionFromTemplateWithPrefillDialog_PetitionBaseFragment,
@@ -58,7 +50,7 @@ type CreatePetitionFromTemplateWithPrefillDialogSteps = {
   };
 };
 
-/* 
+/*
   Dialog that creates a petition from a template with profile prefill.
   It has a maximum of 3 steps:
   Step 1 "SELECT_FIELD_GROUPS" - select which field groups to prefill from the template
@@ -151,7 +143,7 @@ function CreatePetitionFromTemplateSelectFieldGroupsStep({
               render={({ field: { onChange, value } }) => (
                 <RadioGroup
                   as={Stack}
-                  spacing={2}
+                  gap={2}
                   onChange={onChange}
                   value={value || ""}
                   colorScheme="primary"

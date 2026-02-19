@@ -1,4 +1,5 @@
-import { Box, Center, useTheme } from "@chakra-ui/react";
+import { Center, useTheme } from "@chakra-ui/react";
+import { Box } from "@parallel/components/ui";
 import { ReactNode } from "react";
 
 interface PetitionComposeDragActiveIndicatorProps {

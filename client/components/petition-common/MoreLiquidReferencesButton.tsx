@@ -1,16 +1,8 @@
 import { gql } from "@apollo/client";
-import {
-  Heading,
-  MenuButton,
-  MenuDivider,
-  MenuItem,
-  MenuList,
-  Portal,
-  Stack,
-} from "@chakra-ui/react";
+import { Heading, MenuButton, MenuDivider, MenuItem, MenuList, Portal } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import { HelpOutlineIcon, MoreVerticalIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import {
   MoreLiquidReferencesButton_PetitionFieldFragment,
   PetitionField,
@@ -23,17 +15,17 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
 import { NakedHelpCenterLink } from "../common/HelpCenterLink";
 import { IconButtonWithTooltip, IconButtonWithTooltipProps } from "../common/IconButtonWithTooltip";
-import { Text } from "@parallel/components/ui";
+import { Stack, Text } from "@parallel/components/ui";
 
 export interface MoreLiquidReferencesButtonProps extends Omit<IconButtonWithTooltipProps, "label"> {
   field: MoreLiquidReferencesButton_PetitionFieldFragment;
   onAddAliasToField?: () => Promise<string>;
 }
 
-export const MoreLiquidReferencesButton = chakraForwardRef<
+export const MoreLiquidReferencesButton = chakraComponent<
   "button",
   MoreLiquidReferencesButtonProps
->(function MoreLiquidReferencesButton({ field, onAddAliasToField, ...props }, ref) {
+>(function MoreLiquidReferencesButton({ ref, field, onAddAliasToField, ...props }) {
   const intl = useIntl();
   const copyReference = useClipboardWithToast({
     text: intl.formatMessage({
@@ -86,7 +78,7 @@ export const MoreLiquidReferencesButton = chakraForwardRef<
               }}
               key={index}
             >
-              <Stack spacing={1}>
+              <Stack gap={1}>
                 <Text fontSize="md" fontWeight="bold">
                   {title}
                 </Text>

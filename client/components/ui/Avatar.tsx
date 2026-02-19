@@ -7,7 +7,7 @@ import {
   AvatarProps,
   Avatar as ChakraAvatar,
 } from "@chakra-ui/react";
-import { forwardRef, ReactElement, ReactNode } from "react";
+import { ReactElement, ReactNode, RefAttributes } from "react";
 
 // Docs: https://chakra-ui.com/docs/components/avatar
 
@@ -23,26 +23,24 @@ interface AvatarImageProps {
   [key: string]: any;
 }
 
-export const AvatarImage = forwardRef<HTMLImageElement, AvatarImageProps>((props, ref) => {
+export function AvatarImage(_props: AvatarImageProps) {
   // This component doesn't render anything visible in v2 compatibility mode
   // The props are extracted by AvatarRoot
   return null;
-});
+}
 
 // Avatar.Fallback component - in v3 this handles fallback content
 interface AvatarFallbackProps {
-  name?: string;
+  name?: string | null;
   children?: ReactNode;
   [key: string]: any;
 }
 
-export const AvatarFallback = forwardRef<HTMLDivElement, AvatarFallbackProps>(
-  ({ name, children, ...props }, ref) => {
-    // This component doesn't render anything visible in v2 compatibility mode
-    // The props are extracted by AvatarRoot
-    return null;
-  },
-);
+export function AvatarFallback(_props: AvatarFallbackProps) {
+  // This component doesn't render anything visible in v2 compatibility mode
+  // The props are extracted by AvatarRoot
+  return null;
+}
 
 // v3 API only - Root component props according to official docs
 export interface AvatarRootProps
@@ -66,56 +64,65 @@ export interface AvatarRootProps
   children?: ReactNode;
 }
 
-export const AvatarRoot = forwardRef<HTMLSpanElement, AvatarRootProps>(
-  ({ colorPalette, size, variant, shape, borderless, onStatusChange, children, ...props }, ref) => {
-    // Extract src and name from children
-    let extractedSrc: string | undefined;
-    let extractedName: string | undefined;
+export function AvatarRoot({
+  colorPalette,
+  size,
+  variant,
+  shape,
+  borderless,
+  onStatusChange,
+  children,
+  ref,
+  ...props
+}: AvatarRootProps & RefAttributes<HTMLSpanElement>) {
+  // Extract src and name from children
+  let extractedSrc: string | undefined;
+  let extractedName: string | undefined;
 
-    // Look for Avatar.Image and Avatar.Fallback in children
-    const processChild = (child: ReactElement) => {
-      if (child?.type === AvatarImage) {
-        extractedSrc = (child.props as AvatarImageProps).src;
-      }
-      if (child?.type === AvatarFallback) {
-        extractedName = (child.props as AvatarFallbackProps).name;
-      }
-    };
-
-    if (Array.isArray(children)) {
-      children.forEach(processChild);
-    } else if (children && typeof children === "object") {
-      processChild(children as ReactElement);
+  // Look for Avatar.Image and Avatar.Fallback in children
+  const processChild = (child: ReactElement) => {
+    if (child?.type === AvatarImage) {
+      extractedSrc = (child.props as AvatarImageProps).src;
     }
+    if (child?.type === AvatarFallback) {
+      extractedName = (child.props as AvatarFallbackProps).name ?? undefined;
+    }
+  };
 
-    return (
-      <ChakraAvatar
-        ref={ref}
-        src={extractedSrc}
-        name={extractedName}
-        size={size}
-        colorScheme={colorPalette}
-        showBorder={!borderless}
-        {...props}
-      >
-        {/* Pass through any non-Avatar children (like badges) */}
-        {Array.isArray(children)
-          ? children.filter(
-              (child) => child?.type !== AvatarImage && child?.type !== AvatarFallback,
-            )
-          : (children as ReactElement)?.type !== AvatarImage &&
-              (children as ReactElement)?.type !== AvatarFallback
-            ? children
-            : null}
-      </ChakraAvatar>
-    );
-  },
-);
+  if (Array.isArray(children)) {
+    children.forEach(processChild);
+  } else if (children && typeof children === "object") {
+    processChild(children as ReactElement);
+  }
+
+  return (
+    <ChakraAvatar
+      ref={ref}
+      src={extractedSrc}
+      name={extractedName}
+      size={size}
+      colorScheme={colorPalette}
+      showBorder={!borderless}
+      {...props}
+    >
+      {/* Pass through any non-Avatar children (like badges) */}
+      {Array.isArray(children)
+        ? children.filter((child) => child?.type !== AvatarImage && child?.type !== AvatarFallback)
+        : (children as ReactElement)?.type !== AvatarImage &&
+            (children as ReactElement)?.type !== AvatarFallback
+          ? children
+          : null}
+    </ChakraAvatar>
+  );
+}
 
 // AvatarBadge component - maps to v2 AvatarBadge
-export const AvatarBadgeWrapper = forwardRef<HTMLDivElement, AvatarBadgeProps>((props, ref) => {
+export function AvatarBadgeWrapper({
+  ref,
+  ...props
+}: AvatarBadgeProps & RefAttributes<HTMLDivElement>) {
   return <AvatarBadge ref={ref} {...props} />;
-});
+}
 
 // v3 API only - AvatarGroup props
 interface AvatarGroupWrapperProps extends Omit<AvatarGroupProps, "spacing"> {
@@ -125,11 +132,16 @@ interface AvatarGroupWrapperProps extends Omit<AvatarGroupProps, "spacing"> {
   stacking?: "first-on-top" | "last-on-top";
 }
 
-export const AvatarGroupWrapper = forwardRef<HTMLDivElement, AvatarGroupWrapperProps>(
-  ({ gap, spaceX, borderless, stacking, ...props }, ref) => {
-    return <AvatarGroup ref={ref} spacing={spaceX || gap} {...props} />;
-  },
-);
+export function AvatarGroupWrapper({
+  gap,
+  spaceX,
+  borderless,
+  stacking,
+  ref,
+  ...props
+}: AvatarGroupWrapperProps & RefAttributes<HTMLDivElement>) {
+  return <AvatarGroup ref={ref} spacing={spaceX || gap} {...props} />;
+}
 
 // Namespace for using as Avatar.XXX (without Group)
 export const Avatar = {
@@ -141,10 +153,3 @@ export const Avatar = {
 
 // Export AvatarGroup as separate component to match v3 API
 export { AvatarGroupWrapper as AvatarGroup };
-
-// Assign display names for debugging
-AvatarRoot.displayName = "Avatar.Root";
-AvatarImage.displayName = "Avatar.Image";
-AvatarFallback.displayName = "Avatar.Fallback";
-AvatarBadgeWrapper.displayName = "Avatar.Badge";
-AvatarGroupWrapper.displayName = "AvatarGroup";

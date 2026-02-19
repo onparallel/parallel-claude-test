@@ -1,7 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Box,
-  HStack,
   Heading,
   Tab,
   TabList,
@@ -10,7 +8,7 @@ import {
   Tabs,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Divider } from "@parallel/components/common/Divider";
 import {
   PetitionComposeNewFieldDrawer_PetitionBaseFragment,
@@ -26,7 +24,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { CloseButton } from "../common/CloseButton";
 import { PetitionComposeNewFieldDrawerPetitionFields } from "./PetitionComposeNewFieldDrawerPetitionFields";
 import { PetitionComposeNewFieldDrawerProfileTypeFields } from "./PetitionComposeNewFieldDrawerProfileTypeFields";
-import { Text } from "@parallel/components/ui";
+import { Box, HStack, Text } from "@parallel/components/ui";
 
 interface PetitionComposeNewFieldDrawerProps {
   user: PetitionComposeNewFieldDrawer_UserFragment;
@@ -45,22 +43,20 @@ interface PetitionComposeNewFieldDrawerProps {
   newFieldPlaceholderParentFieldId?: string;
 }
 
-export const PetitionComposeNewFieldDrawer = chakraForwardRef<
+export const PetitionComposeNewFieldDrawer = chakraComponent<
   "div",
   PetitionComposeNewFieldDrawerProps
->(function PetitionComposeNewFieldDrawer(
-  {
-    user,
-    profileTypes,
-    onClose,
-    onAddField,
-    onAddProfileTypeFieldGroup,
-    onFieldEdit,
-    petition,
-    newFieldPlaceholderParentFieldId,
-  },
+>(function PetitionComposeNewFieldDrawer({
   ref,
-) {
+  user,
+  profileTypes,
+  onClose,
+  onAddField,
+  onAddProfileTypeFieldGroup,
+  onFieldEdit,
+  petition,
+  newFieldPlaceholderParentFieldId,
+}) {
   const intl = useIntl();
 
   const isFieldGroupChild = Boolean(newFieldPlaceholderParentFieldId);

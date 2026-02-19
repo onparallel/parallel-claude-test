@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
-import { Box, FormControl, FormLabel, HStack, Stack } from "@chakra-ui/react";
+import { FormControl, FormLabel } from "@chakra-ui/react";
 import { EmailIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
-import { Text } from "@parallel/components/ui";
+import { chakraComponent } from "@parallel/chakra/utils";
+import { Box, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionTemplateRequestMessageCard_PetitionTemplateFragment,
   PetitionTemplateRequestMessageCard_UserFragment,
@@ -28,13 +28,17 @@ interface PetitionTemplateRequestMessageCardProps {
   isDisabled: boolean;
 }
 
-export const PetitionTemplateRequestMessageCard = chakraForwardRef<
+export const PetitionTemplateRequestMessageCard = chakraComponent<
   "section",
   PetitionTemplateRequestMessageCardProps
->(function PetitionTemplateRequestMessageCard(
-  { petition, user, onUpdatePetition, isDisabled, ...props },
+>(function PetitionTemplateRequestMessageCard({
   ref,
-) {
+  petition,
+  user,
+  onUpdatePetition,
+  isDisabled,
+  ...props
+}) {
   const [messages, setMessages] = useState({
     emailSubject: petition.emailSubject ?? "",
     emailBody: petition.emailBody ?? emptyRTEValue(),
@@ -80,7 +84,7 @@ export const PetitionTemplateRequestMessageCard = chakraForwardRef<
         />
       </CardHeader>
 
-      <Stack padding={4} spacing={3}>
+      <Stack padding={4} gap={3}>
         <Text>
           <FormattedMessage
             id="component.petition-template-request-message.card-explainer"

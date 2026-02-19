@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Circle } from "@chakra-ui/react";
 import { SignatureIcon } from "@parallel/chakra/icons";
-import { forwardRef } from "react";
+import { RefAttributes } from "react";
 import { FormattedMessage } from "react-intl";
 import { PetitionUserNotification } from "./PetitionUserNotification";
 
@@ -10,10 +10,11 @@ export interface SignatureCompletedUserNotificationProps {
   notification: any;
 }
 
-export const SignatureCompletedUserNotification = forwardRef<
-  HTMLElement,
-  SignatureCompletedUserNotificationProps
->(function SignatureCompletedUserNotification({ isFirst, notification }, ref) {
+export function SignatureCompletedUserNotification({
+  isFirst,
+  notification,
+  ref,
+}: SignatureCompletedUserNotificationProps & RefAttributes<HTMLElement>) {
   return (
     <PetitionUserNotification
       ref={ref}
@@ -32,7 +33,7 @@ export const SignatureCompletedUserNotification = forwardRef<
       />
     </PetitionUserNotification>
   );
-});
+}
 
 const _fragments = {
   SignatureCompletedUserNotification: gql`

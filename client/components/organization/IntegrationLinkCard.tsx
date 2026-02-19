@@ -1,8 +1,8 @@
-import { Center, HStack, LinkBox, LinkOverlay, Stack } from "@chakra-ui/react";
+import { Center, LinkBox, LinkOverlay } from "@chakra-ui/react";
 import { ChevronRightIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import NextLink from "next/link";
-import { Text } from "@parallel/components/ui";
+import { HStack, Stack, Text } from "@parallel/components/ui";
 import { ReactNode } from "react";
 import { Card } from "../common/Card";
 
@@ -16,11 +16,18 @@ export interface IntegrationLinkCardProps {
   isExternal?: boolean;
 }
 
-export const IntegrationLinkCard = chakraForwardRef<"div", IntegrationLinkCardProps>(
-  function IntegrationLinkCard(
-    { logo, title, body, badge, isDisabled, href, isExternal, ...props },
+export const IntegrationLinkCard = chakraComponent<"div", IntegrationLinkCardProps>(
+  function IntegrationLinkCard({
     ref,
-  ) {
+    logo,
+    title,
+    body,
+    badge,
+    isDisabled,
+    href,
+    isExternal,
+    ...props
+  }) {
     return (
       <LinkBox
         ref={ref}
@@ -31,8 +38,8 @@ export const IntegrationLinkCard = chakraForwardRef<"div", IntegrationLinkCardPr
         isDisabled={isDisabled}
         {...props}
       >
-        <HStack spacing={6}>
-          <Stack direction={{ base: "column", md: "row" }} flex="1" spacing={{ base: 4, md: 6 }}>
+        <HStack gap={6}>
+          <Stack direction={{ base: "column", md: "row" }} flex="1" gap={{ base: 4, md: 6 }}>
             <Center width={{ base: "auto", md: "120px" }}>{logo}</Center>
             <Stack flex="1">
               <HStack>

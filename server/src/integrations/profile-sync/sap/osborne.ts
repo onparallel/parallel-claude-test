@@ -1,8 +1,10 @@
+import { never } from "../../../util/never";
 import {
   SapEntityMapping,
   SapEntityRelationshipMapping,
   SapEntitySetFilter,
   SapProfileSyncIntegrationSettings,
+  SapProfileSyncIntegrationSettingsAuthorization,
 } from "./types";
 
 interface BusinessPartnerMappedProfileTypeFieldIds {
@@ -13,6 +15,7 @@ interface BusinessPartnerMappedProfileTypeFieldIds {
   relationship: number;
   addressId: number;
   clientPartner: number;
+  clientPartnerText: number;
   clientStatus: number;
   city: number;
   postalCode: number;
@@ -31,6 +34,8 @@ interface BusinessPartnerMappedProfileTypeFieldIds {
 }
 
 export function getOsborneSapSettings({
+  environment,
+  authorization,
   individualProfileTypeId,
   individualProfileTypeFieldIds,
   legalEntityProfileTypeId,
@@ -41,6 +46,8 @@ export function getOsborneSapSettings({
   businessPartnerFilter,
   projectFilter,
 }: {
+  environment: "SANDBOX" | "PRODUCTION";
+  authorization: SapProfileSyncIntegrationSettingsAuthorization;
   individualProfileTypeId: number;
   individualProfileTypeFieldIds: BusinessPartnerMappedProfileTypeFieldIds;
   legalEntityProfileTypeId: number;
@@ -52,6 +59,7 @@ export function getOsborneSapSettings({
     matterDescription: number;
     matterStatus: number;
     matterSupervisor: number;
+    matterSupervisorText: number;
     practiceGroup: number;
     subpracticeGroup: number;
     amlSubjectMatters: number;
@@ -64,17 +72,15 @@ export function getOsborneSapSettings({
   businessPartnerFilter?: SapEntitySetFilter;
   projectFilter?: SapEntitySetFilter;
 }): SapProfileSyncIntegrationSettings {
-  const [user, password] = process.env.OSBORNE_CREDENTIALS!.split(":");
   return {
-    baseUrl: "https://my303668-api.s4hana.ondemand.com/sap/opu/odata",
+    baseUrl:
+      environment === "SANDBOX"
+        ? "https://my303668-api.s4hana.ondemand.com/sap/opu/odata"
+        : never(),
     additionalHeaders: {
       "sap-language": "es",
     },
-    authorization: {
-      type: "BASIC",
-      user,
-      password,
-    },
+    authorization,
     mappings: [
       ...[
         {
@@ -204,7 +210,7 @@ export function getOsborneSapSettings({
               {
                 remoteEntityFields: ["YY1_bp_kyc_refresh_dat_bus"],
                 profileTypeFieldIds: [profileTypeFieldIds.kycRefreshDate],
-                direction: "TO_REMOTE",
+                direction: "BOTH",
                 toLocalTransforms: [{ type: "SAP_DATETIME_TO_DATE" }],
                 toRemoteTransforms: [{ type: "DATE_TO_SAP_DATETIME" }],
               },
@@ -376,7 +382,7 @@ export function getOsborneSapSettings({
                 },
                 fetchStrategy: {
                   type: "FROM_NAVIGATION_PROPERTY",
-                  expectedCardinality: "MANY",
+                  expectedCardinality: "MANY", // Only one address is expected
                   navigationProperty: "to_BusinessPartnerAddress",
                   entityDefinition: {
                     servicePath: "sap/API_BUSINESS_PARTNER",
@@ -445,6 +451,12 @@ export function getOsborneSapSettings({
                                 {
                                   remoteEntityFields: ["DefaultEmailAddress"],
                                   profileTypeFieldIds: [profileTypeFieldIds.clientPartner],
+                                  direction: "TO_LOCAL",
+                                  toLocalTransforms: [{ type: "IGNORE_IF", value: "" }],
+                                },
+                                {
+                                  remoteEntityFields: ["DefaultEmailAddress"],
+                                  profileTypeFieldIds: [profileTypeFieldIds.clientPartnerText],
                                   direction: "TO_LOCAL",
                                   toLocalTransforms: [{ type: "IGNORE_IF", value: "" }],
                                 },
@@ -645,7 +657,7 @@ export function getOsborneSapSettings({
           {
             remoteEntityFields: ["YY1_EP_transaction_vo_Cpr"],
             profileTypeFieldIds: [matterProfileTypeFieldIds.transactionVolume],
-            direction: "TO_LOCAL",
+            direction: "BOTH",
             toLocalTransforms: [
               { type: "IGNORE_IF", value: "" },
               { type: "PREPEND", value: "_" },
@@ -697,7 +709,7 @@ export function getOsborneSapSettings({
           {
             remoteEntityFields: ["YY1_EP_temp_active_unt_Cpr"],
             profileTypeFieldIds: [matterProfileTypeFieldIds.tempActiveUntil],
-            direction: "TO_REMOTE",
+            direction: "BOTH",
             toLocalTransforms: [{ type: "SAP_DATETIME_TO_DATE" }],
             toRemoteTransforms: [{ type: "DATE_TO_SAP_DATETIME" }],
           },
@@ -764,6 +776,12 @@ export function getOsborneSapSettings({
                 {
                   remoteEntityFields: ["DefaultEmailAddress"],
                   profileTypeFieldIds: [matterProfileTypeFieldIds.matterSupervisor],
+                  direction: "TO_LOCAL",
+                  toLocalTransforms: [{ type: "IGNORE_IF", value: "" }],
+                },
+                {
+                  remoteEntityFields: ["DefaultEmailAddress"],
+                  profileTypeFieldIds: [matterProfileTypeFieldIds.matterSupervisorText],
                   direction: "TO_LOCAL",
                   toLocalTransforms: [{ type: "IGNORE_IF", value: "" }],
                 },

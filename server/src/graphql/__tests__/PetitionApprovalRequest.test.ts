@@ -44,7 +44,7 @@ describe("GraphQL/Petition Approval Request", () => {
   afterEach(async () => {
     await mocks.knex.from("petition_approval_request_step_approver").delete();
     await mocks.knex.from("petition_approval_request_step").delete();
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   afterAll(async () => {
@@ -333,7 +333,7 @@ describe("GraphQL/Petition Approval Request", () => {
     });
 
     it("cancels whole flow, deprecating steps and sending emails to approvers", async () => {
-      const emailSpy = jest.spyOn(
+      const emailSpy = vi.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
         "sendPetitionApprovalRequestStepCanceledEmail",
       );
@@ -1194,7 +1194,7 @@ describe("GraphQL/Petition Approval Request", () => {
     });
 
     it("starts the provided step, marking it as PENDING and sending emails to the approvers", async () => {
-      const emailSpy = jest.spyOn(
+      const emailSpy = vi.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
         "sendPetitionApprovalRequestStepPendingEmail",
       );
@@ -1985,7 +1985,7 @@ describe("GraphQL/Petition Approval Request", () => {
       ]);
     });
     it("sends a reminder email to the approvers of the provided step and creates the petition event", async () => {
-      const emailSpy = jest.spyOn(
+      const emailSpy = vi.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
         "sendPetitionApprovalRequestStepReminderEmail",
       );
@@ -2126,7 +2126,7 @@ describe("GraphQL/Petition Approval Request", () => {
     });
 
     it("approves the provided step if type=ANY, marking it as APPROVED", async () => {
-      const emailSpy = jest.spyOn(
+      const emailSpy = vi.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
         "sendPetitionApprovalRequestStepApprovedEmail",
       );
@@ -2300,7 +2300,7 @@ describe("GraphQL/Petition Approval Request", () => {
         .where("id", steps[0].id)
         .update("approval_type", "ALL");
 
-      const emailSpy = jest.spyOn(
+      const emailSpy = vi.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
         "sendPetitionApprovalRequestStepApprovedEmail",
       );
@@ -2473,7 +2473,7 @@ describe("GraphQL/Petition Approval Request", () => {
         .whereNot("user_id", user.id)
         .update({ approved_at: new Date() });
 
-      const emailSpy = jest.spyOn(
+      const emailSpy = vi.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
         "sendPetitionApprovalRequestStepApprovedEmail",
       );
@@ -2651,7 +2651,7 @@ describe("GraphQL/Petition Approval Request", () => {
         .where("id", steps[1].id)
         .update("status", "PENDING");
 
-      const emailSpy = jest.spyOn(
+      const emailSpy = vi.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
         "sendPetitionApprovalRequestStepApprovedEmail",
       );
@@ -3011,7 +3011,7 @@ describe("GraphQL/Petition Approval Request", () => {
     });
 
     it("temporally rejects the provided step if type=ALL, marking it as REJECTED and finishing the whole approval request and configuring a new one", async () => {
-      const emailSpy = jest.spyOn(
+      const emailSpy = vi.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
         "sendPetitionApprovalRequestStepRejectedEmail",
       );
@@ -3236,7 +3236,7 @@ describe("GraphQL/Petition Approval Request", () => {
     });
 
     it("temporally rejects the provided step if type=ANY, marking it as REJECTED and finishing the whole process and configuring a new one", async () => {
-      const emailSpy = jest.spyOn(
+      const emailSpy = vi.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
         "sendPetitionApprovalRequestStepRejectedEmail",
       );
@@ -3717,7 +3717,7 @@ describe("GraphQL/Petition Approval Request", () => {
     });
 
     it("permanently rejects the provided step, marking it as REJECTED and not allowing to start a new one", async () => {
-      const emailSpy = jest.spyOn(
+      const emailSpy = vi.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
         "sendPetitionApprovalRequestStepRejectedEmail",
       );

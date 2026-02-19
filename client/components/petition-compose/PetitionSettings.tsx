@@ -4,14 +4,11 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Box,
   Heading,
-  HStack,
   Input,
   InputGroup,
   InputRightAddon,
   InputRightElement,
-  Stack,
   useToast,
 } from "@chakra-ui/react";
 import { Select } from "@parallel/chakra/components";
@@ -35,7 +32,7 @@ import {
   TimeIcon,
   UserPlusIcon,
 } from "@parallel/chakra/icons";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionSettings_createPublicPetitionLinkDocument,
   PetitionSettings_enableAutomaticNumberingOnPetitionFieldsDocument,
@@ -471,7 +468,7 @@ function _PetitionSettings({
   };
 
   return (
-    <Stack padding={4} spacing={2}>
+    <Stack padding={4} gap={2}>
       <Heading as="h5" size="sm" marginY={1.5}>
         <FormattedMessage
           id="component.petition-settings.process-settings"
@@ -609,7 +606,7 @@ function _PetitionSettings({
             />
           }
         >
-          <HStack minWidth={0} spacing={2}>
+          <HStack minWidth={0} gap={2}>
             <PathName
               as={Box}
               whiteSpace="nowrap"

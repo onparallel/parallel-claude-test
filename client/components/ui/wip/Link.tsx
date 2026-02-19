@@ -1,5 +1,5 @@
 import { Link as ChakraLink, LinkProps } from "@chakra-ui/react";
-import { forwardRef } from "react";
+import { RefAttributes } from "react";
 
 // Docs: https://chakra-ui.com/docs/components/link
 
@@ -9,8 +9,6 @@ export interface ExtendedLinkProps extends LinkProps {
   // No isExternal prop in v3
 }
 
-export const Link = forwardRef<HTMLAnchorElement, ExtendedLinkProps>((props, ref) => {
+export function Link({ ref, ...props }: ExtendedLinkProps & RefAttributes<HTMLAnchorElement>) {
   return <ChakraLink ref={ref} {...props} />;
-});
-
-Link.displayName = "Link";
+}

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Center, HStack, Skeleton, Spinner, Stack, useToast } from "@chakra-ui/react";
+import { Center, Skeleton, Spinner, useToast } from "@chakra-ui/react";
 import { RepeatIcon, ShortSearchIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -17,7 +17,7 @@ import { BackgroundCheckEntityDetailsRelationships } from "@parallel/components/
 import { BackgroundCheckEntityDetailsSanctions } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityDetailsSanctions";
 import { BackgroundCheckEntityDifferencesAlert } from "@parallel/components/petition-preview/fields/background-check/BackgroundCheckEntityDifferencesAlert";
 import { useBackgroundCheckContentsNotUpdatedDialog } from "@parallel/components/profiles/dialogs/BackgroundCheckContentsNotUpdatedDialog";
-import { Text } from "@parallel/components/ui";
+import { Box, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   BackgroundCheckEntitySearchType,
   BackgroundCheckProfileDetails_backgroundCheckEntityDetailsDocument,
@@ -259,9 +259,9 @@ function BackgroundCheckProfileDetails({
         </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
-      <Stack paddingX={6} paddingY={5} spacing={2} minHeight="100vh" backgroundColor="gray.50">
+      <Stack paddingX={6} paddingY={5} gap={2} minHeight="100vh" backgroundColor="gray.50">
         <HStack justifyContent="space-between">
-          <HStack spacing={4}>
+          <HStack gap={4}>
             <IconButtonWithTooltip
               icon={<ShortSearchIcon />}
               label={intl.formatMessage({
@@ -331,7 +331,7 @@ function BackgroundCheckProfileDetails({
                     <Skeleton height="18px" width="50px" />
                     <Skeleton height="18px" width="40px" />
                   </HStack>
-                  <HStack spacing={4}>
+                  <HStack gap={4}>
                     <Skeleton height="18px" width="100px" />
                     <Skeleton height="40px" width="110px" />
                   </HStack>

@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, HStack, List, ListItem, Stack } from "@chakra-ui/react";
+import { List, ListItem } from "@chakra-ui/react";
 import { BusinessIcon, SearchIcon, ShortSearchIcon, UserIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Link } from "@parallel/components/common/Link";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   AdverseMediaArticle,
   AdverseMediaSearchTermInput,
@@ -42,10 +42,10 @@ export interface ProfilePropertyContentProps {
   fromHistory?: boolean;
 }
 
-export const ProfilePropertyContent = chakraForwardRef<
+export const ProfilePropertyContent = chakraComponent<
   "p" | "span" | "ul" | "div",
   ProfilePropertyContentProps
->(function ProfileFieldValueContent(props, ref) {
+>(function ProfileFieldValueContent({ ref, ...props }) {
   if (props.field.type === "FILE") {
     return <ProfileFieldFiles ref={ref} {...(props as any)} />;
   } else {
@@ -88,8 +88,8 @@ function ProfileFieldFileContent({ file, field, profileId }: ProfileFieldFileCon
   );
 }
 
-const ProfileFieldFiles = chakraForwardRef<"ul" | "div", ProfilePropertyContentProps>(
-  function ProfileFieldFiles({ files, field, profileId, singleLine, fromHistory, ...props }, ref) {
+const ProfileFieldFiles = chakraComponent<"ul" | "div", ProfilePropertyContentProps>(
+  function ProfileFieldFiles({ ref, files, field, profileId, singleLine, fromHistory, ...props }) {
     assert(files !== undefined, "files must be defined if field type is FILE");
     const buttons =
       files?.map((file, key) => (
@@ -140,8 +140,8 @@ const ProfileFieldFiles = chakraForwardRef<"ul" | "div", ProfilePropertyContentP
   },
 );
 
-const ProfileFieldValue = chakraForwardRef<"p" | "span" | "div", ProfilePropertyContentProps>(
-  function ProfileFieldValue({ value, field, profileId, singleLine, ...props }, ref) {
+const ProfileFieldValue = chakraComponent<"p" | "span" | "div", ProfilePropertyContentProps>(
+  function ProfileFieldValue({ ref, value, field, profileId, singleLine, ...props }) {
     if (isNullish(value)) {
       return (
         <Box ref={ref} as="span" textStyle="hint" {...props}>
@@ -314,11 +314,15 @@ const ProfileFieldValue = chakraForwardRef<"p" | "span" | "div", ProfileProperty
   },
 );
 
-const ProfileFieldBackgroundCheckValue = chakraForwardRef<"div", ProfilePropertyContentProps>(
-  function ProfileFieldBackgroundCheckValue(
-    { value, field, profileId, fromHistory, ...props },
+const ProfileFieldBackgroundCheckValue = chakraComponent<"div", ProfilePropertyContentProps>(
+  function ProfileFieldBackgroundCheckValue({
     ref,
-  ) {
+    value,
+    field,
+    profileId,
+    fromHistory,
+    ...props
+  }) {
     const intl = useIntl();
     const content = value!.content!;
     const handleClick = async (event: MouseEvent<HTMLButtonElement>) => {
@@ -374,7 +378,7 @@ const ProfileFieldBackgroundCheckValue = chakraForwardRef<"div", ProfileProperty
                 {content.entity.name}
               </OverflownText>
               {topics.length > 3 ? (
-                <HStack spacing={1} marginStart={1}>
+                <HStack gap={1} marginStart={1}>
                   <EnumerateList
                     values={topics as string[]}
                     maxItems={1}
@@ -409,7 +413,7 @@ const ProfileFieldBackgroundCheckValue = chakraForwardRef<"div", ProfileProperty
           ) : (
             <>
               <SearchIcon boxSize={3} />
-              <HStack marginStart={1} spacing={1} display="inline-flex">
+              <HStack marginStart={1} gap={1} display="inline-flex">
                 {content.query.type === "PERSON" ? (
                   <UserIcon boxSize={4} />
                 ) : content.query.type === "COMPANY" ? (
@@ -438,11 +442,15 @@ const ProfileFieldBackgroundCheckValue = chakraForwardRef<"div", ProfileProperty
   },
 );
 
-const ProfileFieldAdverseMediaSearchValue = chakraForwardRef<"div", ProfilePropertyContentProps>(
-  function ProfileFieldAdverseMediaSearchValue(
-    { value, field, profileId, fromHistory, ...props },
+const ProfileFieldAdverseMediaSearchValue = chakraComponent<"div", ProfilePropertyContentProps>(
+  function ProfileFieldAdverseMediaSearchValue({
     ref,
-  ) {
+    value,
+    field,
+    profileId,
+    fromHistory,
+    ...props
+  }) {
     const intl = useIntl();
     const savedArticles = value?.content?.articles?.items.filter(
       (article: AdverseMediaArticle) => article.classification === "RELEVANT",
@@ -481,8 +489,8 @@ const ProfileFieldAdverseMediaSearchValue = chakraForwardRef<"div", ProfilePrope
           onClick={handleClick}
           fontWeight={500}
         >
-          <Stack spacing={1} maxWidth="100%" width="100%" textAlign="start">
-            <HStack spacing={1.5} minWidth={0} width="100%">
+          <Stack gap={1} maxWidth="100%" width="100%" textAlign="start">
+            <HStack gap={1.5} minWidth={0} width="100%">
               <ShortSearchIcon />
               <OverflownText textAlign="start" width="100%">
                 {intl.formatList(
@@ -532,10 +540,10 @@ const ProfileFieldAdverseMediaSearchValue = chakraForwardRef<"div", ProfilePrope
   },
 );
 
-const ProfileFieldUserAssignmentValue = chakraForwardRef<
+const ProfileFieldUserAssignmentValue = chakraComponent<
   "span" | "div",
   ProfilePropertyContentProps
->(function ProfileFieldUserAssignmentValue({ value, field, singleLine, ...props }, ref) {
+>(function ProfileFieldUserAssignmentValue({ ref, value, field, singleLine, ...props }) {
   const user = value?.content?.user;
 
   return (

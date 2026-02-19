@@ -1,5 +1,4 @@
-import { Flex, HStack } from "@chakra-ui/react";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Flex, HStack, Text } from "@parallel/components/ui";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { PinInput } from "../ui";

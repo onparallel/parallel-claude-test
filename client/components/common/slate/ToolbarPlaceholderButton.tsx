@@ -1,5 +1,5 @@
 import { BracesIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { getPreventDefaultHandler } from "@parallel/utils/events";
 import { ELEMENT_PLACEHOLDER_INPUT } from "@parallel/utils/slate/PlaceholderPlugin";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
@@ -12,8 +12,8 @@ import { ToolbarButton, ToolbarButtonProps } from "./ToolbarButton";
 export interface ToolbarPlaceholderButtonProps
   extends Omit<ToolbarButtonProps, "isToggeable" | "type" | "label" | "icon"> {}
 
-export const ToolbarPlaceholderButton = chakraForwardRef<"button", ToolbarPlaceholderButtonProps>(
-  function ToolbarPlaceholderButton({ ...props }, ref) {
+export const ToolbarPlaceholderButton = chakraComponent<"button", ToolbarPlaceholderButtonProps>(
+  function ToolbarPlaceholderButton({ ref, ...props }) {
     const intl = useIntl();
     const editor = usePlateEditorRef();
     const editorRef = useUpdatingRef(editor);

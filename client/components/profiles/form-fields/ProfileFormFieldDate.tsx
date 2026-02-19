@@ -1,8 +1,9 @@
-import { Center, Flex } from "@chakra-ui/react";
+import { Center } from "@chakra-ui/react";
 import { FieldDateIcon } from "@parallel/chakra/icons";
 import { DateInput } from "@parallel/components/common/DateInput";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { useBrowserMetadata } from "@parallel/utils/useBrowserMetadata";
+import { Flex } from "@parallel/components/ui";
 import { isPast, sub } from "date-fns";
 import { Controller, useFormContext } from "react-hook-form";
 import { isNonNullish } from "remeda";

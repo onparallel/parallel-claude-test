@@ -1,4 +1,4 @@
-import { FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel, Input } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
@@ -6,7 +6,7 @@ import {
   UserSelectInstance,
   UserSelectSelection,
 } from "@parallel/components/common/UserSelect";
-import { Button } from "@parallel/components/ui";
+import { Button, Stack } from "@parallel/components/ui";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { isNotEmptyText } from "@parallel/utils/strings";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";

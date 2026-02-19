@@ -1,20 +1,17 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
-  Box,
   Center,
-  Flex,
   FormControl,
   FormControlOptions,
   FormErrorMessage,
   FormLabel,
   Input,
-  Stack,
   ThemingProps,
 } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { DeleteIcon, EditIcon, SignatureIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
@@ -28,7 +25,7 @@ import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withPermission } from "@parallel/components/common/withPermission";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, Stack, Text } from "@parallel/components/ui";
 import {
   Contact_contactDocument,
   Contact_PetitionAccessFragment,
@@ -463,10 +460,12 @@ interface ToggleInputProps extends ThemingProps<"Input">, FormControlOptions {
   isEditing: boolean;
 }
 
-const ToggleInput = chakraForwardRef<"input", ToggleInputProps>(function ToggleInput(
-  { isEditing, children, ...props },
+const ToggleInput = chakraComponent<"input", ToggleInputProps>(function ToggleInput({
   ref,
-) {
+  isEditing,
+  children,
+  ...props
+}) {
   return isEditing ? (
     <Input ref={ref} {...props} />
   ) : children === null ? (

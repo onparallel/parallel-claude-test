@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { BracesIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { CopyLiquidReferenceButton_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { MouseEvent } from "react";
@@ -12,8 +12,8 @@ export interface CopyLiquidReferenceButtonProps extends Omit<IconButtonWithToolt
   onAddAliasToField?: () => Promise<string>;
 }
 
-export const CopyLiquidReferenceButton = chakraForwardRef<"button", CopyLiquidReferenceButtonProps>(
-  function CopyReferenceIconButton({ field, onClick, onAddAliasToField, ...props }, ref) {
+export const CopyLiquidReferenceButton = chakraComponent<"button", CopyLiquidReferenceButtonProps>(
+  function CopyReferenceIconButton({ ref, field, onClick, onAddAliasToField, ...props }) {
     const intl = useIntl();
     const copyFormula = useClipboardWithToast({
       text: intl.formatMessage({

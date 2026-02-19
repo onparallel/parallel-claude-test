@@ -1,18 +1,10 @@
 import { gql } from "@apollo/client";
-import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  Flex,
-  ListItem,
-  Stack,
-  UnorderedList,
-} from "@chakra-ui/react";
+import { Alert, AlertDescription, AlertIcon, ListItem, UnorderedList } from "@chakra-ui/react";
 import { ContactReference } from "@parallel/components/common/ContactReference";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { PetitionRemindersConfig } from "@parallel/components/petition-compose/PetitionRemindersConfig";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Flex, Stack, Text } from "@parallel/components/ui";
 import {
   useConfigureRemindersDialog_PetitionAccessFragment,
   useConfigureRemindersDialog_RemindersConfigFragment,
@@ -54,7 +46,7 @@ export function ConfigureRemindersDialog({
         />
       }
       body={
-        <Stack spacing={4}>
+        <Stack gap={4}>
           {optedOut.length ? (
             <Alert status="warning" rounded="md">
               <Flex alignItems="center" justifyContent="flex-start">

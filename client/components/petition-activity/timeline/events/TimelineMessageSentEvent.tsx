@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex } from "@chakra-ui/react";
+
 import { EmailSentIcon } from "@parallel/chakra/icons";
 import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -11,7 +11,7 @@ import { UserReference } from "../../../common/UserReference";
 import { useSentPetitionMessageDialog } from "../../dialogs/SentPetitionMessageDialog";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, Text } from "@parallel/components/ui";
 
 export interface TimelineMessageSentEventProps {
   event: TimelineMessageSentEvent_MessageSentEventFragment;

@@ -1,12 +1,12 @@
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { ProfileTypeStandardType } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 import { Text } from "@parallel/components/ui";
 
-export const ProfileTypeFieldStandardType = chakraForwardRef<
+export const ProfileTypeFieldStandardType = chakraComponent<
   "span",
   { type: ProfileTypeStandardType }
->(function ProfileTypeFieldStandardType({ type, ...props }, ref) {
+>(function ProfileTypeFieldStandardType({ ref, type, ...props }) {
   const intl = useIntl();
 
   const TYPES = {

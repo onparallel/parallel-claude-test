@@ -1,16 +1,16 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import { Box, Flex, HStack, IconButton } from "@chakra-ui/react";
+import { IconButton } from "@chakra-ui/react";
 import { AddIcon, CloseIcon } from "@parallel/chakra/icons";
 import { ProfileForm } from "@parallel/components/profiles/ProfileForm";
-import { Button } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack } from "@parallel/components/ui";
 import {
   ProfileDrawer_PetitionBaseFragment,
   ProfileDrawer_ProfileFragment,
   ProfileDrawer_profileDocument,
 } from "@parallel/graphql/__types";
 import { useRerender } from "@parallel/utils/useRerender";
-import { forwardRef } from "react";
+import { RefAttributes } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { MenuListProps, components } from "react-select";
 import {
@@ -30,86 +30,82 @@ interface ProfileDrawerProps {
   canAddProfiles?: boolean;
 }
 
-export const ProfileDrawer = forwardRef<ProfileSelectInstance<false>, ProfileDrawerProps>(
-  function ProfileDrawer(
-    {
+export function ProfileDrawer({
+  ref,
+  profileId,
+  petitionId,
+  profiles,
+  onChangeProfile,
+  onAssociateProfile,
+  isReadOnly,
+  canAddProfiles,
+  petition,
+}: ProfileDrawerProps & RefAttributes<ProfileSelectInstance<false>>) {
+  const intl = useIntl();
+
+  const { data: profileData, refetch: refetchProfile } = useQuery(ProfileDrawer_profileDocument, {
+    fetchPolicy: "cache-and-network",
+    variables: {
       profileId,
-      petitionId,
-      profiles,
-      onChangeProfile,
-      onAssociateProfile,
-      isReadOnly,
-      canAddProfiles,
-      petition,
     },
-    ref,
-  ) {
-    const intl = useIntl();
+  });
 
-    const { data: profileData, refetch: refetchProfile } = useQuery(ProfileDrawer_profileDocument, {
-      fetchPolicy: "cache-and-network",
-      variables: {
-        profileId,
-      },
-    });
+  const [key, rerender] = useRerender();
 
-    const [key, rerender] = useRerender();
+  const handleRefetchProfile = async () => {
+    try {
+      await refetchProfile();
+      rerender();
+    } catch {}
+  };
 
-    const handleRefetchProfile = async () => {
-      try {
-        await refetchProfile();
-        rerender();
-      } catch {}
-    };
-
-    return (
-      <Flex direction="column" background="white" height="100%">
-        <HStack
-          borderBottom="1px solid"
-          borderColor="gray.200"
-          height="53px"
-          alignItems="center"
-          paddingY={2}
-          paddingX={4}
-          justifyContent="space-between"
-        >
-          <Box flex="1" fontWeight={400} fontSize="md">
-            <ProfileSelect
-              ref={ref}
-              key={key}
-              isSync
-              value={profileId}
-              onChange={(profile) => onChangeProfile(profile?.id ?? profileId)}
-              options={profiles}
-              isDisabled={isReadOnly}
-              components={{ MenuList }}
-              {...({ onAssociateProfile, canAddProfiles } as any)}
-            />
-          </Box>
-          <IconButton
-            aria-label={intl.formatMessage({ id: "generic.close", defaultMessage: "Close" })}
-            variant="ghost"
-            onClick={() => onChangeProfile(null)}
-            icon={<CloseIcon boxSize={4} />}
+  return (
+    <Flex direction="column" background="white" height="100%">
+      <HStack
+        borderBottom="1px solid"
+        borderColor="gray.200"
+        height="53px"
+        alignItems="center"
+        paddingY={2}
+        paddingX={4}
+        justifyContent="space-between"
+      >
+        <Box flex="1" fontWeight={400} fontSize="md">
+          <ProfileSelect
+            ref={ref}
+            key={key}
+            isSync
+            value={profileId}
+            onChange={(profile) => onChangeProfile(profile?.id ?? profileId)}
+            options={profiles}
+            isDisabled={isReadOnly}
+            components={{ MenuList }}
+            {...({ onAssociateProfile, canAddProfiles } as any)}
           />
-        </HStack>
-        {profileData?.profile ? (
-          <ProfileForm
-            key={profileData.profile.id}
-            overlapsIntercomBadge
-            profile={profileData.profile}
-            onRefetch={handleRefetchProfile}
-            flex={1}
-            minHeight={0}
-            petition={petition}
-            petitionId={petitionId}
-            includeLinkToProfile
-          />
-        ) : null}
-      </Flex>
-    );
-  },
-);
+        </Box>
+        <IconButton
+          aria-label={intl.formatMessage({ id: "generic.close", defaultMessage: "Close" })}
+          variant="ghost"
+          onClick={() => onChangeProfile(null)}
+          icon={<CloseIcon boxSize={4} />}
+        />
+      </HStack>
+      {profileData?.profile ? (
+        <ProfileForm
+          key={profileData.profile.id}
+          overlapsIntercomBadge
+          profile={profileData.profile}
+          onRefetch={handleRefetchProfile}
+          flex={1}
+          minHeight={0}
+          petition={petition}
+          petitionId={petitionId}
+          includeLinkToProfile
+        />
+      ) : null}
+    </Flex>
+  );
+}
 
 const _fragments = {
   Profile: gql`

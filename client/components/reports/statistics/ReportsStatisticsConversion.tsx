@@ -1,11 +1,8 @@
 import {
-  Box,
   ButtonGroup,
   Center,
-  HStack,
   RadioProps,
   Spinner,
-  Stack,
   useRadioGroup,
   useTheme,
 } from "@chakra-ui/react";
@@ -16,7 +13,7 @@ import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { RadioButton } from "@parallel/components/common/RadioButton";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { Text } from "@parallel/components/ui";
+import { Box, HStack, Stack, Text } from "@parallel/components/ui";
 import { ReportTypeStatistics } from "@parallel/pages/app/reports/statistics";
 import { dateToFilenameFormat } from "@parallel/utils/dates";
 import { downloadSpreadsheet } from "@parallel/utils/downloadSpreadsheet";
@@ -461,7 +458,7 @@ export function ReportsStatisticsConversion({
           <HStack
             flex="1"
             width="100%"
-            spacing={8}
+            gap={8}
             paddingStart={14}
             paddingEnd={4}
             justifyContent="space-between"
@@ -469,7 +466,7 @@ export function ReportsStatisticsConversion({
             {calculatedData.map(({ id, label, total, percentage, relativePercentage }) => {
               const percent = chartType === "ABSOLUTE" ? percentage : relativePercentage;
               return (
-                <Stack key={id} spacing={0} paddingX={0} width="100%">
+                <Stack key={id} gap={0} paddingX={0} width="100%">
                   <HStack>
                     <Text fontWeight={500} color="gray.600" as="span">
                       {label}

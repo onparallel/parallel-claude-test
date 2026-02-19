@@ -1,8 +1,8 @@
-import { Checkbox, FormControl, FormLabel, Stack } from "@chakra-ui/react";
+import { Checkbox, FormControl, FormLabel } from "@chakra-ui/react";
 import { SimpleSelect, useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import { AutomaticNumberingType } from "@parallel/graphql/__types";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";

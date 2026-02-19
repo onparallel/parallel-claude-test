@@ -4,24 +4,21 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Box,
-  Flex,
   FormControl,
-  HStack,
   MenuButton,
   MenuDivider,
   MenuItem,
   MenuList,
-  Stack,
 } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import { BusinessIcon, ChevronDownIcon, DeleteIcon, UsersIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { AlertPopover } from "@parallel/components/common/AlertPopover";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
   SimpleSelect,
+  SimpleSelectInstance,
   SimpleSelectProps,
   useSimpleSelectOptions,
 } from "@parallel/components/common/SimpleSelect";
@@ -29,7 +26,7 @@ import { UserAvatar } from "@parallel/components/common/UserAvatar";
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
 import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
 import { UserSelect, UserSelectInstance } from "@parallel/components/common/UserSelect";
-import { Avatar, Button, Text } from "@parallel/components/ui";
+import { Avatar, Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   ProfileTypeField,
   ProfileTypeFieldPermissionType,
@@ -42,10 +39,9 @@ import {
   useProfileTypeFieldPermissionDialog_usersDocument,
 } from "@parallel/graphql/__types";
 import { assertTypename, isTypename } from "@parallel/utils/apollo/typename";
-import { Focusable } from "@parallel/utils/types";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { nanoid } from "nanoid";
-import { forwardRef, useRef } from "react";
+import { RefAttributes, useRef } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";
@@ -501,10 +497,10 @@ const _queries = [
 interface ProfileTypeFieldPermissionTypeSelectProps
   extends Omit<SimpleSelectProps<ProfileTypeFieldPermissionType, false>, "options"> {}
 
-const ProfileTypeFieldPermissionTypeSelect = forwardRef<
-  Focusable,
-  ProfileTypeFieldPermissionTypeSelectProps
->(function ProfileTypeFieldPermissionTypeSelect({ ...props }, ref) {
+function ProfileTypeFieldPermissionTypeSelect(
+  props: ProfileTypeFieldPermissionTypeSelectProps &
+    RefAttributes<SimpleSelectInstance<ProfileTypeFieldPermissionType, false>>,
+) {
   const options = useSimpleSelectOptions(
     (intl) => [
       {
@@ -526,13 +522,13 @@ const ProfileTypeFieldPermissionTypeSelect = forwardRef<
     [],
   );
 
-  return <SimpleSelect ref={ref as any} options={options} {...props} />;
-});
+  return <SimpleSelect options={options} {...props} />;
+}
 
-const ProfileTypeFieldPermissionTypeText = chakraForwardRef<
+const ProfileTypeFieldPermissionTypeText = chakraComponent<
   "span",
   { type: ProfileTypeFieldPermissionType }
->(function ProfileTypeFieldPermissionTypeText({ type, ...props }, ref) {
+>(function ProfileTypeFieldPermissionTypeText({ ref, type, ...props }) {
   return (
     <Text ref={ref as any} as="span" {...props}>
       {type === "HIDDEN" ? (

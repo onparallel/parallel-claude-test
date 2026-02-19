@@ -8,7 +8,7 @@ import {
   useStyleConfig,
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Button } from "@parallel/components/ui";
 import { ReactNode } from "react";
 import { omit, pick } from "remeda";
@@ -23,11 +23,15 @@ export interface ButtonWithMoreOptionsProps
   colorPalette?: string;
 }
 
-export const ButtonWithMoreOptions = chakraForwardRef<"button", ButtonWithMoreOptionsProps>(
-  function ButtonWithMoreOptions(
-    { as, options, moreOptionsButtonProps, colorPalette, ...props },
+export const ButtonWithMoreOptions = chakraComponent<"button", ButtonWithMoreOptionsProps>(
+  function ButtonWithMoreOptions({
     ref,
-  ) {
+    as,
+    options,
+    moreOptionsButtonProps,
+    colorPalette,
+    ...props
+  }) {
     const layoutProps = pick(props, layoutPropNames as any);
     const otherProps = omitThemingProps(omit(props, layoutPropNames as any));
     const themingProps = pick(props, ["styleConfig", "size", "variant"]);

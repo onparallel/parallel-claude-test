@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, Center, Flex, Image, Stack, useCounter } from "@chakra-ui/react";
+import { Center, Image, useCounter } from "@chakra-ui/react";
 import { keyframes } from "@emotion/react";
 import { Logo } from "@parallel/components/common/Logo";
 import { Steps } from "@parallel/components/common/Steps";
@@ -17,6 +17,7 @@ import { createApolloClient } from "@parallel/utils/apollo/client";
 import { asSupportedUserLocale } from "@parallel/utils/locales";
 import { Maybe } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
+import { Box, Flex, Stack } from "@parallel/components/ui";
 import { GetServerSidePropsContext, GetServerSidePropsResult } from "next";
 import { useEffect, useRef } from "react";
 import { useIntl } from "react-intl";
@@ -164,7 +165,7 @@ function Signup({ code, source, activationEmail }: SignupProps) {
               <Flex width="100%">
                 <Steps currentStep={currentStep} width="100%">
                   {[0, 1, 2, 3].map((step) => (
-                    <Stack key={step} spacing={10}>
+                    <Stack key={step} gap={10}>
                       {[0, 1, 2].map((i) => {
                         const imageName = `${step > i ? "checked" : "unchecked"}-field-${
                           i + 1

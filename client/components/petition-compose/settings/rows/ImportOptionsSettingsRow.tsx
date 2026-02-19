@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
-import { Box } from "@chakra-ui/react";
-import { Button } from "@parallel/components/ui";
+
+import { Box, Button } from "@parallel/components/ui";
 import { UpdatePetitionFieldInput } from "@parallel/graphql/__types";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { SettingsRow } from "./SettingsRow";

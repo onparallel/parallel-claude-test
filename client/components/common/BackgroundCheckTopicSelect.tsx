@@ -1,12 +1,12 @@
 import { BACKGROUND_CHECK_TOPICS } from "@parallel/utils/backgroundCheckTopics";
-import { forwardRef, useMemo } from "react";
+import { RefAttributes, useMemo } from "react";
 import { entries, map, pipe, sortBy } from "remeda";
 import { SimpleSelect, SimpleSelectInstance, SimpleSelectProps } from "./SimpleSelect";
 
-export const BackgroundCheckTopicSelect = forwardRef<
-  SimpleSelectInstance<string, boolean>,
-  Omit<SimpleSelectProps<string, boolean>, "options">
->(function BackgroundCheckTopicSelect(props, ref) {
+export function BackgroundCheckTopicSelect(
+  props: Omit<SimpleSelectProps<string, boolean>, "options"> &
+    RefAttributes<SimpleSelectInstance<string, boolean>>,
+) {
   const options = useMemo(() => {
     return pipe(
       BACKGROUND_CHECK_TOPICS,
@@ -15,5 +15,5 @@ export const BackgroundCheckTopicSelect = forwardRef<
       sortBy((i) => i.label),
     );
   }, []);
-  return <SimpleSelect ref={ref} options={options} {...props} />;
-});
+  return <SimpleSelect options={options} {...props} />;
+}

@@ -1,14 +1,14 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, HStack } from "@chakra-ui/react";
+
 import { DraggableAttributes } from "@dnd-kit/core";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { DeleteIcon, DragHandleIcon, SettingsIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Card, CardProps } from "@parallel/components/common/Card";
 import { ConfimationPopover } from "@parallel/components/common/ConfirmationPopover";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { OverflownText } from "@parallel/components/common/OverflownText";
-import { Button } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack } from "@parallel/components/ui";
 import { DashboardModuleCard_DashboardModuleFragment } from "@parallel/graphql/__types";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -28,24 +28,22 @@ export interface DashboardModuleCardProps extends CardProps {
   listeners?: SyntheticListenerMap;
 }
 
-export const DashboardModuleCard = chakraForwardRef<"section", DashboardModuleCardProps>(
-  function DashboardModuleCard(
-    {
-      module,
-      children,
-      headerAddon,
-      linkToResults,
-      isEditing,
-      isReadOnly,
-      onEdit,
-      onDelete,
-      isDragging,
-      attributes,
-      listeners,
-      ...props
-    },
+export const DashboardModuleCard = chakraComponent<"section", DashboardModuleCardProps>(
+  function DashboardModuleCard({
     ref,
-  ) {
+    module,
+    children,
+    headerAddon,
+    linkToResults,
+    isEditing,
+    isReadOnly,
+    onEdit,
+    onDelete,
+    isDragging,
+    attributes,
+    listeners,
+    ...props
+  }) {
     const intl = useIntl();
 
     const colSpan = { SMALL: 1, MEDIUM: 2, LARGE: 4 }[module.size];
@@ -102,7 +100,7 @@ export const DashboardModuleCard = chakraForwardRef<"section", DashboardModuleCa
             <DragHandleIcon role="presentation" transform="rotate(90deg)" />
           </Box>
         )}
-        <HStack as="header" marginBottom={1} fontSize="lg" minHeight={"32px"} spacing={1}>
+        <HStack as="header" marginBottom={1} fontSize="lg" minHeight={"32px"} gap={1}>
           <OverflownText
             flex={1}
             textStyle={isNullish(module.title) ? "hint" : undefined}
@@ -117,7 +115,7 @@ export const DashboardModuleCard = chakraForwardRef<"section", DashboardModuleCa
           </OverflownText>
           {isEditing ? (
             <>
-              <HStack spacing={1} alignSelf="flex-end">
+              <HStack gap={1} alignSelf="flex-end">
                 <IconButtonWithTooltip
                   size="sm"
                   variant="ghost"

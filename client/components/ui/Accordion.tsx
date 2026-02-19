@@ -11,7 +11,7 @@ import {
   AccordionProps,
   Accordion as ChakraAccordion,
 } from "@chakra-ui/react";
-import { forwardRef, ReactNode } from "react";
+import { ReactNode, RefAttributes } from "react";
 
 // Docs: https://chakra-ui.com/docs/components/accordion
 
@@ -33,9 +33,15 @@ interface AccordionRootProps
   onValueChange?: (details: AccordionValueChangeDetails) => void;
 }
 
-export const AccordionRoot = forwardRef<HTMLDivElement, AccordionRootProps>((props, ref) => {
-  const { multiple, collapsible, defaultValue, value, onValueChange, ...rest } = props;
-
+export function AccordionRoot({
+  multiple,
+  collapsible,
+  defaultValue,
+  value,
+  onValueChange,
+  ref,
+  ...rest
+}: AccordionRootProps & RefAttributes<HTMLDivElement>) {
   // Map v3 props to v2 props
   const v2Props: AccordionProps = {
     ...rest,
@@ -56,43 +62,49 @@ export const AccordionRoot = forwardRef<HTMLDivElement, AccordionRootProps>((pro
   };
 
   return <ChakraAccordion ref={ref} {...v2Props} />;
-});
+}
 
 // Item component - v3 API with value prop
 interface AccordionItemWrapperProps extends AccordionItemProps {
   value?: string; // Required for v3 but optional for gradual migration
 }
 
-export const AccordionItemWrapper = forwardRef<HTMLDivElement, AccordionItemWrapperProps>(
-  (props, ref) => {
-    const { value: _value, ...rest } = props;
-    // Note: value prop is stored for future v3 migration but not used in v2
-    return <AccordionItem ref={ref} {...rest} />;
-  },
-);
+export function AccordionItemWrapper({
+  value: _value,
+  ref,
+  ...rest
+}: AccordionItemWrapperProps & RefAttributes<HTMLDivElement>) {
+  // Note: value prop is stored for future v3 migration but not used in v2
+  return <AccordionItem ref={ref} {...rest} />;
+}
 
 // ItemTrigger component - maps to AccordionButton
-export const AccordionItemTrigger = forwardRef<HTMLButtonElement, AccordionButtonProps>(
-  (props, ref) => {
-    return <AccordionButton ref={ref} {...props} />;
-  },
-);
+export function AccordionItemTrigger({
+  ref,
+  ...props
+}: AccordionButtonProps & RefAttributes<HTMLButtonElement>) {
+  return <AccordionButton ref={ref} {...props} />;
+}
 
 // ItemIndicator component - maps to AccordionIcon
-export const AccordionItemIndicator = forwardRef<HTMLElement, AccordionIconProps>((props, ref) => {
+export function AccordionItemIndicator({
+  ref,
+  ...props
+}: AccordionIconProps & RefAttributes<HTMLElement>) {
   return <AccordionIcon ref={ref} {...props} />;
-});
+}
 
 // ItemContent component - maps to AccordionPanel
 interface AccordionItemContentProps extends AccordionPanelProps {
   children?: ReactNode;
 }
 
-export const AccordionItemContent = forwardRef<HTMLDivElement, AccordionItemContentProps>(
-  (props, ref) => {
-    return <AccordionPanel ref={ref} {...props} />;
-  },
-);
+export function AccordionItemContent({
+  ref,
+  ...props
+}: AccordionItemContentProps & RefAttributes<HTMLDivElement>) {
+  return <AccordionPanel ref={ref} {...props} />;
+}
 
 // ItemBody component - wrapper for content inside ItemContent
 interface AccordionItemBodyProps {
@@ -100,11 +112,12 @@ interface AccordionItemBodyProps {
   [key: string]: any;
 }
 
-export const AccordionItemBody = forwardRef<HTMLDivElement, AccordionItemBodyProps>(
-  (props, ref) => {
-    return <div ref={ref} {...props} />;
-  },
-);
+export function AccordionItemBody({
+  ref,
+  ...props
+}: AccordionItemBodyProps & RefAttributes<HTMLDivElement>) {
+  return <div ref={ref} {...props} />;
+}
 
 // Namespace to use as Accordion.XXX
 export const Accordion = {
@@ -115,11 +128,3 @@ export const Accordion = {
   ItemContent: AccordionItemContent,
   ItemBody: AccordionItemBody,
 };
-
-// Assign display names for debugging
-AccordionRoot.displayName = "Accordion.Root";
-AccordionItemWrapper.displayName = "Accordion.Item";
-AccordionItemTrigger.displayName = "Accordion.ItemTrigger";
-AccordionItemIndicator.displayName = "Accordion.ItemIndicator";
-AccordionItemContent.displayName = "Accordion.ItemContent";
-AccordionItemBody.displayName = "Accordion.ItemBody";

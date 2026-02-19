@@ -1,5 +1,5 @@
-import { HStack } from "@chakra-ui/react";
 import { downloadLocalFile } from "@parallel/utils/downloadLocalFile";
+import { HStack } from "@parallel/components/ui";
 import { FileAttachment } from "./FileAttachment";
 
 interface LocalFileAttachmentsProps {

@@ -2,7 +2,10 @@ import { Locator, Page } from "@playwright/test";
 import { getAriaControls } from "../aria/getAriaControls";
 import { waitForSelectLoading } from "./waitForSelectLoading";
 
-type UserOrGroup = string | { type: "User"; email: string } | { type: "UserGroup"; name: string };
+export type UserOrGroup =
+  | string
+  | { type: "User"; email: string }
+  | { type: "UserGroup"; name: string };
 
 export async function fillUserSelect(page: Page, select: Locator, usersOrGroups: UserOrGroup[]) {
   await select.click();

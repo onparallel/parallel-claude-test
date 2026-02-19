@@ -1,13 +1,23 @@
 import "./../init";
 // keep this space to prevent import sorting removing init from top
+import { GetSecretValueCommand, SecretsManagerClient } from "@aws-sdk/client-secrets-manager";
+import { fromInstanceMetadata } from "@aws-sdk/credential-providers";
 import { Knex } from "knex";
-import { isNullish, pick } from "remeda";
+import { isNonNullish, isNullish, pick } from "remeda";
+import { assert } from "ts-essentials";
 import yargs from "yargs";
 import { createContainer } from "../container";
 import { ProfileRelationshipType, ProfileType, ProfileTypeField } from "../db/__types";
 import { KNEX } from "../db/knex";
 import { getOsborneSapSettings } from "../integrations/profile-sync/sap/osborne";
+import {
+  SapEntitySetFilter,
+  SapProfileSyncIntegrationSettings,
+} from "../integrations/profile-sync/sap/types";
 import { loadEnv } from "../util/loadEnv";
+import { never } from "../util/never";
+
+const STAGING_BPS = ["1505412", "1505422"];
 
 function findProfileTypeById(id: number | undefined, options: ProfileType[], key: string) {
   let result = id;
@@ -68,7 +78,7 @@ function extractFieldIds<T extends { [key: string]: string }>(
 
 async function main() {
   const opts = await yargs
-    .usage("Usage: $0 --orgId [orgId]")
+    .usage('Usage: NODE_ENV=production ENV=staging OSBORNE_CREDENTIALS="x:x" $0 --orgId [orgId]')
     .option("orgId", {
       required: true,
       type: "number",
@@ -106,6 +116,21 @@ async function main() {
   await loadEnv();
   const container = createContainer();
   const knex = container.get<Knex>(KNEX);
+
+  const secretsManager = new SecretsManagerClient({
+    credentials: fromInstanceMetadata({
+      maxRetries: 3,
+      timeout: 3_000,
+    }),
+    region: process.env.AWS_REGION!,
+  });
+  const response = await secretsManager.send(
+    new GetSecretValueCommand({
+      SecretId: "arn:aws:secretsmanager:eu-central-1:749273139513:secret:ops/certificate-EnGjo7",
+    }),
+  );
+  assert(isNonNullish(response.SecretString));
+  const secret = JSON.parse(response.SecretString) as { passphrase: string; pfx: string };
 
   const [organization] = await knex
     .from("organization")
@@ -176,102 +201,166 @@ async function main() {
     .whereNotNull("alias")
     .select("*");
 
-  const settings = getOsborneSapSettings({
-    individualProfileTypeId: individualPT,
-    individualProfileTypeFieldIds: extractFieldIds(
-      {
-        name: "full_name",
-        email: "p_email",
-        phone: "p_phone_number",
-        externalId: "external_id",
-        relationship: "p_relationship",
-        addressId: "p_address",
-        clientPartner: "client_partner",
-        clientStatus: "oc_client_status",
-        city: "p_city",
-        postalCode: "p_zip",
-        country: "p_country_of_residence",
-        taxNumber: "p_tax_id",
-        isNewClient: "is_new_client",
-        nonFaceToFaceCustomer: "non_face_to_face_customer",
-        language: "language",
-        activity: "activity",
-        kycRefreshDate: "kyc_refresh_date",
-        kycStartDate: "kyc_start_date",
-        prescoringRisk: "prescoring_risk",
-        globalRisk: "global_risk",
-        risk: "p_risk",
+  const settings: SapProfileSyncIntegrationSettings = {
+    ...getOsborneSapSettings({
+      environment:
+        process.env.ENV === "staging"
+          ? "SANDBOX"
+          : process.env.ENV === "production"
+            ? process.env.OSBORNE_SANDBOX
+              ? "SANDBOX"
+              : "PRODUCTION"
+            : never(),
+      authorization: {
+        type: "CERTIFICATE",
+        ...secret,
       },
-      individualFields,
-    ),
-    legalEntityProfileTypeId: legalEntityPT,
-    legalEntityProfileTypeFieldIds: extractFieldIds(
-      {
-        activity: "activity",
-        addressId: "p_registered_address",
-        city: "p_city",
-        clientPartner: "client_partner",
-        clientStatus: "oc_client_status",
-        country: "p_country",
-        email: "email",
-        externalId: "external_id",
-        globalRisk: "global_risk",
-        isNewClient: "is_new_client",
-        kycRefreshDate: "kyc_refresh_date",
-        kycStartDate: "kyc_start_date",
-        language: "language",
-        name: "p_entity_name",
-        nonFaceToFaceCustomer: "non_face_to_face_customer",
-        phone: "p_phone_number",
-        postalCode: "p_zip",
-        prescoringRisk: "prescoring_risk",
-        relationship: "p_relationship",
-        risk: "p_risk",
-        taxNumber: "p_tax_id",
-        entityType: "p_entity_type",
-      },
-      legalEntityFields,
-    ),
-    matterProfileTypeId: matterPT,
-    matterProfileTypeFieldIds: extractFieldIds(
-      {
-        amlSubjectMatters: "aml_subject_matters",
-        countriesInvolved: "p_countries_involved",
-        matterDescription: "p_matter_description",
-        matterName: "p_matter_name",
-        matterRisk: "p_matter_risk",
-        matterStatus: "matter_status",
-        matterSupervisor: "matter_supervisor",
-        practiceGroup: "practice_group",
-        projectId: "p_matter_id",
-        subpracticeGroup: "subpractice_group",
-        tempActiveUntil: "temp_active_until",
-        transactionVolume: "transaction_volume",
-      },
-      matterFields,
-    ),
-    clientMatterRelationshipTypeId: findRelationshipTypeByAlias(
-      clientMatterRelationshipTypeAlias ?? "p_client__matter",
-      relationshipTypes,
-      "clientMatterRelationshipTypeAlias",
-    ),
-    ...(process.env.ENV === "staging"
-      ? {
-          projectFilter: {
-            operator: "and",
-            conditions: [
-              {
-                left: { type: "property", name: "CreatedOn" },
-                operator: "ge",
-                right: { type: "literal", value: "datetime'2025-01-01T00:00:00'" },
-              },
-            ],
-          },
-        }
-      : {}),
-  });
+      individualProfileTypeId: individualPT,
+      individualProfileTypeFieldIds: extractFieldIds(
+        {
+          name: "full_name",
+          email: "p_email",
+          phone: "p_phone_number",
+          externalId: "external_id",
+          relationship: "p_relationship",
+          addressId: "p_address",
+          clientPartner: "client_partner",
+          clientPartnerText: "client_partner_text",
+          clientStatus: "oc_client_status",
+          city: "p_city",
+          postalCode: "p_zip",
+          country: "p_country_of_residence",
+          taxNumber: "p_tax_id",
+          isNewClient: "is_new_client",
+          nonFaceToFaceCustomer: "non_face_to_face_customer",
+          language: "language",
+          activity: "activity",
+          kycRefreshDate: "kyc_refresh_date",
+          kycStartDate: "kyc_start_date",
+          prescoringRisk: "prescoring_risk",
+          globalRisk: "global_risk",
+          risk: "p_risk",
+        },
+        individualFields,
+      ),
+      legalEntityProfileTypeId: legalEntityPT,
+      legalEntityProfileTypeFieldIds: extractFieldIds(
+        {
+          activity: "activity",
+          addressId: "p_registered_address",
+          city: "p_city",
+          clientPartner: "client_partner",
+          clientPartnerText: "client_partner_text",
+          clientStatus: "oc_client_status",
+          country: "p_country",
+          email: "email",
+          externalId: "external_id",
+          globalRisk: "global_risk",
+          isNewClient: "is_new_client",
+          kycRefreshDate: "kyc_refresh_date",
+          kycStartDate: "kyc_start_date",
+          language: "language",
+          name: "p_entity_name",
+          nonFaceToFaceCustomer: "non_face_to_face_customer",
+          phone: "p_phone_number",
+          postalCode: "p_zip",
+          prescoringRisk: "prescoring_risk",
+          relationship: "p_relationship",
+          risk: "p_risk",
+          taxNumber: "p_tax_id",
+          entityType: "p_entity_type",
+        },
+        legalEntityFields,
+      ),
+      matterProfileTypeId: matterPT,
+      matterProfileTypeFieldIds: extractFieldIds(
+        {
+          amlSubjectMatters: "aml_subject_matters",
+          countriesInvolved: "p_countries_involved",
+          matterDescription: "p_matter_description",
+          matterName: "p_matter_name",
+          matterRisk: "p_matter_risk",
+          matterStatus: "matter_status",
+          matterSupervisor: "matter_supervisor",
+          matterSupervisorText: "matter_supervisor_text",
+          practiceGroup: "practice_group",
+          projectId: "p_matter_id",
+          subpracticeGroup: "subpractice_group",
+          tempActiveUntil: "temp_active_until",
+          transactionVolume: "transaction_volume",
+        },
+        matterFields,
+      ),
+      clientMatterRelationshipTypeId: findRelationshipTypeByAlias(
+        clientMatterRelationshipTypeAlias ?? "p_client__matter",
+        relationshipTypes,
+        "clientMatterRelationshipTypeAlias",
+      ),
+      ...(process.env.ENV === "staging"
+        ? {
+            projectFilter: {
+              operator: "and",
+              conditions: [
+                {
+                  left: { type: "property", name: "CreatedOn" },
+                  operator: "ge",
+                  right: { type: "literal", value: "datetime'2025-01-01T00:00:00'" },
+                },
+                {
+                  operator: "or",
+                  conditions: STAGING_BPS.map((customer) => ({
+                    left: { type: "property", name: "Customer" },
+                    operator: "eq",
+                    right: { type: "literal", value: `'${customer}'` },
+                  })),
+                },
+              ],
+            },
+            businessPartnerFilter: {
+              operator: "or",
+              conditions: STAGING_BPS.map((customer) => ({
+                left: { type: "property", name: "BusinessPartner" },
+                operator: "eq",
+                right: { type: "literal", value: `'${customer}'` },
+              })),
+            },
+          }
+        : process.env.ENV === "production"
+          ? process.env.OSBORNE_SANDBOX
+            ? {
+                projectFilter: {
+                  operator: "and",
+                  conditions: [
+                    {
+                      left: { type: "property", name: "CreatedOn" },
+                      operator: "ge",
+                      right: { type: "literal", value: "datetime'2025-01-01T00:00:00'" },
+                    },
+                    ...STAGING_BPS.map(
+                      (customer) =>
+                        ({
+                          left: { type: "property", name: "Customer" },
+                          operator: "ne",
+                          right: { type: "literal", value: `'${customer}'` },
+                        }) as SapEntitySetFilter,
+                    ),
+                  ],
+                },
+                businessPartnerFilter: {
+                  operator: "and",
+                  conditions: STAGING_BPS.map((customer) => ({
+                    left: { type: "property", name: "BusinessPartner" },
+                    operator: "ne",
+                    right: { type: "literal", value: `'${customer}'` },
+                  })),
+                },
+              }
+            : {}
+          : {}),
+    }),
+  };
 
-  console.log(settings);
+  console.log(JSON.stringify(settings));
 }
 
 main().then(() => {

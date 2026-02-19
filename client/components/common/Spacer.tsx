@@ -1,4 +1,4 @@
-import { Box, BoxProps } from "@chakra-ui/react";
+import { Box, BoxProps } from "@parallel/components/ui";
 
 export type SpacerProps = BoxProps;
 

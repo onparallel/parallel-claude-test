@@ -1,12 +1,4 @@
-import {
-  Center,
-  HStack,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  Stack,
-} from "@chakra-ui/react";
+import { Center, ModalBody, ModalCloseButton, ModalContent, ModalHeader } from "@chakra-ui/react";
 import { DownloadIcon } from "@parallel/chakra/icons";
 import { Dropzone } from "@parallel/components/common/Dropzone";
 import { FileSize } from "@parallel/components/common/FileSize";
@@ -19,7 +11,7 @@ import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog"
 import { useState } from "react";
 import { FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 
 const MAX_FILESIZE = 1024 * 1024 * 10;
 
@@ -138,7 +130,7 @@ function ImportSelectOptionsDialog({
             </Text>
           )}
 
-          <HStack marginTop={4} marginBottom={2} spacing={4}>
+          <HStack marginTop={4} marginBottom={2} gap={4}>
             <Button
               fontWeight="bold"
               variant="link"

@@ -1,19 +1,9 @@
 import { gql } from "@apollo/client";
-import {
-  Badge,
-  Box,
-  Center,
-  ComponentWithAs,
-  Flex,
-  FlexProps,
-  HStack,
-  Icon,
-  IconProps,
-  Stack,
-} from "@chakra-ui/react";
+import { Badge, Center, ComponentWithAs, Icon, IconProps } from "@chakra-ui/react";
 import { CommentIcon, InfoCircleIcon, ListIcon, UserArrowIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { RecipientViewSidebar_PublicPetitionAccessFragment } from "@parallel/graphql/__types";
+import { Box, Flex, FlexProps, HStack, Stack } from "@parallel/components/ui";
 import { AnimatePresence, motion } from "framer-motion";
 import { useIntl } from "react-intl";
 import { sumBy } from "remeda";
@@ -48,7 +38,7 @@ export function RecipientViewSidebar({ keycode, access, currentPage }: Recipient
   return (
     <HStack
       display={{ base: "none", [breakpoint]: "flex" }}
-      spacing={0}
+      gap={0}
       align="top"
       backgroundColor="white"
     >
@@ -85,7 +75,7 @@ export function RecipientViewSidebar({ keycode, access, currentPage }: Recipient
         ) : null}
       </AnimatePresence>
 
-      <Stack spacing={0} align="center" height="100%">
+      <Stack gap={0} align="center" height="100%">
         <SidebarIconButton
           isActive={isOpen && sidebarState === "CONTENTS"}
           label={intl.formatMessage({
@@ -176,7 +166,7 @@ export function RecipientViewMobileNavigation({
       <HStack
         display={{ base: "flex", [breakpoint]: "none" }}
         backgroundColor="white"
-        spacing={0}
+        gap={0}
         justify="space-between"
         align="center"
         paddingX={4}
@@ -295,7 +285,7 @@ function SidebarIconButton({
   );
 }
 
-const RecipientViewSidebarBody = chakraForwardRef<
+const RecipientViewSidebarBody = chakraComponent<
   "div",
   {
     keycode: string;
@@ -304,10 +294,15 @@ const RecipientViewSidebarBody = chakraForwardRef<
     isRecipientViewContentsHidden: boolean;
     closeOnNavigate?: boolean;
   }
->(function RecipientViewSidebarBody(
-  { keycode, currentPage, access, isRecipientViewContentsHidden, closeOnNavigate, ...props },
+>(function RecipientViewSidebarBody({
   ref,
-) {
+  keycode,
+  currentPage,
+  access,
+  isRecipientViewContentsHidden,
+  closeOnNavigate,
+  ...props
+}) {
   const { setSidebarState, sidebarState } = useRecipientViewSidebarContext();
 
   const handleClose = () => {

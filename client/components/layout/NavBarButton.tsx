@@ -1,6 +1,6 @@
 import { ButtonOptions, Center, ThemingProps } from "@chakra-ui/react";
 import { Button } from "@parallel/components/ui";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { ReactElement, ReactNode } from "react";
 import { OverflownText } from "../common/OverflownText";
 
@@ -13,10 +13,17 @@ interface NavBarButtonProps
   badge?: ReactNode;
 }
 
-export const NavBarButton = chakraForwardRef<"button", NavBarButtonProps>(function NavBarButton(
-  { children, onClick, section, isActive, icon, badge, sx = {}, ...props },
+export const NavBarButton = chakraComponent<"button", NavBarButtonProps>(function NavBarButton({
   ref,
-) {
+  children,
+  onClick,
+  section,
+  isActive,
+  icon,
+  badge,
+  sx = {},
+  ...props
+}) {
   return (
     <Button
       ref={ref}

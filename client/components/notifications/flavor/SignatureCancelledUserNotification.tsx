@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { Circle } from "@chakra-ui/react";
 import { SignatureIcon } from "@parallel/chakra/icons";
 import { SignatureCancelledUserNotification_SignatureCancelledUserNotificationFragment } from "@parallel/graphql/__types";
-import { forwardRef } from "react";
+import { RefAttributes } from "react";
 import { FormattedMessage } from "react-intl";
 import { PetitionUserNotification } from "./PetitionUserNotification";
 
@@ -11,10 +11,11 @@ export interface SignatureCancelledUserNotificationProps {
   notification: SignatureCancelledUserNotification_SignatureCancelledUserNotificationFragment;
 }
 
-export const SignatureCancelledUserNotification = forwardRef<
-  HTMLElement,
-  SignatureCancelledUserNotificationProps
->(function SignatureCancelledUserNotification({ isFirst, notification }, ref) {
+export function SignatureCancelledUserNotification({
+  isFirst,
+  notification,
+  ref,
+}: SignatureCancelledUserNotificationProps & RefAttributes<HTMLElement>) {
   return (
     <PetitionUserNotification
       ref={ref}
@@ -49,7 +50,7 @@ export const SignatureCancelledUserNotification = forwardRef<
       )}
     </PetitionUserNotification>
   );
-});
+}
 
 const _fragments = {
   SignatureCancelledUserNotification: gql`

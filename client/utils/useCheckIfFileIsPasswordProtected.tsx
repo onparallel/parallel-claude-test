@@ -1,13 +1,14 @@
-import { FormControl, FormErrorMessage, FormLabel, HStack, Stack } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
-import { Box, Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import * as Sentry from "@sentry/nextjs";
 import { useCallback, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
+import { checkPdfPassword } from "./checkPdfPassword";
 import { loadPdfJs, PdfJs } from "./pdfjs";
 import { useRegisterWithRef } from "./react-form-hook/useRegisterWithRef";
 import { turnOffPasswordManagers } from "./turnOffPasswordManagers";
@@ -27,7 +28,7 @@ export function useCheckIfFileIsPasswordProtected() {
       }
       let hasPassword: boolean;
       try {
-        hasPassword = !(await checkPassword(pdfJs, file, undefined));
+        hasPassword = !(await checkPdfPassword(pdfJs, file, undefined));
       } catch (error) {
         // this is usually due to malformed pdf files. we give the ability to upload anyways
         try {
@@ -55,16 +56,6 @@ export function useCheckIfFileIsPasswordProtected() {
   }, []);
 }
 
-async function checkPassword(pdfjs: PdfJs, file: File, password: string | undefined) {
-  return new Promise<boolean>(async (resolve, reject) => {
-    const task = pdfjs.getDocument({ data: await file.arrayBuffer(), password });
-    task.onPassword = () => {
-      resolve(false);
-    };
-    task.promise.then(() => resolve(true), reject);
-  });
-}
-
 function EnterFilePasswordDialog({
   pdfJs,
   file,
@@ -79,7 +70,7 @@ function EnterFilePasswordDialog({
   const passwordRef = useRef<HTMLInputElement>(null);
   const passwordProps = useRegisterWithRef(passwordRef, register, "password", {
     async validate(password) {
-      return (await checkPassword(pdfJs, file, password)) || "INVALID";
+      return (await checkPdfPassword(pdfJs, file, password)) || "INVALID";
     },
   });
 

@@ -1,19 +1,19 @@
-import { Center, HStack } from "@chakra-ui/react";
+import { Center } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { generateCssStripe } from "@parallel/utils/css";
 import { AnimatePresence } from "framer-motion";
 import { FormattedMessage } from "react-intl";
-import { Text } from "@parallel/components/ui";
+import { HStack, Text } from "@parallel/components/ui";
 interface PetitionComposeNewFieldPlaceholderProps {
   isGroupChild?: boolean;
   isTemplate?: boolean;
 }
 
-export const PetitionComposeNewFieldPlaceholder = chakraForwardRef<
+export const PetitionComposeNewFieldPlaceholder = chakraComponent<
   "div",
   PetitionComposeNewFieldPlaceholderProps
->(function PetitionComposeNewFieldPlaceholder({ isTemplate, isGroupChild, ...props }, ref) {
+>(function PetitionComposeNewFieldPlaceholder({ ref, isTemplate, isGroupChild, ...props }) {
   return (
     <AnimatePresence>
       <Center
@@ -27,7 +27,7 @@ export const PetitionComposeNewFieldPlaceholder = chakraForwardRef<
         backgroundColor="white"
         {...props}
       >
-        <HStack padding={6} spacing={4}>
+        <HStack padding={6} gap={4}>
           <ArrowBackIcon color="gray.400" />
           <Text color="gray.400" fontWeight={400}>
             {isGroupChild ? (

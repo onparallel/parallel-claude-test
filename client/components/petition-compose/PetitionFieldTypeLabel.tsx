@@ -1,7 +1,7 @@
-import { Box, BoxProps } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { usePetitionFieldTypeColor } from "@parallel/utils/petitionFields";
+import { Box, BoxProps } from "@parallel/components/ui";
 import { PetitionFieldTypeIcon } from "../petition-common/PetitionFieldTypeIcon";
 import { PetitionFieldTypeText } from "./PetitionFieldTypeText";
 
@@ -10,8 +10,8 @@ interface PetitionFieldTypeLabelProps {
   labelProps?: BoxProps;
 }
 
-export const PetitionFieldTypeLabel = chakraForwardRef<"div", PetitionFieldTypeLabelProps>(
-  function PetitionFieldTypeLabel({ type, labelProps, ...props }, ref) {
+export const PetitionFieldTypeLabel = chakraComponent<"div", PetitionFieldTypeLabelProps>(
+  function PetitionFieldTypeLabel({ ref, type, labelProps, ...props }) {
     const color = usePetitionFieldTypeColor(type);
     return (
       <Box ref={ref} display="inline-flex" alignItems="center" {...props}>

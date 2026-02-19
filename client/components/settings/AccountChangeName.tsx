@@ -8,10 +8,8 @@ import {
   FormLabel,
   Heading,
   Input,
-  Stack,
-  StackProps,
 } from "@chakra-ui/react";
-import { Button } from "@parallel/components/ui";
+import { Button, Stack, StackProps } from "@parallel/components/ui";
 import { AccountChangeName_UserFragment } from "@parallel/graphql/__types";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
@@ -61,7 +59,7 @@ export function AccountChangeName({ user, onSubmit, ...props }: AccountChangeNam
           onSubmit(values);
           reset(values);
         })}
-        spacing={4}
+        gap={4}
       >
         <FormControl id="first-name" isInvalid={!!errors.firstName} isDisabled={user.isSsoUser}>
           <FormLabel fontWeight="semibold">

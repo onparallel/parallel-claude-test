@@ -1,7 +1,7 @@
 import { ButtonOptions, ThemingProps } from "@chakra-ui/react";
 import { Button } from "@parallel/components/ui";
 import { PlusCircleIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { PetitionFieldLogicCondition } from "@parallel/utils/fieldLogic/types";
 import { FormattedMessage } from "react-intl";
 import { isNonNullish } from "remeda";
@@ -12,10 +12,10 @@ interface PetitionFieldLogicAddConditionButtonProps extends ButtonOptions, Themi
   onAddCondition: (condition: PetitionFieldLogicCondition) => void;
 }
 
-export const PetitionFieldLogicAddConditionButton = chakraForwardRef<
+export const PetitionFieldLogicAddConditionButton = chakraComponent<
   "button",
   PetitionFieldLogicAddConditionButtonProps
->(function PetitionFieldLogicAddConditionButton({ conditions, onAddCondition, ...props }, ref) {
+>(function PetitionFieldLogicAddConditionButton({ ref, conditions, onAddCondition, ...props }) {
   const { fieldsWithIndices } = usePetitionFieldLogicContext();
   return (
     <Button

@@ -1,7 +1,7 @@
-import { Box, Flex, HStack, List, Progress, Stack } from "@chakra-ui/react";
+import { List, Progress } from "@chakra-ui/react";
 import { ExclamationOutlineIcon } from "@parallel/chakra/icons";
 import { useTone } from "@parallel/components/common/ToneProvider";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { centeredPopup, isWindowBlockedError, openNewWindow } from "@parallel/utils/openNewWindow";

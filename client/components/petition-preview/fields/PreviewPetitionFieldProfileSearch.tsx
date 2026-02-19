@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Badge, Box, Center, HStack, List, Progress, Stack } from "@chakra-ui/react";
+import { Badge, Center, List, Progress } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import {
   CheckIcon,
@@ -15,7 +15,7 @@ import {
   RecipientViewPetitionFieldLayout_PetitionFieldReplySelection,
   RecipientViewPetitionFieldLayoutProps,
 } from "@parallel/components/recipient-view/fields/RecipientViewPetitionFieldLayout";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   PreviewPetitionFieldProfileSearch_PetitionBaseFragment,
   PreviewPetitionFieldProfileSearch_UserFragment,
@@ -247,7 +247,7 @@ export function PreviewPetitionFieldProfileSearchReply({
       >
         {reply.isAnonymized ? <QuestionIcon color="gray.300" /> : <ProfileSearchIcon boxSize={6} />}
       </Center>
-      <Stack flex="1" spacing={0.5}>
+      <Stack flex="1" gap={0.5}>
         <Text>
           {reply.content.search}
           <Text as="span" marginStart={1} color="gray.500" fontSize="sm">

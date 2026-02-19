@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
-import { Stack } from "@chakra-ui/react";
+
 import { DownloadIcon, EyeIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import {
   CopyOrDownloadReplyButton_PetitionFieldReplyFragment,
   PetitionFieldType,
@@ -11,6 +11,7 @@ import { useHasRemovePreviewFiles } from "@parallel/utils/useHasRemovePreviewFil
 import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
 import { useMergeRefs } from "@parallel/utils/useMergeRefs";
+import { Stack } from "@parallel/components/ui";
 import { useRef } from "react";
 import { useIntl } from "react-intl";
 import { isNonNullish } from "remeda";
@@ -48,7 +49,7 @@ export function CopyOrDownloadReplyButton({
         : content;
 
   return (
-    <Stack spacing={1}>
+    <Stack gap={1}>
       {petitionFieldType === "BACKGROUND_CHECK" ? (
         <IconButtonWithTooltip
           disabled={isDisabled}
@@ -123,10 +124,10 @@ const _fragments = {
   `,
 };
 
-const ReplyDownloadButton = chakraForwardRef<
+const ReplyDownloadButton = chakraComponent<
   "button",
   { contentType: string; onDownload: (preview: boolean) => void; isDisabled: boolean }
->(function ReplyDownloadButton({ contentType, onDownload, ...props }, ref) {
+>(function ReplyDownloadButton({ ref, contentType, onDownload, ...props }) {
   const intl = useIntl();
   const userHasRemovePreviewFiles = useHasRemovePreviewFiles();
   const isPreviewable =

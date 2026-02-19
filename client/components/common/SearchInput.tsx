@@ -7,7 +7,7 @@ import {
   layoutPropNames,
 } from "@chakra-ui/react";
 import { SearchIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useFocus } from "@parallel/utils/useFocus";
 import { useMergeRefs } from "@parallel/utils/useMergeRefs";
@@ -16,7 +16,10 @@ import { useIntl } from "react-intl";
 import { omit, pick } from "remeda";
 import { CloseButton } from "./CloseButton";
 
-export const SearchInput = chakraForwardRef<"input", InputProps>(function SearchInput(props, ref) {
+export const SearchInput = chakraComponent<"input", InputProps>(function SearchInput({
+  ref,
+  ...props
+}) {
   const inputRef = useRef<HTMLInputElement>(null);
   const mergedRef = useMergeRefs(ref, inputRef);
   const intl = useIntl();

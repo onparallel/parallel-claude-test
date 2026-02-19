@@ -1,11 +1,11 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, MenuButton, MenuDivider, MenuItem, MenuList, Stack } from "@chakra-ui/react";
+import { MenuButton, MenuDivider, MenuItem, MenuList } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import { ChevronDownIcon, DeleteIcon, UsersIcon } from "@parallel/chakra/icons";
 import { SubscribedNotificationsIcon } from "@parallel/components/common/SubscribedNotificationsIcon";
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
 import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
-import { Avatar, Button, Text } from "@parallel/components/ui";
+import { Avatar, Box, Button, Flex, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionPermissionTypeRW,
   TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment,
@@ -36,7 +36,7 @@ export function TemplateDefaultUserGroupPermissionRow({
         <Avatar.Fallback name={group.name} />
       </Avatar.Root>
       <Box flex="1" minWidth={0} fontSize="sm" marginStart={2}>
-        <Stack direction={"row"} spacing={1} align="center">
+        <Stack direction={"row"} gap={1} align="center">
           <Text lineClamp={1} wordBreak="break-all">
             <UserGroupReference userGroup={group} />
           </Text>

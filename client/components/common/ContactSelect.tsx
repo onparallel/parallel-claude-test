@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box } from "@chakra-ui/react";
+
 import { Tooltip } from "@parallel/chakra/components";
 import { AlertCircleFilledIcon, UserPlusIcon } from "@parallel/chakra/icons";
 import { ContactSelect_ContactFragment } from "@parallel/graphql/__types";
@@ -8,16 +8,7 @@ import { CustomAsyncCreatableSelectProps } from "@parallel/utils/react-select/ty
 import { Maybe, MaybePromise, unMaybeArray } from "@parallel/utils/types";
 import { isValidEmail } from "@parallel/utils/validation";
 import { useMergeRefs } from "@parallel/utils/useMergeRefs";
-import {
-  ClipboardEvent,
-  ForwardedRef,
-  KeyboardEvent,
-  ReactElement,
-  RefAttributes,
-  forwardRef,
-  useRef,
-  useState,
-} from "react";
+import { ClipboardEvent, KeyboardEvent, RefAttributes, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
   InputActionMeta,
@@ -33,7 +24,7 @@ import AsyncCreatableSelect, { AsyncCreatableProps } from "react-select/async-cr
 import { isNonNullish, isNullish, pick, range, zip } from "remeda";
 import { DeletedContact } from "./DeletedContact";
 import { useErrorDialog } from "./dialogs/ErrorDialog";
-import { Text } from "@parallel/components/ui";
+import { Box, Text } from "@parallel/components/ui";
 
 export type ContactSelectSelection = ContactSelect_ContactFragment & {
   isInvalid?: boolean;
@@ -58,19 +49,17 @@ export type ContactSelectInstance<IsMulti extends boolean = false> = SelectInsta
   never
 >;
 
-export const ContactSelect = forwardRef(function ContactSelect<IsMulti extends boolean = false>(
-  {
-    value,
-    isMulti,
-    onSearchContacts,
-    onCreateContact,
-    onPasteEmails,
-    onChange,
-    onFocus,
-    ...props
-  }: ContactSelectProps<IsMulti>,
-  ref: ForwardedRef<ContactSelectInstance<IsMulti>>,
-) {
+export function ContactSelect<IsMulti extends boolean = false>({
+  ref,
+  value,
+  isMulti,
+  onSearchContacts,
+  onCreateContact,
+  onPasteEmails,
+  onChange,
+  onFocus,
+  ...props
+}: ContactSelectProps<IsMulti> & RefAttributes<ContactSelectInstance<IsMulti>>) {
   const [isCreating, _setIsCreating] = useState(false);
   // we need this because the create handler is called twice when clicking on the create menu option,
   // one because of the click and another one from the input blur
@@ -216,9 +205,7 @@ export const ContactSelect = forwardRef(function ContactSelect<IsMulti extends b
       {...rsProps}
     />
   );
-}) as <IsMulti extends boolean = false>(
-  props: ContactSelectProps<IsMulti> & RefAttributes<ContactSelectInstance<IsMulti>>,
-) => ReactElement;
+}
 
 const _fragments = {
   // firstName and lastName are needed for converting from Contact to PetitionSigner in some dialogs

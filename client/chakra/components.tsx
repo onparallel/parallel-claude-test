@@ -9,7 +9,7 @@ import {
   Tooltip as ChakraTooltip,
   ComponentWithAs,
 } from "@chakra-ui/react";
-import { ComponentProps, forwardRef, FunctionComponent } from "react";
+import { ComponentProps, FunctionComponent } from "react";
 import { ChevronDownIcon } from "./icons";
 
 function withChakraDefaultProps<
@@ -20,7 +20,7 @@ function withChakraDefaultProps<
   Component: C,
   defaults: PD,
 ): C {
-  const Wrapped = forwardRef((props: any, ref) => <Component ref={ref} {...defaults} {...props} />);
+  const Wrapped = (props: any) => <Component {...defaults} {...props} />;
   Wrapped.displayName = `WithChakraDefaultProps(${Component.displayName ?? Component.name})`;
   return Wrapped as any;
 }

@@ -14,7 +14,7 @@ import {
   ModalOverlayProps,
   ModalProps,
 } from "@chakra-ui/react";
-import { forwardRef, ReactNode } from "react";
+import { ReactNode, RefAttributes } from "react";
 
 // Docs: https://chakra-ui.com/docs/components/dialog
 
@@ -26,29 +26,33 @@ interface DialogRootProps extends Omit<ModalProps, "isOpen" | "onClose" | "child
   children: ReactNode;
 }
 
-export const DialogRoot = forwardRef<HTMLDivElement, DialogRootProps>(
-  ({ open, onOpenChange, placement, children, ...props }, ref) => {
-    // Map v3 props to v2 props
-    const v2Props = {
-      ...props,
-      isOpen: open || false,
-      onClose: onOpenChange ? () => onOpenChange({ open: false }) : () => {},
-      isCentered: placement === "center",
-    };
+export function DialogRoot({ open, onOpenChange, placement, children, ...props }: DialogRootProps) {
+  // Map v3 props to v2 props
+  const v2Props = {
+    ...props,
+    isOpen: open || false,
+    onClose: onOpenChange ? () => onOpenChange({ open: false }) : () => {},
+    isCentered: placement === "center",
+  };
 
-    return <ChakraModal {...v2Props}>{children}</ChakraModal>;
-  },
-);
+  return <ChakraModal {...v2Props}>{children}</ChakraModal>;
+}
 
 // Dialog.Backdrop component - maps to ModalOverlay
-export const DialogBackdrop = forwardRef<HTMLDivElement, ModalOverlayProps>((props, ref) => {
+export function DialogBackdrop({
+  ref,
+  ...props
+}: ModalOverlayProps & RefAttributes<HTMLDivElement>) {
   return <ModalOverlay ref={ref} {...props} />;
-});
+}
 
 // Dialog.Positioner component - maps to ModalContent
-export const DialogPositioner = forwardRef<HTMLDivElement, ModalContentProps>((props, ref) => {
+export function DialogPositioner({
+  ref,
+  ...props
+}: ModalContentProps & RefAttributes<HTMLDivElement>) {
   return <ModalContent ref={ref} {...props} />;
-});
+}
 
 // Dialog.Content component - wrapper for content
 interface DialogContentProps {
@@ -56,33 +60,40 @@ interface DialogContentProps {
   [key: string]: any;
 }
 
-export const DialogContentWrapper = forwardRef<HTMLDivElement, DialogContentProps>((props, ref) => {
+export function DialogContentWrapper({
+  ref,
+  ...props
+}: DialogContentProps & RefAttributes<HTMLDivElement>) {
   // In v2, ModalContent handles the content container
   // In v3, Dialog.Content would be a separate layer
   return <div ref={ref} {...props} />;
-});
+}
 
 // Dialog.Title component - maps to ModalHeader
-export const DialogTitle = forwardRef<HTMLDivElement, ModalHeaderProps>((props, ref) => {
+export function DialogTitle({ ref, ...props }: ModalHeaderProps & RefAttributes<HTMLDivElement>) {
   return <ModalHeader ref={ref} {...props} />;
-});
+}
 
 // Dialog.Description component - maps to ModalBody
-export const DialogDescription = forwardRef<HTMLDivElement, ModalBodyProps>((props, ref) => {
+export function DialogDescription({
+  ref,
+  ...props
+}: ModalBodyProps & RefAttributes<HTMLDivElement>) {
   return <ModalBody ref={ref} {...props} />;
-});
+}
 
 // Dialog.Footer component - maps to ModalFooter
-export const DialogFooter = forwardRef<HTMLDivElement, ModalFooterProps>((props, ref) => {
+export function DialogFooter({ ref, ...props }: ModalFooterProps & RefAttributes<HTMLDivElement>) {
   return <ModalFooter ref={ref} {...props} />;
-});
+}
 
 // Dialog.CloseTrigger component - maps to ModalCloseButton
-export const DialogCloseTrigger = forwardRef<HTMLButtonElement, ModalCloseButtonProps>(
-  (props, ref) => {
-    return <ModalCloseButton ref={ref} {...props} />;
-  },
-);
+export function DialogCloseTrigger({
+  ref,
+  ...props
+}: ModalCloseButtonProps & RefAttributes<HTMLButtonElement>) {
+  return <ModalCloseButton ref={ref} {...props} />;
+}
 
 // v3 Dialog namespace
 export const Dialog = {
@@ -95,13 +106,3 @@ export const Dialog = {
   Footer: DialogFooter,
   CloseTrigger: DialogCloseTrigger,
 };
-
-// Assign display names for debugging
-DialogRoot.displayName = "Dialog.Root";
-DialogBackdrop.displayName = "Dialog.Backdrop";
-DialogPositioner.displayName = "Dialog.Positioner";
-DialogContentWrapper.displayName = "Dialog.Content";
-DialogTitle.displayName = "Dialog.Title";
-DialogDescription.displayName = "Dialog.Description";
-DialogFooter.displayName = "Dialog.Footer";
-DialogCloseTrigger.displayName = "Dialog.CloseTrigger";

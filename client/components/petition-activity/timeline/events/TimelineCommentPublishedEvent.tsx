@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Stack, useTheme } from "@chakra-ui/react";
+import { useTheme } from "@chakra-ui/react";
 import { CommentIcon, NoteIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -16,7 +16,7 @@ import { PetitionFieldReference } from "../../../common/PetitionFieldReference";
 import { UserOrContactReference } from "../../../common/UserOrContactReference";
 import { TimelineIcon } from "../common/TimelineIcon";
 import { TimelineItem } from "../common/TimelineItem";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Stack, Text } from "@parallel/components/ui";
 
 export interface TimelineCommentPublishedEventProps {
   event: TimelineCommentPublishedEvent_CommentPublishedEventFragment;
@@ -137,7 +137,7 @@ export function TimelineCommentPublishedEvent({ event }: TimelineCommentPublishe
             backgroundColor="gray.50"
             direction={{ base: "column", md: "row" }}
             alignItems={{ base: "start", md: "center" }}
-            spacing={3}
+            gap={3}
           >
             <Box flex={1}>
               {getCommentTitle({ event })}

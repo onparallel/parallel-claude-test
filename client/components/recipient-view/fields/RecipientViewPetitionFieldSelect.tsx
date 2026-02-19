@@ -1,8 +1,8 @@
-import { Box, Center, FormControl, List, Stack } from "@chakra-ui/react";
+import { Center, FormControl, List } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
-import { Text } from "@parallel/components/ui";
+import { Box, Stack, Text } from "@parallel/components/ui";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
@@ -10,7 +10,7 @@ import { waitFor } from "@parallel/utils/promises/waitFor";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
-import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
+import { RefAttributes, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { SelectInstance as _SelectInstance } from "react-select";
 import { zip } from "remeda";
@@ -225,13 +225,14 @@ interface RecipientViewPetitionFieldReplySelectProps {
   onDelete: () => void;
 }
 
-const RecipientViewPetitionFieldReplySelect = forwardRef<
-  SelectInstance,
-  RecipientViewPetitionFieldReplySelectProps
->(function RecipientViewPetitionFieldReplySelect(
-  { field, reply, isDisabled, onUpdate, onDelete },
+function RecipientViewPetitionFieldReplySelect({
   ref,
-) {
+  field,
+  reply,
+  isDisabled,
+  onUpdate,
+  onDelete,
+}: RecipientViewPetitionFieldReplySelectProps & RefAttributes<SelectInstance>) {
   const intl = useIntl();
   const [value, setValue] = useState(reply.content.value);
   const [isSaving, setIsSaving] = useState(false);
@@ -309,4 +310,4 @@ const RecipientViewPetitionFieldReplySelect = forwardRef<
       />
     </Stack>
   );
-});
+}

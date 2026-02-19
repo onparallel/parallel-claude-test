@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Heading, IconButton } from "@chakra-ui/react";
+import { Heading, IconButton } from "@chakra-ui/react";
 import { ArrowBackIcon, ChevronRightIcon } from "@parallel/chakra/icons";
 import { SidebarLayout_QueryFragment } from "@parallel/graphql/__types";
 import { useOnMediaQueryChange } from "@parallel/utils/useOnMediaQueryChange";
@@ -8,7 +8,7 @@ import { ReactNode, useCallback } from "react";
 import { useIntl } from "react-intl";
 import NextLink from "next/link";
 import { AppLayout } from "./AppLayout";
-import { Text } from "@parallel/components/ui";
+import { Box, Flex, Text } from "@parallel/components/ui";
 
 export interface SidebarLayoutProps {
   queryObject: SidebarLayout_QueryFragment;

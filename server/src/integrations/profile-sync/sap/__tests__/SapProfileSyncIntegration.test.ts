@@ -5,6 +5,7 @@ import { join } from "path";
 import { indexBy, pick, range } from "remeda";
 import { MockSapOdataClient } from "../../../../../test/mocks";
 import { createTestContainer } from "../../../../../test/testContainer";
+import { ILogger, LOGGER } from "../../../../services/Logger";
 
 import {
   Organization,
@@ -54,6 +55,11 @@ describe("SapProfileSyncIntegration", () => {
 
   beforeAll(async () => {
     container = await createTestContainer();
+
+    const noopLogger: ILogger = { log() {}, info() {}, warn() {}, error() {}, debug() {} };
+    await container.unbind(LOGGER);
+    container.bind<ILogger>(LOGGER).toConstantValue(noopLogger);
+
     knex = container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
@@ -222,7 +228,7 @@ describe("SapProfileSyncIntegration", () => {
               fields: ["LastChangeDate", "LastChangeTime"],
             },
           },
-          localIdBinding: { remoteEntityFields: ["YY1_ClientPartner_bus"] },
+          localIdBinding: { remoteEntityFields: ["YY1_bp_id_Parallel_bus"] },
           fieldMappings: [
             {
               remoteEntityFields: ["OrganizationBPName1"],
@@ -280,7 +286,12 @@ describe("SapProfileSyncIntegration", () => {
                 ["CreationTime", "asc"],
                 ["BusinessPartnerUUID", "asc"],
               ],
-              $select: ["BusinessPartner", "OrganizationBPName1", "YY1_AMT_CLIENT_STATUS_bus"],
+              $select: [
+                "BusinessPartner",
+                "YY1_bp_id_Parallel_bus",
+                "OrganizationBPName1",
+                "YY1_AMT_CLIENT_STATUS_bus",
+              ],
             },
           ],
           {
@@ -313,7 +324,7 @@ describe("SapProfileSyncIntegration", () => {
               servicePath: "sap/API_BUSINESS_PARTNER",
             },
             { BusinessPartner: "1" },
-            { YY1_ClientPartner_bus: /[A-Za-z0-9]+/i },
+            { YY1_bp_id_Parallel_bus: /[A-Za-z0-9]+/i },
           ],
           null,
         ],
@@ -327,7 +338,7 @@ describe("SapProfileSyncIntegration", () => {
               servicePath: "sap/API_BUSINESS_PARTNER",
             },
             { BusinessPartner: "2" },
-            { YY1_ClientPartner_bus: /[A-Za-z0-9]+/i },
+            { YY1_bp_id_Parallel_bus: /[A-Za-z0-9]+/i },
           ],
           null,
         ],
@@ -341,7 +352,7 @@ describe("SapProfileSyncIntegration", () => {
               servicePath: "sap/API_BUSINESS_PARTNER",
             },
             { BusinessPartner: "3" },
-            { YY1_ClientPartner_bus: /[A-Za-z0-9]+/i },
+            { YY1_bp_id_Parallel_bus: /[A-Za-z0-9]+/i },
           ],
           null,
         ],

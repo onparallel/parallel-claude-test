@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import { useToast } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 
 import {
   ProfileViewTabs_createProfileListViewDocument,
@@ -22,8 +22,8 @@ interface ProfileViewTabsProps {
   views: ProfileViewTabs_ProfileListViewFragment[];
 }
 
-export const ProfileViewTabs = chakraForwardRef<"div", ProfileViewTabsProps>(
-  function ProfileViewTabs({ views }, ref) {
+export const ProfileViewTabs = chakraComponent<"div", ProfileViewTabsProps>(
+  function ProfileViewTabs({ ref, views }) {
     const intl = useIntl();
     const toast = useToast();
     const showGenericErrorToast = useGenericErrorToast();

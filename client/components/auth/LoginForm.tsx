@@ -1,17 +1,8 @@
-import {
-  Box,
-  Center,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  Stack,
-} from "@chakra-ui/react";
+import { Center, FormControl, FormErrorMessage, FormLabel, Input } from "@chakra-ui/react";
 import { LockClosedIcon } from "@parallel/chakra/icons";
 import { Link } from "@parallel/components/common/Link";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, Stack, Text } from "@parallel/components/ui";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { postJSON } from "@parallel/utils/rest";
 import { isValidEmail } from "@parallel/utils/validation";
@@ -169,7 +160,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
             />
           </Button>
         ) : (
-          <Stack spacing={10} textAlign="center">
+          <Stack gap={10} textAlign="center">
             <Text>
               <Link href="/forgot">
                 <FormattedMessage

@@ -836,6 +836,7 @@ export function publicApi(container: Container) {
             $includeOwner: Boolean!
           ) {
             createPetition(name: $name, petitionId: $templateId) {
+              __typename
               ...Petition
             }
           }
@@ -845,7 +846,7 @@ export function publicApi(container: Container) {
           ...body,
           ...getPetitionIncludesFromQuery(query),
         });
-        assert("id" in result.createPetition);
+        assert(result.createPetition.__typename === "Petition");
         return Created(mapPetition(result.createPetition));
       },
     );
@@ -994,11 +995,10 @@ export function publicApi(container: Container) {
             data: inputData,
             ...getPetitionIncludesFromQuery(query),
           });
-          assert("id" in result.updatePetition!);
           if (result.updatePetition.__typename === "Petition") {
-            return Ok(mapPetition(omit(result.updatePetition!, ["__typename"])));
+            return Ok(mapPetition(result.updatePetition!));
           } else {
-            return Ok(mapTemplate(omit(result.updatePetition!, ["__typename"])));
+            return Ok(mapTemplate(result.updatePetition!));
           }
         } catch (error) {
           if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {
@@ -1299,6 +1299,7 @@ export function publicApi(container: Container) {
           $includeOwner: Boolean!
         ) {
           tagPetition(petitionId: $petitionId, tagId: $tagId) {
+            __typename
             ...Petition
           }
         }
@@ -1310,7 +1311,7 @@ export function publicApi(container: Container) {
         ...getPetitionIncludesFromQuery(query),
         includeTags: true,
       });
-      assert("id" in tagResult.tagPetition!);
+      assert(tagResult.tagPetition.__typename === "Petition");
       return Created(mapPetition(tagResult.tagPetition!));
     },
   );

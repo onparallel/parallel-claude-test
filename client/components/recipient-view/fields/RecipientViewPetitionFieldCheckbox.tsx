@@ -1,4 +1,4 @@
-import { Box, Checkbox, HStack, Stack } from "@chakra-ui/react";
+import { Checkbox } from "@chakra-ui/react";
 import { DeleteIcon, RadioButtonSelected } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { LocalizableUserText } from "@parallel/components/common/LocalizableUserTextRender";
@@ -10,11 +10,11 @@ import {
 import { useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { useTone } from "@parallel/components/common/ToneProvider";
 import { CheckboxTypeLabel } from "@parallel/components/petition-common/CheckboxTypeLabel";
-import { Text } from "@parallel/components/ui";
+import { Box, HStack, Stack, Text } from "@parallel/components/ui";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
 import { OptimizedMenuList } from "@parallel/utils/react-select/OptimizedMenuList";
-import { ChangeEvent, forwardRef, useCallback, useEffect, useState } from "react";
+import { ChangeEvent, RefAttributes, useCallback, useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
   components,
@@ -210,7 +210,7 @@ export function RecipientViewPetitionFieldCheckbox({
           reply?.id ? `-${reply.id}` : ""
         }`}
       >
-        <HStack wrap="wrap" color="gray.600" fontSize="sm" gridGap={2} spacing={0}>
+        <HStack wrap="wrap" color="gray.600" fontSize="sm" gridGap={2} gap={0}>
           <CheckboxTypeLabel as="span" options={field.options} />
           {reply?.isAnonymized ? (
             <Text>
@@ -335,13 +335,11 @@ export function RecipientViewPetitionFieldCheckbox({
 
 interface PetitionFieldCheckboxStandardListProps extends MultiCheckboxSimpleSelectProps {}
 
-const PetitionFieldCheckboxMultiSelect = forwardRef<
-  MultiCheckboxSimpleSelectInstance,
-  PetitionFieldCheckboxStandardListProps
->(function ProfileFieldSelectInner(props, ref) {
+function PetitionFieldCheckboxMultiSelect(
+  props: PetitionFieldCheckboxStandardListProps & RefAttributes<MultiCheckboxSimpleSelectInstance>,
+) {
   return (
     <MultiCheckboxSimpleSelect
-      ref={ref}
       {...props}
       isClearable={false}
       filterOption={createFilter({
@@ -420,7 +418,7 @@ const PetitionFieldCheckboxMultiSelect = forwardRef<
       checkboxColorScheme="blue"
     />
   );
-});
+}
 
 function Placeholder(props: PlaceholderProps<SelectOptionValue, true, never>) {
   return (

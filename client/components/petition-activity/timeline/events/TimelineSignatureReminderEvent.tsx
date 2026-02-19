@@ -1,9 +1,10 @@
 import { gql } from "@apollo/client";
-import { Box, Flex } from "@chakra-ui/react";
+
 import { SignatureIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineSignatureReminderEvent_SignatureReminderEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
+import { Box, Flex } from "@parallel/components/ui";
 import { FormattedMessage } from "react-intl";
 import { UserReference } from "../../../common/UserReference";
 import { TimelineIcon } from "../common/TimelineIcon";

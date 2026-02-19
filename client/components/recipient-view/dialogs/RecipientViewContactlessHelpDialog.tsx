@@ -1,7 +1,7 @@
-import { Heading, HStack, Stack } from "@chakra-ui/react";
+import { Heading } from "@chakra-ui/react";
 import { QuestionOutlineIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { Tone } from "@parallel/graphql/__types";
 import { useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -47,7 +47,7 @@ function RecipientViewContactlessHelpDialog({ tone, ...props }: DialogProps<{ to
         </Stack>
       }
       confirm={
-        <HStack width="full" justifyContent="space-between" wrap="wrap" gridGap={4} spacing={0}>
+        <HStack width="full" justifyContent="space-between" wrap="wrap" gridGap={4} gap={0}>
           <Button
             variant="link"
             whiteSpace="break-spaces"

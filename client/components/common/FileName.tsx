@@ -1,7 +1,7 @@
-import { chakra, Flex, ThemingProps } from "@chakra-ui/react";
+import { chakra, ThemingProps } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
-import { chakraForwardRef } from "@parallel/chakra/utils";
-import { Text } from "@parallel/components/ui";
+import { chakraComponent } from "@parallel/chakra/utils";
+import { Flex, Text } from "@parallel/components/ui";
 import { Maybe } from "@parallel/graphql/__types";
 import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import { useEffect, useRef, useState } from "react";
@@ -10,10 +10,11 @@ export interface FileNameProps extends ThemingProps<"Text"> {
   value: Maybe<string>;
 }
 
-export const FileName = chakraForwardRef<"span", FileNameProps>(function FileName(
-  { value, ...props },
+export const FileName = chakraComponent<"span", FileNameProps>(function FileName({
   ref,
-) {
+  value,
+  ...props
+}) {
   const [isTruncated, setIsTruncated] = useState(false);
   const innerRef = useRef<HTMLSpanElement>(null);
   const mergedRef = useMergeRefs(ref, innerRef);

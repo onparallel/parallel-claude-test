@@ -3,14 +3,11 @@ import { useMutation } from "@apollo/client/react";
 import {
   AlertDescription,
   AlertIcon,
-  Box,
-  HStack,
   MenuButton,
   MenuItem,
   MenuList,
   Portal,
   Progress,
-  Stack,
 } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import {
@@ -25,10 +22,10 @@ import {
   FrontCoverIcon,
   PaperclipIcon,
 } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { FileSize } from "@parallel/components/common/FileSize";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionAttachmentType,
   PetitionComposeAttachments_createPetitionAttachmentUploadLinkDocument,
@@ -80,8 +77,8 @@ export interface PetitionComposeAttachmentsProps {
   isReadOnly?: boolean;
 }
 
-export const PetitionComposeAttachments = chakraForwardRef<"div", PetitionComposeAttachmentsProps>(
-  function PetitionComposeAttachments({ petition, isReadOnly, ...props }, ref) {
+export const PetitionComposeAttachments = chakraComponent<"div", PetitionComposeAttachmentsProps>(
+  function PetitionComposeAttachments({ ref, petition, isReadOnly, ...props }) {
     const intl = useIntl();
 
     const petitionId = petition.id;
@@ -223,7 +220,7 @@ export const PetitionComposeAttachments = chakraForwardRef<"div", PetitionCompos
         if (allAttachments.length + files.length > 10) {
           // on drop event already shows a message on the dropzone, if its not type="drop" means the
           // file is coming from the "Add attachment" button which doesn't provide any feedback
-          if (event?.type !== "drop") {
+          if (!("type" in event) || event.type !== "drop") {
             await withError(
               showErrorDialog({
                 header: (
@@ -414,7 +411,7 @@ export const PetitionComposeAttachments = chakraForwardRef<"div", PetitionCompos
           <input type="file" {...getInputProps()} />
           {allAttachments.length > 0 ? (
             <MotionConfig reducedMotion="always">
-              <Stack spacing={2} divider={<Divider />}>
+              <Stack gap={2} divider={<Divider />}>
                 {[
                   ["FRONT", front, setFront] as const,
                   ["ANNEX", annex, setAnnex] as const,
@@ -686,24 +683,22 @@ interface AttachmentItemProps {
   onVisibilityChange: (id: string, visibility: PetitionFieldVisibility | null) => void;
 }
 
-const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function AttachmentItem(
-  {
-    item,
-    index,
-    progress,
-    isDraggable,
-    isDisabled,
-    petition,
-    visibility,
-    onRemove,
-    onPreview,
-    onChangeType,
-    onDragEnd,
-    onVisibilityChange,
-    ...props
-  },
+const AttachmentItem = chakraComponent<"div", AttachmentItemProps>(function AttachmentItem({
   ref,
-) {
+  item,
+  index,
+  progress,
+  isDraggable,
+  isDisabled,
+  petition,
+  visibility,
+  onRemove,
+  onPreview,
+  onChangeType,
+  onDragEnd,
+  onVisibilityChange,
+  ...props
+}) {
   const intl = useIntl();
   const userHasRemovePreviewFiles = useHasRemovePreviewFiles();
   const dragControls = useDragControls();
@@ -766,7 +761,7 @@ const AttachmentItem = chakraForwardRef<"div", AttachmentItemProps>(function Att
     >
       <Stack
         shadow={isAnimated ? "short" : undefined}
-        spacing={0}
+        gap={0}
         backgroundColor="white"
         _hover={{ backgroundColor: "gray.50" }}
         borderRadius="md"

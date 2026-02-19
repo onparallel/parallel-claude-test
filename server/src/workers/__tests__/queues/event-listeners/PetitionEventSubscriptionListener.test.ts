@@ -23,10 +23,7 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
   let petition: Petition;
   let subscriptions: EventSubscription[];
 
-  let queueSpy: jest.SpyInstance<
-    ReturnType<IQueuesService["enqueueMessages"]>,
-    Parameters<IQueuesService["enqueueMessages"]>
-  >;
+  let queueSpy: ReturnType<typeof vi.spyOn>;
 
   let container: Container;
   let petitionEventSubscriptionsListener: PetitionEventSubscriptionsListener;
@@ -45,7 +42,7 @@ describe("Worker - Petition Event Subscriptions Listener", () => {
     ]);
     await mocks.insertUserGroupMembers(bypassGroup.id, [users[6].id]);
 
-    queueSpy = jest.spyOn(container.get<IQueuesService>(QUEUES_SERVICE), "enqueueMessages");
+    queueSpy = vi.spyOn(container.get<IQueuesService>(QUEUES_SERVICE), "enqueueMessages");
   });
 
   beforeEach(async () => {

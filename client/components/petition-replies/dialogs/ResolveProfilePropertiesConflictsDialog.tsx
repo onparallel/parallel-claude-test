@@ -4,11 +4,9 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Box,
   Center,
   FormControl,
   Spinner,
-  Stack,
   Table,
   Tbody,
   Td,
@@ -28,7 +26,7 @@ import {
   useWizardDialog,
   WizardStepDialogProps,
 } from "@parallel/components/common/dialogs/WizardDialog";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Stack, Text } from "@parallel/components/ui";
 import {
   ArchiveFieldGroupReplyIntoProfileConflictResolutionAction,
   ArchiveFieldGroupReplyIntoProfileConflictResolutionInput,
@@ -384,7 +382,7 @@ function ResolveProfilePropertiesConflictsDialog({
         />
       }
       body={
-        <Stack spacing={4} maxHeight="420px">
+        <Stack gap={4} maxHeight="420px">
           {hasFieldsUsedInProfileName ? (
             <Alert status="info" borderRadius="md">
               <AlertIcon />

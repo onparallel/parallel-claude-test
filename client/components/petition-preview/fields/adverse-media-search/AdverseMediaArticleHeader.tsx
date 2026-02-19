@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, HStack, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
+import { MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import {
   CheckIcon,
@@ -12,7 +12,7 @@ import {
 import { ButtonWithMoreOptions } from "@parallel/components/common/ButtonWithMoreOptions";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Text } from "@parallel/components/ui";
 import {
   AdverseMediaArticleHeader_AdverseMediaArticleFragment,
   AdverseMediaArticleRelevance,

@@ -1,8 +1,12 @@
-import { Box, Center, FormControl, forwardRef, List, Stack } from "@chakra-ui/react";
+import { Center, FormControl, List } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { UserSelect, UserSelectSelection } from "@parallel/components/common/UserSelect";
-import { Text } from "@parallel/components/ui";
+import {
+  UserSelect,
+  UserSelectInstance,
+  UserSelectSelection,
+} from "@parallel/components/common/UserSelect";
+import { Box, Stack, Text } from "@parallel/components/ui";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { FieldOptions } from "@parallel/utils/fieldOptions";
@@ -11,7 +15,7 @@ import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { RefAttributes, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
   RecipientViewPetitionFieldLayout,
@@ -220,105 +224,101 @@ interface RecipientViewPetitionFieldReplyUserAssignmentProps {
   options: FieldOptions["USER_ASSIGNMENT"];
 }
 
-const RecipientViewPetitionFieldReplyUserAssignment = forwardRef(
-  function RecipientViewPetitionFieldReplyUserAssignment(
-    {
-      field,
-      reply,
-      isDisabled,
-      onUpdate,
-      onDelete,
-      options,
-    }: RecipientViewPetitionFieldReplyUserAssignmentProps,
-    ref: any,
-  ) {
-    const intl = useIntl();
-    const [value, setValue] = useState<UserSelectSelection | null>(reply.content.value);
-    const [isSaving, setIsSaving] = useState(false);
+function RecipientViewPetitionFieldReplyUserAssignment({
+  ref,
+  field,
+  reply,
+  isDisabled,
+  onUpdate,
+  onDelete,
+  options,
+}: RecipientViewPetitionFieldReplyUserAssignmentProps & RefAttributes<UserSelectInstance<false>>) {
+  const intl = useIntl();
+  const [value, setValue] = useState<UserSelectSelection | null>(reply.content.value);
+  const [isSaving, setIsSaving] = useState(false);
 
-    const _handleSearchUsers = useSearchUsers();
+  const _handleSearchUsers = useSearchUsers();
 
-    const excludeUserIds = useMemo(() => {
-      const parentReplyId = reply.parent?.id;
-      const siblingReplies = parentReplyId
-        ? field.replies.filter(
-            (r: RecipientViewPetitionFieldLayout_PetitionFieldReplySelection) =>
-              r.parent?.id === parentReplyId && r.id !== reply.id,
-          )
-        : field.replies.filter(
-            (r: RecipientViewPetitionFieldLayout_PetitionFieldReplySelection) =>
-              !r.parent && r.id !== reply.id,
-          );
-
-      return siblingReplies
-        .map(
-          (r: RecipientViewPetitionFieldLayout_PetitionFieldReplySelection) => r.content?.value?.id,
+  const excludeUserIds = useMemo(() => {
+    const parentReplyId = reply.parent?.id;
+    const siblingReplies = parentReplyId
+      ? field.replies.filter(
+          (r: RecipientViewPetitionFieldLayout_PetitionFieldReplySelection) =>
+            r.parent?.id === parentReplyId && r.id !== reply.id,
         )
-        .filter((id): id is string => !!id);
-    }, [field.replies, reply.id, reply.parent?.id]);
+      : field.replies.filter(
+          (r: RecipientViewPetitionFieldLayout_PetitionFieldReplySelection) =>
+            !r.parent && r.id !== reply.id,
+        );
 
-    const handleSearchUsers = useCallback(
-      async (search: string) => {
-        return await _handleSearchUsers(search, {
-          excludeIds: [...excludeUserIds, ...(value?.id ? [value.id] : [])],
-          allowedUsersInGroupIds: options.allowedUserGroupId
-            ? [options.allowedUserGroupId]
-            : undefined,
-        });
-      },
-      [_handleSearchUsers, excludeUserIds, value?.id, options.allowedUserGroupId],
-    );
+    return siblingReplies
+      .map(
+        (r: RecipientViewPetitionFieldLayout_PetitionFieldReplySelection) => r.content?.value?.id,
+      )
+      .filter((id): id is string => !!id);
+  }, [field.replies, reply.id, reply.parent?.id]);
 
-    const id = `reply-${field.id}${reply.parent ? `-${reply.parent.id}` : ""}-${reply.id}`;
+  const handleSearchUsers = useCallback(
+    async (search: string) => {
+      return await _handleSearchUsers(search, {
+        excludeIds: [...excludeUserIds, ...(value?.id ? [value.id] : [])],
+        allowedUsersInGroupIds: options.allowedUserGroupId
+          ? [options.allowedUserGroupId]
+          : undefined,
+      });
+    },
+    [_handleSearchUsers, excludeUserIds, value?.id, options.allowedUserGroupId],
+  );
 
-    return (
-      <Stack direction="row">
-        <FormControl id={id} isDisabled={isDisabled}>
-          <Box flex="1" position="relative" minWidth="0">
-            <Box position="relative">
-              <UserSelect
-                ref={ref}
-                isDisabled={isDisabled || reply.status === "APPROVED"}
-                isInvalid={reply.status === "REJECTED"}
-                value={value}
-                onChange={async (user) => {
-                  setValue(user);
-                  setIsSaving(true);
-                  try {
-                    await onUpdate({ value: user?.id ?? null });
-                  } catch {}
-                  setIsSaving(false);
-                }}
-                onSearch={handleSearchUsers}
-                placeholder={
-                  reply.isAnonymized
-                    ? intl.formatMessage({
-                        id: "generic.reply-not-available",
-                        defaultMessage: "Reply not available",
-                      })
-                    : undefined
-                }
-              />
+  const id = `reply-${field.id}${reply.parent ? `-${reply.parent.id}` : ""}-${reply.id}`;
 
-              <Center height="100%" position="absolute" insetEnd="42px" top={0}>
-                <RecipientViewPetitionFieldReplyStatusIndicator reply={reply} isSaving={isSaving} />
-              </Center>
-            </Box>
+  return (
+    <Stack direction="row">
+      <FormControl id={id} isDisabled={isDisabled}>
+        <Box flex="1" position="relative" minWidth="0">
+          <Box position="relative">
+            <UserSelect
+              ref={ref}
+              isDisabled={isDisabled || reply.status === "APPROVED"}
+              isInvalid={reply.status === "REJECTED"}
+              value={value}
+              onChange={async (user) => {
+                setValue(user);
+                setIsSaving(true);
+                try {
+                  await onUpdate({ value: user?.id ?? null });
+                } catch {}
+                setIsSaving(false);
+              }}
+              onSearch={handleSearchUsers}
+              placeholder={
+                reply.isAnonymized
+                  ? intl.formatMessage({
+                      id: "generic.reply-not-available",
+                      defaultMessage: "Reply not available",
+                    })
+                  : undefined
+              }
+            />
+
+            <Center height="100%" position="absolute" insetEnd="42px" top={0}>
+              <RecipientViewPetitionFieldReplyStatusIndicator reply={reply} isSaving={isSaving} />
+            </Center>
           </Box>
-        </FormControl>
-        <IconButtonWithTooltip
-          disabled={isDisabled || reply.status === "APPROVED"}
-          onClick={() => onDelete()}
-          variant="ghost"
-          icon={<DeleteIcon />}
-          size="md"
-          placement="bottom"
-          label={intl.formatMessage({
-            id: "component.recipient-view-petition-field-reply.remove-reply-label",
-            defaultMessage: "Remove reply",
-          })}
-        />
-      </Stack>
-    );
-  },
-);
+        </Box>
+      </FormControl>
+      <IconButtonWithTooltip
+        disabled={isDisabled || reply.status === "APPROVED"}
+        onClick={() => onDelete()}
+        variant="ghost"
+        icon={<DeleteIcon />}
+        size="md"
+        placement="bottom"
+        label={intl.formatMessage({
+          id: "component.recipient-view-petition-field-reply.remove-reply-label",
+          defaultMessage: "Remove reply",
+        })}
+      />
+    </Stack>
+  );
+}

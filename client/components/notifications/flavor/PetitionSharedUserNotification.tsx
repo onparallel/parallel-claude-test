@@ -5,7 +5,7 @@ import { UserGroupReference } from "@parallel/components/common/UserGroupReferen
 import { UserReference } from "@parallel/components/common/UserReference";
 import { PetitionPermissionTypeText } from "@parallel/components/petition-common/PetitionPermissionType";
 import { PetitionSharedUserNotification_PetitionSharedUserNotificationFragment } from "@parallel/graphql/__types";
-import { forwardRef } from "react";
+import { RefAttributes } from "react";
 import { FormattedMessage } from "react-intl";
 import { PetitionUserNotification } from "./PetitionUserNotification";
 
@@ -14,10 +14,11 @@ export interface PetitionSharedUserNotificationProps {
   notification: PetitionSharedUserNotification_PetitionSharedUserNotificationFragment;
 }
 
-export const PetitionSharedUserNotification = forwardRef<
-  HTMLElement,
-  PetitionSharedUserNotificationProps
->(function PetitionSharedUserNotification({ isFirst, notification }, ref) {
+export function PetitionSharedUserNotification({
+  isFirst,
+  notification,
+  ref,
+}: PetitionSharedUserNotificationProps & RefAttributes<HTMLElement>) {
   const { petition, sharedWith } = notification;
   return (
     <PetitionUserNotification
@@ -90,7 +91,7 @@ export const PetitionSharedUserNotification = forwardRef<
       ) : null}
     </PetitionUserNotification>
   );
-});
+}
 
 const _fragments = {
   PetitionSharedUserNotification: gql`

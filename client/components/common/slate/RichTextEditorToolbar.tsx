@@ -1,4 +1,3 @@
-import { Stack } from "@chakra-ui/react";
 import {
   BoldIcon,
   ItalicIcon,
@@ -6,7 +5,8 @@ import {
   OrderedListIcon,
   UnderlineIcon,
 } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
+import { Stack } from "@parallel/components/ui";
 import { useIntl } from "react-intl";
 import { ToolbarHeadingButton } from "./ToolbarHeadingButton";
 import { ToolbarLinkButton } from "./ToolbarLinkButton";
@@ -21,11 +21,15 @@ interface RichTextEditorToolbarProps {
   hasListButtons?: boolean;
 }
 
-export const RichTextEditorToolbar = chakraForwardRef<"div", RichTextEditorToolbarProps>(
-  function RichTextEditorToolbar(
-    { isDisabled, hasPlaceholders, hasHeadingButton = true, hasListButtons = true, ...props },
+export const RichTextEditorToolbar = chakraComponent<"div", RichTextEditorToolbarProps>(
+  function RichTextEditorToolbar({
     ref,
-  ) {
+    isDisabled,
+    hasPlaceholders,
+    hasHeadingButton = true,
+    hasListButtons = true,
+    ...props
+  }) {
     const intl = useIntl();
     return (
       <Stack

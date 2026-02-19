@@ -28,10 +28,7 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
   let users: User[];
   let subscriptions: EventSubscription[];
 
-  let queueSpy: jest.SpyInstance<
-    ReturnType<IQueuesService["enqueueMessages"]>,
-    Parameters<IQueuesService["enqueueMessages"]>
-  >;
+  let queueSpy: ReturnType<typeof vi.spyOn>;
 
   let profileEventSubscriptionsListener: ProfileEventSubscriptionsListener;
 
@@ -49,7 +46,7 @@ describe("Worker - Profile Event Subscriptions Listener", () => {
     [organization] = await mocks.createRandomOrganizations(1);
     users = await mocks.createRandomUsers(organization.id, 6);
 
-    queueSpy = jest.spyOn(container.get<IQueuesService>(QUEUES_SERVICE), "enqueueMessages");
+    queueSpy = vi.spyOn(container.get<IQueuesService>(QUEUES_SERVICE), "enqueueMessages");
   });
 
   beforeEach(async () => {

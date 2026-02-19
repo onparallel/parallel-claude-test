@@ -1,5 +1,5 @@
-import { Box, useFormControl, useMultiStyleConfig } from "@chakra-ui/react";
-import { Text } from "@parallel/components/ui";
+import { useFormControl, useMultiStyleConfig } from "@chakra-ui/react";
+import { Box, Text } from "@parallel/components/ui";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import {
   PlaceholderCombobox,
@@ -44,7 +44,7 @@ import {
   unwrapList,
 } from "@udecode/plate-list";
 import { ELEMENT_PARAGRAPH, createParagraphPlugin } from "@udecode/plate-paragraph";
-import { forwardRef, useImperativeHandle, useRef } from "react";
+import { RefAttributes, useImperativeHandle, useRef } from "react";
 import { identity, isNonNullish, omit, pick, piped } from "remeda";
 import { EditableProps } from "slate-react/dist/components/editable";
 import { PlateWithEditorRef } from "./PlateWithEditorRef";
@@ -93,186 +93,182 @@ export interface RichTextEditorInstance {
   focus(): void;
 }
 
-export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorProps>(
-  function RichTextEditor(
-    {
-      id,
-      value,
-      onChange,
-      isDisabled,
-      isInvalid,
-      isRequired,
-      isReadOnly,
-      placeholder,
-      placeholderOptions,
-      toolbarOpts,
-      ...props
-    },
-    ref,
-  ) {
-    const hasPlaceholders = isNonNullish(placeholderOptions) && placeholderOptions.length > 0;
-    const placeholdersRef = useUpdatingRef(placeholderOptions ?? []);
-    const plugins = useConstant(() =>
-      createPlugins(
-        [
-          createReactPlugin(),
-          createHistoryPlugin(),
-          createParagraphPlugin(),
-          createBoldPlugin(),
-          createItalicPlugin(),
-          createUnderlinePlugin(),
-          createListPlugin(),
-          createAutoformatPlugin({
-            options: {
-              rules: [
-                {
-                  mode: "block",
-                  type: "list-item",
-                  match: ["* ", "- "],
-                  preFormat: (editor: CustomEditor) => unwrapList(editor),
-                  format: (editor: CustomEditor) => formatList(editor, "bulleted-list"),
-                },
-                {
-                  mode: "block",
-                  type: "list-item",
-                  match: ["1. ", "1) "],
-                  preFormat: (editor: CustomEditor) => unwrapList(editor),
-                  format: (editor: CustomEditor) => formatList(editor, "numbered-list"),
-                },
-              ],
-            },
-          }),
-          ...(hasPlaceholders
-            ? [createComboboxPlugin(), createPlaceholderPlugin({ placeholdersRef })]
-            : []),
-          createHeadingPlugin({ options: { levels: 2 } }),
-          createLinkPlugin(),
-          createExitBreakPlugin({
-            options: {
-              rules: [
-                {
-                  hotkey: "enter",
-                  query: { start: true, end: true, allow: ["heading", "subheading"] },
-                },
-              ],
-            },
-          }),
-        ],
-
-        {
-          components,
-          overrideByKey: {
-            [ELEMENT_PARAGRAPH]: { type: "paragraph" },
-            [ELEMENT_H1]: { type: "heading" },
-            [ELEMENT_H2]: { type: "subheading" },
-            [ELEMENT_OL]: { type: "numbered-list" },
-            [ELEMENT_UL]: { type: "bulleted-list" },
-            [ELEMENT_LI]: { type: "list-item" },
-            [ELEMENT_LIC]: { type: "list-item-child" },
-            [ELEMENT_LINK]: { type: "link" },
+export function RichTextEditor({
+  ref,
+  id,
+  value,
+  onChange,
+  isDisabled,
+  isInvalid,
+  isRequired,
+  isReadOnly,
+  placeholder,
+  placeholderOptions,
+  toolbarOpts,
+  ...props
+}: RichTextEditorProps & RefAttributes<RichTextEditorInstance>) {
+  const hasPlaceholders = isNonNullish(placeholderOptions) && placeholderOptions.length > 0;
+  const placeholdersRef = useUpdatingRef(placeholderOptions ?? []);
+  const plugins = useConstant(() =>
+    createPlugins(
+      [
+        createReactPlugin(),
+        createHistoryPlugin(),
+        createParagraphPlugin(),
+        createBoldPlugin(),
+        createItalicPlugin(),
+        createUnderlinePlugin(),
+        createListPlugin(),
+        createAutoformatPlugin({
+          options: {
+            rules: [
+              {
+                mode: "block",
+                type: "list-item",
+                match: ["* ", "- "],
+                preFormat: (editor: CustomEditor) => unwrapList(editor),
+                format: (editor: CustomEditor) => formatList(editor, "bulleted-list"),
+              },
+              {
+                mode: "block",
+                type: "list-item",
+                match: ["1. ", "1) "],
+                preFormat: (editor: CustomEditor) => unwrapList(editor),
+                format: (editor: CustomEditor) => formatList(editor, "numbered-list"),
+              },
+            ],
           },
+        }),
+        ...(hasPlaceholders
+          ? [createComboboxPlugin(), createPlaceholderPlugin({ placeholdersRef })]
+          : []),
+        createHeadingPlugin({ options: { levels: 2 } }),
+        createLinkPlugin(),
+        createExitBreakPlugin({
+          options: {
+            rules: [
+              {
+                hotkey: "enter",
+                query: { start: true, end: true, allow: ["heading", "subheading"] },
+              },
+            ],
+          },
+        }),
+      ],
+
+      {
+        components,
+        overrideByKey: {
+          [ELEMENT_PARAGRAPH]: { type: "paragraph" },
+          [ELEMENT_H1]: { type: "heading" },
+          [ELEMENT_H2]: { type: "subheading" },
+          [ELEMENT_OL]: { type: "numbered-list" },
+          [ELEMENT_UL]: { type: "bulleted-list" },
+          [ELEMENT_LI]: { type: "list-item" },
+          [ELEMENT_LIC]: { type: "list-item-child" },
+          [ELEMENT_LINK]: { type: "link" },
         },
-      ),
-    );
-    const formControl = useFormControl({
-      id,
-      isDisabled,
-      isInvalid,
-      isRequired,
-      isReadOnly,
-    });
-    const editorRef = useRef<RichTextPEditor>(null);
-
-    useImperativeHandle(ref, () => ({
-      focus: () => {
-        focusEditor(editorRef.current!);
       },
-    }));
+    ),
+  );
+  const formControl = useFormControl({
+    id,
+    isDisabled,
+    isInvalid,
+    isRequired,
+    isReadOnly,
+  });
+  const editorRef = useRef<RichTextPEditor>(null);
 
-    const { field: inputStyleConfig } = useMultiStyleConfig("Input", props);
-    const inputStyles = {
-      ...omit(inputStyleConfig as any, ["px", "height", "_focusVisible"]),
-      _focusWithin: (inputStyleConfig as any)._focusVisible,
-    } as any;
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      focusEditor(editorRef.current!);
+    },
+  }));
 
-    const editableProps = {
-      readOnly: formControl.disabled,
-      "aria-disabled": formControl.disabled,
-      placeholder,
-    };
+  const { field: inputStyleConfig } = useMultiStyleConfig("Input", props);
+  const inputStyles = {
+    ...omit(inputStyleConfig as any, ["px", "height", "_focusVisible"]),
+    _focusWithin: (inputStyleConfig as any)._focusVisible,
+  } as any;
 
-    const initialValue = useConstant(() => structuredClone(value));
+  const editableProps = {
+    readOnly: formControl.disabled,
+    "aria-disabled": formControl.disabled,
+    placeholder,
+  };
 
-    return (
-      <PlateProvider<RichTextEditorValue, RichTextPEditor>
-        id={formControl.id}
-        plugins={plugins as any}
-        initialValue={initialValue}
-        onChange={
-          !isDisabled
-            ? piped(hasPlaceholders ? removePlaceholderInputElements : identity, onChange)
-            : undefined
-        }
+  const initialValue = useConstant(() => structuredClone(value));
+
+  return (
+    <PlateProvider<RichTextEditorValue, RichTextPEditor>
+      id={formControl.id}
+      plugins={plugins as any}
+      initialValue={initialValue}
+      onChange={
+        !isDisabled
+          ? piped(hasPlaceholders ? removePlaceholderInputElements : identity, onChange)
+          : undefined
+      }
+    >
+      <Box
+        role="application"
+        overflow="hidden"
+        aria-disabled={formControl.disabled}
+        {...(pick(formControl, [
+          "aria-invalid",
+          "aria-required",
+          "aria-readonly",
+          "aria-describedby",
+        ]) as any)}
+        {...props}
+        sx={{
+          ...inputStyles,
+          "[data-slate-editor]": {
+            outline: "none",
+            minHeight: "120px !important",
+            paddingX: 4,
+            paddingY: 3,
+            maxHeight: "250px",
+            overflow: "auto",
+          },
+          "[data-slate-placeholder]": {
+            top: "unset !important",
+            width: "auto !important",
+            opacity: "1 !important",
+            color: "gray.400",
+          },
+        }}
       >
-        <Box
-          role="application"
-          overflow="hidden"
-          aria-disabled={formControl.disabled}
-          {...(pick(formControl, [
-            "aria-invalid",
-            "aria-required",
-            "aria-readonly",
-            "aria-describedby",
-          ]) as any)}
-          {...props}
-          sx={{
-            ...inputStyles,
-            "[data-slate-editor]": {
-              outline: "none",
-              minHeight: "120px !important",
-              paddingX: 4,
-              paddingY: 3,
-              maxHeight: "250px",
-              overflow: "auto",
-            },
-            "[data-slate-placeholder]": {
-              top: "unset !important",
-              width: "auto !important",
-              opacity: "1 !important",
-              color: "gray.400",
-            },
-          }}
-        >
-          <RichTextEditorToolbar
-            height="40px"
-            isDisabled={formControl.disabled || formControl.readOnly}
-            hasPlaceholders={hasPlaceholders}
-            hasHeadingButton={toolbarOpts?.headingButton}
-            hasListButtons={toolbarOpts?.listButtons}
-          />
+        <RichTextEditorToolbar
+          height="40px"
+          isDisabled={formControl.disabled || formControl.readOnly}
+          hasPlaceholders={hasPlaceholders}
+          hasHeadingButton={toolbarOpts?.headingButton}
+          hasListButtons={toolbarOpts?.listButtons}
+        />
 
-          {hasPlaceholders ? (
-            <PlaceholdersProvider placeholders={placeholderOptions}>
-              <PlateWithEditorRef<RichTextEditorValue, RichTextPEditor>
-                id={formControl.id}
-                editorRef={editorRef}
-                editableProps={editableProps}
-              >
-                <PlaceholderCombobox placeholders={placeholderOptions} />
-              </PlateWithEditorRef>
-            </PlaceholdersProvider>
-          ) : (
+        {hasPlaceholders ? (
+          <PlaceholdersProvider placeholders={placeholderOptions}>
             <PlateWithEditorRef<RichTextEditorValue, RichTextPEditor>
               id={formControl.id}
               editorRef={editorRef}
               editableProps={editableProps}
-            />
-          )}
-        </Box>
-      </PlateProvider>
-    );
-  },
-);
+            >
+              <PlaceholderCombobox placeholders={placeholderOptions} />
+            </PlateWithEditorRef>
+          </PlaceholdersProvider>
+        ) : (
+          <PlateWithEditorRef<RichTextEditorValue, RichTextPEditor>
+            id={formControl.id}
+            editorRef={editorRef}
+            editableProps={editableProps}
+          />
+        )}
+      </Box>
+    </PlateProvider>
+  );
+}
 
 function RenderElement({
   attributes,

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { FormControl, FormControlProps, FormErrorMessage, FormLabel } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { MessageEmailSubjectFormControl_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/usePetitionMessagePlaceholderOptions";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -12,10 +12,10 @@ interface MessageEmailSubjectFormControlProps extends Omit<FormControlProps, "va
   petition: MessageEmailSubjectFormControl_PetitionBaseFragment;
 }
 
-export const MessageEmailSubjectFormControl = chakraForwardRef<
+export const MessageEmailSubjectFormControl = chakraComponent<
   "div",
   MessageEmailSubjectFormControlProps
->(function MessageEmailSubjectFormControl({ value, onChange, petition, ...props }, ref) {
+>(function MessageEmailSubjectFormControl({ ref, value, onChange, petition, ...props }) {
   const intl = useIntl();
   const placeholderOptions = usePetitionMessagePlaceholderOptions({ petition });
   return (

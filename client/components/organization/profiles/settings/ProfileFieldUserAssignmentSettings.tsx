@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client";
-import { FormControl, FormHelperText, FormLabel, Stack } from "@chakra-ui/react";
+import { FormControl, FormHelperText, FormLabel } from "@chakra-ui/react";
 import { UserGroupSelect } from "@parallel/components/common/UserGroupSelect";
 import { UserSelect_UserGroupFragment } from "@parallel/graphql/__types";
 import { useSearchUserGroups } from "@parallel/utils/useSearchUserGroups";
+import { Stack } from "@parallel/components/ui";
 import { useCallback } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -23,7 +24,7 @@ export function ProfileFieldUserAssignmentSettings() {
     [_handleSearchUserGroups],
   );
   return (
-    <Stack spacing={4}>
+    <Stack gap={4}>
       <Controller
         control={control}
         name="options.allowedUserGroupId"

@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, MenuButton, MenuDivider, MenuItem, MenuList, Stack } from "@chakra-ui/react";
+import { MenuButton, MenuDivider, MenuItem, MenuList } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import { ChevronDownIcon, DeleteIcon, UserArrowIcon, UserIcon } from "@parallel/chakra/icons";
 import { SubscribedNotificationsIcon } from "@parallel/components/common/SubscribedNotificationsIcon";
 import { UserAvatar } from "@parallel/components/common/UserAvatar";
-import { Avatar, Button, Text } from "@parallel/components/ui";
+import { Avatar, Box, Button, Flex, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionPermissionTypeRW,
   TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragment,
@@ -47,7 +47,7 @@ export function TemplateDefaultUserPermissionRow({
       <Box flex="1" minWidth={0} fontSize="sm" marginStart={2}>
         {isNonNullish(permission) ? (
           <>
-            <Stack direction={"row"} spacing={1} align="center">
+            <Stack direction={"row"} gap={1} align="center">
               <Text lineClamp={1} wordBreak="break-all">
                 {permission.user.fullName}{" "}
                 {userId === permission.user.id ? (

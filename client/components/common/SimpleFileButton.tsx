@@ -1,6 +1,6 @@
 import { ButtonProps } from "@chakra-ui/react";
 import { Button } from "@parallel/components/ui";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { FileIcon } from "./FileIcon";
 import { FileName } from "./FileName";
 
@@ -9,8 +9,8 @@ export interface SimpleFileButtonProps extends ButtonProps {
   contentType: string;
 }
 
-export const SimpleFileButton = chakraForwardRef<"button", SimpleFileButtonProps>(
-  function SimpleFileButton({ filename, contentType, ...props }, ref) {
+export const SimpleFileButton = chakraComponent<"button", SimpleFileButtonProps>(
+  function SimpleFileButton({ ref, filename, contentType, ...props }) {
     return (
       <Button
         ref={ref}

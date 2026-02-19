@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
-import { HStack, Stack } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
-import { Button, Text } from "@parallel/components/ui";
+import { chakraComponent } from "@parallel/chakra/utils";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { ProfileFieldSuggestion_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { PropsWithChildren, ReactNode } from "react";
@@ -15,19 +14,23 @@ interface ProfileFieldSuggestionProps {
   icon?: ReactNode;
 }
 
-export const ProfileFieldSuggestion = chakraForwardRef<
+export const ProfileFieldSuggestion = chakraComponent<
   "button",
   PropsWithChildren<ProfileFieldSuggestionProps>
->(function ProfileFieldSuggestion(
-  { petitionField, petitionFieldIndex, children, icon, ...props },
+>(function ProfileFieldSuggestion({
   ref,
-) {
+  petitionField,
+  petitionFieldIndex,
+  children,
+  icon,
+  ...props
+}) {
   return (
     <SmallPopover
       width="auto"
       maxWidth="container.xs"
       content={
-        <Stack spacing={0.5}>
+        <Stack gap={0.5}>
           <Text fontSize="sm">
             <FormattedMessage
               id="component.profile-field-suggestion.popover"

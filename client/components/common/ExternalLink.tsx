@@ -1,16 +1,18 @@
 import { LinkProps } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { NormalLink } from "./Link";
 
 interface ExternalLinkProps extends LinkProps {
   hideIcon?: boolean;
 }
 
-export const ExternalLink = chakraForwardRef<"a", ExternalLinkProps>(function ExternalLink(
-  { children, hideIcon, ...props },
+export const ExternalLink = chakraComponent<"a", ExternalLinkProps>(function ExternalLink({
   ref,
-) {
+  children,
+  hideIcon,
+  ...props
+}) {
   return (
     <NormalLink isExternal ref={ref} {...props}>
       {children}

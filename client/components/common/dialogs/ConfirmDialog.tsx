@@ -1,5 +1,4 @@
 import {
-  Flex,
   HTMLChakraProps,
   ModalBody,
   ModalCloseButton,
@@ -7,9 +6,8 @@ import {
   ModalContentProps,
   ModalFooter,
   ModalHeader,
-  Stack,
 } from "@chakra-ui/react";
-import { Button } from "@parallel/components/ui";
+import { Button, Flex, Stack } from "@parallel/components/ui";
 import { MaybeFunction, unMaybeFunction } from "@parallel/utils/types";
 import { useUpdatingMemoRef } from "@parallel/utils/useUpdatingRef";
 import { ReactNode, useRef } from "react";

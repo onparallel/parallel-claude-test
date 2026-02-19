@@ -1,31 +1,18 @@
 import {
-  SimpleOption,
   SimpleSelect,
   SimpleSelectProps,
   useSimpleSelectOptions,
 } from "@parallel/components/common/SimpleSelect";
 import { BackgroundCheckEntitySearchType } from "@parallel/graphql/__types";
-import { Focusable } from "@parallel/utils/types";
-import { forwardRef, useImperativeHandle, useRef } from "react";
 import { IntlShape, useIntl } from "react-intl";
-import { SelectInstance } from "react-select";
 
-export const BackgroundCheckEntityTypeSelect = forwardRef<
-  Focusable,
-  Omit<SimpleSelectProps<BackgroundCheckEntitySearchType, false>, "options">
->(function BackgroundCheckEntityTypeSelect(props, ref) {
+export function BackgroundCheckEntityTypeSelect(
+  props: Omit<SimpleSelectProps<BackgroundCheckEntitySearchType, false>, "options">,
+) {
   const intl = useIntl();
   const options = useBackgroundCheckEntityTypeSelectOptions();
-  const _ref = useRef<SelectInstance<SimpleOption<BackgroundCheckEntitySearchType>, false>>(null);
-  useImperativeHandle(ref, () => ({
-    focus: () => {
-      _ref.current?.focus();
-    },
-  }));
-
   return (
     <SimpleSelect
-      ref={_ref}
       options={options}
       isClearable={true}
       isSearchable={false}
@@ -36,7 +23,7 @@ export const BackgroundCheckEntityTypeSelect = forwardRef<
       {...props}
     />
   );
-});
+}
 
 const useBackgroundCheckEntityTypeSelectOptions = () => {
   return useSimpleSelectOptions(

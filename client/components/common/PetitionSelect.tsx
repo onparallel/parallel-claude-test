@@ -16,7 +16,7 @@ import { If, MaybeArray, unMaybeArray } from "@parallel/utils/types";
 import { useAsyncMemo } from "@parallel/utils/useAsyncMemo";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import pMap from "p-map";
-import { ForwardedRef, ReactElement, RefAttributes, forwardRef, useCallback, useMemo } from "react";
+import { RefAttributes, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, {
   MultiValueGenericProps,
@@ -56,26 +56,25 @@ export interface PetitionSelectProps<
   noOfLines?: number;
 }
 
-export const PetitionSelect = forwardRef(function PetitionSelect<
+export function PetitionSelect<
   IsMulti extends boolean = false,
   IsSync extends boolean = false,
   OptionType extends PetitionSelectSelection = PetitionSelectSelection,
->(
-  {
-    value,
-    isSync,
-    onChange,
-    options,
-    isMulti,
-    placeholder: _placeholder,
-    excludePetitions,
-    excludePublicTemplates,
-    minEffectivePermission,
-    fromTemplateId,
-    ...props
-  }: PetitionSelectProps<IsMulti, IsSync, OptionType>,
-  ref: ForwardedRef<PetitionSelectInstance<IsMulti, OptionType>>,
-) {
+>({
+  ref,
+  value,
+  isSync,
+  onChange,
+  options,
+  isMulti,
+  placeholder: _placeholder,
+  excludePetitions,
+  excludePublicTemplates,
+  minEffectivePermission,
+  fromTemplateId,
+  ...props
+}: PetitionSelectProps<IsMulti, IsSync, OptionType> &
+  RefAttributes<PetitionSelectInstance<IsMulti, OptionType>>) {
   const needsLoading =
     typeof value === "string" || (Array.isArray(value) && typeof value[0] === "string");
 
@@ -206,14 +205,7 @@ export const PetitionSelect = forwardRef(function PetitionSelect<
       {...rsProps}
     />
   );
-}) as <
-  IsMulti extends boolean = false,
-  IsSync extends boolean = false,
-  OptionType extends PetitionSelectSelection = PetitionSelectSelection,
->(
-  props: PetitionSelectProps<IsMulti, IsSync, OptionType> &
-    RefAttributes<PetitionSelectInstance<IsMulti, OptionType>>,
-) => ReactElement;
+}
 
 function useGetPetitions() {
   const client = useApolloClient();

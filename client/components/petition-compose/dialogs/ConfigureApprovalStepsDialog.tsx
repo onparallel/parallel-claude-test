@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 import {
-  Box,
   Center,
   Checkbox,
   Editable,
@@ -9,9 +8,7 @@ import {
   EditablePreview,
   FormControl,
   Grid,
-  HStack,
   Spinner,
-  Stack,
   useEditableControls,
 } from "@chakra-ui/react";
 import {
@@ -31,7 +28,7 @@ import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { SimpleSelect, useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   ApprovalFlowConfigInput,
   ConfigureApprovalStepsDialog_PetitionBaseFragment,
@@ -436,7 +433,7 @@ function ApprovalCard({ index, petition, onRemove }: ApprovalCardProps) {
       </HStack>
       <FormControl>
         <Checkbox {...register(`approvals.${index}.manualStart`)}>
-          <HStack spacing={1}>
+          <HStack gap={1}>
             <Text>
               <FormattedMessage
                 id="component.configure-approval-steps-dialog.checkbox-start-approval-manually"
@@ -456,7 +453,7 @@ function ApprovalCard({ index, petition, onRemove }: ApprovalCardProps) {
       </FormControl>
       <FormControl>
         <Checkbox {...register(`approvals.${index}.allowEdit`)} backgroundColor="white">
-          <HStack spacing={1}>
+          <HStack gap={1}>
             <Text>
               <FormattedMessage
                 id="component.configure-approval-steps-dialog.checkbox-allow-edit"

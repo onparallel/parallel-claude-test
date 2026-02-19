@@ -1,11 +1,11 @@
 import { gql } from "@apollo/client";
 import { useApolloClient, useMutation } from "@apollo/client/react";
-import { Alert, AlertDescription, AlertIcon, Stack } from "@chakra-ui/react";
+import { Alert, AlertDescription, AlertIcon } from "@chakra-ui/react";
 import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/ConfirmDeleteDialog";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import {
   useDeleteProfileType_deleteProfileTypeDocument,
   useDeleteProfileType_profilesSimpleDocument,

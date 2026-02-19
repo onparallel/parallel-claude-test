@@ -1,15 +1,12 @@
 import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
 import {
-  Box,
   Circle,
-  Flex,
   FormControl,
   MenuButton,
   MenuDivider,
   MenuItem,
   MenuList,
-  Stack,
   useToast,
 } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
@@ -21,7 +18,7 @@ import { UserGroupReference } from "@parallel/components/common/UserGroupReferen
 import { UserReference } from "@parallel/components/common/UserReference";
 
 import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
-import { Avatar, Button, Text } from "@parallel/components/ui";
+import { Avatar, Box, Button, Flex, Stack, Text } from "@parallel/components/ui";
 import {
   DashboardPermissionType,
   DashboardSharingDialog_createDashboardPermissionsDocument,

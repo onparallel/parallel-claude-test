@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Badge, Center, Flex, Grid, HStack, Stack } from "@chakra-ui/react";
+import { Badge, Center, Grid } from "@chakra-ui/react";
 import { AdminOrganizationsLayout } from "@parallel/components/admin-organizations/AdminOrganizationsLayout";
 import { AdminOrganizationsSubscriptionCard } from "@parallel/components/admin-organizations/AdminOrganizationsSubscriptionCard";
 import { useUpdateOrganizationCurrentUsagePeriodDialog } from "@parallel/components/admin-organizations/dialogs/UpdateOrganizationCurrentUsagePeriodDialog";
@@ -12,7 +12,7 @@ import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdminAccess";
 import { TimeSpan } from "@parallel/components/reports/common/TimeSpan";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   AdminOrganizationsSubscriptions_modifyCurrentUsagePeriodDocument,
   AdminOrganizationsSubscriptions_organizationUsagePeriodsQueryDocument,
@@ -238,7 +238,7 @@ function AdminOrganizationsSubscriptions({ organizationId }: AdminOrganizationsS
       queryObject={queryObject}
       organization={organization}
     >
-      <Stack padding={4} spacing={4} paddingBottom={24}>
+      <Stack padding={4} gap={4} paddingBottom={24}>
         <Grid gap={4} templateColumns={{ base: "auto", lg: "1fr 1fr 1fr" }}>
           <AdminOrganizationsSubscriptionCard
             headerLabel={intl.formatMessage({

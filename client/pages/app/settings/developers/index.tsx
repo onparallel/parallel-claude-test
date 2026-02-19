@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Heading, Stack } from "@chakra-ui/react";
+import { Heading } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { WithApolloDataContext, withApolloData } from "@parallel/components/common/withApolloData";
 import { withPermission } from "@parallel/components/common/withPermission";
@@ -21,7 +21,7 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 
 import { useMutation } from "@apollo/client/react";
-import { Badge, Box, Center, HStack, List, ListItem, Switch } from "@chakra-ui/react";
+import { Badge, Center, List, ListItem, Switch } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { AlertCircleFilledIcon, DeleteIcon, EditIcon, RepeatIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
@@ -37,7 +37,7 @@ import { useConfirmDeleteDialog } from "@parallel/components/common/dialogs/Conf
 import { useConfirmDeactivateEventSubscriptionDialog } from "@parallel/components/settings/dialogs/ConfirmDeactivateEventSubscriptionDialog";
 import { useCreateOrUpdatePetitionEventSubscriptionDialog } from "@parallel/components/settings/dialogs/CreateOrUpdatePetitionEventSubscriptionDialog";
 import { useCreateOrUpdateProfileEventSubscriptionDialog } from "@parallel/components/settings/dialogs/CreateOrUpdateProfileEventSubscriptionDialog";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionEventType,
   Subscriptions_deleteEventSubscriptionSignatureKeysDocument,
@@ -358,14 +358,14 @@ function Subscriptions() {
 
   return (
     <DevelopersLayout currentTabKey="subscriptions" queryObject={queryObject}>
-      <Stack padding={6} spacing={6} paddingBottom={24}>
+      <Stack padding={6} gap={6} paddingBottom={24}>
         <Text>
           <FormattedMessage
             id="page.subscriptions.subscriptions-explanation"
             defaultMessage="Here you can register webhooks to get notified when anything happens in one of your parallels (e.g. when a recipients adds a comment or when the parallel is completed)"
           />
         </Text>
-        <Stack spacing={4}>
+        <Stack gap={4}>
           <Heading as="h3" size="md">
             <FormattedMessage
               id="page.subscriptions.petition-subscriptions-title"
@@ -425,7 +425,7 @@ function Subscriptions() {
             </Box>
           </Card>
         </Stack>
-        <Stack spacing={4}>
+        <Stack gap={4}>
           <Heading as="h3" size="md">
             <FormattedMessage
               id="page.subscriptions.profiles-subscriptions-title"

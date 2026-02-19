@@ -1,6 +1,6 @@
-import { Box, Center, HStack, HTMLChakraProps, List, ListItem, Stack } from "@chakra-ui/react";
+import { Center, HTMLChakraProps, List, ListItem } from "@chakra-ui/react";
 import { DragHandleIcon, EyeIcon, EyeOffIcon } from "@parallel/chakra/icons";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { Reorder, useDragControls } from "framer-motion";
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -81,7 +81,7 @@ function ColumnVisibilityDialog<T extends string>({
               axis="y"
               values={currentSelection}
               onReorder={setCurrentSelection as any}
-              spacing={2}
+              gap={2}
             >
               {currentSelection.map((key) => {
                 const column = columns.find((c) => c.key === key);

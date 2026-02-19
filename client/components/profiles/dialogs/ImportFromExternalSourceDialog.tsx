@@ -4,17 +4,14 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
-  Box,
   Center,
   FormControl,
   FormErrorMessage,
   FormLabel,
-  HStack,
   Image,
   Input,
   Radio,
   RadioGroup,
-  Stack,
   Table,
   Tbody,
   Td,
@@ -43,7 +40,7 @@ import { SelectableTd, SelectableTr } from "@parallel/components/common/Selectab
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { SupportLink } from "@parallel/components/common/SupportLink";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   ImportFromExternalSourceDialog_completeProfileFromExternalSourceDocument,
   ImportFromExternalSourceDialog_integrationsDocument,
@@ -176,7 +173,7 @@ function ImportFromExternalSourceDialogSelectSource({
           {noIntegrations ? (
             <Alert status="warning" rounded="md">
               <AlertIcon />
-              <HStack spacing={8}>
+              <HStack gap={8}>
                 <AlertDescription>
                   <FormattedMessage
                     id="component.import-from-external-source-dialog.missing-integration-alert-description"

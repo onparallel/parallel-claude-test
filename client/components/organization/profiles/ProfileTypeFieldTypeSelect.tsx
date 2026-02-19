@@ -1,4 +1,3 @@
-import { Flex } from "@chakra-ui/react";
 import {
   SimpleOption,
   SimpleSelect,
@@ -8,16 +7,17 @@ import {
 } from "@parallel/components/common/SimpleSelect";
 import { ProfileTypeFieldType } from "@parallel/graphql/__types";
 import { PROFILE_TYPE_FIELDS, PROFILE_TYPE_FIELD_CONFIG } from "@parallel/utils/profileFields";
-import { forwardRef } from "react";
+import { Flex } from "@parallel/components/ui";
+import { RefAttributes } from "react";
 import { OptionProps, SingleValueProps, components } from "react-select";
 import { ProfileTypeFieldTypeLabel } from "./ProfileTypeFieldTypeLabel";
 
-export interface ProfileTypeFieldTypeSelectProps extends SimpleSelectProps<ProfileTypeFieldType> {}
+interface ProfileTypeFieldTypeSelectProps extends SimpleSelectProps<ProfileTypeFieldType> {}
 
-export const ProfileTypeFieldTypeSelect = forwardRef<
-  SimpleSelectInstance<ProfileTypeFieldType, false>,
-  ProfileTypeFieldTypeSelectProps
->(function ProfileTypeFieldTypeSelect({ ...props }, ref) {
+export function ProfileTypeFieldTypeSelect(
+  props: ProfileTypeFieldTypeSelectProps &
+    RefAttributes<SimpleSelectInstance<ProfileTypeFieldType, false>>,
+) {
   const options = useSimpleSelectOptions(
     (intl) =>
       PROFILE_TYPE_FIELDS.map((type) => ({
@@ -26,15 +26,8 @@ export const ProfileTypeFieldTypeSelect = forwardRef<
       })),
     [],
   );
-  return (
-    <SimpleSelect
-      ref={ref}
-      options={options}
-      components={{ SingleValue, Option } as any}
-      {...props}
-    />
-  );
-});
+  return <SimpleSelect options={options} components={{ SingleValue, Option } as any} {...props} />;
+}
 
 function SingleValue(props: SingleValueProps<SimpleOption<ProfileTypeFieldType>>) {
   return (

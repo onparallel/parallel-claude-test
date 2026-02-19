@@ -1,8 +1,6 @@
 import { run } from "../utils/run";
 import { apiRequest } from "./apiHelpers";
 
-const FROM_PROFILE_TYPE_ID = "3gtknhcm5YKAVC7jz7QeoQEK";
-
 const offset = process.env.OFFSET ? parseInt(process.env.OFFSET) : 0;
 
 async function main() {
@@ -12,7 +10,7 @@ async function main() {
     // break condition is when there are no more profiles to delete
     const result = await apiRequest<{ items: { id: string }[]; totalCount: number }>("/profiles", {
       query: new URLSearchParams([
-        ["profileTypeIds", FROM_PROFILE_TYPE_ID],
+        ["profileTypeId", "6YHC3CN5M8QLoqmV9eJqk"],
         ["status", "OPEN"],
         ["limit", "100"],
         ["offset", `${offset}`],
@@ -22,7 +20,7 @@ async function main() {
       ]),
     });
     totalCount = result.totalCount;
-    console.debug(`Fetched ${result.items.length}/${totalCount}`);
+    console.debug(`Fetched ${offset}-${offset + result.items.length}/${totalCount}`);
 
     if (result.items.length === 0) {
       break;

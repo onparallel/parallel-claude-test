@@ -1,12 +1,12 @@
 import { gql } from "@apollo/client";
 import { useLazyQuery } from "@apollo/client/react";
-import { FormControl, HStack, Input, Stack } from "@chakra-ui/react";
+import { FormControl, Input } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
   useWizardDialog,
   WizardStepDialogProps,
 } from "@parallel/components/common/dialogs/WizardDialog";
-import { Button } from "@parallel/components/ui";
+import { Button, HStack, Stack } from "@parallel/components/ui";
 import {
   CreatePetitionFieldInput,
   PetitionFieldType,
@@ -233,7 +233,7 @@ function CreatePetitionFieldGroupProfileTypeDialogGroupName({
               )}
             />
 
-            <HStack flexWrap="wrap" marginTop={2} gap={2} spacing={0}>
+            <HStack flexWrap="wrap" marginTop={2} gap={2}>
               {suggestions
                 .filter((suggestion) => suggestion.name.toLowerCase() !== currentName.toLowerCase())
                 .map((suggestion) => (

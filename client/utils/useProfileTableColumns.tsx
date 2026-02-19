@@ -1,19 +1,15 @@
 import { gql } from "@apollo/client";
 import {
-  Box,
   ButtonGroup,
-  Flex,
   FormControl,
   FormErrorMessage,
   Grid,
-  HStack,
   IconButton,
   Input,
-  Stack,
   ThemingProps,
 } from "@chakra-ui/react";
 import { CloseIcon, PlusCircleFilledIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { BackgroundCheckTopicSelect } from "@parallel/components/common/BackgroundCheckTopicSelect";
 import { DateInput } from "@parallel/components/common/DateInput";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -30,7 +26,7 @@ import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { UserSelect } from "@parallel/components/common/UserSelect";
 import { ProfileFormFieldCheckboxInner } from "@parallel/components/profiles/form-fields/ProfileFormFieldCheckbox";
 import { ProfileFormFieldSelectInner } from "@parallel/components/profiles/form-fields/ProfileFormFieldSelect";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   FilterSharedWithLogicalOperator,
   ProfileValueFilterLine_ProfileTypeFieldFragment,
@@ -38,17 +34,8 @@ import {
   useProfileTableColumns_ProfileWithPropertiesFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import { format, startOfMonth } from "date-fns";
-import {
-  ClipboardEvent,
-  forwardRef,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { ClipboardEvent, RefAttributes, useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { components, InputActionMeta, InputProps } from "react-select";
@@ -59,6 +46,7 @@ import { never } from "./never";
 import { ProfileTypeFieldOptions } from "./profileFields";
 import { ProfileQueryFilterCondition, ProfileQueryFilterGroup } from "./ProfileQueryFilter";
 import { UseReactSelectProps, useReactSelectProps } from "./react-select/hooks";
+import { Focusable } from "./types";
 import { useProfileFieldValueFilterOperators } from "./useProfileFieldValueFilterOperators";
 import { useSearchUsers } from "./useSearchUsers";
 import { isValidDateString } from "./validation";
@@ -353,7 +341,7 @@ function ProfileValueFilter({
           </Button>
         )}
         <Spacer />
-        <ButtonGroup spacing={2}>
+        <ButtonGroup gap={2}>
           <Button size="sm" onClick={() => setValue("filter.conditions", [])}>
             <FormattedMessage id="generic.clear" defaultMessage="Clear" />
           </Button>
@@ -657,8 +645,8 @@ const _fragmentsProfileValueFilterLine = {
   `,
 };
 
-const SimpleDurationInput = chakraForwardRef<"input", ValueProps<string> & ThemingProps<"Input">>(
-  function SimpleDurationInput({ value, onChange, ...props }, ref) {
+const SimpleDurationInput = chakraComponent<"input", ValueProps<string> & ThemingProps<"Input">>(
+  function SimpleDurationInput({ ref, value, onChange, ...props }) {
     const intl = useIntl();
     const match = value?.match(/^P(\d+)([YMWD])$/);
     const [_, amount, span] = match ?? [, "", "M"];
@@ -710,84 +698,85 @@ interface FreeTextMultiSelectProps
     UseReactSelectProps<any, true, never>,
     Omit<CreatableProps<any, true, never>, "value" | "onChange"> {}
 
-const FreeTextMultiSelect = forwardRef<CreatableSelect, FreeTextMultiSelectProps>(
-  function FreeTextMultiSelect({ value, onChange, ...props }, ref) {
-    const innerRef = useRef<CreatableSelect>(null);
-    const _ref = useMergeRefs(ref, innerRef);
-    const rsProps = useReactSelectProps({
-      ...props,
-      components: _components as any,
-    });
-    const [inputValue, setInputValue] = useState("");
+function FreeTextMultiSelect({
+  ref,
+  value,
+  onChange,
+  ...props
+}: FreeTextMultiSelectProps & RefAttributes<Focusable>) {
+  const rsProps = useReactSelectProps({
+    ...props,
+    components: _components as any,
+  });
+  const [inputValue, setInputValue] = useState("");
 
-    function handleKeyDown(event: KeyboardEvent) {
-      switch (event.key) {
-        case "Enter":
-        case "Tab":
-          const newValue = inputValue.trim();
-          if (newValue.length) {
-            event.preventDefault();
-            const updatedValues = unique([...value, newValue]);
-            onChange(updatedValues.slice(0, 100)); // limit to 100
-            setInputValue("");
-          }
-      }
-    }
-    function handleInputChange(_value: string, meta: InputActionMeta) {
-      switch (meta.action) {
-        case "input-change":
-          if (_value === "") {
-            setInputValue("");
-          } else {
-            setInputValue(_value);
-          }
-          break;
-        case "set-value":
+  function handleKeyDown(event: KeyboardEvent) {
+    switch (event.key) {
+      case "Enter":
+      case "Tab":
+        const newValue = inputValue.trim();
+        if (newValue.length) {
+          event.preventDefault();
+          const updatedValues = unique([...value, newValue]);
+          onChange(updatedValues.slice(0, 100)); // limit to 100
           setInputValue("");
-          break;
-        case "input-blur":
-          const newValue = inputValue.trim();
-          if (newValue.length) {
-            setInputValue("");
-            onChange(unique([...value, newValue]));
-          }
-          break;
-      }
-    }
-    function handlePaste(e: ClipboardEvent<HTMLInputElement>) {
-      if (e.clipboardData.types.includes("text/plain")) {
-        const text = e.clipboardData.getData("text/plain") as string;
-        if (text.includes("\n")) {
-          const values = text
-            .split("\n")
-            .map((l) => l.trim())
-            .filter((l) => l.length > 0);
-          if (values.length > 0) {
-            const newValues = unique([...value, ...values]);
-            onChange(newValues.slice(0, 100)); // limit to 100
-          }
-          e.preventDefault();
         }
+    }
+  }
+  function handleInputChange(_value: string, meta: InputActionMeta) {
+    switch (meta.action) {
+      case "input-change":
+        if (_value === "") {
+          setInputValue("");
+        } else {
+          setInputValue(_value);
+        }
+        break;
+      case "set-value":
+        setInputValue("");
+        break;
+      case "input-blur":
+        const newValue = inputValue.trim();
+        if (newValue.length) {
+          setInputValue("");
+          onChange(unique([...value, newValue]));
+        }
+        break;
+    }
+  }
+  function handlePaste(e: ClipboardEvent<HTMLInputElement>) {
+    if (e.clipboardData.types.includes("text/plain")) {
+      const text = e.clipboardData.getData("text/plain") as string;
+      if (text.includes("\n")) {
+        const values = text
+          .split("\n")
+          .map((l) => l.trim())
+          .filter((l) => l.length > 0);
+        if (values.length > 0) {
+          const newValues = unique([...value, ...values]);
+          onChange(newValues.slice(0, 100)); // limit to 100
+        }
+        e.preventDefault();
       }
     }
+  }
 
-    return (
-      <CreatableSelect
-        ref={_ref as any}
-        isMulti
-        placeholder={props.placeholder ?? ""}
-        value={value.map((value) => ({ value, label: value }))}
-        onChange={(value) => onChange(value.map(({ value }) => value))}
-        menuIsOpen={false}
-        inputValue={inputValue}
-        onInputChange={handleInputChange}
-        onKeyDown={handleKeyDown as any}
-        {...rsProps}
-        {...{ onPaste: handlePaste }}
-      />
-    );
-  },
-);
+  return (
+    <CreatableSelect
+      ref={ref as any}
+      isMulti
+      placeholder={props.placeholder ?? ""}
+      value={value.map((value) => ({ value, label: value }))}
+      onChange={(value) => onChange(value.map(({ value }) => value))}
+      menuIsOpen={false}
+      inputValue={inputValue}
+      onInputChange={handleInputChange}
+      onKeyDown={handleKeyDown as any}
+      {...rsProps}
+      {...{ onPaste: handlePaste }}
+    />
+  );
+}
 
 const _components = {
   DropdownIndicator: () => <Spacer width={2} />,

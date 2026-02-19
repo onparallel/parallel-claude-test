@@ -1,5 +1,5 @@
 import { ButtonOptions, ThemingProps } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { Button } from "@parallel/components/ui";
 import { isNonNullish } from "remeda";
 
@@ -7,10 +7,14 @@ interface SupportButton extends ButtonOptions, ThemingProps<"Button"> {
   message: string;
 }
 
-export const SupportButton = chakraForwardRef<"a", SupportButton>(function SupportButton(
-  { message, onClick, children, isDisabled, ...props },
+export const SupportButton = chakraComponent<"a", SupportButton>(function SupportButton({
   ref,
-) {
+  message,
+  onClick,
+  children,
+  isDisabled,
+  ...props
+}) {
   if (isDisabled) {
     return (
       <Button ref={ref as any} as="a" {...(props as any)} disabled={isDisabled}>

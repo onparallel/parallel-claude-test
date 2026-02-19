@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
-import { Box, GridItem, Heading, HStack, MenuItem, MenuList } from "@chakra-ui/react";
+import { GridItem, Heading, MenuItem, MenuList } from "@chakra-ui/react";
 import { DocumentIcon, DownloadIcon } from "@parallel/chakra/icons";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, HStack, Text } from "@parallel/components/ui";
 import { OlderSignatureRequestRows_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
 import { useSignatureCancelledRequestErrorMessage } from "@parallel/utils/useSignatureCancelledRequestErrorMessage";
 import { Fragment } from "react";

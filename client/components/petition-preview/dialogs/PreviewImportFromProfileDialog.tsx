@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useLazyQuery } from "@apollo/client/react";
-import { FormControl, FormErrorMessage, FormLabel, Stack } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
   useWizardDialog,
@@ -8,7 +8,7 @@ import {
 } from "@parallel/components/common/dialogs/WizardDialog";
 import { ProfileSelect, ProfileSelectInstance } from "@parallel/components/common/ProfileSelect";
 import { ProfileRelationshipsAssociationTable } from "@parallel/components/profiles/ProfileRelationshipsAssociationTable";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import {
   CreatePetitionFromProfilePrefillInput,
   usePreviewImportFromProfileDialog_PetitionBaseFragment,
@@ -216,7 +216,7 @@ function PreviewImportFromProfileDialogPrefillFieldGroups({
         />
       }
       body={
-        <Stack spacing={3}>
+        <Stack gap={3}>
           <Text>
             <FormattedMessage
               id="component.preview-import-from-profile-dialog.body-select-relationships"

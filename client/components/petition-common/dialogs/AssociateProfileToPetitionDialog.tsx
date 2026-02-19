@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client";
-import { FormControl, FormErrorMessage, FormLabel, HStack } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel } from "@chakra-ui/react";
 import { ArrowDiagonalRightIcon } from "@parallel/chakra/icons";
 import { ProfileSelect, ProfileSelectInstance } from "@parallel/components/common/ProfileSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Text } from "@parallel/components/ui";
 import { useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";

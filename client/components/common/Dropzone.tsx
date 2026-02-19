@@ -1,6 +1,7 @@
-import { Box, useFormControl } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
+import { useFormControl } from "@chakra-ui/react";
 import { generateCssStripe } from "@parallel/utils/css";
+import { Box } from "@parallel/components/ui";
 import { InputHTMLAttributes, ReactNode, useImperativeHandle } from "react";
 import { DropzoneOptions, DropzoneRef, DropzoneState, useDropzone } from "react-dropzone";
 import { pick } from "remeda";
@@ -14,7 +15,10 @@ export interface DropzoneProps
   isInvalid?: boolean;
 }
 
-export const Dropzone = chakraForwardRef<"div", DropzoneProps, DropzoneRef>(function (props, ref) {
+export const Dropzone = chakraComponent<"div", DropzoneProps, DropzoneRef>(function Dropzone({
+  ref,
+  ...props
+}) {
   const {
     accept,
     minSize,

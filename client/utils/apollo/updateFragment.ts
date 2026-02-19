@@ -3,7 +3,7 @@ import type { Cache } from "@apollo/client/cache";
 import { omit } from "remeda";
 
 interface UpdateFragmentOptions<TData, TVariables extends OperationVariables>
-  extends Omit<Cache.ReadFragmentOptions<TData, TVariables>, "returnPartialData"> {
+  extends Omit<Cache.ReadFragmentOptions<TData, TVariables>, "returnPartialData" | "from"> {
   returnPartialData?: boolean;
   optimistic?: boolean;
   broadcast?: boolean;

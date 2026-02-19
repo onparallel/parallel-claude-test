@@ -1,16 +1,12 @@
 import { ApolloCache, gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
-  Box,
   Center,
-  Flex,
   FormControl,
   FormLabel,
-  HStack,
   Heading,
   IconButton,
   Input,
-  Stack,
   Switch,
 } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
@@ -27,7 +23,7 @@ import {
   SettingsIcon,
   UnlinkIcon,
 } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import {
   PetitionComposeFieldAttachment_PetitionFieldAttachmentFragmentDoc,
   PetitionComposeField_PetitionBaseFragment,
@@ -53,13 +49,13 @@ import { withError } from "@parallel/utils/promises/withError";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { Assert, UnwrapArray } from "@parallel/utils/types";
 import { UploadFileError, uploadFile } from "@parallel/utils/uploadFile";
+import { usePrevious } from "@parallel/utils/use-previous";
 import { useConstant } from "@parallel/utils/useConstant";
 import { useHasAdverseMediaSearch } from "@parallel/utils/useHasAdverseMediaSearch";
 import { useHasBackgroundCheck } from "@parallel/utils/useHasBackgroundCheck";
 import { useHasIdVerification } from "@parallel/utils/useHasIdVerification";
-import { MultipleRefObject } from "@parallel/utils/useMultipleRefs";
 import { useMergeRefs } from "@parallel/utils/useMergeRefs";
-import { usePrevious } from "@parallel/utils/use-previous";
+import { MultipleRefObject } from "@parallel/utils/useMultipleRefs";
 import { fromEvent } from "file-selector";
 import NextLink from "next/link";
 import pMap from "p-map";
@@ -90,11 +86,11 @@ import { PetitionComposeFieldAttachment } from "./PetitionComposeFieldAttachment
 import { PetitionComposeFieldGroupChildren } from "./PetitionComposeFieldGroupChildren";
 import {
   PetitionFieldOptionsListEditor,
-  PetitionFieldOptionsListEditorRef,
+  PetitionFieldOptionsListEditorInstance,
 } from "./PetitionFieldOptionsListEditor";
 import { PetitionFieldMathEditor } from "./logic/PetitionFieldMathEditor";
 
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import { PetitionComposeVisibilityAccordion } from "../petition-common/PetitionComposeVisibilityAccordion";
 import { PetitionVisibilityEditor } from "./logic/PetitionVisibilityEditor";
 
@@ -150,42 +146,40 @@ export interface PetitionComposeFieldRef {
   focusFromNext: () => void;
 }
 
-const _PetitionComposeField = chakraForwardRef<
+const _PetitionComposeField = chakraComponent<
   "div",
   PetitionComposeFieldProps,
   PetitionComposeFieldRef
->(function PetitionComposeField(
-  {
-    petition,
-    field,
-    fieldIndex,
-    index,
-    childrenFieldIndices,
-    fieldRefs,
-    isActive,
-    activeChildFieldId,
-    showError,
-    onMove,
-    onFocus,
-    onCloneField,
-    onSettingsClick,
-    onTypeIndicatorClick,
-    onDeleteClick,
-    onFieldEdit,
-    onFieldVisibilityClick,
-    onFieldCalculationsClick,
-    onFocusNextField,
-    onFocusPrevField,
-    fieldProps,
-    onUpdateFieldPositions,
-    onLinkField,
-    onUnlinkField,
-    showAddField,
-    isReadOnly,
-    ...props
-  },
+>(function PetitionComposeField({
   ref,
-) {
+  petition,
+  field,
+  fieldIndex,
+  index,
+  childrenFieldIndices,
+  fieldRefs,
+  isActive,
+  activeChildFieldId,
+  showError,
+  onMove,
+  onFocus,
+  onCloneField,
+  onSettingsClick,
+  onTypeIndicatorClick,
+  onDeleteClick,
+  onFieldEdit,
+  onFieldVisibilityClick,
+  onFieldCalculationsClick,
+  onFocusNextField,
+  onFocusPrevField,
+  fieldProps,
+  onUpdateFieldPositions,
+  onLinkField,
+  onUnlinkField,
+  showAddField,
+  isReadOnly,
+  ...props
+}) {
   const intl = useIntl();
   const { elementRef, dragRef, previewRef, isDragging, isOverCurrent } = useDragAndDrop(
     field.id,
@@ -270,13 +264,13 @@ const _PetitionComposeField = chakraForwardRef<
       );
     },
     onDrop: async (files: File[], _, event) => {
-      event?.stopPropagation();
+      if (event && "stopPropagation" in event) event.stopPropagation();
       if (field.attachments.length + files.length > 10) {
         // on drop event already shows a message on the dropzone, type="change" means the
         // file is coming from the "Add attachment" button which doesn't provide any feedback
 
         //TODO: fix this, is undefined when add files from the button and there is no feedback if limit has reached
-        if (event?.type === "change") {
+        if (event && "type" in event && event.type === "change") {
           await withError(
             showErrorDialog({
               header: (
@@ -540,7 +534,7 @@ const _PetitionComposeField = chakraForwardRef<
               </Box>
             )}
 
-            <Stack spacing={1} flex="1">
+            <Stack gap={1} flex="1">
               <Box position="relative">
                 <PetitionComposeFieldInner
                   ref={ref}
@@ -691,37 +685,35 @@ interface PetitionComposeFieldInnerProps
 
 // This component was extracted so the whole PetitionComposeField doesn't rerender
 // when the fieldIndex changes
-const _PetitionComposeFieldInner = chakraForwardRef<
+const _PetitionComposeFieldInner = chakraComponent<
   "div",
   PetitionComposeFieldInnerProps,
   PetitionComposeFieldRef
->(function PetitionComposeFieldInner(
-  {
-    field,
-    fieldIndex,
-    petition,
-    showError,
-    attachmentUploadProgress,
-    onFieldEdit,
-    onTypeIndicatorClick,
-    onFocusNextField,
-    onFocusPrevField,
-    onDownloadAttachment,
-    onRemoveAttachment,
-    onCloneField,
-    onSettingsClick,
-    onDeleteClick,
-    onFieldVisibilityClick,
-    fieldProps,
-    onUpdateFieldPositions,
-    onFieldCalculationsClick,
-    index,
-    isReadOnly,
-    showAddField,
-    ...props
-  },
+>(function PetitionComposeFieldInner({
   ref,
-) {
+  field,
+  fieldIndex,
+  petition,
+  showError,
+  attachmentUploadProgress,
+  onFieldEdit,
+  onTypeIndicatorClick,
+  onFocusNextField,
+  onFocusPrevField,
+  onDownloadAttachment,
+  onRemoveAttachment,
+  onCloneField,
+  onSettingsClick,
+  onDeleteClick,
+  onFieldVisibilityClick,
+  fieldProps,
+  onUpdateFieldPositions,
+  onFieldCalculationsClick,
+  index,
+  isReadOnly,
+  showAddField,
+  ...props
+}) {
   const intl = useIntl();
   const [title, setTitle] = useState(field.title);
 
@@ -746,7 +738,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
     }
   }, []);
 
-  const fieldOptionsRef = useRef<PetitionFieldOptionsListEditorRef>(null);
+  const fieldOptionsRef = useRef<PetitionFieldOptionsListEditorInstance>(null);
   const focusFieldOptions = useCallback((atStart?: boolean) => {
     fieldOptionsRef.current?.focus(atStart ? "START" : undefined);
   }, []);
@@ -781,8 +773,8 @@ const _PetitionComposeFieldInner = chakraForwardRef<
     (field.type === "ADVERSE_MEDIA_SEARCH" && !hasAdverseMediaSearch);
 
   return (
-    <Stack spacing={1} ref={elementRef} {...props}>
-      <Stack direction="row" spacing={2.5} alignItems="center">
+    <Stack gap={1} ref={elementRef} {...props}>
+      <Stack direction="row" gap={2.5} alignItems="center">
         <PetitionFieldTypeIndicator
           type={field.type}
           fieldIndex={fieldIndex}
@@ -1088,7 +1080,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
                     defaultMessage="Uploaded lists:"
                   />
                 </Text>
-                <Stack as="ol" spacing={1} marginTop={1}>
+                <Stack as="ol" gap={1} marginTop={1}>
                   {((field.options.labels ?? []) as string[]).map((label, index) => (
                     <HStack as="li" key={index} alignItems="center">
                       <Center
@@ -1194,24 +1186,22 @@ interface PetitionComposeFieldActionsProps
   isReadOnly?: boolean;
 }
 
-const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFieldActionsProps>(
-  function PetitionComposeFieldActions(
-    {
-      field,
-      canChangeVisibility,
-      onVisibilityClick,
-      onFieldCalculationsClick,
-      onAttachmentClick,
-      onCloneField,
-      onSettingsClick,
-      onDeleteClick,
-      onUnlinkField,
-      isReadOnly,
-      isActive,
-      ...props
-    },
+const _PetitionComposeFieldActions = chakraComponent<"div", PetitionComposeFieldActionsProps>(
+  function PetitionComposeFieldActions({
     ref,
-  ) {
+    field,
+    canChangeVisibility,
+    onVisibilityClick,
+    onFieldCalculationsClick,
+    onAttachmentClick,
+    onCloneField,
+    onSettingsClick,
+    onDeleteClick,
+    onUnlinkField,
+    isReadOnly,
+    isActive,
+    ...props
+  }) {
     const intl = useIntl();
     const hasCondition = field.visibility;
     const hasMath = field.math;
@@ -1730,13 +1720,16 @@ interface PetitionComposeFieldVariablesAccordionProps {
   onEditClick: () => void;
 }
 
-const PetitionComposeFieldVariablesAccordion = chakraForwardRef<
+const PetitionComposeFieldVariablesAccordion = chakraComponent<
   "div",
   PetitionComposeFieldVariablesAccordionProps
->(function PetitionComposeFieldVariablesAccordion(
-  { isOpen, onEditClick, isReadOnly, children },
+>(function PetitionComposeFieldVariablesAccordion({
   ref,
-) {
+  isOpen,
+  onEditClick,
+  isReadOnly,
+  children,
+}) {
   return (
     <Accordion.Root
       defaultValue={isOpen ? ["0"] : undefined}
@@ -1753,7 +1746,7 @@ const PetitionComposeFieldVariablesAccordion = chakraForwardRef<
             <>
               <Heading position="relative">
                 <Accordion.ItemTrigger borderRadius="md" backgroundColor="purple.75" paddingY={3}>
-                  <HStack as="span" flex="1" textAlign="left" fontSize="sm" spacing={1}>
+                  <HStack as="span" flex="1" textAlign="left" fontSize="sm" gap={1}>
                     <ChevronFilledIcon
                       color="gray.500"
                       fontSize="xs"

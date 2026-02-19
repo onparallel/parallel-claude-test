@@ -8,13 +8,11 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  HStack,
   Input,
   InputGroup,
   InputLeftAddon,
   InputRightElement,
   Spinner,
-  Stack,
   Textarea,
 } from "@chakra-ui/react";
 import { AlertCircleIcon, CheckIcon, CloseIcon } from "@parallel/chakra/icons";
@@ -23,7 +21,7 @@ import { DialogProps, useDialog } from "@parallel/components/common/dialogs/Dial
 import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { PlaceholderInput } from "@parallel/components/common/slate/PlaceholderInput";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   PublicLinkSettingsDialog_getSlugDocument,
   PublicLinkSettingsDialog_isValidSlugDocument,
@@ -211,7 +209,7 @@ export function PublicLinkSettingsDialog({
         </Text>
       }
       body={
-        <Stack spacing={4}>
+        <Stack gap={4}>
           {publicLink && dirtyFields.slug === true ? (
             <Alert status="warning" rounded="md">
               <AlertIcon />
@@ -228,7 +226,7 @@ export function PublicLinkSettingsDialog({
               </AlertDescription>
             </Alert>
           ) : null}
-          <Stack spacing={2}>
+          <Stack gap={2}>
             <Text>
               <FormattedMessage
                 id="component.settings-public-link-dialog.description"
@@ -349,7 +347,7 @@ export function PublicLinkSettingsDialog({
             />
 
             <FormErrorMessage>
-              <Stack spacing={1}>
+              <Stack gap={1}>
                 <Text>
                   <FormattedMessage
                     id="component.settings-public-link-dialog.link-error"
@@ -403,7 +401,7 @@ export function PublicLinkSettingsDialog({
               align="center"
               wrap="wrap-reverse"
               paddingTop={2}
-              spacing={1}
+              gap={1}
               fontSize="sm"
               minHeight="29px"
             >

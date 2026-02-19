@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Badge, Flex, Heading, useToast } from "@chakra-ui/react";
+import { Badge, Heading, useToast } from "@chakra-ui/react";
 import { AdminOrganizationsListTableHeader } from "@parallel/components/admin-organizations/AdminOrganizationsListTableHeader";
 import { useCreateOrganizationDialog } from "@parallel/components/admin-organizations/dialogs/CreateOrganizationDialog";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -25,6 +25,7 @@ import { useHandleNavigation } from "@parallel/utils/navigation";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
+import { Flex } from "@parallel/components/ui";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { AdminOrganizations_createOrganizationDocument } from "../../../../graphql/__types";

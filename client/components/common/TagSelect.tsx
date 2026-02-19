@@ -1,17 +1,8 @@
 import { gql } from "@apollo/client";
 import { useApolloClient, useMutation } from "@apollo/client/react";
-import {
-  Box,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Grid,
-  Input,
-  Stack,
-} from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel, Grid, Input } from "@chakra-ui/react";
 import { EditIcon } from "@parallel/chakra/icons";
-import { Button, Text } from "@parallel/components/ui";
+import { Box, Button, Flex, Stack, Text } from "@parallel/components/ui";
 import {
   ManageTagsDialog_updateTagDocument,
   TagSelect_TagFragment,
@@ -32,17 +23,7 @@ import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
 import { useRerender } from "@parallel/utils/useRerender";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
-import {
-  DependencyList,
-  ForwardedRef,
-  ReactElement,
-  RefAttributes,
-  forwardRef,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { DependencyList, RefAttributes, useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
@@ -86,10 +67,14 @@ export type TagSelectInstance<IsMulti extends boolean = false> = SelectInstance<
   never
 >;
 
-export const TagSelect = forwardRef(function TagSelect<IsMulti extends boolean = false>(
-  { value, maxItems, allowCreatingTags, allowUpdatingTags, ...props }: TagSelectProps<IsMulti>,
-  ref: ForwardedRef<TagSelectInstance<IsMulti>>,
-) {
+export function TagSelect<IsMulti extends boolean = false>({
+  ref,
+  value,
+  maxItems,
+  allowCreatingTags,
+  allowUpdatingTags,
+  ...props
+}: TagSelectProps<IsMulti> & RefAttributes<TagSelectInstance<IsMulti>>) {
   const intl = useIntl();
   const [newTagColor, setNewTagColor] = useState(randomColor());
   const apollo = useApolloClient();
@@ -195,8 +180,8 @@ export const TagSelect = forwardRef(function TagSelect<IsMulti extends boolean =
 
   return (
     <Component
-      key={key}
       ref={ref}
+      key={key}
       getOptionValue={(o) => o.id}
       getOptionLabel={(o) => o.name}
       isClearable={false}
@@ -236,9 +221,7 @@ export const TagSelect = forwardRef(function TagSelect<IsMulti extends boolean =
       } as any)}
     />
   );
-}) as <IsMulti extends boolean = false>(
-  props: TagSelectProps<IsMulti> & RefAttributes<TagSelectInstance<IsMulti>>,
-) => ReactElement;
+}
 
 const _fragments = {
   Tag: gql`
@@ -285,7 +268,7 @@ function NoOptionsMessage(props: NoticeProps & { selectProps: ReactSelectExtraPr
   return (
     <Stack
       direction="column"
-      spacing={1}
+      gap={1}
       textStyle="hint"
       fontSize="sm"
       paddingX={2}

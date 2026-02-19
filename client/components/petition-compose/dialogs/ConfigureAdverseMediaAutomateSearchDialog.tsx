@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import { FormControl, FormHelperText, FormLabel, Stack } from "@chakra-ui/react";
+import { FormControl, FormHelperText, FormLabel } from "@chakra-ui/react";
 import { PetitionFieldSelect } from "@parallel/components/common/PetitionFieldSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import {
   ConfigureAdverseMediaAutomateSearchDialog_petitionDocument,
   PetitionComposeFieldSettings_PetitionFieldFragment,

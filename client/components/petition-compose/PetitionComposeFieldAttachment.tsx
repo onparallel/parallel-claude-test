@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { PetitionComposeFieldAttachment_PetitionFieldAttachmentFragment } from "@parallel/graphql/__types";
 import { FileAttachment } from "../common/FileAttachment";
 
@@ -11,13 +11,18 @@ interface PetitionComposeFieldAttachmentProps {
   isDisabled?: boolean;
 }
 
-export const PetitionComposeFieldAttachment = chakraForwardRef<
+export const PetitionComposeFieldAttachment = chakraComponent<
   "div",
   PetitionComposeFieldAttachmentProps
->(function PetitionComposeFieldAttachment(
-  { progress, attachment, onDownload, onRemove, isDisabled, ...props },
+>(function PetitionComposeFieldAttachment({
   ref,
-) {
+  progress,
+  attachment,
+  onDownload,
+  onRemove,
+  isDisabled,
+  ...props
+}) {
   const uploadHasFailed = !attachment.isUploading && !attachment.file.isComplete;
 
   return (

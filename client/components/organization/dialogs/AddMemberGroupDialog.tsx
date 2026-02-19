@@ -1,8 +1,8 @@
-import { FormControl, FormLabel, Stack } from "@chakra-ui/react";
+import { FormControl, FormLabel } from "@chakra-ui/react";
 import { UserPlusIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
@@ -48,7 +48,7 @@ export function AddMemberGroupDialog({
       }}
       initialFocusRef={usersRef}
       header={
-        <Stack direction={"row"} spacing={2} align="center">
+        <Stack direction={"row"} gap={2} align="center">
           <UserPlusIcon role="presentation" />
           <Text>
             <FormattedMessage

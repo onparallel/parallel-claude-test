@@ -1,5 +1,6 @@
-import { Box, BoxProps, Circle } from "@chakra-ui/react";
+import { Circle } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
+import { Box, BoxProps } from "@parallel/components/ui";
 import { useIntl } from "react-intl";
 
 export interface RecipientViewCommentsBadgeProps extends BoxProps {

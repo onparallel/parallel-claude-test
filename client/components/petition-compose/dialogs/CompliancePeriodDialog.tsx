@@ -2,18 +2,16 @@ import { gql } from "@apollo/client";
 import {
   FormControl,
   FormLabel,
-  HStack,
   NumberDecrementStepper,
   NumberIncrementStepper,
   NumberInput,
   NumberInputField,
   NumberInputStepper,
-  Stack,
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { CompliancePeriodDialog_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { addMonths } from "date-fns";

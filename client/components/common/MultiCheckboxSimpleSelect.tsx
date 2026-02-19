@@ -1,5 +1,6 @@
-import { Box, Checkbox, ThemeTypings } from "@chakra-ui/react";
-import { ForwardedRef, ReactElement, RefAttributes, forwardRef, useMemo } from "react";
+import { RefAttributes, useMemo } from "react";
+import { Box } from "@parallel/components/ui";
+import { Checkbox, ThemeTypings } from "@chakra-ui/react";
 import { CSSObjectWithLabel, OptionProps, components, mergeStyles } from "react-select";
 import { isNonNullish, omit } from "remeda";
 import {
@@ -24,13 +25,15 @@ export interface MultiCheckboxSimpleSelectProps<
 > extends SimpleSelectProps<T, true, OptionType>,
     ReactSelectExtraProps {}
 
-export const MultiCheckboxSimpleSelect = forwardRef(function MultiCheckboxSimpleSelect<
+export function MultiCheckboxSimpleSelect<
   T extends string = string,
   OptionType extends SimpleOption<T> = SimpleOption<T>,
->(
-  { styles: _styles, components, ...props }: MultiCheckboxSimpleSelectProps<T, OptionType>,
-  ref: ForwardedRef<MultiCheckboxSimpleSelectInstance<T, OptionType>>,
-) {
+>({
+  styles: _styles,
+  components,
+  ...props
+}: MultiCheckboxSimpleSelectProps<T, OptionType> &
+  RefAttributes<MultiCheckboxSimpleSelectInstance<T, OptionType>>) {
   const styles = useMemo(() => {
     const styles = {
       option: (base: CSSObjectWithLabel, props: OptionProps<OptionType>) => {
@@ -55,29 +58,25 @@ export const MultiCheckboxSimpleSelect = forwardRef(function MultiCheckboxSimple
   }, [_styles]);
 
   return (
-    <SimpleSelect
-      ref={ref}
+    <SimpleSelect<T, true, OptionType>
       isMulti
       hideSelectedOptions={false}
       closeMenuOnSelect={false}
       styles={styles}
       components={{
-        Option,
+        Option: Option as any,
         ...components,
       }}
-      {...(props as any)}
+      {...props}
     />
   );
-}) as <T extends string = string, OptionType extends SimpleOption<T> = SimpleOption<T>>(
-  props: MultiCheckboxSimpleSelectProps<T, OptionType> &
-    RefAttributes<MultiCheckboxSimpleSelectInstance<T, OptionType>>,
-) => ReactElement;
+}
 
 function Option({
   innerProps,
   children,
   ...props
-}: OptionProps<SimpleOption> & {
+}: OptionProps<SimpleOption, true> & {
   selectProps: ReactSelectExtraProps;
 }) {
   return (

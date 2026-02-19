@@ -1,9 +1,10 @@
-import { Box, MenuButton, MenuItemOption, MenuList, MenuOptionGroup } from "@chakra-ui/react";
+import { MenuButton, MenuItemOption, MenuList, MenuOptionGroup } from "@chakra-ui/react";
 import { Menu } from "@parallel/chakra/components";
 import { CheckIcon, FontSizeIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { assignRef } from "@parallel/utils/assignRef";
 import { getPreventDefaultHandler } from "@parallel/utils/events";
+import { Box } from "@parallel/components/ui";
 import {
   focusEditor,
   select,
@@ -18,8 +19,8 @@ import { ToolbarButton } from "./ToolbarButton";
 
 export interface ToolbarHeadingButtonProps {}
 
-export const ToolbarHeadingButton = chakraForwardRef<"button", ToolbarHeadingButtonProps>(
-  function ToolbarHeadingButton({ ...props }, ref) {
+export const ToolbarHeadingButton = chakraComponent<"button", ToolbarHeadingButtonProps>(
+  function ToolbarHeadingButton({ ref, ...props }) {
     const intl = useIntl();
     const editor = usePlateEditorRef();
     const type =

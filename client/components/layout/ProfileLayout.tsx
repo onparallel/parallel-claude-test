@@ -1,8 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import {
-  Flex,
-  HStack,
   MenuDivider,
   MenuItem,
   MenuList,
@@ -42,6 +40,7 @@ import { useRecoverProfile } from "@parallel/utils/mutations/useRecoverProfile";
 import { useReopenProfile } from "@parallel/utils/mutations/useReopenProfile";
 import { useHandleNavigation } from "@parallel/utils/navigation";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
+import { Flex, HStack } from "@parallel/components/ui";
 import { useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import NextLink from "next/link";
@@ -249,7 +248,7 @@ export function ProfileLayout({
             {...extendFlexColumn}
           >
             <HStack
-              spacing={0}
+              gap={0}
               backgroundColor="white"
               minHeight="64px"
               borderBottom="1px solid"

@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
-import { Badge, HStack, Stack } from "@chakra-ui/react";
+import { Badge } from "@chakra-ui/react";
 import { CircleCheckFilledIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { RecipientViewSignatureStatusDialog_PublicPetitionFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 
@@ -41,7 +41,7 @@ function SignatureStatusDialog({
               />
             )}
           </Text>
-          <Stack as="ul" spacing={1} paddingStart={4}>
+          <Stack as="ul" gap={1} paddingStart={4}>
             {signers.map((signer, i) => (
               <Text as="li" key={i}>
                 {signer.signer.fullName} {`<${signer.signer.email}>`}{" "}

@@ -342,7 +342,7 @@ describe("GraphQL/PublicPetitionLink", () => {
     });
 
     it("creates a petition via a public link and sends it to the provided email", async () => {
-      const emailSpy = jest.spyOn(
+      const emailSpy = vi.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
         "sendPublicPetitionLinkAccessEmail",
       );
@@ -877,7 +877,7 @@ describe("GraphQL/PublicPetitionLink", () => {
     });
 
     it("sends a reminder to the contact email if a petition is already created", async () => {
-      const emailSpy = jest.spyOn(
+      const emailSpy = vi.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
         "sendPetitionReminderEmail",
       );

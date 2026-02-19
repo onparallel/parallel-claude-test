@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "test": "playwright test",
-    "report": "playwright show-report"
+    "report": "playwright show-report",
+    "check-types": "tsc --noEmit"
   },
   "devDependencies": {
     "@playwright/test": "^1.56.1",

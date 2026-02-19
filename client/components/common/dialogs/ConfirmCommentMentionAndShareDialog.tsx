@@ -1,18 +1,10 @@
 import { gql } from "@apollo/client";
 import { useFragment } from "@apollo/client/react";
-import {
-  Checkbox,
-  FormControl,
-  FormLabel,
-  HStack,
-  ListItem,
-  Stack,
-  UnorderedList,
-} from "@chakra-ui/react";
+import { Checkbox, FormControl, FormLabel, ListItem, UnorderedList } from "@chakra-ui/react";
 import { UserGroupReference } from "@parallel/components/common/UserGroupReference";
 import { UserReference } from "@parallel/components/common/UserReference";
 import { PetitionPermissionTypeSelect } from "@parallel/components/petition-common/PetitionPermissionTypeSelect";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   ConfirmCommentMentionAndShareDialog_PetitionFragmentDoc,
   PetitionPermissionTypeRW,

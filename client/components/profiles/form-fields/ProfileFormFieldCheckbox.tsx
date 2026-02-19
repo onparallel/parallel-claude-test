@@ -8,7 +8,7 @@ import { ProfileFormField_ProfileTypeFieldFragment } from "@parallel/graphql/__t
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { OptimizedMenuList } from "@parallel/utils/react-select/OptimizedMenuList";
 import { UnwrapArray } from "@parallel/utils/types";
-import { forwardRef, useMemo } from "react";
+import { RefAttributes, useMemo } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { useIntl } from "react-intl";
 import {
@@ -152,10 +152,11 @@ interface ProfileFormFieldSelectInnerProps extends MultiCheckboxSimpleSelectProp
   field: ProfileFormField_ProfileTypeFieldFragment;
 }
 
-export const ProfileFormFieldCheckboxInner = forwardRef<
-  MultiCheckboxSimpleSelectInstance,
-  ProfileFormFieldSelectInnerProps
->(function ProfileFieldSelectInner({ field, value, ...props }, ref) {
+export function ProfileFormFieldCheckboxInner({
+  field,
+  value,
+  ...props
+}: ProfileFormFieldSelectInnerProps & RefAttributes<MultiCheckboxSimpleSelectInstance>) {
   const intl = useIntl();
 
   const { values, standardList } = field.options as ProfileTypeFieldOptions<"CHECKBOX">;
@@ -190,7 +191,6 @@ export const ProfileFormFieldCheckboxInner = forwardRef<
 
   return (
     <MultiCheckboxSimpleSelect
-      ref={ref}
       {...props}
       options={valuesOrderedByLocale}
       value={value}
@@ -206,7 +206,7 @@ export const ProfileFormFieldCheckboxInner = forwardRef<
       }
     />
   );
-});
+}
 
 function ValueContainer(props: ValueContainerProps<SelectOptionValue, true, never>) {
   return (

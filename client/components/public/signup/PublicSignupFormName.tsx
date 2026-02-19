@@ -1,5 +1,5 @@
-import { Box, FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
-import { Button, Text } from "@parallel/components/ui";
+import { FormControl, FormErrorMessage, FormLabel, Input } from "@chakra-ui/react";
+import { Box, Button, Stack, Text } from "@parallel/components/ui";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 
@@ -37,7 +37,7 @@ export function PublicSignupFormName({ onNext }: PublicSignupFormNameProps) {
       <Text color="gray.500" fontSize="sm">
         1/3
       </Text>
-      <Stack spacing={4}>
+      <Stack gap={4}>
         <Text as="h1" fontSize="2xl" fontWeight="bold" marginTop={0}>
           <FormattedMessage
             id="component.public-signup-form-name.heading"

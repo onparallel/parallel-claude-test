@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
-import { FormControl, FormErrorMessage, FormLabel, HStack, Input, Stack } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel, Input } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   AddAliasToFieldDialog_PetitionFieldFragment,
   UpdatePetitionFieldInput,
@@ -96,7 +96,7 @@ export function AddAliasToFieldDialog({
         />
       }
       body={
-        <Stack spacing={4}>
+        <Stack gap={4}>
           <Text>
             <FormattedMessage
               id="component.add-alias-to-field-dialog.body"

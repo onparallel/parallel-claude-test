@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
-import { Stack } from "@chakra-ui/react";
+
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { usePetitionShouldConfirmNavigation } from "@parallel/components/layout/PetitionLayout";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import { useConfirmDiscardDraftDialog_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { assignRef } from "@parallel/utils/assignRef";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";

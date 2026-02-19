@@ -1,6 +1,6 @@
-import { Box, Center, useFormControl, useMultiStyleConfig } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
-import { Text } from "@parallel/components/ui";
+import { chakraComponent } from "@parallel/chakra/utils";
+import { Center, useFormControl, useMultiStyleConfig } from "@chakra-ui/react";
+import { Box, Text } from "@parallel/components/ui";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import {
   ELEMENT_PLACEHOLDER_INPUT,
@@ -70,26 +70,24 @@ function RenderElement({ attributes, nodeProps, styles, element, editor, ...prop
   return <Text {...attributes} {...props} />;
 }
 
-export const PlaceholderInput = chakraForwardRef<
+export const PlaceholderInput = chakraComponent<
   "div",
   PlaceholderInputProps,
   PlaceholderInputInstance
 >(
-  (
-    {
-      id,
-      placeholder,
-      placeholders,
-      value,
-      isDisabled,
-      isInvalid,
-      isRequired,
-      isReadOnly,
-      onChange,
-      ...props
-    },
+  ({
     ref,
-  ) => {
+    id,
+    placeholder,
+    placeholders,
+    value,
+    isDisabled,
+    isInvalid,
+    isRequired,
+    isReadOnly,
+    onChange,
+    ...props
+  }) => {
     const placeholdersRef = useUpdatingRef(placeholders);
     const plugins = useConstant(() =>
       createPlugins<PlaceholderInputValue, PlaceholderInputEditor>(

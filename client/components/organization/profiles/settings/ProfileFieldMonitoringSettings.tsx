@@ -1,16 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  Center,
-  Checkbox,
-  Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  HStack,
-  Stack,
-  Switch,
-} from "@chakra-ui/react";
+import { Center, Checkbox, FormControl, FormHelperText, FormLabel, Switch } from "@chakra-ui/react";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import {
   LocalizableUserTextRender,
@@ -22,7 +11,7 @@ import {
   SimpleSelect,
   useSimpleSelectOptions,
 } from "@parallel/components/common/SimpleSelect";
-import { Text } from "@parallel/components/ui";
+import { Box, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   CreateProfileTypeFieldInput,
   ProfileFieldMonitoringSettings_ProfileTypeFieldFragment,
@@ -292,9 +281,9 @@ export function ProfileFieldMonitoringSettings({
     }) as CreateProfileTypeFieldInput;
 
   return (
-    <Stack spacing={4}>
+    <Stack gap={4}>
       <FormControl as={HStack} isDisabled={isDisabled}>
-        <Stack flex={1} spacing={1}>
+        <Stack flex={1} gap={1}>
           <FormLabel margin={0}>
             <FormattedMessage
               id="component.profile-field-monitoring-settings.monitoring-label"
@@ -320,7 +309,7 @@ export function ProfileFieldMonitoringSettings({
                 onChange={handleActivationConditionChange}
                 isChecked={hasActivationCondition}
               >
-                <HStack alignItems="center" spacing={0}>
+                <HStack alignItems="center" gap={0}>
                   <FormattedMessage
                     id="component.profile-field-monitoring-settings.activation-conditions-label"
                     defaultMessage="Add activation conditions"

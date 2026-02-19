@@ -1,13 +1,11 @@
 import {
   Center,
-  HStack,
   Image,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
-  Stack,
 } from "@chakra-ui/react";
 import {
   BaseDialog,
@@ -15,7 +13,7 @@ import {
   useDialog,
 } from "@parallel/components/common/dialogs/DialogProvider";
 import { StepsIndicator } from "@parallel/components/common/StepsIndicator";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { Tone } from "@parallel/graphql/__types";
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -126,13 +124,7 @@ export function RecipientViewHelpDialog({ tone, ...props }: DialogProps<{ tone: 
           {bodyElements[page]}
           <StepsIndicator numberOfSteps={bodyElements.length} currentStep={page} paddingTop={6} />
         </ModalBody>
-        <ModalFooter
-          as={HStack}
-          spacing={2}
-          justifyContent="center"
-          paddingTop={8}
-          paddingBottom={6}
-        >
+        <ModalFooter as={HStack} gap={2} justifyContent="center" paddingTop={8} paddingBottom={6}>
           {page > 0 ? (
             <Button variant="outline" onClick={() => paginate(-1)}>
               <FormattedMessage id="generic.go-back" defaultMessage="Go back" />

@@ -1,8 +1,8 @@
-import { FormControl, FormErrorMessage, FormLabel, Stack } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, Stack, Text } from "@parallel/components/ui";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { Maybe } from "@parallel/utils/types";
 import { useRef } from "react";
@@ -50,7 +50,7 @@ export function RestrictPetitionDialog({ ...props }: DialogProps<{}, RestrictPet
         },
       }}
       body={
-        <Stack spacing={2}>
+        <Stack gap={2}>
           <FormControl id="password" isInvalid={!!errors.password}>
             <FormLabel>
               <FormattedMessage

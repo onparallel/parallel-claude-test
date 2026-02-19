@@ -1,5 +1,6 @@
-import { Box, BoxProps, Placement, TextProps } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
+import { Placement, TextProps } from "@chakra-ui/react";
+import { Box, BoxProps } from "@parallel/components/ui";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { PaidBadge } from "./PaidBadge";
@@ -14,10 +15,15 @@ export interface PaidPopoverProps {
   fontSize?: TextProps["fontSize"];
 }
 
-export const PaidPopover = chakraForwardRef<"svg", PaidPopoverProps>(function (
-  { children, placement = "bottom", popoverWidth, fontSize = "sm", contactMessage, ...props },
+export const PaidPopover = chakraComponent<"svg", PaidPopoverProps>(function PaidPopover({
   ref,
-) {
+  children,
+  placement = "bottom",
+  popoverWidth,
+  fontSize = "sm",
+  contactMessage,
+  ...props
+}) {
   return (
     <SmallPopover
       content={

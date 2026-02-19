@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
-import { Editable, EditableInput, EditablePreview, Flex, UseEditableProps } from "@chakra-ui/react";
+import { Editable, EditableInput, EditablePreview, UseEditableProps } from "@chakra-ui/react";
 import { Tooltip } from "@parallel/chakra/components";
 import { CloudErrorIcon, CloudOkIcon, CloudUploadIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
-import { Text } from "@parallel/components/ui";
+import { chakraComponent } from "@parallel/chakra/utils";
+import { Flex, Text } from "@parallel/components/ui";
 import { HeaderNameEditable_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useImperativeHandle, useRef, useState } from "react";
@@ -19,11 +19,11 @@ export interface HeaderNameEditableInstance {
   focus(): void;
 }
 
-export const HeaderNameEditable = chakraForwardRef<
+export const HeaderNameEditable = chakraComponent<
   "div",
   HeaderNameEditableProps,
   HeaderNameEditableInstance
->(function HeaderNameEditable({ petition, state, onNameChange, ...props }, ref) {
+>(function HeaderNameEditable({ ref, petition, state, onNameChange, ...props }) {
   const intl = useIntl();
   const petitionName = petition.name ?? "";
   const [name, setName] = useState(petitionName);

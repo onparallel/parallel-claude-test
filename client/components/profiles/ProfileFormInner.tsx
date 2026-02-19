@@ -1,12 +1,12 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Divider, Flex, HStack, Heading, Stack } from "@chakra-ui/react";
+import { Divider, Heading } from "@chakra-ui/react";
 import { EyeOffIcon, LockClosedIcon } from "@parallel/chakra/icons";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { LocalizableUserTextRender } from "@parallel/components/common/LocalizableUserTextRender";
 import { ProfileFormField } from "@parallel/components/profiles/form-fields/ProfileFormField";
 import { ProfileFormFieldFileAction } from "@parallel/components/profiles/form-fields/ProfileFormFieldFileUpload";
-import { Text } from "@parallel/components/ui";
+import { Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionFieldType,
   ProfileFormInner_ProfileFieldPropertyFragment,
@@ -130,7 +130,7 @@ export function ProfileFormInner({
 
   return (
     <Flex direction="column" {...props}>
-      <Stack divider={<Divider />} spacing={4}>
+      <Stack divider={<Divider />} gap={4}>
         {propertiesWithSuggestedFields.length ? (
           <Stack as="ul" width="100%">
             {propertiesWithSuggestedFields.map(([{ field, value, files }, suggestedFields]) => {
@@ -153,7 +153,7 @@ export function ProfileFormInner({
           </Stack>
         ) : null}
         {isNonNullish(hiddenProperties) && hiddenProperties.length ? (
-          <Stack spacing={4}>
+          <Stack gap={4}>
             <HStack>
               <LockClosedIcon />
               <Heading as="h3" size="sm" fontWeight={600}>

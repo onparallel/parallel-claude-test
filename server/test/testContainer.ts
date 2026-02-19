@@ -22,7 +22,6 @@ import { EMAILS, IEmailsService } from "../src/services/EmailsService";
 import { FETCH_SERVICE, IFetchService } from "../src/services/FetchService";
 import { ILogger, LOGGER } from "../src/services/Logger";
 import { IQueuesService, QUEUES_SERVICE } from "../src/services/QueuesService";
-import { IRedis, REDIS } from "../src/services/Redis";
 import { IStorageService, STORAGE_SERVICE } from "../src/services/StorageService";
 import { BackgroundCheckProfileSearchQueue } from "../src/workers/queues/BackgroundCheckProfileSearchQueue";
 import { eventListenersModule } from "../src/workers/queues/event-listeners/module";
@@ -39,7 +38,6 @@ import {
   MockEmailsService,
   MockFetchService,
   MockQueuesService,
-  MockRedis,
   MockSapOdataClient,
   MockStorage,
 } from "./mocks";
@@ -49,9 +47,6 @@ export async function createTestContainer() {
 
   await container.unbind(LOGGER);
   container.bind<ILogger>(LOGGER).toConstantValue(console);
-
-  await container.unbind(REDIS);
-  container.bind<IRedis>(REDIS).to(MockRedis).inSingletonScope();
 
   await container.unbind(ANALYTICS);
   container.bind<IAnalyticsService>(ANALYTICS).to(MockAnalyticsService).inSingletonScope();

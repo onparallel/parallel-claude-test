@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
-import { Box, Center, HStack, Image, Stack, useMultiStyleConfig } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
+import { Center, Image, useMultiStyleConfig } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { Text } from "@parallel/components/ui";
+import { Box, HStack, Stack, Text } from "@parallel/components/ui";
 import { PublicTemplateCard_PetitionTemplateFragment } from "@parallel/graphql/__types";
 import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
 import { useRoleButton } from "@parallel/utils/useRoleButton";
@@ -16,8 +16,8 @@ export interface PublicTemplateCardProps {
   onPress: () => void;
 }
 
-export const PublicTemplateCard = chakraForwardRef<"div", PublicTemplateCardProps>(
-  function TemplateCard({ template, onPress, ...props }, ref) {
+export const PublicTemplateCard = chakraComponent<"div", PublicTemplateCardProps>(
+  function TemplateCard({ ref, template, onPress, ...props }) {
     const intl = useIntl();
     const buttonProps = useRoleButton(onPress);
 
@@ -45,7 +45,7 @@ export const PublicTemplateCard = chakraForwardRef<"div", PublicTemplateCardProp
         {...buttonProps}
         {...props}
       >
-        <Stack spacing={0} height="100%">
+        <Stack gap={0} height="100%">
           <Center
             height="130px"
             minHeight="130px"
@@ -67,7 +67,7 @@ export const PublicTemplateCard = chakraForwardRef<"div", PublicTemplateCardProp
               }
             />
           </Center>
-          <Stack padding={4} paddingTop={2.5} height="100%" minHeight="130px" spacing={1}>
+          <Stack padding={4} paddingTop={2.5} height="100%" minHeight="130px" gap={1}>
             <HStack>
               <Text fontSize="sm" color="gray.600">
                 {firstCategorie ?? ""}
@@ -94,7 +94,7 @@ export const PublicTemplateCard = chakraForwardRef<"div", PublicTemplateCardProp
             )}
 
             <Spacer />
-            <TemplateActiveSettingsIcons template={template} spacing={2.5} />
+            <TemplateActiveSettingsIcons template={template} gap={2.5} />
           </Stack>
         </Stack>
       </Card>

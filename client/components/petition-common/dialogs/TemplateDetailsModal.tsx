@@ -1,8 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Box,
-  Flex,
-  HStack,
   MenuItem,
   MenuList,
   Modal,
@@ -12,7 +9,6 @@ import {
   ModalHeader,
   ModalOverlay,
   ModalProps,
-  Stack,
 } from "@chakra-ui/react";
 import {
   CopyIcon,
@@ -22,14 +18,14 @@ import {
   PaperPlaneIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { HtmlBlock } from "@parallel/components/common/HtmlBlock";
 import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
 import { RestrictedFeaturePopover } from "@parallel/components/common/RestrictedFeaturePopover";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { TemplateActiveSettingsIcons } from "@parallel/components/petition-new/TemplateActiveSettingsIcons";
-import { Accordion, Button, Text } from "@parallel/components/ui";
+import { Accordion, Box, Button, Flex, HStack, Stack, Text } from "@parallel/components/ui";
 import {
   PetitionFieldTitleContent_LandingTemplateFieldFragment,
   PetitionFieldTitleContent_PetitionFieldFragment,
@@ -133,7 +129,7 @@ export function TemplateDetailsModal({
             paddingEnd={12}
             paddingBottom={0}
             as={Stack}
-            spacing={2}
+            gap={2}
           >
             <Text as="span" fontSize="sm" fontWeight="normal" color="gray.600">
               <FormattedMessage
@@ -170,7 +166,7 @@ export function TemplateDetailsModal({
 
           <ModalBody paddingBottom={6} paddingTop={4}>
             <Flex alignItems="center">
-              <TemplateActiveSettingsIcons template={template} spacing={4} />
+              <TemplateActiveSettingsIcons template={template} gap={4} />
               {isFromPublicTemplates ? null : (
                 <HStack marginStart={6}>
                   <Text>
@@ -221,7 +217,7 @@ export function TemplateDetailsModal({
                   </Button>
                 )}
               </Box>
-              <HStack flex="1" spacing={3}>
+              <HStack flex="1" gap={3}>
                 {template.isPublic ? (
                   <RestrictedFeaturePopover
                     width="100%"
@@ -444,8 +440,8 @@ export interface PetitionFieldTitleContentProps {
     | PetitionFieldTitleContent_LandingTemplateFieldFragment;
 }
 
-export const PetitionFieldTitleContent = chakraForwardRef<"p", PetitionFieldTitleContentProps>(
-  function PetitionFieldTitleContent({ index, field, ...props }, ref) {
+export const PetitionFieldTitleContent = chakraComponent<"p", PetitionFieldTitleContentProps>(
+  function PetitionFieldTitleContent({ ref, index, field, ...props }) {
     return (
       <Text {...props} ref={ref}>
         {index}.{" "}

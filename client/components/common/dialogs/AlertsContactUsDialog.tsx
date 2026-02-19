@@ -1,6 +1,6 @@
-import { Badge, HStack, Stack } from "@chakra-ui/react";
+import { Badge } from "@chakra-ui/react";
 import { TimeAlarmIcon } from "@parallel/chakra/icons";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { FormattedMessage, useIntl } from "react-intl";
 import { SupportButton } from "../SupportButton";
 import { ConfirmDialog } from "./ConfirmDialog";

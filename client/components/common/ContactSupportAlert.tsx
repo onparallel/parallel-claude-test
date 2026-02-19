@@ -1,6 +1,7 @@
-import { Alert, AlertDescription, AlertIcon, HStack, ThemingProps } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
+import { Alert, AlertDescription, AlertIcon, ThemingProps } from "@chakra-ui/react";
 import { SupportButton } from "@parallel/components/common/SupportButton";
+import { HStack } from "@parallel/components/ui";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 
@@ -9,12 +10,12 @@ interface ContactSupportAlertProps extends ThemingProps<"Alert"> {
   contactMessage: string;
 }
 
-export const ContactSupportAlert = chakraForwardRef<"div", ContactSupportAlertProps>(
-  function ContactSupportAlert({ body, contactMessage, ...props }, ref) {
+export const ContactSupportAlert = chakraComponent<"div", ContactSupportAlertProps>(
+  function ContactSupportAlert({ ref, body, contactMessage, ...props }) {
     return (
       <Alert status="info" rounded="md" {...props} ref={ref}>
         <AlertIcon />
-        <HStack spacing={4} width="100%">
+        <HStack gap={4} width="100%">
           <AlertDescription flex="1">{body}</AlertDescription>
           <SupportButton
             variant="outline"

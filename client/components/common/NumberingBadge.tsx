@@ -1,7 +1,7 @@
 /** no-recipient */
-import { Badge, BoxProps, Placement, TextProps, ThemingProps } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
-import { Text } from "@parallel/components/ui";
+import { chakraComponent } from "@parallel/chakra/utils";
+import { BoxProps, Text } from "@parallel/components/ui";
+import { Badge, Placement, TextProps, ThemingProps } from "@chakra-ui/react";
 import { FormattedMessage } from "react-intl";
 import { SmallPopover } from "./SmallPopover";
 
@@ -11,10 +11,13 @@ export interface NumberingBadgeProps extends ThemingProps<"Badge"> {
   fontSize?: TextProps["fontSize"];
 }
 
-export const NumberingBadge = chakraForwardRef<"span", NumberingBadgeProps>(function NumberingBadge(
-  { placement = "bottom", popoverWidth, fontSize = "sm", ...props },
+export const NumberingBadge = chakraComponent<"span", NumberingBadgeProps>(function NumberingBadge({
   ref,
-) {
+  placement = "bottom",
+  popoverWidth,
+  fontSize = "sm",
+  ...props
+}) {
   return (
     <SmallPopover
       content={

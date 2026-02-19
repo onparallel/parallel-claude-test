@@ -1,4 +1,4 @@
-import { FormControl, Grid, HStack, Stack } from "@chakra-ui/react";
+import { FormControl, Grid } from "@chakra-ui/react";
 import { AssignIcon } from "@parallel/chakra/icons";
 import {
   localizableUserTextRender,
@@ -8,7 +8,7 @@ import { OverflownText } from "@parallel/components/common/OverflownText";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { ProfileFormFieldSelectOptionItem } from "@parallel/components/profiles/form-fields/ProfileFormFieldSelect";
-import { Button, Text } from "@parallel/components/ui";
+import { Button, HStack, Stack, Text } from "@parallel/components/ui";
 import { UpdateProfileTypeFieldSelectOptionsSubstitution } from "@parallel/graphql/__types";
 import { ProfileTypeFieldOptions } from "@parallel/utils/profileFields";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";

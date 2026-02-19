@@ -34,15 +34,17 @@ export async function waitForEmail(
         const range = `${mailbox.exists}:${Math.max(mailbox.exists - 20, 1)}`;
         let uid: number | undefined = undefined;
         for await (const message of client.fetch(range, { envelope: true, flags: true })) {
-          if (!message.flags.has("\\Seen") && !seen[message.uid]) {
+          if (!message.flags?.has("\\Seen") && !seen[message.uid]) {
             seen[message.uid] = true;
-            if (predicate(message.envelope)) {
+            if (message.envelope && predicate(message.envelope)) {
               uid = message.uid;
             }
           }
         }
         if (isNonNullish(uid)) {
           const message = await client.fetchOne(`${uid}`, { source: true }, { uid: true });
+          if (!message || !message.source)
+            throw new Error(`Failed to fetch message with uid ${uid}`);
           await client.messageFlagsAdd(`${uid}`, ["\\Seen"], { uid: true });
           return await parseEmail(message.source);
         }

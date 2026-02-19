@@ -8,7 +8,7 @@ import {
   UseRadioGroupProps,
 } from "@chakra-ui/react";
 import { cx } from "@chakra-ui/utils";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { chakraComponent } from "@parallel/chakra/utils";
 import { ChangeEvent, createContext, useContext } from "react";
 import { omit } from "remeda";
 
@@ -19,10 +19,16 @@ interface RadioTabListProps extends Omit<UseRadioGroupProps, "isNative">, Themin
 
 const [StylesProvider, useStyles] = createStylesContext("Tabs");
 
-export const RadioTabList = chakraForwardRef<"div", RadioTabListProps>(function ViewTabs(
-  { value, defaultValue, onChange, isDisabled, isFocusable, name, ...props },
+export const RadioTabList = chakraComponent<"div", RadioTabListProps>(function ViewTabs({
   ref,
-) {
+  value,
+  defaultValue,
+  onChange,
+  isDisabled,
+  isFocusable,
+  name,
+  ...props
+}) {
   const { getRadioProps, getRootProps } = useRadioGroup({
     value,
     defaultValue,
@@ -59,10 +65,10 @@ interface RadioTabProps {
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
-export const RadioTab = chakraForwardRef<"label", RadioTabProps>(function RadioTab(
-  { ...props },
+export const RadioTab = chakraComponent<"label", RadioTabProps>(function RadioTab({
   ref,
-) {
+  ...props
+}) {
   const getUseRadioProps = useContext(RadioTabContext);
   const { getInputProps, getRadioProps, htmlProps } = useRadio(getUseRadioProps(props as any));
 

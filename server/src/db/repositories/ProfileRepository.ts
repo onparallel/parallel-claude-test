@@ -1691,12 +1691,16 @@ export class ProfileRepository extends BaseRepository {
                   ) filter (where nv.content is not null and (wnpv.id is not null or wpv.id is not null)),
                   '{}'::jsonb
                 ) as values,
-                coalesce(array_agg(nv.profile_type_field_id::text) filter (where nv.content is null), array[]::text[]) as removed_profile_type_field_ids
+                -- fields where a previous value was removed but no replacement was inserted (explicit removal)
+                coalesce(array_agg(nv.profile_type_field_id::text) filter (where rpv.id is not null and wpv.id is null), array[]::text[]) as removed_profile_type_field_ids
               from new_values nv
               left join with_no_previous_values wnpv on wnpv.profile_id = nv.profile_id and wnpv.profile_type_field_id = nv.profile_type_field_id
               left join with_previous_values wpv on wpv.profile_id = nv.profile_id and wpv.profile_type_field_id = nv.profile_type_field_id
+              left join removed_previous_values rpv on rpv.profile_id = nv.profile_id and rpv.profile_type_field_id = nv.profile_type_field_id
               where nv.type in :cacheable_types
               group by nv.profile_id
+              -- only update profiles where at least one field was actually inserted, updated, or removed
+              having bool_or(wnpv.id is not null or wpv.id is not null or rpv.id is not null)
             ) t
             where p.id = t.profile_id
           )
@@ -1728,52 +1732,55 @@ export class ProfileRepository extends BaseRepository {
         },
         t,
       );
+      const changedProfileIds = unique(events.map((e) => e.profile_id));
 
-      const profileValues = await this.raw<{
-        profileId: number;
-        pattern: number[];
-        values: {
-          [profileTypeFieldId: number]: string | null;
-        };
-      }>(
-        /* sql */ `
-          select
-            p.id as "profileId",
-            t.profile_name_pattern as "pattern",
-            jsonb_object_agg(
-              t.profile_type_field_id,
-              pfv.content->>'value'
-            ) as values
-          from profile p
-          join lateral (
-            select t.profile_name_pattern, t.part::int as profile_type_field_id from (
-              select pt.profile_name_pattern, jsonb_array_elements(pt.profile_name_pattern) part
-              from profile_type pt
-              where pt.id = p.profile_type_id
-            ) t where jsonb_typeof(t.part) = 'number'
-          ) t on true
-          left join profile_field_value pfv
-            on p.id = pfv.profile_id 
-            and pfv.profile_type_field_id = t.profile_type_field_id 
-            and pfv.removed_at is null 
-            and pfv.deleted_at is null
-            and pfv.is_draft = false
-          where p.id in ?
-          group by p.id, t.profile_name_pattern
-        `,
-        [this.sqlIn(unique(_fields.map((f) => f.profileId)))],
-        t,
-      );
+      if (changedProfileIds.length > 0) {
+        const profileValues = await this.raw<{
+          profileId: number;
+          pattern: number[];
+          values: {
+            [profileTypeFieldId: number]: string | null;
+          };
+        }>(
+          /* sql */ `
+            select
+              p.id as "profileId",
+              t.profile_name_pattern as "pattern",
+              jsonb_object_agg(
+                t.profile_type_field_id,
+                pfv.content->>'value'
+              ) as values
+            from profile p
+            join lateral (
+              select t.profile_name_pattern, t.part::int as profile_type_field_id from (
+                select pt.profile_name_pattern, jsonb_array_elements(pt.profile_name_pattern) part
+                from profile_type pt
+                where pt.id = p.profile_type_id
+              ) t where jsonb_typeof(t.part) = 'number'
+            ) t on true
+            left join profile_field_value pfv
+              on p.id = pfv.profile_id
+              and pfv.profile_type_field_id = t.profile_type_field_id
+              and pfv.removed_at is null
+              and pfv.deleted_at is null
+              and pfv.is_draft = false
+            where p.id in ?
+            group by p.id, t.profile_name_pattern
+          `,
+          [this.sqlIn(changedProfileIds)],
+          t,
+        );
 
-      await this.updateProfileNamesWithPattern(
-        profileValues,
-        from.userId
-          ? `User:${from.userId}`
-          : from.orgIntegrationId
-            ? `OrgIntegration:${from.orgIntegrationId}`
-            : null,
-        t,
-      );
+        await this.updateProfileNamesWithPattern(
+          profileValues,
+          from.userId
+            ? `User:${from.userId}`
+            : from.orgIntegrationId
+              ? `OrgIntegration:${from.orgIntegrationId}`
+              : null,
+          t,
+        );
+      }
 
       return events.map((e) => ({
         org_id: orgId,

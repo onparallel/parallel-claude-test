@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Box, HStack, Stack } from "@chakra-ui/react";
+
 import { ColumnsIcon, RepeatIcon } from "@parallel/chakra/icons";
 import {
   PetitionListHeader_PetitionListViewFragment,
@@ -16,6 +16,7 @@ import {
 } from "@parallel/utils/petitionsQueryState";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
+import { Box, HStack, Stack } from "@parallel/components/ui";
 import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDeepEqual, isNonNullish, omit, pick } from "remeda";

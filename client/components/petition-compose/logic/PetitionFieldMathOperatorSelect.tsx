@@ -1,4 +1,3 @@
-import { Box, HStack } from "@chakra-ui/react";
 import {
   AddIcon,
   AssignIcon,
@@ -7,6 +6,7 @@ import {
   SubstractIcon,
 } from "@parallel/chakra/icons";
 import { PetitionFieldMathOperator } from "@parallel/utils/fieldLogic/types";
+import { Box, HStack } from "@parallel/components/ui";
 import { ReactNode, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { OptionProps, SingleValueProps, components } from "react-select";
@@ -88,7 +88,7 @@ export function PetitionFieldMathOperatorSelect({
   );
   const option = options.find((o) => o.value === value)!;
   return isReadOnly ? (
-    <HStack spacing={1.5}>
+    <HStack gap={1.5}>
       <Box display="flex" as="span" fontSize="2xs">
         {option.icon}
       </Box>

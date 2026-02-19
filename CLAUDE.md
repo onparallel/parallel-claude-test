@@ -18,6 +18,10 @@
 
 ## Agent Behavior Guidelines
 
+### Code Formatting
+
+Do not worry about code formatting when editing files. After editing a file, run `yarn prettier --write <file>` on it to auto-format it.
+
 ### Documentation
 
 When editing README files or other documentation markdown files, **always use the `crafting-effective-readmes` skill**. This ensures documentation follows best practices and is tailored to the appropriate audience.
@@ -444,10 +448,18 @@ await this.createEvent(
 - `SapProfileSyncIntegration`: Main sync orchestration
 - `SapProfileSyncIntegrationSettingsValidator`: Config validation
 
+**Authentication Types**:
+
+- `BASIC`: Username/password authentication
+  - Fields: `user`, `password`
+- `CERTIFICATE`: PFX certificate authentication (TLS client certificates)
+  - Fields: `pfx` (base64-encoded PFX certificate), `passphrase`
+
 **Sync Types**: `INITIAL` (first import), `TO_LOCAL` (SAP→Parallel), `TO_REMOTE` (Parallel→SAP)
 
 **Settings** (stored in `org_integration.settings` JSON):
 
+- Authentication configuration (basic or certificate)
 - Entity, filter, profile type mapping
 - Field mappings with directions (`TO_LOCAL`, `TO_REMOTE`, `BIDIRECTIONAL`)
 - Field transformations (date format, enum mapping, concat, split)
@@ -1010,6 +1022,26 @@ Use DataLoaders for **all** relations in GraphQL resolvers. Batch database queri
 ## 10. Development Workflow
 
 For local development setup and running the application, see [getting-started.md](./getting-started.md).
+
+### Branching Strategy
+
+- **`develop`**: Main integration branch. All PRs are opened against `develop` by default.
+- **`staging`**: Used for releases to the staging environment.
+- **`master`**: Used for releases to production.
+
+Only **hotfix** PRs should be opened directly against `staging` or `master`. For all other changes, always target `develop`.
+
+**Branch Naming**: Use prefixed branch names based on the type of change:
+
+- `feat/short-description-of-feature` - New features
+- `fix/short-description-of-bug` - Bug fixes
+- `chore/short-description-of-task` - Maintenance, refactoring, tooling
+
+**PR Title Prefix**: PR titles must be prefixed with the change type in brackets:
+
+- `[feat] Add user authentication`
+- `[fix] Resolve petition loading issue`
+- `[chore] Update dependencies`
 
 ### Database Migrations
 

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import { Container, Grid, Stack, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
+import { Container, Grid, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { AddIcon } from "@parallel/chakra/icons";
 import { PathBreadcrumbs } from "@parallel/components/common/PathBreadcrumbs";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
@@ -56,6 +56,7 @@ import {
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
+import { Stack } from "@parallel/components/ui";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
@@ -268,7 +269,7 @@ function NewPetition() {
             position="sticky"
             top={0}
             backgroundColor="gray.50"
-            spacing={2}
+            gap={2}
             paddingTop={10}
             paddingX={6}
             paddingBottom={1}
@@ -329,7 +330,7 @@ function NewPetition() {
             <TabPanel padding={0} flex="1" display="flex" flexDirection="column">
               <Stack
                 direction={{ base: "column", md: "row" }}
-                spacing={2}
+                gap={2}
                 paddingX={6}
                 paddingY={{ base: 4, md: 6 }}
                 position="sticky"

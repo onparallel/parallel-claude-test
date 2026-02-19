@@ -1,7 +1,8 @@
-import { Box, BoxProps, Flex, useDisclosure } from "@chakra-ui/react";
+import { useDisclosure } from "@chakra-ui/react";
 import { BurgerButton } from "@parallel/components/common/BurgerButton";
 import { Logo } from "@parallel/components/common/Logo";
 import { Spacer } from "@parallel/components/common/Spacer";
+import { Box, BoxProps, Flex } from "@parallel/components/ui";
 import useWindowScroll from "beautiful-react-hooks/useWindowScroll";
 import { useEffect, useState } from "react";
 import { PublicContainer } from "./PublicContainer";
@@ -60,7 +61,7 @@ export function PublicHeader(props: BoxProps) {
         >
           <PublicHeaderMenu
             direction={{ base: "column", [bp]: "row" }}
-            spacing={{ base: 2, xl: 4 }}
+            gap={{ base: 2, xl: 4 }}
             alignItems={{ base: undefined, [bp]: "center" }}
           />
         </Box>

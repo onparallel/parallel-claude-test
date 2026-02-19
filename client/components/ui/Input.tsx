@@ -1,5 +1,5 @@
 import { Input as ChakraInput, InputProps } from "@chakra-ui/react";
-import { forwardRef } from "react";
+import { RefAttributes } from "react";
 
 // Docs: https://chakra-ui.com/docs/components/input
 
@@ -11,18 +11,20 @@ export interface ExtendedInputProps
   readOnly?: boolean;
 }
 
-export const Input = forwardRef<HTMLInputElement, ExtendedInputProps>(
-  ({ invalid, disabled, readOnly, ...props }, ref) => {
-    return (
-      <ChakraInput
-        ref={ref}
-        isInvalid={invalid}
-        isDisabled={disabled}
-        isReadOnly={readOnly}
-        {...props}
-      />
-    );
-  },
-);
-
-Input.displayName = "Input";
+export function Input({
+  invalid,
+  disabled,
+  readOnly,
+  ref,
+  ...props
+}: ExtendedInputProps & RefAttributes<HTMLInputElement>) {
+  return (
+    <ChakraInput
+      ref={ref}
+      isInvalid={invalid}
+      isDisabled={disabled}
+      isReadOnly={readOnly}
+      {...props}
+    />
+  );
+}

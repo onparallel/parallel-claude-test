@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { Flex, MenuDivider, MenuItem, MenuList } from "@chakra-ui/react";
+import { MenuDivider, MenuItem, MenuList } from "@chakra-ui/react";
 import { CopyIcon, DeleteIcon } from "@parallel/chakra/icons";
 import { userGroupReferenceText } from "@parallel/components/common/UserGroupReference";
 import {
@@ -19,6 +19,7 @@ import { useConfirmDeleteGroupsDialog } from "@parallel/pages/app/organization/g
 import { asSupportedUserLocale } from "@parallel/utils/locales";
 import { withError } from "@parallel/utils/promises/withError";
 import { useHasPermission } from "@parallel/utils/useHasPermission";
+import { Flex } from "@parallel/components/ui";
 import { useRouter } from "next/router";
 import { ReactNode, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
