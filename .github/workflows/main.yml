@@ -82,36 +82,41 @@ jobs:
       - name: Install dependencies
         if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile --production=false
+        env:
+          SKIP_UPDATE_IP_DB: "1"
 
-      - name: Lint server
-        if: needs.detect-changes.outputs.server == 'true' || needs.detect-changes.outputs.root-config == 'true'
-        run: npx eslint --quiet server/
-
-      - name: Lint client
-        if: needs.detect-changes.outputs.client == 'true' || needs.detect-changes.outputs.root-config == 'true'
-        run: npx eslint --quiet client/
-
-      - name: Lint bin
-        if: needs.detect-changes.outputs.bin == 'true' || needs.detect-changes.outputs.root-config == 'true'
-        run: npx eslint --quiet bin/
-
-      - name: Lint e2e
-        if: needs.detect-changes.outputs.e2e == 'true' || needs.detect-changes.outputs.root-config == 'true'
-        run: npx eslint --quiet e2e/
-
-      - name: Check server translations
-        if: needs.detect-changes.outputs.server == 'true' || needs.detect-changes.outputs.root-config == 'true'
+      - name: Lint and check translations
         run: |
-          yarn workspace @parallel/server extract-i18n-terms
-          yarn workspace @parallel/server generate-i18n-files
+          # Start translations in background
+          (
+            if [[ "$SERVER_CHANGED" == "true" ]]; then
+              yarn workspace @parallel/server extract-i18n-terms && \
+              yarn workspace @parallel/server generate-i18n-files
+            fi
+            if [[ "$CLIENT_CHANGED" == "true" ]]; then
+              yarn workspace @parallel/client extract-i18n-terms:recipient && \
+              yarn workspace @parallel/client generate-i18n-files:recipient && \
+              yarn workspace @parallel/client extract-i18n-terms:app && \
+              yarn workspace @parallel/client generate-i18n-files:app
+            fi
+          ) &
+          TRANSLATIONS_PID=$!
 
-      - name: Check client translations
-        if: needs.detect-changes.outputs.client == 'true' || needs.detect-changes.outputs.root-config == 'true'
-        run: |
-          yarn workspace @parallel/client extract-i18n-terms:recipient
-          yarn workspace @parallel/client generate-i18n-files:recipient
-          yarn workspace @parallel/client extract-i18n-terms:app
-          yarn workspace @parallel/client generate-i18n-files:app
+          # Run lint in foreground
+          LINT_FAILED=0
+          [[ "$SERVER_CHANGED" == "true" ]] && { npx eslint --quiet server/ || LINT_FAILED=1; }
+          [[ "$CLIENT_CHANGED" == "true" ]] && { npx eslint --quiet client/ || LINT_FAILED=1; }
+          [[ "$BIN_CHANGED" == "true" ]] && { npx eslint --quiet bin/ || LINT_FAILED=1; }
+          [[ "$E2E_CHANGED" == "true" ]] && { npx eslint --quiet e2e/ || LINT_FAILED=1; }
+
+          # Wait for translations and check results
+          wait $TRANSLATIONS_PID || exit 1
+          [[ $LINT_FAILED -ne 0 ]] && exit 1
+        env:
+          SERVER_CHANGED: ${{ needs.detect-changes.outputs.server == 'true' || needs.detect-changes.outputs.root-config == 'true' }}
+          CLIENT_CHANGED: ${{ needs.detect-changes.outputs.client == 'true' || needs.detect-changes.outputs.root-config == 'true' }}
+          BIN_CHANGED: ${{ needs.detect-changes.outputs.bin == 'true' || needs.detect-changes.outputs.root-config == 'true' }}
+          E2E_CHANGED: ${{ needs.detect-changes.outputs.e2e == 'true' || needs.detect-changes.outputs.root-config == 'true' }}
 
   check-types:
     name: Check types
@@ -134,6 +139,8 @@ jobs:
       - name: Install dependencies
         if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile --production=false
+        env:
+          SKIP_UPDATE_IP_DB: "1"
 
       - name: Check server types
         if: needs.detect-changes.outputs.server == 'true' || needs.detect-changes.outputs.root-config == 'true'
@@ -153,10 +160,10 @@ jobs:
         if: needs.detect-changes.outputs.e2e == 'true' || needs.detect-changes.outputs.root-config == 'true'
         run: yarn workspace @parallel/e2e check-types
 
-  tests:
-    name: Tests
+  server-tests-1:
+    name: Server Tests (1/2)
     needs: detect-changes
-    if: needs.detect-changes.outputs.any-project == 'true'
+    if: needs.detect-changes.outputs.server == 'true' || needs.detect-changes.outputs.root-config == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -174,21 +181,72 @@ jobs:
       - name: Install dependencies
         if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile --production=false
-
-      - name: Run server test suite
-        if: needs.detect-changes.outputs.server == 'true' || needs.detect-changes.outputs.root-config == 'true'
+        env:
+          SKIP_UPDATE_IP_DB: "1"
+      - name: Run server tests (shard 1/2)
         timeout-minutes: 15
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
-        run: yarn --cwd server/ test --silent
+        run: yarn --cwd server/ test --silent --shard=1/2
 
-      - name: Run client test suite
-        if: needs.detect-changes.outputs.client == 'true' || needs.detect-changes.outputs.root-config == 'true'
+  server-tests-2:
+    name: Server Tests (2/2)
+    needs: detect-changes
+    if: needs.detect-changes.outputs.server == 'true' || needs.detect-changes.outputs.root-config == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+      - uses: actions/cache@v4
+        id: yarn-cache
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-yarn-cache-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-cache-
+      - name: Install dependencies
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile --production=false
+        env:
+          SKIP_UPDATE_IP_DB: "1"
+      - name: Run server tests (shard 2/2)
+        timeout-minutes: 15
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+        run: yarn --cwd server/ test --silent --shard=2/2
+
+  client-tests:
+    name: Client Tests
+    needs: detect-changes
+    if: needs.detect-changes.outputs.client == 'true' || needs.detect-changes.outputs.root-config == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+      - uses: actions/cache@v4
+        id: yarn-cache
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-yarn-cache-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-cache-
+      - name: Install dependencies
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile --production=false
+        env:
+          SKIP_UPDATE_IP_DB: "1"
+      - name: Run client tests
         run: yarn workspace @parallel/client test
 
   code-review:
     name: Code Review
-    needs: [lint, check-types, tests]
+    needs: [lint, check-types, server-tests-1, server-tests-2, client-tests]
     if: |
       always() &&
       github.event_name == 'pull_request' &&
@@ -197,7 +255,9 @@ jobs:
       github.event.pull_request.head.ref != 'master' &&
       needs.lint.result != 'failure' && needs.lint.result != 'cancelled' &&
       needs.check-types.result != 'failure' && needs.check-types.result != 'cancelled' &&
-      needs.tests.result != 'failure' && needs.tests.result != 'cancelled'
+      needs.server-tests-1.result != 'failure' && needs.server-tests-1.result != 'cancelled' &&
+      needs.server-tests-2.result != 'failure' && needs.server-tests-2.result != 'cancelled' &&
+      needs.client-tests.result != 'failure' && needs.client-tests.result != 'cancelled'
     runs-on: ubuntu-latest
     permissions:
       contents: read
