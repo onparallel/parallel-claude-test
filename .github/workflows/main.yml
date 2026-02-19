@@ -104,14 +104,14 @@ jobs:
 
           # Run lint in foreground
           LINT_FAILED=0
-          [[ "$SERVER_CHANGED" == "true" ]] && { npx eslint --quiet server/ || LINT_FAILED=1; }
-          [[ "$CLIENT_CHANGED" == "true" ]] && { npx eslint --quiet client/ || LINT_FAILED=1; }
-          [[ "$BIN_CHANGED" == "true" ]] && { npx eslint --quiet bin/ || LINT_FAILED=1; }
-          [[ "$E2E_CHANGED" == "true" ]] && { npx eslint --quiet e2e/ || LINT_FAILED=1; }
+          if [[ "$SERVER_CHANGED" == "true" ]]; then npx eslint --quiet server/ || LINT_FAILED=1; fi
+          if [[ "$CLIENT_CHANGED" == "true" ]]; then npx eslint --quiet client/ || LINT_FAILED=1; fi
+          if [[ "$BIN_CHANGED" == "true" ]]; then npx eslint --quiet bin/ || LINT_FAILED=1; fi
+          if [[ "$E2E_CHANGED" == "true" ]]; then npx eslint --quiet e2e/ || LINT_FAILED=1; fi
 
           # Wait for translations and check results
           wait $TRANSLATIONS_PID || exit 1
-          [[ $LINT_FAILED -ne 0 ]] && exit 1
+          if [[ $LINT_FAILED -ne 0 ]]; then exit 1; fi
         env:
           SERVER_CHANGED: ${{ needs.detect-changes.outputs.server == 'true' || needs.detect-changes.outputs.root-config == 'true' }}
           CLIENT_CHANGED: ${{ needs.detect-changes.outputs.client == 'true' || needs.detect-changes.outputs.root-config == 'true' }}
