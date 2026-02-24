@@ -4,6 +4,10 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   code-review:
     name: Code Review
@@ -11,14 +15,33 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Run Code Review
+      - name: Detect review mode
+        id: review-mode
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          # Find the last code review comment that contains a reviewed-sha marker
+          LAST_SHA=$(gh pr view "$PR_NUMBER" --json comments \
+            --jq '[.comments[] | select(.body | test("<!-- reviewed-sha: [a-f0-9]+ -->")) | .body | capture("<!-- reviewed-sha: (?<sha>[a-f0-9]+) -->").sha] | last // empty')
+
+          if [ -n "$LAST_SHA" ] && git cat-file -e "$LAST_SHA" 2>/dev/null; then
+            echo "mode=incremental" >> "$GITHUB_OUTPUT"
+            echo "last-sha=$LAST_SHA" >> "$GITHUB_OUTPUT"
+            echo "Incremental review from $LAST_SHA"
+          else
+            echo "mode=full" >> "$GITHUB_OUTPUT"
+            echo "Full review (no previous review found or SHA no longer exists)"
+          fi
+
+      - name: Run Full Code Review
+        if: steps.review-mode.outputs.mode == 'full'
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -29,6 +52,7 @@ jobs:
             - "Bash(git show:*)"
             - "Bash(gh pr diff:*)"
             - "Bash(gh pr view:*)"
+            - "Bash(gh pr comment:*)"
           prompt: |
             IMPORTANT CONTEXT: You are running in GitHub Actions CI environment.
             The PR number is ${{ github.event.pull_request.number }}.
@@ -37,20 +61,11 @@ jobs:
             Run the /code-review skill to analyze this PR for security vulnerabilities and code quality issues.
             Use `git diff origin/${{ github.base_ref }}...HEAD` to get the changes.
 
-  docs-check:
-    name: Documentation Check
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
+            IMPORTANT: When posting the PR comment, you MUST append this exact line at the very end of the comment body:
+            <!-- reviewed-sha: ${{ github.event.pull_request.head.sha }} -->
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Check Documentation
+      - name: Run Incremental Code Review
+        if: steps.review-mode.outputs.mode == 'incremental'
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -61,14 +76,42 @@ jobs:
             - "Bash(git show:*)"
             - "Bash(gh pr diff:*)"
             - "Bash(gh pr view:*)"
+            - "Bash(gh pr comment:*)"
           prompt: |
             IMPORTANT CONTEXT: You are running in GitHub Actions CI environment.
             The PR number is ${{ github.event.pull_request.number }}.
             Do NOT try to check environment variables - you are confirmed to be in CI.
+            This is an INCREMENTAL review — only review the changes since the last review.
 
-            Run the /check-if-documentation-needs-update skill to analyze if this PR requires documentation updates.
-            Use `git diff origin/${{ github.base_ref }}...HEAD` to get the changes.
+            Get the diff of changes since the last review:
+            ```
+            git diff ${{ steps.review-mode.outputs.last-sha }}..${{ github.event.pull_request.head.sha }}
+            ```
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+            Analyze ONLY these new changes for:
+            - **CRITICAL**: SQL injection, XSS, command injection, multi-tenancy violations, data loss risks, hardcoded secrets
+            - **CODE QUALITY**: Missing error handling, race conditions, incorrect transaction handling, N+1 queries
+
+            Do NOT re-review code that was already reviewed in a previous review.
+
+            **If NO issues found**, post a short PR comment:
+            ```
+            gh pr comment ${{ github.event.pull_request.number }} --body "## Incremental Code Review
+
+            ✅ New changes look good. No issues found.
+
+            <!-- reviewed-sha: ${{ github.event.pull_request.head.sha }} -->"
+            ```
+
+            **If issues ARE found**, post a PR comment:
+            ```
+            gh pr comment ${{ github.event.pull_request.number }} --body "## Incremental Code Review
+
+            ### Critical Issues
+            [List issues with file:line, problem, and suggested fix]
+
+            ### Suggestions
+            [List code quality improvements]
+
+            <!-- reviewed-sha: ${{ github.event.pull_request.head.sha }} -->"
+            ```
